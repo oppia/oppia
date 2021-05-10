@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Common utility functions and classes used by multiple Python scripts."""
+"""Utility functions for managing server processes required by Oppia."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -74,7 +74,7 @@ def managed_process(
     try:
         yield popen_proc
     finally:
-        python_utils.PRINT('Ending %s' % get_debug_info(popen_proc))
+        python_utils.PRINT('Stopping %s...' % get_debug_info(popen_proc))
         procs_still_alive = [popen_proc]
         try:
             if popen_proc.is_running():
@@ -86,11 +86,11 @@ def managed_process(
             procs_to_kill = []
             for proc in procs_still_alive:
                 if proc.is_running():
-                    procs_to_kill.append(proc)
                     logging.info('Terminating %s...' % get_debug_info(proc))
                     proc.terminate()
+                    procs_to_kill.append(proc)
                 else:
-                    logging.info('%s has ended.' % get_debug_info(proc))
+                    logging.info('%s has already ended.' % get_debug_info(proc))
 
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
@@ -98,12 +98,12 @@ def managed_process(
                 logging.warn('Forced to kill %s!' % get_debug_info(proc))
                 proc.kill()
             for proc in procs_gone:
-                logging.info('%s has ended.' % get_debug_info(proc))
+                logging.info('%s has already ended.' % get_debug_info(proc))
         except Exception:
             # NOTE: Raising an exception while exiting a context manager is bad
             # practice, so we log and suppress exceptions instead.
-            logging.exception('Failed to gracefully shut down %s' % (
-                ', '.join(get_debug_info(p) for p in procs_still_alive)))
+            logging.exception(
+                'Failed to stop %s gracefully!' % get_debug_info(popen_proc))
 
 
 @contextlib.contextmanager
@@ -216,6 +216,8 @@ def managed_elasticsearch_dev_server():
     es_args = ['%s/bin/elasticsearch' % common.ES_PATH, '-q']
     # Override the default path to ElasticSearch config files.
     es_env = {'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR}
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
         es_args, human_readable_name='ElasticSearch Server', env=es_env,
         shell=True)
@@ -259,6 +261,8 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         elif not data_dir_exists:
             os.makedirs(common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
 
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so there is no risk of a shell-injection attack.
         proc = stack.enter_context(managed_process(
             emulator_args, human_readable_name='Cloud Datastore Emulator',
             shell=True))
@@ -297,8 +301,8 @@ def managed_redis_server():
     if os.path.exists(common.REDIS_DUMP_PATH):
         os.remove(common.REDIS_DUMP_PATH)
 
-    # Start the redis local development server. Redis doesn't run on
-    # Windows machines.
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
         [common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH],
         human_readable_name='Redis Server', shell=True)
@@ -382,6 +386,8 @@ def managed_webpack_compiler(
         compiler_args.extend(['--color', '--watch', '--progress'])
 
     with contextlib2.ExitStack() as exit_stack:
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
             compiler_args, human_readable_name='Webpack Compiler', shell=True,
             # Capture compiler's output to detect when builds have completed.
@@ -438,8 +444,10 @@ def managed_portserver():
         'python', '-m', 'scripts.run_portserver',
         '--portserver_unix_socket_address', common.PORTSERVER_SOCKET_FILEPATH,
     ]
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
-        portserver_args, human_readable_name='PortServer')
+        portserver_args, human_readable_name='PortServer', shell=True)
     with proc_context as proc:
         yield proc
 
@@ -462,17 +470,20 @@ def managed_webdriver_server(chrome_version=None):
     import contextlib2
 
     if chrome_version is None:
+        # Although there are spaces between Google and Chrome in the path, we
+        # don't need to escape them for Popen (as opposed to on the terminal, in
+        # which case we would need to escape them for the command to run).
         chrome_command = (
             '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
             if common.is_mac_os() else 'google-chrome')
         try:
             output = subprocess.check_output([chrome_command, '--version'])
         except OSError:
-            # For the error message for the mac command, we need to add the
-            # backslashes in. This is because it is likely that a user will try
-            # to run the command on their terminal and, as mentioned above, the
-            # mac get chrome version command has spaces in the path which need
-            # to be escaped for successful terminal use.
+            # For the error message on macOS, we need to add the backslashes in.
+            # This is because it is likely that a user will try to run the
+            # command on their terminal and, as mentioned above, the macOS
+            # chrome version command has spaces in the path which need to be
+            # escaped for successful terminal use.
             raise Exception(
                 'Failed to execute "%s --version" command. This is used to '
                 'determine the chromedriver version to use. Please set the '
@@ -523,10 +534,12 @@ def managed_webdriver_server(chrome_version=None):
                 common.GECKO_PROVIDER_FILE_PATH, regex_pattern,
                 replacement_string))
 
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so there is no risk of a shell-injection attack.
         yield exit_stack.enter_context(managed_process([
             common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
             '--versions.chrome', chrome_version, '--detach', '--quiet',
-        ], human_readable_name='Webdriver manager'))
+        ], human_readable_name='Webdriver manager', shell=True))
 
 
 @contextlib.contextmanager
@@ -568,7 +581,10 @@ def managed_protractor_server(
         # immediately after NODE_BIN_PATH.
         protractor_args.insert(1, '--inspect-brk')
 
+    # OK to use shell=True here because we are passing string literals and
+    # constants, so there is no risk of a shell-injection attack.
     managed_protractor_proc = managed_process(
-        protractor_args, human_readable_name='Protractor Server', **kwargs)
+        protractor_args, human_readable_name='Protractor Server', shell=True,
+        **kwargs)
     with managed_protractor_proc as proc:
         yield proc

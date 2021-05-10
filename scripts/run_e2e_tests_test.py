@@ -297,7 +297,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(self.swap_with_checks(
             servers, 'managed_webdriver_server', mock_managed_process))
         self.exit_stack.enter_context(self.swap_with_checks(
-            servers, 'managed_protractor_server', mock_managed_protractor_server,
+            servers, 'managed_protractor_server',
+            mock_managed_protractor_server,
             expected_kwargs=[
                 {
                     'dev_mode': True,

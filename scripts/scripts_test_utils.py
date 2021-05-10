@@ -29,6 +29,17 @@ import psutil
 class PopenStub(python_utils.OBJECT):
     """Stubs the API of psutil.Popen() to make unit tests less expensive.
 
+    Starting a new process for every unit test is intrinsically more expensive
+    than checking an object's attributes, and for some developers it isn't even
+    possible for them to kill a spawned process due to a lack of permission on
+    their operating system.
+
+    We used to spawn real processes for tests, and observed the following:
+        With actual processes: Runs 78 tests in 50.7 seconds
+        With PopenStub:        Runs 97 tests in 32.3 seconds
+
+    Thus, using this stub gives us a ~4.62x speed boost per-test.
+
     Attributes:
         pid: int. The ID of the process.
         stdout: str. The text written to standard output by the process.

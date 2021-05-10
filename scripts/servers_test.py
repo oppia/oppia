@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for scripts/common.py."""
+"""Unit tests for scripts/servers.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -30,8 +30,8 @@ import time
 
 from core.tests import test_utils
 import python_utils
-from scripts import scripts_test_utils
 from scripts import common
+from scripts import scripts_test_utils
 from scripts import servers
 
 import contextlib2
@@ -90,20 +90,16 @@ class ManagedProcessTests(test_utils.TestBase):
             Returns:
                 PopenStub. The return value of psutil.Popen.
             """
-            popen_calls.append(self.POPEN_CALL(program_args, kwargs.copy()))
+            popen_calls.append(self.POPEN_CALL(program_args, kwargs))
 
-            parent_pid = 1
-            child_procs = [
-                scripts_test_utils.PopenStub(
-                    pid=pid, unresponsive=unresponsive)
-                for pid in python_utils.RANGE(
-                    parent_pid + 1, parent_pid + 1 + num_children)
-            ]
-
+            pid = 1
             stdout = ''.join('%s\n' % o for o in outputs)
-
+            child_procs = [
+                scripts_test_utils.PopenStub(pid=i, unresponsive=unresponsive)
+                for i in python_utils.RANGE(pid + 1, pid + 1 + num_children)
+            ]
             return scripts_test_utils.PopenStub(
-                pid=parent_pid, stdout=stdout, unresponsive=unresponsive,
+                pid=pid, stdout=stdout, unresponsive=unresponsive,
                 child_procs=child_procs)
 
         with self.swap(psutil, 'Popen', mock_popen):
@@ -162,7 +158,7 @@ class ManagedProcessTests(test_utils.TestBase):
         if manager_should_have_sent_kill_signal:
             expected_patterns.append(r'Forced to kill %s!' % proc_pattern)
         else:
-            expected_patterns.append(r'%s has ended\.' % proc_pattern)
+            expected_patterns.append(r'%s has already ended\.' % proc_pattern)
 
         logs_with_pid = [msg for msg in logs if re.search(proc_pattern, msg)]
         if expected_patterns and not logs_with_pid:
@@ -320,7 +316,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assert_matches_regexps(logs, [
-            r'Failed to gracefully shut down Process\(pid=1\)\n'
+            r'Failed to stop Process\(pid=1\) gracefully!\n'
             r'Traceback \(most recent call last\):\n'
             r'.*'
             r'Exception: uh-oh',
@@ -600,9 +596,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            ['python', '-m', 'scripts.run_portserver',
-             '--portserver_unix_socket_address',
-             common.PORTSERVER_SOCKET_FILEPATH])
+            'python -m scripts.run_portserver '
+            '--portserver_unix_socket_address %s' % (
+                common.PORTSERVER_SOCKET_FILEPATH))
 
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
@@ -625,7 +621,7 @@ class ManagedProcessTests(test_utils.TestBase):
             'abc',
             'Built at: 123',
             'def',
-            'Ending Webpack Compiler',
+            'Stopping Webpack Compiler',
         ])
 
     def test_managed_webpack_compiler_in_watch_mode_raises_when_not_built(self):
@@ -642,7 +638,7 @@ class ManagedProcessTests(test_utils.TestBase):
             'Starting new Webpack Compiler',
             'abc',
             'def',
-            'Ending Webpack Compiler',
+            'Stopping Webpack Compiler',
         ])
 
     def test_managed_webpack_compiler_uses_explicit_config_path(self):
@@ -749,8 +745,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            [common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-             '--versions.chrome', '123', '--detach', '--quiet'])
+            '%s %s start --versions.chrome 123 --detach --quiet' % (
+                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_on_mac_os(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -780,8 +776,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            [common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-             '--versions.chrome', '4.5.6', '--detach', '--quiet'])
+            '%s %s start --versions.chrome 4.5.6 --detach --quiet' % (
+                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_on_non_mac_os(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -807,8 +803,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            [common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-             '--versions.chrome', '1.2.3', '--detach', '--quiet'])
+            '%s %s start --versions.chrome 1.2.3 --detach --quiet' % (
+                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_fails_to_get_chrome_version(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -854,8 +850,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            [common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-             '--versions.chrome', '1.2.3', '--detach', '--quiet'])
+            '%s %s start --versions.chrome 1.2.3 --detach --quiet' % (
+                common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_protractor_with_invalid_sharding_instances(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -879,12 +875,13 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(popen_calls[0].kwargs, {'shell': False})
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
         program_args = popen_calls[0].program_args
-        self.assertEqual(
-            program_args[:4],
-            [common.NODE_BIN_PATH, '--unhandled-rejections=strict',
-             common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH])
+        self.assertIn(
+            '%s --unhandled-rejections=strict %s %s' % (
+                common.NODE_BIN_PATH, common.PROTRACTOR_BIN_PATH,
+                common.PROTRACTOR_CONFIG_FILE_PATH),
+            program_args)
         self.assertNotIn('--inspect-brk', program_args)
         self.assertIn('--capabilities.shardTestFiles=True', program_args)
         self.assertIn('--capabilities.maxInstances=1', program_args)
@@ -901,7 +898,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
-            popen_calls[0].kwargs, {'shell': False, 'stdout': subprocess.PIPE})
+            popen_calls[0].kwargs, {'shell': True, 'stdout': subprocess.PIPE})
         program_args = popen_calls[0].program_args
         # From debug_mode=True.
         self.assertIn('--inspect-brk', program_args)
