@@ -24,12 +24,12 @@ import { LearnerExplorationSummaryBackendDict } from
 
 export interface CollectionNodeBackendDict {
   'exploration_id': string;
-  'exploration_summary': LearnerExplorationSummaryBackendDict;
+  'exploration_summary': LearnerExplorationSummaryBackendDict | null;
 }
 
 export class CollectionNode {
   _explorationId: string;
-  _explorationSummaryObject: LearnerExplorationSummaryBackendDict;
+  _explorationSummaryObject: LearnerExplorationSummaryBackendDict | null;
 
   constructor(collectionNodeBackendObject: CollectionNodeBackendDict) {
     this._explorationId = collectionNodeBackendObject.exploration_id;
@@ -59,7 +59,7 @@ export class CollectionNode {
   // Returns the title of the exploration represented by this collection node.
   // This property is immutable. The value returned by this function is
   // null if doesExplorationExist() returns false.
-  getExplorationTitle(): string {
+  getExplorationTitle(): string | null {
     if (this._explorationSummaryObject) {
       return this._explorationSummaryObject.title;
     } else {
@@ -77,19 +77,20 @@ export class CollectionNode {
   // not published. This property is immutable. The value returned by this
   // function is undefined if doesExplorationExist() returns false.
   isExplorationPrivate(): boolean {
-    if (this._explorationSummaryObject) {
+    if (this._explorationSummaryObject !== null) {
       return this._explorationSummaryObject.status === (
         AppConstants.ACTIVITY_STATUS_PRIVATE);
     } else {
-      return undefined;
+      return false;
     }
   }
 
   // Returns a raw exploration summary object, as supplied by the backend for
   // frontend exploration summary tile displaying. Changes to the returned
   // object are not reflected in this domain object. The value returned by
-  // this function is null if doesExplorationExist() returns false.
-  getExplorationSummaryObject(): LearnerExplorationSummaryBackendDict {
+  // this function is an object with empty values
+  // if doesExplorationExist() returns false.
+  getExplorationSummaryObject(): LearnerExplorationSummaryBackendDict | null {
     // TODO(bhenning): This should be represented by a
     // frontend summary domain object that is also shared with
     // the search result and profile pages.
@@ -99,14 +100,18 @@ export class CollectionNode {
   // Sets the raw exploration summary object stored within this node.
   setExplorationSummaryObject(
       explorationSummaryBackendObject:
-      LearnerExplorationSummaryBackendDict): void {
+      LearnerExplorationSummaryBackendDict | null): void {
     this._explorationSummaryObject = cloneDeep(
       explorationSummaryBackendObject);
   }
 
-  getCapitalizedObjective(): string {
-    return (
-      this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
-      this._explorationSummaryObject.objective.slice(1));
+  getCapitalizedObjective(): string | null {
+    if (this._explorationSummaryObject !== null) {
+      return (
+        this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
+        this._explorationSummaryObject.objective.slice(1));
+    } else {
+      return null;
+    }
   }
 }

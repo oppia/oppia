@@ -30,6 +30,10 @@ interface TypeDefinitionObject {
   'default_value': Object;
 }
 
+interface RegistryType {
+    [key: string]: ParamType
+}
+
 export class ParamType {
   _name: string;
   valueIsValid: (arg0: Object) => boolean;
@@ -56,7 +60,7 @@ export class ParamType {
     }
 
     /** @member {String} */
-    this._name = null;
+    this._name = '';
     /** @member {Function.<Object, Boolean>} */
     this.valueIsValid = typeDefinitionObject.validate;
     /** @member {Object} */
@@ -96,7 +100,7 @@ export class ParamTypeObjectFactory {
   // Type registration.
 
   /** @type {Object.<String, ParamType>} */
-  registry = {
+  registry: RegistryType = {
     UnicodeString: new ParamType({
       validate: (value: Object) => {
         return (typeof value === 'string' || value instanceof String);
