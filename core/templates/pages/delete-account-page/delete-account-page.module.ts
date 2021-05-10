@@ -35,14 +35,14 @@ import { DeleteAccountModalComponent } from './templates/delete-account-modal.co
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent,
+    DeleteAccountModalComponent,
     DeleteAccountPageComponent,
-    DeleteAccountModalComponent
+    OppiaAngularRootComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent,
+    DeleteAccountModalComponent,
     DeleteAccountPageComponent,
-    DeleteAccountModalComponent
+    OppiaAngularRootComponent
   ],
   providers: [
     {

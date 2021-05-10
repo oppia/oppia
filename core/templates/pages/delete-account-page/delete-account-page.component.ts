@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Oppia 'edit preferences' page.
+ * @fileoverview Component for the Oppia 'Delete Account' page.
  */
 
 import { Component } from '@angular/core';
