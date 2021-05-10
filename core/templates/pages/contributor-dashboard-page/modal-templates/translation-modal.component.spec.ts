@@ -151,7 +151,7 @@ describe('Translation Modal Component', () => {
       expect(contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
       expect(contextService.getEntityId()).toBe('1');
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
@@ -453,10 +453,10 @@ describe('Translation Modal Component', () => {
 
     it('should not reset the image save destination', () => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
       component.suggestTranslatedText();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     });
 
@@ -474,7 +474,7 @@ describe('Translation Modal Component', () => {
       });
       flushMicrotasks();
       component.suggestTranslatedText();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     }));
   });
