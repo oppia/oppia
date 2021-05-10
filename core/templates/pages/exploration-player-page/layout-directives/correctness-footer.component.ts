@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the correctness footer in the exploration player.
+ * @fileoverview Component for the correctness footer in the exploration player.
  */
 
-angular.module('oppia').directive('correctnessFooter', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      template: require('./correctness-footer.directive.html')
-    };
-  }]);
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+
+@Component({
+  selector: 'oppia-correctness-footer',
+  templateUrl: './correctness-footer.component.html'
+})
+export class CorrectnessFooterComponent {}
+
+angular.module('oppia').directive('oppiaCorrectnessFooter',
+  downgradeComponent({ component: CorrectnessFooterComponent }));
