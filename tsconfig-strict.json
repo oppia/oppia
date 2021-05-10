@@ -55,6 +55,7 @@
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
+    "core/templates/domain/exploration/AnswerGroupObjectFactory.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactory.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactorySpec.ts",
     "core/templates/domain/exploration/ParamSpecsObjectFactory.ts",
