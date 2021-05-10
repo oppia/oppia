@@ -1,0 +1,37 @@
+<ng-template #popContent>
+  <oppia-feedback-popup (closePopover)="closePopover()"></oppia-feedback-popup>
+</ng-template>
+<ul class="nav navbar-nav oppia-navbar-nav float-right mr-0">
+  <li class="nav-item">
+    <a href="" class="nav-link" ngbTooltip="Share"
+       placement="bottom" (click)="toggleAttributionModal()">
+      <i class="material-icons">share</i>
+      <span class="oppia-icon-accessibility-label">Share</span>
+    </a>
+  </li>
+  <li *ngIf="feedbackOptionIsShown" placement="bottom-right"
+      [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
+      class="nav-item" #feedbackPopOver="ngbPopover" [autoClose]="false">
+    <a href="" class="nav-link protractor-test-exploration-feedback-popup-link"
+       ngbTooltip="{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}" placement="bottom">
+      <i class="material-icons">&#xE87F;</i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a *ngIf="canEdit" href="/create/{{explorationId}}"
+       ngbTooltip="{{'I18N_PLAYER_EDIT_TOOLTIP' | translate}}" placement="bottom"
+       target="_blank" rel="noopener" class="nav-link">
+      <i class="material-icons">&#xE254;</i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_EDIT_TOOLTIP' | translate }}</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a *ngIf="username" (click)="showFlagExplorationModal()"
+       ngbTooltip="{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}" placement="bottom"
+       tabindex="0" class="nav-link protractor-test-report-exploration-button">
+      <i class="material-icons">&#xE153;</i>
+      <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_REPORT_TOOLTIP' | translate }}</span>
+    </a>
+  </li>
+</ul>

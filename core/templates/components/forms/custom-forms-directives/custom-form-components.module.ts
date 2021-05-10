@@ -25,7 +25,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { MaterialModule } from 'components/material.module';
-import { TranslateModule } from 'filters/translate.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ImageUploaderComponent } from './image-uploader.component';
 
 @NgModule({
@@ -37,7 +37,7 @@ import { ImageUploaderComponent } from './image-uploader.component';
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
-    TranslateModule
+    SharedPipesModule
   ],
   declarations: [
     ImageUploaderComponent
