@@ -50,9 +50,15 @@ export class PositionOfTermsEditorComponent implements OnInit {
       }
     }
   }
-  onChangePosition(): void {
-    this.value = this.localValue.name;
+  onChangePosition(name: string): void {
+    this.value = name;
     this.valueChanged.emit(this.value);
+    for (let i = 0; i < this.positionOfTerms.length; i++) {
+      if (this.positionOfTerms[i].name === this.value) {
+        this.localValue = this.positionOfTerms[i] as unknown as PositionOfTerm;
+        break;
+      }
+    }
   }
 }
 

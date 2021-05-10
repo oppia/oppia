@@ -43,13 +43,13 @@ describe('PositionOfTerms', () => {
 
   it('should change ctrl.value when ctrl.localValue changes', () => {
     // Initially, the default value of localValue is assigned.
-    component.onChangePosition();
+    component.onChangePosition('both');
     expect(component.value).toBe('both');
 
     // Changing localValue should change ctrl.value.
     component.localValue = (
       component.positionOfTerms[0] as unknown as PositionOfTerm);
-    component.onChangePosition();
+    component.onChangePosition('lhs');
     expect(component.value).toBe('lhs');
   });
 
