@@ -38,7 +38,7 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
     def test_random_selector(self):
         generator = generators.RandomSelector()
         self.assertIn(generator.generate_value(
-            None, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
+            {}, **{'list_of_values': ['a', 'b', 'c']}), ['a', 'b', 'c'])
         self.assertIn(
             'schema="$ctrl.SCHEMA" '
             'local-value="$ctrl.customizationArgs.list_of_values"',
