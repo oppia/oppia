@@ -1756,7 +1756,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             line_num: int. Line number of the current comment.
         """
         # Extract comment from line.
-        _, trail_comment = line.split('#')
+        split_line = line.split('#')
+        trail_comment = split_line[1]
         # Check for pylint pragma.
         if (re.search('pylint:', trail_comment) or
                 re.search('isort:', trail_comment)):
