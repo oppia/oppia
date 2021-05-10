@@ -222,7 +222,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'pretest-question-backend-api.service.ts',
     'profile-link-image.component.ts',
     'profile-link-text.component.ts',
-    'progress-nav.directive.ts',
+    'progress-nav.component.ts',
     'promo-bar-backend-api.service.ts',
     'python-program.tokenizer.ts',
     'question-difficulty-selector.directive.ts',
