@@ -145,6 +145,8 @@ describe('Translation Modal Component', () => {
     });
 
     it('should set context correctly', fakeAsync(() => {
+      contextService.removeCustomEntityContext();
+      contextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
       component.ngOnInit();

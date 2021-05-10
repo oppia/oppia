@@ -37,6 +37,9 @@ export class ContextService {
   // Eg: In the translation modal, a custom entity context was defined, and this
   // was accessed in the filepath component when the copy service was called.
   // Without the static declaration, the latter call returned undefined.
+  // NOTE TO DEV: Make sure any tests that directly access these variables clear
+  // it (using the appropriate reset fn) initially. Since these are static,
+  // depending on the order of tests, values may be retained across tests.
   static customEntityContext = null;
   static imageSaveDestination: string = (
     AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
