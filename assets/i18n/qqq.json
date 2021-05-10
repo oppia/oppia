@@ -618,7 +618,7 @@
 	"I18N_TEACH_TESTIMONIAL_4": "The testimonial of the fourth person, displayed on the Teach page",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "Text to be displayed in the topic summary tile after the number of lessons in topic",
 	"I18N_TOPIC_VIEWER_CHAPTER": "Text to be displayed on each story summary tile in the topic viewer indicating the chapter count in the story.",
-	"I18N_TOPIC_VIEWER_CHAPTERS": "Text to be displayed on each topic summary tile with singular/plural adjustments.\n\nOnly translate \"1 chapter\" and \"# chapters\" (keep a \"#\" as the placeholder for the actual replaced number). The rest should remain as is, including curly braces (\"{\", \"}\"), plural keywords \"count\", \"one\" or \"other\" (in English), and comma separators (\",\").\n\nIn languages that don't need to mark different forms for the plural, you may just keep the \"other\" option (used as the default value for the result of the \"{count...}\" expression), and then translate just \"# chapters\".",
+	"I18N_TOPIC_VIEWER_CHAPTERS": "Text to be displayed on each topic summary tile in the topic viewer indicating the chapter count to be more than 1.",
 	"I18N_TOPIC_VIEWER_DESCRIPTION": "Text shown on the header inside the topic info tab, where the topic description is displayed.\n{{identical|Description}}",
 	"I18N_TOPIC_VIEWER_LESSON": "Title shown in a label in the topic's viewer page, when the number of chapters is equal to one.",
 	"I18N_TOPIC_VIEWER_LESSONS": "Title shown in a tab header in the topic's viewer page. - Clicking on this tab header shows the list of stories in topic.",

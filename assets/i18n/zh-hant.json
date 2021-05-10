@@ -618,7 +618,7 @@
 	"I18N_TEACH_TESTIMONIAL_4": "「待寫」",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 個課程} other{# 個課程}}",
 	"I18N_TOPIC_VIEWER_CHAPTER": "章節",
-	"I18N_TOPIC_VIEWER_CHAPTERS": "{count, plural, one{1 個章節} other{# 個章節}}",
+	"I18N_TOPIC_VIEWER_CHAPTERS": "個章節",
 	"I18N_TOPIC_VIEWER_DESCRIPTION": "描述",
 	"I18N_TOPIC_VIEWER_LESSON": "課程",
 	"I18N_TOPIC_VIEWER_LESSONS": "課程",
