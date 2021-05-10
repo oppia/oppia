@@ -70,6 +70,7 @@ import { CreateActivityButtonComponent } from './button-directives/create-activi
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
+import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 
 
 // Directives.
@@ -147,6 +148,7 @@ const toastrConfig = {
     AttributionGuideComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
+    ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -193,6 +195,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
+    ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -240,6 +243,7 @@ const toastrConfig = {
     AlertMessageComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
+    ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
