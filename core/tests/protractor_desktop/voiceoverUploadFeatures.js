@@ -159,8 +159,4 @@ describe('Voiceover upload features', function() {
        ' The uploaded file is 301.87 seconds long.'}]);
     await users.logout();
   });
-
-  afterAll(async function() {
-
-  });
 });
