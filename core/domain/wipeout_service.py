@@ -528,11 +528,11 @@ def _save_pseudonymizable_entity_mappings_to_same_pseudonym(
         ID.
     """
     if (
-            entity_category not in
+            entity_category.value not in
             pending_deletion_request.pseudonymizable_entity_mappings):
         pseudonymized_id = user_models.PseudonymizedUserModel.get_new_id('')
         pending_deletion_request.pseudonymizable_entity_mappings[
-            entity_category] = {
+            entity_category.value] = {
                 entity_id: pseudonymized_id for entity_id in entity_ids
             }
         save_pending_deletion_requests([pending_deletion_request])
@@ -553,10 +553,10 @@ def _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
     # The pseudonymizable_entity_mappings field might have only been partially
     # generated, so we fill in the missing part for this entity category.
     if (
-            entity_category not in
+            entity_category.value not in
             pending_deletion_request.pseudonymizable_entity_mappings):
         pending_deletion_request.pseudonymizable_entity_mappings[
-            entity_category] = (
+            entity_category.value] = (
                 _generate_entity_to_pseudonymized_ids_mapping(entity_ids))
         save_pending_deletion_requests([pending_deletion_request])
 
@@ -692,7 +692,7 @@ def _pseudonymize_config_models(pending_deletion_request):
 
     config_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.config])
+            models.NAMES.config.value])
     for config_id, pseudonymized_id in config_ids_to_pids.items():
         config_related_models = [
             model for model in snapshot_metadata_models
@@ -781,7 +781,7 @@ def _pseudonymize_activity_models_without_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            activity_category])
+            activity_category.value])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_models = [
             model for model in snapshot_metadata_models
@@ -953,7 +953,7 @@ def _pseudonymize_activity_models_with_associated_rights_models(
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            activity_category])
+            activity_category.value])
     for activity_id, pseudonymized_id in activity_ids_to_pids.items():
         activity_related_snapshot_metadata_models = [
             model for model in snapshot_metadata_models
@@ -1078,7 +1078,7 @@ def _pseudonymize_app_feedback_report_models(pending_deletion_request):
 
     report_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.app_feedback_report])
+            models.NAMES.app_feedback_report.value])
 
     for i in python_utils.RANGE(
             0, len(feedback_report_models),
@@ -1178,7 +1178,7 @@ def _pseudonymize_feedback_models(pending_deletion_request):
 
     feedback_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.feedback])
+            models.NAMES.feedback.value])
     for feedback_id, pseudonymized_id in feedback_ids_to_pids.items():
         feedback_related_models = [
             model for model in feedback_thread_models
@@ -1248,7 +1248,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
 
     suggestion_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.suggestion])
+            models.NAMES.suggestion.value])
     for i in python_utils.RANGE(
             0,
             len(voiceover_application_models),

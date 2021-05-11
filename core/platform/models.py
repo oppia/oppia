@@ -24,10 +24,9 @@ import inspect
 from constants import constants
 import feconf
 import python_utils
-import utils
 
 # Valid model names.
-NAMES = utils.create_enum(
+NAMES = python_utils.create_enum(
     'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
     'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
     'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
@@ -39,7 +38,7 @@ NAMES = utils.create_enum(
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
-MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
     NAMES.app_feedback_report, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
     NAMES.subtopic, NAMES.suggestion, NAMES.topic)
@@ -73,7 +72,7 @@ class _Gae(Platform):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage module names.
+            model_names: list(NAMES). List of storage module names.
 
         Returns:
             tuple(module). Tuple of storage modules.
@@ -193,9 +192,7 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [
-            name for name in NAMES.__dict__
-            if '__' not in name and name != 'base_model']
+        model_names = [name for name in NAMES if name != NAMES.base_model]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
@@ -378,7 +375,7 @@ class Registry(python_utils.OBJECT):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage module names.
+            model_names: list(NAMES). List of storage modules.
 
         Returns:
             list(module). The corresponding storage-layer modules.

@@ -376,7 +376,7 @@ legend {
 }
 
 .oppia-dashboard-container .exp-private-text {
-  color: #aaa;
+  color: #555;
   font-style: italic;
 }
 
@@ -810,7 +810,8 @@ textarea {
   Styles for footer
 */
 
-.oppia-footer-container h4 {
+.oppia-footer-container h3 {
+  color: #fff;
   font-size: 1em;
   font-weight: bold;
   margin: 1.33em 0;
@@ -3421,7 +3422,7 @@ oppia-noninteractive-link {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1em;
+  font-size: 1.2em;
   font-weight: normal;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -4089,13 +4090,13 @@ oppia-noninteractive-link {
     padding: 20px 26px 15px;
   }
   .oppia-mobile-back-to-parent {
-    color: #007bff;
+    color: #015F9C;
     display: block;
     font-size: 18px;
     margin-left: 3%;
   }
   .oppia-mobile-back-to-parent i {
-    color: #007bff;
+    color: #015F9C;
     font-size: 18px;
     margin-left: 3%;
   }
@@ -4169,7 +4170,7 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-playthrough-rectangle-text {
-  color: white;
+  color: #fff;
   font-size: 20px;
   position: absolute;
   text-align: center;
@@ -4398,4 +4399,13 @@ div.oppia-issues-learner-action {
 
 .practice-tab-mat-checkbox .mat-checkbox-label {
   font-weight: normal;
+}
+
+/*
+  TODO(#12768): Remove the .forced-modal-stack style once the
+  rte-component-modal is migrated to Angular. Currently, this style is used for
+  correctly stacking AngularJS modal on top of Angular modal.
+*/
+.forced-modal-stack {
+  z-index: 1035 !important;
 }

@@ -5,34 +5,18 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
+      <div ng-controller="Base" dir="<[direction]>">
         <base-content>
           <navbar-breadcrumb>
             <ul class="nav navbar-nav oppia-navbar-breadcrumb">
               <li>
                 <span class="oppia-navbar-breadcrumb-separator"></span>
-                Pending Account Deletion
+                <span translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_BREADCRUMB"></span>
               </li>
             </ul>
           </navbar-breadcrumb>
           <content>
-            <div class="oppia-static-header">
-              <h1 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_HEADING"></h1>
-            </div>
-            <background-banner></background-banner>
-            <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-              <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-pending-account-deletion">
-                <h2 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1_HEADING"></h2>
-                <p translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_1"></p>
-
-                <h2 translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2_HEADING"></h2>
-                <p translate="I18N_PENDING_ACCOUNT_DELETION_PAGE_PARAGRAPH_2"></p>
-
-                <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4"></p>
-              </div>
-            </div>
-            <div class="oppia-footer-padding-below-banner">
-            </div>
+            <oppia-pending-account-deletion-page></oppia-pending-account-deletion-page>
           </content>
         </base-content>
       </div>

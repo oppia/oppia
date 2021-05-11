@@ -386,8 +386,14 @@ def validate_explorations_for_story(exp_ids, strict):
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
-            validation_error_messages.extend(
-                exp_services.validate_exploration_for_story(exp, strict))
+            try:
+                validation_error_messages.extend(
+                    exp_services.validate_exploration_for_story(exp, strict))
+            except Exception as e:
+                logging.exception(
+                    'Exploration validation failed for exploration with ID: '
+                    '%s. Error: %s' % (exp_id, e))
+                raise Exception(e)
 
     return validation_error_messages
 

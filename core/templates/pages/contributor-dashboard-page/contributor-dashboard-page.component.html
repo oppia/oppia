@@ -6,14 +6,13 @@
             class="oppia-opportunities-tab-item"
             ng-repeat="(tabName, tabDetails) in $ctrl.tabsDetails"
             ng-if="tabDetails.enabled"
-            aria-label="<[tabDetails.ariaLabel]>"
-            role="button">
-          <a ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text protractor-test-<[tabName]>"><[tabDetails.tabName]></a>
+            aria-label="<[tabDetails.ariaLabel]>">
+          <a role="button" ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text protractor-test-<[tabName]>"><[tabDetails.tabName]></a>
           <div class="oppia-active-tab-hilighter"></div>
         </li>
       </ul>
     </div>
-    <div ng-class="{'oppia-fade-in': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
+    <div ng-class="{'oppia-translate-y': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -71,7 +70,7 @@
         </div>
       </div>
     </div>
-    <div ng-class="{'oppia-fade-in': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
+    <div ng-class="{'oppia-translate-y': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
       <div class="collapsed-oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
           <div class="oppia-profile-details-container">
@@ -274,7 +273,7 @@
     width: 100%;
   }
   .oppia-active-opportunities-tab a {
-    color: #009688;
+    color: #00645D;
     text-decoration: none;
   }
   .oppia-active-tab-hilighter {
@@ -286,20 +285,20 @@
     width: 60%;
   }
   .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
-    background-color: #009688;
-    border: 2px solid #009688;
+    background-color: #00645D;
+    border: 2px solid #00645D;
     text-decoration: none;
     transform: scale(1);
   }
   .oppia-opportunities-tabs-text:hover {
-    color: #009688;
+    color: #00645D;
     text-decoration: none;
   }
   .oppia-active-opportunities-tab a:hover {
-    color: #009688;
+    color: #00645D;
   }
   .oppia-review-item-detail-container {
-    background-color: #009688;
+    background-color: #00645D;
     border-radius: 10%;
     color: #fff;
     padding: 1px 5px;
@@ -314,7 +313,7 @@
     transform: translateY(0%);
   }
   .collapsed-oppia-contributor-username-container {
-    color: #009688;
+    color: #00645D;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 15px;
     height: 30%;
@@ -327,7 +326,7 @@
     margin: auto;
   }
   .collapsed-oppia-opportunities-tabs-explanation {
-    color: #009688;
+    color: #00615A;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 15px;
     position: relative;
@@ -347,10 +346,10 @@
   .oppia-contributor-dashboard-collapsible-header {
     display: none;
   }
-  .oppia-fade-in {
-      -webkit-animation: fadein 0.5s ease-out alternate;
-      -moz-animation: fadein 0.5s ease-out alternate;
-      animation: fadein 0.5s ease-out alternate;
+  .oppia-translate-y {
+      -webkit-animation: translate-y 0.5s ease-out alternate;
+      -moz-animation: translate-y 0.5s ease-out alternate;
+      animation: translate-y 0.5s ease-out alternate;
   }
   .oppia-language-selector {
     padding-bottom: 10px;
@@ -358,15 +357,15 @@
   .oppia-collapsed-language-selector {
     padding-bottom: 15px;
   }
-  @-webkit-keyframes fadein {
+  @-webkit-keyframes translate-y {
     from { transform: translateY(-100%); }
     to { transform: translateY(0); }
   }
-  @-moz-keyframes fadein {
+  @-moz-keyframes translate-y {
     from { transform: translateY(-100%); }
     to { transform: translateY(0); }
   }
-  @keyframes fadein {
+  @keyframes translate-y {
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
   }

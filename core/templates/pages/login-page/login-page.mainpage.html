@@ -5,7 +5,7 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
+      <div ng-controller="Base" dir="<[direction]>">
         <base-content>
           <navbar-breadcrumb>
             <ul class="nav navbar-nav oppia-navbar-breadcrumb">
@@ -16,7 +16,7 @@
             </ul>
           </navbar-breadcrumb>
           <content>
-            <login-page></login-page>
+            <login-page class="protractor-test-login-page"></login-page>
           </content>
         </base-content>
       </div>
