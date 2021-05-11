@@ -39,7 +39,7 @@ describe('Audio Slider Component', () => {
   it('should emit value when slider value changes', fakeAsync(() => {
     const valueChangeSpy = spyOn(component.valueChange, 'emit');
     const eventPayload = { value: 5 };
-    component.setProgress(eventPayload);
+    component.setDuration(eventPayload);
     expect(valueChangeSpy).toHaveBeenCalledWith(eventPayload);
   }));
 });
