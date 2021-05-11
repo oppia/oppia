@@ -129,11 +129,6 @@ export class InteractiveNumericExpressionInput implements OnInit {
       if (activeGuppyObject !== undefined) {
         this.hasBeenTouched = true;
         this.value = activeGuppyObject.guppyInstance.asciimath();
-        if (eventType === 'change') {
-          // Need to manually trigger the digest cycle to make any
-          // 'watchers' aware of changes in answer.
-          // $rootScope.$applyAsync();
-        }
       }
     });
     const isCurrentAnswerValid = (): boolean => {

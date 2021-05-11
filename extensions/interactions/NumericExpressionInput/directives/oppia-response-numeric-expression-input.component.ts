@@ -31,7 +31,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ResponseNumericExpressionInput implements OnInit {
   @Input() answer: string;
-  displayAnswer: Object = '';
+  displayAnswer: Object;
 
   constructor(
     private htmlEscaperService: HtmlEscaperService
