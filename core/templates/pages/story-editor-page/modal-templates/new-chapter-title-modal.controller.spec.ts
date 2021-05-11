@@ -188,8 +188,8 @@ describe('Create New Chapter Modal Controller', function() {
     spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
     var deferred = $q.defer();
     deferred.resolve(false);
-    spyOn(explorationIdValidationService, 'isExpPublished').and.returnValue(
-      deferred.promise);
+    spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+      .and.returnValue(deferred.promise);
     $scope.save();
     $rootScope.$apply();
     expect($scope.invalidExpId).toEqual(true);
@@ -210,8 +210,8 @@ describe('Create New Chapter Modal Controller', function() {
       spyOn(StoryEditorStateService, 'isStoryPublished').and.returnValue(true);
       var deferred = $q.defer();
       deferred.resolve(true);
-      spyOn(explorationIdValidationService, 'isExpPublished').and.returnValue(
-        deferred.promise);
+      spyOn(explorationIdValidationService, 'isExpPublishedAsync')
+        .and.returnValue(deferred.promise);
       $scope.save();
       $rootScope.$apply();
       expect($uibModalInstance.close).toHaveBeenCalled();

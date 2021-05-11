@@ -38,7 +38,7 @@ describe('Solution Verification Service', () => {
   beforeEach(() => {
     mockExplorationData = {
       explorationId: 0,
-      autosaveChangeList: () => {}
+      autosaveChangeListAsync: () => {}
     };
 
     mockInteractionState = {
@@ -75,12 +75,12 @@ describe('Solution Verification Service', () => {
   beforeEach(function() {
     mockExplorationData = {
       explorationId: 0,
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     };
     angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
-    spyOn(mockExplorationData, 'autosaveChangeList');
+    spyOn(mockExplorationData, 'autosaveChangeListAsync');
   });
   // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
   // block when ExplorationStateService has been migrated to Angular 8.

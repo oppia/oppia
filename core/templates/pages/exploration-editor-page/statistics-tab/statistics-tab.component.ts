@@ -56,7 +56,8 @@ angular.module('oppia').component('statisticsTab', {
       const expId = ExplorationDataService.explorationId;
       const refreshExplorationStatistics = () => {
         $q.all([
-          ReadOnlyExplorationBackendApiService.loadLatestExploration(expId),
+          ReadOnlyExplorationBackendApiService
+            .loadLatestExplorationAsync(expId),
           ExplorationStatsService.getExplorationStatsAsync(expId)
         ]).then(responses => {
           const [expResponse, expStats] = responses;
@@ -100,7 +101,7 @@ angular.module('oppia').component('statisticsTab', {
       const openStateStatsModal = (stateName: string) => {
         const state = this.states.getState(stateName);
         AlertsService.clearWarnings();
-        return StateInteractionStatsService.computeStats(expId, state)
+        return StateInteractionStatsService.computeStatsAsync(expId, state)
           .then(stats => $uibModal.open({
             controller: 'StateStatsModalController',
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

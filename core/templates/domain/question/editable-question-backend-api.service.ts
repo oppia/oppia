@@ -64,7 +64,7 @@ export class EditableQuestionBackendApiService {
     private questionObjectFactory: QuestionObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  private _createQuestion(
+  private async _createQuestionAsync(
       skillIds: string[],
       skillDifficulties: number[],
       questionObject: Question,
@@ -99,7 +99,7 @@ export class EditableQuestionBackendApiService {
         });
     });
   }
-  private _fetchQuestion(
+  private async _fetchQuestionAsync(
       questionId: string,
       successCallback: (value: FetchQuestionResponse) => void,
       errorCallback: (reason?: string) => void):
@@ -128,7 +128,7 @@ export class EditableQuestionBackendApiService {
           });
     });
   }
-  private _updateQuestion(
+  private async _updateQuestionAsync(
       questionId: string,
       questionVersion: string,
       commitMessage: string,
@@ -160,7 +160,7 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  private _editQuestionSkillLinks(
+  private async _editQuestionSkillLinksAsync(
       questionId: string,
       skillIdsTaskArray: (string | number)[],
       successCallback: (value: void) => void,
@@ -184,28 +184,28 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  createQuestion(
+  async createQuestionAsync(
       skillIds: string[],
       skillDifficulties: number[],
       questionDict: Question,
       imagesData: ImageData[]): Promise<CreateQuestionResponse> {
     return new Promise((resolve, reject) => {
-      this._createQuestion(
+      this._createQuestionAsync(
         skillIds, skillDifficulties, questionDict, imagesData, resolve, reject);
     });
   }
 
-  fetchQuestion(questionId: string): Promise<FetchQuestionResponse> {
+  async fetchQuestionAsync(questionId: string): Promise<FetchQuestionResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestion(questionId, resolve, reject);
+      this._fetchQuestionAsync(questionId, resolve, reject);
     });
   }
 
-  editQuestionSkillLinks(
+  async editQuestionSkillLinksAsync(
       questionId: string,
       skillIdsTaskArray: (string | number)[]): Promise<void> {
     return new Promise((resolve, reject) => {
-      this._editQuestionSkillLinks(
+      this._editQuestionSkillLinksAsync(
         questionId, skillIdsTaskArray, resolve, reject);
     });
   }
@@ -220,13 +220,13 @@ export class EditableQuestionBackendApiService {
   * the success callback, if one is provided to the returned promise
   * object. Errors are passed to the error callback, if one is provided.
   */
-  updateQuestion(
+  async updateQuestionAsync(
       questionId: string,
       questionVersion: string,
       commitMessage: string,
       changeList: string[]): Promise<QuestionBackendDict> {
     return new Promise((resolve, reject) => {
-      this._updateQuestion(
+      this._updateQuestionAsync(
         questionId, questionVersion,
         commitMessage, changeList, resolve, reject);
     });

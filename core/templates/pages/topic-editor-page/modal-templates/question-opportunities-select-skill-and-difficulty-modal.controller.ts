@@ -44,7 +44,7 @@ angular.module('oppia').controller(
       $scope.instructionMessage = (
         'Select the skill(s) to link the question to:');
       $scope.currentMode = MODE_SELECT_DIFFICULTY;
-      SkillBackendApiService.fetchSkill(skillId)
+      SkillBackendApiService.fetchSkillAsync(skillId)
         .then(function(backendSkillObject) {
           $scope.skill = backendSkillObject.skill;
           $scope.linkedSkillsWithDifficulty = [

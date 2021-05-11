@@ -37,7 +37,7 @@ describe('Exploration Property Service', function() {
   beforeEach(function() {
     angular.mock.module('oppia', function($provide) {
       $provide.value('ExplorationDataService', {
-        autosaveChangeList: function() {}
+        autosaveChangeListAsync: function() {}
       });
     });
   });

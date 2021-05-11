@@ -49,7 +49,7 @@ describe('User Email Preferences Service', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     csrfTokenService = TestBed.inject(CsrfTokenService);
 
-    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });

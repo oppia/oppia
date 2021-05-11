@@ -113,7 +113,7 @@ export class ExplorationEngineService {
        !('skill_editor' === this.urlService.getPathname()
          .split('/')[1].replace(/"/g, "'"))) {
          this.readOnlyExplorationBackendApiService
-           .loadExploration(this._explorationId, this.version)
+           .loadExplorationAsync(this._explorationId, this.version)
            .then((exploration) => {
              this.version = exploration.version;
            });

@@ -60,7 +60,8 @@ describe('Voiceover opportunities component', function() {
 
     spyOnProperty(translationLanguageService, 'onActiveLanguageChanged').and
       .returnValue(activeLanguageChangedEmitter);
-    spyOn(contributionOpportunitiesService, 'getVoiceoverOpportunities').and
+    spyOn(
+      contributionOpportunitiesService, 'getVoiceoverOpportunitiesAsync').and
       .callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '1',
@@ -83,8 +84,9 @@ describe('Voiceover opportunities component', function() {
           }
         }),
       ], true));
-    spyOn(contributionOpportunitiesService, 'getMoreVoiceoverOpportunities').and
-      .callFake((languageCode, callback) => callback([
+    spyOn(
+      contributionOpportunitiesService, 'getMoreVoiceoverOpportunitiesAsync')
+      .and.callFake((languageCode, callback) => callback([
         ExplorationOpportunitySummary.createFromBackendDict({
           id: '3',
           topic_name: 'topic_3',

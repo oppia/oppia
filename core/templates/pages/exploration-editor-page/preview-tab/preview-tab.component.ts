@@ -144,7 +144,7 @@ angular.module('oppia').component('previewTab', {
           ExplorationInitStateNameService.savedMemento);
         $timeout(function() {
           var explorationId = ContextService.getExplorationId();
-          EditableExplorationBackendApiService.fetchApplyDraftExploration(
+          EditableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
             explorationId).then(function(returnDict) {
             ExplorationEngineService.init(
               returnDict, null, null, null, null,
@@ -175,7 +175,7 @@ angular.module('oppia').component('previewTab', {
           })
         );
         ctrl.isExplorationPopulated = false;
-        ExplorationDataService.getData().then(function() {
+        ExplorationDataService.getDataAsync().then(function() {
           var initStateNameForPreview = StateEditorService
             .getActiveStateName();
 

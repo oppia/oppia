@@ -85,7 +85,7 @@ export const multiTrim = (
  * @param {angular.IModule} ng1Module - The angularjs module to be included
  *  in angular zone.
  */
-export const bootstrap = (
+export const bootstrapAsync = async(
     platform: PlatformRef,
     Ng2Module: Type<{}>,
     element: Element,
@@ -127,7 +127,7 @@ export const bootstrap = (
  * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  */
-export const setupAndGetUpgradedComponent = (
+export const setupAndGetUpgradedComponentAsync = async(
     kebabCaseName: string,
     camelCaseName: string,
     upgradedComponentTypes: unknown): Promise<string> => {
@@ -155,7 +155,7 @@ export const setupAndGetUpgradedComponent = (
 
   // Bootstrap.
   const element = html('<mock-comp></mock-comp>');
-  return bootstrap(
+  return bootstrapAsync(
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
     () => multiTrim(element.textContent));
 };

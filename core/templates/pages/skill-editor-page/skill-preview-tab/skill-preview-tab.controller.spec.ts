@@ -145,7 +145,7 @@ describe('Skill preview tab', function() {
     var skillId = 'df432fe';
     $scope = $rootScope.$new();
     var MockQuestionBackendApiService = {
-      fetchQuestionsAsync: () => Promise.resolve([questionDict])
+      fetchQuestionsAsync: async() => Promise.resolve([questionDict])
     };
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue(skillId);
 

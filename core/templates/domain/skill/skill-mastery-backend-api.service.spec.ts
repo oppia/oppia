@@ -44,7 +44,7 @@ describe('Skill mastery backend API service', () => {
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(function() {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async function() {
       return Promise.resolve('sample-csrf-token');
     });
 

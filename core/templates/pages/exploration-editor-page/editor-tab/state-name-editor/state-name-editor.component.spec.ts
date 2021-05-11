@@ -44,7 +44,7 @@ describe('State Name Editor component', function() {
   var mockExternalSaveEventEmitter = null;
   var mockExplorationData = {
     explorationId: 0,
-    autosaveChangeList: function() {}
+    autosaveChangeListAsync: function() {}
   };
 
   var autosaveDraftUrl = 'createhandler/autosave_draft/0';
@@ -87,7 +87,7 @@ describe('State Name Editor component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
-    spyOn(mockExplorationData, 'autosaveChangeList');
+    spyOn(mockExplorationData, 'autosaveChangeListAsync');
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
     explorationStatesService.init({
@@ -253,7 +253,7 @@ describe('State Name Editor component', function() {
       tick(200);
       expect(explorationStatesService.getState('Fifth State')).toBeTruthy();
       expect(explorationStatesService.getState('First State')).toBeFalsy();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -272,24 +272,24 @@ describe('State Name Editor component', function() {
     // This is not a valid state name.
     ctrl.saveStateName('#!% State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
 
     // Long state names will not save.
     ctrl.saveStateName(
       'This state name is too long to be saved. Try to be brief next time.'
     );
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
 
     // This will not save because it is an already existing state name.
     ctrl.saveStateName('First State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
 
     // Will not save because the memento is the same as the new state name.
     ctrl.saveStateName('Third State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
   });
 
   it('should save state name when ExternalSave event occurs', function() {

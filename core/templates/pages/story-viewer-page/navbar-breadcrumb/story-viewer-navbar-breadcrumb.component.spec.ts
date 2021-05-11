@@ -50,7 +50,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
         {
           provide: StoryViewerBackendApiService,
           useValue: {
-            fetchStoryDataAsync: () => (
+            fetchStoryDataAsync: async() => (
               new Promise((resolve) => {
                 resolve(
                   StoryPlaythrough.createFromBackendDict({

@@ -19,7 +19,7 @@ import { Directive, ElementRef, Injector, destroyPlatform } from
   '@angular/core';
 import { UpgradeComponent } from '@angular/upgrade/static';
 
-import { setupAndGetUpgradedComponent } from './unit-test-utils';
+import { setupAndGetUpgradedComponentAsync } from './unit-test-utils';
 import { async } from '@angular/core/testing';
 
 @Directive({
@@ -34,12 +34,12 @@ describe('setupAndGetUpgradedComponent function', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
   it('should setup component and return the proper text context', async(() => {
-    setupAndGetUpgradedComponent(
+    setupAndGetUpgradedComponentAsync(
       'mock-ng2-component',
       'mockNg2Component',
       [MockNg2Component]
     ).then(
-      textContext => expect(textContext).toBe('Hello Oppia!')
+      async(textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

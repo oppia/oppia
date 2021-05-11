@@ -52,7 +52,7 @@ describe('Notifications dashboard backend api service', () => {
   });
 
   it('should return promise with data', fakeAsync(() => {
-    notificationsDashboardPageBackendApiService.getNotificationData()
+    notificationsDashboardPageBackendApiService.getNotificationDataAsync()
       .then((responseData) => {
         expect(responseData).toEqual(responseData);
       });

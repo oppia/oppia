@@ -74,7 +74,7 @@ export class UserEmailPreferencesService {
    */
   setFeedbackNotificationPreferences(
       mute: boolean, successCallback: () => void): void {
-    this.saveChangeToBackend({
+    this.saveChangeToBackendAsync({
       message_type: this.MESSAGE_TYPE_FEEDBACK,
       mute: mute
     }).then(() => {
@@ -88,7 +88,7 @@ export class UserEmailPreferencesService {
    */
   setSuggestionNotificationPreferences(
       mute: boolean, successCallback: () => void): void {
-    this.saveChangeToBackend({
+    this.saveChangeToBackendAsync({
       message_type: this.MESSAGE_TYPE_SUGGESTION,
       mute: mute
     }).then(()=> {
@@ -100,10 +100,10 @@ export class UserEmailPreferencesService {
    * Save the change of message_type and mute to backend.
    * @param {RequestParam} requestParams - Info about message_type and mute.
    */
-  saveChangeToBackend(requestParams: RequestParams):
+  async saveChangeToBackendAsync(requestParams: RequestParams):
   Promise<void> {
     return this.userEmailPreferencesBackendApiService
-      .saveChangeToBackend(requestParams).then(
+      .saveChangeToBackendAsync(requestParams).then(
         (response: EmailPreferencesData) => {
           let data = response;
           this.alertsService.clearWarnings(),

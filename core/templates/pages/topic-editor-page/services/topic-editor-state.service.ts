@@ -182,12 +182,12 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       loadTopic: function(topicId) {
         _topicIsLoading = true;
-        let topicDataPromise = EditableTopicBackendApiService.fetchTopic(
+        let topicDataPromise = EditableTopicBackendApiService.fetchTopicAsync(
           topicId);
-        let storyDataPromise = EditableTopicBackendApiService.fetchStories(
+        let storyDataPromise = EditableTopicBackendApiService.fetchStoriesAsync(
           topicId);
-        let topicRightsPromise = TopicRightsBackendApiService.fetchTopicRights(
-          topicId);
+        let topicRightsPromise = TopicRightsBackendApiService
+          .fetchTopicRightsAsync(topicId);
         Promise.all([
           topicDataPromise,
           storyDataPromise,
@@ -258,7 +258,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           _subtopicPageLoadedEventEmitter.emit();
           return;
         }
-        EditableTopicBackendApiService.fetchSubtopicPage(
+        EditableTopicBackendApiService.fetchSubtopicPageAsync(
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
             _updateSubtopicPage(newBackendSubtopicPageObject);
@@ -440,7 +440,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           return false;
         }
         _topicIsBeingSaved = true;
-        EditableTopicBackendApiService.updateTopic(
+        EditableTopicBackendApiService.updateTopicAsync(
           _topic.getId(), _topic.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
@@ -454,7 +454,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
-                EditableStoryBackendApiService.deleteStory(
+                EditableStoryBackendApiService.deleteStoryAsync(
                   changeList[i].story_id);
               }
             }

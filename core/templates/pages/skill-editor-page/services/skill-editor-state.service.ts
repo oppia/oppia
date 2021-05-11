@@ -121,7 +121,7 @@ export class SkillEditorStateService {
    */
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
-    let skillDataPromise = this.skillBackendApiService.fetchSkill(skillId);
+    let skillDataPromise = this.skillBackendApiService.fetchSkillAsync(skillId);
     let skillRightsPromise = (
       this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
     Promise.all([skillDataPromise, skillRightsPromise]).then(
@@ -195,7 +195,7 @@ export class SkillEditorStateService {
     }
     this._skillIsBeingSaved = true;
 
-    this.skillBackendApiService.updateSkill(
+    this.skillBackendApiService.updateSkillAsync(
       this._skill.getId(), this._skill.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList()).then(
       (skill) => {

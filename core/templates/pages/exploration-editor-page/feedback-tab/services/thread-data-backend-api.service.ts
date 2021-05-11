@@ -146,7 +146,7 @@ export class ThreadDataBackendApiService {
     return this.threadsById.get(threadId) || null;
   }
 
-  getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
+  async getThreadsAsync(): Promise<SuggestionAndFeedbackThreads> {
     let suggestions$ = this.http.get(this.getSuggestionListHandlerUrl(), {
       params: {
         target_type: 'exploration',
@@ -180,10 +180,10 @@ export class ThreadDataBackendApiService {
                 (dict === null ? null : dict.thread_id))))
         };
       },
-      () => Promise.reject('Error on retrieving feedback threads.'));
+      async() => Promise.reject('Error on retrieving feedback threads.'));
   }
 
-  getMessagesAsync(thread: SuggestionAndFeedbackThread):
+  async getMessagesAsync(thread: SuggestionAndFeedbackThread):
    Promise<ThreadMessage[]> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
@@ -199,7 +199,7 @@ export class ThreadDataBackendApiService {
       });
   }
 
-  getOpenThreadsCountAsync(): Promise<number> {
+  async getOpenThreadsCountAsync(): Promise<number> {
     return this.http.get(this.getFeedbackStatsHandlerUrl()).toPromise()
       .then((response: NumberOfOpenThreads) => {
         return this.openThreadsCount = response.num_open_threads;
@@ -210,13 +210,13 @@ export class ThreadDataBackendApiService {
     return this.openThreadsCount;
   }
 
-  createNewThreadAsync(newSubject: string, newText: string):
+  async createNewThreadAsync(newSubject: string, newText: string):
     Promise<void | SuggestionAndFeedbackThreads> {
     return this.http.post(this.getThreadListHandlerUrl(), {
       state_name: null,
       subject: newSubject,
       text: newText
-    }).toPromise().then(() => {
+    }).toPromise().then(async() => {
       this.openThreadsCount += 1;
       return this.getThreadsAsync();
     },
@@ -226,7 +226,8 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  markThreadAsSeenAsync(thread: SuggestionAndFeedbackThread): Promise<void> {
+  async markThreadAsSeenAsync(
+      thread: SuggestionAndFeedbackThread): Promise<void> {
     if (!thread) {
       throw new Error('Trying to update a non-existent thread');
     }
@@ -237,7 +238,7 @@ export class ThreadDataBackendApiService {
     }).toPromise().then();
   }
 
-  addNewMessageAsync(
+  async addNewMessageAsync(
       thread: SuggestionAndFeedbackThread, newMessage: string,
       newStatus: string): Promise<ThreadMessage[]> {
     if (!thread) {
@@ -268,7 +269,7 @@ export class ThreadDataBackendApiService {
     });
   }
 
-  resolveSuggestionAsync(
+  async resolveSuggestionAsync(
       thread: SuggestionAndFeedbackThread, action: string, commitMsg: string,
       reviewMsg: string): Promise<ThreadMessage[]> {
     if (!thread) {
@@ -282,7 +283,7 @@ export class ThreadDataBackendApiService {
       commit_message: (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
           commitMsg : null)
-    }).toPromise().then(() => {
+    }).toPromise().then(async() => {
       thread.status = (
         action === AppConstants.ACTION_ACCEPT_SUGGESTION ?
          ExplorationEditorPageConstants.STATUS_FIXED :

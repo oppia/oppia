@@ -91,7 +91,7 @@ export class LearnerLocalNavComponent {
     this.explorationId = this.explorationEngineService.getExplorationId();
     this.version = this.explorationEngineService.getExplorationVersion();
     this.readOnlyExplorationBackendApiService
-      .loadExploration(this.explorationId, this.version)
+      .loadExplorationAsync(this.explorationId, this.version)
       .then((exploration) => {
         this.canEdit = exploration.can_edit;
       });

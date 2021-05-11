@@ -85,7 +85,7 @@ describe(
           prerequisite_skill_ids: []
         };
 
-        spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue(
+        spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue(
           $q.resolve({
             skill: skillObjectFactory.createFromBackendDict(skill)
           }));
@@ -133,7 +133,7 @@ describe(
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
 
-        spyOn(SkillBackendApiService, 'fetchSkill').and.returnValue(
+        spyOn(SkillBackendApiService, 'fetchSkillAsync').and.returnValue(
           $q.reject('It was not possible to fetch the skill'));
 
         $scope = $rootScope.$new();

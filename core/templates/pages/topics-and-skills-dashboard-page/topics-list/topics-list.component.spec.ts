@@ -70,7 +70,7 @@ describe('Topics List Component', () => {
   class MockEditableBackendApiService {
     success: boolean = true;
     message: string = '';
-    deleteTopic(topicId: string): object {
+    deleteTopicAsync(topicId: string): object {
       return {
         then: (
             successCallback: (status: number) => void,

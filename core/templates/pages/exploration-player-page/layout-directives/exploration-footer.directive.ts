@@ -54,7 +54,7 @@ angular.module('oppia').directive('explorationFooter', [
             if (!ContextService.isInQuestionPlayerMode() ||
                 ContextService.getQuestionPlayerIsManuallySet()) {
               ExplorationSummaryBackendApiService
-                .loadPublicAndPrivateExplorationSummaries([
+                .loadPublicAndPrivateExplorationSummariesAsync([
                   $scope.explorationId])
                 .then(function(responseObject) {
                   var summaries = responseObject.summaries;

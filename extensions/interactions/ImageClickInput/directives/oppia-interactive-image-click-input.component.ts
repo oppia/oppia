@@ -176,7 +176,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   loadImage(): void {
-    this.imagePreloaderService.getImageUrl(this.filepath)
+    this.imagePreloaderService.getImageUrlAsync(this.filepath)
       .then((objectUrl: string) => {
         this.isTryAgainShown = false;
         this.isLoadingIndicatorShown = false;

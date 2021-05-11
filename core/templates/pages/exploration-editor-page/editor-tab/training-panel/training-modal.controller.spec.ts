@@ -36,8 +36,8 @@ describe('Training Modal Controller', function() {
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
       explorationId: 0,
-      autosaveChangeList: function() {},
-      discardDraft: function() {}
+      autosaveChangeListAsync: function() {},
+      discardDraftAsync: function() {}
     });
   }));
 

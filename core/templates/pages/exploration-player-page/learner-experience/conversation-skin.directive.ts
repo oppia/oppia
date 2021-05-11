@@ -962,7 +962,8 @@ angular.module('oppia').directive('conversationSkin', [
                       oldStateName, nextCard.getStateName(), answer,
                       LearnerParamsService.getAllParams(), isFirstHit);
 
-                    StatsReportingService.recordStateCompleted(oldStateName);
+                    StatsReportingService.recordStateCompleted(
+                      oldStateName);
                   }
                   if (nextCard.isTerminal()) {
                     StatsReportingService.recordStateCompleted(

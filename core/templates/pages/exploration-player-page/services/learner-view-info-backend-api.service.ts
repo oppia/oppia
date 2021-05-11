@@ -36,7 +36,7 @@ export class LearnerViewInfoBackendApiService {
         private http: HttpClient
   ) {}
 
-  fetchLearnerInfo(
+  async fetchLearnerInfoAsync(
       stringifiedExpIds: string,
       includePrivateExplorations: string): Promise<LearnerViewResposne> {
     return this.http.get<LearnerViewBackendDict>(

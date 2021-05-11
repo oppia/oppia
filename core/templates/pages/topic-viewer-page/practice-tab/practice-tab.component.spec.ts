@@ -58,7 +58,7 @@ class MockWindowRef {
 }
 
 class MockQuestionBackendApiService {
-  fetchTotalQuestionCountForSkillIdsAsync() {
+  async fetchTotalQuestionCountForSkillIdsAsync() {
     return Promise.resolve(1);
   }
 }

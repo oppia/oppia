@@ -30,9 +30,9 @@ export class ExplorationIdValidationService {
     private explorationSummartBackendApiService:
       ExplorationSummaryBackendApiService) {}
 
-  isExpPublished(explorationId: string): Promise<boolean> {
+  async isExpPublishedAsync(explorationId: string): Promise<boolean> {
     return this.explorationSummartBackendApiService.
-      loadPublicExplorationSummaries([explorationId]).then(
+      loadPublicExplorationSummariesAsync([explorationId]).then(
         (response: ExplorationSummaryBackendDict) => {
           let summaries = response.summaries;
           return (summaries.length === 1 && summaries[0] !== null);

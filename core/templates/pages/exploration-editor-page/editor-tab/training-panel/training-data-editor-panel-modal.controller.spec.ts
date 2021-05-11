@@ -49,7 +49,7 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
       }
     });
     $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     });
   }));
 

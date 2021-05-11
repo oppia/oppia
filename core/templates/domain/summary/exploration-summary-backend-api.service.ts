@@ -94,14 +94,14 @@ export class ExplorationSummaryBackendApiService {
     });
   }
 
-  loadPublicAndPrivateExplorationSummaries(
+  async loadPublicAndPrivateExplorationSummariesAsync(
       explorationIds: string[]): Promise<ExplorationSummaryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, true, resolve, reject);
     });
   }
 
-  loadPublicExplorationSummaries(
+  async loadPublicExplorationSummariesAsync(
       explorationIds: string[]): Promise<ExplorationSummaryBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExpSummaries(explorationIds, false, resolve, reject);

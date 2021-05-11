@@ -540,7 +540,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   openRemoveActivityModal(
       sectionNameI18nId: string, subsectionName: string,
       activity: LearnerExplorationSummary | CollectionSummary): void {
-    this.learnerDashboardActivityBackendApiService.removeActivityModal(
+    this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activity.id, activity.title)
       .then(() => {

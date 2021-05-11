@@ -161,7 +161,7 @@ describe('Skills List Component', () => {
 
   class MockSkillBackendApiService {
     doesNotHaveSkillLinked: boolean = false;
-    deleteSkill(skillId: string) {
+    deleteSkillAsync(skillId: string) {
       return {
         then: (callb: () => void) => {
           callb();
@@ -204,7 +204,7 @@ describe('Skills List Component', () => {
   }
 
   class MockEditableBackendApiService {
-    updateTopic(
+    updateTopicAsync(
         topicId: string,
         topicVersion: number,
         msg: string,

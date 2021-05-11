@@ -205,7 +205,7 @@ export class ImagePreloaderService {
    * @param {function} onLoadCallback - Function that is called when the
    *                                    Url of the loaded image is obtained.
    */
-  getImageUrl(filename: string): Promise<string> {
+  async getImageUrlAsync(filename: string): Promise<string> {
     return new Promise((resolve, reject) => {
       if (this.assetsBackendApiService.isCached(filename) ||
           this.isInFailedDownload(filename)) {

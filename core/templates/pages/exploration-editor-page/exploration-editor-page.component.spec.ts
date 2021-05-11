@@ -184,7 +184,7 @@ describe('Exploration editor page component', function() {
     show_state_translation_tutorial_on_load: true
   };
   var mockExplorationDataService = {
-    getData: function(callback) {
+    getDataAsync: function(callback) {
       callback();
       return $q.resolve(explorationData);
     }

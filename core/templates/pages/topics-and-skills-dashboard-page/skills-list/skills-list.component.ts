@@ -95,7 +95,7 @@ export class SkillsListComponent {
     modalRef.componentInstance.skillId = skillId;
 
     modalRef.result.then(() => {
-      this.skillBackendApiService.deleteSkill(skillId).then(
+      this.skillBackendApiService.deleteSkillAsync(skillId).then(
         () => {
           setTimeout(() => {
             this.topicsAndSkillsDashboardBackendApiService.
@@ -153,7 +153,7 @@ export class SkillsListComponent {
             uncategorized_skill_id: skillId
           });
 
-          this.editableTopicBackendApiService.updateTopic(
+          this.editableTopicBackendApiService.updateTopicAsync(
             topicsToUnassign[topic].topicId,
             topicsToUnassign[topic].topicVersion,
             `Unassigned skill with id ${skillId} from the topic.`,
@@ -195,7 +195,7 @@ export class SkillsListComponent {
       for (let i = 0; i < topicIds.length; i++) {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
-            this.editableTopicBackendApiService.updateTopic(
+            this.editableTopicBackendApiService.updateTopicAsync(
               topicIds[i], topicSummaries[j].version,
               'Added skill with id ' + skillId + ' to topic.',
               changeList

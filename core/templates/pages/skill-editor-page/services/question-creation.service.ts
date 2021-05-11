@@ -83,7 +83,7 @@ angular.module('oppia').factory('QuestionCreationService', [
     var newQuestionSkillIds = [];
 
     var populateMisconceptions = function() {
-      SkillBackendApiService.fetchMultiSkills(
+      SkillBackendApiService.fetchMultiSkillsAsync(
         newQuestionSkillIds).then(
         function(skills) {
           skills.forEach(function(skill) {
@@ -203,7 +203,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
-      EditableQuestionBackendApiService.createQuestion(
+      EditableQuestionBackendApiService.createQuestionAsync(
         newQuestionSkillIds, newQuestionSkillDifficulties,
         question.toBackendDict(true), imagesData);
     };

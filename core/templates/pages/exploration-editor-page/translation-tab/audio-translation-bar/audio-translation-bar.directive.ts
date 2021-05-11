@@ -188,7 +188,7 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           var showPermissionAndStartRecording = function() {
             $scope.checkingMicrophonePermission = true;
-            $scope.voiceoverRecorder.startRecording().then(function() {
+            $scope.voiceoverRecorder.startRecordingAsync().then(function() {
               // When the user accepts the microphone access.
               $scope.showRecorderWarning = true;
               $scope.isTranslationTabBusy = true;

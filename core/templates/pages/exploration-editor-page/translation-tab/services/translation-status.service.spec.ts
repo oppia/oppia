@@ -76,13 +76,13 @@ describe('Translation status service', function() {
     beforeEach(function() {
       mockExplorationData = {
         explorationId: 0,
-        autosaveChangeList: function() {},
-        discardDraft: function() {}
+        autosaveChangeListAsync: function() {},
+        discardDraftAsync: function() {}
       };
       angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
-      spyOn(mockExplorationData, 'autosaveChangeList');
+      spyOn(mockExplorationData, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {

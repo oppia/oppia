@@ -54,7 +54,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
         {
           provide: SubtopicViewerBackendApiService,
           useValue: {
-            fetchSubtopicDataAsync: () => (
+            fetchSubtopicDataAsync: async() => (
               new Promise((resolve) => {
                 resolve(
                   ReadOnlySubtopicPageData.createFromBackendDict({

@@ -34,7 +34,7 @@ export class UserEmailPreferencesBackendApiService {
     private explorationDataService: ExplorationDataService
   ) { }
 
-  saveChangeToBackend(
+  async saveChangeToBackendAsync(
       requestParams: RequestParams
   ): Promise<EmailPreferencesData> {
     let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
