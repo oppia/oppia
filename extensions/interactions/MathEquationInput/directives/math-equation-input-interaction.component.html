@@ -1,5 +1,5 @@
-<div class="guppy-div-learner protractor-test-guppy-div" ng-click="$ctrl.showOSK()"></div>
+<div class="guppy-div-learner protractor-test-guppy-div" (click)="showOSK()"></div>
 
-<div ng-show="!$ctrl.isCurrentAnswerValid()" class="alert alert-danger mt-2 oppia-algebraic-warning">
-  <[$ctrl.warningText]>
+<div [hidden]="isCurrentAnswerValid()" class="alert alert-danger mt-2 oppia-algebraic-warning">
+  {{warningText}}
 </div>

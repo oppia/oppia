@@ -30,6 +30,7 @@ import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
 import { NumericExpressionInputModule } from './NumericExpressionInput/numeric-expression-input-interactions.module';
 import { NumericInputModule } from './NumericInput/numeric-input-interactions.module';
+import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interaction.module';
 
 @NgModule({
   imports: [
@@ -42,7 +43,8 @@ import { NumericInputModule } from './NumericInput/numeric-input-interactions.mo
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
     NumericExpressionInputModule,
-    NumericInputModule
+    NumericInputModule,
+    MathEquationInputModule
   ],
   declarations: [],
   entryComponents: [],
@@ -54,7 +56,8 @@ import { NumericInputModule } from './NumericInput/numeric-input-interactions.mo
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
     NumericExpressionInputModule,
-    NumericInputModule
+    NumericInputModule,
+    MathEquationInputModule
   ],
 })
 export class InteractionExtensionsModule { }

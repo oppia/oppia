@@ -16,25 +16,29 @@
  * @fileoverview Unit tests for the MathEquationInput response component.
  */
 
-require(
-  'interactions/MathEquationInput/directives/' +
-  'oppia-response-math-equation-input.component.ts');
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ResponseMathEquationInput } from './oppia-response-math-equation-input.component';
 
-describe('MathEquationInputResponse', function() {
-  let ctrl = null;
+describe('ResponseNumericExpressionInput', function() {
+  let component: ResponseMathEquationInput;
+  let fixture: ComponentFixture<ResponseMathEquationInput>;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$attrs', {
-      answer: '&quot;answer&quot;',
-    });
-  }));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('oppiaResponseMathEquationInput');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule(
+      {
+        declarations: [ResponseMathEquationInput]
+      }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      ResponseMathEquationInput);
+    component = fixture.componentInstance;
+    component.answer = '&quot;answer&quot;';
+    fixture.detectChanges();
+  });
   it('should correctly escape characters in the answer', function() {
-    ctrl.$onInit();
-    expect(ctrl.answer).toBe('answer');
+    component.ngOnInit();
+    expect(component.displayAnswer).toBe('answer');
   });
 });
