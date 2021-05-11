@@ -30,6 +30,10 @@ export interface AnswerGroupBackendDict {
   'rule_specs': RuleBackendDict[];
   'outcome': OutcomeBackendDict;
   'training_data': readonly InteractionAnswer[];
+  // Note: Here the type 'null' comes from file
+  // 'add-answer-group-modal.controller.ts'. Property
+  // 'tmpTaggedSkillMisconceptionId' has been initialized
+  // as 'null' there.
   'tagged_skill_misconception_id': string | null;
 }
 
