@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import io
 import os
+import re
 
 from PIL import Image
 from PIL import ImageChops
@@ -64,19 +65,25 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
     def test_invalid_scaling_factor_triggers_value_error(self):
         value_exception = self.assertRaisesRegexp(
             ValueError,
-            r'Scaling factor should be in the interval \(0, 1], received 1.1.')
+            re.escape(
+                'Scaling factor should be in the interval (0, 1], '
+                'received 1.100000.'))
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, 1.1)
 
         value_exception = self.assertRaisesRegexp(
             ValueError,
-            r'Scaling factor should be in the interval \(0, 1], received 0.')
+            re.escape(
+                'Scaling factor should be in the interval (0, 1], '
+                'received 0.000000.'))
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, 0)
 
         value_exception = self.assertRaisesRegexp(
             ValueError,
-            r'Scaling factor should be in the interval \(0, 1], received -1.')
+            re.escape(
+                'Scaling factor should be in the interval (0, 1], '
+                'received -1.000000.'))
         with value_exception:
             image_services.compress_image(self.jpeg_raw_image, -1)
 

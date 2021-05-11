@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import re
 
 from constants import constants
 from core import jobs_registry
@@ -152,15 +153,19 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _get_external_id_relationships\(\) method is missing from the'
-            ' derived class. It should be implemented in the derived class.'):
+            re.escape(
+                'The _get_external_id_relationships() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             MockBaseModelValidator().validate(self.invalid_model)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _get_external_model_properties\(\) method is missing from the'
-            ' derived class. It should be implemented in the derived class.'):
+            re.escape(
+                'The _get_external_model_properties() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             MockSummaryModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
@@ -171,8 +176,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _get_change_domain_class\(\) method is missing from the '
-            'derived class. It should be implemented in the derived class.'):
+            re.escape(
+                'The _get_change_domain_class() method is missing from the '
+                'derived class. It should be implemented in the '
+                'derived class.')):
             snapshot_model = MockSnapshotModel(id='mockmodel')
             snapshot_model.update_timestamps()
             snapshot_model.put()
@@ -183,8 +190,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             prod_validation_jobs_one_off.ProdValidationAuditOneOffJob)
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The entity_classes_to_map_over\(\) method is missing from the '
-            'derived class. It should be implemented in the derived class.'):
+            re.escape(
+                'The entity_classes_to_map_over() method is missing from '
+                'the derived class. It should be implemented in the '
+                'derived class.')):
             with self.swap(jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
                 job_id = job_class.create_new()
                 job_class.enqueue(job_id)

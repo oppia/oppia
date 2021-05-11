@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
@@ -73,9 +75,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
                 with self.assertRaisesRegexp(
                     NotImplementedError,
-                    r'The has_reference_to_user_id\(\) method is missing from '
-                    r'the derived class. It should be implemented in the '
-                    r'derived class.'
+                    re.escape(
+                        'The has_reference_to_user_id() method is missing from '
+                        'the derived class. It should be implemented in the '
+                        'derived class.'
+                    )
                 ):
                     clazz.has_reference_to_user_id('any_id')
             else:

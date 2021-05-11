@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import re
 
 from core.domain import question_domain
 from core.domain import state_domain
@@ -380,8 +381,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """
         self.question.inapplicable_skill_misconception_ids = ['Test', 1]
         self._assert_validation_error(
-            r'Expected inapplicable_skill_misconception_ids to be a list of '
-            r'strings, received \[u\'Test\', 1\]')
+            re.escape(
+                'Expected inapplicable_skill_misconception_ids to be a list of '
+                'strings, received [u\'Test\', 1]'))
 
     def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
             self):
@@ -401,9 +403,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """
         self.question.inapplicable_skill_misconception_ids = ['abc', 'def']
         self._assert_validation_error(
-            r'Expected inapplicable_skill_misconception_ids to be a list '
-            r'of strings of the format <skill_id>-<misconception_id>, '
-            r'received \[u\'abc\', u\'def\'\]')
+            re.escape(
+                'Expected inapplicable_skill_misconception_ids to be a list '
+                'of strings of the format <skill_id>-<misconception_id>, '
+                'received [u\'abc\', u\'def\']'))
 
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
             self):
@@ -605,8 +608,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object.misconception_ids = ['Test', 1]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            r'Expected misconception ids to be a list of strings, '
-            r'received \[u\'Test\', 1\]'):
+            re.escape(
+                'Expected misconception ids to be a list of strings, '
+                'received [u\'Test\', 1]')):
             self.observed_object.validate()
 
     def test_validate_invalid_type_of_misconception_ids(self):

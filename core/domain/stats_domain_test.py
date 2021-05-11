@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import re
 
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -1055,7 +1056,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            r'unsupported operand type\(s\) for \+=: \'NoneType\' and \'int\''):
+            re.escape(
+                'unsupported operand type(s) for +=: \'NoneType\' '
+                'and \'int\'')):
             stats_services.get_exp_issues_from_model(exp_issues_model)
 
     def test_actual_update_exp_issue_from_model_raises_error(self):
@@ -1064,9 +1067,10 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _convert_issue_v1_dict_to_v2_dict\(\) method is missing from '
-            r'the derived class. It should be implemented in the '
-            r'derived class.'):
+            re.escape(
+                'The _convert_issue_v1_dict_to_v2_dict() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             stats_domain.ExplorationIssue.update_exp_issue_from_model(
                 exp_issue_dict)
 
@@ -1255,7 +1259,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            r'unsupported operand type\(s\) for \+=: \'NoneType\' and \'int\''):
+            re.escape(
+                'unsupported operand type(s) for +=: \'NoneType\' '
+                'and \'int\'')):
             stats_services.get_playthrough_from_model(playthrough_model)
 
     def test_actual_update_learner_action_from_model_raises_error(self):
@@ -1264,9 +1270,10 @@ class LearnerActionTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'The _convert_action_v1_dict_to_v2_dict\(\) method is missing from'
-            r' the derived class. It should be implemented in the '
-            r'derived class.'):
+            re.escape(
+                'The _convert_action_v1_dict_to_v2_dict() method is missing '
+                'from the derived class. It should be implemented in the '
+                'derived class.')):
             stats_domain.LearnerAction.update_learner_action_from_model(
                 learner_action_dict)
 

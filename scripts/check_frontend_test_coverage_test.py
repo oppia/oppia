@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
+import re
 import subprocess
 import sys
 from core.tests import test_utils
@@ -197,8 +198,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with not_fully_covered_files_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
-                    r'\033\[1mfile.ts\033\[0m seems to be not completely'
-                    ' tested. Make sure it\'s fully covered.\n'):
+                    re.escape(
+                        '\033[1mfile.ts\033[0m seems to be not completely '
+                        'tested. Make sure it\'s fully covered.\n')):
                     check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_remove_file(self):
@@ -219,14 +221,15 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with not_fully_covered_files_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
-                    r'\033\[1mfile.ts\033\[0m seems to be fully covered!'
-                    ' Before removing it manually from the denylist'
-                    ' in the file'
-                    ' scripts/check_frontend_test_coverage.py, please'
-                    ' make sure you\'ve followed the unit tests rules'
-                    ' correctly on:'
-                    ' https://github.com/oppia/oppia/wiki/Frontend-unit'
-                    '-tests-guide#rules\n'):
+                    re.escape(
+                        '\033[1mfile.ts\033[0m seems to be fully covered! '
+                        'Before removing it manually from the denylist '
+                        'in the file '
+                        'scripts/check_frontend_test_coverage.py, please '
+                        'make sure you\'ve followed the unit tests rules '
+                        'correctly on: '
+                        'https://github.com/oppia/oppia/wiki/Frontend-unit'
+                        '-tests-guide#rules\n')):
                     check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_when_renaming_file(self):
@@ -247,13 +250,15 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with not_fully_covered_files_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
-                    r'\033\[1mnewfilename.ts\033\[0m seems to be not completely'
-                    ' tested. Make sure it\'s fully covered.\n'
-                    r'\033\[1mfile.ts\033\[0m is in the frontend test coverage'
-                    ' denylist but it doesn\'t exist anymore. If you have'
-                    ' renamed it, please make sure to remove the old file name'
-                    ' and add the new file name in the denylist in the file'
-                    ' scripts/check_frontend_test_coverage.py.\n'):
+                    re.escape(
+                        '\033[1mnewfilename.ts\033[0m seems to be not '
+                        'completely tested. Make sure it\'s fully covered.\n'
+                        '\033[1mfile.ts\033[0m is in the frontend test '
+                        'coverage denylist but it doesn\'t exist anymore. If '
+                        'you have renamed it, please make sure to remove the '
+                        'old file name and add the new file name in the '
+                        'denylist in the file scripts/'
+                        'check_frontend_test_coverage.py.\n')):
                     check_frontend_test_coverage.check_coverage_changes()
 
     def test_fully_covered_filenames_is_sorted(self):
@@ -320,8 +325,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with not_fully_covered_files_swap:
                 with self.assertRaisesRegexp(
                     SystemExit,
-                    r'The \033\[1mNOT_FULLY_COVERED_FILENAMES\033\[0m list'
-                    ' must be kept in alphabetical order.'):
+                    re.escape(
+                        'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list '
+                        'must be kept in alphabetical order.')):
                     (
                         check_frontend_test_coverage
                         .check_not_fully_covered_filenames_list_is_sorted())

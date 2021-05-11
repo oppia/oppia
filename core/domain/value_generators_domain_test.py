@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import importlib
 import inspect
 import os
+import re
 
 from core.domain import value_generators_domain
 from core.tests import test_utils
@@ -45,7 +46,8 @@ class ValueGeneratorsUnitTests(test_utils.GenericTestBase):
         base_generator = value_generators_domain.BaseValueGenerator()
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'generate_value\(\) method has not yet been implemented'):
+            re.escape(
+                'generate_value() method has not yet been implemented')):
             base_generator.generate_value()
 
 
