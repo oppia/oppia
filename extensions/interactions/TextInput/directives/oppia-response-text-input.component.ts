@@ -13,32 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the TextInput short response.
+ * @fileoverview Directive for the TextInput response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
-require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/html-escaper.service.ts');
+@Component({
+  selector: 'oppia-response-text-input',
+  templateUrl: './text-input-response.component.html'
+})
+export class ResponseTextInputComponent implements OnInit {
+  @Input('answer') answerWithValue: string;
+  answer: string = '';
+  constructor(private htmlEscaperService: HtmlEscaperService) { }
 
-angular.module('oppia').directive('oppiaShortResponseTextInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./text-input-short-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        };
-      }]
-    };
+  ngOnInit(): void {
+    this.answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answerWithValue) as string;
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaResponseTextInput',
+  downgradeComponent({
+    component: ResponseTextInputComponent
+  }));

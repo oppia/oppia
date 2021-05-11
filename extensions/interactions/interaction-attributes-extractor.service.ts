@@ -41,7 +41,8 @@ export class InteractionAttributesExtractorService {
     'InteractiveMap',
     'LogicProof',
     'MultipleChoiceInput',
-    'SetInput'
+    'SetInput',
+    'TextInput',
   ];
 
   constructor(

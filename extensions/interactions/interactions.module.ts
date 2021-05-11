@@ -32,6 +32,7 @@ import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-ma
 import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
+import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
 
 @NgModule({
   imports: [
@@ -46,7 +47,8 @@ import { SetInputInteractionModule } from './SetInput/set-input-interactions.mod
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
-    SetInputInteractionModule
+    SetInputInteractionModule,
+    TextInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
@@ -60,7 +62,8 @@ import { SetInputInteractionModule } from './SetInput/set-input-interactions.mod
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
-    SetInputInteractionModule
+    SetInputInteractionModule,
+    TextInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }
