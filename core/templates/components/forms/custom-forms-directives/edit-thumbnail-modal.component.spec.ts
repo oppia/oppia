@@ -67,8 +67,7 @@ class MockReaderObject {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Edit Thumbnail Modal Component', () => {
+describe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
