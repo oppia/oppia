@@ -303,14 +303,24 @@ export class SiteAnalyticsService {
       'PlayerFinishExploration', 'engage', explorationId);
   }
 
-  registerCuratedLessonCompleted(explorationId: string): void {
+  registerCuratedLessonStarted(
+      topicName: string, explorationId: string): void {
     this._sendEventToGoogleAnalytics(
-      'CuratedLessonCompleted', 'engage', explorationId);
+      'CuratedLessonStarted', `start ${topicName}`, explorationId);
   }
 
-  registerClassroomLessonActiveUse(): void {
+  registerCuratedLessonCompleted(
+      topicName: string, explorationId: string): void {
     this._sendEventToGoogleAnalytics(
-      'ClassroomActiveUserStartAndSawCards', 'engage', '');
+      'CuratedLessonCompleted', `start ${topicName}`, explorationId);
+  }
+
+  registerClassroomLessonActiveUse(
+      topicName: string, explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomActiveUserStartAndSawCards',
+      `start ${topicName}`,
+      explorationId);
   }
 
   registerClassoomHeaderClickEvent(): void {

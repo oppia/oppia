@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { EventEmitter, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -58,7 +58,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-describe('About Page', () => {
+fdescribe('About Page', () => {
   const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
@@ -67,6 +67,7 @@ describe('About Page', () => {
     TestBed.configureTestingModule({
       declarations: [AboutPageComponent,
         MockTranslatePipe],
+      imports: [HttpClientTestingModule],
       providers: [
         {
           provide: I18nLanguageCodeService,
@@ -93,18 +94,12 @@ describe('About Page', () => {
         }
       ]
     }).compileComponents();
-  });
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     component = aboutPageComponent.componentInstance;
   });
+  beforeEach(angular.mock.module('oppia'));
   let component = null;
 
   it('should successfully instantiate the component',
@@ -120,26 +115,7 @@ describe('About Page', () => {
     });
 
   it('should redirect guest user to the login page when they click' +
-  'create lesson button',
-  fakeAsync(() => {
-    const userInfoBackendDict = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: false,
-      preferred_site_language_code: null,
-      username: '',
-      email: '',
-      user_is_logged_in: true
-    };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(userInfoBackendDict))
-    );
-    component.ngOnInit();
-
-    flushMicrotasks();
-    expect(component.userIsLoggedIn).toBe(true);
+  'create lesson button', () => {
     spyOn(
       siteAnalyticsService, 'registerCreateLessonButtonEvent')
       .and.callThrough();
@@ -149,12 +125,6 @@ describe('About Page', () => {
       .toHaveBeenCalledWith();
     expect(component.windowRef.nativeWindow.location.href).toBe(
       '/creator-dashboard?mode=create');
-  }));
-
-  it('should set component properties when ngOnInit() is called', () => {
-    component.ngOnInit();
-
-    expect(component.classroomUrl).toBe('/learn/math');
   });
 
   it('should show and hide loading screen with the correct text', () =>
@@ -165,28 +135,45 @@ describe('About Page', () => {
         .toHaveBeenCalledWith('Loading');
     }));
 
-  it('should activate Visit Classroom button when clicked', function() {
-    spyOn(
-      siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
-      .and.callThrough();
-    component.onClickVisitClassroomButton();
+  it('should register correct event on calling onClickVisitClassroomButton',
+    () => {
+      const userInfoBackendDict = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: false,
+        preferred_site_language_code: null,
+        username: '',
+        email: '',
+        user_is_logged_in: true
+      };
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+        UserInfo.createFromBackendDict(userInfoBackendDict))
+      );
+      spyOn(
+        siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
+        .and.callThrough();
+      component.onClickVisitClassroomButton();
 
-    expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
-      .toHaveBeenCalledWith();
-    expect(component.windowRef.nativeWindow.location.href).toBe(
-      component.classroomUrl);
-  });
+      expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
+        .toHaveBeenCalledWith();
+      expect(component.classroomUrl).toBe('/learn/math');
+      expect(component.windowRef.nativeWindow.location.href).toBe(
+        component.classroomUrl);
+    });
 
-  it('should activate Browse Library button when clicked', function() {
-    spyOn(
-      siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
-      .and.callThrough();
+  it('should register correct event on calling onClickBrowseLibraryButton',
+    () => {
+      spyOn(
+        siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+        .and.callThrough();
 
-    component.onClickBrowseLibraryButton();
+      component.onClickBrowseLibraryButton();
 
-    expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
-      .toHaveBeenCalledWith();
-    expect(component.windowRef.nativeWindow.location.href)
-      .toBe('/community-library');
-  });
+      expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
+        .toHaveBeenCalledWith();
+      expect(component.windowRef.nativeWindow.location.href)
+        .toBe('/community-library');
+    });
 });

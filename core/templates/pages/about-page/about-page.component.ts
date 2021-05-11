@@ -19,6 +19,7 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import constants from 'assets/constants';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
@@ -26,14 +27,12 @@ import { UrlInterpolationService } from
 import { UserService } from 'services/user.service';
 import { WindowRef } from
   'services/contextual/window-ref.service';
-import constants from 'assets/constants';
 
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html'
 })
 export class AboutPageComponent implements OnInit {
-  classroomUrlFragment: string;
   classroomUrl: string;
   userIsLoggedIn: boolean;
   features = [{
@@ -65,6 +64,15 @@ export class AboutPageComponent implements OnInit {
   }
 
   onClickVisitClassroomButton(): void {
+    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+    this.loaderService.showLoadingScreen('Loading');
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.loaderService.hideLoadingScreen();
+    });
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
     this.windowRef.nativeWindow.location.href = this.classroomUrl;
   }
@@ -80,17 +88,7 @@ export class AboutPageComponent implements OnInit {
       '/creator-dashboard?mode=create');
   }
 
-  ngOnInit(): void {
-    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
-      });
-    this.loaderService.showLoadingScreen('Loading');
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.loaderService.hideLoadingScreen();
-    });
-  }
+  ngOnInit(): void {}
 }
 angular.module('oppia').directive(
   'aboutPage', downgradeComponent({component: AboutPageComponent}));
