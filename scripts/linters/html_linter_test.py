@@ -199,7 +199,6 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
     def test_third_party_linter_with_lint_errors(self):
         lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH]).lint_html_files()
-        print(lint_task_report.trimmed_messages)
         self.assert_same_list_elements(
             ['line 10, col 20, line contains trailing whitespace'],
             lint_task_report.trimmed_messages)
