@@ -3491,7 +3491,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 49
+schema_version: 50
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -3621,7 +3621,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 44
+states_schema_version: 45
 tags: []
 title: Title
 """)
@@ -3641,7 +3641,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 50
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -3741,7 +3741,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 45
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -3880,7 +3880,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 50
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -4006,7 +4006,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 49
+schema_version: 50
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4118,7 +4118,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 44
+states_schema_version: 45
 tags: []
 title: Title
 """)

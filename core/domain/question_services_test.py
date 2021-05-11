@@ -3107,7 +3107,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     }
                 }],
                 'solution': {},
-                'id': 'NumericExpressionInput'
+                'id': 'NumericInput'
             },
             'next_content_id_index': 3,
             'param_changes': [],
