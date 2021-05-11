@@ -5,7 +5,6 @@ var glob = require('glob');
 var path = require('path');
 var fs = require('fs');
 var childProcess = require('child_process');
-var randomString = require('randomstring');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
@@ -326,8 +325,8 @@ exports.config = {
 
     var spw = null;
     var vidPath = '';
-    // Enable ALLVIDEOS if you want success videos to be saved.
-    const ALLVIDEOS = false;
+    // Enable ALL_VIDEOS if you want success videos to be saved.
+    const ALL_VIDEOS = false;
 
     // Only running video recorder on Github Actions, since running it on
     // CicleCI causes RAM issues (meaning very high flakiness).
@@ -344,7 +343,7 @@ exports.config = {
             '-g', '300',
             '-loglevel', '16',
           ];
-          const uniqueString = randomString.generate(7);
+          const uniqueString = Math.random().toString(36).substring(7);
           var name = uniqueString + '.mp4';
           var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
