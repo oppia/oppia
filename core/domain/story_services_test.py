@@ -1016,6 +1016,36 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_validate_exploration_throws_an_exception(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.exception()."""
+            observed_log_messages.append(msg)
+
+        def _mock_validate_function(_exploration, _strict):
+            """Mocks logging.exception()."""
+            raise Exception('Error in exploration')
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        validate_fn_swap = self.swap(
+            exp_services, 'validate_exploration_for_story',
+            _mock_validate_function)
+        with logging_swap, validate_fn_swap:
+            self.save_new_valid_exploration(
+                'exp_id_1', self.user_id_a, title='title',
+                category='Category 1', correctness_feedback_enabled=True)
+            self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+            with self.assertRaisesRegexp(
+                Exception, 'Error in exploration'):
+                story_services.validate_explorations_for_story(
+                    ['exp_id_1'], False)
+                self.assertItemsEqual(
+                    observed_log_messages, [
+                        'Exploration validation failed for exploration with '
+                        'ID: exp_id_1. Error: Error in exploration'])
+
     def test_validate_exploration_returning_error_messages(self):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
