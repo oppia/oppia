@@ -34,8 +34,8 @@ from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-from proto import text_classifier_pb2
-from proto import training_job_response_payload_pb2
+from proto_files import text_classifier_pb2
+from proto_files import training_job_response_payload_pb2
 import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])

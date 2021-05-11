@@ -5,7 +5,7 @@
 *.bak
 gae_runtime/*
 # Ignore the auto-generated protobuf python code.
-proto/*.py
+proto_files/*.py
 extensions/classifiers/proto/*.ts
 extensions/classifiers/proto/*.js
 # We have added .git over here such that "git check-ignore" command should
