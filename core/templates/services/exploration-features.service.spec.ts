@@ -29,7 +29,7 @@ describe('ExplorationFeatureService', () => {
   let featureData: ExplorationFeatures;
   let explorationData: ExplorationDataDict;
   let explorationData2: ExplorationDataDict;
-  let testParamChanges: ParamChangeBackendDict;
+  let testParamChange: ParamChangeBackendDict;
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
@@ -44,18 +44,18 @@ describe('ExplorationFeatureService', () => {
       alwaysAskLearnersForAnswerDetails: false
     };
     explorationData = {
-      param_changes: [testParamChanges],
+      param_changes: [testParamChange],
       states: {}
     };
     explorationData2 = {
       param_changes: [],
       states: {
         testState: {
-          param_changes: [testParamChanges],
+          param_changes: [testParamChange],
         }
       }
     };
-    testParamChanges = {
+    testParamChange = {
       name: 'param_1',
       generator_id: 'test_id',
       customization_args: {

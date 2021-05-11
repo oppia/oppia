@@ -29,6 +29,7 @@ export interface ExplorationDataDict {
   'param_changes': ParamChangeBackendDict[] | [];
   states: StateObjectsBackendDict;
 }
+
 @Injectable({
   providedIn: 'root'
 })
