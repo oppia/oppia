@@ -18,22 +18,22 @@
  */
 
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { ResponseMathEquationInput } from './oppia-response-math-equation-input.component';
+import { ShortResponseMathEquationInput } from './oppia-short-response-math-equation-input.component';
 
 describe('ResponseNumericExpressionInput', function() {
-  let component: ResponseMathEquationInput;
-  let fixture: ComponentFixture<ResponseMathEquationInput>;
+  let component: ShortResponseMathEquationInput;
+  let fixture: ComponentFixture<ShortResponseMathEquationInput>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule(
       {
-        declarations: [ResponseMathEquationInput]
+        declarations: [ShortResponseMathEquationInput]
       }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      ResponseMathEquationInput);
+      ShortResponseMathEquationInput);
     component = fixture.componentInstance;
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
