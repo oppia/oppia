@@ -567,7 +567,7 @@ def check_can_voiceover_activity(user, activity_rights):
 
 
 def check_can_modify_voiceartist_in_activity(user, activity_rights):
-    """Check whether the user can assign voicearttist to activity.
+    """Check whether the user can assign voice artist to activity.
 
     Args:
         user: UserActionInfo. Object having user_id, role, and actions for
@@ -576,17 +576,12 @@ def check_can_modify_voiceartist_in_activity(user, activity_rights):
             activity.
 
     Returns:
-        bool. Whether the user can assign voiceartist.
+        bool. Whether the user can assign voice artist.
     """
-
     if activity_rights is None:
         return False
-
-    if (activity_rights.community_owned and
-            role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
-        return True
-    elif (activity_rights.is_published() and
-          role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions):
+    elif (role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions and (
+            activity_rights.community_owned or activity_rights.is_published())):
         return True
     else:
         return False
@@ -784,8 +779,8 @@ def _assign_role(
         committer, activity_rights)
 
     user_can_assigning_role = (
-        role_is_voice_artist and user_can_assigning_voice_artist) or (
-            check_can_modify_activity_roles(committer, activity_rights))
+        check_can_modify_activity_roles(committer, activity_rights)) or (
+            role_is_voice_artist and user_can_assigning_voice_artist)
 
     if not user_can_assigning_role:
         logging.error(
@@ -890,7 +885,7 @@ def _assign_role(
 def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     """Deassigns given user from their current role in the activity.
 
-    Args:ready can edit
+    Args:
         committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
         removed_user_id: str. ID of the user who is being deassigned from
@@ -907,9 +902,14 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    user_can_modify_activity_roles = check_can_modify_voiceartist_in_activity(
-        committer, activity_rights) or check_can_modify_activity_roles(
-            committer, activity_rights)
+    user_can_modify_activity_roles = (
+        check_can_modify_activity_roles(committer, activity_rights) or (
+            check_can_modify_voiceartist_in_activity(
+                committer, activity_rights) and (
+                    activity_rights.is_voice_artist(removed_user_id)
+                )
+            )
+        )
     if not user_can_modify_activity_roles:
         logging.error(
             'User %s tried to remove user %s from an activity %s '

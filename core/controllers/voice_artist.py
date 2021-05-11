@@ -133,8 +133,8 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         self.render_json({})
 
 
-class VoiceartistManagementHandler(base.BaseHandler):
-    """Handles assignment of voiceover admin."""
+class VoiceArtistManagementHandler(base.BaseHandler):
+    """Handles assignment of voice artists."""
 
     @acl_decorators.can_assign_voiceartist
     def post(self, entity_type, entity_id):
