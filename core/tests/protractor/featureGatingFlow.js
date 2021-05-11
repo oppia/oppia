@@ -49,7 +49,7 @@ describe('Feature Gating Flow', function() {
 
     await adminPage.getFeaturesTab();
     const dummy = await adminPage.getDummyFeatureElement();
-
+    await adminPage.enableFeatureForDev(dummy);
     await adminPage.removeAllRulesOfFeature(dummy);
     await adminPage.saveChangeOfFeature(dummy);
 
