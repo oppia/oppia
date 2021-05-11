@@ -124,11 +124,11 @@ HUMAN_READABLE_ROLES = {
 }
 
 
-# TODO(#12755): It is not expected to define a function before defining
-# constants in the module. The _get_unique_actions_list function is needed here
-# as it helps generating values for constants. Remove this function once user
-# roles are independent and doesn't need the _get_unique_actions_list to
-# generate the unique actions.
+# TODO(#12755): Remove this function once user roles are independent and
+# doesn't need the _get_unique_actions_list to generate the unique actions.
+# It is not expected to define a function before defining constants in the
+# module. The _get_unique_actions_list function is needed here
+# as it helps generating values for constants.
 def _get_unique_actions_list(*actions):
     """Returns a list of unique actions out of the given list of actions.
 
