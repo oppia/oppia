@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { GraphAnswer } from 'interactions/answer-defs.ts';
+import { GraphAnswer } from 'interactions/answer-defs';
 
 @Injectable({
   providedIn: 'root'

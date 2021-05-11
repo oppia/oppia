@@ -41,7 +41,8 @@
     "core/templates/domain/classifier/answer-classification-result.model.ts",
     "core/templates/domain/classifier/answer-classification-result.model.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
+    "core/templates/domain/collection/collection-node.model.ts",
+    "core/templates/domain/collection/collection-node.model.spec.ts",
     "core/templates/domain/collection/collection-playthrough.model.ts",
     "core/templates/domain/collection/collection-playthrough.model.spec.ts",
     "core/templates/domain/collection/collection-rights.model.ts",
@@ -56,6 +57,10 @@
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactory.ts",
     "core/templates/domain/exploration/ParamChangeObjectFactorySpec.ts",
+    "core/templates/domain/exploration/ParamSpecsObjectFactory.ts",
+    "core/templates/domain/exploration/ParamSpecsObjectFactorySpec.ts",
+    "core/templates/domain/exploration/ParamTypeObjectFactory.ts",
+    "core/templates/domain/exploration/ParamTypeObjectFactorySpec.ts",
     "core/templates/domain/exploration/RuleObjectFactory.ts",
     "core/templates/domain/exploration/RuleObjectFactorySpec.ts",
     "core/templates/domain/exploration/SubtitledUnicodeObjectFactory.ts",
@@ -82,6 +87,8 @@
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.spec.ts",
+    "core/templates/domain/story/StoryContentsObjectFactory.ts",
+    "core/templates/domain/story/StoryContentsObjectFactorySpec.ts",
     "core/templates/domain/story/story-node.model.ts",
     "core/templates/domain/story/story-node.model.spec.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.ts",
@@ -127,6 +134,8 @@
     "core/templates/services/code-normalizer.service.spec.ts",
     "core/templates/services/construct-translation-ids.service.ts",
     "core/templates/services/construct-translation-ids.service.spec.ts",
+    "core/templates/services/contextual/device-info.service.ts",
+    "core/templates/services/contextual/device-info.service.spec.ts",
     "core/templates/services/contextual/logger.service.ts",
     "core/templates/services/contextual/logger.service.spec.ts",
     "core/templates/services/csrf-token.service.ts",
@@ -183,5 +192,6 @@
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"]
+  "include": ["typings/*.ts"],
+  "exclude": ["extensions/classifiers/proto"]
 }

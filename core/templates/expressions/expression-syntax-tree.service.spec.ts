@@ -17,10 +17,13 @@
  */
 import { TestBed } from '@angular/core/testing';
 
-import { ExpressionSyntaxTreeService, ExpressionError,
-  ExprUndefinedVarError, ExprWrongArgTypeError,
-  ExprWrongNumArgsError } from
-  'expressions/expression-syntax-tree.service.ts';
+import {
+  ExpressionSyntaxTreeService,
+  ExpressionError,
+  ExprUndefinedVarError,
+  ExprWrongArgTypeError,
+  ExprWrongNumArgsError
+} from 'expressions/expression-syntax-tree.service';
 
 describe('Expression syntax tree service', () => {
   describe('expression syntax tree service', () => {
