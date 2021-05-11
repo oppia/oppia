@@ -18,12 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { StoryContents, StoryContentsObjectFactory } from
+import { StoryContents, StoryContentsBackendDict, StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 
 describe('Story contents object factory', () => {
-  let storyContentsObjectFactory: StoryContentsObjectFactory = null;
-  let _sampleStoryContents: StoryContents = null;
+  let storyContentsObjectFactory: StoryContentsObjectFactory;
+  let _sampleStoryContents: StoryContents;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -92,10 +92,10 @@ describe('Story contents object factory', () => {
 
   it('should correctly set initial node id when first node is ' +
     'created', () => {
-    var sampleStoryContentsBackendDict = {
-      initial_node_id: null,
-      nodes: [],
-      next_node_id: 'node_1'
+    var sampleStoryContentsBackendDict: StoryContentsBackendDict = {
+      initial_node_id: 'node_1',
+      next_node_id: '',
+      nodes: []
     };
     var storyContents = storyContentsObjectFactory.createFromBackendDict(
       sampleStoryContentsBackendDict);
