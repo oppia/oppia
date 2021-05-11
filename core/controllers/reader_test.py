@@ -401,11 +401,9 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     def test_get_init_params(self):
         """Test the get_init_params() method."""
         independent_pc = param_domain.ParamChange(
-            'a', 'Copier', {'value': 'firstValue'})
-
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
         exp_param_specs = {
             'a': param_domain.ParamSpec('UnicodeString'),
-            'b': param_domain.ParamSpec('UnicodeString'),
         }
         new_params = self.get_updated_param_dict(
             {}, [independent_pc], exp_param_specs)
