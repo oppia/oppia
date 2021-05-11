@@ -296,7 +296,7 @@ class BaseValidateCommitCmdsSchema(beam.DoFn):
             # For example, if a CollectionCommitLogEntryModel does
             # not have id starting with collection/rights, there is
             # no commit command domain object defined for this model.
-            yield audit_errors.CommitCmdsNoneError(input_model)
+            yield base_validation_errors.CommitCmdsNoneError(input_model)
             return
         for commit_cmd_dict in input_model.commit_cmds:
             if not commit_cmd_dict:
@@ -304,11 +304,11 @@ class BaseValidateCommitCmdsSchema(beam.DoFn):
             try:
                 change_domain_object(commit_cmd_dict)
             except Exception as e:
-                yield audit_errors.CommitCmdsValidateError(
+                yield base_validation_errors.CommitCmdsValidateError(
                     input_model, commit_cmd_dict, e)
 
 
-@audit_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting(
     base_models.BaseCommitLogEntryModel, base_models.BaseSnapshotMetadataModel)
 class ValidateCommitType(beam.DoFn):
     """DoFn to check whether commit type is valid."""

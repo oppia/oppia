@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.exp_model_audits."""
+"""Unit tests for jobs.transforms.exp_validation."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from jobs import job_test_utils
-from jobs.transforms import exp_model_audits
-from jobs.types import audit_errors
+from jobs.transforms import exp_validation
+from jobs.types import base_validation_errors
 
 import apache_beam as beam
 
@@ -49,7 +49,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
@@ -71,12 +71,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {'invalid': 'data'},
                 'Missing cmd key in change dict')
@@ -98,12 +98,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {'cmd': 'invalid'},
                 'Command invalid is not allowed')
@@ -129,12 +129,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'edit_state_property',
@@ -166,12 +166,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'rename_state',
@@ -203,12 +203,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'edit_exploration_property',
@@ -242,12 +242,12 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_model_audits
+                exp_validation
                 .ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'edit_state_property',

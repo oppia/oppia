@@ -21,17 +21,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.platform import models
-from jobs.decorators import audit_decorators
-from jobs.transforms import base_model_audits
+from jobs.decorators import validation_decorators
+from jobs.transforms import base_validation
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
-@audit_decorators.AuditsExisting(
+@validation_decorators.AuditsExisting(
     exp_models.ExplorationSnapshotMetadataModel,
     exp_models.ExplorationCommitLogEntryModel)
 class ValidateExplorationCommitCmdsSchema(
-        base_model_audits.BaseValidateCommitCmdsSchema):
+        base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class and define """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument

@@ -379,7 +379,7 @@ class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
             user_id='',
             post_commit_status='',
             commit_cmds=[{}])
-        error = audit_errors.CommitCmdsNoneError(model)
+        error = base_validation_errors.CommitCmdsNoneError(model)
 
         self.assertEqual(
             error.message,
@@ -400,7 +400,7 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             post_commit_status='',
             commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])
         error_message = 'Missing cmd key in change dict'
-        error = audit_errors.CommitCmdsValidateError(
+        error = base_validation_errors.CommitCmdsValidateError(
             model, '{u\'cmd-invalid\': u\'invalid_test_command\'}',
             error_message)
 

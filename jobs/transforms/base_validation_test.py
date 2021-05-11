@@ -395,20 +395,20 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
 
 
 class MockValidateCommitCmdsSchema(
-        base_model_audits.BaseValidateCommitCmdsSchema):
+        base_validation.BaseValidateCommitCmdsSchema):
 
     def process(self, input_model):
         self._get_change_domain_class(input_model)
 
 
 class MockValidateCommitCmdsSchemaChangeDomain(
-        base_model_audits.BaseValidateCommitCmdsSchema):
+        base_validation.BaseValidateCommitCmdsSchema):
 
     def _get_change_domain_class(self, item):
         pass
 
 
-class MockValidateWrongSchema(base_model_audits.BaseValidateCommitCmdsSchema):
+class MockValidateWrongSchema(base_validation.BaseValidateCommitCmdsSchema):
 
     def _get_change_domain_class(self, item): # pylint: disable=unused-argument
         return change_domain.BaseChange
@@ -433,7 +433,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
+            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])
 
     def test_validate_wrong_commit_cmd_missing(self):
@@ -453,7 +453,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {'cmd-invalid': 'invalid_test_command'},
                 'Missing cmd key in change dict')
@@ -476,7 +476,7 @@ class ValidateCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.CommitCmdsValidateError(
+            base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
                 {'cmd': 'invalid_test_command'},
                 'Command invalid_test_command is not allowed')
