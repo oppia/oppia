@@ -31,6 +31,7 @@ import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 
@@ -91,6 +92,8 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 // Services.
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { HttpClient } from '@angular/common/http';
+import { createTranslateLoader } from 'pages/translate-loader.factory';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -135,6 +138,14 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'en',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (createTranslateLoader),
+        deps: [HttpClient]
+      }
+    }),
     ...firebaseAuthModules,
   ],
 
@@ -237,6 +248,7 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioFileUploaderComponent,

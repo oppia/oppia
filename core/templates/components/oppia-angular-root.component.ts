@@ -460,7 +460,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { TranslateService } from 'services/translate.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'oppia-angular-root',
@@ -1482,6 +1482,11 @@ private injector: Injector
 
     OppiaAngularRootComponent.injector = this.injector;
 
+    this.translateService.use('en');
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange
+      .subscribe((languageCode) => {
+        this.translateService.use(languageCode);
+      });
     // This emit triggers ajs to start its app.
     this.initialized.emit();
   }

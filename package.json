@@ -130,6 +130,8 @@
     "@asymmetrik/ngx-leaflet": "^8.1.0",
     "@ctrl/ngx-codemirror": "^4.1.1",
     "@ng-bootstrap/ng-bootstrap": "^8.0.0",
+    "@ngx-translate/core": "^13.0.0",
+    "@ngx-translate/http-loader": "^6.0.0",
     "@types/angular-translate": "^2.16.2",
     "angular": "^1.8.2",
     "angular-cookies": "^1.8.2",
