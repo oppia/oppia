@@ -148,7 +148,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             },
             'score_category': 'content.Algebra',
             'language_code': None,
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
 
     def test_create_suggestion_edit_state_content(self):
@@ -862,7 +863,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             },
             'score_category': 'translation.Algebra',
             'language_code': 'hi',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
 
     def test_create_suggestion_add_translation(self):
@@ -1505,7 +1507,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'score_category': 'question.topic_1',
             'language_code': 'en',
-            'last_updated': utils.get_time_in_millisecs(self.fake_date)
+            'last_updated': utils.get_time_in_millisecs(self.fake_date),
+            'edited_by_reviewer': False
         }
 
     def test_create_suggestion_add_question(self):
