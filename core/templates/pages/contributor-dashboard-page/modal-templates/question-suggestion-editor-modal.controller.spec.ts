@@ -17,7 +17,6 @@
  */
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
-import { fakeAsync } from '@angular/core/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Editor Modal Controller', function() {
@@ -206,7 +205,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
     it('should show alert when suggestion is submitted', function() {
       spyOn(AlertsService, 'addSuccessMessage');
       $scope.done();
-      expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith('Submitted question for review.');
+      expect(AlertsService.addSuccessMessage)
+        .toHaveBeenCalledWith('Submitted question for review.');
     });
 
     it('should register Contributor Dashboard submit suggestion event on' +
