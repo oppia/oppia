@@ -60,7 +60,7 @@ export class RolesAndActionsVisualizerComponent implements OnInit {
     }
 
     this.roles = Object.keys(this.roleToActions).sort();
-    this.activeRole = this.roles[0];
+    this.activeRole = this.roles[3];
   }
 }
 
