@@ -25,6 +25,13 @@ import { Howl } from 'howler';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+
+interface AutoPlayAudioEvent {
+  audioTranslations: RecordedVoiceovers;
+  html: string;
+  componentName: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +42,8 @@ export class AudioPlayerService {
   private _lastPauseOrSeekPos: number | null = null;
   private _loadingTrack = false;
   private _updateViewEventEmitter = new EventEmitter<void>();
-  private _autoplayAudioEventEmitter = new EventEmitter<void>();
+  private _autoplayAudioEventEmitter = (
+    new EventEmitter<void | AutoPlayAudioEvent>());
   private _stopIntervalSubject = new Subject<void>();
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -60,13 +68,14 @@ export class AudioPlayerService {
           format: ['mp3']
         });
         this._currentTrack.on('load', () => {
+          this._stopIntervalSubject.next();
           this._currentTrackFilename = loadedAudioFile.filename;
           this._loadingTrack = false;
           this._lastPauseOrSeekPos = 0;
-          this.play();
           successCallback();
         });
         this._currentTrack.on('end', () => {
+          this._stopIntervalSubject.next();
           this._currentTrack = null;
           this._currentTrackFilename = null;
           this._lastPauseOrSeekPos = null;
@@ -114,10 +123,9 @@ export class AudioPlayerService {
       return;
     }
     this._lastPauseOrSeekPos = 0;
+    this.setCurrentTime(0);
     this._currentTrack.stop();
     this._stopIntervalSubject.next();
-    this._currentTrackFilename = null;
-    this._currentTrack = null;
   }
 
   rewind(seconds: number): void {
@@ -129,11 +137,8 @@ export class AudioPlayerService {
     if (typeof currentSeconds !== 'number') {
       return;
     }
-    if (currentSeconds - seconds > 0) {
-      this._currentTrack.seek(currentSeconds - seconds);
-    } else {
-      this._currentTrack.seek(0);
-    }
+    const rewindTo = currentSeconds - seconds;
+    this._currentTrack.seek(rewindTo > 0 ? rewindTo : 0);
   }
 
   forward(seconds: number): void {
@@ -153,11 +158,11 @@ export class AudioPlayerService {
     if (!this._currentTrack) {
       return 0;
     }
-    const sec = this._currentTrack.seek();
-    if (typeof sec !== 'number') {
+    const currentTime = this._currentTrack.seek();
+    if (typeof currentTime !== 'number') {
       return 0;
     }
-    return Math.floor(sec);
+    return Math.floor(currentTime);
   }
 
   setCurrentTime(val: number): void {
@@ -184,23 +189,6 @@ export class AudioPlayerService {
     }
   }
 
-  getProgress(): number {
-    if (!this._currentTrack) {
-      return 0;
-    }
-    return (
-      this._currentTrack.seek() as number) / this._currentTrack.duration();
-  }
-
-  setProgress(progress: number): void {
-    if (progress < 0 || progress > 1) {
-      return;
-    }
-    if (this._currentTrack) {
-      this._currentTrack.seek(progress * this._currentTrack.duration());
-    }
-  }
-
   isPlaying(): boolean {
     return this._currentTrack && this._currentTrack.playing();
   }
@@ -210,21 +198,18 @@ export class AudioPlayerService {
   }
 
   clear(): void {
-    if (this._currentTrack && this.isPlaying()) {
+    if (this.isPlaying()) {
       this.stop();
     }
+    this._currentTrackFilename = null;
     this._currentTrack = null;
-  }
-
-  get currentTime(): number {
-    return this.getCurrentTime();
   }
 
   get viewUpdate(): EventEmitter<void> {
     return this._updateViewEventEmitter;
   }
 
-  get onAutoplayAudio(): EventEmitter<void> {
+  get onAutoplayAudio(): EventEmitter<void | AutoPlayAudioEvent> {
     return this._autoplayAudioEventEmitter;
   }
 }
