@@ -24,6 +24,10 @@ import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { QuestionSuggestionBackendApiService } from './question-suggestion-backend-api.service';
 
+const fakeImage = (): File => {
+  const blob = new Blob([''], { type: 'image/jpeg' });
+  return blob as File;
+};
 
 describe('Question Suggestion Backend Api Service', () => {
   let qsbas: QuestionSuggestionBackendApiService;
@@ -60,7 +64,10 @@ describe('Question Suggestion Backend Api Service', () => {
 
     let skillDifficulty = new SkillDifficulty('test_id', 'test_description', 1);
     qsbas.submitSuggestionAsync(
-      question as unknown as Question, associatedSkill, skillDifficulty, [])
+      question as unknown as Question, associatedSkill, skillDifficulty, [{
+        filename: 'image',
+        imageBlob: fakeImage()
+      }])
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/suggestionhandler/');
