@@ -23,6 +23,7 @@ import ast
 import collections
 import contextlib
 import copy
+import functools
 import inspect
 import itertools
 import json
@@ -1128,7 +1129,7 @@ class TestBase(unittest.TestCase):
 
     @contextlib.contextmanager
     def swap_with_checks(
-            self, obj, attr, new_value, expected_args=None,
+            self, obj, attr, new_function, expected_args=None,
             expected_kwargs=None, called=True):
         """Swap an object's function value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -1154,7 +1155,7 @@ class TestBase(unittest.TestCase):
         Args:
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
-            new_value: function. The new function you want to use.
+            new_function: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you want
                 this function to be invoked with. When its value is None, args
                 will not be checked. If the value type is list, the function
@@ -1168,53 +1169,84 @@ class TestBase(unittest.TestCase):
         Yields:
             context. The context with function replaced.
         """
-        original = getattr(obj, attr)
-        # The actual error message will also include detail assert error message
-        # via the `self.longMessage` below.
-        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+        original_function = getattr(obj, attr)
+        original_long_message_value = self.longMessage
+        msg = '%s.%s() failed the expectations of swap_with_checks()' % (
             obj.__name__, attr)
 
-        def wrapper(*args, **kwargs):
-            """Wrapper function for the new value. This function will do the
-            check before the wrapped function is invoked. After the function
-            finished, the wrapper will update how many times this function is
-            invoked.
+        expected_args_iter = iter(expected_args or ())
+        expected_kwargs_iter = iter(expected_kwargs or ())
+
+        @functools.wraps(original_function)
+        def new_function_with_checks(*args, **kwargs):
+            """Wrapper function for the new value which keeps track of how many
+            times this function is invoked.
 
             Args:
                 *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                *. Result of `new_value`.
+                *. Result of `new_function`.
             """
-            wrapper.called = True
-            if expected_args is not None:
-                self.assertEqual(args, expected_args[0], msg=msg)
-                expected_args.pop(0)
-            if expected_kwargs is not None:
-                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
-                expected_kwargs.pop(0)
-            result = new_value(*args, **kwargs)
-            return result
+            new_function_with_checks.call_num += 1
 
-        wrapper.called = False
-        setattr(obj, attr, wrapper)
-        error_occurred = False
-        try:
-            # This will show the detailed assert message.
+            # Includes assertion error information in addition to the message.
             self.longMessage = True
+
+            if expected_args:
+                next_args = python_utils.NEXT(expected_args_iter, None)
+                self.assertEqual(
+                    args, next_args, msg='*args to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            if expected_kwargs:
+                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                self.assertEqual(
+                    kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            # Reset self.longMessage just in case `new_function()` raises.
+            self.longMessage = original_long_message_value
+
+            return new_function(*args, **kwargs)
+
+        new_function_with_checks.call_num = 0
+        setattr(obj, attr, new_function_with_checks)
+
+        try:
             yield
-        except Exception:
-            error_occurred = True
-            # Raise issues thrown by the called function or assert error.
-            raise
+            # Includes assertion error information in addition to the message.
+            self.longMessage = True
+
+            self.assertEqual(
+                new_function_with_checks.call_num > 0, called, msg=msg)
+            pretty_unused_args = [
+                ', '.join(itertools.chain(
+                    (repr(a) for a in args),
+                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                for args, kwargs in itertools.izip_longest( # pylint: disable=deprecated-itertools-function
+                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+            ]
+            if pretty_unused_args:
+                num_expected_calls = (
+                    new_function_with_checks.call_num + len(pretty_unused_args))
+                missing_call_summary = '\n'.join(
+                    '\tCall %d of %d: %s(%s)' % (
+                        i, num_expected_calls, attr, call_args)
+                    for i, call_args in enumerate(
+                        pretty_unused_args,
+                        start=new_function_with_checks.call_num + 1))
+                self.fail(
+                    msg='Only %d of the %d expected calls were made.\n'
+                    '\n'
+                    'Missing:\n'
+                    '%s : %s' % (
+                        new_function_with_checks.call_num, num_expected_calls,
+                        missing_call_summary, msg))
         finally:
-            setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
+            self.longMessage = original_long_message_value
+            setattr(obj, attr, original_function)
 
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
@@ -1925,16 +1957,19 @@ title: Title
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username):
+    def signup(self, email, username, is_super_admin=False):
         """Complete the signup process for the user with the given username.
 
         Args:
             email: str. Email of the given user.
             username: str. Username of the given user.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        login_context = self.login_context(email, is_super_admin=is_super_admin)
+
+        with login_context, requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)

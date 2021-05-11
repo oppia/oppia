@@ -1150,9 +1150,6 @@ CLOUD_DATASTORE_EMULATOR_PORT = 8089
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 FIREBASE_EMULATOR_PORT = 9099
 
-# TODO(#11462): Delete this after Firebase authentication has been deployed.
-ENABLE_USER_CREATION = True
-
 # The name of the cookie Oppia will place the session cookie into. The name is
 # arbitrary. If it is changed later on, then the cookie will live on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
