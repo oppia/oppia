@@ -31,6 +31,7 @@ import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.mod
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
 import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
+import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 
 @NgModule({
   imports: [
@@ -44,7 +45,8 @@ import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/mult
     ImageClickInputInteractionModule,
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
-    MultipleChoiceInputInteractionModule
+    MultipleChoiceInputInteractionModule,
+    SetInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
@@ -57,7 +59,8 @@ import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/mult
     ImageClickInputInteractionModule,
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
-    MultipleChoiceInputInteractionModule
+    MultipleChoiceInputInteractionModule,
+    SetInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }

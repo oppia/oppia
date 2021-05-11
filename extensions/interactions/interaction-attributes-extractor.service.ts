@@ -40,7 +40,8 @@ export class InteractionAttributesExtractorService {
     'CodeRepl',
     'InteractiveMap',
     'LogicProof',
-    'MultipleChoiceInput'
+    'MultipleChoiceInput',
+    'SetInput'
   ];
 
   constructor(

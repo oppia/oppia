@@ -44,7 +44,8 @@ export class ExplorationHtmlFormatterService {
     'ImageClickInput',
     'InteractiveMap',
     'LogicProof',
-    'MultipleChoiceInput'
+    'MultipleChoiceInput',
+    'SetInput'
   ];
 
   constructor(

@@ -20,26 +20,34 @@
  * followed by the name of the arg.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+@Component({
+  selector: 'oppia-short-response-set-input',
+  templateUrl: './set-input-short-response.component.html'
+})
+
+export class ShortResponseSetInputComponent implements OnInit {
+  @Input() answer;
+  displayedAnswer: string;
+  constructor(private htmlEscaperService: HtmlEscaperService) { }
+
+  ngOnInit(): void {
+    const _answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer) as unknown[];
+    this.displayedAnswer = (
+      _answer.length > 0 ? _answer.join(', ') :
+      'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
+  }
+}
+
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaShortResponseSetInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./set-input-short-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          ctrl.displayedAnswer = (
-            _answer.length > 0 ? _answer.join(', ') :
-            'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').directive(
+  'oppiaShortResponseSetInput',
+  downgradeComponent({
+    component: ShortResponseSetInputComponent
+  }));

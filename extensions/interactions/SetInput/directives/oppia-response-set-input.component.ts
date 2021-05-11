@@ -20,22 +20,24 @@
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+@Component({
+  selector: 'oppia-response-set-input',
+  templateUrl: './set-input-response.component.html'
+})
+export class ResponseSetInputComponent implements OnInit {
+  @Input('answer') answerWithValue;
+  answer;
+  constructor(private htmlEscaperService: HtmlEscaperService) { }
 
-angular.module('oppia').directive('oppiaResponseSetInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./set-input-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        };
-      }]
-    };
+  ngOnInit(): void {
+    this.answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answerWithValue);
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaResponseSetInput',
+  downgradeComponent({component: ResponseSetInputComponent}));
