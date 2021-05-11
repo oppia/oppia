@@ -133,7 +133,14 @@ angular.module('oppia').directive('learnerViewInfo', [
                 $rootScope.$applyAsync();
               });
             // To check if the exploration is linked to the topic or not.
-            ctrl.isLinkedToTopic = ctrl.getTopicUrl() ? true : false;
+            try {
+              if (ctrl.getTopicUrl()) {
+                ctrl.isLinkedToTopic = true;
+              }
+            } catch (error) {
+              ctrl.isLinkedToTopic = false;
+            }
+
             // If linked to topic then print topic name in the lesson player.
             if (ctrl.isLinkedToTopic) {
               ctrl.storyViewerBackendApiService = (
