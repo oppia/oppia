@@ -28,7 +28,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let $flushPendingTasks = null;
   let CsrfTokenService = null;
   let QuestionObjectFactory = null;
-  let QuestionSuggestionService = null;
+  let QuestionSuggestionBackendApiService = null;
   let QuestionUndoRedoService = null;
   let SiteAnalyticsService = null;
   let SkillObjectFactory = null;
@@ -52,7 +52,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       CsrfTokenService = $injector.get('CsrfTokenService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      QuestionSuggestionService = $injector.get('QuestionSuggestionService');
+      QuestionSuggestionBackendApiService =
+      $injector.get('QuestionSuggestionBackendApiService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
       SiteAnalyticsService = $injector.get('SiteAnalyticsService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
@@ -287,7 +288,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      QuestionSuggestionService = $injector.get('QuestionSuggestionService');
+      QuestionSuggestionBackendApiService =
+      $injector.get('QuestionSuggestionBackendApiService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
 
@@ -336,10 +338,11 @@ describe('Question Suggestion Editor Modal Controller', function() {
     });
 
     it('should not submit question', function() {
-      spyOn(QuestionSuggestionService, 'submitSuggestion').and.callThrough();
+      spyOn(QuestionSuggestionBackendApiService, 'submitSuggestionAsync')
+        .and.callThrough();
       $scope.done();
 
-      expect(QuestionSuggestionService.submitSuggestion).not
+      expect(QuestionSuggestionBackendApiService.submitSuggestionAsync).not
         .toHaveBeenCalled();
       expect($uibModalInstance.close).not.toHaveBeenCalled();
     });
