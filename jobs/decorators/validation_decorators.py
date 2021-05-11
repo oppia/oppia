@@ -26,7 +26,7 @@ import re
 
 from core.platform import models
 from jobs import job_utils
-from jobs.types import audit_errors
+from jobs.types import base_validation_errors
 from jobs.types import model_property
 import python_utils
 
@@ -123,7 +123,7 @@ class AuditsExisting(python_utils.OBJECT):
         with_input_types, with_output_types = (
             typehints.with_input_types(
                 typehints.Union[self._targeted_model_types]),
-            typehints.with_output_types(audit_errors.BaseAuditError))
+            typehints.with_output_types(base_validation_errors.BaseAuditError))
         return with_input_types(with_output_types(do_fn_type))
 
     @classmethod
