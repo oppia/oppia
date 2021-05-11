@@ -60,7 +60,7 @@ describe('User Api Service', () => {
     csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
-      () =>{
+      async() => {
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
         });

@@ -68,7 +68,7 @@ describe('Exploration player page', function() {
     ' and set angular element content property based on the exploration',
   function() {
     spyOn(ContextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(ReadOnlyExplorationBackendApiService, 'fetchExploration').and
+    spyOn(ReadOnlyExplorationBackendApiService, 'fetchExplorationAsync').and
       .returnValue($q.resolve({
         exploration: exploration
       }));
