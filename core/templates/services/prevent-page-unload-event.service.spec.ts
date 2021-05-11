@@ -126,7 +126,7 @@ fdescribe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.addListener(val);
     spyOn(reloadEvt, 'preventDefault');
 
-    windowRef.nativeWindow.location.reload();
+    windowRef.nativeWindow.location.reload(val());
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
