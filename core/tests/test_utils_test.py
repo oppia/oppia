@@ -386,7 +386,10 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_cannot_get_updated_param_dict_with_invalid_param_name(self):
         param_change_list = [
             param_domain.ParamChange(
-                'a', 'Copier', {'value': 'firstValue'})
+                'a', 'Copier', {
+                    'value': 'firstValue', 'parse_with_jinja': False
+                }
+            )
         ]
         exp_param_specs = {
             'b': param_domain.ParamSpec('UnicodeString'),

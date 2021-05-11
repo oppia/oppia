@@ -27,7 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import suggestion_services
 from core.domain import topic_fetchers
-from core.domain import translation_services
+# from core.domain import translation_services
 from core.domain import user_services
 import feconf
 import utils
@@ -347,8 +347,8 @@ class MachineTranslationStateTextsHandler(base.BaseHandler):
 
             source_text = content_id_to_text_mapping[content_id]
             translated_texts[content_id] = (
-                translation_services.get_and_cache_machine_translation(
-                    exp.language_code, target_language_code, source_text)
+                # translation_services.get_and_cache_machine_translation(
+                #     exp.language_code, target_language_code, source_text)
             )
 
         self.values = {
