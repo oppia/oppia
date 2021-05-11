@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Component for svg filename editor.
- */
+ */.onload
 
 require('components/forms/custom-forms-directives/image-uploader.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
