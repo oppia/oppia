@@ -13,18 +13,6 @@
   <p class="logic-proof-error-message"> {{ errorMessage }}  </p>
 </div>
 
-<style>
-  .logic-proof-container {
-    background: #fff;
-    max-width: 100%;
-    padding: 8px;
-  }
-  @media screen and (max-width: 959px) {
-    .logic-proof-container {
-      width: 100vw;
-    }
-  }
-</style>
 <ng-template #content let-modal>
   <div class="modal-header">
     Possible line layouts
@@ -99,3 +87,16 @@
     <button class="btn" (click)="modal.close()">Close</button>
   </div>
 </ng-template>
+
+<style>
+  .logic-proof-container {
+    background: #fff;
+    max-width: 100%;
+    padding: 8px;
+  }
+  @media screen and (max-width: 959px) {
+    .logic-proof-container {
+      width: 100vw;
+    }
+  }
+</style>

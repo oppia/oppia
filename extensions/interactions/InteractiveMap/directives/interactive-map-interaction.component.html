@@ -24,13 +24,12 @@
 
 <div class="interactive-map-container">
   <div leaflet
-      id="interactiveMap"
-      class="oppia-interactive-map"
-      [leafletOptions]="mapOptions"
-      (leafletClick)="leafletClick($event)"
-      (leafletMouseOut)="leafletMouseOut()"
-      (leafletMouseOver)="leafletMouseOver()">
+       id="interactiveMap"
+       class="oppia-interactive-map"
+       [leafletOptions]="mapOptions"
+       (leafletClick)="leafletClick($event)"
+       (leafletMouseOut)="leafletMouseOut()"
+       (leafletMouseOver)="leafletMouseOver()">
     <div *ngIf="mapMarkers" [leafletLayer]="mapMarkers"></div>
   </div>
 </div>
-

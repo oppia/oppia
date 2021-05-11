@@ -31,7 +31,7 @@ import { CurrentInteractionService, InteractionRulesService } from 'pages/explor
 import { LogicProofRulesService } from './logic-proof-rules.service';
 import CodeMirror from 'codemirror';
 import { LogicProofCustomizationArgs } from 'interactions/customization-args-defs';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 @Component({
@@ -335,16 +335,6 @@ export class InteractiveLogicProofComponent implements OnInit {
     );
   }
 }
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require('third-party-imports/ui-codemirror.import.ts');
-require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
-require(
-  'pages/exploration-player-page/services/current-interaction.service.ts');
-require(
-  'interactions/interaction-attributes-extractor.service.ts');
-require('pages/exploration-player-page/services/player-position.service.ts');
 
 angular.module('oppia').directive(
   'oppiaInteractiveLogicProof', downgradeComponent({
