@@ -51,7 +51,7 @@ export interface HTMLSchema {
 
 @Component({
   selector: 'oppia-translation-modal',
-  templateUrl: './translation-modal.component.html',
+  templateUrl: './translation-modal.component.html'
 })
 export class TranslationModalComponent {
   @Input() opportunity: TranslationOpportunity;
