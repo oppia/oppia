@@ -34,8 +34,7 @@ export class DeleteAccountPageComponent {
 
   deleteAccount(): void {
     const modelRef = this.ngbModal.open(
-      DeleteAccountModalComponent,
-      { backdrop: true });
+      DeleteAccountModalComponent, { backdrop: true });
     modelRef.result.then(() => {
       this.deleteAccountBackendApiService.deleteAccount();
     }, () => {
