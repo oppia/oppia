@@ -56,6 +56,7 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'InteractiveMap',
     'LogicProof',
     'MathEquationInput',
+    'MultipleChoiceInput',
     'NumericExpressionInput',
     'RatioExpressionInput'
 ]

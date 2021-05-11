@@ -30,6 +30,7 @@ import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
 import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
+import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
 
 @NgModule({
   imports: [
@@ -42,7 +43,8 @@ import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactio
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
     InteractiveMapInteractionModule,
-    LogicProofInteractionModule
+    LogicProofInteractionModule,
+    MultipleChoiceInputInteractionModule
   ],
   declarations: [],
   entryComponents: [],
@@ -54,7 +56,8 @@ import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactio
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
     InteractiveMapInteractionModule,
-    LogicProofInteractionModule
+    LogicProofInteractionModule,
+    MultipleChoiceInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }
