@@ -26,21 +26,12 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
   }
 }
 
@@ -102,7 +93,6 @@ describe('About Page', function() {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
-        { provide: TranslateService, useClass: MockTranslateService },
         UtilsService,
         UrlInterpolationService,
         { provide: WindowRef, useValue: windowRef }

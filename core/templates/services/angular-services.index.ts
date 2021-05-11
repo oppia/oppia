@@ -325,7 +325,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
-import { TranslateService } from 'services/translate.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
@@ -688,7 +687,6 @@ export const angularServices: [string, Type<{}>][] = [
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
-  ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],

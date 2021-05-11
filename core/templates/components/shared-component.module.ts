@@ -93,7 +93,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
-import { createTranslateLoader } from 'pages/translate-loader.factory';
+import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -142,7 +142,7 @@ const toastrConfig = {
       defaultLanguage: 'en',
       loader: {
         provide: TranslateLoader,
-        useFactory: (createTranslateLoader),
+        useFactory: (TranslateLoaderFactory.createTranslateLoader),
         deps: [HttpClient]
       }
     }),

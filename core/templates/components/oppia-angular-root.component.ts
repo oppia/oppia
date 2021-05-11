@@ -1482,12 +1482,6 @@ private injector: Injector
 
     OppiaAngularRootComponent.injector = this.injector;
 
-    this.translateService.use('en');
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange
-      .subscribe((languageCode) => {
-        this.translateService.use(languageCode);
-      });
-    // This emit triggers ajs to start its app.
     this.initialized.emit();
   }
 }

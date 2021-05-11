@@ -19,7 +19,6 @@ import { Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
 import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from
@@ -37,13 +36,7 @@ class MockTranslatePipe {
     return value;
   }
 }
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
+
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -77,7 +70,6 @@ describe('Teach Page', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        { provide: TranslateService, useClass: MockTranslateService },
         {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,
         {
