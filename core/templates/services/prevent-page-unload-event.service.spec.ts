@@ -21,8 +21,7 @@ import { PreventPageUnloadEventService }
   from 'services/prevent-page-unload-event.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe ('Prevent page unload event service', function() {
+describe ('Prevent page unload event service', function() {
   let preventPageUnloadEventService: PreventPageUnloadEventService = null;
   let windowRef: WindowRef = null;
 
