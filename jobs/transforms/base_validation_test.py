@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.base_model_audits."""
+"""Unit tests for jobs.transforms.base_validation."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -27,8 +27,8 @@ from core.domain import state_domain
 from core.platform import models
 import feconf
 from jobs import job_test_utils
-from jobs.transforms import base_model_audits
-from jobs.types import audit_errors
+from jobs.transforms import base_validation
+from jobs.types import base_validation_errors
 
 import apache_beam as beam
 
@@ -55,11 +55,11 @@ class ValidateDeletedTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([expired_model])
-            | beam.ParDo(base_model_audits.ValidateDeletedModel())
+            | beam.ParDo(base_validation.ValidateDeletedModel())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelExpiredError(expired_model),
+            base_validation_errors.ModelExpiredError(expired_model),
         ])
 
 
@@ -74,11 +74,12 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_model_audits.ValidateModelTimestamps())
+            | beam.ParDo(base_validation.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InconsistentTimestampsError(invalid_timestamp),
+            base_validation_errors.InconsistentTimestampsError(
+                invalid_timestamp),
         ])
 
     def test_process_reports_model_mutated_during_job_error(self):
@@ -90,11 +91,12 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(base_model_audits.ValidateModelTimestamps())
+            | beam.ParDo(base_validation.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelMutatedDuringJobError(invalid_timestamp),
+            base_validation_errors.ModelMutatedDuringJobError(
+                invalid_timestamp),
         ])
 
 
@@ -109,13 +111,13 @@ class ValidateModelIdTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_id_model])
-            | beam.ParDo(base_model_audits.ValidateBaseModelId())
+            | beam.ParDo(base_validation.ValidateBaseModelId())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelIdRegexError(
+            base_validation_errors.ModelIdRegexError(
                 invalid_id_model,
-                base_model_audits.BASE_MODEL_ID_PATTERN),
+                base_validation.BASE_MODEL_ID_PATTERN),
         ])
 
 
@@ -135,11 +137,12 @@ class ValidatePostCommitIsInvalidTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_model_audits.ValidatePostCommitStatus())
+            | beam.ParDo(base_validation.ValidatePostCommitStatus())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidCommitStatusError(invalid_commit_status),
+            base_validation_errors.InvalidCommitStatusError(
+                invalid_commit_status),
         ])
 
 
@@ -159,11 +162,12 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_model_audits.ValidatePostCommitIsPrivate())
+            | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
+            base_validation_errors.InvalidPrivateCommitStatusError(
+                invalid_commit_status),
         ])
 
     def test_validate_post_commit_is_private_when_status_is_private(self):
@@ -180,43 +184,44 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_commit_status])
-            | beam.ParDo(base_model_audits.ValidatePostCommitIsPrivate())
+            | beam.ParDo(base_validation.ValidatePostCommitIsPrivate())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidPrivateCommitStatusError(invalid_commit_status),
+            base_validation_errors.InvalidPrivateCommitStatusError(
+                invalid_commit_status),
         ])
 
 
 class MockValidateModelDomainObjectInstancesWithNeutral(
-        base_model_audits.ValidateModelDomainObjectInstances):
+        base_validation.ValidateModelDomainObjectInstances):
     def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_model_audits.VALIDATION_MODES.neutral
+        return base_validation.VALIDATION_MODES.neutral
 
 
 class MockValidateModelDomainObjectInstancesWithStrict(
-        base_model_audits.ValidateModelDomainObjectInstances):
+        base_validation.ValidateModelDomainObjectInstances):
     def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_model_audits.VALIDATION_MODES.strict
+        return base_validation.VALIDATION_MODES.strict
 
 
 class MockValidateModelDomainObjectInstancesWithNonStrict(
-        base_model_audits.ValidateModelDomainObjectInstances):
+        base_validation.ValidateModelDomainObjectInstances):
     def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
         return MockDomainObject()
 
     def _get_domain_object_validation_type(self, item): # pylint: disable=unused-argument
-        return base_model_audits.VALIDATION_MODES.non_strict
+        return base_validation.VALIDATION_MODES.non_strict
 
 
 class MockValidateModelDomainObjectInstancesWithInvalid(
-        base_model_audits.ValidateModelDomainObjectInstances):
+        base_validation.ValidateModelDomainObjectInstances):
     def _get_model_domain_object_instance(self, item): # pylint: disable=unused-argument
         return MockDomainObject()
 
@@ -225,7 +230,7 @@ class MockValidateModelDomainObjectInstancesWithInvalid(
 
 
 class MockValidateExplorationModelDomainObjectInstances(
-        base_model_audits.ValidateModelDomainObjectInstances):
+        base_validation.ValidateModelDomainObjectInstances):
     def _get_model_domain_object_instance(self, item):
         return exp_fetchers.get_exploration_from_model(item)
 
@@ -244,7 +249,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                base_model_audits.ValidateModelDomainObjectInstances())
+                base_validation.ValidateModelDomainObjectInstances())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -314,7 +319,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(MockValidateModelDomainObjectInstancesWithInvalid())
         )
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelDomainObjectValidateError(
+            base_validation_errors.ModelDomainObjectValidateError(
                 model, 'Invalid validation type for domain object: invalid')
         ])
 
@@ -360,7 +365,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelDomainObjectValidateError(
+            base_validation_errors.ModelDomainObjectValidateError(
                 model_instance2, 'The destination end is not a valid state.')
         ])
 
@@ -380,11 +385,12 @@ class ValidateCommitTypeTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_commit_type_model])
-            | beam.ParDo(base_model_audits.ValidateCommitType())
+            | beam.ParDo(base_validation.ValidateCommitType())
         )
 
         self.assert_pcoll_equal(output, [
-            audit_errors.InvalidCommitTypeError(invalid_commit_type_model),
+            base_validation_errors.InvalidCommitTypeError(
+                invalid_commit_type_model),
         ])
 
 

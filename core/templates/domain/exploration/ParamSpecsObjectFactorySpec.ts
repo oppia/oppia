@@ -18,16 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
+import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 
 describe('ParamSpecs', () => {
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory = null;
-  let paramSpecObjectFactory: ParamSpecObjectFactory = null;
-  var emptyParamSpecs = null;
-  var paramName = 'x';
+  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
+  let paramSpecObjectFactory: ParamSpecObjectFactory;
+  let emptyParamSpecs: ParamSpecs;
+  let paramName = 'x';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,7 +44,7 @@ describe('ParamSpecs', () => {
   });
 
   it('should add param when missing', () => {
-    var paramSpec = paramSpecObjectFactory.createDefault();
+    let paramSpec = paramSpecObjectFactory.createDefault();
 
     expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(true);
     // No longer empty.
@@ -56,12 +54,12 @@ describe('ParamSpecs', () => {
   });
 
   it('should not overwrite existing params', () => {
-    var oldParamSpec = paramSpecObjectFactory.createDefault();
+    let oldParamSpec = paramSpecObjectFactory.createDefault();
     expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec)).toBe(true);
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
 
-    var newParamSpec = paramSpecObjectFactory.createDefault();
+    let newParamSpec = paramSpecObjectFactory.createDefault();
     expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec)).toBe(false);
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);

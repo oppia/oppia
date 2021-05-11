@@ -34,8 +34,8 @@ import re
 from core.platform import models
 import feconf
 from jobs import job_utils
-from jobs.decorators import audit_decorators
-from jobs.types import audit_errors
+from jobs.decorators import validation_decorators
+from jobs.types import base_validation_errors
 import python_utils
 
 import apache_beam as beam
@@ -72,10 +72,10 @@ class ValidateDeletedModel(beam.DoFn):
             feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED)
 
         if model.last_updated < expiration_date:
-            yield audit_errors.ModelExpiredError(model)
+            yield base_validation_errors.ModelExpiredError(model)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseModel)
+@validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateBaseModelId(beam.DoFn):
     """DoFn to validate model ids.
 
@@ -107,10 +107,10 @@ class ValidateBaseModelId(beam.DoFn):
         model = job_utils.clone_model(input_model)
 
         if not re.match(self._pattern, model.id):
-            yield audit_errors.ModelIdRegexError(model, self._pattern)
+            yield base_validation_errors.ModelIdRegexError(model, self._pattern)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
+@validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitStatus(beam.DoFn):
     """DoFn to validate post_commit_status."""
 
@@ -129,10 +129,10 @@ class ValidatePostCommitStatus(beam.DoFn):
         if model.post_commit_status not in [
                 feconf.POST_COMMIT_STATUS_PUBLIC,
                 feconf.POST_COMMIT_STATUS_PRIVATE]:
-            yield audit_errors.InvalidCommitStatusError(model)
+            yield base_validation_errors.InvalidCommitStatusError(model)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
+@validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
 class ValidatePostCommitIsPrivate(beam.DoFn):
     """DoFn to check if post_commit_status is private when
     post_commit_is_private is true and vice-versa.
@@ -155,10 +155,10 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
         expected_post_commit_is_private = (
             model.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE)
         if model.post_commit_is_private != expected_post_commit_is_private:
-            yield audit_errors.InvalidPrivateCommitStatusError(model)
+            yield base_validation_errors.InvalidPrivateCommitStatusError(model)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseModel)
+@validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelTimestamps(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are valid.
     """
@@ -177,14 +177,14 @@ class ValidateModelTimestamps(beam.DoFn):
         """
         model = job_utils.clone_model(input_model)
         if model.created_on > (model.last_updated + MAX_CLOCK_SKEW_SECS):
-            yield audit_errors.InconsistentTimestampsError(model)
+            yield base_validation_errors.InconsistentTimestampsError(model)
 
         current_datetime = datetime.datetime.utcnow()
         if (model.last_updated - MAX_CLOCK_SKEW_SECS) > current_datetime:
-            yield audit_errors.ModelMutatedDuringJobError(model)
+            yield base_validation_errors.ModelMutatedDuringJobError(model)
 
 
-@audit_decorators.AuditsExisting(base_models.BaseModel)
+@validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelDomainObjectInstances(beam.DoFn):
     """DoFn to check whether the model instance passes the validation of the
     domain object for model.
@@ -249,7 +249,8 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
                     'Invalid validation type for domain object: %s' % (
                         validation_type))
         except Exception as e:
-            yield audit_errors.ModelDomainObjectValidateError(input_model, e)
+            yield base_validation_errors.ModelDomainObjectValidateError(
+                input_model, e)
 
 
 class BaseValidateCommitCmdsSchema(beam.DoFn):
@@ -326,4 +327,4 @@ class ValidateCommitType(beam.DoFn):
 
         if (model.commit_type not in
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
-            yield audit_errors.InvalidCommitTypeError(model)
+            yield base_validation_errors.InvalidCommitTypeError(model)
