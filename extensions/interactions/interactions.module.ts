@@ -29,6 +29,7 @@ import { GraphInputInteractionModule } from './GraphInput/graph-input-interactio
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
+import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
 
 @NgModule({
   imports: [
@@ -40,7 +41,8 @@ import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-ma
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
-    InteractiveMapInteractionModule
+    InteractiveMapInteractionModule,
+    LogicProofInteractionModule
   ],
   declarations: [],
   entryComponents: [],
@@ -51,7 +53,8 @@ import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-ma
     FractionInputInteractionModule,
     GraphInputInteractionModule,
     ImageClickInputInteractionModule,
-    InteractiveMapInteractionModule
+    InteractiveMapInteractionModule,
+    LogicProofInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }

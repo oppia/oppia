@@ -38,7 +38,8 @@ export class InteractionAttributesExtractorService {
     'GraphInput',
     'ImageClickInput',
     'CodeRepl',
-    'InteractiveMap'
+    'InteractiveMap',
+    'LogicProof'
   ];
 
   constructor(
