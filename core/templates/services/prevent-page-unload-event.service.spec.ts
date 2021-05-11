@@ -21,7 +21,8 @@ import { PreventPageUnloadEventService }
   from 'services/prevent-page-unload-event.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-describe ('Prevent page unload event service', function() {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe ('Prevent page unload event service', function() {
   let preventPageUnloadEventService: PreventPageUnloadEventService = null;
   let windowRef: WindowRef = null;
 
@@ -46,8 +47,10 @@ describe ('Prevent page unload event service', function() {
       document.addEventListener('mock' + eventname, callback);
     },
     location: {
-      reload: () => {
-        document.dispatchEvent(reloadEvt);
+      reload: (val = true) => {
+        if (val) {
+          document.dispatchEvent(reloadEvt);
+        }
       }
     }
   };
@@ -100,5 +103,32 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.ngOnDestroy();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+  });
+
+  it('should test if Alert is displayed when a condition is passed', () => {
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    preventPageUnloadEventService.addListener(() => {
+      return true;
+    });
+    spyOn(reloadEvt, 'preventDefault');
+
+    windowRef.nativeWindow.location.reload();
+
+    expect(reloadEvt.preventDefault).toHaveBeenCalled();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+  });
+
+  it('should test if Alert is not displayed when a condition is passed', () => {
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    var val = () => {
+      return false;
+    };
+    preventPageUnloadEventService.addListener(val);
+    spyOn(reloadEvt, 'preventDefault');
+
+    windowRef.nativeWindow.location.reload();
+
+    expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 });

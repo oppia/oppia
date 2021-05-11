@@ -25,11 +25,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class PreventPageUnloadEventService {
   private listenerActive: boolean;
-  validation: Function;
+  validationCallback: Function;
   _preventPageUnloadEventHandlerBind = undefined;
   constructor(private windowRef: WindowRef) {
     this.listenerActive = false;
-    this.validation = undefined;
+    this.validationCallback = undefined;
   }
 
   addListener(callback: Function = () => {
@@ -38,9 +38,9 @@ export class PreventPageUnloadEventService {
     if (this.listenerActive) {
       return;
     }
-    this.validation = callback;
+    this.validationCallback = callback;
     this._preventPageUnloadEventHandlerBind =
-      this._preventPageUnloadEventHandler.bind(null, this.validation);
+      this._preventPageUnloadEventHandler.bind(null, this.validationCallback);
     this.windowRef.nativeWindow.addEventListener(
       'beforeunload', this._preventPageUnloadEventHandlerBind, true);
     this.listenerActive = true;
@@ -53,8 +53,8 @@ export class PreventPageUnloadEventService {
   }
 
   private _preventPageUnloadEventHandler(
-      validation: Function, e: BeforeUnloadEvent): void {
-    if (validation()) {
+      validationCallback: Function, e: BeforeUnloadEvent): void {
+    if (validationCallback()) {
       // The preventDefault call is used to trigger a confirmation
       // before leaving.
       e.preventDefault();
