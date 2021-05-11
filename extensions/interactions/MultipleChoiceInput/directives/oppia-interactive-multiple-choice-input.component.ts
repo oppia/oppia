@@ -94,6 +94,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   }
 
   selectAnswer(event: MouseEvent, answer: string): void {
+    event.preventDefault();
     if (answer === null) {
       return;
     }
