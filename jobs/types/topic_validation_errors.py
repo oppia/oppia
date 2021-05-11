@@ -14,26 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Entry point for accessing the full collection of Apache Beam jobs.
-
-This module imports all of the "jobs.*_jobs" modules so that they can be fetched
-from the _JobMetaclass which keeps track of them all.
-
-TODO(#11475): Add lint checks that ensure all "jobs.*_jobs" modules are imported
-into this file.
-"""
+"""Error classes for topic model audits."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs import base_jobs
-from jobs import base_validation_jobs  # pylint: disable=unused-import
+from jobs.types import base_validation_errors
 
 
-def get_all_jobs():
-    """Returns all jobs that have inherited from the JobBase class.
+class ModelCanonicalNameMismatchError(base_validation_errors.BaseAuditError):
+    """Error class for models that have mismatching names."""
 
-    Returns:
-        list(class). The classes that have inherited from JobBase.
-    """
-    return base_jobs._JobMetaclass.get_all_jobs() # pylint: disable=protected-access
+    def __init__(self, model):
+        super(ModelCanonicalNameMismatchError, self).__init__(model)
+        self.message = (
+            'Entity name %s in lowercase does not match '
+            'canonical name %s' % (model.name, model.canonical_name))

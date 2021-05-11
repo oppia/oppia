@@ -21,15 +21,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from jobs import job_utils
-from jobs.decorators import audit_decorators
-from jobs.types import audit_errors
+from jobs.decorators import validation_decorators
+from jobs.types import topic_validation_errors
 
 import apache_beam as beam
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-@audit_decorators.AuditsExisting(topic_models.TopicModel)
+@validation_decorators.AuditsExisting(topic_models.TopicModel)
 class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
     """DoFn to validate canonical name matching with lower case name."""
 
@@ -47,4 +47,4 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
         model = job_utils.clone_model(input_model)
         name = model.name
         if name.lower() != model.canonical_name:
-            yield audit_errors.ModelCanonicalNameMismatchError(model)
+            yield topic_validation_errors.ModelCanonicalNameMismatchError(model)

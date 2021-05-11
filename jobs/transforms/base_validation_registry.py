@@ -28,10 +28,10 @@ are imported into this file.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs.decorators import audit_decorators
-from jobs.transforms import auth_audits  # pylint: disable=unused-import
-from jobs.transforms import base_model_audits  # pylint: disable=unused-import
-from jobs.transforms import user_audits  # pylint: disable=unused-import
+from jobs.decorators import validation_decorators
+from jobs.transforms import auth_validation  # pylint: disable=unused-import
+from jobs.transforms import base_validation  # pylint: disable=unused-import
+from jobs.transforms import user_validation  # pylint: disable=unused-import
 
 
 def get_audit_do_fn_types_by_kind():
@@ -41,7 +41,7 @@ def get_audit_do_fn_types_by_kind():
         dict(str: set(DoFn)). DoFn classes, keyed by the kind of model they have
         targeted.
     """
-    return audit_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
+    return validation_decorators.AuditsExisting.get_audit_do_fn_types_by_kind()
 
 
 def get_id_referencing_properties_by_kind_of_possessor():
@@ -54,7 +54,7 @@ def get_id_referencing_properties_by_kind_of_possessor():
         properties belong to.
     """
     return (
-        audit_decorators.RelationshipsOf
+        validation_decorators.RelationshipsOf
         .get_id_referencing_properties_by_kind_of_possessor())
 
 
@@ -66,5 +66,5 @@ def get_all_model_kinds_referenced_by_properties():
         excluding the models' own ID.
     """
     return (
-        audit_decorators.RelationshipsOf
+        validation_decorators.RelationshipsOf
         .get_all_model_kinds_referenced_by_properties())

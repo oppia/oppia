@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.decorators.audit_decorators."""
+"""Unit tests for jobs.decorators.validation_decorators."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -24,7 +24,7 @@ import re
 
 from core.platform import models
 from core.tests import test_utils
-from jobs.decorators import audit_decorators
+from jobs.decorators import validation_decorators
 from jobs.types import model_property
 import python_utils
 
@@ -36,7 +36,7 @@ base_models, exp_models = models.Registry.import_models(
 datastore_services = models.Registry.import_datastore_services()
 
 
-class MockAuditsExisting(audit_decorators.AuditsExisting):
+class MockAuditsExisting(validation_decorators.AuditsExisting):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value of _DO_FN_TYPES_BY_KIND for the unit tests.
@@ -192,7 +192,7 @@ class AuditsExistingTests(test_utils.TestBase):
             lambda: MockAuditsExisting(base_models.BaseModel)(NotDoFn))
 
 
-class MockRelationshipsOf(audit_decorators.RelationshipsOf):
+class MockRelationshipsOf(validation_decorators.RelationshipsOf):
     """Subclassed with overrides to avoid modifying the real decorator."""
 
     # Overrides the real value for the unit tests.

@@ -21,15 +21,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
-from jobs.decorators import audit_decorators
-from jobs.transforms import base_model_audits
+from jobs.decorators import validation_decorators
+from jobs.transforms import base_validation
 
 (auth_models, user_models) = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
-@audit_decorators.AuditsExisting(auth_models.FirebaseSeedModel)
-class ValidateFirebaseSeedModelId(base_model_audits.ValidateBaseModelId):
+@validation_decorators.AuditsExisting(auth_models.FirebaseSeedModel)
+class ValidateFirebaseSeedModelId(base_validation.ValidateBaseModelId):
     """Overrides regex to match the single valid FirebaseSeedModel ID."""
 
     def __init__(self):
@@ -37,9 +37,9 @@ class ValidateFirebaseSeedModelId(base_model_audits.ValidateBaseModelId):
         self._pattern = auth_models.ONLY_FIREBASE_SEED_MODEL_ID
 
 
-@audit_decorators.AuditsExisting(auth_models.UserIdByFirebaseAuthIdModel)
+@validation_decorators.AuditsExisting(auth_models.UserIdByFirebaseAuthIdModel)
 class ValidateUserIdByFirebaseAuthIdModelId(
-        base_model_audits.ValidateBaseModelId):
+        base_validation.ValidateBaseModelId):
     """Overrides regex to match the Firebase account ID pattern."""
 
     def __init__(self):
@@ -47,20 +47,20 @@ class ValidateUserIdByFirebaseAuthIdModelId(
         self._pattern = feconf.FIREBASE_AUTH_ID_REGEX
 
 
-@audit_decorators.RelationshipsOf(auth_models.UserAuthDetailsModel)
+@validation_decorators.RelationshipsOf(auth_models.UserAuthDetailsModel)
 def user_auth_details_model_relationships(model):
     """Yields how the properties of the model relate to the IDs of others."""
     yield (model.firebase_auth_id, [auth_models.UserIdByFirebaseAuthIdModel])
     yield (model.gae_id, [auth_models.UserIdentifiersModel])
 
 
-@audit_decorators.RelationshipsOf(auth_models.UserIdByFirebaseAuthIdModel)
+@validation_decorators.RelationshipsOf(auth_models.UserIdByFirebaseAuthIdModel)
 def user_id_by_firebase_auth_id_model_relationships(model):
     """Yields how the properties of the model relate to the IDs of others."""
     yield (model.user_id, [auth_models.UserAuthDetailsModel])
 
 
-@audit_decorators.RelationshipsOf(auth_models.UserIdentifiersModel)
+@validation_decorators.RelationshipsOf(auth_models.UserIdentifiersModel)
 def user_identifiers_model_relationships(model):
     """Yields how the properties of the model relate to the IDs of others."""
     yield (model.user_id, [auth_models.UserAuthDetailsModel])

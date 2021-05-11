@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.topic_audits."""
+"""Unit tests for jobs.transforms.topic_validation."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -23,8 +23,8 @@ import datetime
 
 from core.platform import models
 from jobs import job_test_utils
-from jobs.transforms import topic_audits
-from jobs.types import audit_errors
+from jobs.transforms import topic_validation
+from jobs.types import topic_validation_errors
 
 import apache_beam as beam
 
@@ -53,10 +53,10 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
             self.pipeline
             | beam.Create([model_with_different_name])
             | beam.ParDo(
-                topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
+                topic_validation.ValidateCanonicalNameMatchesNameInLowercase())
         )
         self.assert_pcoll_equal(output, [
-            audit_errors.ModelCanonicalNameMismatchError(
+            topic_validation_errors.ModelCanonicalNameMismatchError(
                 model_with_different_name)
         ])
 
@@ -77,6 +77,6 @@ class ValidateCanonicalNameMatchesNameInLowercaseTests(
             self.pipeline
             | beam.Create([model_with_same_name])
             | beam.ParDo(
-                topic_audits.ValidateCanonicalNameMatchesNameInLowercase())
+                topic_validation.ValidateCanonicalNameMatchesNameInLowercase())
         )
         self.assert_pcoll_equal(output, [])
