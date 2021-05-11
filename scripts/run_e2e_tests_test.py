@@ -226,6 +226,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_start_tests_when_other_instances_not_stopped(self):
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running', lambda *_: True))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
 
         with self.assertRaisesRegexp(SystemExit, '1'):
             run_e2e_tests.main(args=[])
@@ -351,6 +353,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'RERUN_NON_FLAKY', False))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
 
         run_e2e_tests.main(args=['--suite', 'mySuite'])
 
@@ -358,6 +362,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args):
             return 'sample\noutput', 1
 
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap_with_checks(
@@ -381,6 +387,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_is_test_output_flaky(unused_output, unused_suite_name):
             raise AssertionError('Tried to Check Flakiness.')
 
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap(
@@ -399,6 +407,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             raise AssertionError('Tried to Report Pass')
 
+        self.exit_stack.enter_context(self.swap_with_checks(
+            servers, 'managed_portserver', mock_managed_process))
         self.exit_stack.enter_context(self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests))
         self.exit_stack.enter_context(self.swap(
