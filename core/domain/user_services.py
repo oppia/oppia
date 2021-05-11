@@ -43,7 +43,7 @@ auth_models, user_models, audit_models, suggestion_models = (
          models.NAMES.suggestion]))
 
 current_user_services = models.Registry.import_current_user_services()
-platform_bulk_email_services = models.Registry.import_bulk_email_services()
+bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -116,6 +116,23 @@ def get_user_settings_from_username(username):
     """
     user_model = user_models.UserSettingsModel.get_by_normalized_username(
         user_domain.UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
+def get_user_settings_from_email(email):
+    """Gets the user settings for a given email.
+
+    Args:
+        email: str. Email of the user.
+
+    Returns:
+        UserSettingsModel or None. The UserSettingsModel instance corresponding
+        to the given email, or None if no such model was found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_email(email)
     if user_model is None:
         return None
     else:
@@ -1379,7 +1396,8 @@ def record_user_created_an_exploration(user_id):
 
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
-        can_receive_feedback_email, can_receive_subscription_email):
+        can_receive_feedback_email, can_receive_subscription_email,
+        update_bulk_email_db=True):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -1395,13 +1413,15 @@ def update_email_preferences(
             emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
+        update_bulk_email_db: bool. Whether to update the bulk email provider's
+            db as well. This is set to false only when called from the webhook
+            controller in which case the bulk email DB is already updated.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
     if email_preferences_model is None:
         email_preferences_model = user_models.UserEmailPreferencesModel(
             id=user_id)
-        email_preferences_model.site_updates = False
 
     email_preferences_model.editor_role_notifications = (
         can_receive_editor_role_email)
@@ -1410,8 +1430,9 @@ def update_email_preferences(
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
     email_preferences_model.site_updates = can_receive_email_updates
-    platform_bulk_email_services.add_or_update_user_status(
-        get_email_from_user_id(user_id), can_receive_email_updates)
+    if update_bulk_email_db:
+        bulk_email_services.add_or_update_user_status(
+            get_email_from_user_id(user_id), can_receive_email_updates)
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
 

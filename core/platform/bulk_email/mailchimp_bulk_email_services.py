@@ -69,7 +69,10 @@ def _get_mailchimp_class():
     if not feconf.MAILCHIMP_USERNAME:
         raise Exception('Mailchimp username is not set.')
 
-    return mailchimp3.MailChimp(
+    # The following is a class initialized in the library with the API key and
+    # username and hence cannot be tested directly. The mailchimp functions are
+    # tested with a mock class.
+    return mailchimp3.MailChimp(    # pragma: no cover
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
@@ -77,9 +80,10 @@ def permanently_delete_user_from_list(user_email):
     """Permanently deletes the user with the given email from the Mailchimp
     list.
 
-    NOTE: This should only be called from the wipeout service since once a user
-    is permanently deleted from mailchimp, they cannot be programmatically added
-    back via their API (the user would have to manually resubscribe back).
+    NOTE TO DEVELOPERS: This should only be called from the wipeout service
+    since once a user is permanently deleted from mailchimp, they cannot be
+    programmatically added back via their API (the user would have to manually
+    resubscribe back).
 
     Args:
         user_email: str. Email ID of the user. Email is used to uniquely
@@ -94,13 +98,13 @@ def permanently_delete_user_from_list(user_email):
         client.lists.members.delete_permanent(
             feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
     except mailchimpclient.MailChimpError as error:
-        # This is has to be done since the message can only be accessed from
+        # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
         # Python3.
         # In Python3, the message can be accessed directly by KeyError
         # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
         # workaround for Python2, the 'message' attribute is obtained by
-        # str() and then it is converted to dict.
+        # str() and then it is converted to dict. This works in Python3 as well.
         error_message = ast.literal_eval(python_utils.UNICODE(error))
         # Ignore if the error corresponds to "User does not exist".
         if error_message['status'] != 404:
@@ -118,7 +122,7 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
         user_email: str. Email ID of the user. Email is used to uniquely
             identify the user in the mailchimp DB.
         can_receive_email_updates: bool. Whether they want to be subscribed to
-            list or not.
+            the bulk email list or not.
     """
     client = _get_mailchimp_class()
     subscriber_hash = _get_subscriber_hash(user_email)
@@ -154,13 +158,13 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
                 unsubscribed_mailchimp_data)
 
     except mailchimpclient.MailChimpError as error:
-        # This is has to be done since the message can only be accessed from
+        # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
         # Python3.
         # In Python3, the message can be accessed directly by KeyError
         # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
         # workaround for Python2, the 'message' attribute is obtained by
-        # str() and then it is converted to dict.
+        # str() and then it is converted to dict. This works in Python3 as well.
         error_message = ast.literal_eval(python_utils.UNICODE(error))
         # Error 404 corresponds to "User does not exist".
         if error_message['status'] == 404:

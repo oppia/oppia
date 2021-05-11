@@ -113,6 +113,50 @@ class PreferencesPage(base.BaseHandler):
         self.render_template('preferences-page.mainpage.html')
 
 
+class BulkEmailWebhookEndpoint(base.BaseHandler):
+    """The endpoint for the webhook that is triggered when a user
+    subscribes/unsubscribes to the bulk email service provider externally."""
+
+    def get(self):
+        """Handles GET requests. This is just an empty endpoint that is
+        required since when the webhook is updated in the bulk email service
+        provider, a GET request is sent initially to validate the endpoint.
+        """
+        pass
+
+    def post(self):
+        """Handles POST requests."""
+        if self.request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
+            self.render_json({})
+            return
+
+        email = self.request.get('data[email]')
+        user_settings = user_services.get_user_settings_from_email(email)
+
+        # If user is not logged in with Oppia, ignore the request.
+        if user_settings is None:
+            self.render_json({})
+            return
+
+        user_id = user_settings.user_id
+        user_email_preferences = user_services.get_email_preferences(user_id)
+        if self.request.get('type') == 'subscribe':
+            user_services.update_email_preferences(
+                user_id, True,
+                user_email_preferences.can_receive_editor_role_email,
+                user_email_preferences.can_receive_feedback_message_email,
+                user_email_preferences.can_receive_subscription_email,
+                update_bulk_email_db=False)
+        elif self.request.get('type') == 'unsubscribe':
+            user_services.update_email_preferences(
+                user_id, False,
+                user_email_preferences.can_receive_editor_role_email,
+                user_email_preferences.can_receive_feedback_message_email,
+                user_email_preferences.can_receive_subscription_email,
+                update_bulk_email_db=False)
+        self.render_json({})
+
+
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 

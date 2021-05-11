@@ -2232,6 +2232,26 @@ title: Title
 
         return self._parse_json_response(json_response, expect_errors)
 
+    def post_json_with_custom_body(
+            self, url, data, expected_status_int=200):
+        """Post an object to the server by JSON; return the received object."""
+        expect_errors = expected_status_int >= 400
+
+        json_response = self._send_post_request(
+            self.testapp, url, data, expect_errors,
+            expected_status_int=expected_status_int, upload_files=None)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        #
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        self.assertEqual(json_response.status_int, expected_status_int)
+
+        return self._parse_json_response(json_response, expect_errors)
+
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:

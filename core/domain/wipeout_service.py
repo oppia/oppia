@@ -51,7 +51,7 @@ import python_utils
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
-platform_bulk_email_services = models.Registry.import_bulk_email_services()
+bulk_email_services = models.Registry.import_bulk_email_services()
 
 
 WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
@@ -172,7 +172,7 @@ def pre_delete_user(user_id):
         # ordinary emails that could be sent to the users.
         user_services.update_email_preferences(
             user_id, False, False, False, False)
-        platform_bulk_email_services.permanently_delete_user_from_list(
+        bulk_email_services.permanently_delete_user_from_list(
             user_settings.email)
 
     date_now = datetime.datetime.utcnow()

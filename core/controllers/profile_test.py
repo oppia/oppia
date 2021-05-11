@@ -803,6 +803,72 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
             self.get_html_response('/delete-account', expected_status_int=404)
 
 
+class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(BulkEmailWebhookEndpointTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_services.update_email_preferences(
+            self.editor_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+
+    def test_get_function(self):
+        # The GET function should not throw any error and should return status
+        # 200. No other check required here.
+        self.get_html_response('%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT)
+
+    def test_post_with_different_audience_id(self):
+        with self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'):
+            json_response = self.post_json_with_custom_body(
+                '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'invalid_audience_id',
+                    'data[email]': self.EDITOR_EMAIL
+                })
+            self.assertEqual(json_response, {})
+
+    def test_post_with_invalid_email_id(self):
+        with self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'):
+            json_response = self.post_json_with_custom_body(
+                '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'audience_id',
+                    'data[email]': 'invalid_email'
+                })
+            self.assertEqual(json_response, {})
+
+    def test_post(self):
+        with self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'):
+            email_preferences = user_services.get_email_preferences(
+                self.editor_id)
+            self.assertEqual(email_preferences.can_receive_email_updates, False)
+
+            # User subscribed externally.
+            json_response = self.post_json_with_custom_body(
+                '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'audience_id',
+                    'data[email]': self.EDITOR_EMAIL,
+                    'type': 'subscribe'
+                })
+            self.assertEqual(json_response, {})
+            email_preferences = user_services.get_email_preferences(
+                self.editor_id)
+            self.assertEqual(email_preferences.can_receive_email_updates, True)
+
+            # User unsubscribed externally.
+            json_response = self.post_json_with_custom_body(
+                '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    'data[list_id]': 'audience_id',
+                    'data[email]': self.EDITOR_EMAIL,
+                    'type': 'unsubscribe'
+                })
+            self.assertEqual(json_response, {})
+            email_preferences = user_services.get_email_preferences(
+                self.editor_id)
+            self.assertEqual(email_preferences.can_receive_email_updates, False)
+
+
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):

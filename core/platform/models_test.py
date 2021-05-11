@@ -282,6 +282,33 @@ class RegistryUnitTest(test_utils.TestBase):
                 'Invalid email service provider: invalid service provider'):
                 self.registry_instance.import_email_services()
 
+    def test_import_bulk_email_services_mailchimp(self):
+        """Tests import email services method for when email service provider is
+        mailchimp.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP), (
+                self.swap(constants, 'DEV_MODE', False)):
+            from core.platform.bulk_email import mailchimp_bulk_email_services
+            self.assertEqual(
+                mailchimp_bulk_email_services,
+                self.registry_instance.import_bulk_email_services())
+
+    def test_import_bulk_email_services_invalid(self):
+        """Tests import email services method for when email service provider is
+        an invalid option.
+        """
+        with self.swap(
+            feconf, 'BULK_EMAIL_SERVICE_PROVIDER',
+            'invalid service provider'), (
+                self.swap(constants, 'DEV_MODE', False)):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Invalid bulk email service provider: invalid service '
+                'provider'):
+                self.registry_instance.import_bulk_email_services()
+
     def test_import_cache_services(self):
         """Tests import cache services function."""
         from core.platform.cache import redis_cache_services
