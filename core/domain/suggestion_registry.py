@@ -64,7 +64,8 @@ class BaseSuggestion(python_utils.OBJECT):
         language_code: str|None. The ISO 639-1 code used to query suggestions
             by language, or None if the suggestion type is not queryable by
             language.
-        edited_by_reviewer: bool. Whether the suggestion is edited by the reviewer.
+        edited_by_reviewer: bool. Whether the suggestion is edited by the
+            reviewer.
     """
 
     def __init__(self, status, final_reviewer_id):
@@ -672,7 +673,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             was last updated.
         language_code: str. The ISO 639-1 code used to query suggestions
             by language. In this case it is the language code of the question.
-        edited_by_reviewer: bool. Whether the suggestion is edited by the reviewer.
+        edited_by_reviewer: bool. Whether the suggestion is edited by the
+            reviewer.
     """
 
     def __init__(
