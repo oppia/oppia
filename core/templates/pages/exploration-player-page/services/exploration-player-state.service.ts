@@ -108,7 +108,7 @@ export class ExplorationPlayerStateService {
       if (!this.questionPlayerMode &&
       !('skill_editor' === this.urlService.getPathname()
         .split('/')[1].replace(/"/g, "'"))) {
-        this.readOnlyExplorationBackendApiService.loadExploration(
+        this.readOnlyExplorationBackendApiService.loadExplorationAsync(
           this.explorationId, this.version).then((exploration) => {
           this.version = exploration.version;
         });
@@ -193,7 +193,7 @@ export class ExplorationPlayerStateService {
       callback: (sateCard: StateCard, str: string) => void): void {
     this.setExplorationMode();
     Promise.all([
-      this.editableExplorationBackendApiService.fetchApplyDraftExploration(
+      this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         this.explorationId),
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
         this.explorationId),
@@ -232,9 +232,9 @@ export class ExplorationPlayerStateService {
   initExplorationPlayer(
       callback: (stateCard: StateCard, str: string) => void): void {
     let explorationDataPromise = this.version ?
-      this.readOnlyExplorationBackendApiService.loadExploration(
+      this.readOnlyExplorationBackendApiService.loadExplorationAsync(
         this.explorationId, this.version) :
-      this.readOnlyExplorationBackendApiService.loadLatestExploration(
+      this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
         this.explorationId);
     Promise.all([
       explorationDataPromise,
