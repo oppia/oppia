@@ -924,13 +924,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -970,7 +970,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1043,13 +1043,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1079,7 +1079,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         ]
         args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1443,13 +1443,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1490,7 +1490,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1617,13 +1617,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1664,7 +1664,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 
@@ -1742,13 +1742,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_firebase_auth_emulator',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
-                value=python_utils.null_context()),
+                value=python_utils.nullcontext()),
             self.swap_with_checks(
                 common, 'wait_for_port_to_be_in_use',
                 mock_wait_for_port_to_be_in_use,
@@ -1788,7 +1788,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 sys, 'exit', mock_exit, expected_args=[(0,)]),
         ]
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             for context in swap_contexts:
                 stack.enter_context(context)
 

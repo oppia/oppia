@@ -231,7 +231,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(input_reader_swap)

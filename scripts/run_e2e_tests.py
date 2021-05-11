@@ -541,7 +541,7 @@ def run_tests(args):
         clear_datastore=True, skip_sdk_update_check=True,
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
-    with python_utils.exit_stack() as stack:
+    with python_utils.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(common.managed_firebase_auth_emulator())

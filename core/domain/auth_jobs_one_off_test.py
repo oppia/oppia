@@ -49,7 +49,7 @@ class FirebaseOneOffJobTestBase(test_utils.AppEngineTestBase):
 
     def setUp(self):
         super(FirebaseOneOffJobTestBase, self).setUp()
-        self.exit_stack = python_utils.exit_stack()
+        self.exit_stack = python_utils.ExitStack()
         self.firebase_sdk_stub = (
             firebase_auth_services_test.FirebaseAdminSdkStub())
 

@@ -78,7 +78,7 @@ def redirect_stdout(new_target):
     return impl(new_target)
 
 
-def null_context(enter_result=None):
+def nullcontext(enter_result=None):
     """Returns nullcontext from contextlib2 if run under Python 2 and from
     contextlib if run under Python 3.
 
@@ -90,13 +90,13 @@ def null_context(enter_result=None):
         object.
     """
     try:
-        from contextlib import nullcontext # pylint: disable=import-only-modules
+        from contextlib import nullcontext as impl # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import nullcontext # pylint: disable=import-only-modules
-    return nullcontext(enter_result=enter_result)
+        from contextlib2 import nullcontext as impl # pylint: disable=import-only-modules
+    return impl(enter_result=enter_result)
 
 
-def exit_stack():
+def ExitStack(): # pylint: disable=invalid-name
     """Returns ExitStack from contextlib2 if run under Python 2 and from
     contextlib if run under Python 3.
 
@@ -104,10 +104,10 @@ def exit_stack():
         contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
     """
     try:
-        from contextlib import ExitStack # pylint: disable=import-only-modules
+        from contextlib import ExitStack as impl # pylint: disable=import-only-modules
     except ImportError:
-        from contextlib2 import ExitStack # pylint: disable=import-only-modules
-    return ExitStack()
+        from contextlib2 import ExitStack as impl # pylint: disable=import-only-modules
+    return impl()
 
 
 def string_io(buffer_value=b''):

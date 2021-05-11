@@ -3804,7 +3804,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(

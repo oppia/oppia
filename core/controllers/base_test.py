@@ -555,7 +555,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual('http://localhost/', response.headers['location'])
 
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
-        with python_utils.exit_stack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -572,7 +572,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
-        with python_utils.exit_stack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -598,7 +598,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MaintenanceModeTests, self).setUp()
-        with python_utils.exit_stack() as context_stack:
+        with python_utils.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()

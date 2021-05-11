@@ -157,7 +157,7 @@ def main(args=None):
         automatic_restart=not parsed_args.no_auto_restart,
         skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
 
-    with python_utils.exit_stack() as stack:
+    with python_utils.ExitStack() as stack:
         python_utils.PRINT('Starting ElasticSearch development server.')
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:

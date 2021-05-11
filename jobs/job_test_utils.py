@@ -52,7 +52,7 @@ class PipelinedTestBase(test_utils.TestBase):
 
     def setUp(self):
         super(PipelinedTestBase, self).setUp()
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(decorate_beam_errors())
             stack.enter_context(self.pipeline)
             self._close_stack = stack.pop_all().close

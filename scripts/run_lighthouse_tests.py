@@ -209,7 +209,7 @@ def main(args=None):
         APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
         clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
 
-    with python_utils.exit_stack() as stack:
+    with python_utils.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
             stack.enter_context(common.managed_firebase_auth_emulator())

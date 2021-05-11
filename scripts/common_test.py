@@ -993,7 +993,7 @@ class ManagedProcessTests(test_utils.TestBase):
             yield popen_calls
 
     def test_does_not_raise_when_psutil_not_in_path(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(self.swap(sys, 'path', []))
             stack.enter_context(self._swap_popen())
 
@@ -1001,7 +1001,7 @@ class ManagedProcessTests(test_utils.TestBase):
             stack.enter_context(common.managed_process(['a'], timeout_secs=10))
 
     def test_concats_command_args_when_shell_is_true(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
@@ -1012,7 +1012,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
 
     def test_passes_command_args_as_list_of_strings_when_shell_is_false(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
@@ -1024,7 +1024,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_true(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
@@ -1035,7 +1035,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_false(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
@@ -1047,7 +1047,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
     def test_reports_killed_processes_as_warnings(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
 
@@ -1060,7 +1060,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal=True)
 
     def test_terminates_child_processes(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(num_children=3))
 
@@ -1073,7 +1073,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.assert_proc_was_managed_as_expected(logs, pid)
 
     def test_kills_child_processes(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(
                 num_children=3, make_procs_unresponsive=True))
@@ -1090,7 +1090,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 manager_should_have_sent_kill_signal=True)
 
     def test_respects_processes_that_are_killed_early(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen())
 
@@ -1105,7 +1105,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_terminate_signal=False)
 
     def test_respects_processes_that_are_killed_after_delay(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
 
@@ -1128,7 +1128,7 @@ class ManagedProcessTests(test_utils.TestBase):
             manager_should_have_sent_kill_signal=False)
 
     def test_managed_firebase_emulator(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
             stack.enter_context(self.swap_to_always_return(
                 common, 'wait_for_port_to_be_in_use'))
@@ -1164,14 +1164,14 @@ class ManagedProcessTests(test_utils.TestBase):
         new_makedirs = test_utils.CallCounter(
             lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw))
 
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(self.swap(os.path, 'exists', new_exists))
             stack.enter_context(self.swap(shutil, 'rmtree', new_rmtree))
             stack.enter_context(self.swap(os, 'makedirs', new_makedirs))
             yield new_rmtree, new_makedirs
 
     def test_managed_cloud_datastore_emulator(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(
@@ -1187,7 +1187,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
     def test_managed_cloud_datastore_emulator_creates_missing_data_dir(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(self._swap_popen())
 
             rmtree_counter, makedirs_counter = stack.enter_context(
@@ -1201,7 +1201,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(makedirs_counter.times_called, 1)
 
     def test_managed_cloud_datastore_emulator_clears_data_dir(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(self._swap_popen())
 
             rmtree_counter, makedirs_counter = stack.enter_context(
@@ -1216,7 +1216,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(makedirs_counter.times_called, 1)
 
     def test_managed_cloud_datastore_emulator_acknowledges_data_dir(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(self._swap_popen())
 
             rmtree_counter, makedirs_counter = stack.enter_context(
@@ -1231,7 +1231,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(makedirs_counter.times_called, 0)
 
     def test_managed_dev_appserver(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(
@@ -1242,7 +1242,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
 
     def test_managed_elasticsearch_dev_server(self):
-        with python_utils.exit_stack() as stack:
+        with python_utils.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
             stack.enter_context(common.managed_elasticsearch_dev_server())
 
@@ -1283,7 +1283,7 @@ class ManagedProcessTests(test_utils.TestBase):
         swap_call = self.swap(subprocess, 'call', mock_call)
         swap_os_remove = self.swap(shutil, 'rmtree', mock_os_remove_files)
         swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
-        stack = python_utils.exit_stack()
+        stack = python_utils.ExitStack()
         with swap_call, swap_os_remove, swap_os_path_exists, stack:
             stack.enter_context(self._swap_popen())
             stack.enter_context(common.managed_elasticsearch_dev_server())

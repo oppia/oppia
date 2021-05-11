@@ -992,7 +992,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
-    with python_utils.exit_stack() as stack:
+    with python_utils.ExitStack() as stack:
         data_dir_exists = os.path.exists(CLOUD_DATASTORE_EMULATOR_DATA_DIR)
         if clear_datastore and data_dir_exists:
             # Replace it with an empty directory.
