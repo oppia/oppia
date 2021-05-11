@@ -30,7 +30,7 @@ import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
 import { NumericExpressionInputModule } from './NumericExpressionInput/numeric-expression-input-interactions.module';
 import { NumericInputModule } from './NumericInput/numeric-input-interactions.module';
-import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interaction.module';
+import { MathEquationInputModule } from './MathEquationInput/math-equation-input-interactions.module';
 
 @NgModule({
   imports: [
