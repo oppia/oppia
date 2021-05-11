@@ -23,32 +23,34 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { MaterialModule } from 'components/material.module';
-import { ShortResponseNumericExpressionInput } from './directives/oppia-short-response-numeric-expression-input.component';
-import { ResponseNumericExpressionInput } from './directives/oppia-response-numeric-expression-input.component';
-import { InteractiveNumericExpressionInput } from './directives/oppia-interactive-numeric-expression-input.component';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import { InteractiveNumericInput } from './directives/oppia-interactive-numeric-input.component';
+import { ResponseNumericInput } from './directives/oppia-response-numeric-input.component';
+import { ShortResponseNumericInput } from './directives/oppia-short-response-numeric-input.component';
 
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    MaterialModule
+    MaterialModule,
+    SharedFormsModule
   ],
   declarations: [
-    ResponseNumericExpressionInput,
-    ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput
+    InteractiveNumericInput,
+    ResponseNumericInput,
+    ShortResponseNumericInput
   ],
   entryComponents: [
-    ResponseNumericExpressionInput,
-    ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput
+    InteractiveNumericInput,
+    ResponseNumericInput,
+    ShortResponseNumericInput
   ],
   exports: [
-    ResponseNumericExpressionInput,
-    ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput
+    InteractiveNumericInput,
+    ResponseNumericInput,
+    ShortResponseNumericInput
   ],
 })
 
-export class NumericExpressionInputModule {}
+export class NumericInputModule {}
