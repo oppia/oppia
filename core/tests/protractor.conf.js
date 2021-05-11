@@ -1,7 +1,11 @@
+require('dotenv').config();
 var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
+var fs = require('fs');
+var childProcess = require('child_process');
+var randomString = require('randomstring');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
@@ -319,9 +323,55 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-    var _ADD_SCREENSHOT_REPORTER = true;
 
-    if (_ADD_SCREENSHOT_REPORTER) {
+    var spw = null;
+    var vidPath = '';
+    // Enable ALLVIDEOS if you want success videos to be saved.
+    const ALLVIDEOS = false;
+
+    // Only running video recorder on Github Actions, since running it on
+    // CicleCI causes RAM issues (meaning very high flakiness).
+
+    if (process.env.GITHUB_ACTIONS) {
+      jasmine.getEnv().addReporter({
+        specStarted: function(result){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1285x1000',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-loglevel', '16',
+          ];
+          const uniqueString = randomString.generate(7);
+          var name = uniqueString + '.mp4';
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          vidPath = path.resolve(dirPath, name);
+          console.log('Test name: ' + result.fullName + ' has video path ' + vidPath);
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.on('message', (message) => {console.log(`ffmpeg stdout: ${message}`)});
+          spw.on('error', (errorMessage) => {console.error(`ffmpeg stderr: ${errorMessage}`)});
+          spw.on('close', (code) => {console.log(`ffmpeg exited with code ${code}`)});
+        },
+        specDone: function(result) {
+          spw.kill();
+          if (result.status == 'passed' && !ALLVIDEOS && fs.existsSync(vidPath)) {
+            fs.unlinkSync(vidPath);
+            console.log(`Video for test: ${result.fullName} was deleted successfully (test passed).`);
+          }
+        },
+      });
+    }
+
+    // Screenshots will only run on CircleCI, since we don't have videos here.
+    // We don't need these on Github Actions since we have videos. 
+
+    if (process.env.CIRCLECI) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
