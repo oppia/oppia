@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for information card modal.
+ * @fileoverview Component for information card modal.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
 
-require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/date-time-format.service.ts');
 
 angular.module('oppia').controller('InformationCardModalController', [
   '$controller', '$scope', '$uibModalInstance',

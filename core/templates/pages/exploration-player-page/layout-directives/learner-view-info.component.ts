@@ -18,12 +18,16 @@
  */
 
 import { Component } from '@angular/core';
-import { UrlSerializer } from '@angular/router';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { UrlService } from 'services/contextual/url.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
@@ -33,17 +37,134 @@ import { StatsReportingService } from '../services/stats-reporting.service';
   templateUrl: './learner-view-info.component.html'
 })
 export class LearnerViewInfoComponent {
+  explorationId: string;
+  directiveSubscriptions: Subscription = new Subscription();
+  explorationTitle: string;
+  isLinkedToTopic: boolean;
+  storyViewBackendApiService;
+  storyPlaythroughObject;
+  topicName;
+  expInfo;
+
   constructor(
     private ngbModal: NgbModal,
     private contextService: ContextService,
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
+    private loggerService: LoggerService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlSerializer
+    private urlService: UrlService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService
   ) {}
+
+  ngOnInit(): void {
+    let pathnameArray = this.urlService.getPathname().split('/');
+    let explorationContext = false;
+
+    for (let i = 0; i < pathnameArray.length; i++) {
+      if (pathnameArray[i] === 'explore' ||
+          pathnameArray[i] === 'create' ||
+          pathnameArray[i] === 'skill_editor' ||
+          pathnameArray[i] === 'embed') {
+        explorationContext = true;
+        break;
+      }
+    }
+
+    this.explorationId = explorationContext ?
+      this.contextService.getExplorationId() : 'test_id';
+
+    this.explorationTitle = 'Loading...';
+    this.readOnlyExplorationBackendApiService.fetchExploration(
+      this.explorationId, this.urlService.getExplorationVersionFromUrl())
+      .then((response) => {
+        this.explorationTitle = response.exploration.title;
+      });
+    // To check if the exploration is linked to the topic or not.
+    this.isLinkedToTopic = this.getTopicUrl() ? true : false;
+    // If linked to topic then print topic name in the lesson player.
+    if (this.isLinkedToTopic) {
+      let topicUrlFragment = (
+        this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      let classroomUrlFragment = (
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+      let storyUrlFragment = (
+        this.urlService.getStoryUrlFragmentFromLearnerUrl());
+      this.storyViewerBackendApiService.fetchStoryDataAsync(
+        topicUrlFragment,
+        classroomUrlFragment,
+        storyUrlFragment).then((storyDataDict) => {
+        this.storyPlaythroughObject = storyDataDict;
+        let topicName = this.storyPlaythroughObject.topicName;
+        this.topicName = topicName;
+        this.statsReportingService.setTopicName(this.topicName);
+        this.siteAnalyticsService.registerCuratedLessonStarted(
+          this.topicName, this.explorationId);
+      });
+    }
+  }
+
+  getTopicUrl(): string {
+    let topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    let classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    return topicUrlFragment &&
+      classroomUrlFragment &&
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE, {
+          topic_url_fragment: topicUrlFragment,
+          classroom_url_fragment: classroomUrlFragment,
+        });
+  }
+
+  openInformationCardModal(): void {
+    // $uibModal.open({
+    //   animation: true,
+    //   template: require(
+    //     'pages/exploration-player-page/templates/' +
+    //     'information-card-modal.directive.html'),
+    //   windowClass: 'oppia-modal-information-card',
+    //   resolve: {
+    //     expInfo: function() {
+    //       return expInfo;
+    //     }
+    //   },
+    //   controller: 'InformationCardModalController'
+    // }).result.then(null, () => {
+    //   // Note to developers:
+    //   // This callback is triggered when the Cancel button is clicked.
+    //   // No further action is needed.
+    // });
+  }
+
+  showInformationCard(): void {
+    let stringifiedExpIds = JSON.stringify(
+      [this.explorationId]);
+    let includePrivateExplorations = JSON.stringify(true);
+    if (this.expInfo) {
+      this.openInformationCardModal();
+    } else {
+      this.learnerViewInfoBackendApiService.fetchLearnerInfo(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openInformationCardModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
+  ngOnDestory(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
 }
 
 angular.module('oppia').directive('oppiaLearnerViewInfo',
@@ -51,7 +172,7 @@ angular.module('oppia').directive('oppiaLearnerViewInfo',
     component: LearnerViewInfoComponent
   }) as angular.IDirectiveFactory);
 
-// angular.module('oppia').directive('learnerViewInfo', [
+// Angular.module('oppia').directive('learnerViewInfo', [
 //   function() {
 //     return {
 //       restrict: 'E',
