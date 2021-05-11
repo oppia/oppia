@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.transforms.audits_registry."""
+"""Unit tests for jobs.transforms.base_validation_registry."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.tests import test_utils
-from jobs.decorators import audit_decorators
-from jobs.transforms import audits_registry
+from jobs.decorators import validation_decorators
+from jobs.transforms import base_validation_registry
 
 
 class GetAuditsByKindTests(test_utils.TestBase):
@@ -35,12 +35,14 @@ class GetAuditsByKindTests(test_utils.TestBase):
             return unique_obj
 
         get_audit_do_fn_types_by_kind_swap = self.swap(
-            audit_decorators.AuditsExisting, 'get_audit_do_fn_types_by_kind',
+            validation_decorators.AuditsExisting,
+            'get_audit_do_fn_types_by_kind',
             get_audit_do_fn_types_by_kind_mock)
 
         with get_audit_do_fn_types_by_kind_swap:
             self.assertIs(
-                audits_registry.get_audit_do_fn_types_by_kind(), unique_obj)
+                base_validation_registry.get_audit_do_fn_types_by_kind(),
+                unique_obj)
 
 
 class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
@@ -54,13 +56,13 @@ class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
             return unique_obj
 
         get_id_referencing_properties_by_kind_of_possessor_swap = self.swap(
-            audit_decorators.RelationshipsOf,
+            validation_decorators.RelationshipsOf,
             'get_id_referencing_properties_by_kind_of_possessor',
             get_id_referencing_properties_by_kind_of_possessor_mock)
 
         with get_id_referencing_properties_by_kind_of_possessor_swap:
             self.assertIs(
-                audits_registry
+                base_validation_registry
                 .get_id_referencing_properties_by_kind_of_possessor(),
                 unique_obj)
 
@@ -76,11 +78,12 @@ class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
             return unique_obj
 
         get_all_model_kinds_referenced_by_properties_swap = self.swap(
-            audit_decorators.RelationshipsOf,
+            validation_decorators.RelationshipsOf,
             'get_all_model_kinds_referenced_by_properties',
             get_all_model_kinds_referenced_by_properties_mock)
 
         with get_all_model_kinds_referenced_by_properties_swap:
             self.assertIs(
-                audits_registry.get_all_model_kinds_referenced_by_properties(),
+                base_validation_registry
+                .get_all_model_kinds_referenced_by_properties(),
                 unique_obj)
