@@ -207,7 +207,7 @@ describe('Admin backend api service', () => {
       )
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -617,6 +617,26 @@ describe('Admin backend api service', () => {
     let req = httpTestingController.expectOne(
       '/getcontributorusershandler' +
       '?category=voiceover&language_code=en');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(
+      ['validUsername'],
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+
+    category = 'question';
+    languageCode = null;
+
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
+
+    req = httpTestingController.expectOne(
+      '/getcontributorusershandler' +
+      '?category=question');
     expect(req.request.method).toEqual('GET');
 
     req.flush(

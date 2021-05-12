@@ -16,96 +16,128 @@
  * @fileoverview Unit tests for notificationsDashboardPage.
  */
 
-require(
-  'pages/notifications-dashboard-page/' +
-  'notifications-dashboard-page.component.ts');
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
+import { MatCardModule } from '@angular/material/card';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { LoaderService } from 'services/loader.service';
+import { NotificationsDashboardBackendDict, NotificationsDashboardPageBackendApiService } from './notifications-dashboard-page-backend-api.service';
+import { NotificationsDashboardPageComponent } from './notifications-dashboard-page.component';
 
-describe('Notifications Dashboard Page', function() {
-  var $scope, ctrl;
-  var $httpBackend = null;
-  var LoaderService = null;
-  var loadingMessage = null;
-  var subscriptions = [];
-  var windowRefMock = {
-    nativeWindow: {
+describe('Notifications Dasboard Page Component', () => {
+  let fixture: ComponentFixture<NotificationsDashboardPageComponent>;
+  let componentInstance: NotificationsDashboardPageComponent;
+  let loaderService: LoaderService;
+  let responseData: NotificationsDashboardBackendDict = {
+    is_admin: true,
+    is_moderator: true,
+    is_super_admin: true,
+    is_topic_manager: false,
+    job_queued_msec: 2000,
+    last_seen_msec: 2000,
+    recent_notifications: [],
+    user_email: 'test_email',
+    username: 'test'
+  };
+  let mockWindowRef: MockWindowRef;
+  let dateTimeFormatService: DateTimeFormatService;
+
+  class MockNotificationsDashboardBackendApiService {
+    async getNotificationDataAsync() {
+      return {
+        then: (
+            successCallback: (
+              response: NotificationsDashboardBackendDict) => void
+        ) => {
+          successCallback(responseData);
+        }
+      };
+    }
+  }
+
+  class MockWindowRef {
+    nativeWindow = {
       location: {
         href: ''
       }
-    }
-  };
+    };
+  }
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRefMock);
-  }));
-  beforeEach(angular.mock.inject(function(
-      $injector, $componentController, $rootScope) {
-    $httpBackend = $injector.get('$httpBackend');
-    $scope = $rootScope.$new();
-    loadingMessage = '';
-    LoaderService = $injector.get('LoaderService');
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
-
-    ctrl = $componentController('notificationsDashboardPage', {
-      $rootScope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
-    }
-  });
-
-  it('should get item url', function() {
-    expect(ctrl.getItemUrl('0', 'feedback_thread')).toBe(
-      '/create/0#/feedback');
-    expect(ctrl.getItemUrl('0', 'exploration_commit')).toBe(
-      '/create/0');
-  });
-
-  it('should navigate to profile', function() {
-    var $event = jasmine.createSpyObj('$event', ['stopPropagation']);
-    ctrl.navigateToProfile($event, 'user1');
-    expect($event.stopPropagation).toHaveBeenCalled();
-    expect(windowRefMock.nativeWindow.location.href).toBe('/profile/user1');
-  });
-
-  it('should get locale date time string', function() {
-    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-    var NOW_MILLIS = 1416563100000;
-    expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-      '11/21/14');
-  });
-
-  it('should successfully get data from backend notifications dashboard',
-    function() {
-      var response = {
-        recent_notifications: {
-          type: 'feedback_thread',
-          activity_id: '0',
-          activity_title: 'Title',
-          last_updated_ms: 2000000,
-          author_id: 'user1',
-          subject: 'This is a brief description of the notification'
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        MatCardModule
+      ],
+      declarations: [
+        NotificationsDashboardPageComponent
+      ],
+      providers: [
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
         },
-        job_queued_msec: 1000000,
-        last_seen_msec: null,
-        username: 'user1'
-      };
-
-      $httpBackend.expect('GET', '/notificationsdashboardhandler/data')
-        .respond(response);
-      ctrl.$onInit();
-      expect(loadingMessage).toBe('Loading');
-      $httpBackend.flush();
-
-      expect(loadingMessage).toBe('');
-      expect(ctrl.recentNotifications).toEqual(response.recent_notifications);
-      expect(ctrl.jobQueuedMsec).toBe(response.job_queued_msec);
-      expect(ctrl.lastSeenMsec).toBe(0);
-      expect(ctrl.currentUsername).toBe(response.username);
+        LoaderService,
+        DateTimeFormatService,
+        {
+          provide: NotificationsDashboardPageBackendApiService,
+          useClass: MockNotificationsDashboardBackendApiService
+        }
+      ]
     });
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(NotificationsDashboardPageComponent);
+    componentInstance = fixture.componentInstance;
+    loaderService = (TestBed.inject(LoaderService) as unknown) as
+      jasmine.SpyObj<LoaderService>;
+    mockWindowRef = (TestBed.inject(WindowRef) as unknown) as
+      jasmine.SpyObj<MockWindowRef>;
+    dateTimeFormatService = (TestBed.inject(
+      DateTimeFormatService) as unknown) as
+      jasmine.SpyObj<DateTimeFormatService>;
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', fakeAsync(() => {
+    spyOn(loaderService, 'hideLoadingScreen');
+    componentInstance.ngOnInit();
+    flushMicrotasks();
+    expect(componentInstance.recentNotifications)
+      .toEqual(responseData.recent_notifications);
+    expect(componentInstance.jobQueuedMsec)
+      .toEqual(responseData.job_queued_msec);
+    expect(componentInstance.lastSeenMsec)
+      .toEqual(responseData.last_seen_msec);
+    expect(componentInstance.currentUsername)
+      .toEqual(responseData.username);
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
+  it('should get item url', () => {
+    let activityId: string = 'test_id';
+    let notificationType: string = 'test_type';
+    expect(componentInstance.getItemUrl(activityId, notificationType)).toEqual(
+      '/create/' + activityId);
+    expect(componentInstance.getItemUrl(activityId, 'feedback_thread')).toEqual(
+      '/create/' + activityId + '#/feedback');
+  });
+
+  it('should navigate to profile', () => {
+    let username: string = 'test';
+    componentInstance.navigateToProfile(new Event('click'), username);
+    expect(mockWindowRef.nativeWindow.location.href)
+      .toEqual('/profile/' + username);
+  });
+
+  it('should get locale abbreviated date time string', () => {
+    let testStr: string = 'test';
+    spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+      .and.returnValue(testStr);
+    expect(componentInstance.getLocaleAbbreviatedDatetimeString(123))
+      .toEqual(testStr);
+  });
 });

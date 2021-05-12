@@ -40,7 +40,7 @@ describe('Exploration Metadata Modal Controller', function() {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     });
   }));
 

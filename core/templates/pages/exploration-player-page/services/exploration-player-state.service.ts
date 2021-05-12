@@ -70,7 +70,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     if (!questionPlayerMode && !('skill_editor' === UrlService.getPathname()
       .split('/')[1].replace(/"/g, "'"))) {
       ReadOnlyExplorationBackendApiService
-        .loadExploration(explorationId, version)
+        .loadExplorationAsync(explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
           $rootScope.$applyAsync();
@@ -84,8 +84,8 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
       // For some cases, version is set only after
-      // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
-      // Use returnDict.version for non-null version value.
+      // ReadOnlyExplorationBackendApiService.loadExplorationAsync()
+      // has completed. Use returnDict.version for non-null version value.
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, returnDict.version,
         returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());
@@ -137,7 +137,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initExplorationPreviewPlayer = function(callback) {
       setExplorationMode();
       $q.all([
-        EditableExplorationBackendApiService.fetchApplyDraftExploration(
+        EditableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
           explorationId),
         ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
           explorationId),
@@ -170,9 +170,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
 
     var initExplorationPlayer = function(callback) {
       var explorationDataPromise = version ?
-        ReadOnlyExplorationBackendApiService.loadExploration(
+        ReadOnlyExplorationBackendApiService.loadExplorationAsync(
           explorationId, version) :
-        ReadOnlyExplorationBackendApiService.loadLatestExploration(
+        ReadOnlyExplorationBackendApiService.loadLatestExplorationAsync(
           explorationId);
       $q.all([
         explorationDataPromise,

@@ -53,7 +53,7 @@ describe('Subtopic editor tab', function() {
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIdsAsync: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIdsAsync: async() => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
