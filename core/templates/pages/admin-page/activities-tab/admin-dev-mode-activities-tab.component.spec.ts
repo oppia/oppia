@@ -139,11 +139,7 @@ describe('Admin dev mode activities tab', () => {
       const expId = 'wrong-exp-id';
 
       spyOn(adminBackendApiService, 'reloadExplorationAsync')
-        .and.returnValue(Promise.reject({
-          data: {
-            error: 'Exploration not found.'
-          }
-        }));
+        .and.returnValue(Promise.reject('Exploration not found.'));
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
       spyOn(component.setStatusMessage, 'emit');
 
@@ -257,11 +253,7 @@ describe('Admin dev mode activities tab', () => {
         component.reloadingAllExplorationPossible = true;
 
         spyOn(adminBackendApiService, 'reloadExplorationAsync')
-          .and.returnValue(Promise.reject({
-            data: {
-              error: 'Exploration not found.'
-            }
-          }));
+          .and.returnValue(Promise.reject('Exploration not found.'));
         spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
         spyOn(component.setStatusMessage, 'emit');
 
@@ -321,11 +313,7 @@ describe('Admin dev mode activities tab', () => {
       component.numDummyExpsToGenerate = 2;
 
       spyOn(adminBackendApiService, 'generateDummyExplorationsAsync')
-        .and.returnValue(Promise.reject({
-          data: {
-            error: 'Dummy explorations not generated.'
-          }
-        }));
+        .and.returnValue(Promise.reject('Dummy explorations not generated.'));
       spyOn(component.setStatusMessage, 'emit');
 
       component.generateDummyExplorations();
@@ -359,11 +347,7 @@ describe('Admin dev mode activities tab', () => {
     it('should show error message if new structues data' +
       'is not generated', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewStructuresDataAsync')
-        .and.returnValue(Promise.reject({
-          data: {
-            error: 'New structures not generated.'
-          }
-        }));
+        .and.returnValue(Promise.reject('New structures not generated.'));
       spyOn(component.setStatusMessage, 'emit');
       component.loadNewStructuresData();
 
@@ -396,11 +380,7 @@ describe('Admin dev mode activities tab', () => {
     it('should show error message if new structues data' +
       'is not generated', async(() => {
       spyOn(adminBackendApiService, 'generateDummyNewSkillDataAsync')
-        .and.returnValue(Promise.reject({
-          data: {
-            error: 'New skill data not generated.'
-          }
-        }));
+        .and.returnValue(Promise.reject('New skill data not generated.'));
       spyOn(component.setStatusMessage, 'emit');
       component.generateNewSkillData();
 
@@ -460,11 +440,7 @@ describe('Admin dev mode activities tab', () => {
       const wrongCollectionId = 'wrongCollectionId';
 
       spyOn(adminBackendApiService, 'reloadCollectionAsync')
-        .and.returnValue(Promise.reject({
-          data: {
-            error: 'Wrong collection ID.'
-          }
-        }));
+        .and.returnValue(Promise.reject('Wrong collection ID.'));
       spyOn(component.setStatusMessage, 'emit');
       spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(false);
 

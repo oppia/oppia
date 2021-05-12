@@ -65,7 +65,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       this.adminTaskManagerService.finishTask();
     }, (errorResponse) => {
       this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.data.error);
+        'Server error: ' + errorResponse);
       this.adminTaskManagerService.finishTask();
     });
   }
@@ -136,7 +136,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         'Dummy explorations generated successfully.');
     }, (errorResponse) => {
       this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.data.error);
+        'Server error: ' + errorResponse);
     });
     this.adminTaskManagerService.finishTask();
   }
@@ -151,7 +151,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
           'Dummy new structures data generated successfully.');
       }, (errorResponse) => {
         this.setStatusMessage.emit(
-          'Server error: ' + errorResponse.data.error);
+          'Server error: ' + errorResponse);
       });
     this.adminTaskManagerService.finishTask();
   }
@@ -166,7 +166,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
           'Dummy new skill and questions generated successfully.');
       }, (errorResponse) => {
         this.setStatusMessage.emit(
-          'Server error: ' + errorResponse.data.error);
+          'Server error: ' + errorResponse);
       });
     this.adminTaskManagerService.finishTask();
   }
@@ -189,7 +189,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         this.setStatusMessage.emit('Data reloaded successfully.');
       }, (errorResponse) => {
         this.setStatusMessage.emit(
-          'Server error: ' + errorResponse.data.error);
+          'Server error: ' + errorResponse);
       });
     this.adminTaskManagerService.finishTask();
   }
