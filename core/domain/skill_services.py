@@ -1065,6 +1065,34 @@ def skill_has_associated_questions(skill_id):
     return len(question_ids) > 0
 
 
+def filtered_skills_with_none_type_keys(degrees_of_mastery):
+    """Given a dict of skills id's with there corresponding
+    mastery. It first split the dict and then returns a list of skill
+    id.
+    
+    Args:
+        degrees_of_mastery: dict. (skill_ids, float|None)
+    
+    Returns:
+        sorted list of skill ids."""
+
+    skill_dict_with_float_value = {skill_id: degree 
+        for skill_id,degree in degrees_of_mastery.items() if degree is not None}
+
+    sorted_skill_ids_with_float_value = sorted(
+        skill_dict_with_float_value, key=skill_dict_with_float_value.get)
+
+    skill_ids_with_none_value = [skill_id 
+        for skill_id,degree in degrees_of_mastery.items() if degree is None]
+    
+    if feconf.MAX_NUMBER_OF_SKILL_IDS <= len(skill_ids_with_none_value):
+        return skill_ids_with_none_value[:feconf.MAX_NUMBER_OF_SKILL_IDS]
+    else:
+        return (skill_ids_with_none_value + sorted_skill_ids_with_float_value[:(
+            feconf.MAX_NUMBER_OF_SKILL_IDS - len(skill_ids_with_none_value))])
+
+    
+
 def filter_skills_by_mastery(user_id, skill_ids):
     """Given a list of skill_ids, it returns a list of
     feconf.MAX_NUMBER_OF_SKILL_IDS skill_ids in which the user has
@@ -1078,12 +1106,9 @@ def filter_skills_by_mastery(user_id, skill_ids):
     Returns:
         list(str). A list of the filtered skill_ids.
     """
-    degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
+    degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)    
 
-    sorted_skill_ids = sorted(
-        degrees_of_mastery, key=degrees_of_mastery.get)
-
-    filtered_skill_ids = sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
+    filtered_skill_ids = filtered_skills_with_none_type_keys(degrees_of_mastery)
 
     # Arranges the skill_ids in the order as it was received.
     arranged_filtered_skill_ids = []
