@@ -1166,7 +1166,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_assign_voiceartist
+        @acl_decorators.can_assign_voice_artist
         def post(self, entity_type, entity_id):
             self.render_json({
                 'entity_type': entity_type,
@@ -1213,7 +1213,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         user_services.update_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
-    def test_voiceover_admin_can_assign_voiceartist_in_public_exp(self):
+    def test_voiceover_admin_can_assign_voice_artist_in_public_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1222,7 +1222,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 {}, csrf_token=csrf_token)
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voiceartist_in_private_exp(self):
+    def test_voiceover_admin_cannot_assign_voice_artist_in_private_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1231,10 +1231,10 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
                 response['error'], 'You do not have credentials to '
-                                   'assign voiceartist to this exploration.')
+                                   'assign voice artist.')
         self.logout()
 
-    def test_owner_cannot_assign_voiceartist_in_public_exp(self):
+    def test_owner_cannot_assign_voice_artist_in_public_exp(self):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1242,11 +1242,11 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to assign '
-                                   'voiceartist to this exploration.')
+                response['error'], 'You do not have credentials to '
+                                   'assign voice artist.')
         self.logout()
 
-    def test_random_user_cannot_assign_voiceartist_in_public_exp(self):
+    def test_random_user_cannot_assign_voice_artist_in_public_exp(self):
         self.login(self.user_email)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1254,11 +1254,11 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 '/mock/exploration/%s' % self.private_exp_id_1, {},
                 csrf_token=csrf_token, expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to assign '
-                                   'voiceartist to this exploration.')
+                response['error'], 'You do not have credentials to '
+                                   'assign voice artist.')
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voiceartist_in_invalid_exp(self):
+    def test_voiceover_admin_cannot_assign_voice_artist_in_invalid_exp(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1267,7 +1267,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
-    def test_voiceover_admin_cannot_assign_voiceartist_without_login(self):
+    def test_voiceover_admin_cannot_assign_voice_artist_without_login(self):
         csrf_token = self.get_new_csrf_token()
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(

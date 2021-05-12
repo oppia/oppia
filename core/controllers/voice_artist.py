@@ -158,7 +158,7 @@ class VoiceArtistManagementHandler(base.BaseHandler):
                 entity_id).to_dict()
         })
 
-    @acl_decorators.can_assign_voiceartist
+    @acl_decorators.can_assign_voice_artist
     def delete(self, entity_type, entity_id):
         """Handles Delete requests."""
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
