@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0036.
+presubmit checks. Next message id would be C0037.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -2152,11 +2152,14 @@ class StringConcatenationChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0035': (
-            'at %s, avoid using string concatenation and replace it with '
-            'string '
-            'interpolation instead.',
-            'no-string-concatenation',
+            'Please replace string concatenation with string interpolation.',
+            'string-interpolation',
             'Enforce use of string interpolation over string concatenation.',
+        ),
+        'C0036': (
+            'Please remove the concatenation as it is not needed',
+            'no-string-concatenation',
+            'Enforce removal of unnecessary string concatenation.',
         ),
     }
 
@@ -2180,13 +2183,20 @@ class StringConcatenationChecker(checkers.BaseChecker):
         """
         if node.op != b'+':
             return
-        for operand in node.get_children():
-            if self.is_node_string_constant(operand):
-                self.add_message(
-                    'no-string-concatenation',
-                    args=(operand.as_string()),
-                    node=node)
-                break
+
+        is_left_node_a_str_const = self.is_node_string_constant(node.left)
+        is_right_node_a_str_const = self.is_node_string_constant(node.right)
+
+        if is_left_node_a_str_const and is_right_node_a_str_const:
+            self.add_message(
+                'no-string-concatenation',
+                node=node)
+        elif not (is_left_node_a_str_const or is_right_node_a_str_const):
+            return
+        else:
+            self.add_message(
+                'string-interpolation',
+                node=node)
 
 
 def register(linter):

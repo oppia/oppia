@@ -3352,29 +3352,23 @@ class StringConcatenationCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_string_concatenation_with_string_operands_raises_error(self):
-        binop_node1, binop_node2, binop_node3 = astroid.extract_node(
+        binop_node1, binop_node2 = astroid.extract_node(
             """
-            'string1' + 'string2' #@
             a + 'string1' #@
             'string2' + b #@
             """)
 
-        str_str_message = testutils.Message(
-            msg_id='no-string-concatenation', args=('\'string1\''),
-            node=binop_node1)
         right_message = testutils.Message(
-            msg_id='no-string-concatenation', args=('\'string1\''),
-            node=binop_node2)
+            msg_id='string-interpolation',
+            node=binop_node1)
         left_message = testutils.Message(
-            msg_id='no-string-concatenation', args=('\'string2\''),
-            node=binop_node3)
+            msg_id='string-interpolation',
+            node=binop_node2)
 
-        with self.checker_test_object.assertAddsMessages(str_str_message):
-            self.checker_test_object.checker.visit_binop(binop_node1)
         with self.checker_test_object.assertAddsMessages(right_message):
-            self.checker_test_object.checker.visit_binop(binop_node2)
+            self.checker_test_object.checker.visit_binop(binop_node1)
         with self.checker_test_object.assertAddsMessages(left_message):
-            self.checker_test_object.checker.visit_binop(binop_node3)
+            self.checker_test_object.checker.visit_binop(binop_node2)
 
     def test_string_interpolation_does_not_raise_error(self):
         binop_node1, binop_node2 = astroid.extract_node(
@@ -3398,25 +3392,6 @@ class StringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(binop_node1)
 
-    def test_multiple_string_concatenations_raises_error(self):
-        binop_node1 = astroid.extract_node(
-            """
-            'string1' + 'string2' + 'string3'
-            """)
-
-        binop_node2 = binop_node1.left
-        first_message = testutils.Message(
-            msg_id='no-string-concatenation', args=('\'string3\''),
-            node=binop_node1)
-        sec_message = testutils.Message(
-            msg_id='no-string-concatenation', args=('\'string1\''),
-            node=binop_node2)
-
-        with self.checker_test_object.assertAddsMessages(first_message):
-            self.checker_test_object.checker.visit_binop(binop_node1)
-        with self.checker_test_object.assertAddsMessages(sec_message):
-            self.checker_test_object.checker.visit_binop(binop_node2)
-
     def test_string_concatenation_inside_interpolation_raises_error(self):
         mod_binop_node = astroid.extract_node(
             """
@@ -3426,10 +3401,23 @@ class StringConcatenationCheckerTests(unittest.TestCase):
 
         plus_binop_node = mod_binop_node.right
         first_message = testutils.Message(
-            msg_id='no-string-concatenation', args=('\'string3\''),
+            msg_id='string-interpolation',
             node=plus_binop_node)
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(mod_binop_node)
         with self.checker_test_object.assertAddsMessages(first_message):
             self.checker_test_object.checker.visit_binop(plus_binop_node)
+
+    def test_unnecessary_string_concatenation_raises_error(self):
+        mod_binop_node = astroid.extract_node(
+            """
+            'string1' + 'string3' #@
+            """)
+
+        first_message = testutils.Message(
+            msg_id='no-string-concatenation',
+            node=mod_binop_node)
+
+        with self.checker_test_object.assertAddsMessages(first_message):
+            self.checker_test_object.checker.visit_binop(mod_binop_node)

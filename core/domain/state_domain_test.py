@@ -3626,7 +3626,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.linked_skill_id, None)
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected linked_skill_id to be ' +
+            utils.ValidationError, 'Expected linked_skill_id to be '
             'a str, received 12.'):
             with self.swap(init_state, 'linked_skill_id', 12):
                 exploration.validate()
@@ -3638,7 +3638,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected card_is_checkpoint to be ' +
+            utils.ValidationError, 'Expected card_is_checkpoint to be '
             'a boolean, received'):
             with self.swap(init_state, 'card_is_checkpoint', 'abc'):
                 exploration.validate()
