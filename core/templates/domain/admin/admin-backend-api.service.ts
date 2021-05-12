@@ -222,15 +222,15 @@ export class AdminBackendApiService {
     });
   }
 
-  private _postRequestAsync(
+  private async _postRequestAsync(
       handlerUrl: string, payload?: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
         .then(response => {
           resolve(response);
-        }, errorResonse => {
-          reject(errorResonse.error.error);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
         });
     });
   }

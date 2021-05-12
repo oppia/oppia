@@ -31,6 +31,7 @@ from core.tests import test_utils
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+from scripts import scripts_test_utils
 
 import pkg_resources
 
@@ -120,20 +121,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.open_file_swap = self.swap(
             python_utils, 'open_file', MockOpenFile)
 
-        class MockProcess(python_utils.OBJECT):
-            """Return object with required attributes."""
-
-            def __init__(self):
-                self.returncode = 0
-
-            def communicate(self):
-                """Return required method."""
-                return '', ''
-
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
-            return MockProcess()
+            return scripts_test_utils.PopenStub()
 
         self.swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)
@@ -514,7 +505,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             paths_to_delete.append(
                 path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
 
         def mock_get_mismatches():
@@ -577,8 +568,41 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'google_cloud_datastore-1.13.0.dist-info'
             ])
 
+    def test_correct_metadata_directory_names_do_not_throw_error(self):
+        def mock_find_distributions(unused_paths):
+            return [
+                Distribution('dependency-1', '1.5.1', {}),
+                Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency-5', '0.5.3', {}),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                }),
+            ]
+
+        def mock_list_dir(unused_path):
+            return [
+                'dependency-1-1.5.1.dist-info',
+                'dependency2-5.0.0.egg-info',
+                'dependency-5-0.5.3-py2.7.egg-info',
+                'dependency_6-0.5.3-py2.7.egg-info',
+            ]
+
+        def mock_is_dir(unused_path):
+            return True
+
+        swap_find_distributions = self.swap(
+            pkg_resources, 'find_distributions', mock_find_distributions)
+        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+
+        with swap_find_distributions, swap_list_dir, swap_is_dir:
+            install_backend_python_libs.validate_metadata_directories()
+
     def test_exception_raised_when_metadata_directory_names_are_missing(self):
-        def mock_find_distributions(paths): # pylint: disable=unused-argument
+        def mock_find_distributions(unused_paths):
             return [
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
@@ -591,7 +615,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 }),
             ]
 
-        def mock_list_dir(path): # pylint: disable=unused-argument
+        def mock_list_dir(unused_path):
             return [
                 'dependency1-1.5.1.dist-info',
                 'dependency1',
@@ -601,7 +625,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency5-0.5.3.metadata',
             ]
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)

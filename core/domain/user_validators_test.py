@@ -3061,7 +3061,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_incorrect_keys_in_activity_mappings(self):
         self.model_instance.pseudonymizable_entity_mappings = {
-            models.NAMES.audit: {'some_id': 'id'}
+            models.NAMES.audit.value: {'some_id': 'id'}
         }
         self.model_instance.update_timestamps()
         self.model_instance.put()
@@ -3148,9 +3148,8 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_existing_feedback_email_reply_to_id_model_failure(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='id', user_id=self.user_id, reply_to_id='id').put()
+    def test_existing_user_contributions_model_failure(self):
+        user_models.UserContributionsModel(id=self.user_id).put()
         expected_output = [
             (
                 '[u\'failed validation check for '
