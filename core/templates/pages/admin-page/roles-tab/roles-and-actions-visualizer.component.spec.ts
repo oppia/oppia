@@ -34,20 +34,23 @@ describe('Roles and actions visualizer component', function() {
     component = fixture.componentInstance;
     component.roleToActions = {
       guest: ['allowed action 1', 'allowed action 2'],
-      learner: ['allowed action 3', 'allowed action 4']
+      learner: ['allowed action 3', 'allowed action 4'],
+      'exploration editor': ['allowed action 5', 'allowed action 6'],
+      admin: ['allowed action 7', 'allowed action 8']
     };
   });
 
   it('should intialize correct active role', function() {
     component.ngOnInit();
 
-    expect(component.activeRole).toEqual('Guest');
+    expect(component.activeRole).toEqual('Learner');
   });
 
   it('should intialize roles with all the roles', function() {
     component.ngOnInit();
 
-    expect(component.roles).toEqual(['Guest', 'Learner']);
+    expect(component.roles).toEqual(
+      ['Admin', 'Exploration editor', 'Guest', 'Learner']);
   });
 
   it('should intialize roleToActions correctly', function() {
@@ -55,16 +58,18 @@ describe('Roles and actions visualizer component', function() {
 
     expect(component.roleToActions).toEqual({
       Guest: ['Allowed action 1', 'Allowed action 2'],
-      Learner: ['Allowed action 3', 'Allowed action 4']
+      Learner: ['Allowed action 3', 'Allowed action 4'],
+      'Exploration editor': ['Allowed action 5', 'Allowed action 6'],
+      Admin: ['Allowed action 7', 'Allowed action 8']
     });
   });
 
   it('should set active role correctly', function() {
     component.ngOnInit();
 
-    expect(component.activeRole).toEqual('Guest');
-
-    component.setActiveRole('Learner');
     expect(component.activeRole).toEqual('Learner');
+
+    component.setActiveRole('Admin');
+    expect(component.activeRole).toEqual('Admin');
   });
 });
