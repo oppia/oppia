@@ -315,11 +315,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.target_id.IN(exp_ids))
         )
         suggestion_models = []
-        cursor, more = (None, True)
+        offset, more = (0, True)
         while more:
-            results, cursor, more = query.fetch_page(
-                feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
-            suggestion_models.extend(results)
+            results = query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset)
+            if len(results):
+                offset = offset + len(results)
+                suggestion_models.extend(results)
+            else:
+                more = False
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
