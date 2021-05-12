@@ -30,7 +30,8 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
-    def generate_value(self, unused_context_params, value, parse_with_jinja):  # pylint: disable=unused-argument
+    def generate_value(
+            self, unused_context_params, value, parse_with_jinja=False):  # pylint: disable=unused-argument
         """Returns a copy of the input value.
 
         Args:
