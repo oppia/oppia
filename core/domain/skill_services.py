@@ -1069,29 +1069,29 @@ def filtered_skills_with_none_type_keys(degrees_of_mastery):
     """Given a dict of skills id's with there corresponding
     mastery. It first split the dict and then returns a list of skill
     id.
-    
+
     Args:
         degrees_of_mastery: dict. (skill_ids, float|None)
-    
-    Returns:
-        sorted list of skill ids."""
 
-    skill_dict_with_float_value = {skill_id: degree 
-        for skill_id,degree in degrees_of_mastery.items() if degree is not None}
+    Returns:
+        list. Sorted list of skill ids."""
+
+    skill_dict_with_float_value = {
+        skill_id: degree for skill_id, degree in degrees_of_mastery.items()
+            if degree is not None}
 
     sorted_skill_ids_with_float_value = sorted(
         skill_dict_with_float_value, key=skill_dict_with_float_value.get)
 
     skill_ids_with_none_value = [skill_id 
-        for skill_id,degree in degrees_of_mastery.items() if degree is None]
-    
+        for skill_id, degree in degrees_of_mastery.items() if degree is None]
+
     if feconf.MAX_NUMBER_OF_SKILL_IDS <= len(skill_ids_with_none_value):
         return skill_ids_with_none_value[:feconf.MAX_NUMBER_OF_SKILL_IDS]
     else:
         return (skill_ids_with_none_value + sorted_skill_ids_with_float_value[:(
             feconf.MAX_NUMBER_OF_SKILL_IDS - len(skill_ids_with_none_value))])
 
-    
 
 def filter_skills_by_mastery(user_id, skill_ids):
     """Given a list of skill_ids, it returns a list of
