@@ -93,6 +93,12 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
       this.value.pop();
       this.valueChanged.emit(this.value);
     }
+    // Inserting empty arrays for skipped slots in between.
+    for (let i = 0; i < this.value.length; i++) {
+      if (this.value[i] === undefined) {
+        this.value[i] = [];
+      }
+    }
     this.validateOrdering();
   }
 
