@@ -32,7 +32,7 @@ from jobs.transforms import base_validation
     exp_models.ExplorationCommitLogEntryModel)
 class ValidateExplorationCommitCmdsSchema(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class and define """
+    """Overrides _get_change_domain_class for exploration models """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a Change domain class.
