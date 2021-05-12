@@ -91,7 +91,7 @@ def run_lighthouse_puppeteer_script():
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
 
     try:
-        script_output = subprocess.check_output(bash_command).split('\n')
+        script_output = subprocess.check_output(bash_command).split(b'\n')
         python_utils.PRINT(script_output)
         for url in script_output:
             export_url(url)
@@ -212,9 +212,11 @@ def main(args=None):
         clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(common.managed_elasticsearch_dev_server())
+
         if constants.EMULATOR_MODE:
+            stack.enter_context(common.managed_elasticsearch_dev_server())
             stack.enter_context(common.managed_firebase_auth_emulator())
+            stack.enter_context(common.managed_cloud_datastore_emulator())
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.

@@ -369,7 +369,7 @@ def validate_svg_filenames_in_math_rich_text(
             fs = fs_domain.AbstractFileSystem(
                 file_system_class(entity_type, entity_id))
             filepath = 'image/%s' % svg_filename
-            if not fs.isfile(filepath.encode('utf-8')):
+            if not fs.isfile(filepath):
                 error_list.append(python_utils.UNICODE(math_tag))
     return error_list
 

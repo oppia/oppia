@@ -411,11 +411,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'attachment; filename=topic_similarities.csv')
 
         self.assertIn(
-            'Architecture,Art,Biology,Business,Chemistry,Computing,Economics,'
-            'Education,Engineering,Environment,Geography,Government,Hobbies,'
-            'Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,'
-            'Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,'
-            'Statistics,Welcome',
+            b'Architecture,Art,Biology,Business,Chemistry,Computing,Economics,'
+            b'Education,Engineering,Environment,Geography,Government,Hobbies,'
+            b'Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,'
+            b'Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,'
+            b'Statistics,Welcome',
             response.body)
 
         self.logout()

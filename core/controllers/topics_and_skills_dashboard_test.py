@@ -341,7 +341,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.save_new_skill(
             skill_id, self.admin_id, description='Random Skill')
 
-        print(type(csrf_token))
         json_response = self.post_json(
             feconf.SKILL_DASHBOARD_DATA_URL, {
                 'num_skills_to_fetch': 1,

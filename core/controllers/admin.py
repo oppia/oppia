@@ -546,11 +546,9 @@ class AdminHandler(base.BaseHandler):
             logging.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
-            collection_services.load_demo(
-                python_utils.convert_to_bytes(collection_id))
+            collection_services.load_demo(collection_id)
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), python_utils.convert_to_bytes(
-                    collection_id))
+                user_services.get_system_user(), collection_id)
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -728,7 +726,7 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         self.render_downloadable_file(
-            recommendations_services.get_topic_similarities_as_csv(),
+            recommendations_services.get_topic_similarities_as_csv().encode('utf-8'),
             'topic_similarities.csv', 'text/csv')
 
 

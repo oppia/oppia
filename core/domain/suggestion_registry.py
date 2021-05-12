@@ -309,6 +309,8 @@ class BaseSuggestion(python_utils.OBJECT):
         storage.
         """
         new_image_filenames = self.get_new_image_filenames_added_in_suggestion()
+        print(self.image_context, self.target_id, self.target_type,
+            self.target_id, new_image_filenames)
         fs_services.copy_images(
             self.image_context, self.target_id, self.target_type,
             self.target_id, new_image_filenames)

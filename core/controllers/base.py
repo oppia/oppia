@@ -381,8 +381,7 @@ class BaseHandler(webapp2.RequestHandler):
             filename: str. The name of the file to be rendered.
             content_type: str. The type of file to be rendered.
         """
-        self.response.headers['Content-Type'] = python_utils.convert_to_bytes(
-            content_type)
+        self.response.headers['Content-Type'] = content_type
         self.response.headers[
             'Content-Disposition'] = str('attachment; filename=%s' % filename)
         self.response.write(values)

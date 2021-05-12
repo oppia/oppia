@@ -84,6 +84,7 @@ import webtest
             models.NAMES.suggestion, models.NAMES.topic]))
 
 datastore_services = models.Registry.import_datastore_services()
+storage_services = models.Registry.import_storage_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_auth_services = models.Registry.import_auth_services()
@@ -403,7 +404,7 @@ class ElasticSearchStub(python_utils.OBJECT):
             AssertionError. The query is not in the correct form.
             elasticsearch.NotFoundError. The given index name was not found.
         """
-        assert query.keys() == ['query']
+        assert list(query.keys()) == ['query']
         assert query['query'] == {
             'match_all': {}
         }
@@ -955,7 +956,6 @@ class TestBase(unittest.TestCase):
                 defaultTestResult() method) and used instead.
         """
         with main.client.context(namespace=self.id()[-100:]):
-            print(self.id()[-100:])
             super(TestBase, self).run(result=result)
 
     def _get_unicode_test_string(self, suffix):
@@ -1366,6 +1366,7 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
+        storage_services.CLIENT.reset()
         super(AppEngineTestBase, self).tearDown()
 
     def run(self, result=None):
@@ -2071,6 +2072,36 @@ title: Title
         # practice it is sufficient for our tests. We make it a positive integer
         # because those are always valid auth IDs.
         return str(abs(hash(email)))
+
+    def get_all_python_files(self, skip_prefix=None):
+        """Recursively collects all Python files in the core/ and extensions/
+        directory.
+
+        Args:
+            skip_prefix: str. Path prefix that should be skipped when collecting
+            the files.
+
+        Returns:
+            list(str). A list of Python files.
+        """
+        current_dir = os.getcwd()
+        files_in_directory = []
+        for _dir, _, files in os.walk(current_dir):
+            for file_name in files:
+                filepath = os.path.relpath(
+                    os.path.join(_dir, file_name), current_dir)
+                if (
+                        filepath.endswith('.py') and (
+                            filepath.startswith('core/') or
+                            filepath.startswith('extensions/')
+                        ) and (
+                            skip_prefix is None or
+                            not filepath.startswith(skip_prefix)
+                        )
+                ):
+                    module = filepath[:-3].replace('/', '.')
+                    files_in_directory.append(module)
+        return files_in_directory
 
     def _get_response(
             self, url, expected_content_type, params=None,

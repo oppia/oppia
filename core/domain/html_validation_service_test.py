@@ -780,7 +780,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
         with self.assertRaisesRegexp(
-            json.decoder.JSONDecodeError,
+            Exception,
             'Expecting value: line 1 column 1 (char 0)'
         ):
             html_validation_service.add_math_content_to_math_rte_components(

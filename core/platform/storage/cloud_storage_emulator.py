@@ -70,3 +70,6 @@ class CloudStorageEmulator(python_utils.OBJECT):
             value for key, value in self._blob_dict.items()
             if key.startswith(prefix)
         ]
+
+    def reset(self):
+        self._blob_dict = {}

@@ -113,11 +113,6 @@ def listdir(_, dir_name):
     Returns:
         list(str). A lexicographically-sorted list of filenames.
     """
-    # The trailing slash is necessary to prevent non-identical directory
-    # names with the same prefix from matching, e.g. /abcd/123.png should
-    if not dir_name.endswith('/'):
-        dir_name += '/'
-    # The prefix now ends and starts with '/'.
     blobs = CLIENT.list_blobs(prefix=dir_name)
     files_in_dir = []
     for blob in blobs:

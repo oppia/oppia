@@ -544,11 +544,11 @@ def run_tests(args):
         clear_datastore=True, skip_sdk_update_check=True)
 
     with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_elasticsearch_dev_server())
         if constants.EMULATOR_MODE:
-            stack.enter_context(common.managed_elasticsearch_dev_server())
             stack.enter_context(common.managed_firebase_auth_emulator())
-            stack.enter_context(common.managed_cloud_datastore_emulator())
         stack.enter_context(managed_dev_appserver)
+        stack.enter_context(common.managed_cloud_datastore_emulator())
 
         python_utils.PRINT('Waiting for servers to come up...')
 

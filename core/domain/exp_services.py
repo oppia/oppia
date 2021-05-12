@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
+import io
 import logging
 import math
 import os
@@ -286,9 +287,8 @@ def export_to_zip_file(exploration_id, version=None):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
-    print(type(yaml_repr))
 
-    temp_file = python_utils.string_io()
+    temp_file = io.BytesIO()
     with zipfile.ZipFile(
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
         if not exploration.title:
@@ -300,11 +300,11 @@ def export_to_zip_file(exploration_id, version=None):
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
+        print(dir_list)
         for filepath in dir_list:
             if not filepath.startswith(asset_dirs_to_include_in_downloads):
                 continue
-            file_contents = fs.get(filepath).decode('utf-8')
-
+            file_contents = fs.get(filepath)
             str_filepath = 'assets/%s' % filepath
             zfile.writestr(str_filepath, file_contents)
 

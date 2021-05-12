@@ -88,7 +88,7 @@ def copy(bucket_name, source_assets_path, dest_assets_path):
         filepath: str. The path to the relevant file within the entity's
             assets folder.
     """
-    src_blob = CLIENT.get_bucket(bucket_name).blob(source_assets_path)
+    src_blob = CLIENT.get_bucket(bucket_name).get_blob(source_assets_path)
     CLIENT.get_bucket(bucket_name).copy_blob(
         src_blob, CLIENT.get_bucket(bucket_name), new_name=dest_assets_path)
 
@@ -108,9 +108,4 @@ def listdir(bucket_name, dir_name):
     if not dir_name.endswith('/'):
         dir_name += '/'
     # The prefix now ends and starts with '/'.
-    blobs = CLIENT.list_blobs(CLIENT.get_bucket(bucket_name), prefix=dir_name)
-    files_in_dir = []
-    for blob in blobs:
-        # Remove the asset path from the prefix of filename.
-        files_in_dir.append(blob.name.replace(dir_name, ''))
-    return files_in_dir
+    return CLIENT.list_blobs(CLIENT.get_bucket(bucket_name), prefix=dir_name)

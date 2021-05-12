@@ -289,7 +289,8 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
     def test_event_handler_names(self):
         """This function checks for duplicate event handlers."""
 
-        all_python_files = self._get_all_python_files()
+        all_python_files = self.get_all_python_files(
+            skip_prefix='core/platform')
         all_event_handlers = []
 
         for file_name in all_python_files:
