@@ -28,7 +28,7 @@ LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 EXCLUDED_DIRECTORIES = [
     'node_modules/*',
-    'extensions/classifiers/proto/*'
+    'extensions/classifiers/proto_files/*'
 ]
 
 # Contains the name of all files that is not 100% coverage.

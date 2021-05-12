@@ -71,6 +71,7 @@ install_third_party_libs.main()
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import servers
 
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
@@ -331,7 +332,7 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    with common.managed_cloud_datastore_emulator():
+    with servers.managed_cloud_datastore_emulator():
         if parsed_args.test_target:
             if '_test' in parsed_args.test_target:
                 all_test_targets = [parsed_args.test_target]

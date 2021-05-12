@@ -285,6 +285,8 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
             'DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID))
         stack.enter_context(common.swap_env(
             'DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true'))
+        stack.enter_context(common.swap_env(
+            'GOOGLE_CLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
 
         yield proc
 
@@ -400,10 +402,10 @@ def managed_webpack_compiler(
             # Iterate until an empty string is printed, which signals the end of
             # the process.
             for line in iter(proc.stdout.readline, ''):
-                sys.stdout.write(line)
+                sys.stdout.write(line.decode('utf-8'))
                 # Message printed when a compilation has succeeded. We break
                 # after the first one to ensure the site is ready to be visited.
-                if 'Built at: ' in line:
+                if b'Built at: ' in line:
                     break
             else:
                 # If the code never ran `break`, raise an error because a build
@@ -415,7 +417,7 @@ def managed_webpack_compiler(
             # Iterate until an empty string is printed, which signals the end of
             # the output.
             for line in iter(proc.stdout.readline, ''):
-                sys.stdout.write(line)
+                sys.stdout.write(line.decode('utf-8'))
 
         # Start a thread to print the rest of the compiler's output to stdout.
         printer_thread = threading.Thread(target=print_proc_output)

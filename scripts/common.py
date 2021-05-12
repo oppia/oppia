@@ -188,6 +188,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
     PSUTIL_DIR,
+    os.path.join(CURR_DIR, 'proto_files'),
     os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
     os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION),

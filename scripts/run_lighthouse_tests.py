@@ -172,6 +172,7 @@ def main(args=None):
 
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
+            stack.enter_context(servers.managed_cloud_datastore_emulator())
 
         stack.enter_context(servers.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode],

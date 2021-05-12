@@ -161,6 +161,8 @@ def main(args=None):
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator(
                 recover_users=parsed_args.save_datastore))
+            stack.enter_context(servers.managed_cloud_datastore_emulator(
+                clear_datastore=not parsed_args.save_datastore))
 
         # NOTE: When prod_env=True the Webpack compiler is run by build.main().
         if not parsed_args.prod_env:

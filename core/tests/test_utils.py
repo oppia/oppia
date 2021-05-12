@@ -70,7 +70,6 @@ import schema_utils
 import utils
 
 import contextlib2
-from google.cloud import ndb
 import elasticsearch
 import requests_mock
 import webtest
