@@ -116,6 +116,7 @@ angular.module('oppia').directive('oppiaRoot', [
                   map[serviceName][0])
               );
             }
+            OppiaAngularRootComponent.ajsTranslate = $translate;
             const translateService = (
               OppiaAngularRootComponent.translateService);
             const i18nLanguageCodeService = (
