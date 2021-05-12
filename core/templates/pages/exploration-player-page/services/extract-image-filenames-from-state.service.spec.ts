@@ -97,6 +97,7 @@ describe('Extracting Image file names in the state service', () => {
             answer_groups: [],
             hints: []
           },
+          linked_skill_id: null,
           next_content_id_index: 1,
           solicit_answer_details: false,
           written_translations: {
@@ -133,6 +134,7 @@ describe('Extracting Image file names in the state service', () => {
             answer_groups: [],
             hints: []
           },
+          linked_skill_id: null,
           next_content_id_index: 0,
           solicit_answer_details: false,
           written_translations: {
@@ -224,6 +226,7 @@ describe('Extracting Image file names in the state service', () => {
             hints: [],
             solution: null
           },
+          linked_skill_id: null,
           next_content_id_index: 5,
           solicit_answer_details: false,
           written_translations: {
@@ -337,6 +340,7 @@ describe('Extracting Image file names in the state service', () => {
               }
             ]
           },
+          linked_skill_id: null,
           next_content_id_index: 5,
           solicit_answer_details: false,
           written_translations: {
@@ -640,6 +644,7 @@ describe('Extracting Image file names in the state service', () => {
               }
             },
           },
+          linked_skill_id: null,
           next_content_id_index: 4,
           solicit_answer_details: false,
           written_translations: {

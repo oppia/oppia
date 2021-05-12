@@ -61,7 +61,7 @@ export interface CategorizedSkills {
   };
 }
 
-interface TopicsAndSkillsDashboardDataBackendDict {
+export interface TopicsAndSkillsDashboardDataBackendDict {
   'all_classroom_names': string[];
   'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
   'mergeable_skill_summary_dicts': SkillSummaryBackendDict[];
@@ -74,7 +74,7 @@ interface TopicsAndSkillsDashboardDataBackendDict {
   'categorized_skills_dict': CategorizedSkillsBackendDict;
 }
 
-interface TopicsAndSkillDashboardData {
+export interface TopicsAndSkillDashboardData {
   allClassroomNames: string[];
   canDeleteTopic: boolean;
   canCreateTopic: boolean;

@@ -895,7 +895,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         return []
 
     def convert_html_in_suggestion_change(self, conversion_fn):
-        """Checks for HTML fields in the suggestion change  and converts it
+        """Checks for HTML fields in the suggestion change and converts it
         according to the conversion function.
 
         Args:
