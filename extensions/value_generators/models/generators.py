@@ -30,17 +30,16 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
-    def generate_value(self, unused_context_params, value, **kwargs):
+    def generate_value(self, unused_context_params, value, parse_with_jinja):  # pylint: disable=unused-argument
         """Returns a copy of the input value.
 
         Args:
             unused_context_params: dict. Context params parsed with input
                 value which is treated as a template. Not used.
             value: str. Value whose copy should be returned.
-            **kwargs: dict. Contains parse_with_jinja which is a part
-                of ParamChange object. The actual parsing of input value
-                against context_params based on parse_with_jinja
-                is done in the FE. Not used.
+            parse_with_jinja: bool. It is a part of ParamChange object.
+                The parsing of input value against context_params
+                based on parse_with_jinja is done in the FE. Not used.
 
         Returns:
             str. Copy of the input value.
