@@ -114,11 +114,14 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(explorationCategoryInput)
     ).setValue(category);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setFirstState = async function(stateName) {
@@ -166,8 +169,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationCategoryInput,
       'Exploration category input takes too long to be visible.');
-    var checkedElement = explorationCategoryInput.$('option:checked');
-    expect(await action.getText('Checked Element', checkedElement)).
+    expect(await explorationCategoryInput.$('option:checked').getText()).
       toEqual(category);
   };
 
