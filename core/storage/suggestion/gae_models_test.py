@@ -1026,8 +1026,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         test_export_change_cmd = self.change_cmd
         test_export_score_category = 'category1'
         test_export_thread_id = 'exploration.exp1.thread_export'
-        test_export_language_code = None
-        test_edited_by_reviewer = False
+        test_export_language_code = 'en'
+        test_export_edited_by_reviewer = False
 
         suggestion_models.GeneralSuggestionModel.create(
             test_export_suggestion_type,
@@ -1055,7 +1055,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'target_version_at_submission': test_export_target_version,
                 'status': test_export_status,
                 'change_cmd': test_export_change_cmd,
-                'edited_by_reviewer': test_edited_by_reviewer
+                'language_code': test_export_language_code,
+                'edited_by_reviewer': test_export_edited_by_reviewer
             },
 
         }

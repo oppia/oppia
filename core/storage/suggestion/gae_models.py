@@ -158,7 +158,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # suggestion type is not queryable by language.
     language_code = datastore_services.StringProperty(indexed=True)
     # A flag that indicates whether the suggestion is edited by the reviewer.
-    edited_by_reviewer = datastore_services.BooleanProperty(default=False)
+    edited_by_reviewer = datastore_services.BooleanProperty(
+        default=False,indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -190,7 +191,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
             'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
             'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -518,6 +519,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     .target_version_at_submission),
                 'status': suggestion_model.status,
                 'change_cmd': suggestion_model.change_cmd,
+                'language_code': suggestion_model.language_code,
                 'edited_by_reviewer': suggestion_model.edited_by_reviewer
             }
 
