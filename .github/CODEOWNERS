@@ -326,7 +326,6 @@
 # TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
 /extensions/domain*.py @kevintab95
 /extensions/interactions/ @iamprayush @vojtechjelinek
-/extensions/objects/templates/filepath-editor.component.* @kevintab95
 /extensions/objects/ @iamprayush
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @iamprayush
@@ -736,6 +735,7 @@
 /core/domain/role_services*.py @seanlip
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
+/extensions/objects/templates/filepath-editor.component*.ts @kevintab95
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
