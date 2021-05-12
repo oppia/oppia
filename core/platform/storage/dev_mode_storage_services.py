@@ -23,7 +23,6 @@ See cloud_translate_emulator.py for more details"""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import fs_domain
 from core.platform.storage import cloud_storage_emulator
 
 CLIENT = cloud_storage_emulator.CloudStorageEmulator()
@@ -42,7 +41,7 @@ def isfile(_, filepath):
     return CLIENT.get_blob(filepath) is not None
 
 
-def get(bucket_name, filepath):
+def get(_, filepath):
     """Gets a file as an unencoded stream of raw bytes.
 
     Args:
@@ -53,12 +52,9 @@ def get(bucket_name, filepath):
         FileStream or None. It returns FileStream domain object if the file
         exists. Otherwise, it returns None.
     """
-    if isfile(bucket_name, filepath):
-        blob = CLIENT.get_blob(filepath)
-        data = blob.download_as_bytes()
-        return fs_domain.FileStream(data)
-    else:
-        return None
+    blob = CLIENT.get_blob(filepath)
+    data = blob.download_as_bytes()
+    return data
 
 
 def commit(_, filepath, raw_bytes, mimetype):
@@ -82,11 +78,7 @@ def delete(_, filepath):
         filepath: str. The path to the relevant file within the entity's
             assets folder.
     """
-    blob = CLIENT.get_blob(filepath)
-    if blob is not None:
-        CLIENT.delete_blob(filepath)
-    else:
-        raise IOError('Image does not exist: %s' % filepath)
+    CLIENT.delete_blob(filepath)
 
 
 def copy(_, source_assets_path, dest_assets_path):
@@ -113,11 +105,6 @@ def listdir(_, dir_name):
     Returns:
         list(str). A lexicographically-sorted list of filenames.
     """
-    # The trailing slash is necessary to prevent non-identical directory
-    # names with the same prefix from matching, e.g. /abcd/123.png should
-    if not dir_name.endswith('/'):
-        dir_name += '/'
-    # The prefix now ends and starts with '/'.
     blobs = CLIENT.list_blobs(prefix=dir_name)
     files_in_dir = []
     for blob in blobs:

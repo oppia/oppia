@@ -137,7 +137,7 @@ class GcsFileSystem(GeneralFileSystem):
         # Upload to GCS bucket with filepath
         # "<entity>/<entity-id>/assets/<filepath>".
         gcs_file_url = '%s/%s' % (self._assets_path, filepath)
-        return gcs_file_url.encode('utf-8')
+        return gcs_file_url
 
     def isfile(self, filepath):
         """Checks if the file with the given filepath exists in the GCS.
@@ -164,8 +164,8 @@ class GcsFileSystem(GeneralFileSystem):
             exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
-            return storage_services.get(
-                self._bucket_name, self._get_gcs_file_url(filepath))
+            return FileStream(storage_services.get(
+                self._bucket_name, self._get_gcs_file_url(filepath)))
         else:
             return None
 
@@ -208,8 +208,8 @@ class GcsFileSystem(GeneralFileSystem):
                 assets folder.
         """
         source_file_url = (
-            '/%s/%s/%s' % (self._bucket_name, source_assets_path, filepath)
-        ).encode('utf-8')
+            '%s/%s' % (source_assets_path, filepath)
+        )
         storage_services.copy(
             self._bucket_name, source_file_url, self._get_gcs_file_url(filepath)
         )
@@ -227,7 +227,11 @@ class GcsFileSystem(GeneralFileSystem):
         if dir_name.startswith('/'):
             raise IOError(
                 'The dir_name should not start with / : %s' % dir_name)
-        return storage_services.listdir(self._bucket_name, dir_name)
+
+        prefix = '%s' % utils.vfs_construct_path(self._assets_path, dir_name)
+        filepaths_in_dir = storage_services.listdir(self._bucket_name, prefix)
+        return [
+            filepath.replace(prefix, '') for filepath in filepaths_in_dir]
 
 
 class AbstractFileSystem(python_utils.OBJECT):
