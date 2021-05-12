@@ -138,8 +138,8 @@ describe('Settings Tab Component', () => {
       data: {
         param_changes: []
       },
-      getData: () => $q.resolve(),
-      autosaveChangeList: () => {}
+      getDataAsync: () => $q.resolve(),
+      autosaveChangeListAsync: () => {}
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
@@ -331,8 +331,8 @@ describe('Settings Tab Component', () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve()
         });
-        spyOn(editableExplorationBackendApiService, 'deleteExploration').and
-          .returnValue($q.resolve());
+        spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync')
+          .and.returnValue($q.resolve());
         spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
           location: {
             reload: () => {}

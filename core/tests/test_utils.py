@@ -64,7 +64,7 @@ from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
 import main_taskqueue
-from proto import text_classifier_pb2
+from proto_files import text_classifier_pb2
 import python_utils
 import schema_utils
 import utils
@@ -1773,6 +1773,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1806,6 +1807,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:

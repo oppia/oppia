@@ -176,7 +176,7 @@ angular.module('oppia').component('settingsTab', {
         // /settings) results in a console error.
 
         ctrl.hasPageLoaded = false;
-        ExplorationDataService.getData().then(function() {
+        ExplorationDataService.getDataAsync().then(function() {
           if (ExplorationStatesService.isInitialized()) {
             var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
               function(categoryItem) {
@@ -452,7 +452,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          EditableExplorationBackendApiService.deleteExploration(
+          EditableExplorationBackendApiService.deleteExplorationAsync(
             ctrl.explorationId).then(function() {
             WindowRef.nativeWindow.location = CREATOR_DASHBOARD_PAGE_URL;
           });
