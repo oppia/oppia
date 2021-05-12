@@ -1071,7 +1071,7 @@ def filtered_skills_with_none_type_keys(degrees_of_mastery):
     id.
 
     Args:
-        degrees_of_mastery: dict. (skill_ids, float|None)
+        degrees_of_mastery: dict. The dict of type (skill_ids, float|None)
 
     Returns:
         list. Sorted list of skill ids.
