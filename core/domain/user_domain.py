@@ -38,8 +38,7 @@ class UserSettings(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         email: str. The user email.
-        role: str. Role of the user. This is used in conjunction with
-            PARENT_ROLES to determine which actions the user can perform.
+        role: str. Role of the user.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -87,8 +86,7 @@ class UserSettings(python_utils.OBJECT):
         Args:
             user_id: str. The unique ID of the user.
             email: str. The user email.
-            role: str. Role of the user. This is used in conjunction with
-                PARENT_ROLES to determine which actions the user can perform.
+            role: str. Role of the user.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -182,7 +180,7 @@ class UserSettings(python_utils.OBJECT):
         if not isinstance(self.role, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected role to be a string, received %s' % self.role)
-        if self.role not in role_services.PARENT_ROLES:
+        if not role_services.is_valid_role(self.role):
             raise utils.ValidationError('Role %s does not exist.' % self.role)
 
         if self.pin is not None:

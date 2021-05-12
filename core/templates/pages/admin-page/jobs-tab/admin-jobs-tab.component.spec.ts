@@ -74,7 +74,7 @@ describe('Admin Jobs Tab Component', () => {
     demoExplorations: [],
     demoCollections: [],
     updatableRoles: null,
-    roleGraphData: null,
+    roleToActions: {},
     configProperties: null,
     viewableRoles: null,
     topicSummaries: [],

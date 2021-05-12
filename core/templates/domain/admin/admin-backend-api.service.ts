@@ -50,14 +50,8 @@ interface UserRolesBackendResponse {
   [role: string]: string;
 }
 
-interface RoleGraphDataBackendResponse {
-  nodes: {
-    [role: string]: string;
-  };
-  links: {
-    target: string;
-    source: string;
-  }[];
+interface RoleToActionsBackendResponse {
+  [role: string]: string[];
 }
 
 interface ConfigPropertiesBackendResponse {
@@ -150,7 +144,7 @@ export interface AdminPageDataBackendDict {
   'human_readable_current_time': string;
   'audit_job_status_summaries': JobStatusSummaryBackendDict[];
   'updatable_roles': UserRolesBackendResponse;
-  'role_graph_data': RoleGraphDataBackendResponse;
+  'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
   'viewable_roles': UserRolesBackendResponse;
   'unfinished_job_data': JobDataBackendDict[];
@@ -168,7 +162,7 @@ export interface AdminPageData {
   humanReadableCurrentTime: string;
   auditJobStatusSummaries: JobStatusSummary[];
   updatableRoles: UserRolesBackendResponse;
-  roleGraphData: RoleGraphDataBackendResponse;
+  roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
   viewableRoles: UserRolesBackendResponse;
   unfinishedJobData: Job[];
@@ -200,7 +194,7 @@ export class AdminBackendApiService {
           auditJobStatusSummaries: response.audit_job_status_summaries.map(
             JobStatusSummary.createFromBackendDict),
           updatableRoles: response.updatable_roles,
-          roleGraphData: response.role_graph_data,
+          roleToActions: response.role_to_actions,
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           unfinishedJobData: response.unfinished_job_data.map(
