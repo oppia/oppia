@@ -898,6 +898,63 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertNotIn('DEF', os.environ)
 
 
+class MockProcess(python_utils.OBJECT):
+    """Mock process object for testing cleanup."""
+
+    def __init__(
+            self, name, pid, race_kill=False,
+            race_terminate=False, terminates=True):
+        """Mock process object.
+
+        Can simulate race conditions by throwing NoSuchProcess
+        exceptions when calling kill() or terminate().
+
+        Args:
+            name: str. Process name.
+            pid: int. PID.
+            race_kill: bool. Whether to simulate a race condition when
+                killing the process.
+            race_terminate: bool. Whether to simulate a race condition
+                when terminating the process.
+            terminates: bool. Whether calling terminate() actually halts
+                the process.
+        """
+        self.proc_name = name
+        self.pid = pid
+        self.running = True
+        self.race_kill = race_kill
+        self.race_terminate = race_terminate
+        self.terminates = terminates
+
+    def name(self):
+        """Get the process name."""
+        return bytes(self.proc_name)
+
+    def kill(self):
+        """Try and kill the process."""
+        self.running = False
+        if self.race_kill:
+            raise psutil.NoSuchProcess(
+                self.pid, name=self.proc_name)
+
+    def terminate(self):
+        """Try and terminate the process."""
+        if self.terminates:
+            self.running = False
+        if self.race_terminate:
+            raise psutil.NoSuchProcess(
+                self.pid, name=self.proc_name)
+
+    def is_running(self):
+        """Get whether the process is running."""
+        return self.running
+
+    def children(self, recursive):
+        """Returns an empty list since there are no children."""
+        assert recursive
+        return []
+
+
 class ManagedProcessTests(test_utils.TestBase):
 
     # Helper class for improving the readability of tests.
@@ -1127,6 +1184,46 @@ class ManagedProcessTests(test_utils.TestBase):
             logs, proc.pid,
             manager_should_have_sent_terminate_signal=True,
             manager_should_have_sent_kill_signal=False)
+
+    def test_handles_kill_race_condition(self):
+        proc = MockProcess(
+            'mock', 9999, terminates=False, race_kill=True)
+
+        def mock_popen(unused_tokens, **unused_kwargs):
+            return proc
+
+        def mock_wait_procs(unused_procs, **unused_kwargs):
+            return tuple(), (proc,)
+
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self.swap(psutil, 'Popen', mock_popen))
+            stack.enter_context(self.swap(
+                psutil, 'wait_procs', mock_wait_procs))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=False)
+
+    def test_handles_terminate_race_condition(self):
+        proc = MockProcess(
+            'mock', 9999, race_terminate=True)
+
+        def mock_popen(unused_tokens, **unused_kwargs):
+            return proc
+
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self.swap(psutil, 'Popen', mock_popen))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=False)
 
     def test_managed_firebase_emulator(self):
         with contextlib2.ExitStack() as stack:

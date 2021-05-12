@@ -852,26 +852,25 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         # proc.terminate() or proc.kill(). The try-except handles this
         # case. See https://psutil.readthedocs.io/en/latest/#exceptions.
         for proc in procs_to_kill:
-            if proc.is_running():
-                procs_still_alive.append(proc)
-                logging.info('Terminating %s...' % get_debug_info(proc))
-                try:
-                    proc.terminate()
-                except psutil.Error:
-                    pass
-            else:
+            try:
+                proc.terminate()
+            except psutil.NoSuchProcess:
                 logging.info('%s has ended.' % get_debug_info(proc))
+            else:
+                logging.info('Terminating %s...' % get_debug_info(proc))
+                procs_still_alive.append(proc)
 
         procs_gone, procs_still_alive = (
             psutil.wait_procs(procs_still_alive, timeout=timeout_secs))
         for proc in procs_gone:
             logging.info('%s has ended.' % get_debug_info(proc))
         for proc in procs_still_alive:
-            logging.warn('Forced to kill %s!' % get_debug_info(proc))
             try:
                 proc.kill()
-            except psutil.Error:
-                pass
+            except psutil.NoSuchProcess:
+                logging.info('%s has ended.' % get_debug_info(proc))
+            else:
+                logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
 
 @contextlib.contextmanager
