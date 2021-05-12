@@ -1089,7 +1089,7 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id'] == 'NumericExpressionInput':
+        if question_state_dict['interaction']['id'] == 'NumericInput':
             customization_args = question_state_dict[
                 'interaction']['customization_args']
             customization_args.update({
