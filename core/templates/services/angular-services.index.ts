@@ -35,6 +35,7 @@ import { StateGraphLayoutService } from 'components/graph-services/graph-layout.
 import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+import { StateLinkedSkillIdService } from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
@@ -87,7 +88,7 @@ import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThre
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
 import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service.ts';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -346,6 +347,10 @@ import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page
 import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ExplorationEngineService } from 'pages/exploration-player-page/services/exploration-engine.service';
+import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
+import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
+import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
+import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -462,6 +467,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EventBusService', EventBusService],
   ['FatigueDetectionService',
     FatigueDetectionService],
+  ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],
@@ -507,12 +513,15 @@ export const angularServices: [string, Type<{}>][] = [
   ['LearnerDashboardBackendApiService', LearnerDashboardBackendApiService],
   ['LearnerDashboardIdsBackendApiService',
     LearnerDashboardIdsBackendApiService],
+  ['LearnerLocalNavBackendApiService', LearnerLocalNavBackendApiService],
   ['LearnerParamsService', LearnerParamsService],
   ['LearnerDashboardActivityBackendApiService',
     LearnerDashboardActivityBackendApiService],
   ['SuggestionModalForLearnerDashboardService',
     SuggestionModalForLearnerDashboardService],
   ['LearnerViewInfoBackendApiService', LearnerViewInfoBackendApiService],
+  ['LearnerViewRatingBackendApiService', LearnerViewRatingBackendApiService],
+  ['LearnerViewRatingService', LearnerViewRatingService],
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
@@ -623,6 +632,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateCardObjectFactory', StateCardObjectFactory],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
+  ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],

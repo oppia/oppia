@@ -151,7 +151,7 @@ export class StoryEditorNavbarComponent implements OnInit {
       }
       this.forceValidateExplorations = false;
       if (explorationIds.length > 0) {
-        this.editableStoryBackendApiService.validateExplorations(
+        this.editableStoryBackendApiService.validateExplorationsAsync(
           this.story.getId(), explorationIds
         ).then((validationIssues) => {
           this.explorationValidationIssues =
