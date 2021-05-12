@@ -1070,7 +1070,7 @@ def filtered_skills_with_none_type_keys(degrees_of_mastery):
 
     Args:
         degrees_of_mastery: dict(str, float|None). Dict mapping
-        skill ids to mastery level.
+            skill ids to mastery level.
 
     Returns:
         list. List of the initial skill id's based on the mastery level.
