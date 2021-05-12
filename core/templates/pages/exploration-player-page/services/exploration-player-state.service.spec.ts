@@ -133,12 +133,12 @@ describe('Exploration Player State Service', () => {
   }
 
   class MockReadOnlyExplorationBackendApiService {
-    loadLatestExploration(explorationId: string):
+    async loadLatestExplorationAsync(explorationId: string):
     Promise<FetchExplorationBackendResponse> {
       return Promise.resolve(returnDict);
     }
 
-    loadExploration(explorationId: string, version: number):
+    async loadExplorationAsync(explorationId: string, version: number):
     Promise<FetchExplorationBackendResponse> {
       return Promise.resolve(returnDict);
     }
@@ -320,8 +320,8 @@ describe('Exploration Player State Service', () => {
   it('should init exploration preview player', fakeAsync(() => {
     spyOn(explorationPlayerStateService, 'setExplorationMode');
     spyOn(
-      editableExplorationBackendApiService, 'fetchApplyDraftExploration').and
-      .returnValue(Promise.resolve({
+      editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
+      .and.returnValue(Promise.resolve({
         init_state_name: '',
         param_changes: [],
         param_specs: {},
