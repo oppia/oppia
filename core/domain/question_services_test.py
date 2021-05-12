@@ -3057,7 +3057,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': '-1'
+                    'x': '1'
                 },
                 'rule_type': 'MatchesExactlyWith'
             }],
@@ -3081,8 +3081,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'answer_groups': [answer_group],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
-                    'placeholder':{
-                        'value': { True }
+                    'placeholder': {
+                        'value': False
                     }
                 },
                 'default_outcome': {
@@ -3132,5 +3132,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['placeholder'].value, True)
-
+            cust_args['placeholder'].value, False)

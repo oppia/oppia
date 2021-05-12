@@ -1814,11 +1814,7 @@ class Exploration(python_utils.OBJECT):
                     'interaction']['customization_args']
                 customization_args.update({
                     'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type input greater than or eual to zero.')
-                        }
+                        'value': False
                     }
                 })
         return states_dict
