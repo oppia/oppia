@@ -343,7 +343,7 @@ exports.config = {
             '-g', '300',
             '-loglevel', '16',
           ];
-          const uniqueString = Math.random().toString(36).substring(7);
+          const uniqueString = Math.random().toString(36).substring(2,8);
           var name = uniqueString + '.mp4';
           var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
           try {
