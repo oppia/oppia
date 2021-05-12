@@ -23,7 +23,7 @@ import os
 import subprocess
 
 from core.tests import test_utils
-from scripts import scripts_test_utils
+import python_utils
 
 from . import css_linter
 
@@ -34,6 +34,17 @@ CONFIG_PATH = os.path.join(
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.css')
 INVALID_CSS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid.css')
+
+
+class MockProcessClass(python_utils.OBJECT):
+    def __init__(self):
+        pass
+
+    kill_count = 0
+
+    def kill(self):
+        """Mock method to kill process."""
+        MockProcessClass.kill_count += 1
 
 
 class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
@@ -73,9 +84,15 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_perform_all_lint_checks_with_stderr(self):
         def mock_popen(unused_commands, stdout, stderr):  # pylint: disable=unused-argument
-            return scripts_test_utils.PopenStub(stdout='True', stderr='True')
+            def mock_communicate():
+                return ('True', 'True')
+            result = MockProcessClass()
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            return result
 
-        popen_swap = self.swap_with_checks(subprocess, 'Popen', mock_popen)
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             CONFIG_PATH, [VALID_CSS_FILEPATH])
