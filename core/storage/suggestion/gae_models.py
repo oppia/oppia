@@ -159,7 +159,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     language_code = datastore_services.StringProperty(indexed=True)
     # A flag that indicates whether the suggestion is edited by the reviewer.
     edited_by_reviewer = datastore_services.BooleanProperty(
-        default=False,indexed=True)
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
