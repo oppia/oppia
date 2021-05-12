@@ -51,7 +51,7 @@ describe('State content editor directive', function() {
 
     mockExplorationData = {
       explorationId: 0,
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     };
     angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);

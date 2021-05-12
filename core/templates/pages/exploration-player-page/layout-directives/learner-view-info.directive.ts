@@ -52,14 +52,14 @@ angular.module('oppia').directive('learnerViewInfo', [
       controller: [
         '$log', '$rootScope', '$uibModal', 'ContextService',
         'LearnerViewInfoBackendApiService',
-        'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-        'UrlService',
+        'ReadOnlyExplorationBackendApiService', 'SiteAnalyticsService',
+        'StatsReportingService', 'UrlInterpolationService', 'UrlService',
         'TOPIC_VIEWER_STORY_URL_TEMPLATE',
         function(
             $log, $rootScope, $uibModal, ContextService,
             LearnerViewInfoBackendApiService,
-            ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-            UrlService,
+            ReadOnlyExplorationBackendApiService, SiteAnalyticsService,
+            StatsReportingService, UrlInterpolationService, UrlService,
             TOPIC_VIEWER_STORY_URL_TEMPLATE
         ) {
           var ctrl = this;
@@ -74,7 +74,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             if (expInfo) {
               openInformationCardModal();
             } else {
-              LearnerViewInfoBackendApiService.fetchLearnerInfo(
+              LearnerViewInfoBackendApiService.fetchLearnerInfoAsync(
                 stringifiedExpIds,
                 includePrivateExplorations
               ).then(function(response) {
@@ -126,7 +126,7 @@ angular.module('oppia').directive('learnerViewInfo', [
 
           ctrl.$onInit = function() {
             ctrl.explorationTitle = 'Loading...';
-            ReadOnlyExplorationBackendApiService.fetchExploration(
+            ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
               explorationId, UrlService.getExplorationVersionFromUrl())
               .then(function(response) {
                 ctrl.explorationTitle = response.exploration.title;
@@ -152,6 +152,9 @@ angular.module('oppia').directive('learnerViewInfo', [
                   ctrl.storyPlaythroughObject = storyDataDict;
                   var topicName = ctrl.storyPlaythroughObject.topicName;
                   ctrl.topicName = topicName;
+                  StatsReportingService.setTopicName(ctrl.topicName);
+                  SiteAnalyticsService.registerCuratedLessonStarted(
+                    ctrl.topicName, explorationId);
                 });
             }
           };

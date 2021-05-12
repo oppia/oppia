@@ -28,6 +28,25 @@ angular.module('oppia').directive('schemaBasedExpressionEditor', [
         labelForFocusTarget: '&'
       },
       template: require('./schema-based-expression-editor.directive.html'),
-      restrict: 'E'
+      restrict: 'E',
+      controllerAs: '$ctrl',
+      controller: [
+        '$scope', '$timeout',
+        'FocusManagerService',
+        function(
+            $scope, $timeout,
+            FocusManagerService) {
+          var ctrl = this;
+          var labelForFocus = $scope.labelForFocusTarget();
+
+          ctrl.$onInit = function() {
+            // So that focus is applied after all the functions in
+            // main thread have executed.
+            $timeout(function() {
+              FocusManagerService.setFocusWithoutScroll(labelForFocus);
+            }, 5);
+          };
+        }
+      ]
     };
   }]);

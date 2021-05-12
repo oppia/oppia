@@ -30,6 +30,7 @@ import threading
 
 import python_utils
 from scripts import common
+from scripts import servers
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -87,7 +88,7 @@ WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
@@ -113,7 +114,7 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
-    'webpack_bundles/*'
+    'webpack_bundles/*',
 )
 
 PAGES_IN_APP_YAML = (
@@ -128,6 +129,14 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
     'webpack_bundles/thanks-page.mainpage.html'
+)
+
+# NOTE: These pages manage user sessions. Thus, we should never reject or
+# replace them when running in maintenance mode; otherwise admins will be unable
+# to access the site.
+AUTH_PAGE_PATHS = (
+    'webpack_bundles/login-page.mainpage.html',
+    'webpack_bundles/logout-page.mainpage.html',
 )
 
 # Hashes for files with these paths should be provided to the frontend in
@@ -195,7 +204,7 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
     with python_utils.open_file(APP_DEV_YAML_FILEPATH, 'r') as yaml_file:
         content += yaml_file.read()
     for file_path in PAGES_IN_APP_YAML:
-        if maintenance_mode:
+        if maintenance_mode and file_path not in AUTH_PAGE_PATHS:
             content = content.replace(
                 file_path, prod_file_prefix + maintenance_page_path)
         else:
@@ -661,10 +670,10 @@ def build_using_webpack(config_path):
     """
 
     python_utils.PRINT('Building webpack')
-
-    cmd = '%s --max-old-space-size=2400 %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
-    subprocess.check_call(cmd, shell=True)
+    managed_webpack_compiler = servers.managed_webpack_compiler(
+        config_path=config_path, max_old_space_size=2400)
+    with managed_webpack_compiler as p:
+        p.wait()
 
 
 def hash_should_be_inserted(filepath):

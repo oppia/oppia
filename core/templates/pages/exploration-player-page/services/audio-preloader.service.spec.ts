@@ -95,12 +95,14 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -136,11 +138,13 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -187,12 +191,14 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -285,6 +291,7 @@ describe('Audio preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: true,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -292,6 +299,7 @@ describe('Audio preloader service', () => {
             feedback_1: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       }

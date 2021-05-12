@@ -270,7 +270,8 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
 
     SAMPLE_JSON_CONTENT = {
         'State A': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -296,6 +297,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -311,7 +313,8 @@ written_translations:
     default_outcome: {}
 """),
         'State B': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -337,6 +340,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -352,7 +356,8 @@ written_translations:
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
-            """classifier_model_id: null
+            """card_is_checkpoint: true
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -378,6 +383,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -395,7 +401,8 @@ written_translations:
     }
 
     SAMPLE_STATE_STRING = (
-        """classifier_model_id: null
+        """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -421,6 +428,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:

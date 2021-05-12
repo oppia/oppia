@@ -2302,8 +2302,9 @@ class State(python_utils.OBJECT):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, solicit_answer_details,
-            next_content_id_index, classifier_model_id=None):
+            written_translations, solicit_answer_details, card_is_checkpoint,
+            next_content_id_index, linked_skill_id=None,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -2320,8 +2321,12 @@ class State(python_utils.OBJECT):
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
+            card_is_checkpoint: bool. If the card is marked as a checkpoint by
+                the creator or not.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
+            linked_skill_id: str or None. The linked skill ID associated with
+                this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -2340,8 +2345,10 @@ class State(python_utils.OBJECT):
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
+        self.linked_skill_id = linked_skill_id
         self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
+        self.card_is_checkpoint = card_is_checkpoint
         self.next_content_id_index = next_content_id_index
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -2457,8 +2464,21 @@ class State(python_utils.OBJECT):
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
 
+        if not isinstance(self.card_is_checkpoint, bool):
+            raise utils.ValidationError(
+                'Expected card_is_checkpoint to be a boolean, '
+                'received %s' % self.card_is_checkpoint)
+
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
+
+        if self.linked_skill_id is not None:
+            if not isinstance(
+                    self.linked_skill_id,
+                    python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected linked_skill_id to be a str, '
+                    'received %s.' % self.linked_skill_id)
 
     def get_content_html(self, content_id):
         """Returns the content belongs to a given content id of the object.
@@ -2722,6 +2742,14 @@ class State(python_utils.OBJECT):
         """
         self.next_content_id_index = next_content_id_index
 
+    def update_linked_skill_id(self, linked_skill_id):
+        """Update the state linked skill id attribute.
+
+        Args:
+            linked_skill_id: str. The linked skill id to state.
+        """
+        self.linked_skill_id = linked_skill_id
+
     def update_interaction_customization_args(self, customization_args_dict):
         """Update the customization_args of InteractionInstance domain object.
 
@@ -2967,6 +2995,19 @@ class State(python_utils.OBJECT):
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
 
+    def update_card_is_checkpoint(self, card_is_checkpoint):
+        """Update the card_is_checkpoint field of a state.
+
+        Args:
+            card_is_checkpoint: bool. The new value of
+                card_is_checkpoint for the state.
+        """
+        if not isinstance(card_is_checkpoint, bool):
+            raise Exception(
+                'Expected card_is_checkpoint to be a boolean, received %s'
+                % card_is_checkpoint)
+        self.card_is_checkpoint = card_is_checkpoint
+
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
@@ -3046,9 +3087,11 @@ class State(python_utils.OBJECT):
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
+            'linked_skill_id': self.linked_skill_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
+            'card_is_checkpoint': self.card_is_checkpoint,
             'next_content_id_index': self.next_content_id_index
         }
 
@@ -3072,7 +3115,9 @@ class State(python_utils.OBJECT):
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
+            state_dict['card_is_checkpoint'],
             state_dict['next_content_id_index'],
+            state_dict['linked_skill_id'],
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -3100,7 +3145,7 @@ class State(python_utils.OBJECT):
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
-            False, 0)
+            False, is_initial_state, 0)
 
     @classmethod
     def convert_html_fields_in_state(

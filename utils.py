@@ -68,20 +68,6 @@ class ExplorationConversionError(Exception):
     pass
 
 
-def create_enum(*sequential, **names):
-    """Creates a enumerated constant.
-
-    Args:
-        *sequential: *. Sequence List to generate the enumerations.
-        **names: *. Names of the enumerration.
-
-    Returns:
-        dict. Dictionary containing the enumerated constants.
-    """
-    enums = dict(python_utils.ZIP(sequential, sequential), **names)
-    return type(b'Enum', (), enums)
-
-
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
     """Gets the contents of a file, given a relative filepath
     from oppia.
@@ -437,7 +423,8 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value]))
+    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']'
+    return base64.b64encode(byte_value)
 
 
 def get_time_in_millisecs(datetime_obj):

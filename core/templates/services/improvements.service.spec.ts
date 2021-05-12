@@ -74,6 +74,7 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
+        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
@@ -83,6 +84,7 @@ describe('ImprovementsService', () => {
           }
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -134,6 +136,7 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
+        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
@@ -143,6 +146,7 @@ describe('ImprovementsService', () => {
           }
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
