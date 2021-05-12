@@ -171,7 +171,7 @@
 	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Der Lexioun nolauschteren",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Sprooch",
 	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Audio gëtt gelueden...",
-	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Net disponibel op <[languageDescription]>",
+	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Net disponibel op {{ languageDescription }}",
 	"I18N_PLAYER_BACK": "Zréck",
 	"I18N_PLAYER_BACK_TO_COLLECTION": "Zréck op d'Kollektioun",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Kaart #",
@@ -274,6 +274,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Astellungen",
 	"I18N_TOPNAV_SIGN_IN": "Aloggen",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Alogge mat Google",
-	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Dir hutt am Ganzen <[totalSubscribers]> Abonnenten.",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Dir hutt am Ganzen {{ totalSubscribers }} Abonnenten.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Ofbestellen"
 }

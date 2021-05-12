@@ -22,6 +22,6 @@ import { HttpClient } from '@angular/common/http';
 export class TranslateLoaderFactory {
   static createTranslateLoader(httpClient: HttpClient):
   TranslateHttpLoader {
-    return new TranslateHttpLoader(httpClient, '/assets/ng-i18n/', '.json');
+    return new TranslateHttpLoader(httpClient, '/assets/i18n/', '.json');
   }
 }

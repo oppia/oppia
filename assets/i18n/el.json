@@ -5,7 +5,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT": "για να βελτιώσετε την εξερεύνησή σας.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "Σχετικά με το Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_1": "Η αποστολή του Oppia είναι να βοηθήσει κάποιον να μάθει οτιδήποτε σε ένα αποτελεσματικό και απολαυστικό τρόπο.",
-	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3": "Μέχρι τώρα, εκπαιδευτές έχουν δημιουργήσει πάνω από <[numberOfExplorations]> αυτών των μαθητών, τις οποίες αποκαλούμε <em>Εξερευνήσεις</em>. Και εξυπηρετούν σχεδόν <[numberofStudentsServed]> σπουδαστές παγκοσμίως.",
+	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3": "Μέχρι τώρα, εκπαιδευτές έχουν δημιουργήσει πάνω από {{ numberOfExplorations }} αυτών των μαθητών, τις οποίες αποκαλούμε <em>Εξερευνήσεις</em>. Και εξυπηρετούν σχεδόν {{ numberofStudentsServed }} σπουδαστές παγκοσμίως.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5": "Εάν είστε σπουδαστής που ενδιαφέρεται να διδαχθεί με τη Oppia, μπορείτε να <a href=\"/community-library\">ξεκινήσετε την περιπέτεια μάθησής κάνοντας περιήγηση στις εξερευνήσεις μας</a>.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_6": "Εάν είστε δάσκαλος ενδιαφερόμενος στο να επηρεάζετε την ζωή των σπουδαστών σε όλο τον κόσμο, μπορείτε να κάνετε αίτηση να προσχωρήσετε στο πρόγραμμά μας <a href=\"/teach\">Διδάξτε με την Oppia</a>, με στόχο να παρέχει μαθήματα για θέμα που οι φοιτητές θα τα έβρισκαν δύσκολα.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "Δημοσίευση &amp; Κοινοποίηση",
@@ -252,7 +252,7 @@
 	"I18N_PLAYER_REPORT_SUCCESS_MODAL_CLOSE": "Κλείσιμο",
 	"I18N_PLAYER_REPORT_SUCCESS_MODAL_HEADER": "Ευχαριστούμε!",
 	"I18N_PLAYER_REPORT_TOOLTIP": "Αναφορά εξερεύνησης",
-	"I18N_PLAYER_RETURN_TO_COLLECTION": "Επαναφορά στο <[collectionTitle]>",
+	"I18N_PLAYER_RETURN_TO_COLLECTION": "Επαναφορά στο {{ collectionTitle }}",
 	"I18N_PLAYER_RETURN_TO_EDITOR": "Επιστροφή στον επεξεργαστή",
 	"I18N_PLAYER_RETURN_TO_LIBRARY": "Επιστροφή στη βιβλιοθήκη",
 	"I18N_PLAYER_RETURN_TO_PARENT": "Επιστροφή στο κύριο μάθημα",
@@ -325,7 +325,7 @@
 	"I18N_TOPNAV_SIGN_IN": "Συνδεθείτε",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Σύνδεση με τη Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Διδάξτε με την Oppia",
-	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Έχετε ένα σύνολο <[totalSubscribers]> συνδρομητών.",
+	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Έχετε ένα σύνολο {{ totalSubscribers }} συνδρομητών.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Κατάργηση συνδρομής",
 	"I18N_WORKED_EXAMPLE": "Δουλεμένο παράδειγμα"
 }

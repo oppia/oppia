@@ -66,6 +66,81 @@ angular.module('oppia').directive('i18nFooter', [
     };
   }]);
 
+angular.module('oppia').factory(
+  'customInterpolation', ['$translateDefaultInterpolation',
+    function($translateDefaultInterpolation) {
+      let templateMatcher: RegExp = /{{\s?([^{}\s]*)\s?}}/g;
+
+      let interpolateBraces = function(expr: string | Function, params):
+       string {
+        let result: string;
+
+        if (typeof expr === 'string') {
+          result = interpolateString(expr, params);
+        } else if (typeof expr === 'function') {
+          result = interpolateFunction(expr, params);
+        } else {
+          // This should not happen, but an unrelated TranslateService test
+          // depends on it
+          result = expr as string;
+        }
+
+        return result;
+      };
+
+      let interpolateFunction = function(fn: Function, params?) {
+        return fn(params);
+      };
+
+      let interpolateString = function(expr: string, params?) {
+        if (!params) {
+          return expr;
+        }
+
+        return expr.replace(
+          templateMatcher, (substring: string, b: string) => {
+            let r = getValue(params, b);
+            return r ? r : substring;
+          });
+      };
+
+      let getValue = function(target, key: string) {
+        let keys = typeof key === 'string' ? key.split('.') : [key];
+        key = '';
+        do {
+          key += keys.shift();
+          if (target && target[key] &&
+            (typeof target[key] === 'object' || !keys.length)) {
+            target = target[key];
+            key = '';
+          } else if (!keys.length) {
+            target = undefined;
+          } else {
+            key += '.';
+          }
+        } while (keys.length);
+
+        return target;
+      };
+
+      return {
+        setLocale: function(locale) {
+          $translateDefaultInterpolation.setLocale(locale);
+        },
+
+        getInterpolationIdentifier: function() {
+          return $translateDefaultInterpolation.getInterpolationIdentifier();
+        },
+
+        interpolate: function(
+            string, interpolateParams, context,
+            sanitizeStrategy, translationId) {
+          let interpolate = $translateDefaultInterpolation.interpolate(string,
+            interpolateParams, context, sanitizeStrategy, translationId);
+          return interpolateBraces(interpolate, interpolateParams);
+        }
+      };
+    }]);
 
 angular.module('oppia').config([
   '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
@@ -91,10 +166,11 @@ angular.module('oppia').config([
       .fallbackLanguage('en')
       .determinePreferredLanguage()
       .useCookieStorage()
+      .useInterpolation('customInterpolation')
       // The messageformat interpolation method is necessary for pluralization.
       // Is optional and should be passed as argument to the translate call. See
       // https://angular-translate.github.io/docs/#/guide/14_pluralization
-      .addInterpolation('$translateMessageFormatInterpolation')
+      // .addInterpolation('$translateMessageFormatInterpolation')
       // The strategy 'sanitize' does not support utf-8 encoding.
       // https://github.com/angular-translate/angular-translate/issues/1131
       // The strategy 'escape' will brake strings with raw html, like
