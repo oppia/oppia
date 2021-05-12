@@ -383,10 +383,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question.inapplicable_skill_misconception_ids = ['Test', 1]
         self._assert_validation_error(
             re.escape(
-                'Expected inapplicable_skill_misconception_ids to be a '
-                'list of strings, received [\'Test\', 1]'
-            )
-        )
+                'Expected inapplicable_skill_misconception_ids to be a list of '
+                'strings, received [\'Test\', 1]'))
 
     def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
             self):
@@ -409,9 +407,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             re.escape(
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings of the format <skill_id>-<misconception_id>, '
-                'received [\'abc\', \'def\']'
-            )
-        )
+                'received [\'abc\', \'def\']'))
 
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
             self):
@@ -615,9 +611,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
-                'received [\'Test\', 1]'
-            )
-        ):
+                'received [\'Test\', 1]')):
             self.observed_object.validate()
 
     def test_validate_invalid_type_of_misconception_ids(self):
