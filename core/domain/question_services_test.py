@@ -3081,12 +3081,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'answer_groups': [answer_group],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
-                    'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': (
-                                'Type an expression here, using only numbers.')
-                        }
+                    'placeholder':{
+                        'value': { True }
                     }
                 },
                 'default_outcome': {
@@ -3112,6 +3108,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
+            'card_is_checkpoint': False,
             'classifier_model_id': None
         }
         question_model = question_models.QuestionModel(
