@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Handler for the Missing translations.
+ * @fileoverview Custom parser for translations.
  */
 
 
 import { Injectable } from '@angular/core';
 import { TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
+import constants from 'assets/constants';
 import * as MessageFormat from 'messageformat';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -37,7 +38,7 @@ export class TranslateCustomParser extends TranslateParser {
   }
 
   interpolate(expr: string | Function,
-      params?: { [key: string]: number | string | boolean } ): string {
+      params?: { [key: string]: number | string | boolean }): string {
     let interpolate = this.translateDefaultParser.interpolate(expr, params);
     if (params) {
       if (params.hasOwnProperty('plural') && interpolate !== undefined) {
@@ -48,7 +49,7 @@ export class TranslateCustomParser extends TranslateParser {
                 .getCurrentI18nLanguageCode())(params);
           } catch (e) {
             interpolate = this.messageFormat.compile(
-              interpolate, 'en')(params);
+              interpolate, constants.DEFAULT_LANGUAGE_CODE)(params);
           }
         }
       }

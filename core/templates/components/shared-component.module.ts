@@ -31,7 +31,7 @@ import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
+import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
@@ -98,6 +98,8 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';
+import { MyMissingTranslationHandler } from 'pages/missing-translations-handler';
+import constants from 'assets/constants';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -143,7 +145,11 @@ const toastrConfig = {
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
+      defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MyMissingTranslationHandler
+      },
       loader: {
         provide: TranslateLoader,
         useFactory: (TranslateLoaderFactory.createHttpLoader),

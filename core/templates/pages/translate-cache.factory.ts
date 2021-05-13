@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Handler for the Missing translations.
+ * @fileoverview Factory for creating translation cache service.
  */
-
 
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
