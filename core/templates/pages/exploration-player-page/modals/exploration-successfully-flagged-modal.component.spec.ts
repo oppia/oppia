@@ -30,7 +30,7 @@ describe('Exploration Successfully flagged modal', () => {
     TestBed.configureTestingModule({
       imports: [
         SharedPipesModule,
-        TranslateModule
+        TranslateModule.forRoot()
       ],
       declarations: [ExplorationSuccessfullyFlaggedModalComponent],
       providers: [

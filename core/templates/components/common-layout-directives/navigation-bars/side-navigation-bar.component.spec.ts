@@ -47,7 +47,7 @@ describe('Side Navigation Bar Component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule,
-        TranslateModule
+        TranslateModule.forRoot()
       ],
       declarations: [
         SideNavigationBarComponent,

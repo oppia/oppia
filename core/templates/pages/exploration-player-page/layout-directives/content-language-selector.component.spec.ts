@@ -68,7 +68,7 @@ describe('Content language selector component', () => {
         FormsModule,
         HttpClientTestingModule,
         NgbModule,
-        TranslateModule
+        TranslateModule.forRoot()
       ],
       declarations: [
         ContentLanguageSelectorComponent,

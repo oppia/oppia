@@ -42,7 +42,7 @@ describe('Flag Exploration modal', () => {
     TestBed.configureTestingModule({
       imports: [
         SharedPipesModule,
-        TranslateModule,
+        TranslateModule.forRoot(),
         FormsModule
       ],
       declarations: [
