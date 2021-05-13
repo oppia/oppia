@@ -160,7 +160,7 @@ export class QuestionPlayerEngineService {
 
     if (!this.questionPlayerMode) {
       this.readOnlyExplorationBackendApiService
-        .loadExploration(this.explorationId, this.version)
+        .loadExplorationAsync(this.explorationId, this.version)
         .then(function(exploration) {
           this.version = exploration.version;
         });

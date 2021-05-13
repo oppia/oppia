@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controller for the questions list.
  */
+import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 require('directives/angular-html-bind.directive.ts');
 require(
@@ -58,6 +60,7 @@ require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/ngb-modal.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
@@ -89,7 +92,7 @@ angular.module('oppia').directive('questionsList', [
         '$location', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'ContextService', 'EditableQuestionBackendApiService',
         'FocusManagerService', 'ImageLocalStorageService',
-        'MisconceptionObjectFactory',
+        'MisconceptionObjectFactory', 'NgbModal',
         'QuestionObjectFactory', 'QuestionUndoRedoService',
         'QuestionValidationService', 'QuestionsListService',
         'SkillBackendApiService',
@@ -101,7 +104,7 @@ angular.module('oppia').directive('questionsList', [
             $location, $rootScope, $timeout, $uibModal, AlertsService,
             ContextService, EditableQuestionBackendApiService,
             FocusManagerService, ImageLocalStorageService,
-            MisconceptionObjectFactory,
+            MisconceptionObjectFactory, NgbModal,
             QuestionObjectFactory, QuestionUndoRedoService,
             QuestionValidationService, QuestionsListService,
             SkillBackendApiService,
@@ -128,7 +131,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.misconceptionsBySkill = {};
             ctrl.misconceptionIdsForSelectedSkill = [];
             if (ctrl.getSelectedSkillId()) {
-              SkillBackendApiService.fetchSkill(
+              SkillBackendApiService.fetchSkillAsync(
                 ctrl.getSelectedSkillId()
               ).then(responseObject => {
                 ctrl.misconceptionIdsForSelectedSkill = (
@@ -196,13 +199,13 @@ angular.module('oppia').directive('questionsList', [
             if (!ctrl.questionIsBeingUpdated) {
               var imagesData = ImageLocalStorageService.getStoredImagesData();
               ImageLocalStorageService.flushStoredImagesData();
-              EditableQuestionBackendApiService.createQuestion(
+              EditableQuestionBackendApiService.createQuestionAsync(
                 ctrl.newQuestionSkillIds, ctrl.newQuestionSkillDifficulties,
                 ctrl.question.toBackendDict(true), imagesData
               ).then(function(response) {
                 if (ctrl.skillLinkageModificationsArray &&
                     ctrl.skillLinkageModificationsArray.length > 0) {
-                  EditableQuestionBackendApiService.editQuestionSkillLinks(
+                  EditableQuestionBackendApiService.editQuestionSkillLinksAsync(
                     response.questionId, ctrl.skillLinkageModificationsArray
                   );
                 }
@@ -220,7 +223,7 @@ angular.module('oppia').directive('questionsList', [
               if (QuestionUndoRedoService.hasChanges()) {
                 if (commitMessage) {
                   ctrl.questionIsBeingSaved = true;
-                  EditableQuestionBackendApiService.updateQuestion(
+                  EditableQuestionBackendApiService.updateQuestionAsync(
                     ctrl.questionId, ctrl.question.getVersion(), commitMessage,
                     QuestionUndoRedoService.getCommittableChangeList()).then(
                     function() {
@@ -356,7 +359,7 @@ angular.module('oppia').directive('questionsList', [
 
           ctrl.populateMisconceptions = function(skillIds) {
             ctrl.misconceptionsBySkill = {};
-            SkillBackendApiService.fetchMultiSkills(
+            SkillBackendApiService.fetchMultiSkillsAsync(
               skillIds).then(
               function(skills) {
                 skills.forEach(function(skill) {
@@ -397,7 +400,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.difficulty = difficulty;
             ctrl.misconceptionsBySkill = {};
             ctrl.associatedSkillSummaries = [];
-            EditableQuestionBackendApiService.fetchQuestion(
+            EditableQuestionBackendApiService.fetchQuestionAsync(
               questionSummaryForOneSkill.getQuestionId()).then(
               function(response) {
                 if (response.associated_skill_dicts) {
@@ -444,7 +447,7 @@ angular.module('oppia').directive('questionsList', [
             _reInitializeSelectedSkillIds();
             // For the case when, it is in the skill editor.
             if (ctrl.getAllSkillSummaries().length === 0) {
-              EditableQuestionBackendApiService.editQuestionSkillLinks(
+              EditableQuestionBackendApiService.editQuestionSkillLinksAsync(
                 questionId, [{id: ctrl.selectedSkillId, task: 'remove'}]
               ).then(function() {
                 QuestionsListService.resetPageNumber();
@@ -456,7 +459,7 @@ angular.module('oppia').directive('questionsList', [
             } else {
               ctrl.getAllSkillSummaries().forEach(function(summary) {
                 if (summary.getDescription() === skillDescription) {
-                  EditableQuestionBackendApiService.editQuestionSkillLinks(
+                  EditableQuestionBackendApiService.editQuestionSkillLinksAsync(
                     questionId, [{id: summary.getId(), task: 'remove'}]
                   ).then(function() {
                     QuestionsListService.resetPageNumber();
@@ -525,23 +528,22 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.getGroupedSkillSummaries().current.concat(
                   ctrl.getGroupedSkillSummaries().others);
             var allowSkillsFromOtherTopics = true;
-            $uibModal.open({
-              templateUrl:
-                  UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/components/skill-selector/' +
-                      'select-skill-modal.template.html'),
-              backdrop: 'static',
-              resolve: {
-                skillsInSameTopicCount: () => skillsInSameTopicCount,
-                sortedSkillSummaries: () => sortedSkillSummaries,
-                categorizedSkills: () => ctrl.getSkillsCategorizedByTopics,
-                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
-                untriagedSkillSummaries: () => ctrl.getUntriagedSkillSummaries
-              },
-              controller: 'SelectSkillModalController',
-              windowClass: 'skill-select-modal',
-              size: 'xl'
-            }).result.then(function(summary) {
+            let modalRef: NgbModalRef = NgbModal.open(
+              SelectSkillModalComponent, {
+                backdrop: 'static',
+                windowClass: 'skill-select-modal',
+                size: 'xl'
+              });
+            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
+            modalRef.componentInstance.skillsInSameTopicCount = (
+              skillsInSameTopicCount);
+            modalRef.componentInstance.categorizedSkills = (
+              ctrl.getSkillsCategorizedByTopics);
+            modalRef.componentInstance.allowSkillsFromOtherTopics = (
+              allowSkillsFromOtherTopics);
+            modalRef.componentInstance.untriagedSkillSummaries = (
+              ctrl.getUntriagedSkillSummaries);
+            modalRef.result.then(function(summary) {
               for (var idx in ctrl.associatedSkillSummaries) {
                 if (
                   ctrl.associatedSkillSummaries[idx].getId() ===
@@ -569,7 +571,7 @@ angular.module('oppia').directive('questionsList', [
           };
 
           ctrl.updateSkillLinkage = function(commitMsg) {
-            EditableQuestionBackendApiService.editQuestionSkillLinks(
+            EditableQuestionBackendApiService.editQuestionSkillLinksAsync(
               ctrl.questionId, ctrl.skillLinkageModificationsArray
             ).then(
               data => {
