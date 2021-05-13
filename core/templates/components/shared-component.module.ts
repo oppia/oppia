@@ -31,7 +31,7 @@ import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule, TranslateLoader, MissingTranslationHandler, TranslateService, TranslateCompiler, TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
+import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
@@ -97,7 +97,7 @@ import { HttpClient } from '@angular/common/http';
 // Miscellaneous
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
-import { TranslateCustomParser } from 'pages/custom-translate-parser';
+import { TranslateCustomParser } from 'pages/translate-custom-parser';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [

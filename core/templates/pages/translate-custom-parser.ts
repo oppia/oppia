@@ -18,7 +18,7 @@
 
 
 import { Injectable } from '@angular/core';
-import { TranslateDefaultParser, TranslateParser, TranslateService } from '@ngx-translate/core';
+import { TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
 import * as MessageFormat from 'messageformat';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -36,14 +36,20 @@ export class TranslateCustomParser extends TranslateParser {
     this.messageFormat = new MessageFormat();
   }
 
-  interpolate(expr: string | Function, params?: Object): string {
+  interpolate(expr: string | Function,
+      params?: { [key: string]: number | string | boolean } ): string {
     let interpolate = this.translateDefaultParser.interpolate(expr, params);
     if (params) {
-      if (params.hasOwnProperty('plural')) {
+      if (params.hasOwnProperty('plural') && interpolate !== undefined) {
         if (params.plural) {
-          interpolate = this.messageFormat.compile(
-            interpolate, this.i18nLanguageCodeService
-              .getCurrentI18nLanguageCode())(params);
+          try {
+            interpolate = this.messageFormat.compile(
+              interpolate, this.i18nLanguageCodeService
+                .getCurrentI18nLanguageCode())(params);
+          } catch (e) {
+            interpolate = this.messageFormat.compile(
+              interpolate, 'en')(params);
+          }
         }
       }
     }
