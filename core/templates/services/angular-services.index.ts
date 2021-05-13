@@ -349,6 +349,7 @@ import { LearnerViewRatingService } from 'pages/exploration-player-page/services
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import { TranslateCustomParser } from 'pages/translate-custom-parser';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -688,6 +689,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
+  ['TranslateCustomParser', TranslateCustomParser],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],
   ['TranslationTabActiveContentIdService',

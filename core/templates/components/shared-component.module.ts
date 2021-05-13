@@ -94,7 +94,7 @@ import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
 
-// Miscellaneous
+// Miscellaneous.
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';

@@ -1460,7 +1460,8 @@ private injector: Injector
     OppiaAngularRootComponent.topicViewerBackendApiService = (
       this.topicViewerBackendApiService);
     OppiaAngularRootComponent.translateService = this.translateService;
-    OppiaAngularRootComponent.translateCacheService = this.translateCacheService;
+    OppiaAngularRootComponent.translateCacheService =
+    this.translateCacheService;
     OppiaAngularRootComponent.unitsObjectFactory = this.unitsObjectFactory;
     OppiaAngularRootComponent.urlInterpolationService = (
       this.urlInterpolationService);

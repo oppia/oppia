@@ -36,7 +36,8 @@ export class TranslateCustomParser extends TranslateParser {
     this.messageFormat = new MessageFormat();
   }
 
-  interpolate(expr: string | Function,
+  interpolate(
+      expr: string | Function,
       params?: { [key: string]: number | string | boolean }): string {
     let interpolate = this.translateDefaultParser.interpolate(expr, params);
     if (params) {
