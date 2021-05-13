@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
 import constants from 'assets/constants';
-import * as MessageFormat from 'messageformat';
+import MessageFormat from 'messageformat';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 @Injectable({
