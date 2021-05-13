@@ -86,7 +86,7 @@ export class StateTopAnswersStatsService {
     return this.initPromise;
   }
 
-  getInitPromise(): Promise<void> {
+  async getInitPromiseAsync(): Promise<void> {
     return this.initPromise;
   }
 

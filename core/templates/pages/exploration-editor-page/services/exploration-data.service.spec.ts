@@ -81,7 +81,7 @@ describe('Exploration data service', function() {
   } as unknown as FetchExplorationBackendResponse;
   class MockEditableExplorationBackendApiService {
     resolve: boolean = true;
-    fetchApplyDraftExploration() {
+    async fetchApplyDraftExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
           resolve(sampleDataResults);
@@ -90,7 +90,7 @@ describe('Exploration data service', function() {
         }
       });
     }
-    updateExploration() {
+    async updateExplorationAsync() {
       return new Promise((resolve, reject) => {
         if (this.resolve) {
           resolve(sampleDataResults);
@@ -130,7 +130,7 @@ describe('Exploration data service', function() {
     eebas = TestBed.inject(EditableExplorationBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -144,7 +144,7 @@ describe('Exploration data service', function() {
       eds.data = sampleDataResults;
       const errorCallback = jasmine.createSpy('error');
       const successCallback = jasmine.createSpy('success');
-      eds.autosaveChangeList([], successCallback, errorCallback);
+      eds.autosaveChangeListAsync([], successCallback, errorCallback);
       const req = httpTestingController.expectOne(
         '/createhandler/autosave_draft/0');
       expect(req.request.method).toBe('PUT');
@@ -160,7 +160,7 @@ describe('Exploration data service', function() {
       eds.data = sampleDataResults;
       const errorCallback = jasmine.createSpy('error');
       const successCallback = jasmine.createSpy('success');
-      eds.autosaveChangeList([], successCallback, errorCallback);
+      eds.autosaveChangeListAsync([], successCallback, errorCallback);
       const req = httpTestingController.expectOne(
         '/createhandler/autosave_draft/0');
       expect(req.request.method).toBe('PUT');
@@ -177,7 +177,7 @@ describe('Exploration data service', function() {
     const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
     spyOn(explorationDraft, 'isValid').and.callFake(() => true);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    eds.getData(errorCallback).then(successCallback);
+    eds.getDataAsync(errorCallback).then(successCallback);
     flushMicrotasks();
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0');
@@ -194,7 +194,7 @@ describe('Exploration data service', function() {
       spyOn(explorationDraft, 'isValid').and.callFake(() => true);
       spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
       // Save draft.
-      eds.getData(errorCallback).then(data => {
+      eds.getDataAsync(errorCallback).then(data => {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
@@ -208,7 +208,7 @@ describe('Exploration data service', function() {
 
       const logInfoSpy = spyOn(ls, 'info').and.callThrough();
       // Draft is already saved and it's in cache.
-      eds.getData(errorCallback).then(data => {
+      eds.getDataAsync(errorCallback).then(data => {
         expect(logInfoSpy).toHaveBeenCalledWith(
           'Found exploration data in cache.');
         expect(data).toEqual(sampleDataResults);
@@ -224,7 +224,7 @@ describe('Exploration data service', function() {
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
     const windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
       .and.callThrough();
-    eds.getData(errorCallback).then(data => {
+    eds.getDataAsync(errorCallback).then(data => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
       expect(windowRefSpy).not.toHaveBeenCalled();
@@ -242,7 +242,7 @@ describe('Exploration data service', function() {
     spyOn(explorationDraft, 'isValid').and.callFake(() => false);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
     const errorCallback = jasmine.createSpy('error');
-    eds.getData(errorCallback).then(data => {
+    eds.getDataAsync(errorCallback).then(data => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).toHaveBeenCalled();
     });
@@ -252,7 +252,7 @@ describe('Exploration data service', function() {
   it('should discard draft', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    eds.discardDraft().then(successHandler, failHandler);
+    eds.discardDraftAsync().then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0');
     req.flush({});
@@ -264,7 +264,7 @@ describe('Exploration data service', function() {
   it('should use reject handler when discard draft fails', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    eds.discardDraft().then(successHandler, failHandler);
+    eds.discardDraftAsync().then(successHandler, failHandler);
     const req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0');
     req.error(new ErrorEvent('Internal server error'));
@@ -278,7 +278,7 @@ describe('Exploration data service', function() {
     const failHandler = jasmine.createSpy('fail');
     const logInfoSpy = spyOn(ls, 'info').and.callThrough();
 
-    eds.getLastSavedData().then(successHandler, failHandler);
+    eds.getLastSavedDataAsync().then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
@@ -299,7 +299,7 @@ describe('Exploration data service', function() {
     spyOn(explorationDraft, 'isValid').and.callFake(() => true);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
     const changeList = [];
-    eds.getData(errorCallback).then(data => {
+    eds.getDataAsync(errorCallback).then(data => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
     });
@@ -328,8 +328,8 @@ describe('Exploration data service', function() {
     const changeList = [];
     let toBeResolved = false;
     // The data.exploration won't receive a value.
-    spyOn(eebas, 'updateExploration').and.callFake(
-      () => {
+    spyOn(eebas, 'updateExplorationAsync').and.callFake(
+      async() => {
         return new Promise((resolve, reject) => {
           if (toBeResolved) {
             resolve(sampleDataResults);
@@ -339,7 +339,7 @@ describe('Exploration data service', function() {
         });
       }
     );
-    eds.getData(errorCallback);
+    eds.getDataAsync(errorCallback);
     flushMicrotasks();
     expect(errorCallback).toHaveBeenCalled();
     toBeResolved = true;
@@ -361,7 +361,7 @@ describe('Exploration data service', function() {
       spyOn(explorationDraft, 'isValid').and.callFake(() => true);
       spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
       const changeList = [];
-      eds.getData(errorCallback).then(function(data) {
+      eds.getDataAsync(errorCallback).then(function(data) {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
@@ -369,8 +369,8 @@ describe('Exploration data service', function() {
       const req = httpTestingController.expectOne(
         '/createhandler/autosave_draft/0');
       req.flush(sampleDataResults);
-      spyOn(eebas, 'updateExploration').and.callFake(
-        () => {
+      spyOn(eebas, 'updateExplorationAsync').and.callFake(
+        async() => {
           return new Promise((resolve, reject) => {
             reject();
           });

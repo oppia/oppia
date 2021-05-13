@@ -37,16 +37,8 @@ describe('Admin backend api service', () => {
   let failHandler = null;
   let adminBackendResponse = {
     unfinished_job_data: [],
-    role_graph_data: {
-      links: [
-        {
-          source: 'TOPIC_MANAGER',
-          target: 'MODERATOR'
-        }
-      ],
-      nodes: {
-        TOPIC_MANAGER: 'topic manager'
-      }
+    role_to_actions: {
+      guest: ['action for guest']
     },
     topic_summaries: [
       {
@@ -190,7 +182,7 @@ describe('Admin backend api service', () => {
         adminBackendResponse.audit_job_status_summaries.map(
           JobStatusSummary.createFromBackendDict),
       updatableRoles: adminBackendResponse.updatable_roles,
-      roleGraphData: adminBackendResponse.role_graph_data,
+      roleToActions: adminBackendResponse.role_to_actions,
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
@@ -207,7 +199,7 @@ describe('Admin backend api service', () => {
       )
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
   });
