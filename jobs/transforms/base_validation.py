@@ -40,7 +40,8 @@ import python_utils
 
 import apache_beam as beam
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.exploration])
 
 BASE_MODEL_ID_PATTERN = r'^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 MAX_CLOCK_SKEW_SECS = datetime.timedelta(seconds=1)
@@ -250,6 +251,61 @@ class ValidateModelDomainObjectInstances(beam.DoFn):
         except Exception as e:
             yield base_validation_errors.ModelDomainObjectValidateError(
                 input_model, e)
+
+
+class BaseValidateCommitCmdsSchema(beam.DoFn):
+    """DoFn to validate schema of commit commands in commit_cmds dict.
+
+    Decorators are not required here as _get_change_domain_class is not
+    implemented. This class is used as a parent class in other places.
+    """
+
+    def _get_change_domain_class(self, unused_item):
+        """Returns a Change domain class.
+
+        This should be implemented by subclasses.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            change_domain.BaseChange. A domain object class for the
+            changes made by commit commands of the model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
+        """
+        raise NotImplementedError(
+            'The _get_change_domain_class() method is missing from the derived '
+            'class. It should be implemented in the derived class.')
+
+    def process(self, input_model):
+        """Validates schema of commit commands in commit_cmds dict.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Yields:
+            CommitCmdsNoneError. Error for invalid commit cmds id.
+            CommitCmdsValidateError. Error for wrong commit cmds.
+        """
+        change_domain_object = self._get_change_domain_class(input_model)
+        if change_domain_object is None:
+            # This is for cases where id of the entity is invalid
+            # and no commit command domain object is found for the entity.
+            # For example, if a CollectionCommitLogEntryModel does
+            # not have id starting with collection/rights, there is
+            # no commit command domain object defined for this model.
+            yield base_validation_errors.CommitCmdsNoneError(input_model)
+            return
+        for commit_cmd_dict in input_model.commit_cmds:
+            if not commit_cmd_dict:
+                continue
+            try:
+                change_domain_object(commit_cmd_dict)
+            except Exception as e:
+                yield base_validation_errors.CommitCmdsValidateError(
+                    input_model, commit_cmd_dict, e)
 
 
 @validation_decorators.AuditsExisting(
