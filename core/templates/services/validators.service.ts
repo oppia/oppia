@@ -118,6 +118,18 @@ export class ValidatorsService {
     }
     return true;
   }
+  isValidReviewMessage(input: string, showWarnings: boolean): boolean {
+    if (input) {
+      if (input.length > 10000) {
+        if (showWarnings) {
+          this.alerts.addWarning(
+            'Review message should be at most 10000 charatcers long.');
+        }
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 angular.module('oppia').factory(

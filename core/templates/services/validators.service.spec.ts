@@ -106,4 +106,11 @@ describe('Validators service', () => {
       'A state name that is toooooooooooooooooooooooo long', true))
       .toBe(false);
   });
+
+  it('should correctly validate review message', () => {
+    var longReviewText: string = 'a'.repeat(10001);
+    expect(vs.isValidReviewMessage('some review message', null)).toBe(true);
+    expect(vs.isValidReviewMessage('', null)).toBe(true);
+    expect(vs.isValidReviewMessage(longReviewText, true)).toBe(false);
+  });
 });

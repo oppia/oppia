@@ -407,10 +407,9 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_text_length(self):
-        self.model_instance.text = 'a'*10001
+        self.model_instance.text = 'a' * 10001
         self.model_instance.update_timestamps()
         self.model_instance.put()
-        print(self.model_instance)
         expected_output = [
             (
                 u'[u\'failed validation check for text of '

@@ -154,13 +154,19 @@ class GeneralFeedbackMessageModelValidator(
 
     @classmethod
     def _validate_text(cls, item):
+        """Validate that text length is less than 10000 characters.
+
+        Args:
+            item: datastore_services.Model. GeneralFeedbackMessageModel to
+                validate.
+        """
 
         if item.text:
             if len(item.text) > 10000:
                 cls._add_error(
                     'text',
-                    'Entity id %s: has text length of more than 10000 characters'
-                    % (item.id))
+                    'Entity id %s: has text length of more than 10000 '
+                    'characters' % (item.id))
 
     @classmethod
     def _validate_message_id(

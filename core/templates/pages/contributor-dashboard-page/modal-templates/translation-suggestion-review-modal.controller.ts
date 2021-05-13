@@ -23,12 +23,13 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$http', '$scope', '$uibModalInstance', 'AlertsService',
     'ContextService', 'ContributionAndReviewService', 'SiteAnalyticsService',
-    'UrlInterpolationService',
+    'UrlInterpolationService', 'ValidatorsService',
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT',
@@ -36,7 +37,7 @@ angular.module('oppia').controller(
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContextService, ContributionAndReviewService, SiteAnalyticsService,
-        UrlInterpolationService,
+        UrlInterpolationService, ValidatorsService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT,
         MAX_TEXT_MESSAGE_LENGTH) {
@@ -134,14 +135,16 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function(reviewMessage) {
-        $scope.resolvingSuggestion = true;
-        SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
-          'Translation');
+        if (ValidatorsService.isValidReviewMessage(reviewMessage, true)) {
+          $scope.resolvingSuggestion = true;
+          SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
+            'Translation');
 
-        ContributionAndReviewService.resolveSuggestionToExploration(
-          $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
-          generateCommitMessage(), $scope.showNextItemToReview);
+          ContributionAndReviewService.resolveSuggestionToExploration(
+            $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
+            ACTION_REJECT_SUGGESTION, reviewMessage || $scope.reviewMessage,
+            generateCommitMessage(), $scope.showNextItemToReview);
+        }
       };
 
       $scope.cancel = function() {
