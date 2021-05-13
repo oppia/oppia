@@ -17,13 +17,12 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
 @Component({
-  selector: 'oppia-social-buttons',
+  selector: 'social-buttons',
   templateUrl: './social-buttons.component.html',
   styleUrls: []
 })
@@ -35,8 +34,3 @@ export class SocialButtonsComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-
-angular.module('oppia').directive('oppiaSocialButtons',
-  downgradeComponent({
-    component: SocialButtonsComponent
-  }) as angular.IDirectiveFactory);
