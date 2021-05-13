@@ -308,8 +308,9 @@ export class PlatformFeatureService {
   }
 }
 
-export const platformFeatureInitFactory = (service: PlatformFeatureService) => {
-  return (): Promise<void> => service.initialize();
+export const platformFeatureInitFactory = (
+    service: PlatformFeatureService) => {
+  return async(): Promise<void> => service.initialize();
 };
 
 angular.module('oppia').factory(

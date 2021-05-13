@@ -70,7 +70,7 @@ export class SkillBackendApiService {
     private skillObjectFactory: SkillObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchSkill(skillId: string): Promise<FetchSkillResponse> {
+  async fetchSkillAsync(skillId: string): Promise<FetchSkillResponse> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -93,7 +93,7 @@ export class SkillBackendApiService {
     });
   }
 
-  fetchMultiSkills(skillIds: string[]): Promise<Skill[]> {
+  async fetchMultiSkillsAsync(skillIds: string[]): Promise<Skill[]> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.SKILL_DATA_URL_TEMPLATE, {
@@ -112,7 +112,7 @@ export class SkillBackendApiService {
     });
   }
 
-  deleteSkill(skillId: string): Promise<void> {
+  async deleteSkillAsync(skillId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
@@ -128,7 +128,7 @@ export class SkillBackendApiService {
     });
   }
 
-  updateSkill(
+  async updateSkillAsync(
       skillId: string, skillVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<Skill> {

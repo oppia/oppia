@@ -566,6 +566,7 @@ var constants = {
             "default_outcome": {}
           }
       },
+      "linked_skill_id": null,
       "next_content_id_index": 0
   }
 };
