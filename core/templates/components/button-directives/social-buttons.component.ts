@@ -31,7 +31,6 @@ export class SocialButtonsComponent {
   constructor(
     private urlInterpolationService: UrlInterpolationService) {
   }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
