@@ -153,6 +153,16 @@ class GeneralFeedbackMessageModelValidator(
         return field_name_to_external_model_references
 
     @classmethod
+    def _validate_text(cls, item):
+
+        if item.text:
+            if len(item.text) > 10000:
+                cls._add_error(
+                    'text',
+                    'Entity id %s: has text length of more than 10000 characters'
+                    % (item.id))
+
+    @classmethod
     def _validate_message_id(
             cls, item, field_name_to_external_model_references):
         """Validate that message_id is less than the message count for
@@ -204,6 +214,10 @@ class GeneralFeedbackMessageModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_message_id]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_text]
 
 
 class GeneralFeedbackThreadUserModelValidator(

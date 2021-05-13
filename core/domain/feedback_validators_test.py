@@ -406,6 +406,20 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_text_length(self):
+        self.model_instance.text = 'a'*10001
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        print(self.model_instance)
+        expected_output = [
+            (
+                u'[u\'failed validation check for text of '
+                'GeneralFeedbackMessageModel\', [u\'Entity id %s: has text '
+                'length of more than 10000 characters\']]'
+            ) % self.model_instance.id]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
 
 class GeneralFeedbackThreadUserModelValidatorTests(
         test_utils.AuditJobsTestBase):
