@@ -47,7 +47,7 @@ class QuestionsListHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-        offset = self.request.get('cursor')
+        offset = self.request.get('offset')
         if offset == '':
             offset = 0
         else:
@@ -67,7 +67,7 @@ class QuestionsListHandler(base.BaseHandler):
 
         (
             question_summaries, merged_question_skill_links,
-            offset) = (
+            next_offset) = (
                 question_services.get_displayable_question_skill_link_details(
                     constants.NUM_QUESTIONS_PER_PAGE, skill_ids, offset=offset)
             )
@@ -101,7 +101,7 @@ class QuestionsListHandler(base.BaseHandler):
 
         self.values.update({
             'question_summary_dicts': return_dicts,
-            'next_start_cursor': offset
+            'next_offset': next_offset
         })
         self.render_json(self.values)
 

@@ -80,18 +80,18 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
             json_response = self.get_json(
-                '%s/%s,%s?cursor=' % (
+                '%s/%s,%s?offset=' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
                     self.skill_id, self.skill_id_2
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
             self.assertEqual(len(question_summary_dicts), 2)
-            offset = json_response['next_start_cursor']
+            next_offset = json_response['next_offset']
             json_response = self.get_json(
-                '%s/%s,%s?cursor=%s' % (
+                '%s/%s,%s?offset=%s' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
                     self.skill_id, self.skill_id_2,
-                    offset
+                    next_offset
                 ))
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
@@ -115,7 +115,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                     question_summary_dicts_2[i]['skill_difficulties'],
                     [0.3, 0.5])
             json_response = self.get_json(
-                '%s/%s?cursor=' % (
+                '%s/%s?offset=' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
                     self.skill_id
                 ))
@@ -136,12 +136,12 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         self.logout()
 
     def test_get_fails_when_skill_id_not_valid(self):
-        self.get_json('%s/%s?cursor=' % (
+        self.get_json('%s/%s?offset=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
                       expected_status_int=400)
 
     def test_get_fails_when_skill_does_not_exist(self):
-        self.get_json('%s/%s?cursor=' % (
+        self.get_json('%s/%s?offset=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
                       expected_status_int=404)
 
