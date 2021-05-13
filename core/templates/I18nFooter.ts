@@ -91,6 +91,9 @@ angular.module('oppia').config([
       .fallbackLanguage('en')
       .determinePreferredLanguage()
       .useCookieStorage()
+      // The messageformat interpolation method is necessary for pluralization.
+      // Is optional and should be passed as argument to the translate call. See
+      // https://angular-translate.github.io/docs/#/guide/14_pluralization
       .addInterpolation('$translateMessageFormatInterpolation')
       // The strategy 'sanitize' does not support utf-8 encoding.
       // https://github.com/angular-translate/angular-translate/issues/1131
