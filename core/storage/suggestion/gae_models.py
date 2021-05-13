@@ -157,8 +157,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
     language_code = datastore_services.StringProperty(indexed=True)
-    # A flag that indicates whether the suggestion is edited by the reviewer of
-    # the given suggestion.
+    # A flag that indicates whether the suggestion is edited by the reviewer.
     edited_by_reviewer = datastore_services.BooleanProperty(
         default=False, indexed=True)
 
