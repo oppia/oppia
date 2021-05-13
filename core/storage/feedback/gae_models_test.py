@@ -202,8 +202,9 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, None, 'open', 'subject 2', 'text 2')
 
-        model = feedback_models.GeneralFeedbackMessageModel\
-            .get_feedback_message_model(thread_id, 0)
+        model = (
+            feedback_models.GeneralFeedbackMessageModel
+            .get_feedback_message_model(thread_id, 0))
         self.assertEqual(model.entity_type, 'exploration')
 
         all_messages = (
@@ -231,8 +232,9 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             thread_id, None, 'open', 'subject 2', 'text 2')
 
-        model1 = feedback_models.GeneralFeedbackMessageModel\
-            .get_feedback_message_model(thread_id, 0)
+        model1 = (
+            feedback_models.GeneralFeedbackMessageModel.
+            get_feedback_message_model(thread_id, 0))
 
         self.assertEqual(model1.entity_type, 'exploration')
 

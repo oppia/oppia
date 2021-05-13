@@ -439,8 +439,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         """Returns the CollectionProgressModel for the given user id and
         collection id.
         """
-        return user_models.CollectionProgressModel\
-            .get_collection_progress_model(user_id, collection_id)
+        return (
+            user_models.CollectionProgressModel.get_collection_progress_model(
+                user_id, collection_id))
 
     def _record_completion(self, user_id, collection_id, exploration_id):
         """Records the played exploration in the collection by the user

@@ -386,8 +386,9 @@ def get_completed_exploration_ids(user_id, collection_id):
         the sake of this call, so it returns an empty list, indicating that no
         progress has yet been made.
     """
-    progress_model = user_models.CollectionProgressModel\
-        .get_collection_progress_model(user_id, collection_id)
+    progress_model = (
+        user_models.CollectionProgressModel.get_collection_progress_model(
+            user_id, collection_id))
     return progress_model.completed_explorations if progress_model else []
 
 
