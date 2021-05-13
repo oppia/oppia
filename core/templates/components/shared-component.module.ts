@@ -31,10 +31,10 @@ import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateModule, TranslateLoader, MissingTranslationHandler, TranslateService, TranslateCompiler } from '@ngx-translate/core';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
-
+import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
@@ -93,7 +93,11 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
+
+// Miscellaneous
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
+import { TranslateCacheFactory } from 'pages/translate-cache.factory';
+import { TranslateMessageFormatCompiler } from 'pages/message-format-compiler';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -139,18 +143,32 @@ const toastrConfig = {
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
+      compiler: {
+        provide: TranslateCompiler,
+        useClass: TranslateMessageFormatCompiler
+      },
+      defaultLanguage: 'en' ,
       loader: {
         provide: TranslateLoader,
-        useFactory: (TranslateLoaderFactory.createTranslateLoader),
-        deps: [HttpClient]
+        useFactory: (TranslateLoaderFactory.createHttpLoader),
+        deps: [HttpClient],
       }
+    }),
+    TranslateCacheModule.forRoot({
+      cacheService: {
+        provide: TranslateCacheService,
+        useFactory: TranslateCacheFactory.createTranslateCacheService,
+        deps: [TranslateService, TranslateCacheSettings]
+      },
+      cacheName: 'NGX_TRANSLATE_LANG_KEY',
+      cacheMechanism: 'Cookie',
+      cookieExpiry: 1
     }),
     ...firebaseAuthModules,
   ],
 
   providers: [
-    ...firebaseAuthProviders,
+    ...firebaseAuthProviders
   ],
 
   declarations: [

@@ -68,7 +68,9 @@ angular.module('oppia').directive('i18nFooter', [
 
 angular.module('oppia').factory(
   'customInterpolation', ['$translateDefaultInterpolation',
-    function($translateDefaultInterpolation) {
+    '$translateMessageFormatInterpolation',
+    function(
+        $translateDefaultInterpolation, $translateMessageFormatInterpolation) {
       let templateMatcher: RegExp = /{{\s?([^{}\s]*)\s?}}/g;
 
       let interpolateBraces = function(expr: string | Function, params):
@@ -137,7 +139,9 @@ angular.module('oppia').factory(
             sanitizeStrategy, translationId) {
           let interpolate = $translateDefaultInterpolation.interpolate(string,
             interpolateParams, context, sanitizeStrategy, translationId);
-          return interpolateBraces(interpolate, interpolateParams);
+          interpolate = interpolateBraces(interpolate, interpolateParams);
+          return $translateMessageFormatInterpolation.interpolate(
+            interpolate, interpolateParams, context, sanitizeStrategy);
         }
       };
     }]);
@@ -167,10 +171,6 @@ angular.module('oppia').config([
       .determinePreferredLanguage()
       .useCookieStorage()
       .useInterpolation('customInterpolation')
-      // The messageformat interpolation method is necessary for pluralization.
-      // Is optional and should be passed as argument to the translate call. See
-      // https://angular-translate.github.io/docs/#/guide/14_pluralization
-      // .addInterpolation('$translateMessageFormatInterpolation')
       // The strategy 'sanitize' does not support utf-8 encoding.
       // https://github.com/angular-translate/angular-translate/issues/1131
       // The strategy 'escape' will brake strings with raw html, like

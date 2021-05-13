@@ -125,6 +125,7 @@
         </span>
       </div>
     </div>
+    <h1 [innerHtml]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count: 20}"></h1>
     <div class="oppia-splash-section-five-right" *ngIf="!isWindowNarrow">
       <picture class="splash-student-image">
         <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">

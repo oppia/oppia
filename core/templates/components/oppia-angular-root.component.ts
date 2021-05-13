@@ -461,6 +461,7 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TranslateService } from '@ngx-translate/core';
+import { TranslateCacheService } from 'ngx-translate-cache';
 
 @Component({
   selector: 'oppia-angular-root',
@@ -732,6 +733,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     TopicsAndSkillsDashboardPageService;
   static topicViewerBackendApiService: TopicViewerBackendApiService;
   static translateService: TranslateService;
+  static translateCacheService: TranslateCacheService;
   static unitsObjectFactory: UnitsObjectFactory;
   static urlInterpolationService: UrlInterpolationService;
   static urlService: UrlService;
@@ -1018,6 +1020,7 @@ private topicsAndSkillsDashboardPageService:
   TopicsAndSkillsDashboardPageService,
 private topicViewerBackendApiService: TopicViewerBackendApiService,
 private translateService: TranslateService,
+private translateCacheService: TranslateCacheService,
 private unitsObjectFactory: UnitsObjectFactory,
 private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
@@ -1457,6 +1460,7 @@ private injector: Injector
     OppiaAngularRootComponent.topicViewerBackendApiService = (
       this.topicViewerBackendApiService);
     OppiaAngularRootComponent.translateService = this.translateService;
+    OppiaAngularRootComponent.translateCacheService = this.translateCacheService;
     OppiaAngularRootComponent.unitsObjectFactory = this.unitsObjectFactory;
     OppiaAngularRootComponent.urlInterpolationService = (
       this.urlInterpolationService);
