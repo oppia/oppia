@@ -16,7 +16,6 @@
  * @fileoverview Handler for the Missing translations.
  */
 
-
 import { MissingTranslationHandler, MissingTranslationHandlerParams } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 

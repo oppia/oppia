@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Handler for the Missing translations.
+ * @fileoverview Factory for creating http loader for translations.
  */
-
 
 import { HttpClient } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';

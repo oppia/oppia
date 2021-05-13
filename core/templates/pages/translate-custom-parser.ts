@@ -16,7 +16,6 @@
  * @fileoverview Custom parser for translations.
  */
 
-
 import { Injectable } from '@angular/core';
 import { TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
 import constants from 'assets/constants';
