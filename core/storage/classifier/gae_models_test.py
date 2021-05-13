@@ -111,10 +111,9 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
         self.assertEqual(offset, 2)
 
-    def test_query_new_and_pending_training_jobs_with_multiple_fetches(self):
-        offset = 0
+    def test_query_new_and_pending_training_jobs_with_non_zero_offset(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
-        # Creating 14 jobs out of which 12 will be fetched in steps.
+        # Creating 6 jobs out of which 4 will be fetched in steps.
         classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id01', 1,
             next_scheduled_check_time,
@@ -145,57 +144,16 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'TextClassifier', 'TextInput', 'exp_id06', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id07', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id08', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id09', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id10', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id11', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id12', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id13', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
-        classifier_models.ClassifierTrainingJobModel.create(
-            'TextClassifier', 'TextInput', 'exp_id14', 1,
-            next_scheduled_check_time,
-            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
 
         training_jobs, offset = (
             classifier_models.ClassifierTrainingJobModel.
-            query_new_and_pending_training_jobs(offset))
+            query_new_and_pending_training_jobs(2))
 
-        self.assertEqual(len(training_jobs), 10)
-
+        self.assertEqual(len(training_jobs), 2)
         self.assertEqual(training_jobs[0].algorithm_id, 'TextClassifier')
         self.assertEqual(training_jobs[0].interaction_id, 'TextInput')
-        self.assertEqual(training_jobs[0].exp_id, 'exp_id01')
+        self.assertEqual(training_jobs[0].exp_id, 'exp_id05')
         self.assertEqual(training_jobs[0].exp_version, 1)
         self.assertEqual(
             training_jobs[0].next_scheduled_check_time,
@@ -210,15 +168,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_jobs[1].status,
             feconf.TRAINING_JOB_STATUS_PENDING)
-        self.assertEqual(offset, 10)
-
-        training_jobs, offset = (
-            classifier_models.ClassifierTrainingJobModel.
-            query_new_and_pending_training_jobs(offset))
-
-        self.assertEqual(len(training_jobs), 2)
-        self.assertEqual(training_jobs[0].exp_id, 'exp_id13')
-        self.assertEqual(offset, 12)
+        self.assertEqual(offset, 4)
 
     def test_create_multi_jobs(self):
         next_scheduled_check_time = datetime.datetime.utcnow()
