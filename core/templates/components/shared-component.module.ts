@@ -160,7 +160,7 @@ const toastrConfig = {
         useFactory: TranslateCacheFactory.createTranslateCacheService,
         deps: [TranslateService, TranslateCacheSettings]
       },
-      cacheName: 'NGX_TRANSLATE_LANG_KEY',
+      cacheName: 'NG_TRANSLATE_LANG_KEY',
       cacheMechanism: 'Cookie',
       cookieExpiry: 1
     }),

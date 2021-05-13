@@ -36,7 +36,6 @@ class MockTranslatePipe {
     return value;
   }
 }
-
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
