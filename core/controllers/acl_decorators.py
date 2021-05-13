@@ -2942,10 +2942,8 @@ def can_update_suggestion(handler):
         handler: function. The function to be decorated.
 
     Returns:
-        function. The newly decorated function that has common checks and
-        permissions specified by passed in decorator. This function is allowed
-        to be called for users who have the rights to update the given
-        suggestion.
+        function. The newly decorated function that now checks
+        if the user can update a given suggestion.
 
     Raises:
         NotLoggedInException. The user is not logged in.
