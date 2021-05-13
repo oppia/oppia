@@ -47,7 +47,7 @@ export interface StateBackendDict {
   'classifier_model_id'?: string;
   'content'?: SubtitledHtmlBackendDict;
   'interaction'?: InteractionBackendDict;
-  'linked_skill_id': string,
+  'linked_skill_id'?: string,
   'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers'?: RecordedVoiceOverBackendDict;
   'solicit_answer_details'?: boolean;
