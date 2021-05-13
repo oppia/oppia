@@ -114,7 +114,7 @@
 	"I18N_FOOTER_TEACH_LEARN_ALL_CAPS": "NAUCZAJ/UCZ SIĘ",
 	"I18N_FOOTER_TERMS_OF_SERVICE": "Warunki użytkowania serwisu",
 	"I18N_FORMS_TYPE_NUMBER": "Wpisz liczbę",
-	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Proszę wpisać liczbę, której wartość jest większa lub równa {{ minValue }}.",
+	"I18N_FORMS_TYPE_NUMBER_AT_LEAST": "Proszę wpisać liczbę, której wartość jest większa lub równa <[minValue]>.",
 	"I18N_GET_STARTED_PAGE_HEADING": "Rozpocznij!",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING": "Dołącz do nas",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING": "Wybierz Temat",
