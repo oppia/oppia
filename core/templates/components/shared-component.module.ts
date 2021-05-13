@@ -100,6 +100,7 @@ import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';
 import { MyMissingTranslationHandler } from 'pages/missing-translations-handler';
 import constants from 'assets/constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -157,7 +158,8 @@ const toastrConfig = {
       },
       parser: {
         provide: TranslateParser,
-        useClass: TranslateCustomParser
+        useClass: TranslateCustomParser,
+        deps: [TranslateDefaultParser, I18nLanguageCodeService]
       }
     }),
     TranslateCacheModule.forRoot({

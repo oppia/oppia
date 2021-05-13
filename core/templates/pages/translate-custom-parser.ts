@@ -16,15 +16,11 @@
  * @fileoverview Custom parser for translations.
  */
 
-import { Injectable } from '@angular/core';
 import { TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
 import constants from 'assets/constants';
 import MessageFormat from 'messageformat';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class TranslateCustomParser extends TranslateParser {
   messageFormat;
   constructor(
