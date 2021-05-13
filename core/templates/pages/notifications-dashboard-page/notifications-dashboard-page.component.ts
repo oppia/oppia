@@ -60,7 +60,7 @@ export class NotificationsDashboardPageComponent {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.notificationsDashboardPageBackendApiService.getNotificationData()
+    this.notificationsDashboardPageBackendApiService.getNotificationDataAsync()
       .then((response) => {
         let data = response;
         this.recentNotifications = data.recent_notifications;
