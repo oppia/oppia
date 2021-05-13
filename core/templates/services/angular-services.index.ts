@@ -328,7 +328,6 @@ import { SuggestionsService } from 'services/suggestions.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
-import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
@@ -688,7 +687,6 @@ export const angularServices: [string, Type<{}>][] = [
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
-  ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslateCustomParser', TranslateCustomParser],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],
