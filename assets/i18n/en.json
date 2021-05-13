@@ -225,58 +225,8 @@
     "I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT": "Update Weight",
     "I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[Select an image to display]",
     "I18N_INTERACTIONS_ITEM_SELECTION_MORE": "You may select more choices.",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{Please select one or more choices.} other{Please select # or more choices.}}",
     "I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE": "{maxAllowableSelectionCount, plural, one{No more than 1 choice may be selected.} other{No more than # choices may be selected.}}",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_INTERACTIONS_LOGIC_PROOF_CORRECT_ANSWERS": "Correct",
     "I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS": "Incorrect",
     "I18N_INTERACTIONS_LOGIC_PROOF_POSSIBLE_LINES": "Possible lines",
@@ -314,72 +264,12 @@
     "I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "In Progress",
     "I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_ONE": "It looks like you haven't tried any of our explorations yet.",
     "I18N_LEARNER_DASHBOARD_INTRO_MESSAGE_PART_TWO": "Let's get started on this exciting journey!",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST": "{numberNonexistent, plural, one{1 of the collections in your 'Play Later' list is no longer available. We are sorry for the inconvenience} other{# of the collections in your 'Play Later' list are no longer available. We are sorry for the inconvenience}}",
     "I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS": "{numberNonexistent, plural, one{1 of the collections which you completed is no longer available. We are sorry for the inconvenience} other{# of the collections which you completed are no longer available. We are sorry for the inconvenience}}",
     "I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS": "{numberNonexistent, plural, one{1 of the explorations which you completed is no longer available. We are sorry for the inconvenience} other{# of the explorations which you completed are no longer available. We are sorry for the inconvenience}}",
     "I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST": "{numberNonexistent, plural, one{1 of the explorations in your 'Play Later' list is no longer available. We are sorry for the inconvenience} other{# of the explorations in your 'Play Later' list are no longer available. We are sorry for the inconvenience}}",
     "I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS": "{numberNonexistent, plural, one{1 of the collections in progress is no longer available. We are sorry for the inconvenience} other{# of the collections in progress are no longer available. We are sorry for the inconvenience}}",
     "I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS": "{numberNonexistent, plural, one{1 of the explorations in progress is no longer available. We are sorry for the inconvenience} other{# of the explorations in progress are no longer available. We are sorry for the inconvenience}}",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_COLLECTION": "It looks like you haven't started any collections yet. Head over to the library to start an exciting new collection!",
     "I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION": "It looks like you haven't started any explanations yet. Head over to the library to start an exciting new exploration!",
     "I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION": "Play Later",
@@ -461,83 +351,8 @@
     "I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "Oops, it looks like your search didn't match any explorations.",
     "I18N_LIBRARY_NO_EXPLORATION_GROUPS": "There are no groups of explorations available to display.",
     "I18N_LIBRARY_NO_OBJECTIVE": "No objective specified.",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_LIBRARY_N_CATEGORIES": "{categoriesCount, plural, =1{1 Category} other{# Categories}}",
     "I18N_LIBRARY_N_LANGUAGES": "{languagesCount, plural, =1{1 Language} other{# Languages}}",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_LIBRARY_PAGE_TITLE": "Community Library Lessons | Oppia",
     "I18N_LIBRARY_RATINGS_TOOLTIP": "Ratings",
     "I18N_LIBRARY_SEARCH_PLACEHOLDER": "What are you curious about?",
@@ -810,80 +625,9 @@
     "I18N_TEACH_TESTIMONIAL_3": "“I never expected the students to learn tech and do maths lessons so fast. It's their first exposure to smarttech and they were really struggling to handle them at first. Now, I feel so elated to see them doing the Oppia lessons even before I enter the class!”",
     "I18N_TEACH_TESTIMONIAL_4": "“to be written3”",
     "I18N_THANKS_PAGE_BREADCRUMB": "Thanks",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     "I18N_TOPIC_VIEWER_CHAPTER": "Chapter",
-
-
-
-
-
-
-
     "I18N_TOPIC_VIEWER_CHAPTERS": "{count, plural, one{1 chapter} other{# chapters}}",
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     "I18N_TOPIC_VIEWER_DESCRIPTION": "Description",
     "I18N_TOPIC_VIEWER_LESSON": "Lesson",
     "I18N_TOPIC_VIEWER_LESSONS": "Lessons",
