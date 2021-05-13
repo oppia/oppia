@@ -539,10 +539,14 @@ def managed_webdriver_server(chrome_version=None):
 
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
-        yield exit_stack.enter_context(managed_process([
+        proc = exit_stack.enter_context(managed_process([
             common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-            '--versions.chrome', chrome_version, '--detach', '--quiet',
+            '--versions.chrome', chrome_version, '--quiet', '--standalone',
         ], human_readable_name='Webdriver manager', shell=True))
+
+        common.wait_for_port_to_be_in_use(4444)
+
+        yield proc
 
 
 @contextlib.contextmanager
@@ -574,15 +578,19 @@ def managed_protractor_server(
         '--unhandled-rejections=strict',
         common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
         '--params.devMode=%s' % dev_mode,
-        '--suite=%s' % suite_name,
-        '--capabilities.shardTestFiles=True',
-        '--capabilities.maxInstances=%d' % sharding_instances,
+        '--suite', suite_name,
     ]
 
     if debug_mode:
         # NOTE: This is a flag for Node.js, not Protractor, so we insert it
         # immediately after NODE_BIN_PATH.
         protractor_args.insert(1, '--inspect-brk')
+
+    if sharding_instances > 1:
+        protractor_args.extend([
+            '--capabilities.shardTestFiles=True',
+            '--capabilities.maxInstances=%d' % sharding_instances,
+        ])
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.

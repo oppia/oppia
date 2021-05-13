@@ -737,6 +737,9 @@ class ManagedProcessTests(test_utils.TestBase):
                      '--versions.chrome', '123'],
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(
             servers.managed_webdriver_server(chrome_version='123'))
@@ -745,7 +748,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 123 --detach --quiet' % (
+            '%s %s start --versions.chrome 123 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_on_mac_os(self):
@@ -769,6 +772,9 @@ class ManagedProcessTests(test_utils.TestBase):
                     '/LATEST_RELEASE_4.5.6',
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(servers.managed_webdriver_server())
         self.exit_stack.close()
@@ -776,7 +782,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 4.5.6 --detach --quiet' % (
+            '%s %s start --versions.chrome 4.5.6 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_on_non_mac_os(self):
@@ -796,6 +802,9 @@ class ManagedProcessTests(test_utils.TestBase):
                     '/LATEST_RELEASE_1.2.3',
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(servers.managed_webdriver_server())
         self.exit_stack.close()
@@ -803,7 +812,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 1.2.3 --detach --quiet' % (
+            '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_fails_to_get_chrome_version(self):
@@ -811,6 +820,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
         self.exit_stack.enter_context(self.swap_to_always_raise(
             subprocess, 'check_output', error=OSError))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None, called=False))
 
         expected_regexp = 'Failed to execute "google-chrome --version" command'
         with self.assertRaisesRegexp(Exception, expected_regexp):
@@ -843,6 +854,9 @@ class ManagedProcessTests(test_utils.TestBase):
                     'this.osArch = "x64";',
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(servers.managed_webdriver_server())
         self.exit_stack.close()
@@ -850,7 +864,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 1.2.3 --detach --quiet' % (
+            '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_protractor_with_invalid_sharding_instances(self):
@@ -883,10 +897,8 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.PROTRACTOR_CONFIG_FILE_PATH),
             program_args)
         self.assertNotIn('--inspect-brk', program_args)
-        self.assertIn('--capabilities.shardTestFiles=True', program_args)
-        self.assertIn('--capabilities.maxInstances=1', program_args)
         self.assertIn('--params.devMode=True', program_args)
-        self.assertIn('--suite=full', program_args)
+        self.assertIn('--suite full', program_args)
 
     def test_managed_protractor_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -908,4 +920,4 @@ class ManagedProcessTests(test_utils.TestBase):
         # From dev_mode=True.
         self.assertIn('--params.devMode=False', program_args)
         # From suite='full'.
-        self.assertIn('--suite=abc', program_args)
+        self.assertIn('--suite abc', program_args)

@@ -521,10 +521,10 @@ def main():
         server.run()
     except KeyboardInterrupt:
         logging.info('Stopping portserver due to ^C.')
-
-    server.close()
-    request_handler.dump_stats()
-    logging.info('Shutting down portserver.')
+    finally:
+        server.close()
+        request_handler.dump_stats()
+        logging.info('Shutting down portserver.')
 
 
 if __name__ == '__main__':
