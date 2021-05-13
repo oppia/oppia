@@ -332,7 +332,7 @@ def main():
     python_utils.PRINT('Installing buf and protoc binary.')
     install_buf_and_protoc()
     python_utils.PRINT('Compiling protobuf files.')
-    # compile_protobuf_files(PROTO_FILES_PATHS)
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     # Install pre-commit script.
     python_utils.PRINT('Installing pre-commit hook for git')
