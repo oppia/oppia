@@ -97,7 +97,7 @@ import { HttpClient } from '@angular/common/http';
 // Miscellaneous
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
-import { TranslateMessageFormatCompiler } from 'pages/message-format-compiler';
+import { TranslateCustomParser } from 'pages/custom-translate-parser';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -151,7 +151,7 @@ const toastrConfig = {
       },
       parser: {
         provide: TranslateParser,
-        useClass: CustomTranslateParser
+        useClass: TranslateCustomParser
       }
     }),
     TranslateCacheModule.forRoot({
