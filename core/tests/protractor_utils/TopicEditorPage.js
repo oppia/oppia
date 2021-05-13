@@ -115,19 +115,27 @@ var TopicEditorPage = function() {
   var storyTitleClassname = '.protractor-test-story-title';
 
   var cdkDragAndDrop = async(start, destination) => {
+    console.log('Empty div-0');
     await browser.actions().mouseDown(start).perform();
+    console.log('Empty div-1');
     await waitFor.presenceOf(
       element(by.css('.protractor-test-empty-div')),
       'protractor-test-empty-div not present');
+    console.log('Empty div-2');
     await browser.actions().mouseMove({x: 10, y: 20 }).perform();
+    console.log('Empty div-3');
     await waitFor.visibilityOf(
       element(by.css('.protractor-test-dnd-placeholder')),
       'Placeholder for dnd not showing up.');
+    console.log('Empty div-4');
     await browser.actions().mouseMove(destination).perform();
+    console.log('Empty div-5');
     await browser.actions().mouseUp(destination).perform();
+    console.log('Empty div-6');
     await waitFor.presenceOf(
       element(by.css('.protractor-test-empty-div-abs')),
       'protractor-test-empty-div not hiding.');
+    console.log('Empty div-7');
   };
   var saveRearrangedSkillsButton = element(
     by.css('.protractor-save-rearrange-skills'));
