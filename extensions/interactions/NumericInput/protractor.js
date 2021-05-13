@@ -17,8 +17,10 @@
  * interaction.
  */
 
-var customizeInteraction = function() {
+var customizeInteraction = function(elem, placeholder) {
   // There are no customizations.
+  await objects.BooleanEditor(elem.element(by.tagName(
+    'schema-based-bool-editor'))).setValue(placeholder);
 };
 
 var expectInteractionDetailsToMatch = async function(elem) {

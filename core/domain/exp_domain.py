@@ -1814,7 +1814,9 @@ class Exploration(python_utils.OBJECT):
                     'interaction']['customization_args']
                 customization_args.update({
                     'placeholder': {
-                        'value': False
+                        'value': {
+                            'bool': True
+                        }
                     }
                 })
         return states_dict

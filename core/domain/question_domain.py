@@ -1094,7 +1094,9 @@ class Question(python_utils.OBJECT):
                 'interaction']['customization_args']
             customization_args.update({
                 'placeholder': {
-                    'value': False
+                    'value': {
+                        'bool': True
+                    }
                 }
             })
         return question_state_dict

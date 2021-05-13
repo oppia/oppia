@@ -182,7 +182,11 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'widget_id',
-                'new_value': 'NumericInput'
+                'new_value': {
+                    'input': {
+                        'value': True
+                    }
+                }
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -202,7 +206,10 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'widget_id',
-                'new_value': 'NumericInput'
+                'new_value': {
+                    'input': {
+                        'value': True
+                    }
             })
         ]
         # Migrate exploration to state schema version 44.

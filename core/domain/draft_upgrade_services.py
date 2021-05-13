@@ -104,6 +104,31 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list):
+        """Converts draft change list from state version 44 to 45.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Converting the answer groups depends on getting an
+                # exploration state of v44, because we need to add a
+                # customization_arg for numeric-input interaction to disable
+                # the ability of user to enter input less than zero.
+                # Since we do not yet support passing an exploration state of a
+                # given version into draft conversion functions, we throw an
+                # Exception to indicate that the conversion cannot be completed.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v43_dict_to_v44_dict(cls, draft_change_list):
         """Converts draft change list from state version 43 to 44. State
         version 44 adds card_is_checkpoint boolean variable to the
@@ -116,29 +141,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        return draft_change_list
-
-    @classmethod
-    def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list):
-        """Converts draft change list from state version 43 to 44.
-        Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
-        """
-        for change in draft_change_list:
-            if (change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                # Converting the answer groups depends on getting an
-                # exploration state of v42, because we need to add a
-                # customization_arg for numeric-input interaction to disable
-                # the ability of user to enter input less than zero.
-                # Since we do not yet support passing an exploration state of a
-                # given version into draft conversion functions, we throw an
-                # Exception to indicate that the conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod

@@ -3523,7 +3523,7 @@ states:
       customization_args:
         placeholder:
           value:
-            false
+            bool: True
         rows:
           value: 1
       default_outcome:
@@ -3591,7 +3591,7 @@ states:
       customization_args:
         placeholder:
           value:
-            false
+            bool: True
         rows:
           value: 1
       default_outcome:

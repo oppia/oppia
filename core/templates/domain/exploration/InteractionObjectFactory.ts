@@ -368,6 +368,21 @@ export class InteractionObjectFactory {
     };
   }
 
+  _createFromNumericInputCustomizationArgsBackendDict(
+  caBackendDict: NumericInputCustomizationArgsBackendDict
+  ): NumericInputCustomizationArgs {
+    const { placeholder } = caBackendDict;
+    return {
+      placeholder: {
+        value: this.subtitledUnicodeFactory.createFromBackendDict(
+          placeholder.value)
+      },
+      input: {
+        value: true
+      }
+    };
+  }
+
   convertFromCustomizationArgsBackendDict(
       interactionId: string,
       caBackendDict: InteractionCustomizationArgsBackendDict

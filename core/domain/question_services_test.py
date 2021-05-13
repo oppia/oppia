@@ -3082,7 +3082,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {
-                        'value': False
+                        'value': {
+                            'bool': True
+                        }
                     }
                 },
                 'default_outcome': {
@@ -3131,5 +3133,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         cust_args = question.question_state_data.interaction.customization_args
+        cust_val = {'bool': True}
         self.assertEqual(
-            cust_args['placeholder'].value, False)
+            cust_args['placeholder'].value, cust_val)
