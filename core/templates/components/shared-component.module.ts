@@ -31,7 +31,7 @@ import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule, TranslateLoader, MissingTranslationHandler, TranslateService, TranslateCompiler } from '@ngx-translate/core';
+import { TranslateModule, TranslateLoader, MissingTranslationHandler, TranslateService, TranslateCompiler, TranslateDefaultParser } from '@ngx-translate/core';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
@@ -145,9 +145,9 @@ const toastrConfig = {
     TranslateModule.forRoot({
       compiler: {
         provide: TranslateCompiler,
-        useClass: TranslateMessageFormatCompiler
+        useClass: TranslateMessageFormatCompiler,
       },
-      defaultLanguage: 'en' ,
+      defaultLanguage: 'en',
       loader: {
         provide: TranslateLoader,
         useFactory: (TranslateLoaderFactory.createHttpLoader),
@@ -168,6 +168,7 @@ const toastrConfig = {
   ],
 
   providers: [
+    TranslateDefaultParser,
     ...firebaseAuthProviders
   ],
 

@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
-import { TranslateCompiler } from '@ngx-translate/core';
+import { TranslateCompiler, TranslateDefaultParser } from '@ngx-translate/core';
 import * as MessageFormat from 'messageformat';
 
 export const MESSAGE_FORMAT_CONFIG = new InjectionToken<MessageFormatConfig>(
@@ -30,7 +30,8 @@ export class TranslateMessageFormatCompiler extends TranslateCompiler {
 
   constructor(
     @Optional()
-    @Inject(MESSAGE_FORMAT_CONFIG) config?: MessageFormatConfig
+    @Inject(MESSAGE_FORMAT_CONFIG) config?: MessageFormatConfig,
+    private translateDefaultParser: TranslateDefaultParser
   ) {
     super();
 
@@ -46,26 +47,15 @@ export class TranslateMessageFormatCompiler extends TranslateCompiler {
     };
 
     this.messageFormat = new MessageFormat(locales);
-
-    if (formatters) {
-      this.messageFormat.addFormatters(formatters);
-    }
-    if (biDiSupport) {
-      this.messageFormat.setBiDiSupport(biDiSupport);
-    }
-    if (strictNumberSign) {
-      this.messageFormat.setStrictNumberSign(strictNumberSign);
-    }
-    if (disablePluralKeyChecks) {
-      this.messageFormat.disablePluralKeyChecks();
-    }
   }
 
   public compile(value: string, lang: string): (params) => string {
+    console.log(value);
     return this.messageFormat.compile(value, lang);
   }
 
-  public compileTranslations(translations, lang: string) {
+  public compileTranslations(
+      translations, lang: string): MessageFormat.Msg {
     return this.messageFormat.compile(translations, lang);
   }
 }
