@@ -38,6 +38,7 @@ angular.module('oppia').directive('oppiaResponseDragAndDropSortInput', [
         };
         ctrl.$onInit = function() {
           ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
           ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
         };
       }]
