@@ -360,7 +360,7 @@ exports.config = {
         },
         specDone: function(result) {
           spw.kill();
-          if (result.status == 'passed' && !ALLVIDEOS && fs.existsSync(vidPath)) {
+          if (result.status == 'passed' && !ALL_VIDEOS && fs.existsSync(vidPath)) {
             fs.unlinkSync(vidPath);
             console.log(`Video for test: ${result.fullName} was deleted successfully (test passed).`);
           }
