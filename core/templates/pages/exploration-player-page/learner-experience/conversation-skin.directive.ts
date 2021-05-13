@@ -27,7 +27,7 @@ require('components/summary-tile/collection-summary-tile.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'correctness-footer.directive.ts');
+  'correctness-footer.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
 require(
@@ -962,7 +962,8 @@ angular.module('oppia').directive('conversationSkin', [
                       oldStateName, nextCard.getStateName(), answer,
                       LearnerParamsService.getAllParams(), isFirstHit);
 
-                    StatsReportingService.recordStateCompleted(oldStateName);
+                    StatsReportingService.recordStateCompleted(
+                      oldStateName);
                   }
                   if (nextCard.isTerminal()) {
                     StatsReportingService.recordStateCompleted(
@@ -1407,6 +1408,7 @@ angular.module('oppia').directive('conversationSkin', [
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
                 AlertsService.addSuccessMessage('Rating saved!', 1000);
+                $rootScope.$applyAsync();
               })
             );
             ctrl.directiveSubscriptions.add(
