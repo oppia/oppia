@@ -70,7 +70,7 @@ describe('Learner playlist Backend Api service ', () => {
     csrfService = TestBed.inject(CsrfTokenService);
     alertsService = TestBed.inject(AlertsService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
@@ -287,7 +287,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
 
@@ -316,7 +316,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
@@ -344,7 +344,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
 
@@ -373,7 +373,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
@@ -401,7 +401,7 @@ describe('Learner playlist Backend Api service ', () => {
     let activityId = '0';
     let activityTitle = 'title';
 
-    learnerDashboardActivityBackendApiService.removeActivityModal(
+    learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activityId, activityTitle);
     flushMicrotasks();
