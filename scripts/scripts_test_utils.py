@@ -60,7 +60,7 @@ class PopenStub(python_utils.OBJECT):
     def __init__(
             self, pid=1, name='process', stdout='', stderr='',
             reject_signal=False, reject_terminate=False, reject_kill=False,
-            unresponsive=False, return_code=0, child_procs=None):
+            alive=True, unresponsive=False, return_code=0, child_procs=None):
         """Initializes a new PopenStub instance.
 
         Args:
@@ -72,6 +72,7 @@ class PopenStub(python_utils.OBJECT):
             reject_signal: bool. Whether to raise OSError in send_signal().
             reject_terminate: bool. Whether to raise OSError in terminate().
             reject_kill: bool. Whether to raise OSError in kill().
+            alive: bool. Whether the process should be considered to be alive.
             unresponsive: bool. Whether the process will end normally.
             child_procs: list(PopenStub)|None. Processes "owned" by the stub, or
                 None if there aren't any.
@@ -84,7 +85,7 @@ class PopenStub(python_utils.OBJECT):
         self.signals_received = []
         self.terminate_count = 0
         self.kill_count = 0
-        self.alive = True
+        self.alive = alive
         self.reject_signal = reject_signal
         self.reject_terminate = reject_terminate
         self.reject_kill = reject_kill
