@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.tests import test_utils
 from jobs import job_options
 from jobs.io import stub_io
@@ -33,7 +35,7 @@ class JobOptionsTests(test_utils.TestBase):
 
     def test_overwritten_values(self):
         model_io_stub = stub_io.ModelIoStub()
-        get_models = model_io_stub.get_models
+        get_models = model_io_stub.get_models_ptransform
 
         options = job_options.JobOptions(model_getter=get_models)
 
@@ -41,5 +43,5 @@ class JobOptionsTests(test_utils.TestBase):
 
     def test_unsupported_values(self):
         self.assertRaisesRegexp(
-            ValueError, r'Unsupported option\(s\): a, b',
+            ValueError, re.escape('Unsupported option(s): a, b'),
             lambda: job_options.JobOptions(a=1, b=2))

@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import re
 
 from core.domain import question_domain
 from core.domain import question_fetchers
@@ -265,8 +266,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id_2 = question_services.get_new_question_id()
         with self.assertRaisesRegexp(
             Exception,
-            r'Entity for class QuestionModel with id %s not found' % (
-                question_id_2)):
+            re.escape(
+                'Entity for class QuestionModel with id %s not found' % (
+                    question_id_2))):
             question_services.create_new_question_skill_link(
                 self.editor_id, question_id_2, 'skill_1', 0.5)
 
