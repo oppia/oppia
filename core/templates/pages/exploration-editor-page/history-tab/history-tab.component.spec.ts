@@ -122,7 +122,7 @@ describe('History tab component', function() {
       data: {
         version: 2
       },
-      getData: () => $q.resolve({
+      getDataAsync: () => $q.resolve({
         version: 2,
       })
     });
