@@ -1216,7 +1216,7 @@ def update_user_role(user_id, role):
     Raises:
         Exception. The given role does not exist.
     """
-    if role not in role_services.PARENT_ROLES:
+    if not role_services.is_valid_role(role):
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     if user_settings.role == feconf.ROLE_ID_LEARNER:
