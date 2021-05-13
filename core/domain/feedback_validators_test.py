@@ -232,7 +232,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_message_model_failure(self):
         feedback_models.GeneralFeedbackMessageModel.get(
-            '%s.0' % self.thread_id, strict=True).delete()
+            '%s.0' % self.thread_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for message_ids field '
@@ -291,8 +291,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
             has_suggestion=False)
 
         self.model_instance = (
-            feedback_models.GeneralFeedbackMessageModel.get(
-                '%s.0' % self.thread_id, strict=True))
+            feedback_models.GeneralFeedbackMessageModel
+                .get('%s.0' % self.thread_id, strict=False))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -430,7 +430,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(
         self.model_instance = (
             feedback_models.GeneralFeedbackThreadUserModel.
             get(
-                '%s.%s' % (self.owner_id, self.thread_id), strict=True))
+                '%s.%s' % (
+                    self.owner_id, self.thread_id), include_deleted=True))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -489,7 +490,7 @@ class GeneralFeedbackThreadUserModelValidatorTests(
 
     def test_missing_message_model_failure(self):
         feedback_models.GeneralFeedbackMessageModel.get(
-            '%s.0' % self.thread_id, strict=True).delete()
+            '%s.0' % self.thread_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for message_ids field '
@@ -664,7 +665,7 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_missing_message_model_failure(self):
         feedback_models.GeneralFeedbackMessageModel.get(
-            '%s.0' % self.thread_id, strict=True).delete()
+            '%s.0' % self.thread_id, strict=False).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for message_ids field '

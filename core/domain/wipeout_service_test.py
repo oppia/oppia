@@ -275,12 +275,12 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.profile_user_id)
         self.process_and_flush_pending_tasks()
         user_settings = user_models.UserSettingsModel.get(
-            self.profile_user_id, strict=True)
+            self.profile_user_id, include_deleted=True)
         self.assertTrue(user_settings.deleted)
 
         user_auth_details = (
             auth_models.UserAuthDetailsModel.get(
-                self.profile_user_id, strict=True))
+                self.profile_user_id, include_deleted=True))
         self.assertTrue(user_auth_details.deleted)
 
     def test_pre_delete_user_for_full_user_also_deletes_all_profiles(self):
@@ -297,19 +297,19 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         user_settings = user_models.UserSettingsModel.get(
-            self.user_1_id, strict=True)
+            self.user_1_id, include_deleted=True)
         self.assertTrue(user_settings.deleted)
         user_auth_details = (
             auth_models.UserAuthDetailsModel.get(
-                self.profile_user_id, strict=True))
+                self.profile_user_id, include_deleted=True))
         self.assertTrue(user_auth_details.deleted)
         profile_user_settings = (
             user_models.UserSettingsModel.get(
-                self.profile_user_id, strict=True))
+                self.profile_user_id, include_deleted=True))
         self.assertTrue(profile_user_settings.deleted)
         profile_auth_details = (
             auth_models.UserAuthDetailsModel.get(
-                self.profile_user_id, strict=True))
+                self.profile_user_id, include_deleted=True))
         self.assertTrue(profile_auth_details.deleted)
 
     def test_pre_delete_user_without_activities_works_correctly(self):
@@ -326,7 +326,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         user_settings = user_models.UserSettingsModel.get(
-            self.user_1_id, strict=True)
+            self.user_1_id, include_deleted=True)
         self.assertTrue(user_settings.deleted)
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id(self.user_1_id))
@@ -556,7 +556,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get(
-                self.user_1_id, strict=True))
+                self.user_1_id, include_deleted=True))
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get(
                 self.user_1_id, strict=False))
@@ -609,10 +609,11 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 wipeout_domain.USER_VERIFICATION_FAILURE)
 
         self.assertIsNotNone(
-            user_models.UserSettingsModel.get(self.user_1_id, strict=True))
+            user_models.UserSettingsModel.get(
+                self.user_1_id, include_deleted=True))
         self.assertIsNotNone(
             auth_models.UserAuthDetailsModel.get(
-                self.user_1_id, strict=True))
+                self.user_1_id, include_deleted=True))
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get(
                 self.user_1_id, strict=False))
@@ -1298,7 +1299,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get(
                 self.user_1_id, strict=False
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         commit_log_model_1 = (
             collection_models.CollectionCommitLogEntryModel.get(
@@ -1483,11 +1484,11 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
 
         collection_rights_model = (
             collection_models.CollectionRightsModel.get(
-                self.COL_2_ID, strict=True))
+                self.COL_2_ID, include_deleted=True))
         self.assertTrue(collection_rights_model.deleted)
         collection_model = (
             collection_models.CollectionModel.get(
-                self.COL_2_ID, strict=True))
+                self.COL_2_ID, include_deleted=True))
         self.assertTrue(collection_model.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -1875,11 +1876,11 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
         exp_rights_model = (
             exp_models.ExplorationRightsModel.get(
-                self.EXP_2_ID, strict=True))
+                self.EXP_2_ID, include_deleted=True))
         self.assertTrue(exp_rights_model.deleted)
         exp_model = (
             exp_models.ExplorationRightsModel.get(
-                self.EXP_2_ID, strict=True))
+                self.EXP_2_ID, include_deleted=True))
         self.assertTrue(exp_model.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -1999,7 +2000,7 @@ class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        email_models.GeneralFeedbackEmailReplyToIdModel(
+        email_models.GeneralFeedbackEmailReplyToIdModelRe(
             id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
             user_id=self.user_1_id,
             thread_id=self.THREAD_1_ID,
@@ -2014,12 +2015,12 @@ class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.
+            email_models.GeneralFeedbackEmailReplyToIdModelRe.
             get(
                 '%s.%s' % (self.user_1_id, self.THREAD_1_ID), strict=True))
 
     def test_multiple_emails_are_deleted(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
+        email_models.GeneralFeedbackEmailReplyToIdModelRe(
             id='%s.%s' % (self.user_1_id, self.THREAD_2_ID),
             user_id=self.user_1_id,
             thread_id=self.THREAD_2_ID,
@@ -2030,16 +2031,16 @@ class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel
+            email_models.GeneralFeedbackEmailReplyToIdModelRe
             .get(
                 '%s.%s' % (self.user_1_id, self.THREAD_1_ID), strict=True))
         self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel
+            email_models.GeneralFeedbackEmailReplyToIdModelRe
             .get(
                 '%s.%s' % (self.user_1_id, self.THREAD_2_ID), strict=True))
 
     def test_multiple_emails_from_multiple_users_are_deleted(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
+        email_models.GeneralFeedbackEmailReplyToIdModelRe(
             id='%s.%s' % (self.user_2_id, self.THREAD_2_ID),
             user_id=self.user_2_id,
             thread_id=self.THREAD_2_ID,
@@ -2050,18 +2051,18 @@ class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.
+            email_models.GeneralFeedbackEmailReplyToIdModelRe.
             get(
                 '%s.%s' % (self.user_1_id, self.THREAD_1_ID), strict=True))
         self.assertIsNotNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.
+            email_models.GeneralFeedbackEmailReplyToIdModelRe.
             get(
                 '%s.%s' % (self.user_2_id, self.THREAD_2_ID), strict=True))
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
         self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.
+            email_models.GeneralFeedbackEmailReplyToIdModelRe.
             get(
                 '%s.%s' % (self.user_2_id, self.THREAD_2_ID), strict=True))
 
@@ -2080,7 +2081,7 @@ class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
         super(WipeoutServiceVerifyDeleteEmailModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        email_models.GeneralFeedbackEmailReplyToIdModel(
+        email_models.GeneralFeedbackEmailReplyToIdModelRe(
             id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
             user_id=self.user_1_id,
             thread_id=self.THREAD_1_ID,
@@ -2099,7 +2100,7 @@ class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
-        email_models.GeneralFeedbackEmailReplyToIdModel(
+        email_models.GeneralFeedbackEmailReplyToIdModelRe(
             id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
             user_id=self.user_1_id,
             thread_id=self.THREAD_1_ID,
@@ -4281,8 +4282,8 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
 
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get(
-                self.user_1_id, strict=False
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+                self.user_1_id, include_deleted=True
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         metadata_model = (
             topic_models.TopicSnapshotMetadataModel.get(

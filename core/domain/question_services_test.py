@@ -436,7 +436,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             [self.question_id], self.editor_id,
             feconf.COMMIT_MESSAGE_QUESTION_DELETED, force_deletion=False)
         question_model = question_models.QuestionModel.get(
-            self.question_id, strict=True)
+            self.question_id, include_deleted=True)
         self.assertTrue(question_model.deleted)
 
         question_services.delete_question(

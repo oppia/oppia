@@ -430,8 +430,8 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
             the user.
     """
     feedback_thread_user_model = (
-        feedback_models.GeneralFeedbackThreadUserModel.get(
-            user_id, thread_id) or
+        feedback_models.GeneralFeedbackThreadUserModel.
+        get_feedback_thread_model(user_id, thread_id) or
         feedback_models.GeneralFeedbackThreadUserModel.create(
             user_id, thread_id))
     feedback_thread_user_model.message_ids_read_by_user = message_ids
@@ -560,7 +560,8 @@ def get_message(thread_id, message_id):
         FeedbackMessage. The fetched message.
     """
     return _get_message_from_model(
-        feedback_models.GeneralFeedbackMessageModel.get(thread_id, message_id))
+        feedback_models.GeneralFeedbackMessageModel.get_feedback_message_model(
+            thread_id, message_id))
 
 
 def get_next_page_of_all_feedback_messages(

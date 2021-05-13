@@ -448,7 +448,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         return [cls(id=instance_id) for instance_id in instance_ids]
 
     @classmethod
-    def get(cls, thread_id, message_id, strict=True):
+    def get_feedback_message_model(cls, thread_id, message_id, strict=True):
         """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises
         an error if no undeleted message with the given ID is found and
         strict == True.
@@ -633,7 +633,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         return '%s.%s' % (user_id, thread_id)
 
     @classmethod
-    def get(cls, user_id, thread_id):
+    def get_feedback_thread_model(cls, user_id, thread_id):
         """Gets the FeedbackThreadUserModel corresponding to the given user and
         the thread.
 

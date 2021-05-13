@@ -2227,7 +2227,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
         self.model_instance = (
             user_models.CollectionProgressModel.get(
-                '%s.col' % self.user_id, strict=True))
+                '%s.col' % self.user_id, strict=False))
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):

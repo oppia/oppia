@@ -1578,7 +1578,7 @@ class CollectionProgressModel(base_models.BaseModel):
             id=instance_id, user_id=user_id, collection_id=collection_id)
 
     @classmethod
-    def get(cls, user_id, collection_id):
+    def get_collection_progress_model(cls, user_id, collection_id):
         """Gets the CollectionProgressModel for the given user and collection
         id.
 
@@ -1628,7 +1628,8 @@ class CollectionProgressModel(base_models.BaseModel):
             matches the given user_id and collection_id, or the newly
             created one if it does not already exist.
         """
-        instance_model = cls.get(user_id, collection_id)
+        instance_model = cls.get_collection_progress_model(
+            user_id, collection_id)
         if instance_model:
             return instance_model
         else:
