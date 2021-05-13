@@ -1486,6 +1486,7 @@ private injector: Injector
 
     OppiaAngularRootComponent.injector = this.injector;
 
+    // This emit triggers ajs to start its app.
     this.initialized.emit();
   }
 }
