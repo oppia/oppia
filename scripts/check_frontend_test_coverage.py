@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import fnmatch
 import os
 import re
 import sys
@@ -25,6 +26,10 @@ import python_utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
 RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
+EXCLUDED_DIRECTORIES = [
+    'node_modules/*',
+    'extensions/classifiers/proto/*'
+]
 
 # Contains the name of all files that is not 100% coverage.
 # This list must be kept up-to-date; the changes (only remove) should be done
@@ -54,9 +59,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'change-list.service.ts',
     'ck-editor-4-rte.directive.ts',
     'ck-editor-4-widgets.initializer.ts',
-    'code-repl-prediction.service.ts',
     'code-string-editor.component.ts',
-    'codemirror-mergeview.directive.ts',
     'collection-details-editor.directive.ts',
     'collection-editor-navbar-breadcrumb.directive.ts',
     'collection-editor-navbar.directive.ts',
@@ -72,7 +75,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection.model.ts',
     'concept-card.directive.ts',
     'ConceptCardObjectFactory.ts',
-    'continue-button.directive.ts',
     'contribution-and-review.service.ts',
     'contribution-opportunities-backend-api.service.ts',
     'contribution-opportunities.service.ts',
@@ -81,7 +83,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'conversion.ts',
     'convert-to-plain-text.pipe.ts',
     'coord-two-dim-editor.component.ts',
-    'correctness-footer.directive.ts',
     'create-activity-button.component.ts',
     'csrf-token.service.ts',
     'current-interaction.service.ts',
@@ -100,6 +101,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
     'fatigue-detection.service.ts',
+    'feedback-popup.component.ts',
     'feedback-popup.directive.ts',
     'filepath-editor.component.ts',
     'focus-on.directive.ts',
@@ -127,9 +129,9 @@ NOT_FULLY_COVERED_FILENAMES = [
     'int-editor.component.ts',
     'item-selection-input-validation.service.ts',
     'language-util.service.ts',
-    'learner-answer-info-card.directive.ts',
+    'learner-answer-info-card.component.ts',
     'learner-answer-info.service.ts',
-    'learner-local-nav.directive.ts',
+    'learner-local-nav.component.ts',
     'learner-view-info.directive.ts',
     'learner-view-rating.service.ts',
     'list-of-sets-of-translatable-html-content-ids-editor.component.ts',
@@ -151,7 +153,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'number-with-units-validation.service.ts',
     'NumberWithUnitsObjectFactory.ts',
     'object-editor.directive.ts',
-    'oppia-interactive-code-repl.directive.ts',
+    'oppia-interactive-code-repl.component.ts',
     'oppia-interactive-continue.component.ts',
     'oppia-interactive-drag-and-drop-sort-input.directive.ts',
     'oppia-interactive-fraction-input.component.ts',
@@ -174,7 +176,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-noninteractive-skillreview.directive.ts',
     'oppia-noninteractive-tabs.directive.ts',
     'oppia-noninteractive-video.directive.ts',
-    'oppia-response-code-repl.directive.ts',
+    'oppia-response-code-repl.component.ts',
     'oppia-response-continue.component.ts',
     'oppia-response-drag-and-drop-sort-input.directive.ts',
     'oppia-response-fraction-input.component.ts',
@@ -191,7 +193,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-response-set-input.directive.ts',
     'oppia-response-text-input.directive.ts',
     'oppia-root.directive.ts',
-    'oppia-short-response-code-repl.directive.ts',
+    'oppia-short-response-code-repl.component.ts',
     'oppia-short-response-continue.component.ts',
     'oppia-short-response-drag-and-drop-sort-input.directive.ts',
     'oppia-short-response-fraction-input.component.ts',
@@ -238,8 +240,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'request-interceptor.service.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
-    'role-graph.directive.ts',
-    'rubrics-editor.directive.ts',
     'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
     'sanitized-url-editor.directive.ts',
@@ -452,7 +452,8 @@ def check_coverage_changes():
         file_name = stanza.file_name
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-        if stanza.file_path.startswith('node_modules/'):
+        if any(fnmatch.fnmatch(
+                stanza.file_path, pattern) for pattern in EXCLUDED_DIRECTORIES):
             continue
         if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
