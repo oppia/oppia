@@ -20,9 +20,13 @@ import { MissingTranslationHandler, MissingTranslationHandlerParams } from '@ngx
 import { AppConstants } from 'app.constants';
 
 export class MyMissingTranslationHandler implements MissingTranslationHandler {
+  getAppConstants(): typeof AppConstants {
+    return AppConstants;
+  }
+
   handle(params: MissingTranslationHandlerParams): string {
-    if (AppConstants.DEFAULT_TRANSLATIONS[params.key]) {
-      return AppConstants.DEFAULT_TRANSLATIONS[params.key];
+    if (params.key in this.getAppConstants().DEFAULT_TRANSLATIONS) {
+      return this.getAppConstants().DEFAULT_TRANSLATIONS[params.key];
     }
     return params.key;
   }
