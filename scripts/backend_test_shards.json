@@ -112,9 +112,7 @@
         "core.domain.skill_jobs_one_off_test",
         "core.domain.email_validators_test",
         "core.domain.exploration_validators_test",
-        "scripts.check_if_pr_is_low_risk_test",
-        "scripts.scripts_test_utils_test",
-        "scripts.servers_test"
+        "scripts.check_if_pr_is_low_risk_test"
     ],
     "5": [
         "core.domain.suggestion_validators_test",
@@ -209,6 +207,7 @@
         "jobs.job_utils_test",
         "jobs.registry_test",
         "jobs.transforms.base_validation_registry_test",
+        "jobs.transforms.exp_validation_test",
         "jobs.transforms.topic_validation_test",
         "jobs.transforms.auth_validation_test",
         "jobs.transforms.base_validation_test",
