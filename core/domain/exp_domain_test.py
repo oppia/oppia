@@ -3480,156 +3480,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V50 = (
-        """author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: (untitled state)
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: 50
-states:
-  (untitled state):
-    card_is_checkpoint: true
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups:
-      - outcome:
-          dest: END
-          feedback:
-            content_id: feedback_1
-            html: <p>Correct!</p>
-          labelled_as_correct: false
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x:
-              contentId: rule_input_3
-              normalizedStrSet:
-              - InputString
-          rule_type: Equals
-        tagged_skill_misconception_id: null
-        training_data: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: ca_placeholder_2
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: (untitled state)
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 4
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_2: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        rule_input_3: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_2: {}
-        content: {}
-        default_outcome: {}
-        feedback_1: {}
-        rule_input_3: {}
-  END:
-    card_is_checkpoint: false
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: <p>Congratulations, you have finished!</p>
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        recommendedExplorationIds:
-          value: []
-      default_outcome: null
-      hints: []
-      id: EndExploration
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 0
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        content: {}
-  New state:
-    classifier_model_id: null
-    content:
-      content_id: content
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args:
-        placeholder:
-          value:
-            content_id: ca_placeholder_0
-            unicode_str: ''
-        rows:
-          value: 1
-      default_outcome:
-        dest: END
-        feedback:
-          content_id: default_outcome
-          html: ''
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: TextInput
-      solution: null
-    linked_skill_id: null
-    next_content_id_index: 1
-    param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
-    solicit_answer_details: false
-    written_translations:
-      translations_mapping:
-        ca_placeholder_0: {}
-        content: {}
-        default_outcome: {}
-states_schema_version: 45
-tags: []
-title: Title
-""")
-
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V50
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V49
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -3760,7 +3611,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 50
+schema_version: 49
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -3818,7 +3669,6 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -3854,7 +3704,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -3864,7 +3713,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 45
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -3952,7 +3801,6 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -3987,7 +3835,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4013,7 +3860,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 50
+schema_version: 49
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4081,7 +3928,6 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -4117,7 +3963,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4127,7 +3972,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 45
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -4150,7 +3995,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name, is_init_state):
             """Gets the default state dict of the exploration."""
             return {
-                'linked_skill_id': None,
                 'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
