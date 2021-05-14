@@ -166,7 +166,7 @@ class ValidatePostCommitIsPublic(beam.DoFn):
 
     def process(self, input_model):
         """Function validates that post_commit_is_public is true iff
-        post_commit_status is public
+        post_commit_status is public.
 
         Args:
             input_model: base_models.BaseCommitLogEntryModel.

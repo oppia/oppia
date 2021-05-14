@@ -195,12 +195,29 @@ class ValidatePostCommitIsPrivateTests(job_test_utils.PipelinedTestBase):
 
 class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
 
+    def test_validate_post_commit_is_public_when_status_is_public(self):
+        invalid_commit_status = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='create',
+            user_id='',
+            post_commit_status='public',
+            post_commit_community_owned=True,
+            commit_cmds=[])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_status])
+            | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
+        )
+
     def test_validate_post_commit_is_public_when_status_is_private(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            commit_type='invalid-type',
+            commit_type='create',
             user_id='',
             post_commit_status='private',
             post_commit_community_owned=True,
@@ -217,12 +234,12 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
                 invalid_commit_status),
         ])
 
-    def test_validate_post_commit_is_public_when_status_is_public(self):
+    def test_validate_post_commit_is_public_raise_exception(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            commit_type='invalid-type',
+            commit_type='create',
             user_id='',
             post_commit_status='public',
             post_commit_community_owned=False,
