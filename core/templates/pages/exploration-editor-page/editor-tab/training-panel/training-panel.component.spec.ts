@@ -101,7 +101,6 @@ describe('Training Panel Component', function() {
         }
       }
     },
-    linked_skill_id: null,
     next_content_id_index: 1,
     param_changes: [],
     recorded_voiceovers: {

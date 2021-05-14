@@ -58,7 +58,6 @@ describe('StateTopAnswersStatsService', () => {
 
   const stateBackendDict: StateBackendDict = {
     content: { content_id: 'content', html: 'Say "hello" in Spanish!' },
-    linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
     interaction: {
