@@ -512,7 +512,7 @@ def create_enum(*sequential):
     enum_values = dict(ZIP(sequential, sequential))
     try:
         from enum import Enum # pylint: disable=import-only-modules
-        return Enum('Enum', enum_values)
+        return Enum(str('Enum'), enum_values)
     except ImportError:
         _enums = {}
         for name, value in enum_values.items():
