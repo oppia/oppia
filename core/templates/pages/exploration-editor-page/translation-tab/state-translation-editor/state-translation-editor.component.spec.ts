@@ -108,7 +108,6 @@ describe('State Translation Editor Component', function() {
         }
       }
     },
-    linked_skill_id: null,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {
