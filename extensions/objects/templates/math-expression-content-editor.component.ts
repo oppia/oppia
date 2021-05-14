@@ -57,8 +57,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // part of an editable list).
     this.svgString = '';
     this.numberOfElementsInQueue = 0;
-    this.value.mathExpressionSvgIsBeingProcessed = !Boolean(
-      this.value.svg_filename);
+    this.value.mathExpressionSvgIsBeingProcessed = !this.value.svg_filename;
     this.valueChanged.emit(this.value);
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
