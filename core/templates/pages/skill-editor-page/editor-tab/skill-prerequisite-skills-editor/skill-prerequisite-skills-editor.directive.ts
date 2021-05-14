@@ -16,8 +16,7 @@
  * @fileoverview Directive for the skill prerequisite skills editor.
  */
 
-import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+require('components/skill-selector/select-skill-modal.controller.ts');
 require(
   'components/skill-selector/skill-selector.component.ts');
 
@@ -31,14 +30,13 @@ require(
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/ngb-modal.service.ts');
 
 angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
-  'NgbModal', 'SkillEditorStateService', 'SkillUpdateService',
+  'SkillEditorStateService', 'SkillUpdateService',
   'TopicsAndSkillsDashboardBackendApiService', 'UrlInterpolationService',
   'WindowDimensionsService',
   function(
-      NgbModal, SkillEditorStateService, SkillUpdateService,
+      SkillEditorStateService, SkillUpdateService,
       TopicsAndSkillsDashboardBackendApiService, UrlInterpolationService,
       WindowDimensionsService) {
     return {
@@ -49,9 +47,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
         'skill-prerequisite-skills-editor/' +
         'skill-prerequisite-skills-editor.directive.html'),
       controller: [
-        '$scope', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         function(
-            $scope, AlertsService) {
+            $scope, $uibModal, AlertsService) {
           var ctrl = this;
           var categorizedSkills = null;
           var untriagedSkillSummaries = null;
@@ -79,21 +77,21 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             var sortedSkillSummaries = groupedSkillSummaries.current.concat(
               groupedSkillSummaries.others);
             var allowSkillsFromOtherTopics = true;
-            let modalRef: NgbModalRef = NgbModal.open(
-              SelectSkillModalComponent, {
-                backdrop: 'static',
-                windowClass: 'skill-select-modal',
-                size: 'xl'
-              });
-            modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-            modalRef.componentInstance.skillsInSameTopicCount = (
-              skillsInSameTopicCount);
-            modalRef.componentInstance.categorizedSkills = categorizedSkills;
-            modalRef.componentInstance.allowSkillsFromOtherTopics = (
-              allowSkillsFromOtherTopics);
-            modalRef.componentInstance.untriagedSkillSummaries = (
-              untriagedSkillSummaries);
-            modalRef.result.then(function(summary) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/skill-selector/select-skill-modal.template.html'),
+              backdrop: 'static',
+              resolve: {
+                skillsInSameTopicCount: () => skillsInSameTopicCount,
+                sortedSkillSummaries: () => sortedSkillSummaries,
+                categorizedSkills: () => categorizedSkills,
+                allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+                untriagedSkillSummaries: () => untriagedSkillSummaries
+              },
+              controller: 'SelectSkillModalController',
+              windowClass: 'skill-select-modal',
+              size: 'xl'
+            }).result.then(function(summary) {
               var skillId = summary.id;
               if (skillId === $scope.skill.getId()) {
                 AlertsService.addInfoMessage(

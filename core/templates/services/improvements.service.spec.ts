@@ -74,7 +74,6 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
-        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {
@@ -136,7 +135,6 @@ describe('ImprovementsService', () => {
           hints: [],
           solution: null
         },
-        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         recorded_voiceovers: {

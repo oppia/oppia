@@ -178,54 +178,50 @@ describe('Exploration history', function() {
         highlighted: false
       },
       22: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
-      23: {
         text: 'next_content_id_index: 0',
         highlighted: true
       },
-      24: {
+      23: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      24: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      26: {
+      25: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      27: {
+      26: {
         text: '    content: {}',
         highlighted: false
       },
-      28: {
+      27: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      29: {
+      28: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      30: {
+      29: {
         text: 'written_translations:',
         highlighted: false
       },
-      31: {
+      30: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      32: {
+      31: {
         text: '    content: {}',
         highlighted: false
       },
-      33: {
+      32: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      34: {
+      33: {
         text: '',
         highlighted: false
       }
@@ -377,62 +373,58 @@ describe('Exploration history', function() {
         highlighted: false
       },
       37: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
-      38: {
         text: 'next_content_id_index: 2',
         highlighted: true
       },
-      39: {
+      38: {
         text: 'param_changes: []',
         highlighted: false
       },
-      40: {
+      39: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      41: {
+      40: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      42: {
+      41: {
         text: '    content: {}',
+        highlighted: false
+      },
+      42: {
+        text: '    default_outcome: {}',
         highlighted: false
       },
       43: {
-        text: '    default_outcome: {}',
-        highlighted: false
-      },
-      44: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      45: {
+      44: {
         text: 'solicit_answer_details: false',
         highlighted: false
       },
-      46: {
+      45: {
         text: 'written_translations:',
         highlighted: false
       },
-      47: {
+      46: {
         text: '  translations_mapping:',
         highlighted: false
       },
-      48: {
+      47: {
         text: '    content: {}',
         highlighted: false
       },
-      49: {
+      48: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      50: {
+      49: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      51: {
+      50: {
         text: '',
         highlighted: false
       }
@@ -464,7 +456,6 @@ describe('Exploration history', function() {
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
-      'linked_skill_id: null\n' +
       'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +

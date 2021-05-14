@@ -1322,7 +1322,6 @@ states:
         explanation:
           content_id: solution
           html: <p>hello_world is a string</p>
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -1391,7 +1390,6 @@ states:
       hints: []
       id: null
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1892,7 +1890,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1934,7 +1931,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1999,7 +1995,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -2041,7 +2036,6 @@ states:
       hints: []
       id: TextInput
       solution: null
-    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -2325,7 +2319,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2371,7 +2364,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2418,7 +2410,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -3084,29 +3075,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
-
-    def test_update_linked_skill_id(self):
-        """Test updating linked_skill_id."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.init_state.linked_skill_id, None)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'State1',
-            })], 'Add state name')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.states['State1'].linked_skill_id, None)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_0_ID, _get_change_list(
-                'State1',
-                exp_domain.STATE_PROPERTY_LINKED_SKILL_ID,
-                'string_1'),
-            '')
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(
-            exploration.states['State1'].linked_skill_id, 'string_1')
 
     def test_update_card_is_checkpoint(self):
         """Test updating of card_is_checkpoint."""
@@ -4353,7 +4321,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4388,7 +4355,6 @@ states:
       hints: []
       id: Continue
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:

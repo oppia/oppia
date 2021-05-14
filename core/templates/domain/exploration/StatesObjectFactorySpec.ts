@@ -80,7 +80,6 @@ describe('States Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
-      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -124,7 +123,6 @@ describe('States Object Factory', () => {
         },
         hints: [],
       },
-      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -173,7 +171,6 @@ describe('States Object Factory', () => {
         hints: [],
         id: 'TextInput'
       },
-      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -243,7 +240,6 @@ describe('States Object Factory', () => {
         },
         id: 'TextInput'
       },
-      linked_skill_id: null,
       next_content_id_index: 1,
       param_changes: [],
       solicit_answer_details: false,
@@ -492,7 +488,6 @@ describe('States Object Factory', () => {
           }],
           id: 'TextInput'
         },
-        linked_skill_id: null,
         next_content_id_index: 4,
         param_changes: [],
         solicit_answer_details: false,
@@ -838,7 +833,6 @@ describe('States Object Factory', () => {
             hints: [],
             id: 'TextInput'
           },
-          linked_skill_id: null,
           next_content_id_index: 0,
           param_changes: [],
           solicit_answer_details: false,

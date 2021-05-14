@@ -115,7 +115,6 @@ describe('Teach Oppia Modal Controller', function() {
       hints: [],
       solution: null
     },
-    linked_skill_id: null,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {}
