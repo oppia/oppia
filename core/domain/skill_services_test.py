@@ -1299,7 +1299,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             skill_services.create_user_skill_mastery(
                 self.USER_ID, skill_id, mastery)
             self.SKILL_IDS.append(skill_id)
-        
+
         masteries.sort()
         degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
