@@ -36,20 +36,20 @@ module.exports = {
   create: function(context) {
     var itCallsStartLineNums = [];
     var itCallsEndLineNums = [];
-    var startLineToNode = {}
+    var startLineToNode = {};
     return {
       'CallExpression[callee.name="it"]': function(node) {
-        itCallsStartLineNums.push(node.loc.start.line)
-        itCallsEndLineNums.push(node.loc.end.line)
+        itCallsStartLineNums.push(node.loc.start.line);
+        itCallsEndLineNums.push(node.loc.end.line);
         startLineToNode[node.loc.start.line] = node;
       },
       'Program:exit': function() {
         itCallsEndLineNums.forEach((lineNum) => {
-          if(itCallsStartLineNums.includes(lineNum + 1)) {
+          if (itCallsStartLineNums.includes(lineNum + 1)) {
             context.report({
-              node: startLineToNode[lineNum+1],
+              node: startLineToNode[lineNum + 1],
               message: 'Please add a newline between two test cases.'
-            })
+            });
           }
         });
       }
