@@ -14,46 +14,37 @@
 
 
 /**
- * @fileoverview Unit tests for the Translate Cache Factory.
+ * @fileoverview Unit tests for the Translate Loader Factory.
  */
 
+import { HttpClient } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateCacheModule, TranslateCacheService } from 'ngx-translate-cache';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { TranslateCacheFactory } from './translate-cache.factory';
+import { TranslateModule } from '@ngx-translate/core';
+import { TranslateLoaderFactory } from './translate-loader.factory';
 
-describe('Translate Cache Factory', () => {
-  let translateService: TranslateService;
+describe('Translate Loader Factory', () => {
+  let httpClient: HttpClient;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         TranslateModule.forRoot({
           useDefaultLang: true,
           isolate: false,
           extend: false,
           defaultLanguage: 'en'
         }),
-        TranslateCacheModule.forRoot({
-          cacheService: TranslateCacheService,
-          cacheName: 'test',
-          cacheMechanism: 'Cookie',
-          cookieExpiry: 1
-        })
       ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    translateService = TestBed.inject(TranslateService);
+    httpClient = TestBed.inject(HttpClient);
   });
 
-  it('should create translate cache service', () => {
-    expect(TranslateCacheFactory.createTranslateCacheService(
-      translateService, {
-        cacheName: 'test',
-        cacheMechanism: 'Cookie',
-        cookieExpiry: 1
-      })).toBeDefined();
+  it('should create translate loader', () => {
+    expect(TranslateLoaderFactory.createHttpLoader(httpClient)).toBeDefined();
   });
 });
