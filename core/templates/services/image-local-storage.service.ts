@@ -52,6 +52,10 @@ export class ImageLocalStorageService {
     return urlCreator.createObjectURL(imageBlob);
   }
 
+  getRawImageData(filename: string): string {
+    return this.windowRef.nativeWindow.sessionStorage.getItem(filename);
+  }
+
   /**
      * Saves the image data in localStorage.
      * @param {string} filename - Filename of the image.
