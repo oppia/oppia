@@ -3098,9 +3098,6 @@ class State(python_utils.OBJECT):
             content html.
         """
         content_id_to_html = self._get_all_translatable_content()
-        available_translation_content_ids = (
-            self.written_translations
-            .get_content_ids_that_are_correctly_translated(language_code))
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.
