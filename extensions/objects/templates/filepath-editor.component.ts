@@ -525,7 +525,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
         imageFileName);
       if (imageFileName.endsWith('.svg') && sanitizeSvg) {
-        return this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl);
+        const rawImageData = this.imageLocalStorageService.getRawImageData(
+          imageFileName);
+        return this.svgSanitizerService.getTrustedSvgResourceUrl(rawImageData);
       }
       return imageUrl;
     }
