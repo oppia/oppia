@@ -158,6 +158,32 @@ class ValidatePostCommitIsPrivate(beam.DoFn):
             yield base_validation_errors.InvalidPrivateCommitStatusError(model)
 
 
+@validation_decorators.AuditsExisting(base_models.BaseCommitLogEntryModel)
+class ValidatePostCommitIsPublic(beam.DoFn):
+    """DoFn to check if post_commit_status is public when
+    post_commit_is_public is true and vice-versa.
+    """
+
+    def process(self, input_model):
+        """Function validates that post_commit_is_public is true iff
+        post_commit_status is public
+
+        Args:
+            input_model: base_models.BaseCommitLogEntryModel.
+                Entity to validate.
+
+        Yields:
+            InvalidPublicCommitStatusError. Error for public commit_type
+            validation.
+        """
+        model = job_utils.clone_model(input_model)
+
+        expected_post_commit_is_public = (
+            model.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC)
+        if model.post_commit_community_owned != expected_post_commit_is_public:
+            yield base_validation_errors.InvalidPublicCommitStatusError(model)
+
+
 @validation_decorators.AuditsExisting(base_models.BaseModel)
 class ValidateModelTimestamps(beam.DoFn):
     """DoFn to check whether created_on and last_updated timestamps are valid.
