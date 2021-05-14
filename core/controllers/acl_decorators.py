@@ -2994,19 +2994,24 @@ def can_update_suggestion(handler):
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You are not allowed to update suggestions that you created.')
 
-        if suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            if user_services.can_review_translation_suggestions(
-                    self.user_id,
-                    language_code=suggestion.change.language_code):
-                return handler(self, suggestion_id, **kwargs)
-        elif suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION):
-            if user_services.can_review_question_suggestions(self.user_id):
-                return handler(self, suggestion_id, **kwargs)
+        if suggestion.suggestion_type not in (
+            feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
+            raise self.InvalidInputException('Invalid suggestion type.')
 
-        raise base.UserFacingExceptions.UnauthorizedUserException(
-            'You are not allowed to update the suggestion.')
+        else:
+            if suggestion.suggestion_type == (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                if user_services.can_review_translation_suggestions(
+                        self.user_id,
+                        language_code=suggestion.change.language_code):
+                    return handler(self, suggestion_id, **kwargs)
+            if suggestion.suggestion_type == (
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION):
+                if user_services.can_review_question_suggestions(self.user_id):
+                    return handler(self, suggestion_id, **kwargs)
+
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You are not allowed to update the suggestion.')
 
     test_can_update_suggestion.__wrapped__ = True
     return test_can_update_suggestion

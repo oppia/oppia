@@ -1178,7 +1178,7 @@ def get_suggestion_types_that_need_reviewers():
         dict. A dictionary that uses the presence of its keys to indicate which
         suggestion types need more reviewers. The possible key values are the
         suggestion types listed in
-        suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
+        feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
         values for each suggestion type are the following:
         - for question suggestions the value is an empty set
         - for translation suggestions the value is a nonempty set containing the
@@ -1277,12 +1277,8 @@ def update_translation_suggestion(suggestion_id, translation_html):
     """
     suggestion = get_suggestion_by_id(suggestion_id)
 
-    if suggestion.suggestion_type != feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        raise Exception(
-            'Expected suggestion type is %s.' % (
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
-
     suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    suggestion.pre_update_validate(suggestion.change)
     _update_suggestion(suggestion)
 
 
@@ -1297,11 +1293,6 @@ def update_question_suggestion(
         question_state_data: obj. Details of the question.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
-
-    if suggestion.suggestion_type != feconf.SUGGESTION_TYPE_ADD_QUESTION:
-        raise Exception(
-            'Expected suggestion type is %s.' % (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION))
 
     suggestion.change.question_dict['question_state_data'] = question_state_data
     suggestion.change.skill_difficulty = skill_difficulty

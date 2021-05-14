@@ -26,6 +26,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import question_domain
@@ -3645,14 +3646,31 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.author_id, add_question_change_dict,
             'test description')
 
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.exploration_id, exploration.version,
+            self.author_id, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 2',
+                'old_value': self.old_content,
+                'new_value': self.new_content
+            },
+            'change to state 1')
+
         translation_suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', self.exploration_id)])[0]
         question_suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
              ('target_id', 'skill_123')])[0]
+        edit_state_suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
+             ('target_id', self.exploration_id)])[1]
         self.translation_suggestion_id = translation_suggestion.suggestion_id
         self.question_suggestion_id = question_suggestion.suggestion_id
+        self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
         self.logout()
 
     def test_authors_cannot_update_suggestion_that_they_created(self):
@@ -3736,4 +3754,14 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 '/mock/%s' % 'exploration.exp1.' +
                 'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
                 expected_status_int=404)
+        self.logout()
+
+    def test_not_allowed_suggestions_cannot_be_updated(self):
+        self.login(self.en_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.edit_state_suggestion_id,
+                expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid suggestion type.')
         self.logout()

@@ -902,59 +902,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.change.skill_difficulty,
             0.6)
 
-    def test_update_question_suggestion_raises_invalid_suggestion_exception(
-            self):
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            'exploration1', self.author_id, ['state 1'], ['TextInput'],
-            category='Algebra')
-        edit_state_change_dict = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'State A',
-            'new_value': 'TextInput'
-        }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'exploration',
-            'exploration1', 1,
-            self.author_id,
-            edit_state_change_dict, '')
-        question_state_data = self._create_valid_question_data(
-            'default_state').to_dict()
-        expected_exception_regexp = 'Expected suggestion type is %s.' % (
-            feconf.SUGGESTION_TYPE_ADD_QUESTION)
-
-        with self.assertRaisesRegexp(
-            Exception, expected_exception_regexp):
-            suggestion_services.update_question_suggestion(
-                suggestion.suggestion_id,
-                0.6,
-                question_state_data)
-
-    def test_update_translation_suggestion_raises_invalid_suggestion_exception(
-            self):
-        self.save_new_linear_exp_with_state_names_and_interactions(
-            'exploration1', self.author_id, ['state 1'], ['TextInput'],
-            category='Algebra')
-        edit_state_change_dict = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'State A',
-            'new_value': 'TextInput'
-        }
-        suggestion = suggestion_services.create_suggestion(
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT, 'exploration',
-            'exploration1', 1,
-            self.author_id,
-            edit_state_change_dict, '')
-
-        expected_exception_regexp = 'Expected suggestion type is %s.' % (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-
-        with self.assertRaisesRegexp(
-            Exception, expected_exception_regexp):
-            suggestion_services.update_translation_suggestion(
-                suggestion.suggestion_id, '<p>Updated Translation</p>')
-
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (
@@ -2025,7 +1972,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_services
             .SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())
         sorted_contributor_dashboard_suggestion_types = sorted(
-            suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
+            feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
 
         self.assertListEqual(
             sorted_text_getter_dict_suggestion_types,
@@ -3759,7 +3706,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types):
             with self.swap(
                 suggestion_models,

@@ -1172,6 +1172,44 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id))
         self.logout()
 
+    def test_cannot_update_question_when_provided_state_data_is_invalid(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = {}
+
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json('%s/%s' % (
+            feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+            suggestion.suggestion_id), {
+                'question_state_data': question_state_data,
+                'skill_difficulty': '0.6'
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
 
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
