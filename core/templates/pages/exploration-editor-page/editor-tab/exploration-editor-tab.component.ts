@@ -53,7 +53,6 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -67,9 +66,6 @@ require('services/site-analytics.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorTab', {
-  bindings: {
-    explorationIsLinkedToStory: '='
-  },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
     '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
@@ -195,13 +191,6 @@ angular.module('oppia').component('explorationEditorTab', {
         // Show the interaction when the text content is saved, even if no
         // content is entered.
         ctrl.interactionIsShown = true;
-      };
-
-      ctrl.saveLinkedSkillId = function(displayedValue) {
-        ExplorationStatesService.saveLinkedSkillId(
-          StateEditorService.getActiveStateName(),
-          angular.copy(displayedValue));
-        StateEditorService.setLinkedSkillId(angular.copy(displayedValue));
       };
 
       ctrl.saveInteractionId = function(displayedValue) {
