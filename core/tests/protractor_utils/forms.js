@@ -25,6 +25,7 @@ var richTextComponents = require(
 var objects = require('../../../extensions/objects/protractor.js');
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -323,6 +324,7 @@ var AutocompleteDropdownEditor = function(elem) {
     setValue: async function(text) {
       var select2Container = elem.element(by.css('.select2-container'));
       await action.click('Select2 Container', select2Container);
+      await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
