@@ -418,10 +418,9 @@ var StoryEditorPage = function() {
       selectSkill: async function(name) {
         await this._searchSkillByName(name);
         await this._selectSkillBasedOnIndex(0);
-        await waitFor.elementToBeClickable(
-          skillSaveButton,
-          'doneButton takes too long to be clickable');
-        await skillSaveButton.click();
+        await action.click('Confirm Skill Save button', skillSaveButton);
+        await waitFor.invisibilityOf(
+          skillSaveButton, 'Confirm Skill Select takes too long to close.');
       },
     };
   };
