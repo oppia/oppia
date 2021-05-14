@@ -271,7 +271,7 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             id='123',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            commit_type='invalid-type',
+            commit_type='create',
             user_id='',
             post_commit_status='public',
             post_commit_community_owned=False,
