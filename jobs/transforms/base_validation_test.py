@@ -212,6 +212,8 @@ class ValidatePostCommitIsPublicTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(base_validation.ValidatePostCommitIsPublic())
         )
 
+        self.assert_pcoll_empty(output)
+
     def test_validate_post_commit_is_public_when_status_is_private(self):
         invalid_commit_status = base_models.BaseCommitLogEntryModel(
             id='123',
