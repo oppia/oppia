@@ -57,8 +57,8 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should expect request body to be a FormData constructor', () => {
-    httpClient.post('/api', { data: 'test'
-  }).subscribe(
+    httpClient.post( '/api', { data: 'test'
+    }).subscribe(
       async(response) => expect(response).toBeTruthy());
 
     let req = httpTestingController.expectOne('/api');
