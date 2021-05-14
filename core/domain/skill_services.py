@@ -1065,31 +1065,29 @@ def skill_has_associated_questions(skill_id):
     return len(question_ids) > 0
 
 
-def filtered_skills_with_none_type_keys(degrees_of_mastery):
+def get_sorted_skill_ids(degrees_of_mastery):
     """Sort the dict based on the mastery value.
 
     Args:
         degrees_of_mastery: dict(str, float|None). Dict mapping
-            skill ids to mastery level.
+            skill ids to mastery level. The mastery level can be
+            float or None.
 
     Returns:
         list. List of the initial skill id's based on the mastery level.
     """
-
     skill_dict_with_float_value = {
         skill_id: degree for skill_id, degree in degrees_of_mastery.items()
         if degree is not None}
 
     sorted_skill_ids_with_float_value = sorted(
         skill_dict_with_float_value, key=skill_dict_with_float_value.get)
-
     skill_ids_with_none_value = [
         skill_id for skill_id, degree in degrees_of_mastery.items()
         if degree is None]
 
     sorted_skill_ids = (
         skill_ids_with_none_value + sorted_skill_ids_with_float_value)
-
     return sorted_skill_ids[:feconf.MAX_NUMBER_OF_SKILL_IDS]
 
 
@@ -1108,7 +1106,7 @@ def filter_skills_by_mastery(user_id, skill_ids):
     """
     degrees_of_mastery = get_multi_user_skill_mastery(user_id, skill_ids)
 
-    filtered_skill_ids = filtered_skills_with_none_type_keys(degrees_of_mastery)
+    filtered_skill_ids = get_sorted_skill_ids(degrees_of_mastery)
 
     # Arranges the skill_ids in the order as it was received.
     arranged_filtered_skill_ids = []

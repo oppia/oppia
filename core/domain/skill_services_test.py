@@ -1289,6 +1289,31 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             degrees_of_mastery, {skill_id_4: 0.3, skill_id_5: 0.5})
 
+    def test_get_sorted_skill_ids(self):
+        masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2, None]
+
+        for _ in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
+            skill_id = skill_services.get_new_skill_id()
+            mastery = random.random()
+            masteries.append(mastery)
+            skill_services.create_user_skill_mastery(
+                self.USER_ID, skill_id, mastery)
+            self.SKILL_IDS.append(skill_id)
+        
+        masteries.sort()
+        degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
+            self.USER_ID, self.SKILL_IDS)
+        arranged_filtered_skill_ids = skill_services.filter_skills_by_mastery(
+            self.USER_ID, self.SKILL_IDS)
+
+        self.assertEqual(
+            len(arranged_filtered_skill_ids), feconf.MAX_NUMBER_OF_SKILL_IDS)
+
+        for i in python_utils.RANGE(feconf.MAX_NUMBER_OF_SKILL_IDS):
+            self.assertIn(
+                degrees_of_masteries[arranged_filtered_skill_ids[i]],
+                masteries[:feconf.MAX_NUMBER_OF_SKILL_IDS])
+
     def test_filter_skills_by_mastery(self):
         # Create feconf.MAX_NUMBER_OF_SKILL_IDS + 3 skill_ids
         # to test two things:
