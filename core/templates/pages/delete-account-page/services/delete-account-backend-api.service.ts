@@ -33,6 +33,8 @@ export class DeleteAccountBackendApiService {
   ) {}
 
   deleteAccount(): void {
+    // This gives ".delete is a syntax error" due to eslint.
+    // For more information visit https://eslint.org/docs/rules/dot-notation
     // eslint-disable-next-line dot-notation
     this.http.delete('/delete-account-handler').subscribe(() => {
       this.siteAnalyticsService.registerAccountDeletion();

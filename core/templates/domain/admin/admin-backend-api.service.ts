@@ -495,7 +495,10 @@ export class AdminBackendApiService {
   }
 
   async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http['delete']<void>(
+    // This gives ".delete is a syntax error" due to eslint.
+    // For more information visit https://eslint.org/docs/rules/dot-notation
+    // eslint-disable-next-line dot-notation
+    return this.http.delete<void>(
       AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
         params: {username},
       }
@@ -520,6 +523,8 @@ export class AdminBackendApiService {
 
   async deleteUserAsync(userId: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      // This gives ".delete is a syntax error" due to eslint.
+      // For more information visit https://eslint.org/docs/rules/dot-notation
       // eslint-disable-next-line dot-notation
       this.http.delete<void>(
         AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {

@@ -191,7 +191,10 @@ export class EditableTopicBackendApiService {
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
         topic_id: topicId
       });
-    this.http['delete']<DeleteTopicBackendResponse>(
+    // This gives ".delete is a syntax error" due to eslint.
+    // For more information visit https://eslint.org/docs/rules/dot-notation
+    // eslint-disable-next-line dot-notation
+    this.http.delete<DeleteTopicBackendResponse>(
       topicDataUrl).toPromise().then((response) => {
       if (successCallback) {
         successCallback(response.status);
