@@ -57,7 +57,8 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // part of an editable list).
     this.svgString = '';
     this.numberOfElementsInQueue = 0;
-    this.value.mathExpressionSvgIsBeingProcessed = true;
+    this.value.mathExpressionSvgIsBeingProcessed = !Boolean(
+      this.value.svg_filename);
     this.valueChanged.emit(this.value);
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
@@ -176,12 +177,14 @@ export class MathExpressionContentEditorComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.value &&
-      changes.value.currentValue.raw_latex !==
-      changes.value.previousValue.raw_latex) {
+    let value = changes.value;
+    if (value &&
+      (value.currentValue.raw_latex !== value.previousValue.raw_latex ||
+        this.localValue.label !== changes.value.currentValue.raw_latex)) {
       this.localValue = {
         label: this.value.raw_latex || '',
       };
+      this.convertLatexStringToSvg(this.localValue.label);
     }
   }
 
