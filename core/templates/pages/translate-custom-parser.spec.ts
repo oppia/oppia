@@ -56,7 +56,7 @@ describe('Translate Custom Parser', () => {
     expect(translateCustomParser.interpolate(
       '{minChoiceNumber, plural, one{Please select one or more choices.}' +
       'other{Please select # or more choices.}}', {
-        minChoiceNumber: 1, plural: true }))
+        minChoiceNumber: 1, messageFormat: true }))
       .toEqual('Please select one or more choices.');
   });
 
@@ -77,7 +77,7 @@ describe('Translate Custom Parser', () => {
     expect(translateCustomParser.interpolate(
       '{minChoiceNumber, plural, one{Please select one or more choices.}' +
       'other{Please select # or more choices.}}', {
-        minChoiceNumber: 1, plural: true }))
+        minChoiceNumber: 1, messageFormat: true }))
       .toEqual('Please select one or more choices.');
   });
 });

@@ -37,8 +37,8 @@ export class TranslateCustomParser extends TranslateParser {
       params?: { [key: string]: number | string | boolean }): string {
     let interpolate = this.translateDefaultParser.interpolate(expr, params);
     if (params) {
-      if (params.hasOwnProperty('plural') && interpolate !== undefined) {
-        if (params.plural) {
+      if (params.hasOwnProperty('messageFormat') && interpolate !== undefined) {
+        if (params.messageFormat) {
           try {
             interpolate = this.messageFormat.compile(
               interpolate, this.i18nLanguageCodeService
