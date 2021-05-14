@@ -158,7 +158,7 @@ angular.module('oppia').directive('filepathEditor', [
 
 
         var getCroppedGIFDataAsync = async function(
-            imageDataURI, x, y, width, height) {
+            x, y, width, height, imageDataURI) {
           return new Promise((resolve, reject) => {
             // Put the original image in a canvas.
             var img = new Image();
@@ -531,35 +531,18 @@ angular.module('oppia').directive('filepathEditor', [
           let newImageFile;
 
           if (mimeType === 'data:image/gif') {
-            // Looping through individual gif frames can take a while
-            // especially if there are a lot. Changing the cursor will let the
-            // user know that something is happening.
-            document.body.style.cursor = 'wait';
-            gifFrames({
-              url: imageDataURI,
-              frames: 'all',
-              outputType: 'canvas',
-            }).then(async function(frameData) {
-              let frames = [];
-              for (let i = 0; i < frameData.length; i += 1) {
-                let canvas = frameData[i].getImage();
-                frames.push(
-                  await getCroppedGIFDataAsync(
-                    canvas.toDataURL('image/png'), x1, y1, width, height
-                  ));
-              }
-              gifshot.createGIF({
-                gifWidth: width,
-                gifHeight: height,
-                images: frames
-              }, function(obj) {
-                newImageFile = (
-                  ImageUploadHelperService.convertImageDataToImageFile(
-                    obj.image));
-                ctrl.updateDimensions(newImageFile, obj.image, width, height);
-                document.body.style.cursor = 'default';
-              });
-            });
+            let successCb = obj => {
+              validateProcessedFilesize(obj.image);
+              newImageFile = (
+                ImageUploadHelperService.convertImageDataToImageFile(
+                  obj.image));
+              ctrl.updateDimensions(newImageFile, obj.image, width, height);
+              document.body.style.cursor = 'default';
+            };
+            let processFrameCb = getCroppedGIFDataAsync.bind(
+              null, x1, y1, width, height);
+            processGIFImage(
+              imageDataURI, width, height, processFrameCb, successCb);
           } else if (mimeType === 'data:image/svg+xml') {
             var imageData = ctrl.data.metadata.uploadedImageData;
             newImageFile = (
@@ -641,22 +624,35 @@ angular.module('oppia').directive('filepathEditor', [
           // Do not allow to decrease size below 10%.
           ctrl.imageResizeRatio = Math.max(
             0.1, ctrl.imageResizeRatio - amount / 100);
-          const dimensions = ctrl.calculateTargetImageDimensions();
-          const imageDataURI = ctrl.data.metadata.uploadedImageData;
-          const resampledImageData = getResampledImageData(
-            imageDataURI, dimensions.width, dimensions.height);
-          validateProcessedFilesize(resampledImageData);
+          updateValidationWithLatestDimensions();
         };
 
         ctrl.increaseResizePercent = function(amount) {
           // Do not allow to increase size above 100% (only downsize allowed).
           ctrl.imageResizeRatio = Math.min(
             1, ctrl.imageResizeRatio + amount / 100);
+          updateValidationWithLatestDimensions();
+        };
+
+        const updateValidationWithLatestDimensions = () => {
           const dimensions = ctrl.calculateTargetImageDimensions();
           const imageDataURI = ctrl.data.metadata.uploadedImageData;
-          const resampledImageData = getResampledImageData(
-            imageDataURI, dimensions.width, dimensions.height);
-          validateProcessedFilesize(resampledImageData);
+          const mimeType = imageDataURI.split(';')[0];
+          if (mimeType === 'data:image/gif') {
+            let successCb = obj => {
+              validateProcessedFilesize(obj.image);
+              document.body.style.cursor = 'default';
+              $scope.$apply();
+            };
+            processGIFImage(
+              imageDataURI, dimensions.width, dimensions.height,
+              null, successCb);
+          } else {
+            const resampledImageData = getResampledImageData(
+              imageDataURI, dimensions.width, dimensions.height);
+            validateProcessedFilesize(resampledImageData);
+            $scope.$apply();
+          }
         };
 
         ctrl.calculateTargetImageDimensions = function() {
@@ -695,11 +691,7 @@ angular.module('oppia').directive('filepathEditor', [
                 x2: dimensions.width,
                 y2: dimensions.height
               };
-              const imageDataURI = ctrl.data.metadata.uploadedImageData;
-              const resampledImageData = getResampledImageData(
-                imageDataURI, dimensions.width, dimensions.height);
-              validateProcessedFilesize(resampledImageData);
-              $scope.$apply();
+              updateValidationWithLatestDimensions();
             };
             img.src = <string>((<FileReader>e.target).result);
           };
@@ -728,11 +720,13 @@ angular.module('oppia').directive('filepathEditor', [
 
         ctrl.discardUploadedFile = function() {
           ctrl.resetFilePathEditor();
+          ctrl.processedImageIsTooLarge = false;
         };
 
         const validateProcessedFilesize = function(resampledImageData) {
+          const mimeType = resampledImageData.split(';')[0];
           const imageSize = atob(
-            resampledImageData.replace('data:image/png;base64,', '')).length;
+            resampledImageData.replace(`${mimeType};base64,`, '')).length;
           // The processed image can sometimes be larger than 100 KB. This is
           // because the output of HTMLCanvasElement.toDataURL() operation in
           // getResampledImageData() is browser specific and can vary in size.
@@ -758,40 +752,30 @@ angular.module('oppia').directive('filepathEditor', [
           let resampledFile;
 
           if (mimeType === 'data:image/gif') {
-            // Looping through individual gif frames can take a while
-            // especially if there are a lot. Changing the cursor will let the
-            // user know that something is happening.
-            document.body.style.cursor = 'wait';
-            gifFrames({
-              url: imageDataURI,
-              frames: 'all',
-              outputType: 'canvas',
-            }).then(function(frameData) {
-              let frames = [];
-              for (let i = 0; i < frameData.length; i += 1) {
-                let canvas = frameData[i].getImage();
-                frames.push(
-                  canvas.toDataURL('image/png')
-                );
-              }
-              gifshot.createGIF({
-                gifWidth: dimensions.width,
-                gifHeight: dimensions.height,
-                images: frames
-              }, function(obj) {
-                if (!obj.error) {
-                  resampledFile = (
-                    ImageUploadHelperService.convertImageDataToImageFile(
-                      obj.image));
-                  if (resampledFile === null) {
-                    AlertsService.addWarning('Could not get resampled file.');
-                    return;
-                  }
-                  ctrl.saveImage(dimensions, resampledFile, 'gif');
+            let successCb = obj => {
+              if (!obj.error) {
+                validateProcessedFilesize(obj.image);
+                if (ctrl.processedImageIsTooLarge) {
                   document.body.style.cursor = 'default';
+                  $scope.$apply();
+                  return;
                 }
-              });
-            });
+                resampledFile = (
+                  ImageUploadHelperService.convertImageDataToImageFile(
+                    obj.image));
+                if (resampledFile === null) {
+                  AlertsService.addWarning('Could not get resampled file.');
+                  document.body.style.cursor = 'default';
+                  $scope.$apply();
+                  return;
+                }
+                ctrl.saveImage(dimensions, resampledFile, 'gif');
+                document.body.style.cursor = 'default';
+              }
+            };
+            let gifWidth = dimensions.width;
+            let gifHeight = dimensions.height;
+            processGIFImage(imageDataURI, gifWidth, gifHeight, null, successCb);
           } else if (mimeType === 'data:image/svg+xml') {
             ctrl.invalidTagsAndAttributes = (
               SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
@@ -821,6 +805,52 @@ angular.module('oppia').directive('filepathEditor', [
             }
             ctrl.saveImage(dimensions, resampledFile, 'png');
           }
+        };
+
+        const processGIFImage = function(
+            imageDataURI, width, height, processFrameCallback,
+            successCallback) {
+          // Looping through individual gif frames can take a while
+          // especially if there are a lot. Changing the cursor will let the
+          // user know that something is happening.
+          document.body.style.cursor = 'wait';
+          gifFrames({
+            url: imageDataURI,
+            frames: 'all',
+            outputType: 'canvas',
+          }).then(async function(frameData) {
+            let frames = [];
+            for (let i = 0; i < frameData.length; i += 1) {
+              let sourceCanvas = frameData[i].getImage();
+              // Some GIFs may be optimised such that frames are stacked and
+              // only incremental changes are present in individual frames.
+              // For such GIFs, no additional operation needs to be done to
+              // handle transparent content. These GIFs have 0 or 1 Disposal
+              // method value.
+              // See https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+              if (frameData[i].frameInfo.disposal > 1) {
+                // Frames that have transparent content may not render
+                // properly in the gifshot output. As a workaround, add a
+                // white background to individual frames before creating a
+                // GIF.
+                let ctx = sourceCanvas.getContext('2d');
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#FFF';
+                ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+              }
+              let dataURL = sourceCanvas.toDataURL('image/png');
+              let updatedFrame = (
+                processFrameCallback ?
+                await processFrameCallback(dataURL) : dataURL);
+              frames.push(updatedFrame);
+            }
+            gifshot.createGIF({
+              gifWidth: width,
+              gifHeight: height,
+              images: frames
+            }, successCallback);
+          });
         };
 
         ctrl.saveImageToLocalStorage = function(

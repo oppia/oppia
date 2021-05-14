@@ -398,8 +398,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 }
 
 # An array containing the image formats that can be compressed.
-COMPRESSIBLE_IMAGE_FORMATS = [
-    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
+COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
