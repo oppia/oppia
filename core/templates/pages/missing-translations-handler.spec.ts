@@ -46,4 +46,3 @@ describe('Missing Translations Handler', () => {
     })).toEqual(key);
   });
 });
-

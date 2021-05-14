@@ -66,7 +66,7 @@ describe('Translate Custom Parser', () => {
       (interpolate: string, langCode) => {
         return (params) => {
           if (langCode === 'es') {
-            throw Error(
+            throw new Error(
               'language and interpolation parameters are not compatible');
           }
           return 'Please select one or more choices.';
