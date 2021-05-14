@@ -2995,7 +2995,7 @@ def can_update_suggestion(handler):
                 'You are not allowed to update suggestions that you created.')
 
         if suggestion.suggestion_type not in (
-            feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
             raise self.InvalidInputException('Invalid suggestion type.')
 
         else:

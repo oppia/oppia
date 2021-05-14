@@ -1278,6 +1278,7 @@ def update_translation_suggestion(suggestion_id, translation_html):
     suggestion = get_suggestion_by_id(suggestion_id)
 
     suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    suggestion.edited_by_reviewer = True
     suggestion.pre_update_validate(suggestion.change)
     _update_suggestion(suggestion)
 
@@ -1296,5 +1297,6 @@ def update_question_suggestion(
 
     suggestion.change.question_dict['question_state_data'] = question_state_data
     suggestion.change.skill_difficulty = skill_difficulty
+    suggestion.edited_by_reviewer = True
 
     _update_suggestion(suggestion)

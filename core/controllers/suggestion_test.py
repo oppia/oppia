@@ -1202,7 +1202,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        response = self.put_json('%s/%s' % (
+        self.put_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
                 'question_state_data': question_state_data,
