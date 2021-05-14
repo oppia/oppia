@@ -49,8 +49,8 @@
         </supplemental-card>
       </div>
       <div ng-if="getCanAskLearnerForAnswerInfo()">
-        <learner-answer-info-card submit-answer="submitAnswer">
-        </learner-answer-info-card>
+        <oppia-learner-answer-info-card (submit-answer)="submitAnswer($event.currentAnswer, $event.rulesService)">
+        </oppia-learner-answer-info-card>
       </div>
       <div ng-if="!getCanAskLearnerForAnswerInfo()">
         <progress-nav on-submit="submitAnswerFromProgressNav()"
@@ -94,7 +94,7 @@
     </div>
   </div>
   <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
-    <correctness-footer></correctness-footer>
+    <oppia-correctness-footer></oppia-correctness-footer>
   </div>
 </div>
 

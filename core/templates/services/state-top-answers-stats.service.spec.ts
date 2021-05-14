@@ -111,6 +111,7 @@ describe('StateTopAnswersStatsService', () => {
       },
     },
     solicit_answer_details: false,
+    card_is_checkpoint: false,
     written_translations: {
       translations_mapping: {
         content: {},
@@ -147,7 +148,7 @@ describe('StateTopAnswersStatsService', () => {
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     const stateStats = stateTopAnswersStatsService.getStateStats('Hola');
     expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
@@ -164,7 +165,7 @@ describe('StateTopAnswersStatsService', () => {
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getStateStats('Hola')).toEqual([
       joC({answer: 'hola', frequency: 7}),
@@ -182,7 +183,7 @@ describe('StateTopAnswersStatsService', () => {
     ]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
       .toThrowError('Me Llamo does not exist.');
@@ -194,7 +195,7 @@ describe('StateTopAnswersStatsService', () => {
       'Hola', [{answer: 'hola', frequency: 3}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
   }));
@@ -204,7 +205,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.hasStateStats('Hola')).toBeTrue();
   }));
@@ -215,7 +216,7 @@ describe('StateTopAnswersStatsService', () => {
       spyOnBackendApiFetchStatsAsync('Hola', []);
       stateTopAnswersStatsService.initAsync(expId, states);
       flushMicrotasks();
-      await stateTopAnswersStatsService.getInitPromise();
+      await stateTopAnswersStatsService.getInitPromiseAsync();
 
       expect(stateTopAnswersStatsService.hasStateStats('Me Llamo')).toBeFalse();
     }));
@@ -225,7 +226,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getStateNamesWithStats())
       .toEqual(['Hola']);
@@ -236,7 +237,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(() => stateTopAnswersStatsService.getStateStats('Me Llamo'))
       .toThrowError('Me Llamo does not exist.');
@@ -252,7 +253,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     stateTopAnswersStatsService.onStateDeleted('Hola');
     flushMicrotasks();
@@ -266,7 +267,7 @@ describe('StateTopAnswersStatsService', () => {
     spyOnBackendApiFetchStatsAsync('Hola', []);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     const oldStats = stateTopAnswersStatsService.getStateStats('Hola');
 
@@ -286,7 +287,7 @@ describe('StateTopAnswersStatsService', () => {
       'Hola', [{answer: 'adios', frequency: 3}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .toContain(joC({answer: 'adios'}));
@@ -318,7 +319,7 @@ describe('StateTopAnswersStatsService', () => {
       'Hola', [{answer: 'hola', frequency: 3}]);
     stateTopAnswersStatsService.initAsync(expId, states);
     flushMicrotasks();
-    await stateTopAnswersStatsService.getInitPromise();
+    await stateTopAnswersStatsService.getInitPromiseAsync();
 
     expect(stateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
       .not.toContain(joC({answer: 'hola'}));

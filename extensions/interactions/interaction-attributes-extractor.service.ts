@@ -35,7 +35,9 @@ export class InteractionAttributesExtractorService {
   private readonly migratedInteractions: string[] = [
     'Continue',
     'FractionInput',
-    'GraphInput'
+    'GraphInput',
+    'ImageClickInput',
+    'CodeRepl'
   ];
 
   constructor(
