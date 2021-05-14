@@ -241,7 +241,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'request-interceptor.service.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',
-    'role-graph.directive.ts',
     'rule-editor.directive.ts',
     'rule-type-selector.directive.ts',
     'sanitized-url-editor.directive.ts',
