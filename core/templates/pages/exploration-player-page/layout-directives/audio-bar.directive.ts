@@ -310,6 +310,11 @@ angular.module('oppia').directive('audioBar', [
                 $scope.$applyAsync();
               })
             );
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.onAudioStop.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
             AudioPreloaderService.setAudioLoadedCallback(
               onFinishedLoadingAudio);
           };

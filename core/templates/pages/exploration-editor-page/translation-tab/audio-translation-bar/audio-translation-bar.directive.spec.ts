@@ -646,6 +646,7 @@ describe('Audio translation bar directive', function() {
   it('should apply changed when view update emits', waitForAsync(() => {
     const applyAsyncSpy = spyOn($scope, '$applyAsync');
     audioPlayerService.viewUpdate.emit();
+    audioPlayerService.onAudioStop.next();
     expect(applyAsyncSpy).toHaveBeenCalled();
   }));
 

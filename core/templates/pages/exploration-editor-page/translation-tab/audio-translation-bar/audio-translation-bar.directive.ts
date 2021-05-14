@@ -573,6 +573,11 @@ angular.module('oppia').directive('audioTranslationBar', [
                 $scope.$applyAsync();
               })
             );
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.onAudioStop.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
             $scope.initAudioBar();
           };
           ctrl.$onDestroy = function() {

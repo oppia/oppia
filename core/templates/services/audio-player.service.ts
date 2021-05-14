@@ -212,6 +212,10 @@ export class AudioPlayerService {
   get onAutoplayAudio(): EventEmitter<void | AutoPlayAudioEvent> {
     return this._autoplayAudioEventEmitter;
   }
+
+  get onAudioStop(): Subject<void> {
+    return this._stopIntervalSubject;
+  }
 }
 
 angular.module('oppia').factory('AudioPlayerService', downgradeInjectable(
