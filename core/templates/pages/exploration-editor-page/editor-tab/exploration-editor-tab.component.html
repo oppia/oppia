@@ -8,7 +8,13 @@
       <div class="oppia-editor-header">
         <state-name-editor></state-name-editor>
       </div>
-
+      <div>
+      <md-checkbox class="checkpoint-selection-checkbox"
+                   ng-change="$ctrl.onChangeCardIsCheckpoint()"
+                   ng-model="$ctrl.stateCardIsCheckpointService.displayed">
+        Set as a checkpoint for learners
+      </md-checkbox>
+      </div>
       <div ng-if="$ctrl.areParametersEnabled()">
         <state-param-changes-editor></state-param-changes-editor>
       </div>
@@ -65,5 +71,12 @@
       margin-right: 0;
       width: 100%;
     }
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-icon {
+    border-color: #0d48a1;
+    top: 2px;
+  }
+  md-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
+    background-color: rgba(71, 151, 136, 1);
   }
 </style>

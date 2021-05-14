@@ -132,6 +132,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       hints: ['interaction', 'hints'],
       next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
+      card_is_checkpoint: ['cardIsCheckpoint'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs'],
@@ -410,6 +411,14 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveSolicitAnswerDetails: function(stateName, newSolicitAnswerDetails) {
         saveStateProperty(
           stateName, 'solicit_answer_details', newSolicitAnswerDetails);
+      },
+      getCardIsCheckpointMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'card_is_checkpoint');
+      },
+      saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
+        console.error("INSIDE SAVE CIC - ", stateName, " - ", newCardIsCheckpoint);
+        saveStateProperty(
+          stateName, 'card_is_checkpoint', newCardIsCheckpoint);
       },
       getWrittenTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'written_translations');
