@@ -2742,9 +2742,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            r'The parameter name \'all\' is reserved. Please choose '
-            'a different name for the parameter being set in'
-        ):
+            re.escape(
+                'The parameter name \'all\' is reserved. Please choose '
+                'a different name for the parameter being set in')):
             exp_services.update_exploration(
                 self.owner_id,
                 self.EXP_0_ID,

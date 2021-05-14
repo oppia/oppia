@@ -229,7 +229,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                   5000);
                 return;
               }
-              ExplorationIdValidationService.isExpPublished(
+              ExplorationIdValidationService.isExpPublishedAsync(
                 explorationId).then(function(expIdIsValid) {
                 $scope.expIdIsValid = expIdIsValid;
                 if ($scope.expIdIsValid) {

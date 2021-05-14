@@ -146,7 +146,7 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_graph_data': role_services.get_role_graph_data(),
+            'role_to_actions': role_services.get_role_actions(),
             'feature_flags': feature_flag_dicts,
         })
 

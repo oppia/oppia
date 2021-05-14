@@ -96,7 +96,7 @@ angular.module('oppia').factory('ChangeListService', [
       // opened):
       // - Version Mismatch.
       // - Non-strict Validation Fail.
-      ExplorationDataService.autosaveChangeList(
+      ExplorationDataService.autosaveChangeListAsync(
         explorationChangeList,
         function(response) {
           if (!response.is_version_of_draft_valid) {
@@ -166,7 +166,7 @@ angular.module('oppia').factory('ChangeListService', [
       discardAllChanges: function() {
         explorationChangeList = [];
         undoneChangeStack = [];
-        return ExplorationDataService.discardDraft();
+        return ExplorationDataService.discardDraftAsync();
       },
       /**
        * Saves a change dict that represents a change to an exploration

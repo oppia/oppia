@@ -318,7 +318,7 @@ describe('Story node editor directive', function() {
     var deferred = $q.defer();
     deferred.resolve(true);
     var expSpy = spyOn(
-      ExplorationIdValidationService, 'isExpPublished').and.returnValue(
+      ExplorationIdValidationService, 'isExpPublishedAsync').and.returnValue(
       deferred.promise);
     var storyUpdateSpy = spyOn(StoryUpdateService, 'setStoryNodeExplorationId');
 
@@ -336,7 +336,7 @@ describe('Story node editor directive', function() {
     var deferred = $q.defer();
     deferred.resolve(false);
     var expSpy = spyOn(
-      ExplorationIdValidationService, 'isExpPublished').and.returnValue(
+      ExplorationIdValidationService, 'isExpPublishedAsync').and.returnValue(
       deferred.promise);
     var storyUpdateSpy = spyOn(
       StoryUpdateService, 'setStoryNodeExplorationId');
