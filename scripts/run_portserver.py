@@ -438,9 +438,11 @@ class Server(python_utils.OBJECT):
         except socket.error:
             pass
         finally:
-            self.socket.close()
-            if not self.socket_path.startswith('\0'):
-                os.remove(self.socket_path)
+            try:
+                self.socket.close()
+            finally:
+                if not self.socket_path.startswith('\0'):
+                    os.remove(self.socket_path)
 
     @staticmethod
     def handle_connection(connection, handler):
