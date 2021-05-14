@@ -23,6 +23,8 @@
  * It won't be required in Angular 9.
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
+import {
+  OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import 'firebase/auth';
 import 'hammerjs';
 import 'leaflet/dist/leaflet.css';
