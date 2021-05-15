@@ -20,8 +20,7 @@ import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+require('components/skill-selector/select-skill-modal.controller.ts');
 
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -31,11 +30,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
-require('services/ngb-modal.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'NgbModal', 'QuestionUndoRedoService',
+  'ImageLocalStorageService', 'QuestionUndoRedoService',
   'QuestionValidationService',
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
@@ -43,7 +41,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'rubric', 'skillName', 'untriagedSkillSummaries', 'MAX_COMMIT_MESSAGE_LENGTH',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, NgbModal, QuestionUndoRedoService,
+      ImageLocalStorageService, QuestionUndoRedoService,
       QuestionValidationService,
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
@@ -99,20 +97,23 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         groupedSkillSummaries.current.concat(
           groupedSkillSummaries.others);
       var allowSkillsFromOtherTopics = true;
-      let modalRef: NgbModalRef = NgbModal.open(SelectSkillModalComponent, {
+      $uibModal.open({
+        templateUrl:
+          UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/skill-selector/' +
+            'select-skill-modal.template.html'),
         backdrop: 'static',
+        resolve: {
+          skillsInSameTopicCount: () => skillsInSameTopicCount,
+          sortedSkillSummaries: () => sortedSkillSummaries,
+          categorizedSkills: () => categorizedSkills,
+          allowSkillsFromOtherTopics: () => allowSkillsFromOtherTopics,
+          untriagedSkillSummaries: () => untriagedSkillSummaries
+        },
+        controller: 'SelectSkillModalController',
         windowClass: 'skill-select-modal',
         size: 'xl'
-      });
-      modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-      modalRef.componentInstance.skillsInSameTopicCount = (
-        skillsInSameTopicCount);
-      modalRef.componentInstance.categorizedSkills = categorizedSkills;
-      modalRef.componentInstance.allowSkillsFromOtherTopics = (
-        allowSkillsFromOtherTopics);
-      modalRef.componentInstance.untriagedSkillSummaries = (
-        untriagedSkillSummaries);
-      modalRef.result.then(function(summary) {
+      }).result.then(function(summary) {
         for (var idx in $scope.associatedSkillSummaries) {
           if (
             $scope.associatedSkillSummaries[idx].getId() ===
@@ -129,7 +130,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           id: summary.id,
           task: 'add'
         });
-      }, () => {
+      }, function() {
         // Note to developers:
         // This callback is triggered when the Cancel button is
         // clicked. No further action is needed.

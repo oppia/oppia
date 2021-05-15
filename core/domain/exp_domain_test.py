@@ -3480,6 +3480,7 @@ tags: []
 title: Title
 """)
 
+<<<<<<< HEAD
     YAML_CONTENT_V50 = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -3625,6 +3626,9 @@ title: Title
 """)
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V50
+=======
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V49
+>>>>>>> upstream/develop
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -3755,7 +3759,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 50
+schema_version: 49
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -3813,7 +3817,6 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -3849,7 +3852,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -3859,7 +3861,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 45
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -3947,7 +3949,6 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -3982,7 +3983,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4008,7 +4008,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 50
+schema_version: 49
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4076,7 +4076,6 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
-    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -4112,7 +4111,6 @@ states:
       hints: []
       id: EndExploration
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4122,7 +4120,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 45
+states_schema_version: 44
 tags: []
 title: Title
 """)
@@ -4145,7 +4143,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name, is_init_state):
             """Gets the default state dict of the exploration."""
             return {
-                'linked_skill_id': None,
                 'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
