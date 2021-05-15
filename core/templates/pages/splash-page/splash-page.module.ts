@@ -32,8 +32,7 @@ import { SplashPageComponent } from './splash-page.component';
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule,
-    TranslateModule
+    SharedComponentsModule
   ],
   declarations: [
     SplashPageComponent,
@@ -64,13 +63,12 @@ class SplashPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { TranslateModule } from 'filters/translate.module';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(SplashPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

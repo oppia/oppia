@@ -105,11 +105,11 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(TopicsAndSkillsDashboardPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

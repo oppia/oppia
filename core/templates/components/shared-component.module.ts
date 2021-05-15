@@ -29,8 +29,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateModule } from 'filters/translate.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 
@@ -64,15 +64,19 @@ import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 
 import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
-
 import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
 import { LoadingMessageComponent } from '../base-components/loading-message.component';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
+import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
-import { FocusOnDirective } from '../directives/focus-on.directive';
 
 
 // Pipes.
@@ -82,15 +86,12 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ResponseHeaderComponent } from 'components/state-directives/response-header/response-header.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
 // TODO(#11462): Delete these conditional values once firebase auth is launched.
 const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
@@ -124,6 +125,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
@@ -133,7 +135,7 @@ const toastrConfig = {
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
-    TranslateModule,
+    SharedPipesModule,
     ...firebaseAuthModules,
   ],
 
@@ -146,6 +148,8 @@ const toastrConfig = {
     AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    CorrectnessFooterComponent,
+    ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -162,7 +166,6 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
-    ResponseHeaderComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
@@ -192,6 +195,8 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CorrectnessFooterComponent,
+    ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -205,7 +210,6 @@ const toastrConfig = {
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
-    ResponseHeaderComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
@@ -224,6 +228,7 @@ const toastrConfig = {
 
   exports: [
     // Modules.
+    CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
     FormsModule,
@@ -231,19 +236,21 @@ const toastrConfig = {
     NgbTooltipModule,
     NgbModalModule,
     ObjectComponentsModule,
-    TranslateModule,
+    SharedFormsModule,
+    SharedPipesModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    CorrectnessFooterComponent,
+    ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     LazyLoadingComponent,
-    FocusOnDirective,
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
@@ -252,10 +259,8 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
-    SchemaBasedEditorDirective,
     SideNavigationBarComponent,
     SharingLinksComponent,
-    ResponseHeaderComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
