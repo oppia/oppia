@@ -76,8 +76,8 @@ export const AppConstants = {
     TERMINAL_CARD:
       'Checkpoints are not allowed on the last card of the lesson.',
     CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
-    BYPASSABLE_CARD:
-      'Checkpoints must not be assigned to cards that can be bypassed.'
+    BY_PASSABLE_CARD:
+      'Checkpoints must not be assigned to cards that can be by-passed.'
   },
 
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',

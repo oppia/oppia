@@ -332,7 +332,6 @@ angular.module('oppia').component('explorationEditorTab', {
         ExplorationStatesService.saveCardIsCheckpoint(
           StateEditorService.getActiveStateName(),
           angular.copy(displayedValue));
-
         StateEditorService.setCardIsCheckpoint(
           angular.copy(displayedValue));
         StateCardIsCheckpointService.saveDisplayedValue();
