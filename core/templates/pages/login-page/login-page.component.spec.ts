@@ -137,10 +137,6 @@ describe('Login Page', () => {
     loginPageComponent = fixture.componentInstance;
   });
 
-  it('should be enabled by default', () => {
-    expect(loginPageComponent.enabled).toBeTrue();
-  });
-
   it('should be in emulator mode by default', () => {
     expect(loginPageComponent.emulatorModeIsEnabled).toBeTrue();
   });

@@ -92,19 +92,6 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
-// TODO(#11462): Delete these conditional values once firebase auth is launched.
-const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireModule.initializeApp(AuthService.firebaseConfig),
-  AngularFireAuthModule,
-] : [];
-
-const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireAuth,
-  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
-] : [
-  {provide: AngularFireAuth, useValue: null},
-];
-
 const toastrConfig = {
   allowHtml: false,
   iconClasses: {
@@ -135,11 +122,13 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
-    ...firebaseAuthModules,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
   ],
 
   providers: [
-    ...firebaseAuthProviders,
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
   ],
 
   declarations: [
