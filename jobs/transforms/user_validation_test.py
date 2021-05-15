@@ -172,7 +172,7 @@ class UserEmailPreferencesModelRelationshipsTest(
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                user_validation.user_email_preferences_model_relationships)
+                user_validation.user_email_preferences_model_relationships())
         )
         self.assertIsNot(output, [])
 
@@ -187,9 +187,9 @@ class UserEmailPreferencesModelRelationshipsTest(
             self.pipeline
             | beam.Create([model, dependent_model])
             | beam.ParDo(
-                user_validation.user_email_preferences_model_relationships)
+                user_validation.user_email_preferences_model_relationships())
         )
-        self.assertIsNot(output, [])
+        self.assert_pcoll_equal(output, [])
 
 
 class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
