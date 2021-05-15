@@ -35,6 +35,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
@@ -48,6 +49,7 @@ import { MaterialModule } from 'components/material.module';
     BrowserModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    MatButtonModule,
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
@@ -58,11 +60,11 @@ import { MaterialModule } from 'components/material.module';
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     AudioBarComponent,
+    LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -97,11 +99,11 @@ class ExplorationPlayerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ExplorationPlayerPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

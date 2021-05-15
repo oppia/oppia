@@ -14,18 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.audit_jobs."""
+"""Unit tests for jobs.base_validation_jobs."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 import feconf
-from jobs import audit_jobs
+from jobs import base_validation_jobs
 from jobs import job_options
 from jobs import job_test_utils
-from jobs.transforms import base_model_audits
-from jobs.types import audit_errors
+from jobs.transforms import base_validation
+from jobs.types import base_validation_errors
 from jobs.types import model_property
 
 from apache_beam import runners
@@ -37,7 +37,7 @@ from apache_beam.testing import test_pipeline
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = audit_jobs.AuditAllStorageModelsJob
+    JOB_CLASS = base_validation_jobs.AuditAllStorageModelsJob
 
     VALID_USER_ID = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
 
@@ -51,9 +51,9 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
         self.assertRaisesRegexp(
             ValueError, 'JobOptions.model_getter must not be None',
-            audit_jobs.AuditAllStorageModelsJob(pipeline).run)
+            base_validation_jobs.AuditAllStorageModelsJob(pipeline).run)
 
-    def test_base_model_audits(self):
+    def test_base_validation(self):
         base_model_with_invalid_id = self.create_model(
             base_models.BaseModel, id='123@?!*', deleted=False)
         base_model_with_invalid_timestamps = self.create_model(
@@ -76,14 +76,14 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assert_job_output_is([
-            audit_errors.ModelIdRegexError(
+            base_validation_errors.ModelIdRegexError(
                 base_model_with_invalid_id,
-                base_model_audits.BASE_MODEL_ID_PATTERN),
-            audit_errors.ModelMutatedDuringJobError(
+                base_validation.BASE_MODEL_ID_PATTERN),
+            base_validation_errors.ModelMutatedDuringJobError(
                 base_model_with_invalid_timestamps),
-            audit_errors.InconsistentTimestampsError(
+            base_validation_errors.InconsistentTimestampsError(
                 base_model_with_inconsistent_timestamps),
-            audit_errors.ModelExpiredError(expired_base_model),
+            base_validation_errors.ModelExpiredError(expired_base_model),
         ])
 
     def test_user_audits(self):
@@ -100,7 +100,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assert_job_output_is([
-            audit_errors.ModelIdRegexError(
+            base_validation_errors.ModelIdRegexError(
                 user_settings_model_with_invalid_id, feconf.USER_ID_REGEX),
         ])
 
@@ -113,7 +113,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assert_job_output_is([
-            audit_errors.ModelRelationshipError(
+            base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
                     user_models.UserEmailPreferencesModel,
                     user_models.UserEmailPreferencesModel.id),
@@ -161,7 +161,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
         self.assert_job_output_is([
-            audit_errors.ModelRelationshipError(
+            base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
                     auth_models.UserAuthDetailsModel,
                     auth_models.UserAuthDetailsModel.gae_id),

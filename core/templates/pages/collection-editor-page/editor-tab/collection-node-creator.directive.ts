@@ -59,7 +59,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
           ctrl.fetchTypeaheadResults = function(searchQuery) {
             if (isValidSearchQuery(searchQuery)) {
               ctrl.searchQueryHasError = false;
-              return SearchExplorationsBackendApiService.fetchExplorations(
+              return SearchExplorationsBackendApiService.fetchExplorationsAsync(
                 searchQuery
               ).then(function(explorationMetadataList) {
                 var options = [];
@@ -106,7 +106,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             }
 
             ExplorationSummaryBackendApiService
-              .loadPublicAndPrivateExplorationSummaries([newExplorationId])
+              .loadPublicAndPrivateExplorationSummariesAsync([newExplorationId])
               .then(function(responseObject) {
                 var summaries = responseObject.summaries;
                 var summaryBackendObject = null;

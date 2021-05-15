@@ -27,7 +27,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
     style="width: 100%;"
     [thumbLabel]="thumbLabel"
     [max]="max"
-    (change)="setProgress($event)"
+    (change)="setDuration($event)"
     tick-interval="auto"
     [step]="1"
     aria-label="audio-slider">
@@ -40,13 +40,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
   }`]
 })
 export class AudioSliderComponent {
-  @Input() value;
-  @Input() max;
-  @Input() thumbLabel= false;
-  @Output() valueChange = new EventEmitter();
+  @Input() value: number;
+  @Input() max: number;
+  @Input() thumbLabel = false;
+  @Output() valueChange = new EventEmitter<{ value: number }>();
   constructor() { }
 
-  setProgress(event: {value: number}): void {
+  setDuration(event: {value: number}): void {
     this.valueChange.emit(event);
   }
 }
