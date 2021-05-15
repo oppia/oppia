@@ -28,7 +28,7 @@ describe('Promo Bar Component', () => {
   let promoBarBackendApiService: PromoBarBackendApiService;
 
   class MockPromoBarBackendApiService {
-    getPromoBarDataAsync() {
+    async getPromoBarDataAsync() {
       return new Promise((resolve) => {
         resolve(
           {

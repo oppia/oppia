@@ -180,7 +180,7 @@ var ExplorationEditorTranslationTab = function() {
     '.protractor-test-upload-error-message'));
   var playPauseAudioButton = element(
     by.css('.protractor-test-play-pause-audio-button'));
-  var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
+  var audioMaterialSliderDiv = element(by.css('.mat-slider'));
   var closeAudioUploaderModalButton = element(
     by.css('.protractor-test-close-audio-upload-modal'));
   var audioUploadContainerElement = element(by.css(

@@ -92,7 +92,7 @@ angular.module('oppia').controller('CreateNewChapterModalController', [
         }
       }
       if (StoryEditorStateService.isStoryPublished()) {
-        ExplorationIdValidationService.isExpPublished(
+        ExplorationIdValidationService.isExpPublishedAsync(
           $scope.explorationId).then(function(expIdIsValid) {
           $scope.expIdIsValid = expIdIsValid;
           if ($scope.expIdIsValid) {

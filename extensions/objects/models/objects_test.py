@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
+import re
 
 from core.tests import test_utils
 from extensions.objects.models import objects
@@ -996,7 +997,9 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
             })
 
         with self.assertRaisesRegexp(
-            AssertionError, r'Expected unicode string, received \[u\'abc\'\]'):
+            AssertionError,
+            re.escape('Expected unicode string, received [u\'abc\']')
+        ):
             objects.TranslatableUnicodeString.normalize({
                 'contentId': 'rule_input',
                 'unicodeStr': ['abc']
@@ -1016,7 +1019,9 @@ class TranslatableUnicodeStringTests(test_utils.GenericTestBase):
             objects.TranslatableUnicodeString.normalize_value(5)
 
         with self.assertRaisesRegexp(
-            AssertionError, r'Expected unicode string, received \[u\'abc\'\]'):
+            AssertionError,
+            re.escape('Expected unicode string, received [u\'abc\']')
+        ):
             objects.TranslatableUnicodeString.normalize_value(['abc'])
 
         self.assertEqual(
@@ -1070,7 +1075,9 @@ class TranslatableHtmlTests(test_utils.GenericTestBase):
             objects.TranslatableHtml.normalize_value(['abc'])
 
         with self.assertRaisesRegexp(
-            AssertionError, r'Expected unicode string, received \[u\'abc\'\]'):
+            AssertionError,
+            re.escape('Expected unicode string, received [u\'abc\']')
+        ):
             objects.TranslatableUnicodeString.normalize_value(['abc'])
 
         self.assertEqual(
