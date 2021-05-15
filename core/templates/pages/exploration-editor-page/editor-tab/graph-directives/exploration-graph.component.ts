@@ -34,13 +34,16 @@ angular.module('oppia').component('explorationGraph', {
   template: require('./exploration-graph.component.html'),
   controller: [
     '$uibModal', 'AlertsService', 'EditabilityService',
-    'ExplorationStatesService', 'GraphDataService', 'LoggerService',
-    'RouterService', 'StateEditorService', 'UrlInterpolationService',
+    'ExplorationStatesService', 'ExplorationWarningsService',
+    'GraphDataService', 'LoggerService', 'RouterService',
+    'StateEditorService', 'UrlInterpolationService',
     function(
         $uibModal, AlertsService, EditabilityService,
-        ExplorationStatesService, GraphDataService, LoggerService,
-        RouterService, StateEditorService, UrlInterpolationService) {
+        ExplorationStatesService, ExplorationWarningsService,
+        GraphDataService, LoggerService, RouterService,
+        StateEditorService, UrlInterpolationService) {
       var ctrl = this;
+      var checkpointCountWarning = '';
       // We hide the graph at the outset in order not to confuse new
       // exploration creators.
       ctrl.isGraphShown = function() {
@@ -58,6 +61,10 @@ angular.module('oppia').component('explorationGraph', {
       ctrl.getActiveStateName = function() {
         return StateEditorService.getActiveStateName();
       };
+
+      ctrl.getCheckpointCount = function() {
+        return ExplorationStatesService.getCheckpointCount();
+      }
 
       ctrl.openStateGraphModal = function() {
         AlertsService.clearWarnings();
@@ -95,6 +102,12 @@ angular.module('oppia').component('explorationGraph', {
       ctrl.isEditable = function() {
         return EditabilityService.isEditable();
       };
+
+      ctrl.showCheckpointCountWarningSign = function() {
+        ctrl.checkpointCountWarning = (
+          ExplorationWarningsService.getCheckpointCountWarning());
+        return ctrl.checkpointCountWarning;
+      }
     }
   ]
 });

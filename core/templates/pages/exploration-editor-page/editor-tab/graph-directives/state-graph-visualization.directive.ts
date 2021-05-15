@@ -27,6 +27,9 @@ require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-card-is-checkpoint.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -86,16 +89,19 @@ angular.module('oppia').directive('stateGraphVisualization', [
         'state-graph-visualization.directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',
-        'ExplorationWarningsService', 'RouterService',
+        'ExplorationWarningsService', 'ExplorationStatesService',
+        'RouterService', 'StateCardIsCheckpointService',
         'StateGraphLayoutService', 'TranslationStatusService',
         'WindowDimensionsService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
-            ExplorationWarningsService, RouterService,
+            ExplorationWarningsService, ExplorationStatesService,
+            RouterService, StateCardIsCheckpointService,
             StateGraphLayoutService, TranslationStatusService,
             WindowDimensionsService, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          ctrl.stateCardIsCheckpointService = StateCardIsCheckpointService;
           var graphBounds = {
             bottom: 0,
             left: 0,
@@ -221,6 +227,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
             var maxValue = Math.max(bound1, bound2);
             return Math.min(Math.max(value, minValue), maxValue);
           };
+
+          $scope.isCheckpoint = function(nodeId) {
+            return ExplorationStatesService.getState(nodeId).cardIsCheckpoint;
+          }
 
           $scope.getGraphHeightInPixels = function() {
             return Math.max($scope.GRAPH_HEIGHT, 300);

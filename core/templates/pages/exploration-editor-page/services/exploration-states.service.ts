@@ -311,6 +311,17 @@ angular.module('oppia').factory('ExplorationStatesService', [
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
       },
+      getCheckpointCount: function() {
+        var count: number = 0;
+        if(_states != null) {
+          _states.getStateNames().forEach(function(stateName) {
+            if(_states.getState(stateName).cardIsCheckpoint) {
+              count++;
+            }
+          });
+        }
+        return count;
+      },
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
@@ -416,7 +427,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
         return getStatePropertyMemento(stateName, 'card_is_checkpoint');
       },
       saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
-        console.error("INSIDE SAVE CIC - ", stateName, " - ", newCardIsCheckpoint);
         saveStateProperty(
           stateName, 'card_is_checkpoint', newCardIsCheckpoint);
       },
