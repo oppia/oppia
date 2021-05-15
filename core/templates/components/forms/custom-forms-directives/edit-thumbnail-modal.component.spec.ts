@@ -53,22 +53,7 @@ class MockImageObject {
   }
 }
 
-class MockReaderObject {
-  result = null;
-  onload = null;
-  constructor() {
-    this.onload = () => {
-      return 'Fake onload executed';
-    };
-  }
-  readAsDataURL(file) {
-    this.onload();
-    return 'The file is loaded';
-  }
-}
-
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Edit Thumbnail Modal Component', () => {
+describe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -102,7 +87,13 @@ fdescribe('Edit Thumbnail Modal Component', () => {
   });
 
   it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', fakeAsync(() => {
+    ' svg file', fakeAsync((done) => {
+    // This spy is to be sure that an image element will be returned from
+    // document.querySelector method.
+    spyOn(document, 'querySelector').and.callFake(() => {
+      return document.createElement('img');
+    });
+
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
     const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
@@ -117,12 +108,6 @@ fdescribe('Edit Thumbnail Modal Component', () => {
       tags: [],
       attrs: []
     };
-    // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
     const image = document.createElement('img');
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". This is because
@@ -131,10 +116,7 @@ fdescribe('Edit Thumbnail Modal Component', () => {
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new MockImageObject());
 
-    // SpyOn(document, 'querySelector').withArgs(
-    //   '.oppia-thumbnail-uploader').and.callFake(() => {
-    //   return document.createElement('div');
-    // });
+    done();
 
     // ---- Dispatch on load event ----
     image.dispatchEvent(new Event('load'));
