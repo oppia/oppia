@@ -41,14 +41,14 @@ def generate_signature(secret, message, vm_id):
     """Generates digital signature for given data.
 
     Args:
-        secret: str. The secret used to communicate with Oppia-ml.
-        message: str. The message payload data.
-        vm_id: str. The ID of the VM that generated the message.
+        secret: bytes. The secret used to communicate with Oppia-ml.
+        message: bytes. The message payload data.
+        vm_id: bytes. The ID of the VM that generated the message.
 
     Returns:
         str. The signature of the payload data.
     """
-    message = '%s|%s' % (base64.b64encode(message), vm_id)
+    message = b'%s|%s' % (base64.b64encode(message), vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256).hexdigest()
 
@@ -71,8 +71,10 @@ def verify_signature(oppia_ml_auth_info):
     if secret is None:
         return False
 
+    message = python_utils.convert_to_bytes(oppia_ml_auth_info.message)
+    vm_id = python_utils.convert_to_bytes(oppia_ml_auth_info.vm_id)
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
+        secret, message, vm_id)
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True

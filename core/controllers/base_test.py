@@ -1415,9 +1415,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
     def test_that_incorrect_derived_class_raises_exception(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
+        payload['message'] = json.dumps('message').encode()
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             payload['message'], payload['vm_id'])
@@ -1428,9 +1428,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
     def test_that_correct_derived_class_does_not_raise_exception(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
+        payload['message'] = json.dumps('message').encode()
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             payload['message'], payload['vm_id'])

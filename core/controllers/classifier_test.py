@@ -117,16 +117,17 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
         self.payload_proto.job_result.CopyFrom(self.job_result)
-        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
+        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID.encode()
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
-            self.payload_proto.job_result.SerializeToString(),
+            python_utils.convert_to_bytes(
+                self.payload_proto.job_result.SerializeToString()),
             self.payload_proto.vm_id)
 
         self.payload_for_fetching_next_job_request = {
-            'vm_id': feconf.DEFAULT_VM_ID,
-            'message': json.dumps({})
+            'vm_id': feconf.DEFAULT_VM_ID.encode(),
+            'message': json.dumps({}).encode()
         }
 
         self.payload_for_fetching_next_job_request['signature'] = (
@@ -235,7 +236,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto.job_result.ClearField('classifier_frozen_model')
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
-            self.payload_proto.job_result.SerializeToString(),
+            python_utils.convert_to_bytes(
+                self.payload_proto.job_result.SerializeToString()),
             self.payload_proto.vm_id)
         self.post_blob(
             '/ml/trainedclassifierhandler',
@@ -540,9 +542,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         }
 
         self.payload = {}
-        self.payload['vm_id'] = feconf.DEFAULT_VM_ID
+        self.payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.payload['message'] = json.dumps({})
+        self.payload['message'] = json.dumps({}).encode()
         self.payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             self.payload['message'], self.payload['vm_id'])
