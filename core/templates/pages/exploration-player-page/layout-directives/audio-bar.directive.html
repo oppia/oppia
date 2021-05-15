@@ -1,7 +1,7 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()" ng-class="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
   <div ng-if="audioBarIsExpanded" class="audio-bar-expanded" headroom>
     <div class="audio-controls" ng-class="{'audio-controls-margin': progressBarIsShown}">
-      <div class="oppia-audio-header-control-buttons">
+      <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
         <div class="audio-header-control-icons">
           <a ng-click="onBackwardButtonClicked()">
             <span class="oppia-replay-white-circle"  ng-if="progressBarIsShown">
@@ -30,8 +30,11 @@
             <md-progress-linear md-mode="indeterminate"></md-progress-linear>
           </div>
           <div ng-if="!audioLoadingIndicatorIsShown">
-            <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
-            </md-slider>
+            <oppia-audio-slider [value]="AudioPlayerService.getCurrentTime()"
+                                [max]="AudioPlayerService.getAudioDuration()"
+                                (value-change)="setProgress($event)"
+                                aria-label="audio-slider">
+            </oppia-audio-slider>
           </div>
           <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
           <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>

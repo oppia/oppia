@@ -18,7 +18,7 @@
  */
 
 import { Subscription } from 'rxjs';
-
+import 'components/forms/slider/audio-slider.component';
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(
@@ -62,6 +62,11 @@ angular.module('oppia').directive('audioBar', [
 
           ctrl.directiveSubscriptions = new Subscription();
 
+          $scope.setProgress = function(val: {value: number}) {
+            AudioPlayerService.setCurrentTime(val.value);
+            $scope.$applyAsync();
+          };
+
           $scope.explorationPlayerModeIsActive = (
             ContextService.isInExplorationPlayerPage());
 
@@ -84,6 +89,7 @@ angular.module('oppia').directive('audioBar', [
               AudioPreloaderService.restartAudioPreloader(
                 PlayerPositionService.getCurrentStateName());
             }
+            $scope.$applyAsync();
           };
 
           $scope.expandAudioBar = function() {
@@ -216,7 +222,7 @@ angular.module('oppia').directive('audioBar', [
           };
 
           var playCachedAudioTranslation = function(audioFilename) {
-            AudioPlayerService.load(audioFilename)
+            AudioPlayerService.loadAsync(audioFilename)
               .then(function() {
                 $scope.audioLoadingIndicatorIsShown = false;
                 AudioPlayerService.play();
@@ -299,16 +305,16 @@ angular.module('oppia').directive('audioBar', [
             $scope.audioLoadingIndicatorIsShown = false;
 
             $scope.AudioPlayerService = AudioPlayerService;
-            $scope.track = {
-              progress: function(progressPercentage) {
-                // Returns the current track progress. In addition, sets the
-                // track progress if the progressPercentage argument is defined.
-                if (angular.isDefined(progressPercentage)) {
-                  AudioPlayerService.setProgress(progressPercentage / 100);
-                }
-                return AudioPlayerService.getProgress() * 100;
-              }
-            };
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.viewUpdate.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.onAudioStop.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
             AudioPreloaderService.setAudioLoadedCallback(
               onFinishedLoadingAudio);
           };
