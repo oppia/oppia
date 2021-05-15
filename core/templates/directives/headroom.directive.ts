@@ -24,7 +24,7 @@ import Headroom from 'headroom.js';
 @Directive({
   selector: '[headroom]'
 })
-export class HeadroomDirective implements OnDestroy {
+export class HeadroomDirective {
   @Input() tolerance?: Tolerance;
   @Output() toleranceChange: EventEmitter<Tolerance> = new EventEmitter();
   @Input() offset?: number;
@@ -46,9 +46,5 @@ export class HeadroomDirective implements OnDestroy {
     };
 
     this.headroom = new Headroom(this.el.nativeElement, headroomOptions).init();
-  }
-
-  ngOnDestroy(): void {
-    this.headroom.destory();
   }
 }

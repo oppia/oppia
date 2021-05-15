@@ -111,7 +111,7 @@ export class AudioBarComponent {
     this.progressBarIsShown = false;
     this.audioLoadingIndicatorIsShown = false;
     this.audioPreloaderService.setAudioLoadedCallback(
-      this.onFinishedLoadingAudio);
+      this.onFinishedLoadingAudio.bind(this));
   }
 
   ngOnDestroy(): void {
