@@ -165,18 +165,16 @@ class UserEmailPreferencesModelRelationshipsTest(
     NOW = datetime.datetime.utcnow()
 
     def test_with_only_one_model_present(self):
-        userEmailPrefernceModel = user_models.UserEmailPreferencesModel(
+        model = user_models.UserEmailPreferencesModel(
             created_on=self.NOW, id='test_user',
-            last_updated=self.NOW)
-        userSettingsModel = user_models.UserSettingsModel(
-            email='a@a.com', created_on=self.NOW, id='test_user',
             last_updated=self.NOW)
         output = (
             self.pipeline
-            | beam.Create([userEmailPrefernceModel])
+            | beam.Create([model])
             | beam.ParDo(
                 user_validation.user_email_preferences_model_relationships)
         )
+        self.assert_pcoll_equal(output,[])
 
 
 class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
