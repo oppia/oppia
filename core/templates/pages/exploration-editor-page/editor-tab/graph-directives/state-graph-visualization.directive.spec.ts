@@ -25,8 +25,8 @@ import { TextInputRulesService } from
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { StateCardIsCheckpointService } from
-// eslint-disable-next-line max-len
-'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';

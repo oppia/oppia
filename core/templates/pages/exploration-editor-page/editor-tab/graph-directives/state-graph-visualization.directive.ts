@@ -89,13 +89,13 @@ angular.module('oppia').directive('stateGraphVisualization', [
         'state-graph-visualization.directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',
-        'ExplorationWarningsService', 'ExplorationStatesService',
+        'ExplorationStatesService', 'ExplorationWarningsService',
         'RouterService', 'StateCardIsCheckpointService',
         'StateGraphLayoutService', 'TranslationStatusService',
         'WindowDimensionsService', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
             $element, $filter, $scope, $timeout,
-            ExplorationWarningsService, ExplorationStatesService,
+            ExplorationStatesService, ExplorationWarningsService,
             RouterService, StateCardIsCheckpointService,
             StateGraphLayoutService, TranslationStatusService,
             WindowDimensionsService, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
@@ -230,7 +230,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
 
           $scope.isCheckpoint = function(nodeId) {
             return ExplorationStatesService.getState(nodeId).cardIsCheckpoint;
-          }
+          };
 
           $scope.getGraphHeightInPixels = function() {
             return Math.max($scope.GRAPH_HEIGHT, 300);
