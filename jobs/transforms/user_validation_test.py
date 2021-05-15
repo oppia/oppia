@@ -160,7 +160,7 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
 
-class UserEmailPreferencesModelRelationshipsTest(
+class UserEmailPreferencesModelRelationshipsTests(
         job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
