@@ -388,7 +388,7 @@ class UpdateTranslationSuggestionHandler(base.BaseHandler):
         Raises:
             InvalidInputException. The suggestion is already handled.
             InvalidInputException. The 'translation_html' parameter is missing.
-            InvalidInputException. The 'translation_html' parameter is a
+            InvalidInputException. The 'translation_html' parameter is not a
                 string.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)

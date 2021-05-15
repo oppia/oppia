@@ -364,7 +364,7 @@ def accept_suggestion(
         )
 
     if suggestion.edited_by_reviewer:
-        commit_message = commit_message + ' (with edits)'
+        commit_message = '%s (with edits)' % commit_message
 
     suggestion.set_suggestion_status_to_accepted()
     suggestion.set_final_reviewer_id(reviewer_id)
