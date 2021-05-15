@@ -905,10 +905,6 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
                 self.change.skill_id)
-        if self.change.question_dict == change.question_dict:
-            raise utils.ValidationError(
-                'The new change question_dict must not be equal to the old '
-                'question_dict')
 
     def _get_skill_difficulty(self):
         """Returns the suggestion's skill difficulty."""

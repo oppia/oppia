@@ -1197,7 +1197,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = {}
+        invalid_question_state_data = {}
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -1205,7 +1205,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.put_json('%s/%s' % (
             feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
             suggestion.suggestion_id), {
-                'question_state_data': question_state_data,
+                'question_state_data': invalid_question_state_data,
                 'skill_difficulty': '0.6'
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()

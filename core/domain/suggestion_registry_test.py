@@ -1982,33 +1982,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
-    def test_pre_update_validate_change_question_dict(self):
-        change = {
-            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
-            'question_dict': {
-                'question_state_data': self._create_valid_question_data(
-                    'default_state').to_dict(),
-                'language_code': 'en',
-                'question_state_data_schema_version': (
-                    feconf.CURRENT_STATE_SCHEMA_VERSION)
-            },
-            'skill_id': 'skill_1',
-            'skill_difficulty': 0.3
-        }
-
-        suggestion = suggestion_registry.SuggestionAddQuestion(
-            'exploration.exp1.thread1', 'exp1', 1,
-            suggestion_models.STATUS_ACCEPTED, self.author_id,
-            self.reviewer_id, change,
-            'question.topic_1', 'en', self.fake_date)
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The new change question_dict must not be equal to the '
-            'old question_dict'):
-            suggestion.pre_update_validate(
-                question_domain.QuestionSuggestionChange(change))
-
     def test_validate_author_id(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(

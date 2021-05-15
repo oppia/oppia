@@ -1302,5 +1302,6 @@ def update_question_suggestion(
     suggestion.change.question_dict['question_state_data'] = question_state_data
     suggestion.change.skill_difficulty = skill_difficulty
     suggestion.edited_by_reviewer = True
+    suggestion.pre_update_validate(suggestion.change)
 
     _update_suggestion(suggestion)
