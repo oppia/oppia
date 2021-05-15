@@ -67,7 +67,9 @@ class QuestionsListHandler(base.BaseHandler):
 
         (
             question_summaries, merged_question_skill_links,
-            next_offset) = (
+            next_offset
+        ) = (
+
                 question_services.get_displayable_question_skill_link_details(
                     constants.NUM_QUESTIONS_PER_PAGE, skill_ids, offset=offset)
             )
