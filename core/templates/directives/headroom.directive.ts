@@ -18,7 +18,7 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, Output } from '@angular/core';
 import Headroom from 'headroom.js';
 
 @Directive({
