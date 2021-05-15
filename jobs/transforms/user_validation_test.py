@@ -160,6 +160,25 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [])
 
 
+class UserEmailPreferencesModelRelationshipsTest(
+        job_test_utils.PipelinedTestBase):
+    NOW = datetime.datetime.utcnow()
+
+    def test_with_only_one_model_present(self):
+        userEmailPrefernceModel = user_models.UserEmailPreferencesModel(
+            created_on=self.NOW,id='test_user',
+            last_updated=self.NOW)
+        userSettingsModel = user_models.UserSettingsModel(
+            email='a@a.com',created_on=self.NOW,id='test_user',
+            last_updated=self.NOW)
+        output = (
+            self.pipeline
+            | beam.Create([userEmailPrefernceModel])
+            | beam.ParDo(
+                user_validation.user_email_preferences_model_relationships)
+        )
+
+
 class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
 
     NOW = datetime.datetime.utcnow()
