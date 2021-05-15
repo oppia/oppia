@@ -116,6 +116,10 @@ angular.module('oppia').directive('oppiaRoot', [
                   map[serviceName][0])
               );
             }
+
+            // TODO(#12793): Remove the use of (
+            // OppiaAngularRootComponent.ajsTranslate).
+            OppiaAngularRootComponent.ajsTranslate = $translate;
             const translateService = (
               OppiaAngularRootComponent.translateService);
             const i18nLanguageCodeService = (
