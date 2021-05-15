@@ -18,7 +18,7 @@
 
 import { destroyPlatform } from '@angular/core';
 import { waitForAsync } from '@angular/core/testing';
-import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils';
 import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
 
 describe('Angular Html Bind Wrapper Directive', () => {
@@ -27,12 +27,12 @@ describe('Angular Html Bind Wrapper Directive', () => {
     afterEach(() => destroyPlatform());
 
     it('should create the upgraded component', waitForAsync(() => {
-      setupAndGetUpgradedComponent(
+      setupAndGetUpgradedComponentAsync(
         'angular-html-bind-wrapper',
         'angularHtmlBindWrapper',
         [AngularHtmlBindWrapperDirective]
       ).then(
-        textContext => expect(textContext).toBe('Hello Oppia!')
+        async(textContext) => expect(textContext).toBe('Hello Oppia!')
       );
     }));
   });

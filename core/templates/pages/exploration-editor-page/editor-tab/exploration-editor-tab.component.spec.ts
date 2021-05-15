@@ -123,7 +123,7 @@ describe('Exploration editor tab component', function() {
       'WrittenTranslationsObjectFactory',
       TestBed.get(WrittenTranslationsObjectFactory));
     $provide.value('ExplorationDataService', {
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     });
   }));
 

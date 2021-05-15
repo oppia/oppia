@@ -31,7 +31,8 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowSleep: 'Please do not use browser.sleep() in protractor files'
+      disallowSleep: 'Please do not use browser.sleep() in protractor files',
+      disallowThen: 'Please do not use .then(), consider async/await instead'
     },
   },
 
@@ -54,6 +55,13 @@ module.exports = {
     return {
       CallExpression: function(node) {
         checkSleepCall(node);
+      },
+      'CallExpression[callee.property.name=\'then\']': function(node) {
+        context.report({
+          node: node.callee.property,
+          loc: node.callee.property.loc,
+          messageId: 'disallowThen'
+        });
       }
     };
   }
