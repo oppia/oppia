@@ -109,7 +109,7 @@ export class TopicsListComponent {
     });
     modalRef.componentInstance.topicName = topicName;
     modalRef.result.then(() => {
-      this.editableTopicBackendApiService.deleteTopic(topicId).then(
+      this.editableTopicBackendApiService.deleteTopicAsync(topicId).then(
         (status: number) => {
           this.topicsAndSkillsDashboardBackendApiService.
             onTopicsAndSkillsDashboardReinitialized.emit();
