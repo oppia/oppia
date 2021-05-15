@@ -133,7 +133,7 @@ if (navigator.mediaDevices === undefined) {
 // Here, we will just add the getUserMedia property
 // if it's missing.
 if (navigator.mediaDevices.getUserMedia === undefined) {
-  navigator.mediaDevices.getUserMedia = function(constraints) {
+  navigator.mediaDevices.getUserMedia = async function(constraints) {
     // First get ahold of the legacy getUserMedia, if present.
     var getUserMedia = (
       // This throws "Property 'webkitGetUserMedia' does not exist on

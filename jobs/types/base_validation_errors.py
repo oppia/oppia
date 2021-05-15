@@ -189,23 +189,6 @@ class InvalidCommitTypeError(BaseAuditError):
             'Commit type %s is not allowed' % model.commit_type)
 
 
-class ModelExpiringError(BaseAuditError):
-    """Error class for models that are expiring."""
-
-    def __init__(self, model):
-        super(ModelExpiringError, self).__init__(model)
-        self.message = 'mark model as deleted when older than %s days' % (
-            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
-
-
-class ModelIncorrectKeyError(BaseAuditError):
-    """Error class for incorrect key in PendingDeletionRequestModel."""
-
-    def __init__(self, model, incorrect_keys):
-        super(ModelIncorrectKeyError, self).__init__(model)
-        self.message = 'contains keys %s are not allowed' % (incorrect_keys)
-
-
 class ModelRelationshipError(BaseAuditError):
     """Error class for models with invalid relationships."""
 
@@ -232,33 +215,23 @@ class ModelRelationshipError(BaseAuditError):
                 target_kind))
 
 
-class ModelCanonicalNameMismatchError(BaseAuditError):
-    """Error class for models that have mismatching names."""
+class CommitCmdsNoneError(BaseAuditError):
+    """Error class for None Commit Cmds."""
 
     def __init__(self, model):
-        super(ModelCanonicalNameMismatchError, self).__init__(model)
+        super(CommitCmdsNoneError, self).__init__(model)
         self.message = (
-            'Entity name %s in lowercase does not match '
-            'canonical name %s' % (model.name, model.canonical_name))
+            'No commit command domain object '
+            'defined for entity with commands: %s' % (
+                model.commit_cmds))
 
 
-class DraftChangeListLastUpdatedNoneError(BaseAuditError):
-    """Error class for models with draft change list but draft change list
-    last_updated is None.
-    """
+class CommitCmdsValidateError(BaseAuditError):
+    """Error class for wrong commit cmmds."""
 
-    def __init__(self, model):
-        super(DraftChangeListLastUpdatedNoneError, self).__init__(model)
+    def __init__(self, model, commit_cmd_dict, e):
+        super(CommitCmdsValidateError, self).__init__(model)
         self.message = (
-            'draft change list %s exists but draft change list '
-            'last updated is None' % model.draft_change_list)
-
-
-class DraftChangeListLastUpdatedInvalidError(BaseAuditError):
-    """Error class for models with invalid draft change list last_updated."""
-
-    def __init__(self, model):
-        super(DraftChangeListLastUpdatedInvalidError, self).__init__(model)
-        self.message = (
-            'draft change list last updated %s is greater than the time '
-            'when job was run' % model.draft_change_list_last_updated)
+            'Commit command domain validation for '
+            'command: %s failed with error: %s' % (
+                commit_cmd_dict, e))
