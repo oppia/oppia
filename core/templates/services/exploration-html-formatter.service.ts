@@ -149,7 +149,11 @@ export class ExplorationHtmlFormatterService {
       interactionChoices = interactionCustomizationArgs.choices.value.map(
         choice => choice.html);
     }
-
+    var interactionChoicesD = null;
+    if ('choices' in interactionCustomizationArgs) {
+      interactionChoicesD = interactionCustomizationArgs.choices.value.map(
+        choice => choice);
+    }
     var el = $(
       '<oppia-short-response-' + this.camelCaseToHyphens.transform(
         interactionId) + '>');
@@ -157,6 +161,10 @@ export class ExplorationHtmlFormatterService {
     if (interactionChoices) {
       el.attr('choices', this.htmlEscaper.objToEscapedJson(
         interactionChoices));
+    }
+    if (interactionChoicesD) {
+      el.attr('interactionChoicesD', this.htmlEscaper.objToEscapedJson(
+        interactionChoicesD));
     }
     return ($('<span>').append(el)).html();
   }

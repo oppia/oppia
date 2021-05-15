@@ -38,18 +38,24 @@ angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
           return true;
         };
         ctrl.$onInit = function() {
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          const choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-          const answerone = choices.map( choices => {
-            choices._html
-        })
-          /*var answer= [];
-          for (let elem of choices) {
+          const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          const interactionchoicesd = HtmlEscaperService.escapedJsonToObj(
+            $attrs.interactionchoicesd);
+          var answerResponse = [];
+          for (let [key] of answer) {
+            for (let elem of interactionchoicesd) {
+              if (key === elem._contentId) {
+                answerResponse.push(elem._html);
+              }
+            }
+          }
+          var answerArray = [];
+          for (let elem of answerResponse) {
             let transformedArray = [];
             transformedArray.push(elem);
-            answer.push(transformedArray);
-          }*/
-          ctrl.answer = answerone
+            answerArray.push(transformedArray);
+          }
+          ctrl.answer = answerArray;
           ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
         };
       }]
