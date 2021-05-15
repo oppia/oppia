@@ -17,30 +17,29 @@
  * correct.
  */
 
- 'use strict';
+'use strict';
 
 module.exports = {
     meta: {
       type: 'layout',
       docs: {
         description: 'There should be "Async" suffix at the end of asynchronous function names',
-        category: 'Best Practices',
+        category: 'Stylistic Issues',
         recommended: true
       },
-      fixable: null,
       schema: [],
     },
 
    create: function(context) {
 
-    let nodeRequireParent = ['FunctionExpression', 'ArrowFunctionExpression'];
-    let parentToName = {
+    var nodeRequireParent = ['FunctionExpression', 'ArrowFunctionExpression'];
+    var parentToName = {
         MethodDefinition: 'key',
         Property: 'key',
         VariableDeclarator: 'id',
     }
-    let checkForAsyncSuffix = (node) => {
-        let name =  null;
+    var checkForAsyncSuffix = (node) => {
+        var name =  null;
         if (nodeRequireParent.includes(node.type) && node.parent) {
             node = node.parent[parentToName[node.parent.type]]
             name = node.name;
