@@ -28,20 +28,39 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
-
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
+import { LibraryFooterComponent } from 'pages/library-page/library-footer/library-footer.component'
+import { ActivityTilesInfinityGridComponent } from 'pages/library-page/search-results/activity-tiles-infinity-grid.component'
+import { SearchResultsComponent } from 'pages/library-page/search-results/search-results.component'
+import { RouterModule } from '@angular/router';
+import { OppiaFooterComponent } from 'pages/OppiaFooterDirective';
+import { LibraryPageComponent } from 'pages/library-page/library-page.component'
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    RouterModule.forRoot([])
   ],
   declarations: [
     OppiaAngularRootComponent,
-    LearnerPlaylistModalComponent
+    LearnerPlaylistModalComponent,
+    SearchBarComponent, 
+    LibraryFooterComponent,
+    ActivityTilesInfinityGridComponent,
+    SearchResultsComponent,
+    OppiaFooterComponent,
+    LibraryPageComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    LearnerPlaylistModalComponent
+    LearnerPlaylistModalComponent,
+    SearchBarComponent,
+    LibraryFooterComponent,
+    ActivityTilesInfinityGridComponent,
+    SearchResultsComponent,
+    OppiaFooterComponent,
+    LibraryPageComponent
   ],
   providers: [
     {

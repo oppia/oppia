@@ -18,350 +18,412 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'loading-dots.component.ts');
-require('components/summary-tile/exploration-summary-tile.component.ts');
-require('components/summary-tile/collection-summary-tile.component.ts');
-require('pages/library-page/search-results/search-results.component.ts');
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
 
-require('domain/classroom/classroom-backend-api.service');
-require('domain/learner_dashboard/learner-dashboard-activity-ids.model.ts');
-require(
-  'domain/learner_dashboard/learner-dashboard-ids-backend-api.service.ts');
-require(
-  'domain/learner_dashboard/learner-dashboard-activity-backend-api.service');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-require('services/keyboard-shortcut.service.ts');
-require('services/search.service.ts');
-require('services/user.service.ts');
-require('services/contextual/url.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/i18n-language-code.service.ts');
+import constants from 'assets/constants';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
+import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { LibraryPageConstants } from 'pages/library-page/library-page.constants';
+import { LoaderService } from 'services/loader.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { PageTitleService } from 'services/page-title.service';
+import { SearchService } from 'services/search.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserService } from 'services/user.service'
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-require('pages/library-page/library-page.constants.ajs.ts');
+interface LibraryPageGroupData {
+  'activity_list': ActivityDicts[],
+  'header_i18n_id': string,
+  'preferred_language_codes': string[],
+}
 
-angular.module('oppia').component('libraryPage', {
-  template: require('./library-page.component.html'),
-  controller: [
-    '$http', '$log', '$rootScope', '$scope', '$timeout', '$window',
-    'I18nLanguageCodeService', 'KeyboardShortcutService', 'LoaderService',
-    'SearchService', 'UrlInterpolationService',
-    'UserService', 'WindowDimensionsService', 'LIBRARY_PAGE_MODES',
-    'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
-    function(
-        $http, $log, $rootScope, $scope, $timeout, $window,
-        I18nLanguageCodeService, KeyboardShortcutService, LoaderService,
-        SearchService, UrlInterpolationService,
-        UserService, WindowDimensionsService, LIBRARY_PAGE_MODES,
-        LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
-      var ctrl = this;
+interface ActivityDicts {  
+    'activity_type': string                                        
+    'category': string,
+    'community_owned': boolean,
+    'id': string,
+    'language_code': string,
+    'num_views': number,
+    'objective': string,
+    'status': string,
+    'tags': [],
+    'thumbnail_bg_color': string,
+    'thumbnail_icon_url': string,
+    'title': string,
+}
+interface SummaryDicts {
+  'activity_summary_dicts': ActivityDicts[],
+  'categories': [],
+  'header_i18n_id': string,
+  'has_full_results_page': boolean,
+  'full_results_url': string,
+  'protractor_id' ?: string,
+}
 
-      ctrl.classroomBackendApiService = (
-        OppiaAngularRootComponent.classroomBackendApiService);
-      ctrl.pageTitleService = (
-        OppiaAngularRootComponent.pageTitleService);
+interface LibraryIndexData {
+  'activity_summary_dicts_by_category': SummaryDicts[],
+  'preferred_language_codes': string[]
+}
 
-      var possibleBannerFilenames = [
-        'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
-      // If the value below is changed, the following CSS values in
-      // oppia.css must be changed:
-      // - .oppia-exp-summary-tiles-container: max-width
-      // - .oppia-library-carousel: max-width.
-      var MAX_NUM_TILES_PER_ROW = 4;
-      var isAnyCarouselCurrentlyScrolling = false;
+interface Activities {
+  explorations: {},
+  collections: {}
+}
 
-      ctrl.CLASSROOM_PROMOS_ARE_ENABLED = false;
+interface CreatorDashboardData {
+  'explorations_list': CreatorExplorationSummaryBackendDict[];
+  'collections_list': CollectionSummaryBackendDict[];
+}
 
-      ctrl.setActiveGroup = function(groupIndex) {
-        ctrl.activeGroupIndex = groupIndex;
-      };
+interface LibraryPageModes {
+    GROUP: string,
+    INDEX: string,
+    SEARCH: string
+}
 
-      ctrl.clearActiveGroup = function() {
-        ctrl.activeGroupIndex = null;
-      };
+@Component({
+  selector: 'library-page',
+  templateUrl: './library-page.component.html'
+})
 
-      var initCarousels = function() {
-        // This prevents unnecessary execution of this method immediately
-        // after a window resize event is fired.
-        if (!ctrl.libraryGroups) {
-          return;
-        }
+export class LibraryPageComponent implements OnInit, OnDestroy {
+  activeGroupIndex: null | number;
+  activitiesOwned: Activities;
+  activityList: ActivityDicts[];
+  bannerImageFilename: string;
+  bannerImageFileUrl: string;
+  groupName: string;
+  groupHeaderI18nId: string;
+  isAnyCarouselCurrentlyScrolling: boolean = false;
+  index: number;
+  leftmostCardIndices: number[];
+  libraryGroups: LibraryIndexData['activity_summary_dicts_by_category'];
+  libraryWindowIsNarrow: boolean;
+  pageMode: string;
+  possibleBannerFilenames: Array<string>;
+  resizeSubscription: any;
+  tileDisplayCount: number;
+  CLASSROOM_PROMOS_ARE_ENABLED: boolean;
+  // If the value below is changed, the following CSS values in
+  // oppia.css must be changed:
+  // - .oppia-exp-summary-tiles-container: max-width
+  // - .oppia-library-carousel: max-width.
+  MAX_NUM_TILES_PER_ROW: number = 4;
+  LIBRARY_PAGE_MODES: LibraryPageModes;  
 
-        var windowWidth = $(window).width() * 0.85;
-        // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
-        // compensate for padding and margins. 20 is just an arbitrary
-        // number.
-        ctrl.tileDisplayCount = Math.min(
-          Math.floor(windowWidth / (LIBRARY_TILE_WIDTH_PX + 20)),
-          MAX_NUM_TILES_PER_ROW);
+  constructor(
+    private http: HttpClient,
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private loaderService: LoaderService,
+    private loggerService: LoggerService,
+    private pageTitleService: PageTitleService,
+    private searchService: SearchService,
+    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService,
+    private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef,
+  ) {}
 
-        $('.oppia-library-carousel').css({
-          width: (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'
-        });
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  };
 
-        // The following determines whether to enable left scroll after
-        // resize.
-        for (var i = 0; i < ctrl.libraryGroups.length; i++) {
-          var carouselJQuerySelector = (
-            '.oppia-library-carousel-tiles:eq(n)'.replace(
-              'n', String(i)));
-          var carouselScrollPositionPx = $(
-            carouselJQuerySelector).scrollLeft();
-          var index = Math.ceil(
-            carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
-          ctrl.leftmostCardIndices[i] = index;
-        }
-      };
+  setActiveGroup(groupIndex): void {
+    this.activeGroupIndex = groupIndex;
+  };
 
-      ctrl.scroll = function(ind, isLeftScroll) {
-        if (isAnyCarouselCurrentlyScrolling) {
-          return;
-        }
-        var carouselJQuerySelector = (
-          '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
 
-        var direction = isLeftScroll ? -1 : 1;
-        var carouselScrollPositionPx = $(
-          carouselJQuerySelector).scrollLeft();
+  clearActiveGroup(): void {
+    this.activeGroupIndex = null;
+  };
 
-        // Prevent scrolling if there more carousel pixed widths than
-        // there are tile widths.
-        if (ctrl.libraryGroups[ind].activity_summary_dicts.length <=
-            ctrl.tileDisplayCount) {
-          return;
-        }
+  getLibraryPageGroupData(): void {
+    this.http.get<LibraryPageGroupData>('/librarygrouphandler', {
+      params: {
+        group_name: this.groupName
+      }
+    }).toPromise().then((response) => {
+        this.activityList = response.activity_list;
 
-        carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+        this.groupHeaderI18nId = response.header_i18n_id;
 
-        if (isLeftScroll) {
-          ctrl.leftmostCardIndices[ind] = Math.max(
-            0, ctrl.leftmostCardIndices[ind] - ctrl.tileDisplayCount);
-        } else {
-          ctrl.leftmostCardIndices[ind] = Math.min(
-            ctrl.libraryGroups[ind].activity_summary_dicts.length -
-              ctrl.tileDisplayCount + 1,
-            ctrl.leftmostCardIndices[ind] + ctrl.tileDisplayCount);
-        }
+        this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
+          response.preferred_language_codes);
 
-        var newScrollPositionPx = carouselScrollPositionPx +
-          (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX * direction);
+        this.loaderService.hideLoadingScreen();
+      })
+  }
 
-        $(carouselJQuerySelector).animate({
-          scrollLeft: newScrollPositionPx
-        }, {
-          duration: 800,
-          queue: false,
-          start: function() {
-            isAnyCarouselCurrentlyScrolling = true;
-          },
-          complete: function() {
-            isAnyCarouselCurrentlyScrolling = false;
+  getCreatorDashboardPageData(): void {
+    this.http.get<CreatorDashboardData>('/creatordashboardhandler/data').toPromise()
+    .then((response) => {
+      console.log(response)
+      this.libraryGroups.forEach((libraryGroup) => {
+        var activitySummaryDicts = (
+          libraryGroup.activity_summary_dicts);
+
+        var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+        var ACTIVITY_TYPE_COLLECTION = 'collection';
+        activitySummaryDicts.forEach((
+            activitySummaryDict) => {
+          if (activitySummaryDict.activity_type === (
+            ACTIVITY_TYPE_EXPLORATION)) {
+            this.activitiesOwned.explorations[
+              activitySummaryDict.id] = false;
+          } else if (activitySummaryDict.activity_type === (
+            ACTIVITY_TYPE_COLLECTION)) {
+            this.activitiesOwned.collections[
+              activitySummaryDict.id] = false;
+          } else {
+            this.loggerService.error(
+              'INVALID ACTIVITY TYPE: Activity' +
+              '(id: ' + activitySummaryDict.id +
+              ', name: ' + activitySummaryDict.title +
+              ', type: ' + activitySummaryDict.activity_type +
+              ') has an invalid activity type, which could ' +
+              'not be recorded as an exploration or a ' +
+              'collection.'
+            );
           }
         });
-      };
-
-      // The carousels do not work when the width is 1 card long, so we need
-      // to handle this case discretely and also prevent swiping past the
-      // first and last card.
-      ctrl.incrementLeftmostCardIndex = function(ind) {
-        var lastItem = ((
-          ctrl.libraryGroups[ind].activity_summary_dicts.length -
-          ctrl.tileDisplayCount) <= ctrl.leftmostCardIndices[ind]);
-        if (!lastItem) {
-          ctrl.leftmostCardIndices[ind]++;
-        }
-      };
-      ctrl.decrementLeftmostCardIndex = function(ind) {
-        ctrl.leftmostCardIndices[ind] = (
-          Math.max(ctrl.leftmostCardIndices[ind] - 1, 0));
-      };
-
-      // The following loads explorations belonging to a particular group.
-      // If fullResultsUrl is given it loads the page corresponding to
-      // the url. Otherwise, it will initiate a search query for the
-      // given list of categories.
-      ctrl.showFullResultsPage = function(categories, fullResultsUrl) {
-        if (fullResultsUrl) {
-          $window.location.href = fullResultsUrl;
+        response.explorations_list
+        .forEach((ownedExplorations) => {
+          this.activitiesOwned.explorations[
+            ownedExplorations.id] = true;
+        });
+        response.collections_list
+        .forEach((ownedCollections)  =>{
+          this.activitiesOwned.collections[
+            ownedCollections.id] = true;
+        });
+    });
+    this.loaderService.hideLoadingScreen();
+  });
+}
+  getLibraryIndexPageData(): void {
+    this.http.get<LibraryIndexData>('/libraryindexhandler').toPromise().then(
+      (response) => {
+      this.libraryGroups =
+        response.activity_summary_dicts_by_category;
+      this.userService.getUserInfoAsync().then((userInfo) => {
+        this.activitiesOwned = {explorations: {}, collections: {}};
+        if (userInfo.isLoggedIn()) {
+          this.getCreatorDashboardPageData()
         } else {
-          var selectedCategories = {};
-          for (var i = 0; i < categories.length; i++) {
-            selectedCategories[categories[i]] = true;
-          }
-
-          var targetSearchQueryUrl = SearchService.getSearchUrlQueryString(
-            '', selectedCategories, {});
-          $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
+          this.loaderService.hideLoadingScreen();
         }
-      };
-      ctrl.$onInit = function() {
-        LoaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
-        ctrl.bannerImageFilename = possibleBannerFilenames[
-          Math.floor(Math.random() * possibleBannerFilenames.length)];
+      });
 
-        ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-          '/library/' + ctrl.bannerImageFilename);
+      this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
+        response.preferred_language_codes);
+      // // Initialize the carousel(s) on the library index page.
+      // // Pause is necessary to ensure all elements have loaded.
+      // setTimeout(this.initCarousels(), 390);
+      // this.keyboardShortcutService.bindLibraryPageShortcuts();
 
-        ctrl.getStaticImageUrl = function(imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        };
 
-        let service = ctrl.classroomBackendApiService;
-        service.fetchClassroomPromosAreEnabledStatusAsync().then(
-          function(classroomPromosAreEnabled) {
-            ctrl.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
+      // Check if actual and expected widths are the same.
+      // If not produce an error that would be caught by e2e tests.
+      setTimeout(function() {
+        var actualWidth = $('exploration-summary-tile').width();
+        if (actualWidth && actualWidth !== constants.LIBRARY_TILE_WIDTH_PX) {
+          this.loggerService.error(
+            'The actual width of tile is different than the ' +
+            'expected width. Actual size: ' + actualWidth +
+            ', Expected size: ' + constants.LIBRARY_TILE_WIDTH_PX);
+        }
+      }, 3000);
+      // The following initializes the tracker to have all
+      // elements flush left.
+      // Transforms the group names into translation ids.
+      this.leftmostCardIndices = [];
+      for (var i = 0; i < this.libraryGroups.length; i++) {
+        this.leftmostCardIndices.push(0);
+      }
+    });
+  }
+
+  initCarousels(): void {
+    // This prevents unnecessary execution of this method immediately
+    // after a window resize event is fired.
+    if (!this.libraryGroups) {
+      return;
+    }
+    var windowWidth = this.windowDimensionsService.getWidth() * 0.85;
+    // The number 20 is added to constants.LIBRARY_TILE_WIDTH_PX in order to
+    // compensate for padding and margins. 20 is just an arbitrary
+    // number.
+    this.tileDisplayCount = Math.min(
+      Math.floor(windowWidth / (constants.LIBRARY_TILE_WIDTH_PX + 20)),
+      this.MAX_NUM_TILES_PER_ROW);
+
+    $('.oppia-library-carousel').css({
+      width: (this.tileDisplayCount * constants.LIBRARY_TILE_WIDTH_PX) + 'px'
+    });
+
+    // The following determines whether to enable left scroll after
+    // resize.
+    for (var i = 0; i < this.libraryGroups.length; i++) {
+      var carouselJQuerySelector = (
+        '.oppia-library-carousel-tiles:eq(n)'.replace(
+          'n', String(i)));
+      var carouselScrollPositionPx = $(
+        carouselJQuerySelector).scrollLeft();
+      var index = Math.ceil(
+        carouselScrollPositionPx / constants.LIBRARY_TILE_WIDTH_PX);
+      this.leftmostCardIndices[i] = index;
+    }
+  };
+
+  // scroll(ind, isLeftScroll): void{
+  //   if (this.isAnyCarouselCurrentlyScrolling) {
+  //     return;
+  //   }
+  //   var carouselJQuerySelector = (
+  //     '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
+
+  //   var direction = isLeftScroll ? -1 : 1;
+  //   var carouselScrollPositionPx = $(
+  //     carouselJQuerySelector).scrollLeft();
+
+  //   // Prevent scrolling if there more carousel pixed widths than
+  //   // there are tile widths.
+  //   if (this.libraryGroups[ind].activity_summary_dicts.length <=
+  //       this.tileDisplayCount) {
+  //     return;
+  //   }
+  //   carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+  //   if (isLeftScroll) {
+  //     this.leftmostCardIndices[ind] = Math.max(
+  //       0, this.leftmostCardIndices[ind] - this.tileDisplayCount);
+  //   } else {
+  //     this.leftmostCardIndices[ind] = Math.min(
+  //       this.libraryGroups[ind].activity_summary_dicts.length -
+  //         this.tileDisplayCount + 1,
+  //       this.leftmostCardIndices[ind] + this.tileDisplayCount);
+  //   }
+  //   var newScrollPositionPx = carouselScrollPositionPx +
+  //     (this.tileDisplayCount * constants.LIBRARY_TILE_WIDTH_PX * direction);
+
+  //   $(carouselJQuerySelector).animate({
+  //     scrollLeft: newScrollPositionPx
+  //   }, {
+  //     duration: 800,
+  //     queue: false,
+  //     start: function() {
+  //       this.isAnyCarouselCurrentlyScrolling = true;
+  //     },
+  //     complete: function() {
+  //       this.isAnyCarouselCurrentlyScrolling = false;
+  //     }
+  //   });
+  // };
+
+  // The following loads explorations belonging to a particular group.
+  // If fullResultsUrl is given it loads the page corresponding to
+  // the url. Otherwise, it will initiate a search query for the
+  // given list of categories.
+  showFullResultsPage(categories, fullResultsUrl): void{
+    if (fullResultsUrl) {
+      this.windowRef.nativeWindow.location.href = fullResultsUrl;
+    } else {
+      var selectedCategories = {};
+      for (var i = 0; i < categories.length; i++) {
+        selectedCategories[categories[i]] = true;
+      }
+
+      var targetSearchQueryUrl = this.searchService.getSearchUrlQueryString(
+        '', selectedCategories, {});
+      this.windowRef.nativeWindow.location.href = '/search/find?q=' + targetSearchQueryUrl;
+    }
+  };
+
+  // The carousels do not work when the width is 1 card long, so we need
+  // to handle this case discretely and also prevent swiping past the
+  // first and last card.
+  incrementLeftmostCardIndex(ind): void{
+    var lastItem = ((
+      this.libraryGroups[ind].activity_summary_dicts.length -
+      this.tileDisplayCount) <= this.leftmostCardIndices[ind]);
+    if (!lastItem) {
+      this.leftmostCardIndices[ind]++;
+    }
+  };
+
+  decrementLeftmostCardIndex(ind): void{
+    this.leftmostCardIndices[ind] = (
+      Math.max(this.leftmostCardIndices[ind] - 1, 0));
+  };
+
+  ngOnInit(): void {
+    var currentPath = this.windowRef.nativeWindow.location.pathname;
+    var title = 'Community Library Lessons | Oppia';
+    this.loaderService.showLoadingScreen('I18N_LIBRARY_LOADING');
+    this.CLASSROOM_PROMOS_ARE_ENABLED = false;
+    this.activeGroupIndex = null;
+    var libraryWindowCutoffPx = 530;
+    this.libraryGroups=[];
+    this.activitiesOwned = {
+      explorations: {},
+      collections: {}
+    }
+    this.possibleBannerFilenames = [
+      'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+    this.pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[currentPath];
+    this.LIBRARY_PAGE_MODES = LibraryPageConstants.LIBRARY_PAGE_MODES;
+    this.bannerImageFilename = this.possibleBannerFilenames[
+      Math.floor(Math.random() * this.possibleBannerFilenames.length)];
+      this.bannerImageFileUrl = this.getStaticImageUrl(
+        '/library/' + this.bannerImageFilename);
+        this.classroomBackendApiService.fetchClassroomPromosAreEnabledStatusAsync().then(
+          (classroomPromosAreEnabled) => {
+            this.CLASSROOM_PROMOS_ARE_ENABLED = classroomPromosAreEnabled;
           });
-
-        ctrl.activeGroupIndex = null;
-
-        var currentPath = $window.location.pathname;
-        if (!LIBRARY_PATHS_TO_MODES.hasOwnProperty(currentPath)) {
-          $log.error('INVALID URL PATH: ' + currentPath);
-        }
-        ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
-        ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
-
-        var title = 'Community Library Lessons | Oppia';
-        if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
-            ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
+          if (!LibraryPageConstants.LIBRARY_PATHS_TO_MODES.hasOwnProperty(currentPath)) {
+            this.loggerService.error('INVALID URL PATH: ' + currentPath);
+          }
+          if (this.pageMode === this.LIBRARY_PAGE_MODES.GROUP ||
+            this.pageMode === this.LIBRARY_PAGE_MODES.SEARCH) {
           title = 'Find explorations to learn from - Oppia';
         }
-        ctrl.pageTitleService.setPageTitle(title);
-
+        this.pageTitleService.setPageTitle(title);
+    
         // Keeps track of the index of the left-most visible card of each
         // group.
-        ctrl.leftmostCardIndices = [];
-
-        if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP) {
-          var pathnameArray = $window.location.pathname.split('/');
-          ctrl.groupName = pathnameArray[2];
-
-          $http.get('/librarygrouphandler', {
-            params: {
-              group_name: ctrl.groupName
-            }
-          }).then(
-            function(response) {
-              ctrl.activityList = response.data.activity_list;
-
-              ctrl.groupHeaderI18nId = response.data.header_i18n_id;
-
-              I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
-                response.data.preferred_language_codes);
-
-              LoaderService.hideLoadingScreen();
-            });
+        this.leftmostCardIndices = [];
+    
+        if (this.pageMode === this.LIBRARY_PAGE_MODES.GROUP) {
+          var pathnameArray = this.windowRef.nativeWindow.location.pathname.split('/');
+          this.groupName = pathnameArray[2];
+          this.getLibraryPageGroupData();
         } else {
-          $http.get('/libraryindexhandler').then(function(response) {
-            ctrl.libraryGroups =
-              response.data.activity_summary_dicts_by_category;
-            UserService.getUserInfoAsync().then(function(userInfo) {
-              ctrl.activitiesOwned = {explorations: {}, collections: {}};
-              if (userInfo.isLoggedIn()) {
-                $http.get('/creatordashboardhandler/data')
-                  .then(function(response) {
-                    ctrl.libraryGroups.forEach(function(libraryGroup) {
-                      var activitySummaryDicts = (
-                        libraryGroup.activity_summary_dicts);
-
-                      var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                      var ACTIVITY_TYPE_COLLECTION = 'collection';
-                      activitySummaryDicts.forEach(function(
-                          activitySummaryDict) {
-                        if (activitySummaryDict.activity_type === (
-                          ACTIVITY_TYPE_EXPLORATION)) {
-                          ctrl.activitiesOwned.explorations[
-                            activitySummaryDict.id] = false;
-                        } else if (activitySummaryDict.activity_type === (
-                          ACTIVITY_TYPE_COLLECTION)) {
-                          ctrl.activitiesOwned.collections[
-                            activitySummaryDict.id] = false;
-                        } else {
-                          $log.error(
-                            'INVALID ACTIVITY TYPE: Activity' +
-                            '(id: ' + activitySummaryDict.id +
-                            ', name: ' + activitySummaryDict.title +
-                            ', type: ' + activitySummaryDict.activity_type +
-                            ') has an invalid activity type, which could ' +
-                            'not be recorded as an exploration or a ' +
-                            'collection.'
-                          );
-                        }
-                      });
-
-                      response.data.explorations_list
-                        .forEach(function(ownedExplorations) {
-                          ctrl.activitiesOwned.explorations[
-                            ownedExplorations.id] = true;
-                        });
-
-                      response.data.collections_list
-                        .forEach(function(ownedCollections) {
-                          ctrl.activitiesOwned.collections[
-                            ownedCollections.id] = true;
-                        });
-                    });
-                    LoaderService.hideLoadingScreen();
-                  });
-              } else {
-                LoaderService.hideLoadingScreen();
-              }
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$applyAsync();
-            });
-
-            I18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
-              response.data.preferred_language_codes);
-
-            // Initialize the carousel(s) on the library index page.
-            // Pause is necessary to ensure all elements have loaded.
-            $timeout(initCarousels, 390);
-            KeyboardShortcutService.bindLibraryPageShortcuts();
-
-
-            // Check if actual and expected widths are the same.
-            // If not produce an error that would be caught by e2e tests.
-            $timeout(function() {
-              var actualWidth = $('exploration-summary-tile').width();
-              if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
-                $log.error(
-                  'The actual width of tile is different than the ' +
-                  'expected width. Actual size: ' + actualWidth +
-                  ', Expected size: ' + LIBRARY_TILE_WIDTH_PX);
-              }
-            }, 3000);
-            // The following initializes the tracker to have all
-            // elements flush left.
-            // Transforms the group names into translation ids.
-            ctrl.leftmostCardIndices = [];
-            for (var i = 0; i < ctrl.libraryGroups.length; i++) {
-              ctrl.leftmostCardIndices.push(0);
-            }
-          });
+          this.getLibraryIndexPageData();
         }
-        ctrl.tileDisplayCount = 0;
-
-        var libraryWindowCutoffPx = 530;
-        ctrl.libraryWindowIsNarrow = (
-          WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-
-        ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
+        this.tileDisplayCount = 0;
+        this.libraryWindowIsNarrow = (
+          this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+    
+        this.resizeSubscription = this.windowDimensionsService.getResizeEvent().
           subscribe(evt => {
-            initCarousels();
-
-            ctrl.libraryWindowIsNarrow = (
-              WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-            $scope.$applyAsync();
+            this.initCarousels();
+            this.libraryWindowIsNarrow = (
+              this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
           });
-      };
-      ctrl.$onDestroy = function() {
-        if (ctrl.resizeSubscription) {
-          ctrl.resizeSubscription.unsubscribe();
+      }
+    
+      ngOnDestroy() {
+        if (this.resizeSubscription) {
+          this.resizeSubscription.unsubscribe();
         }
       };
     }
-  ]
-});
+    
+angular.module('oppia').directive(
+  'libraryPage', downgradeComponent({component: LibraryPageComponent}));

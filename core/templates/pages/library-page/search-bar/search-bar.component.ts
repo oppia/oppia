@@ -12,278 +12,337 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Subscription } from 'rxjs';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 /**
  * @fileoverview Component for the Search Bar.
  */
 
-require('filters/string-utility-filters/truncate.filter.ts');
+import { Subscription } from 'rxjs';
+import { OppiaAngularRootComponent } from
+  'components/oppia-angular-root.component';
+import { Router } from '@angular/router';
+import constants from 'assets/constants';
+import { NavigationService } from 'services/navigation.service';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SearchService } from 'services/search.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { UrlService } from 'services/contextual/url.service';
+import { TranslateService } from 'services/translate.service'
+import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
-require('domain/classroom/classroom-backend-api.service.ts');
-require('domain/utilities/language-util.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/construct-translation-ids.service.ts');
-require('services/debouncer.service.ts');
-require('services/html-escaper.service.ts');
-require('services/navigation.service.ts');
-require('services/search.service.ts');
-require('services/contextual/url.service.ts');
+interface SearchDropDownCategories {
+  id: string;
+  text: string;
+}
 
-angular.module('oppia').component('searchBar', {
-  bindings: {
-    enableDropup: '&'
+interface LanguageIdAndText {
+  id: string;
+  text: string;
+}
+
+interface SelectionDetails {
+  categories: {
+    description: string,
+    itemsName: string,
+    masterList: SearchDropDownCategories[],
+    numSelections: number,
+    selections: {},
+    summary: string,
   },
-  template: require('./search-bar.component.html'),
-  controller: [
-    '$location', '$rootScope', '$scope', '$translate', '$window',
-    'ConstructTranslationIdsService', 'I18nLanguageCodeService',
-    'LanguageUtilService', 'NavigationService', 'SearchService', 'UrlService',
-    'SEARCH_DROPDOWN_CATEGORIES',
-    function(
-        $location, $rootScope, $scope, $translate, $window,
-        ConstructTranslationIdsService, I18nLanguageCodeService,
-        LanguageUtilService, NavigationService, SearchService, UrlService,
-        SEARCH_DROPDOWN_CATEGORIES) {
-      var ctrl = this;
 
-      ctrl.directiveSubscriptions = new Subscription();
+  languageCodes: {
+    description: string,
+    itemsName: string,
+    masterList: LanguageIdAndText[],
+    numSelections: number,
+    selections: {},
+    summary: string,
+  }
+}
 
-      ctrl.classroomBackendApiService = (
-        OppiaAngularRootComponent.classroomBackendApiService);
+@Component({
+  selector: 'search-bar',
+  templateUrl: './search-bar.component.html'
+})
 
-      ctrl.classroomPageIsActive = (
-        UrlService.getPathname().startsWith('/learn'));
+export class SearchBarComponent implements OnInit, OnDestroy {
+  @Input() enableDropup: boolean;
+  directiveSubscriptions: Subscription = new Subscription();
+  SEARCH_DROPDOWN_CATEGORIES: SearchDropDownCategories[];
+  ACTION_OPEN: string;
+  ACTION_CLOSE: string
+  KEYBOARD_EVENT_TO_KEY_CODES: {};
+  searchQuery: string = '';
+  SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
+  selectionDetails: SelectionDetails
+  translationData = {};
+  activeMenuName: string;
+  searchBarPlaceholder: string;
+  categoryButtonText: string;
+  languageButtonText: string;
+  // TODO(#12793): Remove the use of (
+  // OppiaAngularRootComponent.ajsTranslate).
+  translate = OppiaAngularRootComponent.ajsTranslate
+  constructor(
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private windowRef: WindowRef,
+    private searchService: SearchService,
+    private urlService: UrlService,
+    private navigationService: NavigationService,
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private languageUtilService: LanguageUtilService,
+    private constructTranslationIdsService: ConstructTranslationIdsService,
+    private translateService : TranslateService,
+    private router : Router
+  ){}
 
-      ctrl.isSearchInProgress = function() {
-        return SearchService.isSearchInProgress();
-      };
-      /**
-       * Opens the submenu.
-       * @param {object} evt
-       * @param {String} menuName - name of menu, on which
-       * open/close action to be performed (category,language).
-       */
-      ctrl.openSubmenu = function(evt, menuName) {
-        NavigationService.openSubmenu(evt, menuName);
-      };
-      /**
-       * Handles keydown events on menus.
-       * @param {object} evt
-       * @param {String} menuName - name of menu to perform action
-       * on(category/language)
-       * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
-       * corresponding actions to be performed(open/close).
-       *
-       * @example
-       *  onMenuKeypress($event, 'category', {enter: 'open'})
-       */
+  classroomPageIsActive = (
+        this.urlService.getPathname().startsWith('/learn'));
+  
+  isSearchInProgress(): boolean {
+    console.log("me")
+    return this.searchService.isSearchInProgress();
+  };
 
-      ctrl.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-        NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
-        ctrl.activeMenuName = NavigationService.activeMenuName;
-      };
+  /**
+   * Opens the submenu.
+   * @param {object} evt
+   * @param {String} menuName - name of menu, on which
+   * open/close action to be performed (category,language).
+   */
+  openSubmenu(evt, menuName): void {
+    this.navigationService.openSubmenu(evt, menuName);
+  };
 
-      // Update the description, numSelections and summary fields of the
-      // relevant entry of ctrl.selectionDetails.
-      var updateSelectionDetails = function(itemsType) {
-        var itemsName = ctrl.selectionDetails[itemsType].itemsName;
-        var masterList = ctrl.selectionDetails[itemsType].masterList;
+  /**
+   * Handles keydown events on menus.
+   * @param {object} evt
+   * @param {String} menuName - name of menu to perform action
+   * on(category/language)
+   * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
+   * corresponding actions to be performed(open/close).
+   *
+   * @example
+   *  onMenuKeypress($event, 'category', {enter: 'open'})
+   */
 
-        var selectedItems = [];
-        for (var i = 0; i < masterList.length; i++) {
-          if (ctrl.selectionDetails[itemsType]
-            .selections[masterList[i].id]) {
-            selectedItems.push(masterList[i].text);
-          }
-        }
+  onMenuKeypress(evt, menuName, eventsTobeHandled): void {
+    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
+    this.activeMenuName = this.navigationService.activeMenuName;
+  };
 
-        var totalCount = selectedItems.length;
-        ctrl.selectionDetails[itemsType].numSelections = totalCount;
+  // Update the description, numSelections and summary fields of the
+  // relevant entry of ctrl.selectionDetails.
+  updateSelectionDetails(itemsType): void {
+    let itemsName = this.selectionDetails[itemsType].itemsName;
+    let masterList = this.selectionDetails[itemsType].masterList;
 
-        ctrl.selectionDetails[itemsType].summary = (
-          totalCount === 0 ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() :
-          totalCount === 1 ? selectedItems[0] :
-          'I18N_LIBRARY_N_' + itemsName.toUpperCase());
-        ctrl.translationData[itemsName + 'Count'] = totalCount;
+    let selectedItems = [];
+    for (let i = 0; i < masterList.length; i++) {
+      if (this.selectionDetails[itemsType]
+        .selections[masterList[i].id]) {
+        selectedItems.push(masterList[i].text);
+      }
+    }
 
-        // TODO(milit): When the language changes, the translations won't
-        // change until the user changes the selection and this function is
-        // re-executed.
-        if (selectedItems.length > 0) {
-          var translatedItems = [];
-          for (var i = 0; i < selectedItems.length; i++) {
-            translatedItems.push($translate.instant(selectedItems[i]));
-          }
-          ctrl.selectionDetails[itemsType].description = (
-            translatedItems.join(', '));
+    let totalCount = selectedItems.length;
+    this.selectionDetails[itemsType].numSelections = totalCount;
+
+    this.selectionDetails[itemsType].summary = (
+      totalCount === 0 ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() :
+      totalCount === 1 ? selectedItems[0] :
+      'I18N_LIBRARY_N_' + itemsName.toUpperCase());
+    this.translationData[itemsName + 'Count'] = totalCount;
+
+    // TODO(milit): When the language changes, the translations won't
+    // change until the user changes the selection and this function is
+    // re-executed.
+    if (selectedItems.length > 0) {
+      var translatedItems = [];
+      for (var i = 0; i < selectedItems.length; i++) {
+        translatedItems.push(this.translate.instant(selectedItems[i]));
+      }
+      this.selectionDetails[itemsType].description = (
+        translatedItems.join(', '));
+    } else {
+      this.selectionDetails[itemsType].description = (
+        'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED');
+    }
+  };
+
+  toggleSelection(itemsType, optionName): void {
+    var selections = this.selectionDetails[itemsType].selections;
+    if (!selections.hasOwnProperty(optionName)) {
+      selections[optionName] = true;
+    } else {
+      selections[optionName] = !selections[optionName];
+    }
+
+    this.updateSelectionDetails(itemsType);
+    this.onSearchQueryChangeExec();
+  };
+
+  deselectAll(itemsType): void {
+    this.selectionDetails[itemsType].selections = {};
+    this.updateSelectionDetails(itemsType);
+    this.onSearchQueryChangeExec();
+  };
+
+  onSearchQueryChangeExec(): void {
+    console.log("why")
+    this.searchService.executeSearchQuery(
+      this.searchQuery, this.selectionDetails.categories.selections,
+      this.selectionDetails.languageCodes.selections, () => {
+        var searchUrlQueryString = this.searchService.getSearchUrlQueryString(
+          this.searchQuery, this.selectionDetails.categories.selections,
+          this.selectionDetails.languageCodes.selections
+        );
+        if (this.windowRef.nativeWindow.location.pathname === '/search/find') {
+          this.windowRef.nativeWindow.location.href = ('/find?q=' + searchUrlQueryString);
         } else {
-          ctrl.selectionDetails[itemsType].description = (
-            'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED');
+          this.windowRef.nativeWindow.location.search = ('/search/find?q=' + searchUrlQueryString);
         }
-      };
+      });
+  };
 
-      ctrl.toggleSelection = function(itemsType, optionName) {
-        var selections = ctrl.selectionDetails[itemsType].selections;
-        if (!selections.hasOwnProperty(optionName)) {
-          selections[optionName] = true;
-        } else {
-          selections[optionName] = !selections[optionName];
+  updateSearchFieldsBasedOnUrlQuery(): void {
+    this.selectionDetails.categories.selections = {};
+    this.selectionDetails.languageCodes.selections = {};
+
+    this.updateSelectionDetails('categories');
+    this.updateSelectionDetails('languageCodes');
+
+    var newQuery = (
+      this.searchService.updateSearchFieldsBasedOnUrlQuery(
+        this.windowRef.nativeWindow.location.search, this.selectionDetails));
+
+    if (this.searchQuery !== newQuery) {
+      this.searchQuery = newQuery;
+      this.onSearchQueryChangeExec();
+    }
+  };
+
+  refreshSearchBarLabels(): void {
+    // If you translate these strings in the html, then you must use a
+    // filter because only the first 14 characters are displayed. That
+    // would generate FOUC for languages other than English. As an
+    // exception, we translate them here and update the translation
+    // every time the language is changed.
+    this.searchBarPlaceholder = this.translate.instant(
+      'I18N_LIBRARY_SEARCH_PLACEHOLDER');
+    // 'messageformat' is the interpolation method for plural forms.
+    // http://angular-translate.github.io/docs/#/guide/14_pluralization.
+    this.categoryButtonText = this.translate.instant(
+      this.selectionDetails.categories.summary,
+      this.translationData, 'messageformat');
+    this.languageButtonText = this.translate.instant(
+      this.selectionDetails.languageCodes.summary,
+      this.translationData, 'messageformat');
+  };
+
+  searchDropdownCategories(): SearchDropDownCategories[] {
+    return constants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
+      return {
+        id: categoryName,
+        text: this.constructTranslationIdsService.getLibraryId(
+          'categories', categoryName)
+      };
+    })
+  }
+
+  ngOnInit(): void {
+    this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories()
+    this.ACTION_OPEN = this.navigationService.ACTION_OPEN;
+    this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
+    this.KEYBOARD_EVENT_TO_KEY_CODES =
+    this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+    this.SUPPORTED_CONTENT_LANGUAGES = (
+      this.languageUtilService.getLanguageIdsAndTexts());
+    this.searchQuery = '';
+    this.selectionDetails = {
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: this.SEARCH_DROPDOWN_CATEGORIES,
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: this.SUPPORTED_CONTENT_LANGUAGES,
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      }
+    };
+
+    // Non-translatable parts of the html strings, like numbers or user
+    // names.
+    this.translationData = {};
+    // Initialize the selection descriptions and summaries.
+    for (let itemsType in this.selectionDetails) {
+      this.updateSelectionDetails(itemsType);
+    }
+    
+    this.directiveSubscriptions.add(
+      this.router.events.subscribe(() => {
+        if (this.urlService.getUrlParams().hasOwnProperty('q')) {
+          this.updateSearchFieldsBasedOnUrlQuery();
         }
+      })
+    )
 
-        updateSelectionDetails(itemsType);
-        ctrl.onSearchQueryChangeExec();
-      };
-
-      ctrl.deselectAll = function(itemsType) {
-        ctrl.selectionDetails[itemsType].selections = {};
-        updateSelectionDetails(itemsType);
-        ctrl.onSearchQueryChangeExec();
-      };
-
-      ctrl.onSearchQueryChangeExec = function() {
-        SearchService.executeSearchQuery(
-          ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
-          ctrl.selectionDetails.languageCodes.selections, () => {
-            var searchUrlQueryString = SearchService.getSearchUrlQueryString(
-              ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
-              ctrl.selectionDetails.languageCodes.selections
-            );
-            if ($window.location.pathname === '/search/find') {
-              $location.url('/find?q=' + searchUrlQueryString);
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
+        (preferredLanguageCodesList) => {
+          preferredLanguageCodesList.forEach((languageCode) => {
+            let selections =
+              this.selectionDetails.languageCodes.selections;
+            if (!selections.hasOwnProperty(languageCode)) {
+              selections[languageCode] = true;
             } else {
-              $window.location.href = '/search/find?q=' + searchUrlQueryString;
+              selections[languageCode] = !selections[languageCode];
             }
           });
-      };
 
-      var updateSearchFieldsBasedOnUrlQuery = function() {
-        ctrl.selectionDetails.categories.selections = {};
-        ctrl.selectionDetails.languageCodes.selections = {};
+          this.updateSelectionDetails('languageCodes');
 
-        updateSelectionDetails('categories');
-        updateSelectionDetails('languageCodes');
-
-        var newQuery = (
-          SearchService.updateSearchFieldsBasedOnUrlQuery(
-            $window.location.search, ctrl.selectionDetails));
-
-        if (ctrl.searchQuery !== newQuery) {
-          ctrl.searchQuery = newQuery;
-          ctrl.onSearchQueryChangeExec();
-        }
-      };
-
-      var refreshSearchBarLabels = function() {
-        // If you translate these strings in the html, then you must use a
-        // filter because only the first 14 characters are displayed. That
-        // would generate FOUC for languages other than English. As an
-        // exception, we translate them here and update the translation
-        // every time the language is changed.
-        ctrl.searchBarPlaceholder = $translate.instant(
-          'I18N_LIBRARY_SEARCH_PLACEHOLDER');
-        // 'messageformat' is the interpolation method for plural forms.
-        // http://angular-translate.github.io/docs/#/guide/14_pluralization.
-        ctrl.categoryButtonText = $translate.instant(
-          ctrl.selectionDetails.categories.summary,
-          ctrl.translationData, 'messageformat');
-        ctrl.languageButtonText = $translate.instant(
-          ctrl.selectionDetails.languageCodes.summary,
-          ctrl.translationData, 'messageformat');
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.SEARCH_DROPDOWN_CATEGORIES = (
-          SEARCH_DROPDOWN_CATEGORIES.map(
-            function(categoryName) {
-              return {
-                id: categoryName,
-                text: ConstructTranslationIdsService.getLibraryId(
-                  'categories', categoryName)
-              };
-            }
-          )
-        );
-        ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
-        ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
-        ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
-        NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
-        ctrl.SUPPORTED_CONTENT_LANGUAGES = (
-          LanguageUtilService.getLanguageIdsAndTexts());
-        ctrl.searchQuery = '';
-        ctrl.selectionDetails = {
-          categories: {
-            description: '',
-            itemsName: 'categories',
-            masterList: ctrl.SEARCH_DROPDOWN_CATEGORIES,
-            numSelections: 0,
-            selections: {},
-            summary: ''
-          },
-          languageCodes: {
-            description: '',
-            itemsName: 'languages',
-            masterList: ctrl.SUPPORTED_CONTENT_LANGUAGES,
-            numSelections: 0,
-            selections: {},
-            summary: ''
+          if (this.urlService.getUrlParams().hasOwnProperty('q')) {
+            this.updateSearchFieldsBasedOnUrlQuery();
           }
-        };
 
-        // Non-translatable parts of the html strings, like numbers or user
-        // names.
-        ctrl.translationData = {};
-        // Initialize the selection descriptions and summaries.
-        for (var itemsType in ctrl.selectionDetails) {
-          updateSelectionDetails(itemsType);
-        }
-        $scope.$on('$locationChangeSuccess', function() {
-          if (UrlService.getUrlParams().hasOwnProperty('q')) {
-            updateSearchFieldsBasedOnUrlQuery();
+          if (this.windowRef.nativeWindow.location.pathname === '/search/find') {
+            this.onSearchQueryChangeExec();
           }
-        });
 
-        ctrl.directiveSubscriptions.add(
-          I18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
-            (preferredLanguageCodesList) => {
-              preferredLanguageCodesList.forEach(function(languageCode) {
-                var selections =
-                 ctrl.selectionDetails.languageCodes.selections;
-                if (!selections.hasOwnProperty(languageCode)) {
-                  selections[languageCode] = true;
-                } else {
-                  selections[languageCode] = !selections[languageCode];
-                }
-              });
+          this.refreshSearchBarLabels();
 
-              updateSelectionDetails('languageCodes');
+          // Notify the function that handles overflow in case the
+          // search elements load after it has already been run.
+          this.searchService.onSearchBarLoaded.emit();
+        }
+      )
+    );
 
-              if (UrlService.getUrlParams().hasOwnProperty('q')) {
-                updateSearchFieldsBasedOnUrlQuery();
-              }
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange
+        .subscribe(() => this.refreshSearchBarLabels()));
 
-              if ($window.location.pathname === '/search/find') {
-                ctrl.onSearchQueryChangeExec();
-              }
+    this.directiveSubscriptions.add(
+      this.classroomBackendApiService.onInitializeTranslation
+        .subscribe(() => this.refreshSearchBarLabels()));
+  };
 
-              refreshSearchBarLabels();
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  };
+}
 
-              // Notify the function that handles overflow in case the
-              // search elements load after it has already been run.
-              SearchService.onSearchBarLoaded.emit();
-            }
-          )
-        );
-        $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
-        ctrl.directiveSubscriptions.add(
-          ctrl.classroomBackendApiService.onInitializeTranslation
-            .subscribe(() => refreshSearchBarLabels()));
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }
-  ]
-});
+angular.module('oppia').directive(
+  'searchBar', downgradeComponent({component: SearchBarComponent}));

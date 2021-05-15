@@ -30,6 +30,7 @@ import { TopicLandingPageComponent } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { OppiaFooterComponent } from 'pages/OppiaFooterDirective'
 
 @NgModule({
   imports: [
@@ -39,11 +40,13 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ],
   declarations: [
     OppiaAngularRootComponent,
-    TopicLandingPageComponent
+    TopicLandingPageComponent,
+    OppiaFooterComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    TopicLandingPageComponent
+    TopicLandingPageComponent,
+    OppiaFooterComponent
   ],
   providers: [
     {

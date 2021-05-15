@@ -15,21 +15,27 @@
 /**
  * @fileoverview Directive for the library footer.
  */
+ import { Component, OnInit } from '@angular/core';
+ import { downgradeComponent } from '@angular/upgrade/static';
+ import { LibraryPageConstants } from 'pages/library-page/library-page.constants';
+ import { WindowRef } from 'services/contextual/window-ref.service';
 
-require('pages/OppiaFooterDirective.ts');
+ @Component({
+  selector: 'library-footer',
+  templateUrl: './library-footer.component.html'
+})
+export class LibraryFooterComponent implements OnInit {
+  footerIsDisplayed: boolean;
+  constructor(
+    private windowRef: WindowRef,
+  ) {}
 
-require('pages/library-page/library-page.constants.ajs.ts');
+  ngOnInit(): void {
+    var pageMode = LibraryPageConstants.LIBRARY_PATHS_TO_MODES[
+      this.windowRef.nativeWindow.location.pathname];
+    this.footerIsDisplayed = (pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH);
+  };
+}
 
-angular.module('oppia').component('libraryFooter', {
-  template: require('./library-footer.component.html'),
-  controller: [
-    '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-    function($window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
-        ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
-      };
-    }
-  ]
-});
+angular.module('oppia').directive(
+  'libraryFooter', downgradeComponent({component: LibraryFooterComponent}));

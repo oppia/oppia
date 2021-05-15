@@ -27,7 +27,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
+import { OppiaFooterComponent } from 'pages/OppiaFooterDirective'
 @NgModule({
   imports: [
     BrowserModule,
@@ -35,10 +36,14 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SearchBarComponent,
+    OppiaFooterComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SearchBarComponent,
+    OppiaFooterComponent
   ],
   providers: [
     {

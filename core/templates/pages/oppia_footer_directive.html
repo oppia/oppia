@@ -2,105 +2,105 @@
   <div class="oppia-footer-container">
     <div class="row row-cols-2">
       <div class="col">
-        <h3 translate="I18N_FOOTER_ABOUT_ALL_CAPS"></h3>
+        <h3 [innerHTML]="'I18N_FOOTER_ABOUT_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
             <a href="/about"
-               translate="I18N_FOOTER_ABOUT">
+               [innerHTML]="'I18N_FOOTER_ABOUT' | translate">
             </a>
           </li>
           <li>
             <a href="http://oppiafoundation.org/"
-               translate="I18N_FOOTER_OPPIA_FOUNDATION">
+               [innerHTML]="'I18N_FOOTER_OPPIA_FOUNDATION' | translate">
             </a>
           </li>
           <li>
             <a href="https://medium.com/oppia-org"
-               translate="I18N_TOPNAV_BLOG">
+               [innerHTML]="'I18N_TOPNAV_BLOG' | translate">
             </a>
           </li>
           <li>
             <a href="/about#credits"
-               translate="I18N_FOOTER_CREDITS">
+               [innerHTML]="'I18N_FOOTER_CREDITS' | translate">
             </a>
           </li>
           <li>
             <a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia"
-               translate="I18N_FOOTER_FORUM">
+               [innerHTML]="'I18N_FOOTER_FORUM' | translate">
             </a>
           </li>
         </ul>
 
       </div>
       <div class="col">
-        <h3 translate="I18N_FOOTER_TEACH_LEARN_ALL_CAPS"></h3>
+        <h3 [innerHTML]="'I18N_FOOTER_TEACH_LEARN_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
             <a href="/get-started"
                class="protractor-test-get-started-link"
-               translate="I18N_FOOTER_GET_STARTED">
+               [innerHTML]="'I18N_FOOTER_GET_STARTED' | translate">
             </a>
           </li>
           <li>
             <a href="/creator-guidelines"
-               translate="I18N_PLAYBOOK_HEADING">
+               [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate">
             </a>
           </li>
           <li>
             <a href="/teach"
-               translate="I18N_FOOTER_TEACH_PAGE">
+               [innerHTML]="'I18N_FOOTER_TEACH_PAGE' | translate">
             </a>
           </li>
           <li>
             <a href="/community-library"
-               translate="I18N_FOOTER_BROWSE_LIBRARY">
+               [innerHTML]="'I18N_FOOTER_BROWSE_LIBRARY' | translate">
             </a>
           </li>
           <li>
             <a href="/contact"
-               translate="I18N_FOOTER_CONTACT_US">
+               [innerHTML]="'I18N_FOOTER_CONTACT_US' | translate">
             </a>
           </li>
         </ul>
       </div>
       <div class="col">
-        <h3 translate="I18N_FOOTER_CONTRIBUTE_ALL_CAPS"></h3>
+        <h3 [innerHTML]="'I18N_FOOTER_CONTRIBUTE_ALL_CAPS' | translate"></h3>
         <ul>
           <li>
             <a href="https://oppiafoundation.org/volunteer"
-               translate="I18N_HEADING_VOLUNTEER">
+               [innerHTML]="'I18N_HEADING_VOLUNTEER' | translate">
             </a>
           </li>
-          <li ng-if="$ctrl.siteFeedbackFormUrl">
-            <a ng-href="<[$ctrl.siteFeedbackFormUrl]>"
+          <li *ngIf="siteFeedbackFormUrl">
+            <a [href]="siteFeedbackFormUrl"
                target="_blank"
                rel="noopener"
-               translate="I18N_SPLASH_SITE_FEEDBACK" >
+               [innerHTML]="'I18N_SPLASH_SITE_FEEDBACK' | translate " >
             </a>
           </li>
           <li>
             <a href="/donate"
                class="protractor-test-donate-link"
-               translate="I18N_FOOTER_DONATE">
+               [innerHTML]="'I18N_FOOTER_DONATE' | translate">
             </a>
           </li>
           <li>
             <a href="/terms"
                class="protractor-test-terms-link"
-               translate="I18N_FOOTER_TERMS_OF_SERVICE">
+               [innerHTML]="'I18N_FOOTER_TERMS_OF_SERVICE' | translate">
             </a>
           </li>
           <li>
             <a href="/privacy-policy"
                class="protractor-test-privacy-policy-link"
-               translate="I18N_FOOTER_PRIVACY_POLICY">
+               [innerHTML]="'I18N_FOOTER_PRIVACY_POLICY' | translate">
             </a>
           </li>
         </ul>
       </div>
       <div class="col">
-        <h3><span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span></h3>
-        <i18n-footer></i18n-footer>
+        <h3><span [innerHTML]="'I18N_LANGUAGE_FOOTER_VIEW_IN' | translate"></span></h3>
+        <!-- <i18n-footer></i18n-footer> -->
         <social-buttons></social-buttons>
       </div>
     </div>

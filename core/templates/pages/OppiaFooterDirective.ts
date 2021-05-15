@@ -13,24 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the footer.
+ * @fileoverview Component for the footer.
  */
 
+import { Component, OnInit } from '@angular/core';
+import constants from 'assets/constants';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').directive('oppiaFooter', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./oppia_footer_directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['SITE_FEEDBACK_FORM_URL',
-        function(SITE_FEEDBACK_FORM_URL) {
-          var ctrl = this;
-          ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
-        }
-      ]
-    };
+@Component({
+  selector: 'oppia-footer',
+  templateUrl: './oppia_footer_directive.html',
+  styleUrls: []
+})
+
+export class OppiaFooterComponent implements OnInit{
+  siteFeedbackFormUrl: string
+  constructor() {}
+
+  ngOnInit(): void {
+  this.siteFeedbackFormUrl = constants.SITE_FEEDBACK_FORM_URL;
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaFooter', downgradeComponent({component: OppiaFooterComponent}));
+
