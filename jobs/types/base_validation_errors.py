@@ -139,7 +139,7 @@ class InvalidPublicCommitStatusError(BaseAuditError):
     def __init__(self, model):
         super(InvalidPublicCommitStatusError, self).__init__(model)
         self.message = (
-            'post_commit_status="%s" but post_commit_community_owned=%r' % (
+            'post_commit_status="%s" but post_commit_community_owned=%s' % (
                 model.post_commit_status, model.post_commit_community_owned))
 
 
