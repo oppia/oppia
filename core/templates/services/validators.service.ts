@@ -24,6 +24,7 @@ import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import constants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -120,10 +121,11 @@ export class ValidatorsService {
   }
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
     if (input) {
-      if (input.length > 10000) {
+      if (input.length > constants.MAX_TEXT_MESSAGE_LENGTH) {
         if (showWarnings) {
           this.alerts.addWarning(
-            'Review message should be at most 10000 charatcers long.');
+            'Review message should be at most ' +
+            constants.MAX_TEXT_MESSAGE_LENGTH + ' characters long.');
         }
         return false;
       }
