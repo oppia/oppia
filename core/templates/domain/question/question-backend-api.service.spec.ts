@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 
-describe('Question backend Api service', () => {
+fdescribe('Question backend Api service', () => {
   let questionBackendApiService = null;
   let sampleDataResults = null;
   let sampleResponse = null;
@@ -321,7 +321,7 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?offset=');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -329,7 +329,7 @@ describe('Question backend Api service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
-        nextCursor: null
+        nextOffset: null
       });
       expect(failHandler).not.toHaveBeenCalled();
     })
@@ -343,7 +343,7 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=');
+        '/questions_list_handler/1?offset=');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading questions.'
@@ -366,7 +366,7 @@ describe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1', '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?cursor=1');
+        '/questions_list_handler/1?offset=1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -374,7 +374,7 @@ describe('Question backend Api service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         questionSummaries: sampleResponse.question_summary_dicts,
-        nextCursor: null
+        nextOffset: null
       });
       expect(failHandler).not.toHaveBeenCalled();
     })

@@ -40,12 +40,13 @@ interface QuestionsBackendResponse {
 
 interface QuestionSummariesBackendResponse {
   'question_summary_dicts': QuestionSummaryForOneSkillBackendDict[];
-  'next_start_cursor': string;
+  'next_offset': number;
 }
 
 interface QuestionSummariesResponse {
   questionSummaries: QuestionSummaryForOneSkillBackendDict[];
-  nextCursor: string;
+  nextOffset: number;
+  response: QuestionSummariesBackendResponse;
 }
 
 @Injectable({
@@ -106,7 +107,7 @@ export class QuestionBackendApiService {
   }
 
   private _fetchQuestionSummaries(
-      skillId: string, cursor: string,
+      skillId: string, offset: string,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
     const skillIds = [skillId];
@@ -114,18 +115,19 @@ export class QuestionBackendApiService {
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
-        cursor: cursor
+        offset: offset
       });
     this.http.get<QuestionSummariesBackendResponse>(
       questionsDataUrl
     ).toPromise().then(response => {
       var questionSummaries = cloneDeep(
         response.question_summary_dicts);
-      var nextCursor = response.next_start_cursor;
+
       if (successCallback) {
         successCallback({
           questionSummaries: questionSummaries,
-          nextCursor: nextCursor
+          nextOffset: response.next_offset,
+          response: response
         });
       }
     }, (errorResponse) => {
@@ -200,9 +202,9 @@ export class QuestionBackendApiService {
 
   async fetchQuestionSummariesAsync(
       skillId: string,
-      cursor: string = ''): Promise<QuestionSummariesResponse> {
+      offset: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
-      this._fetchQuestionSummaries(skillId, cursor, resolve, reject);
+      this._fetchQuestionSummaries(skillId, offset, resolve, reject);
     });
   }
 }
