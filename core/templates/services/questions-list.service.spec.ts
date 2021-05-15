@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
 
 import { QuestionsListService } from 'services/questions-list.service';
 
-fdescribe('Questions List Service', () => {
+describe('Questions List Service', () => {
   let qls: QuestionsListService;
   let httpTestingController: HttpTestingController;
   let quesionSummariesInitializedSpy: jasmine.Spy;

@@ -63,7 +63,8 @@ export class QuestionsListService {
 
   isLastQuestionBatch(): boolean {
     return (
-      this._nextOffsetForQuestions === null &&
+      Number(this._nextOffsetForQuestions) >=
+      this._questionSummariesForOneSkill.length &&
       (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
         this._questionSummariesForOneSkill.length);
   }
