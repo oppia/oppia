@@ -164,7 +164,7 @@ class UserEmailPreferencesModelRelationshipsTest(
         job_test_utils.PipelinedTestBase):
     NOW = datetime.datetime.utcnow()
 
-    def test_with_only_userEmailPreferenceModel_present(self):
+    def test_model_without_dependent_model(self):
         model = user_models.UserEmailPreferencesModel(
             created_on=self.NOW, id='test_user',
             last_updated=self.NOW)
@@ -174,7 +174,7 @@ class UserEmailPreferencesModelRelationshipsTest(
             | beam.ParDo(
                 user_validation.user_email_preferences_model_relationships)
         )
-        self.assertIsNot(output,[])
+        self.assertIsNot(output, [])
 
     def test_with_both_model_present(self):
         model = user_models.UserSettingsModel(
@@ -185,11 +185,11 @@ class UserEmailPreferencesModelRelationshipsTest(
             last_updated=self.NOW)
         output = (
             self.pipeline
-            | beam.Create([model,dependent_model])
+            | beam.Create([model, dependent_model])
             | beam.ParDo(
                 user_validation.user_email_preferences_model_relationships)
         )
-        self.assertIsNot(output,[])
+        self.assertIsNot(output, [])
 
 
 class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
