@@ -426,8 +426,10 @@ class UpdateQuestionSuggestionHandler(base.BaseHandler):
             InvalidInputException. The suggestion is already handled.
             InvalidInputException. The 'skill_difficulty' parameter is missing.
             InvalidInputException. The 'skill_difficulty' is not a decimal.
-            InvalidInputException. The 'question_state_data' parameter is missing.
-            InvalidInputException. The 'question_state_data' parameter is invalid.
+            InvalidInputException. The 'question_state_data' parameter is
+                missing.
+            InvalidInputException. The 'question_state_data' parameter is
+                invalid.
         """
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.is_handled:
