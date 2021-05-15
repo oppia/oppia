@@ -936,7 +936,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             'exploration1')
 
-        print(snapshots_metadata)
         self.assertEqual(
             snapshots_metadata[2]['commit_message'],
             'Accepted suggestion by author: Accepted (with edits)')
