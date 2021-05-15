@@ -164,8 +164,8 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.language_code, False,
-        suggestion_model.last_updated)
+        suggestion_model.score_category, suggestion_model.language_code,
+        suggestion_model.edited_by_reviewer, suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):
@@ -294,6 +294,7 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.change_cmd = suggestion.change.to_dict()
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
+        suggestion_model.edited_by_reviewer = suggestion.edited_by_reviewer
 
     suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
@@ -361,6 +362,9 @@ def accept_suggestion(
             'Invalid math tags found in the suggestion with id %s.' % (
                 suggestion.suggestion_id)
         )
+
+    if suggestion.edited_by_reviewer:
+        commit_message = commit_message + ' (with edits)'
 
     suggestion.set_suggestion_status_to_accepted()
     suggestion.set_final_reviewer_id(reviewer_id)

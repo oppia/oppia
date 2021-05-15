@@ -902,6 +902,45 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             updated_suggestion.change.skill_difficulty,
             0.6)
 
+    def test_accept_suggestion_commit_message_after_updating_a_suggestion(self):
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        add_translation_change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'state 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exploration1', self.target_version_at_submission,
+            self.author_id, add_translation_change_dict, 'test description')
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, '<p>Updated translation</p>'
+        )
+
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
+        )
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            'exploration1')
+
+        print(snapshots_metadata)
+        self.assertEqual(
+            snapshots_metadata[2]['commit_message'],
+            'Accepted suggestion by author: Accepted (with edits)')
+
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (

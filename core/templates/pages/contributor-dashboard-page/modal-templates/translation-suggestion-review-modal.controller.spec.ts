@@ -169,7 +169,6 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect($scope.activeSuggestion).toEqual(suggestion2);
       expect($scope.reviewable).toBe(reviewable);
       expect($scope.reviewMessage).toBe('');
-      expect($scope.finalCommitMessage).toContain(' (with edits)');
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Translation');
@@ -177,7 +176,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         .toHaveBeenCalledWith(
           '1', 'suggestion_1', 'accept', 'Review message example: ' +
           'This suggestion was submitted with reviewer edits.',
-          'hint section of "StateName" card (with edits)',
+          'hint section of "StateName" card',
           $scope.showNextItemToReview,
           jasmine.any(Function));
 
