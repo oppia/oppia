@@ -536,16 +536,13 @@ describe('SvgFilenameEditor', function() {
     /* eslint-disable-next-line quotes */
     var responseText = ")]}'\n{ \"filename\": \"imageFile1.svg\" }";
 
+    var d = $.Deferred();
     // This throws "Argument of type '() => Promise<any, any, any>' is not
     // assignable to parameter of type '{ (url: string, ...):
     // jqXHR<any>; ...}'.". We need to suppress this error because we need
     // to mock $.ajax to this function purposes.
     // @ts-expect-error
-    spyOn($, 'ajax').and.callFake(function() {
-      var d = $.Deferred();
-      d.resolve(responseText);
-      return d.promise();
-    });
+    spyOn($, 'ajax').and.returnValue(d.resolve(responseText));
     svgFilenameCtrl.saveSvgFile();
 
     // $q Promises need to be forcibly resolved through a JavaScript digest,
@@ -564,23 +561,20 @@ describe('SvgFilenameEditor', function() {
   it('should handle rejection when saving an svg file fails', function() {
     svgFilenameCtrl.createRect();
     var errorMessage = 'Error on saving svg file';
+    var d = $.Deferred();
     // This throws "Argument of type '() => Promise<any, any, any>' is not
     // assignable to parameter of type '{ (url: string, ...):
     // jqXHR<any>; ...}'.". We need to suppress this error because we need
     // to mock $.ajax to this function purposes.
     // @ts-expect-error
-    spyOn($, 'ajax').and.callFake(function() {
-      var d = $.Deferred();
-      d.reject({
-        // Variable responseText contains a XSSI Prefix, which is represented by
-        // )]}' string. That's why double quotes is being used here. It's not
-        // possible to use \' instead of ' so the XSSI Prefix won't be
-        // evaluated correctly.
-        /* eslint-disable-next-line quotes */
-        responseText: ")]}'\n{ \"error\": \"" + errorMessage + "\" }"
-      });
-      return d.promise();
-    });
+    spyOn($, 'ajax').and.returnValue(d.reject({
+      // Variable responseText contains a XSSI Prefix, which is represented by
+      // )]}' string. That's why double quotes is being used here. It's not
+      // possible to use \' instead of ' so the XSSI Prefix won't be
+      // evaluated correctly.
+      /* eslint-disable-next-line quotes */
+      responseText: ")]}'\n{ \"error\": \"" + errorMessage + "\" }"
+    }));
     svgFilenameCtrl.saveSvgFile();
 
     // $q Promises need to be forcibly resolved through a JavaScript digest,
