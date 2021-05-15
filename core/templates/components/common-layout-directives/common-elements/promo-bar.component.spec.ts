@@ -18,7 +18,7 @@
 
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from
   '@angular/core/testing';
-import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component.ts';
+import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -28,7 +28,7 @@ describe('Promo Bar Component', () => {
   let promoBarBackendApiService: PromoBarBackendApiService;
 
   class MockPromoBarBackendApiService {
-    getPromoBarDataAsync() {
+    async getPromoBarDataAsync() {
       return new Promise((resolve) => {
         resolve(
           {

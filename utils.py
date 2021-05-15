@@ -423,7 +423,8 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value]))
+    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']'
+    return base64.b64encode(byte_value)
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -1014,7 +1015,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
+    return python_utils.zip_longest(*args, fillvalue=fillvalue)
 
 
 def partition(iterable, predicate=bool, enumerated=False):

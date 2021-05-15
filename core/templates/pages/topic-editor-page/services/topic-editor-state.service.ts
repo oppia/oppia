@@ -148,12 +148,98 @@ export class TopicEditorStateService {
       if (!skillIdToRubricsObject[skillId]) {
         continue;
       }
+<<<<<<< HEAD
       let rubrics: Rubric[] = skillIdToRubricsObject[skillId].map((rubric) => {
         return Rubric.createFromBackendDict(rubric);
       });
       this._skillIdToRubricsObject[skillId] = rubrics;
     }
   }
+=======
+    };
+    var _setSubtopicPage = function(subtopicPage) {
+      _subtopicPage.copyFromSubtopicPage(subtopicPage);
+      _cachedSubtopicPages.push(angular.copy(subtopicPage));
+      _subtopicPageLoadedEventEmitter.emit();
+    };
+    var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
+      _setSubtopicPage(SubtopicPage.createFromBackendDict(
+        newBackendSubtopicPageObject));
+    };
+    var _setTopicRights = function(topicRights) {
+      _topicRights.copyFromTopicRights(topicRights);
+    };
+    var _updateTopicRights = function(newBackendTopicRightsObject) {
+      _setTopicRights(TopicRights.createFromBackendDict(
+        newBackendTopicRightsObject));
+    };
+    var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
+      _canonicalStorySummaries = canonicalStorySummaries.map(
+        function(storySummaryDict) {
+          return StorySummary.createFromBackendDict(
+            storySummaryDict);
+        });
+      _storySummariesInitializedEventEmitter.emit();
+    };
+
+    var _setTopicWithNameExists = function(topicWithNameExists) {
+      _topicWithNameExists = topicWithNameExists;
+    };
+
+    var _setTopicWithUrlFragmentExists = function(topicWithUrlFragmentExists) {
+      _topicWithUrlFragmentExists = topicWithUrlFragmentExists;
+    };
+
+    return {
+      /**
+       * Loads, or reloads, the topic stored by this service given a
+       * specified topic ID. See setTopic() for more information on
+       * additional behavior of this function.
+       */
+      loadTopic: function(topicId) {
+        _topicIsLoading = true;
+        let topicDataPromise = EditableTopicBackendApiService.fetchTopicAsync(
+          topicId);
+        let storyDataPromise = EditableTopicBackendApiService.fetchStoriesAsync(
+          topicId);
+        let topicRightsPromise = TopicRightsBackendApiService
+          .fetchTopicRightsAsync(topicId);
+        Promise.all([
+          topicDataPromise,
+          storyDataPromise,
+          topicRightsPromise
+        ]).then(([
+          newBackendTopicObject,
+          canonicalStorySummaries,
+          newBackendTopicRightsObject
+        ]) => {
+          _skillCreationIsAllowed = (
+            newBackendTopicObject.skillCreationIsAllowed);
+          _skillQuestionCountDict = (
+            newBackendTopicObject.skillQuestionCountDict);
+          _updateGroupedSkillSummaries(
+            newBackendTopicObject.groupedSkillSummaries);
+          _updateTopic(
+            newBackendTopicObject.topicDict,
+            newBackendTopicObject.skillIdToDescriptionDict
+          );
+          _updateGroupedSkillSummaries(
+            newBackendTopicObject.groupedSkillSummaries);
+          _updateSkillIdToRubricsObject(
+            newBackendTopicObject.skillIdToRubricsDict);
+          _updateClassroomUrlFragment(
+            newBackendTopicObject.classroomUrlFragment);
+          _updateTopicRights(newBackendTopicRightsObject);
+          _setCanonicalStorySummaries(canonicalStorySummaries);
+          _topicIsLoading = false;
+          $rootScope.$applyAsync();
+        }, (error) => {
+          AlertsService.addWarning(
+            error || 'There was an error when loading the topic editor.');
+          _topicIsLoading = false;
+        });
+      },
+>>>>>>> upstream/develop
 
   _setSubtopicPage(subtopicPage: SubtopicPage): void {
     this._subtopicPage.copyFromSubtopicPage(subtopicPage);
@@ -177,6 +263,7 @@ export class TopicEditorStateService {
       newBackendTopicRightsObject));
   }
 
+<<<<<<< HEAD
   _setCanonicalStorySummaries(
       canonicalStorySummaries: StorySummaryBackendDict[]): void {
     this._canonicalStorySummaries = canonicalStorySummaries.map(
@@ -186,6 +273,31 @@ export class TopicEditorStateService {
       });
     this._storySummariesInitializedEventEmitter.emit();
   }
+=======
+      /**
+       * Loads, or reloads, the subtopic page stored by this service given a
+       * specified topic ID and subtopic ID.
+       */
+      loadSubtopicPage: function(topicId, subtopicId) {
+        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
+        if (_getSubtopicPageIndex(subtopicPageId) !== null) {
+          _subtopicPage = angular.copy(
+            _cachedSubtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
+          _subtopicPageLoadedEventEmitter.emit();
+          return;
+        }
+        EditableTopicBackendApiService.fetchSubtopicPageAsync(
+          topicId, subtopicId).then(
+          function(newBackendSubtopicPageObject) {
+            _updateSubtopicPage(newBackendSubtopicPageObject);
+            $rootScope.$applyAsync();
+          },
+          function(error) {
+            AlertsService.addWarning(
+              error || 'There was an error when loading the topic.');
+          });
+      },
+>>>>>>> upstream/develop
 
   _setTopicWithNameExists(topicWithNameExists: boolean): void {
     this._topicWithNameExists = topicWithNameExists;
@@ -477,6 +589,7 @@ export class TopicEditorStateService {
               changeList[i].story_id);
           }
         }
+<<<<<<< HEAD
         this.undoRedoService.clearChanges();
         this._topicIsBeingSaved = false;
         if (successCallback) {
@@ -489,6 +602,40 @@ export class TopicEditorStateService {
       });
     return true;
   }
+=======
+        _topicIsBeingSaved = true;
+        EditableTopicBackendApiService.updateTopicAsync(
+          _topic.getId(), _topic.getVersion(),
+          commitMessage, UndoRedoService.getCommittableChangeList()).then(
+          function(topicBackendObject) {
+            _updateTopic(
+              topicBackendObject.topicDict,
+              topicBackendObject.skillIdToDescriptionDict
+            );
+            _updateSkillIdToRubricsObject(
+              topicBackendObject.skillIdToRubricsDict);
+            var changeList = UndoRedoService.getCommittableChangeList();
+            for (var i = 0; i < changeList.length; i++) {
+              if (changeList[i].cmd === 'delete_canonical_story' ||
+                  changeList[i].cmd === 'delete_additional_story') {
+                EditableStoryBackendApiService.deleteStoryAsync(
+                  changeList[i].story_id);
+              }
+            }
+            UndoRedoService.clearChanges();
+            _topicIsBeingSaved = false;
+            if (successCallback) {
+              successCallback();
+            }
+            $rootScope.$applyAsync();
+          }, function(error) {
+            AlertsService.addWarning(
+              error || 'There was an error when saving the topic.');
+            _topicIsBeingSaved = false;
+          });
+        return true;
+      },
+>>>>>>> upstream/develop
 
   /**
    * Returns whether this service is currently attempting to save the

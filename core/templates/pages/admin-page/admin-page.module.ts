@@ -35,6 +35,7 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
+import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 
 @NgModule({
   imports: [
@@ -49,7 +50,8 @@ import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
     AdminFeaturesTabComponent,
     AdminJobsTabComponent,
     AdminNavbarComponent,
-    AdminDevModeActivitiesTabComponent
+    AdminDevModeActivitiesTabComponent,
+    RolesAndActionsVisualizerComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -57,7 +59,8 @@ import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
     AdminFeaturesTabComponent,
     AdminJobsTabComponent,
     AdminNavbarComponent,
-    AdminDevModeActivitiesTabComponent
+    AdminDevModeActivitiesTabComponent,
+    RolesAndActionsVisualizerComponent
   ],
   providers: [
     {
@@ -81,11 +84,11 @@ class AdminPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(AdminPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

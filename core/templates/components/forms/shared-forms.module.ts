@@ -25,28 +25,32 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
 import { MaterialModule } from 'components/material.module';
-import { TranslateModule } from 'filters/translate.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
+import { AudioSliderComponent } from './slider/audio-slider.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    MaterialModule,
+    CustomFormsComponentsModule,
     DynamicContentModule,
+    FormsModule,
+    MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
-    FormsModule,
-    TranslateModule,
-    CustomFormsComponentsModule
+    SharedPipesModule
   ],
   declarations: [
+    AudioSliderComponent,
     SchemaBasedEditorDirective
   ],
   entryComponents: [
+    AudioSliderComponent
   ],
   exports: [
+    AudioSliderComponent,
     CustomFormsComponentsModule,
     SchemaBasedEditorDirective
   ],

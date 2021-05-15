@@ -20,7 +20,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory.ts';
+import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -286,9 +286,10 @@ describe('retrieving threads service', () => {
     flushMicrotasks();
   }));
 
-  it('should throw error if trying to fetch messages of null thread', () => {
-    expect(() => threadDataBackendApiService.getMessagesAsync(null))
-      .toThrowError('Trying to update a non-existent thread');
+  it('should throw error if trying to fetch messages of' +
+    'null thread', async() => {
+    await expectAsync(threadDataBackendApiService.getMessagesAsync(null))
+      .toBeRejectedWithError('Trying to update a non-existent thread');
   });
 
   it(
@@ -424,9 +425,9 @@ describe('retrieving threads service', () => {
     flushMicrotasks();
   }));
 
-  it('should throw error if trying to mark null thread as seen', () => {
-    expect(() => threadDataBackendApiService.markThreadAsSeenAsync(null))
-      .toThrowError('Trying to update a non-existent thread');
+  it('should throw error if trying to mark null thread as seen', async() => {
+    await expectAsync(threadDataBackendApiService.markThreadAsSeenAsync(null))
+      .toBeRejectedWithError('Trying to update a non-existent thread');
   });
 
   it(
@@ -451,9 +452,9 @@ describe('retrieving threads service', () => {
       flushMicrotasks();
     }));
 
-  it('should use reject handler when passing a null thread', () => {
-    expect(() => threadDataBackendApiService.addNewMessageAsync(
-      null, 'Message', 'open')).toThrowError(
+  it('should use reject handler when passing a null thread', async() => {
+    await expectAsync(threadDataBackendApiService.addNewMessageAsync(
+      null, 'Message', 'open')).toBeRejectedWithError(
       'Trying to update a non-existent thread');
   });
 
@@ -601,8 +602,9 @@ describe('retrieving threads service', () => {
     flushMicrotasks();
   }));
 
-  it('should throw an error if trying to resolve a null thread', () => {
-    expect(() => threadDataBackendApiService.resolveSuggestionAsync(null))
-      .toThrowError('Trying to update a non-existent thread');
+  it('should throw an error if trying to resolve a null thread', async() => {
+    await expectAsync(
+      threadDataBackendApiService.resolveSuggestionAsync(null))
+      .toBeRejectedWithError('Trying to update a non-existent thread');
   });
 });
