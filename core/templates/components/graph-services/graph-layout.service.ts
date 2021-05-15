@@ -452,8 +452,8 @@ export class StateGraphLayoutService {
       ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
       nodeData[nodeId].width = (
         (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
-      ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2)
-      + WIDTH_OFFSET_CHECKPOINT_ICON;
+      ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2) +
+      WIDTH_OFFSET_CHECKPOINT_ICON;
     }
 
     // Assign id and label to each node.

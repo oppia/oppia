@@ -313,9 +313,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
       },
       getCheckpointCount: function() {
         var count: number = 0;
-        if(_states != null) {
+        if (_states) {
           _states.getStateNames().forEach(function(stateName) {
-            if(_states.getState(stateName).cardIsCheckpoint) {
+            if (_states.getState(stateName).cardIsCheckpoint) {
               count++;
             }
           });

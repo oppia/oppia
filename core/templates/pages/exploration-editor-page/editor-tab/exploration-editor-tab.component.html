@@ -9,11 +9,11 @@
         <state-name-editor></state-name-editor>
       </div>
       <div>
-      <md-checkbox class="checkpoint-selection-checkbox"
-                   ng-change="$ctrl.onChangeCardIsCheckpoint()"
-                   ng-model="$ctrl.stateCardIsCheckpointService.displayed">
-        Set as a checkpoint for learners
-      </md-checkbox>
+        <md-checkbox class="checkpoint-selection-checkbox"
+                     ng-change="$ctrl.onChangeCardIsCheckpoint()"
+                     ng-model="$ctrl.stateCardIsCheckpointService.displayed">
+          Set as a checkpoint for learners
+        </md-checkbox>
       </div>
       <div ng-if="$ctrl.areParametersEnabled()">
         <state-param-changes-editor></state-param-changes-editor>

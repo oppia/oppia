@@ -1040,8 +1040,8 @@ class Exploration(python_utils.OBJECT):
                     if state_name != self.init_state_name:
                         if self.states[state_name].card_is_checkpoint:
                             raise utils.ValidationError(
-                                'Expected card_is_checkpoint of terminal state to '
-                                'be False but found it to be %s'
+                                'Expected card_is_checkpoint of terminal state '
+                                'to be False but found it to be %s'
                                 % self.states[state_name].card_is_checkpoint
                             )
 
@@ -1060,15 +1060,17 @@ class Exploration(python_utils.OBJECT):
             # Check if a state marked as a checkpoint is bypassable.
             non_initial_checkpoint_state_names = []
             for state_name, state in self.states.items():
-                if state_name != self.init_state_name and state.card_is_checkpoint:
+                if (state_name != self.init_state_name
+                        and state.card_is_checkpoint):
                     non_initial_checkpoint_state_names.append(state_name)
 
-            # For every non-initial checkpoint state we remove it from the states
-            # dict. Then we check if we can reach a terminal state after removing
-            # the state with checkpoint. As soon as we find a terminal state, we
-            # break out of the loop and raise a validation error. Since, we reached
-            # a terminal state, this implies that the user was not required to go
-            # through the checkpoint. Hence, the checkpoint is bypassable.
+            # For every non-initial checkpoint state we remove it from the
+            # states dict. Then we check if we can reach a terminal state after
+            # removing the state with checkpoint. As soon as we find a terminal
+            # state, we break out of the loop and raise a validation error.
+            # Since, we reached a terminal state, this implies that the user was
+            # not required to go through the checkpoint. Hence, the checkpoint
+            # is bypassable.
             for state_name_to_exclude in non_initial_checkpoint_state_names:
                 new_states = copy.deepcopy(self.states)
                 new_states.pop(state_name_to_exclude)
@@ -1085,10 +1087,10 @@ class Exploration(python_utils.OBJECT):
                         processed_state_names.add(curr_state_name)
                         curr_state = new_states[curr_state_name]
 
-                        # We do not need to check if the current state is terminal
-                        # or not before getting all outcomes, as when we find a
-                        # terminal state in an outcome, we break out of the for loop
-                        # and raise a validation error.
+                        # We do not need to check if the current state is
+                        # terminal or not before getting all outcomes, as when
+                        # we find a terminal state in an outcome, we break out
+                        # of the for loop and raise a validation error.
                         all_outcomes = (
                             curr_state.interaction.get_all_outcomes())
                         for outcome in all_outcomes:

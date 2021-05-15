@@ -43,7 +43,6 @@ angular.module('oppia').component('explorationGraph', {
         GraphDataService, LoggerService, RouterService,
         StateEditorService, UrlInterpolationService) {
       var ctrl = this;
-      var checkpointCountWarning = '';
       // We hide the graph at the outset in order not to confuse new
       // exploration creators.
       ctrl.isGraphShown = function() {
@@ -64,7 +63,7 @@ angular.module('oppia').component('explorationGraph', {
 
       ctrl.getCheckpointCount = function() {
         return ExplorationStatesService.getCheckpointCount();
-      }
+      };
 
       ctrl.openStateGraphModal = function() {
         AlertsService.clearWarnings();
@@ -107,7 +106,7 @@ angular.module('oppia').component('explorationGraph', {
         ctrl.checkpointCountWarning = (
           ExplorationWarningsService.getCheckpointCountWarning());
         return ctrl.checkpointCountWarning;
-      }
+      };
     }
   ]
 });

@@ -33,14 +33,14 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationWarningsService', [
-  '$injector', 'ExplorationStatesService', 'ExplorationInitStateNameService',
+  '$injector', 'ExplorationInitStateNameService', 'ExplorationStatesService',
   'GraphDataService', 'ImprovementsService',
   'ParameterMetadataService', 'SolutionValidityService',
   'StateTopAnswersStatsService', 'CHECKPOINT_ERROR_MESSAGES',
   'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
-      $injector, ExplorationStatesService, ExplorationInitStateNameService,
+      $injector, ExplorationInitStateNameService, ExplorationStatesService,
       GraphDataService, ImprovementsService,
       ParameterMetadataService, SolutionValidityService,
       StateTopAnswersStatsService, CHECKPOINT_ERROR_MESSAGES,
@@ -291,8 +291,8 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       }
 
       var initStateName = ExplorationInitStateNameService.displayed;
-      var initState = _states.getState(initStateName)
-      if(initState && !initState.cardIsCheckpoint) {
+      var initState = _states.getState(initStateName);
+      if (initState && !initState.cardIsCheckpoint) {
         _extendStateWarnings(
           initStateName, CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
       }
@@ -302,35 +302,35 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       _states.getStateNames().forEach(stateName => {
         var state = _states.getState(stateName);
         var interactionId = state.interaction.id;
-        if(interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
-          if(state.cardIsCheckpoint) {
+        if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
+          if (state.cardIsCheckpoint) {
             _extendStateWarnings(
               stateName, CHECKPOINT_ERROR_MESSAGES.TERMINAL_CARD);
           }
           terminalStateCount++;
         }
-        if(stateName != initStateName && state.cardIsCheckpoint) {
+        if (stateName !== initStateName && state.cardIsCheckpoint) {
           nonInitialCheckpointStateNames.push(stateName);
         }
       });
 
-      var checkpointCount = ExplorationStatesService.getCheckpointCount()
-      if(checkpointCount >= 9) {
+      var checkpointCount = ExplorationStatesService.getCheckpointCount();
+      if (checkpointCount >= 9) {
         checkpointCountWarning = CHECKPOINT_ERROR_MESSAGES.CHECKPOINT_COUNT;
         _warningsList.push({
           type: WARNING_TYPES.ERROR,
           message: ('Checkpoint count has an error.')
-        })
+        });
       }
 
-      for(var i in nonInitialCheckpointStateNames) {
+      for (var i in nonInitialCheckpointStateNames) {
         var links = _graphData.links;
         var newLinks = [];
         var newNodes = _graphData.nodes;
         delete newNodes[nonInitialCheckpointStateNames[i]];
 
         links.forEach(edge => {
-          if(edge.source != nonInitialCheckpointStateNames[i]) {
+          if (edge.source !== nonInitialCheckpointStateNames[i]) {
             newLinks.push(edge);
           }
         });
@@ -341,15 +341,15 @@ angular.module('oppia').factory('ExplorationWarningsService', [
         var terminalUnreachableStateCount = 0;
         unreachableNodeNames.forEach(stateName => {
           var interactionId = _states.getState(stateName).interaction.id;
-          if(interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
+          if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
             terminalUnreachableStateCount++;
           }
         });
 
-        if(terminalStateCount != terminalUnreachableStateCount) {
+        if (terminalStateCount !== terminalUnreachableStateCount) {
           _extendStateWarnings(
             nonInitialCheckpointStateNames[i],
-            CHECKPOINT_ERROR_MESSAGES.BYPASSABLE_CARD)
+            CHECKPOINT_ERROR_MESSAGES.BYPASSABLE_CARD);
         }
       }
 
