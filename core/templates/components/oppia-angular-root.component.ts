@@ -470,7 +470,7 @@ import { TranslateCacheService } from 'ngx-translate-cache';
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-
+  static ajsTranslate;
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;

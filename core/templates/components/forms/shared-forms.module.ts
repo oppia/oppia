@@ -29,13 +29,16 @@ import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
+import { AudioSliderComponent } from './slider/audio-slider.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    MaterialModule,
+    CustomFormsComponentsModule,
     DynamicContentModule,
+    FormsModule,
+    MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
@@ -44,11 +47,14 @@ import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-
     CustomFormsComponentsModule
   ],
   declarations: [
+    AudioSliderComponent,
     SchemaBasedEditorDirective
   ],
   entryComponents: [
+    AudioSliderComponent
   ],
   exports: [
+    AudioSliderComponent,
     CustomFormsComponentsModule,
     SchemaBasedEditorDirective
   ],
