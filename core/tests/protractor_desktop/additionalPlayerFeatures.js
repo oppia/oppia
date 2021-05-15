@@ -19,7 +19,8 @@
  * refresher explorations, state parameters, etc.
  */
 
-var forms = require('../protractor_utils/forms.js');
+var action = require('../protractor_utils/action.js');
+ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
@@ -507,8 +508,9 @@ describe('Full exploration editor', function() {
     await libraryPage.playExploration('Exploration with Recommendation');
     var recommendedExplorationTile = element(
       by.css('.protractor-test-exp-summary-tile-title'));
-    expect(await recommendedExplorationTile.getText())
-      .toEqual('Recommended Exploration 1');
+    var recommendedExplorationName = await action.getText(
+      'Recommended Exploration Tile', recommendedExplorationTile);
+    expect(recommendedExplorationName).toEqual('Recommended Exploration 1');
     await recommendedExplorationTile.click();
     await explorationPlayerPage.expectExplorationNameToBe(
       'Recommended Exploration 1');
