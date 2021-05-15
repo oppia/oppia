@@ -162,6 +162,7 @@ class ValidateOldModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
 
 class UserEmailPreferencesModelRelationshipsTest(
         job_test_utils.PipelinedTestBase):
+
     NOW = datetime.datetime.utcnow()
 
     def test_model_without_dependent_model(self):
@@ -172,7 +173,8 @@ class UserEmailPreferencesModelRelationshipsTest(
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(
-                user_validation.user_email_preferences_model_relationships())
+                user_validation.user_email_preferences_model_relationships(
+                    model))
         )
         self.assertIsNot(output, [])
 
@@ -187,7 +189,8 @@ class UserEmailPreferencesModelRelationshipsTest(
             self.pipeline
             | beam.Create([model, dependent_model])
             | beam.ParDo(
-                user_validation.user_email_preferences_model_relationships())
+                user_validation.user_email_preferences_model_relationships(
+                    model))
         )
         self.assert_pcoll_equal(output, [])
 
