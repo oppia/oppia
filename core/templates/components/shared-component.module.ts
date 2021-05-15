@@ -185,7 +185,6 @@ const toastrConfig = {
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     UploadActivityModalComponent,
-    PromoBarComponent,
     SortByPipe,
     LearnerDashboardIconsComponent
   ],
@@ -265,6 +264,8 @@ const toastrConfig = {
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    PromoBarComponent,
+    RubricsEditorComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
