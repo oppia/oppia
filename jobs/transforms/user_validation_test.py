@@ -166,10 +166,10 @@ class UserEmailPreferencesModelRelationshipsTest(
 
     def test_with_only_one_model_present(self):
         userEmailPrefernceModel = user_models.UserEmailPreferencesModel(
-            created_on=self.NOW,id='test_user',
+            created_on=self.NOW, id='test_user',
             last_updated=self.NOW)
         userSettingsModel = user_models.UserSettingsModel(
-            email='a@a.com',created_on=self.NOW,id='test_user',
+            email='a@a.com', created_on=self.NOW, id='test_user',
             last_updated=self.NOW)
         output = (
             self.pipeline
