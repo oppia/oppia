@@ -16,15 +16,13 @@
  * @fileoverview Component for the about page.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
-import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
 import { WindowRef } from
   'services/contextual/window-ref.service';
 
@@ -32,9 +30,7 @@ import { WindowRef } from
   selector: 'about-page',
   templateUrl: './about-page.component.html'
 })
-export class AboutPageComponent implements OnInit {
-  classroomUrl: string;
-  userIsLoggedIn: boolean;
+export class AboutPageComponent {
   features = [{
     i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
     imageFilename: '/about/cc.svg',
@@ -54,9 +50,7 @@ export class AboutPageComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private siteAnalyticsService: SiteAnalyticsService,
-    private userService: UserService,
-    private loaderService: LoaderService) {
+    private siteAnalyticsService: SiteAnalyticsService) {
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -64,17 +58,12 @@ export class AboutPageComponent implements OnInit {
   }
 
   onClickVisitClassroomButton(): void {
-    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+    let classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
-    this.loaderService.showLoadingScreen('Loading');
-    this.userService.getUserInfoAsync().then((userInfo) => {
-      this.userIsLoggedIn = userInfo.isLoggedIn();
-      this.loaderService.hideLoadingScreen();
-    });
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    this.windowRef.nativeWindow.location.href = classroomUrl;
   }
 
   onClickBrowseLibraryButton(): void {
@@ -87,8 +76,6 @@ export class AboutPageComponent implements OnInit {
     this.windowRef.nativeWindow.location.href = (
       '/creator-dashboard?mode=create');
   }
-
-  ngOnInit(): void {}
 }
 angular.module('oppia').directive(
   'aboutPage', downgradeComponent({component: AboutPageComponent}));

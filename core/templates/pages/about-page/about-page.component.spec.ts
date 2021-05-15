@@ -16,19 +16,15 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { TestBed, fakeAsync } from '@angular/core/testing';
-import { EventEmitter, Pipe } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { Pipe } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutPageComponent } from './about-page.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -47,32 +43,15 @@ class MockTranslateService {
   }
 }
 
-class MockI18nLanguageCodeService {
-  codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
-    return 'en';
-  }
-
-  get onI18nLanguageCodeChange() {
-    return this.codeChangeEventEmiiter;
-  }
-}
-
 describe('About Page', () => {
   const siteAnalyticsService = new SiteAnalyticsService(
     new WindowRef());
-  let loaderService: LoaderService = null;
-  let userService: UserService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [AboutPageComponent,
         MockTranslatePipe],
       imports: [HttpClientTestingModule],
       providers: [
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -94,8 +73,6 @@ describe('About Page', () => {
         }
       ]
     }).compileComponents();
-    loaderService = TestBed.get(LoaderService);
-    userService = TestBed.get(UserService);
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     component = aboutPageComponent.componentInstance;
   });
@@ -105,7 +82,6 @@ describe('About Page', () => {
   it('should successfully instantiate the component',
     () => {
       expect(component).toBeDefined();
-      component.ngOnInit();
     });
 
   it('should return correct static image url when calling getStaticImageUrl',
@@ -127,30 +103,8 @@ describe('About Page', () => {
       '/creator-dashboard?mode=create');
   });
 
-  it('should show and hide loading screen with the correct text', () =>
-    fakeAsync(() => {
-      component.ngOnInit();
-      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-      expect(loaderService.showLoadingScreen)
-        .toHaveBeenCalledWith('Loading');
-    }));
-
   it('should register correct event on calling onClickVisitClassroomButton',
     () => {
-      const userInfoBackendDict = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: false,
-        preferred_site_language_code: null,
-        username: '',
-        email: '',
-        user_is_logged_in: true
-      };
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-        UserInfo.createFromBackendDict(userInfoBackendDict))
-      );
       spyOn(
         siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
         .and.callThrough();
@@ -158,9 +112,8 @@ describe('About Page', () => {
 
       expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
         .toHaveBeenCalledWith();
-      expect(component.classroomUrl).toBe('/learn/math');
       expect(component.windowRef.nativeWindow.location.href).toBe(
-        component.classroomUrl);
+        '/learn/math');
     });
 
   it('should register correct event on calling onClickBrowseLibraryButton',
