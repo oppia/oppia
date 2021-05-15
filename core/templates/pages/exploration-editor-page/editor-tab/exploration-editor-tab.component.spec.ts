@@ -40,6 +40,9 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateCardIsCheckpointService } from
+// eslint-disable-next-line max-len
+'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -113,6 +116,9 @@ describe('Exploration editor tab component', function() {
     $provide.value(
       'StateClassifierMappingService',
       TestBed.get(StateClassifierMappingService));
+    $provide.value(
+      'StateCardIsCheckpointService',
+      TestBed.get(StateCardIsCheckpointService));
     $provide.value(
       'StateEditorService', TestBed.get(StateEditorService));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));

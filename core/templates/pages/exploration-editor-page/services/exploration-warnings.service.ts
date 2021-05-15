@@ -291,7 +291,8 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       }
 
       var initStateName = ExplorationInitStateNameService.displayed;
-      if(!_states.getState(initStateName).cardIsCheckpoint) {
+      var initState = _states.getState(initStateName)
+      if(initState && !initState.cardIsCheckpoint) {
         _extendStateWarnings(
           initStateName, CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
       }

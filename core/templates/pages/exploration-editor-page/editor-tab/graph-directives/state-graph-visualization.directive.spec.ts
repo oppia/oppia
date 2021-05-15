@@ -24,6 +24,9 @@ import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
+import { StateCardIsCheckpointService } from
+// eslint-disable-next-line max-len
+'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateSolutionService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-solution.service';
@@ -118,6 +121,9 @@ describe('State Graph Visualization directive', function() {
       TestBed.get(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+    $provide.value(
+      'StateCardIsCheckpointService',
+      TestBed.get(StateCardIsCheckpointService));
     $provide.value(
       'StateCustomizationArgsService',
       TestBed.get(StateCustomizationArgsService));
