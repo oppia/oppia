@@ -439,7 +439,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Second).toBe(FEW_ASSETS_AVAILABLE_COLOR);
     });
 
-    it('should correctly return an object containing status colors of ' +
+    fit('should correctly return an object containing status colors of ' +
       'translations for all states in the exploration', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
