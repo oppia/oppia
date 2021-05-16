@@ -16,7 +16,7 @@
  * @fileoverview Tests for roles-and-actions-visualizer component.
  */
 
-import { ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RolesAndActionsVisualizerComponent } from './roles-and-actions-visualizer.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';

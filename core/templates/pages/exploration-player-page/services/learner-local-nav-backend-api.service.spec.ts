@@ -47,7 +47,7 @@ describe('Learner Local Nav Backend Api Service', () => {
       expId, {
         report_type: reportType,
         report_text: reportText,
-        state}).then(successHandler, failHandler);
+        state }).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(llnba.flagExplorationUrl);
     expect(req.request.method).toEqual('POST');

@@ -26,4 +26,4 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class ContactPageComponent {}
 
 angular.module('oppia').directive(
-  'oppiaContactPage', downgradeComponent({component: ContactPageComponent}));
+  'oppiaContactPage', downgradeComponent({ component: ContactPageComponent }));

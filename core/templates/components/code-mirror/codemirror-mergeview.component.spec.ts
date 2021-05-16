@@ -67,10 +67,11 @@ describe('Oppia CodeMirror Component', () => {
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     component.codeMirrorInstance = {
       editor: () => {
-        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
+        return { setValue: editSetValueSpy } as unknown as CodeMirror.Editor;
       },
       rightOriginal: () => {
-        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+        return {
+          setValue: rightOrgSetValueSpy } as unknown as CodeMirror.Editor;
       }
     } as unknown as CodeMirror.MergeView.MergeViewEditor;
     let changes: SimpleChanges = {
@@ -104,10 +105,11 @@ describe('Oppia CodeMirror Component', () => {
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     component.codeMirrorInstance = {
       editor: () => {
-        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
+        return { setValue: editSetValueSpy } as unknown as CodeMirror.Editor;
       },
       rightOriginal: () => {
-        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+        return {
+          setValue: rightOrgSetValueSpy } as unknown as CodeMirror.Editor;
       }
     } as unknown as CodeMirror.MergeView.MergeViewEditor;
     const changes: SimpleChanges = {

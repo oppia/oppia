@@ -95,7 +95,7 @@ describe('Classifier Data Backend API Service', () => {
         const req = httpTestingController.expectOne(
           req => req.url === classifierMetaDataRequestUrl);
         expect(req.request.method).toEqual('GET');
-        req.flush('', {status: 400, statusText: 'Failed'});
+        req.flush('', { status: 400, statusText: 'Failed' });
         flushMicrotasks();
         expect(successHandler).not.toHaveBeenCalled();
         expect(failHandler).toHaveBeenCalled();
@@ -126,7 +126,7 @@ describe('Classifier Data Backend API Service', () => {
           classifierBuffer.buffer.slice(
             classifierBuffer.byteOffset,
             classifierBuffer.byteOffset + classifierBuffer.byteLength),
-          {status: 400, statusText: 'Failed'});
+          { status: 400, statusText: 'Failed' });
         flushMicrotasks();
         expect(successHandler).not.toHaveBeenCalled();
         expect(failHandler).toHaveBeenCalled();

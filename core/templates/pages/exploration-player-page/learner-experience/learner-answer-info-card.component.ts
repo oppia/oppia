@@ -58,7 +58,7 @@ export class LearnerAnswerInfoCard {
     this.submitAnswer.emit({
       currentAnswer: this.learnerAnswerInfoService.getCurrentAnswer(),
       rulesService:
-      this.learnerAnswerInfoService.getCurrentInteractionRulesService()});
+      this.learnerAnswerInfoService.getCurrentInteractionRulesService() });
   }
 
   displayCurrentAnswer(): string {
