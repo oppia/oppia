@@ -265,14 +265,14 @@ describe('Site language', function() {
       await browser.get('/collection/' + collectionId);
       await waitFor.pageToFullyLoad();
       expect(await element(by.css('.oppia-share-collection-footer')).getText())
-        .toEqual('SHARE THIS COLLECTION');
+        .toEqual('COMPARTIR ESTA COLECCIÓN');
       await general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       await browser.get('/explore/' + firstExplorationId);
       await waitFor.pageToFullyLoad();
       expect(await element(by.css('.author-profile-text')).getText())
-        .toEqual('Author Profiles');
+        .toEqual('PERFILES DE AUTORES');
       await general.ensurePageHasNoTranslationIds();
     }
   );

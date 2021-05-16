@@ -45,4 +45,8 @@ describe('Missing Translations Handler', () => {
       translateService: null,
     })).toEqual(key);
   });
+
+  it('should get app constants', () => {
+    expect(mth.getAppConstants()).toBeDefined();
+  });
 });

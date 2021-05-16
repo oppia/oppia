@@ -18,42 +18,32 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateCacheModule, TranslateCacheService } from 'ngx-translate-cache';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { TranslateService } from '@ngx-translate/core';
 import { TranslateCacheFactory } from './translate-cache.factory';
 
 describe('Translate Cache Factory', () => {
-  let translateService: TranslateService;
+  class MockTranslateCacheService {
+    constructor(
+      private translateService: TranslateService,
+      private translateCacheSettings: TranslateCacheSettings
+    ) {}
+  }
+  let mockTranslateCacheService = new MockTranslateCacheService(null, null);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        TranslateModule.forRoot({
-          useDefaultLang: true,
-          isolate: false,
-          extend: false,
-          defaultLanguage: 'en'
-        }),
-        TranslateCacheModule.forRoot({
-          cacheService: TranslateCacheService,
-          cacheName: 'test',
-          cacheMechanism: 'Cookie',
-          cookieExpiry: 1
-        })
+      providers: [
+        {
+          provide: TranslateCacheService,
+          useValue: mockTranslateCacheService
+        }
       ]
     }).compileComponents();
   }));
 
-  beforeEach(() => {
-    translateService = TestBed.inject(TranslateService);
-  });
-
   it('should create translate cache service', () => {
     expect(TranslateCacheFactory.createTranslateCacheService(
-      translateService, {
-        cacheName: 'test',
-        cacheMechanism: 'Cookie',
-        cookieExpiry: 1
-      })).toBeDefined();
+      null, null)).toBeDefined();
   });
 });
