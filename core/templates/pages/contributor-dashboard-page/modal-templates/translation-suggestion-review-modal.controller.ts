@@ -33,21 +33,21 @@ angular.module('oppia').controller(
     'initialSuggestionId', 'reviewable', 'subheading',
     'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
     'ACTION_REJECT_SUGGESTION', 'IMAGE_CONTEXT',
-    'MAX_TEXT_MESSAGE_LENGTH',
+    'MAX_REVIEW_MESSAGE_LENGTH',
     function(
         $http, $scope, $uibModalInstance, AlertsService,
         ContextService, ContributionAndReviewService, SiteAnalyticsService,
         UrlInterpolationService, ValidatorsService,
         initialSuggestionId, reviewable, subheading, suggestionIdToSuggestion,
         ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION, IMAGE_CONTEXT,
-        MAX_TEXT_MESSAGE_LENGTH) {
+        MAX_REVIEW_MESSAGE_LENGTH) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
       $scope.subheading = subheading;
-      $scope.MAX_TEXT_MESSAGE_LENGTH = MAX_TEXT_MESSAGE_LENGTH;
+      $scope.MAX_REVIEW_MESSAGE_LENGTH = MAX_REVIEW_MESSAGE_LENGTH;
       delete suggestionIdToSuggestion[initialSuggestionId];
       var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 

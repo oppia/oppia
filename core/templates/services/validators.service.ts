@@ -121,11 +121,11 @@ export class ValidatorsService {
   }
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
     if (input) {
-      if (input.length > constants.MAX_TEXT_MESSAGE_LENGTH) {
+      if (input.length > constants.MAX_REVIEW_MESSAGE_LENGTH) {
         if (showWarnings) {
           this.alerts.addWarning(
             'Review message should be at most ' +
-            constants.MAX_TEXT_MESSAGE_LENGTH + ' characters long.');
+            constants.MAX_REVIEW_MESSAGE_LENGTH + ' characters long.');
         }
         return false;
       }
