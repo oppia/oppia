@@ -26,8 +26,8 @@ into this file.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs import audit_jobs  # pylint: disable=unused-import
 from jobs import base_jobs
+from jobs import base_validation_jobs  # pylint: disable=unused-import
 
 
 def get_all_jobs():

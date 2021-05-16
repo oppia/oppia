@@ -19,11 +19,12 @@
 import { TestBed } from '@angular/core/testing';
 
 import { DeviceInfoService } from
-  'services/contextual/device-info.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+  'services/contextual/device-info.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Device Info Service', () => {
-  let dis, wrs;
+  let dis: DeviceInfoService;
+  let wrs: WindowRef;
   const mobileUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like ' +
     'Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
     'Mobile/15A372 Safari/604.1';

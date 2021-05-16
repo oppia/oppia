@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import io
+import itertools
 import os
 import sys
 
@@ -511,7 +512,8 @@ def create_enum(*sequential):
     enum_values = dict(ZIP(sequential, sequential))
     try:
         from enum import Enum # pylint: disable=import-only-modules
-        return Enum('Enum', enum_values)
+        # The type() of argument 1 in Enum must be str, not unicode.
+        return Enum(str('Enum'), enum_values) # pylint: disable=disallowed-function-calls
     except ImportError:
         _enums = {}
         for name, value in enum_values.items():
@@ -521,3 +523,23 @@ def create_enum(*sequential):
             }
             _enums[name] = type(b'Enum', (), _value)
         return type(b'Enum', (), _enums)
+
+
+def zip_longest(*args, **kwargs):
+    """Creates an iterator that aggregates elements from each of the iterables.
+    If the iterables are of uneven length, missing values are
+    filled-in with fillvalue.
+
+    Args:
+        *args: list(*). Iterables that needs to be aggregated into an iterable.
+        **kwargs: dict. It contains fillvalue.
+
+    Returns:
+        iterable(iterable). A sequence of aggregates elements
+        from each of the iterables.
+    """
+    fillvalue = kwargs.get('fillvalue')
+    try:
+        return itertools.zip_longest(*args, fillvalue=fillvalue)
+    except AttributeError:
+        return itertools.izip_longest(*args, fillvalue=fillvalue)
