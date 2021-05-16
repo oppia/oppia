@@ -46,7 +46,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
                 content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
-            )
+        )
 
         output = (
             self.pipeline
@@ -70,7 +70,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
                     'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
                 content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'invalid': 'data'}])
-            )
+        )
 
         output = (
             self.pipeline
@@ -99,7 +99,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
                     'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
                 content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'invalid'}])
-            )
+        )
 
         output = (
             self.pipeline
@@ -132,7 +132,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
                     'property_name': 'question_state_data',
                     'old_value': 'old_value'
                 }])
-            )
+        )
 
         output = (
             self.pipeline
@@ -165,7 +165,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
                     'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
                 content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{'cmd': 'create_new', 'invalid': 'invalid'}])
-            )
+        )
 
         output = (
             self.pipeline
@@ -199,7 +199,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
                     'new_value': 'new_value',
                     'old_value': 'old_value'
                 }])
-            )
+        )
 
         output = (
             self.pipeline

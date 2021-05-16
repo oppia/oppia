@@ -32,18 +32,21 @@ import apache_beam as beam
 
 class ValidateCollectionCommitCmdsSchemaTests(
         job_test_utils.PipelinedTestBase):
-    
+
     def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = collection_models.CollectionSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        invalid_commit_cmd_model = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        )
 
         output = (
             self.pipeline
@@ -56,16 +59,18 @@ class ValidateCollectionCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [])
 
     def test_collection_change_object_with_missing_cmd(self):
-        invalid_commit_cmd_model = collection_models.CollectionSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'invalid': 'data'}])
+        invalid_commit_cmd_model = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_cmds=[{'invalid': 'data'}])
+        )
 
         output = (
             self.pipeline
@@ -80,19 +85,21 @@ class ValidateCollectionCommitCmdsSchemaTests(
                 invalid_commit_cmd_model,
                 {'invalid': 'data'},
                 'Missing cmd key in change dict')
-        ])    
+        ])
 
     def test_collection_change_object_with_invalid_cmd(self):
-        invalid_commit_cmd_model = collection_models.CollectionSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'cmd': 'invalid'}])
+        invalid_commit_cmd_model = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_cmds=[{'cmd': 'invalid'}])
+        )
 
         output = (
             self.pipeline
@@ -110,20 +117,22 @@ class ValidateCollectionCommitCmdsSchemaTests(
         ])
 
     def test_collection_change_object_with_missing_attribute_in_cmd(self):
-        invalid_commit_cmd_model = collection_models.CollectionSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{
-                'cmd': 'edit_collection_node_property',
-                'property_name': 'category',
-                'old_value': 'old_value'
-            }])
+        invalid_commit_cmd_model = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_cmds=[{
+                    'cmd': 'edit_collection_node_property',
+                    'property_name': 'category',
+                    'old_value': 'old_value'
+                }])
+        )
 
         output = (
             self.pipeline
@@ -143,26 +152,28 @@ class ValidateCollectionCommitCmdsSchemaTests(
                 },
                 'The following required attributes are missing: '
                 'exploration_id, new_value')
-        ])        
+        ])
 
     def test_collection_change_object_with_extra_attribute_in_cmd(self):
-        invalid_commit_cmd_model = collection_models.CollectionSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{
-                'cmd': 'edit_collection_node_property',
-                'exploration_id': 'exploration_id',
-                'property_name': 'category',
-                'old_value': 'old_value',
-                'new_value': 'new_value',
-                'invalid': 'invalid'
-            }])
+        invalid_commit_cmd_model = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_cmds=[{
+                    'cmd': 'edit_collection_node_property',
+                    'exploration_id': 'exploration_id',
+                    'property_name': 'category',
+                    'old_value': 'old_value',
+                    'new_value': 'new_value',
+                    'invalid': 'invalid'
+                }])
+        )
 
         output = (
             self.pipeline
@@ -184,24 +195,26 @@ class ValidateCollectionCommitCmdsSchemaTests(
                     'invalid': 'invalid'
                 },
                 'The following extra attributes are present: invalid')
-        ])        
+        ])
 
     def test_collection_change_object_with_invalid_collection_property(self):
-        invalid_commit_cmd_model = collection_models.CollectionSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{
-                'cmd': 'edit_collection_property',
-                'property_name': 'invalid',
-                'old_value': 'old_value',
-                'new_value': 'new_value',
-            }])
+        invalid_commit_cmd_model = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='model_id-1',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_cmds=[{
+                    'cmd': 'edit_collection_property',
+                    'property_name': 'invalid',
+                    'old_value': 'old_value',
+                    'new_value': 'new_value',
+                }])
+        )
 
         output = (
             self.pipeline
