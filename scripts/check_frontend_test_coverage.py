@@ -87,7 +87,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'csrf-token.service.ts',
     'current-interaction.service.ts',
     'drag-and-drop-positive-int-editor.component.ts',
-    'edit-thumbnail-modal.component.ts'
     'editable-collection-backend-api.service.ts',
     'editable-story-backend-api.service.ts',
     'email-dashboard-data.service.ts',

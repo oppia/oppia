@@ -87,7 +87,7 @@ describe('Edit Thumbnail Modal Component', () => {
   });
 
   it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', fakeAsync((done) => {
+    ' svg file', fakeAsync(() => {
     // This spy is to be sure that an image element will be returned from
     // document.querySelector method.
     spyOn(document, 'querySelector').and.callFake(() => {
@@ -115,8 +115,6 @@ describe('Edit Thumbnail Modal Component', () => {
     // the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(new MockImageObject());
-
-    done();
 
     // ---- Dispatch on load event ----
     image.dispatchEvent(new Event('load'));
