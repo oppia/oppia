@@ -909,7 +909,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         if (self.change.skill_difficulty == change.skill_difficulty) and (
             self.change.question_dict == change.question_dict):
             raise utils.ValidationError(
-                'The new change skill_difficulty or question_dict should be'+
+                'The new change skill_difficulty or question_dict should be'
                 ' changed.')
 
     def _get_skill_difficulty(self):

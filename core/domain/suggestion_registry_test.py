@@ -1982,6 +1982,121 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
+    def test_pre_update_validate_change_question_dict_and_skill_difficulty(
+        self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change skill_difficulty or question_dict should be'
+            ' changed.'):
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change))
+    
+    def test_pre_update_validate_change_skill_difficulty(self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.6
+        }
+
+        self.assertEqual(
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change)), None)
+
+    def test_pre_update_validate_change_question_state_data(self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'hi',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        self.assertEqual(
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change)), None)
+
     def test_validate_author_id(self):
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
