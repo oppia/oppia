@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 
-describe('Question backend Api service', () => {
+fdescribe('Question backend Api service', () => {
   let questionBackendApiService = null;
   let sampleDataResults = null;
   let sampleResponse = null;
@@ -92,7 +92,7 @@ describe('Question backend Api service', () => {
           question_content: ''
         }
       }],
-      next_start_cursor: null
+      next_offset: null
     };
   });
 

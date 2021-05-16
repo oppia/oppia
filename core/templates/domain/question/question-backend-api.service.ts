@@ -46,7 +46,6 @@ interface QuestionSummariesBackendResponse {
 interface QuestionSummariesResponse {
   questionSummaries: QuestionSummaryForOneSkillBackendDict[];
   nextOffset: number;
-  response: QuestionSummariesBackendResponse;
 }
 
 @Injectable({
@@ -122,12 +121,10 @@ export class QuestionBackendApiService {
     ).toPromise().then(response => {
       var questionSummaries = cloneDeep(
         response.question_summary_dicts);
-
       if (successCallback) {
         successCallback({
           questionSummaries: questionSummaries,
-          nextOffset: response.next_offset,
-          response: response
+          nextOffset: response.next_offset
         });
       }
     }, (errorResponse) => {
