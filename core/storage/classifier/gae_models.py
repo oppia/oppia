@@ -28,7 +28,7 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
-NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 10
+NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
 
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
@@ -173,7 +173,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_new_and_pending_training_jobs(cls, offset=0):
+    def query_new_and_pending_training_jobs(cls, offset):
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
