@@ -117,7 +117,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
         self.payload_proto.job_result.CopyFrom(self.job_result)
-        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID.encode()
+        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID.encode(
+            encoding='utf-8')
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
@@ -126,8 +127,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             self.payload_proto.vm_id)
 
         self.payload_for_fetching_next_job_request = {
-            'vm_id': feconf.DEFAULT_VM_ID.encode(),
-            'message': json.dumps({}).encode()
+            'vm_id': feconf.DEFAULT_VM_ID.encode(encoding='utf-8'),
+            'message': json.dumps({}).encode(encoding='utf-8')
         }
 
         self.payload_for_fetching_next_job_request['signature'] = (
@@ -544,7 +545,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.payload = {}
         self.payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.payload['message'] = json.dumps({}).encode()
+        self.payload['message'] = json.dumps({}).encode(encoding='utf-8')
         self.payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             self.payload['message'], self.payload['vm_id'])

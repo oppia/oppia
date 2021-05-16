@@ -3478,9 +3478,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 
     def test_unauthorized_vm_cannot_fetch_jobs(self):
         payload = {}
-        payload['vm_id'] = 'fake_vm'.encode()
+        payload['vm_id'] = 'fake_vm'.encode(encoding='utf-8')
         secret = 'fake_secret'
-        payload['message'] = json.dumps('malicious message').encode()
+        payload['message'] = json.dumps(
+            'malicious message').encode(encoding='utf-8')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             payload['message'], payload['vm_id'])
@@ -3492,9 +3493,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 
     def test_default_vm_id_raises_exception_in_prod_mode(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
+        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode(encoding='utf-8')
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('malicious message').encode()
+        payload['message'] = json.dumps(
+            'malicious message').encode(encoding='utf-8')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             payload['message'], payload['vm_id'])
@@ -3505,9 +3507,10 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 
     def test_that_invalid_signature_raises_exception(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
+        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode(encoding='utf-8')
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('malicious message').encode()
+        payload['message'] = json.dumps(
+            'malicious message').encode(encoding='utf-8')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             'message'.encode(), payload['vm_id'])
@@ -3518,9 +3521,9 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
 
     def test_that_no_excpetion_is_raised_when_valid_vm_access(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode()
+        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode(encoding='utf-8')
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message').encode()
+        payload['message'] = json.dumps('message').encode(encoding='utf-8')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
             payload['message'], payload['vm_id'])
