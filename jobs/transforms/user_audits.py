@@ -138,8 +138,8 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
 
 @audit_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
-    """DoFn to validate there are no models that are archived but not
-    deleted.
+    """DoFn to validate there are no models that are archived but not 
+    marked as deleted.
     """
 
     def process(self, input_model):
