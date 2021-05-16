@@ -247,10 +247,10 @@ class ValidateArchivedModelsMarkedDeletedTests(
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateArchivedModelsMarkedDeleted())
+            | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [
-            audit_errors.ArchivedModelNotDeletedError(model)
+            user_validation_errors.ArchivedModelNotDeletedError(model)
         ])
 
     def test_model_not_archived(self):
@@ -264,6 +264,6 @@ class ValidateArchivedModelsMarkedDeletedTests(
         output = (
             self.pipeline
             | beam.Create([model])
-            | beam.ParDo(user_audits.ValidateArchivedModelsMarkedDeleted())
+            | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [])

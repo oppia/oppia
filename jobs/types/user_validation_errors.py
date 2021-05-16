@@ -62,3 +62,14 @@ class DraftChangeListLastUpdatedInvalidError(
         self.message = (
             'draft change list last updated %s is greater than the time '
             'when job was run' % model.draft_change_list_last_updated)
+
+
+class ArchivedModelNotDeletedError(
+        base_validation_errors.BaseAuditError):
+    """Error class for models that are archived but
+    not marked as deleted.
+    """
+
+    def __init__(self, model):
+        super(ArchivedModelNotDeletedError, self).__init__(model)
+        self.message = 'Archived model not marked as deleted'

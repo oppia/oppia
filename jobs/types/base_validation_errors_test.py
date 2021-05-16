@@ -428,21 +428,3 @@ class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
             '(id=\'invalid\'): Commit command domain validation for '
             'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed '
             'with error: Missing cmd key in change dict')
-
-
-class ArchivedModelNotDeletedErrorTests(AuditErrorsTestBase):
-
-    def test_message(self):
-        model = user_models.UserQueryModel(
-            id='test',
-            submitter_id='submitter',
-            created_on=self.YEAR_AGO,
-            last_updated=self.YEAR_AGO,
-            query_status=feconf.USER_QUERY_STATUS_ARCHIVED
-        )
-
-        error = audit_errors.ArchivedModelNotDeletedError(model)
-        self.assertEqual(
-            error.message,
-            'ArchivedModelNotDeletedError in UserQueryModel(id=\'test\'): '
-            'Archived model not marked as deleted')

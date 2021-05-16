@@ -145,7 +145,7 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
                 model)
 
 
-@audit_decorators.AuditsExisting(user_models.UserQueryModel)
+@validation_decorators.AuditsExisting(user_models.UserQueryModel)
 class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
     """DoFn to validate there are no models that are archived but not
     marked as deleted.
@@ -163,4 +163,4 @@ class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
         """
         model = job_utils.clone_model(input_model)
         if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
-            yield audit_errors.ArchivedModelNotDeletedError(model)
+            yield user_validation_errors.ArchivedModelNotDeletedError(model)
