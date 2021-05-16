@@ -382,20 +382,6 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
     };
 
     $scope.save = function() {
-      const interactionId = $scope.StateInteractionIdService.displayed;
-      if (interactionId === 'NumericExpressionInput') {
-        let escapeCharacters =
-          ['&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
-        let placeholderValue = (
-          StateCustomizationArgsService.displayed.placeholder.value.unicode);
-        for (var i = 0; i < placeholderValue.length; i++) {
-          if (escapeCharacters.includes(placeholderValue[i])) {
-            // eslint-disable-next-line max-len
-            StateCustomizationArgsService.displayed.placeholder.value.unicode = (
-              `\\verb|${placeholderValue}|`);
-          }
-        }
-      }
       const updatedContentIdToContent = $scope.getContentIdToContent(
         StateCustomizationArgsService.displayed);
       const contentIdsWithModifiedContent = [];

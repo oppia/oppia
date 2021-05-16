@@ -505,25 +505,6 @@ describe('Customize Interaction Modal Controller', function() {
       });
       expect(stateNextContentIdIndexService.displayed).toEqual(2);
     });
-
-    it('should escape special characters in NumericExpressionInput on save',
-      () => {
-        stateInteractionIdService.displayed = 'NumericExpressionInput';
-        stateCustomizationArgsService.displayed = {
-          placeholder: {value:
-            new SubtitledUnicode('2^2', null)
-          },
-          useFractionForDivision: false
-        };
-
-        $scope.save();
-        expect(stateCustomizationArgsService.displayed).toEqual({
-          placeholder: {value:
-            new SubtitledUnicode('\\verb|2^2|', 'ca_placeholder_undefined')
-          },
-          useFractionForDivision: false
-        });
-      });
   });
 
   it('should error when a saved customization arg is missing', () => {
