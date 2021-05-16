@@ -2166,6 +2166,13 @@ class StringConcatenationChecker(checkers.BaseChecker):
     def is_node_string_constant(self, node):
         """Helper function for visit_binop. Called to check if any of the
         operand is a string constant.
+
+        Args:
+            node: astroid.node_classes.NodeNG. Node containing the operand.
+
+        Returns:
+            bool: informs if it is a string constant or not. True if Operand
+                is a string constant, otherwise false.
         """
         if (isinstance(node, astroid.nodes.Const) and
                 ('str' in node.pytype() or
@@ -2184,13 +2191,13 @@ class StringConcatenationChecker(checkers.BaseChecker):
         if node.op != b'+':
             return
 
-        is_left_node_a_str_const = self.is_node_string_constant(node.left)
-        is_right_node_a_str_const = self.is_node_string_constant(node.right)
+        left_node_is_str = self.is_node_string_constant(node.left)
+        right_node_is_str = self.is_node_string_constant(node.right)
 
-        if not (is_left_node_a_str_const or is_right_node_a_str_const):
+        if not (left_node_is_str or right_node_is_str):
             return
-        
-        if is_left_node_a_str_const and is_right_node_a_str_const:
+
+        if left_node_is_str and right_node_is_str:
             self.add_message('no-string-concatenation', node=node)
         else:
             self.add_message('string-interpolation', node=node)
