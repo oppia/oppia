@@ -151,7 +151,7 @@ class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
 
         Yields:
             ArchivedModelNotDeletedError. Error for models with query_status
-            as Archived but not deleted.
+            set to archived but not marked as deleted.
         """
         model = job_utils.clone_model(input_model)
         if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
