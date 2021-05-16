@@ -23,9 +23,7 @@ import hmac
 import json
 import logging
 import os
-import sys
 import time
-import traceback
 
 from core.domain import auth_domain
 from core.domain import auth_services
@@ -503,7 +501,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.exception(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
