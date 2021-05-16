@@ -2187,16 +2187,13 @@ class StringConcatenationChecker(checkers.BaseChecker):
         is_left_node_a_str_const = self.is_node_string_constant(node.left)
         is_right_node_a_str_const = self.is_node_string_constant(node.right)
 
-        if is_left_node_a_str_const and is_right_node_a_str_const:
-            self.add_message(
-                'no-string-concatenation',
-                node=node)
-        elif not (is_left_node_a_str_const or is_right_node_a_str_const):
+        if not (is_left_node_a_str_const or is_right_node_a_str_const):
             return
+        
+        if is_left_node_a_str_const and is_right_node_a_str_const:
+            self.add_message('no-string-concatenation', node=node)
         else:
-            self.add_message(
-                'string-interpolation',
-                node=node)
+            self.add_message('string-interpolation', node=node)
 
 
 def register(linter):
