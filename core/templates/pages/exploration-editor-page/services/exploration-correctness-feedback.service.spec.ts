@@ -28,7 +28,7 @@ describe('Exploration Correctness Feedback Service', function() {
   beforeEach(function() {
     angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', {
-        autosaveChangeList: function() {}
+        autosaveChangeListAsync: function() {}
       });
     });
   });
