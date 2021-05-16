@@ -161,10 +161,11 @@ describe('Solution object factory', () => {
       };
       const expectedShortAnswerHtml = {
         prefix: 'One',
-        answer: '<oppia-short-response-0 ' +
-          'answer="&amp;quot;This is a correct answer!&amp;quot;" ' +
-          'choices="[&amp;quot;This is a choice&amp;quot;]">' +
-          '</oppia-short-response-0>'
+        answer: '<oppia-short-response-0 answer="&amp;quot;This is a ' +
+        'correct answer!&amp;quot;" choices="[&amp;quot;This is a ' +
+        'choice&amp;quot;]" interactionchoicesd="[{&amp;quot;_html&amp;quot;' +
+        ':&amp;quot;This is a choice&amp;quot;,&amp;quot;_contentId&amp;quot;' +
+        ':&amp;quot;&amp;quot;}]"></oppia-short-response-0>'
       };
 
       expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(

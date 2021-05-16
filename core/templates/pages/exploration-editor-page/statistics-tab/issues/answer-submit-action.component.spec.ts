@@ -86,8 +86,12 @@ describe('Answer Submit Action directive', function() {
 
   it('should get short answer html', function() {
     expect(ctrl.getShortAnswerHtml()).toBe(
-      '<oppia-short-response-multiple-choice-input answer="&amp;quot;This is' +
-      ' an answer string.&amp;quot;" choices="[&amp;quot;Value&amp;quot;]"' +
-      '></oppia-short-response-multiple-choice-input>');
+      '<oppia-short-response-multiple-choice-input answer="&amp;quot;' +
+      'This is an answer string.&amp;quot;" ' +
+      'choices="[&amp;quot;Value&amp;quot;]" ' +
+      'interactionchoicesd="[{&amp;quot;_html&amp;quot;:&amp;quot;Value&amp;' +
+      'quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;&amp;quot;}]">' +
+      '</oppia-short-response-multiple-choice-input>'
+    );
   });
 });
