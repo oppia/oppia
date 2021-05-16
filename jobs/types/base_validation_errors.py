@@ -245,13 +245,3 @@ class CommitCmdsValidateError(BaseAuditError):
             'Commit command domain validation for '
             'command: %s failed with error: %s' % (
                 commit_cmd_dict, e))
-
-
-class ArchivedModelNotDeletedError(BaseAuditError):
-    """Error class for models that are archived but
-    not marked as deleted.
-    """
-
-    def __init__(self, model):
-        super(ArchivedModelNotDeletedError, self).__init__(model)
-        self.message = 'Archived model not marked as deleted'
