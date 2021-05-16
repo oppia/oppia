@@ -911,7 +911,7 @@ class ContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def delete(self):
-        username = self.payload.get('username', None)
+        username = self.request.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
@@ -919,18 +919,18 @@ class ContributionRightsHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % username)
 
-        language_code = self.payload.get('language_code', None)
+        language_code = self.request.get('language_code', None)
         if language_code is not None and not (
                 utils.is_supported_audio_language_code(language_code)):
             raise self.InvalidInputException(
                 'Invalid language_code: %s' % language_code)
 
-        removal_type = self.payload.get('removal_type')
+        removal_type = self.request.get('removal_type')
         if removal_type == constants.ACTION_REMOVE_ALL_REVIEW_RIGHTS:
             user_services.remove_contribution_reviewer(user_id)
         elif (removal_type ==
               constants.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS):
-            category = self.payload.get('category')
+            category = self.request.get('category')
             if (category ==
                     constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION):
                 if not user_services.can_review_translation_suggestions(
@@ -982,30 +982,6 @@ class ContributionRightsHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        category = self.request.get('category')
-        language_code = self.request.get('language_code', None)
-        if language_code is not None and not (
-                utils.is_supported_audio_language_code(language_code)):
-            raise self.InvalidInputException(
-                'Invalid language_code: %s' % language_code)
-        if category not in [
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
-            raise self.InvalidInputException('Invalid category: %s' % category)
-        usernames = user_services.get_contributor_usernames(
-            category, language_code=language_code)
-        self.render_json({'usernames': usernames})
-
-
-class ContributionRightsDataHandler(base.BaseHandler):
-    """Handler to show the contribution rights of a user."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
         username = self.request.get('username', None)
         if username is None:
             raise self.InvalidInputException('Missing username param')
@@ -1023,6 +999,30 @@ class ContributionRightsDataHandler(base.BaseHandler):
             'can_review_questions': user_rights.can_review_questions,
             'can_submit_questions': user_rights.can_submit_questions
         })
+
+
+class ContributionRightsDataHandler(base.BaseHandler):
+    """Handler to show the contribution rights of a user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        category = self.request.get('category')
+        language_code = self.request.get('language_code', None)
+        if language_code is not None and not (
+                utils.is_supported_audio_language_code(language_code)):
+            raise self.InvalidInputException(
+                'Invalid language_code: %s' % language_code)
+        if category not in [
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
+                constants.CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION]:
+            raise self.InvalidInputException('Invalid category: %s' % category)
+        usernames = user_services.get_contributor_usernames(
+            category, language_code=language_code)
+        self.render_json({'usernames': usernames})
 
 
 class SendDummyMailToAdminHandler(base.BaseHandler):

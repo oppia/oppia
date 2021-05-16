@@ -2327,7 +2327,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/contributionrightshandler', params={
+            '/contributionrightsdatahandler', params={
                 'category': 'translation',
                 'language_code': 'hi'
             })
@@ -2343,7 +2343,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_voiceover_in_language(
             self.voiceover_reviewer_id, 'hi')
         response = self.get_json(
-            '/contributionrightshandler', params={
+            '/contributionrightsdatahandler', params={
                 'category': 'voiceover',
                 'language_code': 'hi'
             })
@@ -2357,7 +2357,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/contributionrightshandler', params={
+            '/contributionrightsdatahandler', params={
                 'category': 'question'
             })
 
@@ -2370,7 +2370,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)
         response = self.get_json(
-            '/contributionrightshandler', params={
+            '/contributionrightsdatahandler', params={
                 'category': 'submit_question'
             })
 
@@ -2382,7 +2382,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightshandler', params={
+            '/contributionrightsdatahandler', params={
                 'category': 'voiceover',
                 'language_code': 'invalid'
             }, expected_status_int=400)
@@ -2394,7 +2394,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightshandler', params={
+            '/contributionrightsdatahandler', params={
                 'category': 'invalid',
                 'language_code': 'hi'
             }, expected_status_int=400)
@@ -2418,7 +2418,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     def test_check_contribution_reviewer_rights(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionrightshandler', params={
                 'username': 'reviewer'
             })
         self.assertEqual(
@@ -2436,7 +2436,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_submit_question(self.reviewer_id)
 
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionrightshandler', params={
                 'username': 'reviewer'
             })
         self.assertEqual(
@@ -2449,7 +2449,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     def test_check_contribution_reviewer_rights_invalid_username(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={
+            '/contributionrightshandler', params={
                 'username': 'invalid'
             }, expected_status_int=400)
 
@@ -2459,7 +2459,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
     def test_check_contribution_reviewer_rights_without_username(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
-            '/contributionrightsdatahandler', params={},
+            '/contributionrightshandler', params={},
             expected_status_int=400)
 
         self.assertEqual(response['error'], 'Missing username param')
