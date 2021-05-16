@@ -34,4 +34,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/classroom-page/classroom-page.component.ts');
-require('pages/OppiaFooterDirective.ts');
+require('pages/OppiaFooter.component.ts');

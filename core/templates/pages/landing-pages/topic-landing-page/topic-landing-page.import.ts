@@ -33,4 +33,4 @@ require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('pages/OppiaFooter.component.ts');

@@ -71,7 +71,7 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-
+import { OppiaFooterComponent } from 'pages/OppiaFooter.component'
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -163,6 +163,7 @@ const toastrConfig = {
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    OppiaFooterComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -206,6 +207,7 @@ const toastrConfig = {
     LazyLoadingComponent, LoadingMessageComponent,
     LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
@@ -258,6 +260,7 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    OppiaFooterComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,

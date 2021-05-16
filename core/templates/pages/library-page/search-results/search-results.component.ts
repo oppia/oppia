@@ -33,7 +33,7 @@ import { Subscription } from 'rxjs';
 
 export class SearchResultsComponent implements OnInit, OnDestroy{
   someResultsExist: boolean;
-  userIsLoggedIn: boolean | null;
+  userIsLoggedIn: boolean;
   directiveSubscriptions: Subscription = new Subscription();
   constructor(
     private searchService: SearchService,
@@ -58,10 +58,9 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.someResultsExist = true;
-    this.userIsLoggedIn = null;
+    this.userIsLoggedIn = false;
     this.loaderService.showLoadingScreen('Loading');
-    var userInfoPromise = this.userService.getUserInfoAsync();
-    userInfoPromise.then(function(userInfo) {
+    this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
 
@@ -71,7 +70,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
       this.searchService.onInitialSearchResultsLoaded.subscribe(
         (activityList) => {
           this.someResultsExist = activityList.length > 0;
-          userInfoPromise.then((userInfo) => {
+          console.log(this.someResultsExist)
+          this.userService.getUserInfoAsync().then((userInfo) => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
             this.loaderService.hideLoadingScreen();
           });

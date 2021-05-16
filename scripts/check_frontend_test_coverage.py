@@ -210,7 +210,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'oppia-short-response-set-input.directive.ts',
     'oppia-short-response-text-input.directive.ts',
     'oppia-visualization-enumerated-frequency-table.directive.ts',
-    'OppiaFooterDirective.ts',
+    'OppiaFooter.component.ts',
     'opportunities-list.component.ts',
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',

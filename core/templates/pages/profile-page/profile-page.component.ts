@@ -25,7 +25,7 @@ require(
   'background-banner.component.ts');
 require('components/summary-tile/exploration-summary-tile.component.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
-require('pages/OppiaFooterDirective.ts');
+require('pages/OppiaFooter.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/user.service.ts');

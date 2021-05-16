@@ -33,5 +33,5 @@ require('pages/privacy-page/privacy-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('pages/OppiaFooterDirective.ts');
+require('pages/OppiaFooter.component.ts');
 require('base-components/base-content.directive.ts');

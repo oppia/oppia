@@ -28,7 +28,6 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
-import { OppiaFooterComponent } from 'pages/OppiaFooterDirective'
 @NgModule({
   imports: [
     BrowserModule,
@@ -38,12 +37,10 @@ import { OppiaFooterComponent } from 'pages/OppiaFooterDirective'
   declarations: [
     OppiaAngularRootComponent,
     SearchBarComponent,
-    OppiaFooterComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     SearchBarComponent,
-    OppiaFooterComponent
   ],
   providers: [
     {

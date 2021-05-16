@@ -104,7 +104,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         this.urlService.getPathname().startsWith('/learn'));
   
   isSearchInProgress(): boolean {
-    console.log("me")
     return this.searchService.isSearchInProgress();
   };
 
@@ -176,6 +175,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   toggleSelection(itemsType, optionName): void {
     var selections = this.selectionDetails[itemsType].selections;
+    console.log(selections)
     if (!selections.hasOwnProperty(optionName)) {
       selections[optionName] = true;
     } else {
@@ -193,20 +193,24 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   };
 
   onSearchQueryChangeExec(): void {
-    console.log("why")
+    var searchUrlQueryString = this.searchService.getSearchUrlQueryString(
+      this.searchQuery, this.selectionDetails.categories.selections,
+      this.selectionDetails.languageCodes.selections
+    );
+    if (decodeURI(this.windowRef.nativeWindow.location.search) !== ('?q=' + searchUrlQueryString)) {
     this.searchService.executeSearchQuery(
       this.searchQuery, this.selectionDetails.categories.selections,
       this.selectionDetails.languageCodes.selections, () => {
-        var searchUrlQueryString = this.searchService.getSearchUrlQueryString(
+          searchUrlQueryString = this.searchService.getSearchUrlQueryString(
           this.searchQuery, this.selectionDetails.categories.selections,
           this.selectionDetails.languageCodes.selections
         );
-        if (this.windowRef.nativeWindow.location.pathname === '/search/find') {
-          this.windowRef.nativeWindow.location.href = ('/find?q=' + searchUrlQueryString);
-        } else {
-          this.windowRef.nativeWindow.location.search = ('/search/find?q=' + searchUrlQueryString);
+        console.log(searchUrlQueryString)
+        if (this.windowRef.nativeWindow.location.pathname !== ('/search/find?q=' + searchUrlQueryString)) {
+          this.windowRef.nativeWindow.location.replace('/search/find?q=' + searchUrlQueryString);
         }
       });
+    }
   };
 
   updateSearchFieldsBasedOnUrlQuery(): void {

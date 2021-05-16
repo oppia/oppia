@@ -3,6 +3,7 @@
     <search-bar [enableDropup]="false"></search-bar>
   </div>
   <div *ngIf="!someResultsExist" class="oppia-search-results-intro">
+    {{someResultsExist}}
     <div class="oppia-search-results-no-match">
       <picture>
         <source type="image/webp" [srcset]="getStaticImageUrl('/general/no_explorations_found.webp')">
@@ -24,7 +25,8 @@
   <activity-tiles-infinity-grid></activity-tiles-infinity-grid>
 </div>
 <style>
-  .oppia-search-results-no-match, .oppia-search-results-no-match p {
+  .oppia-search-results-no-match,
+  .oppia-search-results-no-match p {
     font-size: 0.85em;
     text-align: center;
   }

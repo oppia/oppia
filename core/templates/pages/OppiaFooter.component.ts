@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-footer',
-  templateUrl: './oppia_footer_directive.html',
+  templateUrl: './oppia_footer_component.html',
   styleUrls: []
 })
 

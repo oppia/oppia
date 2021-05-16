@@ -18,7 +18,7 @@
 
 require('base-components/loading-message.component.ts');
 require('base-components/warnings-and-alerts.component.ts');
-require('pages/OppiaFooterDirective.ts');
+require('pages/OppiaFooter.component.ts');
 
 require('services/bottom-navbar-status.service.ts');
 require('services/contextual/url.service.ts');

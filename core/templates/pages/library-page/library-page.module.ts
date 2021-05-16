@@ -34,7 +34,6 @@ import { LibraryFooterComponent } from 'pages/library-page/library-footer/librar
 import { ActivityTilesInfinityGridComponent } from 'pages/library-page/search-results/activity-tiles-infinity-grid.component'
 import { SearchResultsComponent } from 'pages/library-page/search-results/search-results.component'
 import { RouterModule } from '@angular/router';
-import { OppiaFooterComponent } from 'pages/OppiaFooterDirective';
 import { LibraryPageComponent } from 'pages/library-page/library-page.component'
 @NgModule({
   imports: [
@@ -51,7 +50,6 @@ import { LibraryPageComponent } from 'pages/library-page/library-page.component'
     LibraryFooterComponent,
     ActivityTilesInfinityGridComponent,
     SearchResultsComponent,
-    OppiaFooterComponent,
     LibraryPageComponent
   ],
   entryComponents: [
@@ -61,7 +59,6 @@ import { LibraryPageComponent } from 'pages/library-page/library-page.component'
     LibraryFooterComponent,
     ActivityTilesInfinityGridComponent,
     SearchResultsComponent,
-    OppiaFooterComponent,
     LibraryPageComponent
   ],
   providers: [

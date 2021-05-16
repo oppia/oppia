@@ -34,7 +34,6 @@ import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { OppiaFooterComponent } from 'pages/OppiaFooterDirective'
 
 @NgModule({
   imports: [
@@ -45,12 +44,10 @@ import { OppiaFooterComponent } from 'pages/OppiaFooterDirective'
   declarations: [
     OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
-    OppiaFooterComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     ProfilePageNavbarComponent,
-    OppiaFooterComponent
   ],
   providers: [
     {
