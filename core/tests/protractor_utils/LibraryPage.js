@@ -77,6 +77,10 @@ var LibraryPage = function() {
     var searchInput = (
       browser.isMobile ? await searchInputs.get(1) :
       await searchInputs.first());
+    await waitFor.visibilityOf(
+      searchInput,
+      'search input taking too long to appear'
+    );
     await action.clear('Search input', searchInput);
     await action.sendKeys('Search input', searchInput, searchQuery);
     let searchButtonExists = await searchButton.isPresent();

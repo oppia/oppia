@@ -463,7 +463,10 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.getWarnings = () => ExplorationWarningsService.getWarnings();
       ctrl.hasCriticalWarnings = () => (
         ExplorationWarningsService.hasCriticalWarnings);
-      ctrl.selectMainTab = () => RouterService.navigateToMainTab();
+      ctrl.selectMainTab = () => {
+        RouterService.navigateToMainTab();
+        $rootScope.$applyAsync();
+      };
       ctrl.selectTranslationTab = (
         () => RouterService.navigateToTranslationTab());
       ctrl.selectPreviewTab = () => RouterService.navigateToPreviewTab();

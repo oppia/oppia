@@ -281,6 +281,8 @@ var ExplorationEditorPage = function() {
 
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
+    await waitFor.elementToBeClickable(
+      navigateToMainTabButton, 'Could not click navigate to Main Tab Button');
     await action.click('Main tab button', navigateToMainTabButton);
     await action.click('Neutral element', neutralElement);
     await waitFor.pageToFullyLoad();
