@@ -537,17 +537,24 @@ describe('SvgFilenameEditor', () => {
     expect(component.canvas.getObjects()[1].get('type')).toBe('circle');
   });
 
-  it('should set title with onOpen color picker function', (done) => {
-    $(document).ready(() => {
+  it('should set title with onOpen color picker function', waitForAsync(() => {
+    const domReady = new Promise((resolve, reject) => {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', resolve);
+      } else {
+        resolve(0);
+      }
+    });
+    domReady.then(() => {
+      fixture.detectChanges();
       component.bgPicker.onOpen();
       let alphaSliders = document.querySelectorAll(
         '.picker_alpha .picker_selector');
       alphaSliders.forEach((element) => {
         expect(element.getAttribute('title')).toBe('Transparency Slider');
       });
-      done();
     });
-  });
+  }));
 
   it('should trigger object selection and scaling events', () => {
     component.createRect();
