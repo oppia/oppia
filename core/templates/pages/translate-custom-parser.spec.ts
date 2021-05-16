@@ -80,4 +80,10 @@ describe('Translate Custom Parser', () => {
         minChoiceNumber: 1, messageFormat: true }))
       .toEqual('Please select one or more choices.');
   });
+
+  it('should get value', () => {
+    let testValue = 'test_value';
+    spyOn(translateDefaultParser, 'getValue').and.returnValue(testValue);
+    expect(translateCustomParser.getValue(null, '')).toEqual(testValue);
+  });
 });
