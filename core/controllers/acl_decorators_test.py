@@ -3513,7 +3513,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             'malicious message').encode(encoding='utf-8')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            'message'.encode(), payload['vm_id'])
+            'message'.encode(encoding='utf-8'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
