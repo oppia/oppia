@@ -115,8 +115,8 @@ angular.module('oppia').controller(
                 .can_review_translation_for_language_codes);
             $scope.canEditTranslation = (
               userCanReviewTranslationSuggestionsInLanguages.includes(
-                  languageCode) && $scope.username !== $scope.activeSuggestion.
-                  author_name
+                languageCode) && $scope.username !== $scope.activeSuggestion.
+                author_name
             );
           });
         $scope.resolvingSuggestion = false;
