@@ -108,7 +108,8 @@ export class TopicRightsBackendApiService {
     return this.topicRightsCache.hasOwnProperty(topicId);
   }
 
-  fetchTopicRights(topicId: string): Promise<TopicRightsBackendResponse> {
+  async fetchTopicRightsAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopicRights(topicId, resolve, reject);
     });
@@ -123,7 +124,8 @@ export class TopicRightsBackendApiService {
    * rights from the backend, it will store it in the cache to avoid
    * requests from the backend in further function calls.
    */
-  loadTopicRights(topicId: string): Promise<TopicRightsBackendResponse> {
+  async loadTopicRightsAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       if (this._isCached(topicId)) {
         resolve(this.topicRightsCache[topicId]);
@@ -159,13 +161,15 @@ export class TopicRightsBackendApiService {
   /**
    * Publishes a topic.
    */
-  publishTopic(topicId: string): Promise<TopicRightsBackendResponse> {
+  async publishTopicAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, true, resolve, reject);
     });
   }
 
-  sendMail(topicId: string, topicName: string): Promise<void> {
+  async sendMailAsync(
+      topicId: string, topicName: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this._sendMail(topicId, topicName, resolve, reject);
     });
@@ -174,7 +178,8 @@ export class TopicRightsBackendApiService {
   /**
    * Unpublishes a topic.
    */
-  unpublishTopic(topicId: string): Promise<TopicRightsBackendResponse> {
+  async unpublishTopicAsync(
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._setTopicStatus(topicId, false, resolve, reject);
     });

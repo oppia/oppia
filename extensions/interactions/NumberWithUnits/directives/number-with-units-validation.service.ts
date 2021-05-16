@@ -26,9 +26,9 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service.ts';
+  'interactions/base-interaction-validation.service';
 import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory.ts';
+  'domain/objects/NumberWithUnitsObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { NumberWithUnitsCustomizationArgs } from
   'interactions/customization-args-defs';

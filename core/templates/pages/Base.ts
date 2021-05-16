@@ -32,13 +32,13 @@ angular.module('oppia').controller('Base', [
   'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
   'MetaTagCustomizationService', 'SidebarStatusService',
   'UrlInterpolationService', 'UrlService', 'DEV_MODE',
-  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
+  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME', 'SUPPORTED_SITE_LANGUAGES',
   function(
       $document, $rootScope, $scope, AlertsService, BackgroundMaskService,
       CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
       MetaTagCustomizationService, SidebarStatusService,
       UrlInterpolationService, UrlService, DEV_MODE,
-      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
+      SITE_FEEDBACK_FORM_URL, SITE_NAME, SUPPORTED_SITE_LANGUAGES) {
     var ctrl = this;
     $scope.getAssetUrl = function(path) {
       return UrlInterpolationService.getFullStaticAssetUrl(path);
@@ -62,6 +62,7 @@ angular.module('oppia').controller('Base', [
     ctrl.$onInit = function() {
       $scope.siteName = SITE_NAME;
       $scope.currentLang = 'en';
+      $scope.direction = 'ltr';
       $scope.pageUrl = UrlService.getCurrentLocation().href;
       $scope.iframed = UrlService.isIframed();
       $scope.AlertsService = AlertsService;
@@ -116,6 +117,12 @@ angular.module('oppia').controller('Base', [
       // Listener function to catch the change in language preference.
       $rootScope.$on('$translateChangeSuccess', function(unusedEvt, response) {
         $scope.currentLang = response.language;
+        for (var i = 0; i < SUPPORTED_SITE_LANGUAGES.length; i++) {
+          if (SUPPORTED_SITE_LANGUAGES[i].id === $scope.currentLang) {
+            $scope.direction = SUPPORTED_SITE_LANGUAGES[i].direction;
+            break;
+          }
+        }
       });
       $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
       DocumentAttributeCustomizationService.addAttribute(

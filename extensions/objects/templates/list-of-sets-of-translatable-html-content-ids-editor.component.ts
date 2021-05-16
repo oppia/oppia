@@ -19,6 +19,8 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 
 interface Choice {
   id: unknown;
@@ -40,6 +42,10 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   validOrdering = true;
   choices: Choice[];
   initValues: unknown[];
+  eventBusGroup: EventBusGroup;
+  constructor(private eventBusService: EventBusService) {
+    this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
 
   allowedChoices(): Choice[] {
     const allowedList = [];
@@ -103,6 +109,10 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
 
     if (selectedRankList[0] !== 1) {
       this.errorMessage = ('Please assign some choice at position 1.');
+      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+        value: true,
+        modalId: this.modalId
+      }));
       this.validOrdering = false;
       return;
     }
@@ -111,11 +121,19 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
         this.errorMessage = (
           'Please assign some choice at position ' +
           String(selectedRankList[i - 1] + 1) + '.');
+        this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+          value: true,
+          modalId: this.modalId
+        }));
         this.validOrdering = false;
         return;
       }
     }
     this.errorMessage = '';
+    this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+      value: false,
+      modalId: this.modalId
+    }));
     this.validOrdering = true;
     return;
   }

@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import translation_domain
+from core.domain import translation_fetchers
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,18 +32,28 @@ class TranslationFetchersTests(test_utils.GenericTestBase):
 
     def test_get_translation_from_model(self):
         model_id = (
-            translation_models.MachineTranslatedTextModel.create(
+            translation_models.MachineTranslationModel.create(
                 'en', 'es', 'hello world', 'hola mundo')
         )
-        model_instance = translation_models.MachineTranslatedTextModel.get(
+        model_instance = translation_models.MachineTranslationModel.get(
             model_id)
         self.assertEqual(
-            translation_domain.MachineTranslatedText(
-                model_instance.source_language_code,
-                model_instance.target_language_code,
-                model_instance.source_text,
-                model_instance.translated_text
-            ).to_dict(),
-            translation_domain.MachineTranslatedText(
+            translation_fetchers.get_translation_from_model(
+                model_instance).to_dict(),
+            translation_domain.MachineTranslation(
                 'en', 'es', 'hello world', 'hola mundo').to_dict()
         )
+
+    def test_get_machine_translation_with_no_translation_returns_none(self):
+        translation = translation_fetchers.get_machine_translation(
+            'en', 'es', 'untranslated_text')
+        self.assertIsNone(translation)
+
+    def test_get_machine_translation_for_cached_translation_returns_from_cache(
+            self):
+        translation_models.MachineTranslationModel.create(
+            'en', 'es', 'hello world', 'hola mundo')
+        translation = translation_fetchers.get_machine_translation(
+            'en', 'es', 'hello world'
+        )
+        self.assertEqual(translation.translated_text, 'hola mundo')

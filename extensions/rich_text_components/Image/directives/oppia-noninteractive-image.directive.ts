@@ -82,7 +82,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             ctrl.loadImage = function() {
               ctrl.isLoadingIndicatorShown = true;
               ctrl.isTryAgainShown = false;
-              ImagePreloaderService.getImageUrl(ctrl.filepath)
+              ImagePreloaderService.getImageUrlAsync(ctrl.filepath)
                 .then(function(objectUrl) {
                   ctrl.isTryAgainShown = false;
                   ctrl.isLoadingIndicatorShown = false;

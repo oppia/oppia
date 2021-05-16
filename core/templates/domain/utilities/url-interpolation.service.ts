@@ -115,7 +115,7 @@ export class UrlInterpolationService {
    */
   interpolateUrl(
       urlTemplate: string,
-      interpolationValues: InterpolationValuesType): string {
+      interpolationValues: InterpolationValuesType): string | null {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
@@ -155,7 +155,7 @@ export class UrlInterpolationService {
           ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
     }
 
-    let escapedInterpolationValues = {};
+    let escapedInterpolationValues: Record<string, string> = {};
     for (let varName in interpolationValues) {
       let value = interpolationValues[varName];
       escapedInterpolationValues[varName] = encodeURIComponent(value);

@@ -71,10 +71,10 @@ export class ExplorationDataService {
     if (!explorationId) {
       this.loggerService.error(
         'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-      this.autosaveChangeList = undefined;
-      this.discardDraft = undefined;
-      this.getData = undefined;
-      this.getLastSavedData = undefined;
+      this.autosaveChangeListAsync = undefined;
+      this.discardDraftAsync = undefined;
+      this.getDataAsync = undefined;
+      this.getLastSavedDataAsync = undefined;
       this.save = undefined;
     } else {
       this.explorationId = explorationId;
@@ -85,7 +85,7 @@ export class ExplorationDataService {
     }
   }
 
-  private _autosaveChangeList(
+  private async _autosaveChangeListAsync(
       changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
       this.explorationId, changeList, this.draftChangeListId);
@@ -104,12 +104,12 @@ export class ExplorationDataService {
 
   // Note that the changeList is the full changeList since the last
   // committed version (as opposed to the most recent autosave).
-  autosaveChangeList(
+  async autosaveChangeListAsync(
       changeList: ExplorationChange[],
       successCallback: (response: DraftAutoSaveResponse) => void,
       errorCallback = () => {}
   ): Promise<void> {
-    return this._autosaveChangeList(changeList).then(
+    return this._autosaveChangeListAsync(changeList).then(
       (response) => {
         if (successCallback) {
           successCallback(response);
@@ -123,12 +123,12 @@ export class ExplorationDataService {
     );
   }
 
-  discardDraft(): Promise<void> {
+  async discardDraftAsync(): Promise<void> {
     return this.explorationDataBackendApiService.discardDraft(
       this.explorationDraftAutosaveUrl).toPromise();
   }
 
-  getData(errorCallback: (
+  async getDataAsync(errorCallback: (
     explorationId: string,
     lostChanges: ExplorationChange[]) => void | undefined
   ): Promise<ExplorationBackendDict> {
@@ -142,43 +142,44 @@ export class ExplorationDataService {
       // are discarded, otherwise the exploration-with-draft-changes
       // (which is cached here) will be reused.
       return new Promise((resolve, _reject) => {
-        this.editableExplorationBackendApiService.fetchApplyDraftExploration(
-          this.explorationId).then((response) => {
-          this.loggerService.info('Retrieved exploration data.');
-          this.loggerService.info(JSON.stringify(response));
-          this.draftChangeListId = response.draft_change_list_id;
-          this.data = response;
-          const draft = this.localStorageService.getExplorationDraft(
-            this.explorationId);
-          if (draft) {
-            if (draft.isValid(this.draftChangeListId)) {
-              var changeList = draft.getChanges();
-              this._autosaveChangeList(changeList).then(
-                // A reload is needed so that the changelist just saved is
-                // loaded as opposed to the exploration returned by this
-                // response.
-                () => {
-                  this.windowRef.nativeWindow.location.reload();
-                },
-                // If the request errors out, do nothing.
-                () => {}
-              );
-            } else {
-              if (errorCallback) {
-                errorCallback(this.explorationId, draft.getChanges());
+        this.editableExplorationBackendApiService
+          .fetchApplyDraftExplorationAsync(
+            this.explorationId).then((response) => {
+            this.loggerService.info('Retrieved exploration data.');
+            this.loggerService.info(JSON.stringify(response));
+            this.draftChangeListId = response.draft_change_list_id;
+            this.data = response;
+            const draft = this.localStorageService.getExplorationDraft(
+              this.explorationId);
+            if (draft) {
+              if (draft.isValid(this.draftChangeListId)) {
+                var changeList = draft.getChanges();
+                this._autosaveChangeListAsync(changeList).then(
+                  // A reload is needed so that the changelist just saved is
+                  // loaded as opposed to the exploration returned by this
+                  // response.
+                  () => {
+                    this.windowRef.nativeWindow.location.reload();
+                  },
+                  // If the request errors out, do nothing.
+                  () => {}
+                );
+              } else {
+                if (errorCallback) {
+                  errorCallback(this.explorationId, draft.getChanges());
+                }
               }
             }
-          }
-          resolve(response);
-        });
+            resolve(response);
+          });
       });
     }
   }
 
   // Returns a promise supplying the last saved version for the current
   // exploration.
-  getLastSavedData(): Promise<ReadOnlyExplorationBackendDict> {
-    return this.readOnlyExplorationBackendApiService.loadLatestExploration(
+  async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
+    return this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
       this.explorationId).then(response => {
       this.loggerService.info('Retrieved saved exploration data.');
       this.loggerService.info(JSON.stringify(response));
@@ -203,7 +204,7 @@ export class ExplorationDataService {
         isDraftVersionvalid: boolean,
         draftChanges: ExplorationChange[]) => void,
       errorCallback: () => void): void {
-    this.editableExplorationBackendApiService.updateExploration(
+    this.editableExplorationBackendApiService.updateExplorationAsync(
       this.explorationId,
     this.data ? this.data.version : null,
     commitMessage, changeList).then(

@@ -136,13 +136,13 @@ describe('RatioExpressionInputInteractive', function() {
         },
         numberOfTerms: 3,
         labelForFocusTarget: 'label',
-        savedSolution: '[1,2,3]'
       });
     }));
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
       ctrl = $componentController('oppiaInteractiveRatioExpressionInput');
+      ctrl.savedSolution = [1, 2, 3];
       ctrl.RatioExpressionInputForm = {
         answer: {
           $invalid: false,

@@ -730,7 +730,9 @@ class CommonTests(test_utils.GenericTestBase):
 
         compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
         with self.assertRaisesRegexp(
-            ValueError, r'Exception raised from compile\(\)'), compile_swap:
+            ValueError,
+            re.escape('Exception raised from compile()')
+        ), compile_swap:
             common.inplace_replace_file(
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         self.assertFalse(os.path.isfile(backup_file))
@@ -1131,6 +1133,8 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_firebase_emulator(self):
         with contextlib2.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())
+            stack.enter_context(self.swap_to_always_return(
+                common, 'wait_for_port_to_be_in_use'))
 
             stack.enter_context(common.managed_firebase_auth_emulator())
 

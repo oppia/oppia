@@ -42,7 +42,7 @@ export class UserService {
 
     async getUserInfoAsync(): Promise<UserInfo> {
       const pathname = this.urlService.getPathname();
-      if (['/login', '/logout', '/signup'].includes(pathname)) {
+      if (['/logout', '/signup'].includes(pathname)) {
         return UserInfo.createDefault();
       }
       if (!this.userInfo) {
@@ -56,7 +56,7 @@ export class UserService {
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
-        (userInfo) => {
+        async(userInfo) => {
           if (userInfo.isLoggedIn()) {
             return this.userBackendApiService.getProfileImageDataUrlAsync(
               defaultUrl);

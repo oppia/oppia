@@ -286,7 +286,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var skillId = suggestion.change.skill_id;
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
-          SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
+          SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
             misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();

@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -104,8 +104,6 @@ import { CkEditorCopyContentService } from
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
-import { CodeReplPredictionService } from
-  'interactions/CodeRepl/code-repl-prediction.service';
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { CodeReplValidationService } from
@@ -155,6 +153,8 @@ import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
+import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
+import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationFeaturesBackendApiService } from
@@ -469,7 +469,7 @@ import { TranslateService } from 'services/translate.service';
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-
+  static ajsTranslate;
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;
@@ -497,7 +497,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ckEditorCopyContentService: CkEditorCopyContentService;
   static classroomBackendApiService: ClassroomBackendApiService;
   static codeNormalizerService: CodeNormalizerService;
-  static codeReplPredictionService: CodeReplPredictionService;
   static codeReplRulesService: CodeReplRulesService;
   static codeReplValidationService: CodeReplValidationService;
   static collectionCreationBackendService: CollectionCreationBackendService;
@@ -747,6 +746,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static workedExampleObjectFactory: WorkedExampleObjectFactory;
   static writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  static ajsValueProvider: (string, unknown) => void;
+  static injector: Injector;
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -776,7 +777,6 @@ private camelCaseToHyphensPipe: CamelCaseToHyphensPipe,
 private ckEditorCopyContentService: CkEditorCopyContentService,
 private classroomBackendApiService: ClassroomBackendApiService,
 private codeNormalizerService: CodeNormalizerService,
-private codeReplPredictionService: CodeReplPredictionService,
 private codeReplRulesService: CodeReplRulesService,
 private codeReplValidationService: CodeReplValidationService,
 private collectionCreationBackendService: CollectionCreationBackendService,
@@ -812,6 +812,10 @@ private emailDashboardDataService: EmailDashboardDataService,
 private endExplorationRulesService: EndExplorationRulesService,
 private endExplorationValidationService: EndExplorationValidationService,
 private explorationDiffService: ExplorationDiffService,
+private explorationCreationBackendApiService:
+  ExplorationCreationBackendApiService,
+private explorationCreationService:
+  ExplorationCreationService,
 private explorationFeaturesBackendApiService:
   ExplorationFeaturesBackendApiService,
 private explorationFeaturesService: ExplorationFeaturesService,
@@ -1027,7 +1031,8 @@ private windowRef: WindowRef,
 private winnowingPreprocessingService: WinnowingPreprocessingService,
 private workedExampleObjectFactory: WorkedExampleObjectFactory,
 private writtenTranslationObjectFactory: WrittenTranslationObjectFactory,
-private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
+private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory,
+private injector: Injector
   ) {}
 
   public ngAfterViewInit(): void {
@@ -1076,8 +1081,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.classroomBackendApiService);
     OppiaAngularRootComponent.codeNormalizerService = (
       this.codeNormalizerService);
-    OppiaAngularRootComponent.codeReplPredictionService = (
-      this.codeReplPredictionService);
     OppiaAngularRootComponent.codeReplRulesService = this.codeReplRulesService;
     OppiaAngularRootComponent.codeReplValidationService = (
       this.codeReplValidationService);
@@ -1094,7 +1097,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.computeGraphService = this.computeGraphService;
     OppiaAngularRootComponent.conceptCardObjectFactory = (
       this.conceptCardObjectFactory);
-    OppiaAngularRootComponent.contextService = this.contextService;
     OppiaAngularRootComponent.continueRulesService = this.continueRulesService;
     OppiaAngularRootComponent.continueValidationService = (
       this.continueValidationService);
@@ -1477,6 +1479,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.writtenTranslationObjectFactory);
     OppiaAngularRootComponent.writtenTranslationsObjectFactory = (
       this.writtenTranslationsObjectFactory);
+
+    OppiaAngularRootComponent.injector = this.injector;
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

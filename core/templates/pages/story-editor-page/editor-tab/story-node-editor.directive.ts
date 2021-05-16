@@ -63,7 +63,7 @@ angular.module('oppia').directive('storyNodeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
+        '$rootScope', '$scope', '$timeout', '$uibModal',
         'AlertsService',
         'ExplorationIdValidationService', 'FocusManagerService',
         'PageTitleService',
@@ -71,7 +71,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         'TopicsAndSkillsDashboardBackendApiService',
         'WindowDimensionsService', 'MAX_CHARS_IN_CHAPTER_DESCRIPTION',
         'MAX_CHARS_IN_CHAPTER_TITLE', function(
-            $rootScope, $scope, $timeout, $uibModal, $window,
+            $rootScope, $scope, $timeout, $uibModal,
             AlertsService,
             ExplorationIdValidationService, FocusManagerService,
             PageTitleService,
@@ -227,7 +227,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                   5000);
                 return;
               }
-              ExplorationIdValidationService.isExpPublished(
+              ExplorationIdValidationService.isExpPublishedAsync(
                 explorationId).then(function(expIdIsValid) {
                 $scope.expIdIsValid = expIdIsValid;
                 if ($scope.expIdIsValid) {
@@ -400,12 +400,6 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.chapterOutlineButtonsAreShown = (
               !$scope.chapterOutlineButtonsAreShown);
           };
-          $scope.addFocusWithoutScroll = function(label) {
-            FocusManagerService.setFocus(label);
-            $timeout(function() {
-              $window.scrollTo(0, 0);
-            }, 5);
-          };
           ctrl.$onInit = function() {
             // Regex pattern for exploration id,
             // EXPLORATION_AND_SKILL_ID_PATTERN
@@ -445,7 +439,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             // the element may not be present in the DOM yet.Thus it ensure
             // that the element is visible before focussing.
             $timeout(() => {
-              $scope.addFocusWithoutScroll('storyNodeDesc');
+              FocusManagerService.setFocusWithoutScroll('storyNodeDesc');
             }, 0);
           };
 

@@ -44,6 +44,7 @@ describe('Read only exploration backend API service', () => {
           classifier_model_id: null,
           recorded_voiceovers: null,
           solicit_answer_details: true,
+          card_is_checkpoint: true,
           written_translations: null,
           next_content_id_index: null,
           content: {
@@ -98,7 +99,7 @@ describe('Read only exploration backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      roebas.fetchExploration('0', null).then(successHandler, failHandler);
+      roebas.fetchExplorationAsync('0', null).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
@@ -114,7 +115,7 @@ describe('Read only exploration backend API service', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    roebas.fetchExploration('0', 1).then(successHandler, failHandler);
+    roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/explorehandler/init/0?v=1');
@@ -131,7 +132,7 @@ describe('Read only exploration backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      roebas.loadExploration('0', null).then(successHandler, failHandler);
+      roebas.loadExplorationAsync('0', null).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
@@ -153,7 +154,7 @@ describe('Read only exploration backend API service', () => {
     // The exploration should not currently be cached.
     expect(roebas.isCached('0')).toBe(false);
 
-    roebas.loadLatestExploration('0').then(successHandler, failHandler);
+    roebas.loadLatestExplorationAsync('0').then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
@@ -167,7 +168,7 @@ describe('Read only exploration backend API service', () => {
     expect(roebas.isCached('0')).toBe(true);
 
     // The exploration should be loadable from the cache.
-    roebas.loadLatestExploration('0').then(successHandler, failHandler);
+    roebas.loadLatestExplorationAsync('0').then(successHandler, failHandler);
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
 
@@ -175,7 +176,7 @@ describe('Read only exploration backend API service', () => {
     roebas.clearExplorationCache();
     expect(roebas.isCached('0')).toBe(false);
 
-    roebas.loadLatestExploration('0').then(
+    roebas.loadLatestExplorationAsync('0').then(
       successHandler, failHandler);
 
     req = httpTestingController.expectOne('/explorehandler/init/0');
@@ -214,7 +215,7 @@ describe('Read only exploration backend API service', () => {
 
     // A new exploration should not have been fetched from the backend. Also,
     // the returned exploration should match the expected exploration object.
-    roebas.loadLatestExploration('0').then(successHandler, failHandler);
+    roebas.loadLatestExplorationAsync('0').then(successHandler, failHandler);
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
