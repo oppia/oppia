@@ -164,10 +164,8 @@ export class EditableStoryBackendApiService {
       StoryDomainConstants.EDITABLE_STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
-    // This gives ".delete is a syntax error" due to eslint.
-    // For more information visit https://eslint.org/docs/rules/dot-notation
-    // eslint-disable-next-line dot-notation
-    this.http.delete(
+
+    this.http['delete'](
       storyDataUrl, {observe: 'response'}).toPromise().then(
       (response) => {
         if (successCallback) {

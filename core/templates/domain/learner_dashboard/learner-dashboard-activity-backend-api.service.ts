@@ -103,8 +103,6 @@ export class LearnerDashboardActivityBackendApiService {
     modelRef.componentInstance.activityTitle = activityTitle;
     modelRef.componentInstance.activityType = activityType;
     modelRef.result.then((playlistUrl) => {
-      // This gives ".delete is a syntax error" due to eslint.
-      // For more information visit https://eslint.org/docs/rules/dot-notation
       // eslint-disable-next-line dot-notation
       this.http.delete<void>(playlistUrl).toPromise();
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
@@ -135,8 +133,6 @@ export class LearnerDashboardActivityBackendApiService {
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
     await modelRef.result.then((playlistUrl) => {
-      // This gives ".delete is a syntax error" due to eslint.
-      // For more information visit https://eslint.org/docs/rules/dot-notation
       // eslint-disable-next-line dot-notation
       this.http.delete<void>(playlistUrl).toPromise();
       this.removeActivityModalStatus = 'removed';

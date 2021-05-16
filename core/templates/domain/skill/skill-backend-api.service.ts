@@ -118,8 +118,6 @@ export class SkillBackendApiService {
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
           skill_id: skillId
         });
-      // This gives ".delete is a syntax error" due to eslint.
-      // For more information visit https://eslint.org/docs/rules/dot-notation
       // eslint-disable-next-line dot-notation
       this.http.delete<void>(skillDataUrl).toPromise().then(() => {
         resolve();
