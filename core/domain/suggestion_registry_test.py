@@ -1982,8 +1982,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
-    def test_pre_update_validate_change_question_dict_and_skill_difficulty(
-            self):
+    def test_pre_update_validate_complains_if_nothing_changed(self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -2018,12 +2017,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The new change skill_difficulty or question_dict should be'
-            ' changed.'):
+            'At least one of the new skill_difficulty or question_dict '
+            'should be changed.'):
             suggestion.pre_update_validate(
                 question_domain.QuestionSuggestionChange(new_change))
 
-    def test_pre_update_validate_change_skill_difficulty(self):
+    def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
+            self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -2060,7 +2060,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 question_domain.QuestionSuggestionChange(new_change)), None)
 
-    def test_pre_update_validate_change_question_state_data(self):
+    def test_pre_update_validate_accepts_a_change_in_state_data_only(self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
