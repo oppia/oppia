@@ -21,6 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -39,6 +40,7 @@ import { LibraryPageComponent } from 'pages/library-page/library-page.component'
   imports: [
     BrowserModule,
     HttpClientModule,
+    FormsModule,
     SharedComponentsModule,
     RouterModule.forRoot([])
   ],
