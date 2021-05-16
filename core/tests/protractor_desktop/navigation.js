@@ -217,7 +217,6 @@ describe('Static Pages Tour', function() {
     async function() {
       await browser.get('/splashes');
       await waitFor.pageToFullyLoad();
-      expect(await element(
-        by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+      await general.expectErrorPage(404);
     });
 });
