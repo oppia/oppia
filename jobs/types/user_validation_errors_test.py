@@ -144,7 +144,8 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             last_updated)
 
 
-class ArchivedModelNotDeletedErrorTests(AuditErrorsTestBase):
+class ArchivedModelNotDeletedErrorTests(
+        base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = user_models.UserQueryModel(
