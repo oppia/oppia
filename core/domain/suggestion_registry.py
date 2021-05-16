@@ -905,9 +905,9 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
                 self.change.skill_id)
-    
+
         if (self.change.skill_difficulty == change.skill_difficulty) and (
-            self.change.question_dict == change.question_dict):
+                self.change.question_dict == change.question_dict):
             raise utils.ValidationError(
                 'The new change skill_difficulty or question_dict should be'
                 ' changed.')

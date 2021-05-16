@@ -1983,7 +1983,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 question_domain.QuestionChange(change))
 
     def test_pre_update_validate_change_question_dict_and_skill_difficulty(
-        self):
+            self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -2022,7 +2022,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             ' changed.'):
             suggestion.pre_update_validate(
                 question_domain.QuestionSuggestionChange(new_change))
-    
+
     def test_pre_update_validate_change_skill_difficulty(self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
