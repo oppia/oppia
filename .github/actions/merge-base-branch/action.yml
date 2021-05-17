@@ -20,6 +20,8 @@ runs:
         echo "Base Branch: ${{ github.base_ref }}"
         echo "Head Repository: ${{ github.event.pull_request.head.repo.full_name }}"
         echo "Head Branch: $GITHUB_HEAD_REF"
+        git config --global user.email "admin@oppia.org"
+        git config --global user.name "Oppia Merge Base Branch GitHub Action"
         git remote add source "https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
         git fetch source $GITHUB_HEAD_REF
         git checkout source/$GITHUB_HEAD_REF
