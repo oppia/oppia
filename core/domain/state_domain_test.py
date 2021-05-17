@@ -1366,8 +1366,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hint_1': '<p>hint one</p>',
                 'solution': '<p>hello_world is a string</p>',
                 'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>',
-                'content': '<p>This is content</p>'
+                'default_outcome': '<p>The default outcome.</p>'
             })
 
     def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
@@ -1459,13 +1458,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {},
                 'solution': {},
                 'feedback_1': {},
-                'ca_placeholder_0': {
-                    'hi': {
-                        'data_format': 'unicode',
-                        'translation': 'Placeholder translation',
-                        'needs_update': False
-                    }
-                },
+                'ca_placeholder_0': {},
                 'rule_input_4': {}
             }
         }
@@ -1480,7 +1473,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'solution': '<p>hello_world is a string</p>',
                 'feedback_1': '<p>Feedback</p>',
                 'default_outcome': '<p>The default outcome.</p>',
-                'content': '<p>This is content</p>',
                 'ca_placeholder_0': 'Placeholder'
             })
 
