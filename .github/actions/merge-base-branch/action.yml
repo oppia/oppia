@@ -12,8 +12,8 @@ runs:
         fi
         echo "Base Repository: ${{ github.repository }}"
         echo "Base Branch: ${{ github.base_ref }}"
-        echo "Head Branch: ${{ env.GITHUB_HEAD_REF }}"
-        git checkout ${{ env.GITHUB_HEAD_REF }}
+        echo "Head Branch: $GITHUB_HEAD_REF"
+        git checkout $GITHUB_HEAD_REF
         git remote add upstream "https://github.com/${{ github.repository }}.git"
         git fetch upstream ${{ github.base_ref }}
         git merge --ff-only upstream/${{ github.base_ref }}
