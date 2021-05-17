@@ -349,7 +349,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
             csrf_token=csrf_token, expected_status_int=401)
         self.logout()
 
-    def test_voiceover_admin_can_assign_voiceartist(self):
+    def test_voiceover_admin_can_assign_voice_artist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
             'username': self.VOICE_ARTIST_USERNAME
@@ -360,7 +360,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
             % self.published_exp_id_1, params, csrf_token=csrf_token)
         self.logout()
 
-    def test_voiceover_admin_can_deassign_voiceartist(self):
+    def test_voiceover_admin_can_deassign_voice_artist(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
             'username': self.VOICE_ARTIST_USERNAME
@@ -375,7 +375,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 'voice_artist': self.VOICE_ARTIST_USERNAME})
         self.logout()
 
-    def test_cannot_assign_voiceartist_in_incorrect_activity(self):
+    def test_cannot_assign_voice_artist_in_incorrect_activity(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
             'username': self.VOICE_ARTIST_USERNAME
@@ -389,7 +389,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
             response['error'], 'Invalid entity type.')
         self.logout()
 
-    def test_cannot_assign_voiceartist_to_random_user(self):
+    def test_cannot_assign_voice_artist_to_random_user(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
             'username': 'random_user'
@@ -403,7 +403,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
             response['error'], 'Sorry, we could not find the specified user.')
         self.logout()
 
-    def test_cannot_desaaign_voiceartist_in_incorrect_activity(self):
+    def test_cannot_desaaign_voice_artist_in_incorrect_activity(self):
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         params = {
             'username': self.VOICE_ARTIST_USERNAME

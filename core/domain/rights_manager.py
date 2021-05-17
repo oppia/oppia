@@ -566,7 +566,7 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
-def check_can_modify_voiceartist_in_activity(user, activity_rights):
+def check_can_modify_voice_artist_in_activity(user, activity_rights):
     """Check whether the user can assign voice artist to activity.
 
     Args:
@@ -580,7 +580,7 @@ def check_can_modify_voiceartist_in_activity(user, activity_rights):
     """
     if activity_rights is None:
         return False
-    elif (role_services.ACTION_CAN_ASSIGN_VOICEARTIST in user.actions and (
+    elif (role_services.ACTION_CAN_ASSIGN_VOICE_ARTIST in user.actions and (
             activity_rights.community_owned or activity_rights.is_published())):
         return True
     else:
@@ -775,7 +775,7 @@ def _assign_role(
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     role_is_voice_artist = new_role == constants.ROLE_VOICE_ARTIST
-    user_can_assigning_voice_artist = check_can_modify_voiceartist_in_activity(
+    user_can_assigning_voice_artist = check_can_modify_voice_artist_in_activity(
         committer, activity_rights)
 
     user_can_assigning_role = (
@@ -904,7 +904,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
 
     user_can_modify_activity_roles = (
         check_can_modify_activity_roles(committer, activity_rights) or (
-            check_can_modify_voiceartist_in_activity(
+            check_can_modify_voice_artist_in_activity(
                 committer, activity_rights) and (
                     activity_rights.is_voice_artist(removed_user_id)
                 )
