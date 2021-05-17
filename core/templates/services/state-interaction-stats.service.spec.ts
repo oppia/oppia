@@ -165,7 +165,6 @@ describe('State Interaction Stats Service', () => {
       written_translations: {
         translations_mapping: {}
       },
-      linked_skill_id: null,
       next_content_id_index: 0
     };
 
