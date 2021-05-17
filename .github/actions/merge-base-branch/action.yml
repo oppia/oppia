@@ -4,7 +4,6 @@ runs:
   using: 'composite'
   steps:
     - id: merge
-      if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
       run: |
         if [[ ${{ github.event_name}} != "pull_request" && ${{ github.event_name }} != "pull_request_target" ]]
         then
