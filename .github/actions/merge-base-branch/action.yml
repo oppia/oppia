@@ -25,5 +25,5 @@ runs:
         git checkout source/$GITHUB_HEAD_REF
         git remote add base "https://github.com/${{ github.repository }}.git"
         git fetch base ${{ github.base_ref }}
-        git merge --ff-only base/${{ github.base_ref }}
+        git merge base/${{ github.base_ref }}
       shell: bash
