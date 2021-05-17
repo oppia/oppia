@@ -455,11 +455,11 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
         self.init_state.update_card_is_checkpoint(False)
-        self._assert_validation_error(
-            self.exploration, 'Expected card_is_checkpoint of first state to '
-            'be True but found it to be False')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False'):
+            self.exploration.validate(strict=True)
         self.init_state.update_card_is_checkpoint(True)
-        self.exploration.validate()
 
     def test_end_state_with_card_is_checkpoint_true_is_invalid(self):
         default_outcome = self.init_state.interaction.default_outcome
@@ -471,19 +471,22 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'End': self.end_state
         }
         self.end_state.update_card_is_checkpoint(True)
-        self._assert_validation_error(
-            self.exploration, 'Expected card_is_checkpoint of terminal state '
-            'to be False but found it to be True')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected card_is_checkpoint of terminal state '
+            'to be False but found it to be True'):
+            self.exploration.validate(strict=True)
         self.end_state.update_card_is_checkpoint(False)
-        self.exploration.validate()
 
     def test_init_state_checkpoint_with_end_exp_interaction_is_valid(self):
         self.exploration.init_state_name = 'End'
         self.exploration.states = {
             self.exploration.init_state_name: self.end_state
         }
+        self.exploration.objective = 'Objective'
+        self.exploration.title = 'Title'
+        self.exploration.category = 'Category'
         self.end_state.update_card_is_checkpoint(True)
-        self.exploration.validate()
+        self.exploration.validate(strict=True)
         self.end_state.update_card_is_checkpoint(False)
 
     def test_checkpoint_count_with_count_outside_range_is_invalid(self):
@@ -496,15 +499,18 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         for i in python_utils.RANGE(8):
             self.exploration.add_states(['State%s' % i])
             self.exploration.states['State%s' % i].card_is_checkpoint = True
-        self._assert_validation_error(
-            self.exploration, 'Expected checkpoint count to be between 1 and 8 '
+            self.set_interaction_for_state(
+                self.exploration.states['State%s' % i],
+                'Continue')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected checkpoint count to be between 1 and 8 '
             'inclusive but found it to be 9'
-        )
+            ):
+            self.exploration.validate(strict=True)
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
             'End': self.end_state
         }
-        self.exploration.validate()
 
     def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
         # Note: In the graphs below, states with the * symbol are checkpoints.
@@ -624,12 +630,12 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # The exploration can be completed via third_state. Hence, making
         # second_state a checkpoint raises a validation error.
         second_state.card_is_checkpoint = True
-        self._assert_validation_error(
-            self.exploration, 'Cannot make Second a checkpoint as it is '
-            'bypassable'
-        )
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot make Second a checkpoint as it is'
+            ' bypassable'
+            ):
+            self.exploration.validate(strict=True)
         second_state.card_is_checkpoint = False
-        self.exploration.validate()
 
         # Exploration to test a checkpoint state when the state in the other
         # path has no outcome.
@@ -876,12 +882,11 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
         d_state.update_card_is_checkpoint(True)
-        self._assert_validation_error(
-            self.exploration, 'Cannot make D a checkpoint as it is '
-            'bypassable'
-        )
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot make D a checkpoint as it is bypassable'
+            ):
+            self.exploration.validate(strict=True)
         d_state.update_card_is_checkpoint(False)
-        self.exploration.validate()
 
         # Modifying the graph to make D non-bypassable.
         #                ┌────────────────┐
@@ -1024,12 +1029,11 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state.update_interaction_answer_groups(
             c_state_answer_group_dicts)
 
-        self._assert_validation_error(
-            self.exploration, 'Cannot make D a checkpoint as it is '
-            'bypassable'
-        )
+        with self.assertRaisesRegexp(
+            Exception, 'Cannot make D a checkpoint as it is bypassable'
+            ):
+            self.exploration.validate(strict=True)
         d_state.update_card_is_checkpoint(False)
-        self.exploration.validate()
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):

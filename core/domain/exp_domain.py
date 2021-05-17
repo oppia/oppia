@@ -970,61 +970,6 @@ class Exploration(python_utils.OBJECT):
         if strict:
             warnings_list = []
 
-            try:
-                self._verify_all_states_reachable()
-            except utils.ValidationError as e:
-                warnings_list.append(python_utils.UNICODE(e))
-
-            try:
-                self._verify_no_dead_ends()
-            except utils.ValidationError as e:
-                warnings_list.append(python_utils.UNICODE(e))
-
-            if not self.title:
-                warnings_list.append(
-                    'A title must be specified (in the \'Settings\' tab).')
-
-            if not self.category:
-                warnings_list.append(
-                    'A category must be specified (in the \'Settings\' tab).')
-
-            if not self.objective:
-                warnings_list.append(
-                    'An objective must be specified (in the \'Settings\' tab).'
-                )
-
-            # Check that self-loop outcomes are not labelled as correct.
-            all_state_names = list(self.states.keys())
-            for state_name, state in self.states.items():
-                interaction = state.interaction
-                default_outcome = interaction.default_outcome
-
-                if default_outcome is not None:
-                    # Check that, if the outcome is a self-loop, then the
-                    # outcome is not labelled as correct.
-                    if (default_outcome.dest == state_name and
-                            default_outcome.labelled_as_correct):
-                        raise utils.ValidationError(
-                            'The default outcome for state %s is labelled '
-                            'correct but is a self-loop.' % state_name)
-
-                for group in interaction.answer_groups:
-                    # Check that, if the outcome is a self-loop, then the
-                    # outcome is not labelled as correct.
-                    if (group.outcome.dest == state_name and
-                            group.outcome.labelled_as_correct):
-                        raise utils.ValidationError(
-                            'The outcome for an answer group in state %s is '
-                            'labelled correct but is a self-loop.' % state_name)
-
-            if len(warnings_list) > 0:
-                warning_str = ''
-                for ind, warning in enumerate(warnings_list):
-                    warning_str += '%s. %s ' % (ind + 1, warning)
-                raise utils.ValidationError(
-                    'Please fix the following issues before saving this '
-                    'exploration: %s' % warning_str)
-
             # Check if first state is a checkpoint or not.
             if not self.states[self.init_state_name].card_is_checkpoint:
                 raise utils.ValidationError(
@@ -1105,6 +1050,61 @@ class Exploration(python_utils.OBJECT):
                         raise utils.ValidationError(
                             'Cannot make %s a checkpoint as it is bypassable'
                             % state_name_to_exclude)
+
+            try:
+                self._verify_all_states_reachable()
+            except utils.ValidationError as e:
+                warnings_list.append(python_utils.UNICODE(e))
+
+            try:
+                self._verify_no_dead_ends()
+            except utils.ValidationError as e:
+                warnings_list.append(python_utils.UNICODE(e))
+
+            if not self.title:
+                warnings_list.append(
+                    'A title must be specified (in the \'Settings\' tab).')
+
+            if not self.category:
+                warnings_list.append(
+                    'A category must be specified (in the \'Settings\' tab).')
+
+            if not self.objective:
+                warnings_list.append(
+                    'An objective must be specified (in the \'Settings\' tab).'
+                )
+
+            # Check that self-loop outcomes are not labelled as correct.
+            all_state_names = list(self.states.keys())
+            for state_name, state in self.states.items():
+                interaction = state.interaction
+                default_outcome = interaction.default_outcome
+
+                if default_outcome is not None:
+                    # Check that, if the outcome is a self-loop, then the
+                    # outcome is not labelled as correct.
+                    if (default_outcome.dest == state_name and
+                            default_outcome.labelled_as_correct):
+                        raise utils.ValidationError(
+                            'The default outcome for state %s is labelled '
+                            'correct but is a self-loop.' % state_name)
+
+                for group in interaction.answer_groups:
+                    # Check that, if the outcome is a self-loop, then the
+                    # outcome is not labelled as correct.
+                    if (group.outcome.dest == state_name and
+                            group.outcome.labelled_as_correct):
+                        raise utils.ValidationError(
+                            'The outcome for an answer group in state %s is '
+                            'labelled correct but is a self-loop.' % state_name)
+
+            if len(warnings_list) > 0:
+                warning_str = ''
+                for ind, warning in enumerate(warnings_list):
+                    warning_str += '%s. %s ' % (ind + 1, warning)
+                raise utils.ValidationError(
+                    'Please fix the following issues before saving this '
+                    'exploration: %s' % warning_str)
 
     def _verify_all_states_reachable(self):
         """Verifies that all states are reachable from the initial state.
