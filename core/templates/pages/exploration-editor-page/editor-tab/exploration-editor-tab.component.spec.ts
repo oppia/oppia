@@ -208,7 +208,6 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
-        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
@@ -286,7 +285,6 @@ describe('Exploration editor tab component', function() {
           },
           hints: []
         },
-        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
@@ -426,18 +424,6 @@ describe('Exploration editor tab component', function() {
     expect(
       explorationStatesService.getState('First State').nextContentIdIndex
     ).toBe(2);
-  });
-
-  it('should save linked skill id', function() {
-    stateEditorService.setActiveStateName('First State');
-    expect(
-      explorationStatesService.getState('First State').linkedSkillId
-    ).toEqual(null);
-
-    ctrl.saveLinkedSkillId('skill_id1');
-    expect(
-      explorationStatesService.getState('First State').linkedSkillId
-    ).toBe('skill_id1');
   });
 
   it('should save interaction answer groups', function() {

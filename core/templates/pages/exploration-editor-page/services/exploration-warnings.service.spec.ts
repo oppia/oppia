@@ -1482,7 +1482,6 @@ describe('Exploration Warnings Service', function() {
           },
           classifier_model_id: null,
           solicit_answer_details: false,
-          linked_skill_id: null,
           card_is_checkpoint: false,
           next_content_id_index: null,
         },
@@ -1520,7 +1519,6 @@ describe('Exploration Warnings Service', function() {
             }
           },
           classifier_model_id: null,
-          linked_skill_id: null,
           next_content_id_index: null
         }
       });

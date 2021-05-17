@@ -25,9 +25,6 @@ require(
   'components/state-editor/state-interaction-editor/' +
   'state-interaction-editor.directive.ts');
 require(
-  'components/state-editor/state-skill-editor/' +
-  'state-skill-editor.component.ts');
-require(
   'components/state-editor/state-responses-editor/' +
   'state-responses.directive.ts');
 require(
@@ -41,9 +38,6 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-skill.service');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-name.service.ts');
@@ -66,9 +60,6 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service');
-require(
-  'pages/exploration-editor-page/editor-tab/' +
-  'exploration-editor-tab.component.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -89,34 +80,30 @@ angular.module('oppia').directive('stateEditor', [
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
         onSaveInteractionId: '=',
-        onSaveLinkedSkillId: '=',
         onSaveNextContentIdIndex: '=',
         onSaveSolicitAnswerDetails: '=',
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '=',
         refreshWarnings: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
-        explorationIsLinkedToStory: '='
+        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
         '$scope', 'StateCardIsCheckpointService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
-        'StateHintsService', 'StateInteractionIdService',
-        'StateLinkedSkillIdService', 'StateNameService',
-        'StateNextContentIdIndexService', 'StateParamChangesService',
-        'StateSolicitAnswerDetailsService', 'StateSolutionService',
-        'WindowDimensionsService', 'INTERACTION_SPECS',
+        'StateHintsService', 'StateInteractionIdService', 'StateNameService',
+        'StateNextContentIdIndexService',
+        'StateParamChangesService', 'StateSolicitAnswerDetailsService',
+        'StateSolutionService', 'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
             $scope, StateCardIsCheckpointService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
-            StateHintsService, StateInteractionIdService,
-            StateLinkedSkillIdService, StateNameService,
-            StateNextContentIdIndexService, StateParamChangesService,
-            StateSolicitAnswerDetailsService, StateSolutionService,
-            WindowDimensionsService, INTERACTION_SPECS) {
+            StateHintsService, StateInteractionIdService, StateNameService,
+            StateNextContentIdIndexService,
+            StateParamChangesService, StateSolicitAnswerDetailsService,
+            StateSolutionService, WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var updateInteractionVisibility = function(newInteractionId) {
@@ -167,8 +154,6 @@ angular.module('oppia').directive('stateEditor', [
                   StateEditorService.setInteraction(stateData.interaction);
                   StateContentService.init(
                     $scope.stateName, stateData.content);
-                  StateLinkedSkillIdService.init(
-                    $scope.stateName, stateData.linkedSkillId);
                   StateHintsService.init(
                     $scope.stateName, stateData.interaction.hints);
                   StateInteractionIdService.init(
