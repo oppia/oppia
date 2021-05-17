@@ -839,7 +839,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion_change['question_dict'][
             'question_state_data']
         question_state_data['content'][
             'html'] = '<p>Updated question</p>'

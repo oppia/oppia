@@ -24,7 +24,7 @@ import logging
 import re
 
 from constants import constants
-from core.domain import email_manager
+from core.domain import email_manager, question_domain
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
@@ -1298,10 +1298,27 @@ def update_question_suggestion(
         question_state_data: obj. Details of the question.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
-
-    suggestion.change.question_dict['question_state_data'] = question_state_data
-    suggestion.change.skill_difficulty = skill_difficulty
+    new_change_obj = question_domain.QuestionSuggestionChange(
+        {
+            'cmd': suggestion.change.cmd,
+            'question_dict': {
+                'question_state_data': question_state_data,
+                'language_code': suggestion.change.question_dict[
+                    'language_code'],
+                'question_state_data_schema_version': (
+                    suggestion.change.question_dict[
+                        'question_state_data_schema_version']),
+                'linked_skill_ids': suggestion.change.question_dict[
+                    'linked_skill_ids'],
+                'inapplicable_skill_misconception_ids': (
+                    suggestion.change.question_dict[
+                        'inapplicable_skill_misconception_ids'])
+            },
+            'skill_id': suggestion.change.skill_id,
+            'skill_difficulty': skill_difficulty
+        })
+    suggestion.pre_update_validate(new_change_obj)
     suggestion.edited_by_reviewer = True
-    suggestion.pre_update_validate(suggestion.change)
+    suggestion.change = new_change_obj
 
     _update_suggestion(suggestion)
