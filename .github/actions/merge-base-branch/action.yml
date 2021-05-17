@@ -1,0 +1,15 @@
+name: 'Merge from Base Branch if Action Running on a PR'
+description: 'Merge from the base branch the PR is being merged into.'
+runs:
+  using: 'composite'
+  steps:
+    - id: merge
+      if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+      run: |
+        echo "Base Repository: ${{ github.repository }}"
+        echo "Base Branch: ${{ github.base_ref }}"
+        git remote add -f upstream "https://github.com/${{ github.repository }}.git"
+        git checkout ${{ github.base_ref }}
+        git merge --ff-only upstream/${{ github.base_ref }}
+        git show
+      shell: bash
