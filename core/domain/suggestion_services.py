@@ -131,7 +131,7 @@ def create_suggestion(
             suggestion_type])
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category, language_code)
+        None, change, score_category, language_code, False)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
@@ -164,7 +164,7 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category, suggestion_model.language_code,
+        suggestion_model.score_category, suggestion_model.language_code, False,
         suggestion_model.last_updated)
 
 

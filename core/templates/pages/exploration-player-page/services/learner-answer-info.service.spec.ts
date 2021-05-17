@@ -165,7 +165,6 @@ describe('Learner answer info service', () =>{
           feedback_2: {}
         }
       },
-      linked_skill_id: null,
       classifier_model_id: '',
       next_content_id_index: null
     };
