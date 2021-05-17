@@ -35,15 +35,14 @@ class ValidateCollectionCommitCmdsSchemaTests(
 
     def test_validate_change_domain_implemented(self):
         invalid_commit_cmd_model = (
-            collection_models.CollectionSnapshotMetadataModel(
-                id='model_id-1',
+            collection_models.CollectionCommitLogEntryModel(
+                id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_type='test-type',
+                user_id='',
+                collection_id='123',
+                post_commit_status='private',
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -59,15 +58,14 @@ class ValidateCollectionCommitCmdsSchemaTests(
 
     def test_collection_change_object_with_missing_cmd(self):
         invalid_commit_cmd_model = (
-            collection_models.CollectionSnapshotMetadataModel(
-                id='model_id-1',
+            collection_models.CollectionCommitLogEntryModel(
+                id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_type='test-type',
+                user_id='',
+                collection_id='123',
+                post_commit_status='private',
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -87,15 +85,14 @@ class ValidateCollectionCommitCmdsSchemaTests(
 
     def test_collection_change_object_with_invalid_cmd(self):
         invalid_commit_cmd_model = (
-            collection_models.CollectionSnapshotMetadataModel(
-                id='model_id-1',
+            collection_models.CollectionCommitLogEntryModel(
+                id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_type='test-type',
+                user_id='',
+                collection_id='123',
+                post_commit_status='private',
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
