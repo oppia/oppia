@@ -86,9 +86,7 @@ describe('Exploration Player State Service', () => {
 
   let questionBackendDict: QuestionBackendDict = {
     id: '',
-    question_state_data: {
-      param_changes: []
-    },
+    question_state_data: null,
     question_state_data_schema_version: 2,
     language_code: '',
     version: 1,
@@ -322,10 +320,12 @@ describe('Exploration Player State Service', () => {
     spyOn(
       editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
       .and.returnValue(Promise.resolve({
+        draft_changes: [],
+        is_version_of_draft_valid: true,
         init_state_name: '',
         param_changes: [],
-        param_specs: {},
-        states: {},
+        param_specs: null,
+        states: null,
         title: '',
         language_code: ''
       }));

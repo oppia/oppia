@@ -156,7 +156,7 @@ describe('Exploration object factory', () => {
       param_changes: [],
       draft_changes: [],
       is_version_of_draft_valid: true,
-      version: '1'
+      version: 1
     };
 
     exploration = eof.createFromBackendDict(explorationDict);

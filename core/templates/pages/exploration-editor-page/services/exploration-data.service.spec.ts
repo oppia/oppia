@@ -38,7 +38,7 @@ describe('Exploration data service', function() {
   let csrfService: CsrfTokenService = null;
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
-    version: '1',
+    version: 1,
     draft_changes: [],
     is_version_of_draft_valid: true,
     init_state_name: 'init',

@@ -52,6 +52,14 @@ describe('ExplorationFeatureService', () => {
       states: {
         testState: {
           param_changes: [testParamChange],
+          classifier_model_id: '',
+          content: null,
+          interaction: null,
+          recorded_voiceovers: null,
+          solicit_answer_details: false,
+          card_is_checkpoint: false,
+          written_translations: null,
+          next_content_id_index: 1,
         }
       }
     };
