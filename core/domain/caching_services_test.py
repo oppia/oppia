@@ -46,7 +46,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         'objective': '',
         'init_state_name': 'Introduction',
         'author_notes': '',
-        'states_schema_version': 45,
+        'states_schema_version': 44,
         'param_specs': {},
         'param_changes': [],
         'id': 'h51Bu72rDIqO',
@@ -84,7 +84,6 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': '<p>Unicode Characters 😍😍😍😍</p>'
                 },
-                'linked_skill_id': None,
                 'next_content_id_index': 5,
                 'interaction': {
                     'hints': [{
@@ -155,7 +154,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
     # unicode characters that is set to the memory cache.
     json_encoded_string_representing_an_exploration = (
         '{"param_changes": [], "category": "", "auto_tts_enabled": true, "tags"'
-        ': [], "states_schema_version": 45, "title": "", "param_specs": {}, "id'
+        ': [], "states_schema_version": 44, "title": "", "param_specs": {}, "id'
         '": "h51Bu72rDIqO", "states": {"Introduction": {"param_changes": [], "c'
         'ard_is_checkpoint": true, "interaction": {"solution": null, "answer_gr'
         'oups": [{"tagged_skill_misconception_id": null, "outcome": {"param_cha'
@@ -172,18 +171,17 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d", "content_id'
         '": "ca_placeholder_0"}}}, "confirmed_unclassified_answers": [], "id": '
         '"TextInput", "hints": [{"hint_content": {"content_id": "hint_3", "html'
-        '": "<p>This is a copyright character \\u00a9.</p>"}}]}, "linked_skill_'
-        'id": null, "recorded_voiceovers": {"voiceovers_mapping": {"feedback_2"'
-        ': {}, "rule_input_4": {}, "content": {}, "hint_3": {}, "default_outcom'
-        'e": {}, "ca_placeholder_0": {}}}, "classifier_model_id": null, "conten'
-        't": {"content_id": "content", "html": "<p>Unicode Characters \\ud83d\\'
-        'ude0d\\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d</p>"}, "written_transl'
-        'ations": {"translations_mapping": {"feedback_2": {}, "rule_input_4": {'
-        '}, "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder'
-        '_0": {}}}, "next_content_id_index": 5, "solicit_answer_details": false'
-        '}}, "version": 0, "correctness_feedback_enabled": false, "language_cod'
-        'e": "en", "objective": "", "init_state_name": "Introduction", "blurb":'
-        ' "", "author_notes": ""}'
+        '": "<p>This is a copyright character \\u00a9.</p>"}}]}, "recorded_voic'
+        'eovers": {"voiceovers_mapping": {"feedback_2": {}, "rule_input_4": {},'
+        ' "content": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0'
+        '": {}}}, "classifier_model_id": null, "content": {"content_id": "conte'
+        'nt", "html": "<p>Unicode Characters \\ud83d\\ude0d\\ud83d\\ude0d\\ud83'
+        'd\\ude0d\\ud83d\\ude0d</p>"}, "written_translations": {"translations_m'
+        'apping": {"feedback_2": {}, "rule_input_4": {}, "content": {}, "hint_'
+        '3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, "next_content'
+        '_id_index": 5, "solicit_answer_details": false}}, "version": 0, "corre'
+        'ctness_feedback_enabled": false, "language_code": "en", "objective": "'
+        '", "init_state_name": "Introduction", "blurb": "", "author_notes": ""}'
     )
 
     def test_retrieved_memory_profile_contains_correct_elements(self):
