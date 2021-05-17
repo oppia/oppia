@@ -45,7 +45,7 @@ angular.module('oppia').component('explorationPlayerPage', {
       var ctrl = this;
       ctrl.$onInit = function() {
         var explorationId = ContextService.getExplorationId();
-        ReadOnlyExplorationBackendApiService.fetchExploration(
+        ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
           explorationId, null)
           .then(function(response) {
             PageTitleService.setPageTitle(

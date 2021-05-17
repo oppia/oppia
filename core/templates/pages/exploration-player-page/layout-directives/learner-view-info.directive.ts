@@ -74,7 +74,7 @@ angular.module('oppia').directive('learnerViewInfo', [
             if (expInfo) {
               openInformationCardModal();
             } else {
-              LearnerViewInfoBackendApiService.fetchLearnerInfo(
+              LearnerViewInfoBackendApiService.fetchLearnerInfoAsync(
                 stringifiedExpIds,
                 includePrivateExplorations
               ).then(function(response) {
@@ -126,7 +126,7 @@ angular.module('oppia').directive('learnerViewInfo', [
 
           ctrl.$onInit = function() {
             ctrl.explorationTitle = 'Loading...';
-            ReadOnlyExplorationBackendApiService.fetchExploration(
+            ReadOnlyExplorationBackendApiService.fetchExplorationAsync(
               explorationId, UrlService.getExplorationVersionFromUrl())
               .then(function(response) {
                 ctrl.explorationTitle = response.exploration.title;
