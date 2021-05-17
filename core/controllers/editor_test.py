@@ -297,7 +297,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -340,7 +339,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -383,7 +381,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -428,7 +425,6 @@ interaction:
   hints: []
   id: TextInput
   solution: null
-linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:

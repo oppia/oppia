@@ -1225,7 +1225,7 @@ class TestBase(unittest.TestCase):
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in itertools.izip_longest( # pylint: disable=deprecated-itertools-function
+                for args, kwargs in python_utils.zip_longest(
                     expected_args_iter, expected_kwargs_iter, fillvalue={})
             ]
             if pretty_unused_args:
@@ -1773,7 +1773,6 @@ states:
       hints: []
       id: null
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1807,7 +1806,6 @@ states:
       hints: []
       id: null
       solution: null
-    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:

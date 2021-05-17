@@ -137,7 +137,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         '/pages/exploration-editor-page/translation-tab/' +
         'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
-        '$filter', '$interval', '$q', '$scope', '$uibModal', '$window',
+        '$interval', '$q', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService',
         'ExplorationStatesService', 'ExternalSaveService',
@@ -147,7 +147,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         'TranslationTabActiveContentIdService', 'VoiceoverRecordingService',
         'RECORDING_TIME_LIMIT',
         function(
-            $filter, $interval, $q, $scope, $uibModal, $window,
+            $interval, $q, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService,
             ExplorationStatesService, ExternalSaveService,
@@ -158,6 +158,13 @@ angular.module('oppia').directive('audioTranslationBar', [
             RECORDING_TIME_LIMIT) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
+          $scope.AudioPlayerService = AudioPlayerService;
+
+          $scope.setProgress = function(val: {value: number}) {
+            AudioPlayerService.setCurrentTime(val.value);
+            $scope.$applyAsync();
+          };
+
           var saveRecordedVoiceoversChanges = function() {
             StateRecordedVoiceoversService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
@@ -213,7 +220,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.recordingPermissionDenied = true;
               $scope.cannotRecord = true;
               $scope.checkingMicrophonePermission = false;
-              $scope.$apply();
+              $scope.$applyAsync();
             });
           };
 
@@ -284,7 +291,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.waveSurfer.play();
               $scope.waveSurfer.on('finish', function() {
                 $scope.unsavedAudioIsPlaying = false;
-                $scope.$apply();
+                $scope.$applyAsync();
               });
             } else {
               $scope.waveSurfer.pause();
@@ -386,20 +393,6 @@ angular.module('oppia').directive('audioTranslationBar', [
             }
           };
 
-          $scope.getUploadedAudioTimer = function() {
-            if (AudioPlayerService.isTrackLoaded()) {
-              $scope.audioTimerIsShown = true;
-              var currentTime = $filter('formatTimer')(
-                AudioPlayerService.getCurrentTime());
-              var duration = $filter('formatTimer')(
-                AudioPlayerService.getAudioDuration());
-              return currentTime + ' / ' + duration;
-            } else {
-              $scope.audioTimerIsShown = false;
-              return '--:-- / --:--';
-            }
-          };
-
           $scope.isPlayingUploadedAudio = function() {
             return AudioPlayerService.isPlaying();
           };
@@ -409,13 +402,15 @@ angular.module('oppia').directive('audioTranslationBar', [
             var audioTranslation = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslation) {
-              $q.when(AudioPlayerService.load(audioTranslation.filename))
-                .then(function() {
+              AudioPlayerService.loadAsync(audioTranslation.filename).then(
+                function() {
                   $scope.audioLoadingIndicatorIsShown = false;
                   $scope.audioIsLoading = false;
                   $scope.audioTimerIsShown = true;
                   AudioPlayerService.play();
-                });
+                  $scope.$applyAsync();
+                }
+              );
             }
           };
 
@@ -573,14 +568,16 @@ angular.module('oppia').directive('audioTranslationBar', [
                 () => $scope.openTranslationTabBusyModal()
               )
             );
-            $scope.track = {
-              progress: function(progressPercentage) {
-                if (angular.isDefined(progressPercentage)) {
-                  AudioPlayerService.setProgress(progressPercentage / 100);
-                }
-                return AudioPlayerService.getProgress() * 100;
-              }
-            };
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.viewUpdate.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.onAudioStop.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
             $scope.initAudioBar();
           };
           ctrl.$onDestroy = function() {

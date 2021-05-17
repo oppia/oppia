@@ -247,7 +247,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 45
+CURRENT_STATE_SCHEMA_VERSION = 44
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -1006,6 +1006,11 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 ROLE_ID_VOICEOVER_ADMIN = 'VOICEOVER_ADMIN'
+
+ALLOWED_USER_ROLES = [
+    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
+    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_ADMIN]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.

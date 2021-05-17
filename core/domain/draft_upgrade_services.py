@@ -104,22 +104,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list):
-        """Converts draft change list from state version 44 to 45. State
-        version 45 adds a linked skill id property to the
-        state. As this is a new property and therefore doesn't affect any
-        pre-existing drafts, there should be no changes to drafts.
-
-        Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
-        """
-        return draft_change_list
-
-    @classmethod
     def _convert_states_v43_dict_to_v44_dict(cls, draft_change_list):
         """Converts draft change list from state version 43 to 44. State
         version 44 adds card_is_checkpoint boolean variable to the
