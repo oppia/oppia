@@ -76,7 +76,7 @@ import { OppiaFooterComponent } from 'pages/OppiaFooter.component'
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
-
+import { I18nFooter } from '../I18nFooter'
 
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
@@ -155,6 +155,7 @@ const toastrConfig = {
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
+    I18nFooter,
     FilterForMatchingSubstringPipe,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -207,10 +208,10 @@ const toastrConfig = {
     LazyLoadingComponent, LoadingMessageComponent,
     LoadingDotsComponent, SocialButtonsComponent,
     OnScreenKeyboardComponent,
-    OppiaFooterComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SkillSelectorComponent,
+    OppiaFooterComponent,
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
@@ -232,6 +233,7 @@ const toastrConfig = {
     CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
+    I18nFooter,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,

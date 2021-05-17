@@ -80,7 +80,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
   selectionDetails: SelectionDetails
   translationData = {};
-  activeMenuName: string;
+  activeMenuName: string='';
   searchBarPlaceholder: string;
   categoryButtonText: string;
   languageButtonText: string;
@@ -175,7 +175,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   toggleSelection(itemsType, optionName): void {
     var selections = this.selectionDetails[itemsType].selections;
-    console.log(selections)
     if (!selections.hasOwnProperty(optionName)) {
       selections[optionName] = true;
     } else {
@@ -205,7 +204,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
           this.searchQuery, this.selectionDetails.categories.selections,
           this.selectionDetails.languageCodes.selections
         );
-        console.log(searchUrlQueryString)
         if (this.windowRef.nativeWindow.location.pathname !== ('/search/find?q=' + searchUrlQueryString)) {
           this.windowRef.nativeWindow.location.replace('/search/find?q=' + searchUrlQueryString);
         }
@@ -259,7 +257,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories()
+    this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
     this.ACTION_OPEN = this.navigationService.ACTION_OPEN;
     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
     this.KEYBOARD_EVENT_TO_KEY_CODES =
