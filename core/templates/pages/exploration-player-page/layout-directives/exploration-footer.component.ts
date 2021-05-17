@@ -62,7 +62,7 @@ export class ExplorationFooterComponent {
     if (!this.contextService.isInQuestionPlayerMode() ||
         this.contextService.getQuestionPlayerIsManuallySet()) {
       this.explorationSummaryBackendApiService
-        .loadPublicAndPrivateExplorationSummaries([this.explorationId])
+        .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
         .then((responseObject) => {
           let summaries = responseObject.summaries;
           if (summaries.length > 0) {
