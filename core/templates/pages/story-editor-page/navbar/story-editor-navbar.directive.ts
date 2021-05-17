@@ -148,7 +148,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
               }
               $scope.forceValidateExplorations = false;
               if (explorationIds.length > 0) {
-                EditableStoryBackendApiService.validateExplorations(
+                EditableStoryBackendApiService.validateExplorationsAsync(
                   $scope.story.getId(), explorationIds
                 ).then(function(validationIssues) {
                   $scope.explorationValidationIssues =
