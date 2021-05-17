@@ -34,16 +34,16 @@ class ValidateExplorationCommitCmdsSchemaTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
-        invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                commit_type='test-type',
+                user_id='',
+                exploration_id='123',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
 
         output = (
             self.pipeline
@@ -55,16 +55,15 @@ class ValidateExplorationCommitCmdsSchemaTests(
         self.assert_pcoll_equal(output, [])
 
     def test_validate_exp_model_object_with_missing_cmd(self):
-        invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'invalid': 'data'}])
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                commit_type='test-type',
+                user_id='',
+                exploration_id='123',
+                post_commit_status='private',
+                commit_cmds=[{'invalid': 'data'}])
 
         output = (
             self.pipeline
@@ -81,16 +80,15 @@ class ValidateExplorationCommitCmdsSchemaTests(
         ])
 
     def test_validate_exp_model_object_with_invalid_cmd(self):
-        invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{'cmd': 'invalid'}])
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                commit_type='test-type',
+                user_id='',
+                exploration_id='123',
+                post_commit_status='private',
+                commit_cmds=[{'cmd': 'invalid'}])
 
         output = (
             self.pipeline
@@ -107,20 +105,19 @@ class ValidateExplorationCommitCmdsSchemaTests(
         ])
 
     def test_validate_exp_model_object_with_missing_attribute_in_cmd(self):
-        invalid_commit_cmd_model = exp_models.ExplorationSnapshotMetadataModel(
-            id='model_id-1',
-            created_on=self.YEAR_AGO,
-            last_updated=self.NOW,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_cmds_user_ids=[
-                'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-            content_user_ids=['content_user_1_id', 'content_user_2_id'],
-            commit_cmds=[{
-                'cmd': 'edit_state_property',
-                'property_name': 'content',
-                'old_value': 'old_value'
-            }])
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+                id='123',
+                created_on=self.YEAR_AGO,
+                last_updated=self.NOW,
+                commit_type='test-type',
+                user_id='',
+                exploration_id='123',
+                post_commit_status='private',
+                commit_cmds=[{
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content',
+                    'old_value': 'old_value'
+                }])
 
         output = (
             self.pipeline
