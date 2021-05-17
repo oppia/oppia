@@ -16,5 +16,4 @@ runs:
         git fetch upstream ${{ github.base_ref }}
         git checkout ${{ github.base_ref }}
         git merge --ff-only upstream/${{ github.base_ref }}
-        git show
       shell: bash
