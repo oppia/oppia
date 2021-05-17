@@ -52,8 +52,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation
-                .ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -76,8 +75,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation
-                .ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -105,8 +103,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation
-                .ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -138,8 +135,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation
-                .ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -171,8 +167,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation
-                .ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -205,8 +200,7 @@ class ValidateQuestionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                question_validation
-                .ValidateQuestionCommitCmdsSchema())
+                question_validation.ValidateQuestionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [

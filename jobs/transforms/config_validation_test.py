@@ -52,8 +52,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation
-                .ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -76,8 +75,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation
-                .ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -105,8 +103,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation
-                .ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -134,8 +131,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation
-                .ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -168,8 +164,7 @@ class ValidateConfigCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                config_validation
-                .ValidateConfigCommitCmdsSchema())
+                config_validation.ValidateConfigCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [

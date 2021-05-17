@@ -52,8 +52,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation
-                .ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -76,8 +75,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation
-                .ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -105,8 +103,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation
-                .ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -138,8 +135,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation
-                .ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -179,8 +175,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation
-                .ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -220,8 +215,7 @@ class ValidateCollectionCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                collection_validation
-                .ValidateCollectionCommitCmdsSchema())
+                collection_validation.ValidateCollectionCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [

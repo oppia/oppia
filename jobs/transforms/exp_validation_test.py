@@ -49,8 +49,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -71,8 +70,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -98,8 +96,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -129,8 +126,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -166,8 +162,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -203,8 +198,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
@@ -242,8 +236,7 @@ class ValidateExplorationCommitCmdsSchemaTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation
-                .ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationCommitCmdsSchema())
         )
 
         self.assert_pcoll_equal(output, [
