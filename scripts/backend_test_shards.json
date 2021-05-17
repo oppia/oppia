@@ -257,7 +257,6 @@
         "scripts.docstrings_checker_test",
         "core.platform.search.elastic_search_services_test",
         "scripts.typescript_checks_test",
-        "core.platform.auth.gae_auth_services_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
         "core.platform.cloud_translate.cloud_translate_emulator_test",
