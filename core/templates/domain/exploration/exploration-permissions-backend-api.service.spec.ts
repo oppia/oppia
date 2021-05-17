@@ -55,7 +55,7 @@ describe('Exploration permissions backend api service', () => {
       can_delete: false,
       can_modify_roles: true,
       can_edit: true,
-      can_assign_voiceartist: false
+      can_assign_voice_artist: false
     };
 
     let expectedResponse =

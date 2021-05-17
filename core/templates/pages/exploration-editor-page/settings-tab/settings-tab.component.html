@@ -371,7 +371,7 @@
             <div ng-show="!$ctrl.isVoiceoverFormOpen" class="oppia-no-voiceartist-message" ng-if="!$ctrl.ExplorationRightsService.voiceArtistNames.length">
               No voice artists are assigned to this exploration.
             </div>
-            <div ng-if="$ctrl.canAssignVoiceartist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
+            <div ng-if="$ctrl.canAssignVoiceArtist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
               <span ng-click="$ctrl.openVoiceoverRolesForm()" class="oppia-edit-roles-btn protractor-test-edit-roles">
                 EDIT
               </span>
@@ -390,7 +390,7 @@
             </ul>
           </div>
 
-          <div ng-if="$ctrl.canAssignVoiceartist" ng-show="$ctrl.isVoiceoverFormOpen">
+          <div ng-if="$ctrl.canAssignVoiceArtist" ng-show="$ctrl.isVoiceoverFormOpen">
             <div class="form-group">
               <form ng-submit="$ctrl.editVoiseArtist($ctrl.newVoiceartistUsername)">
                 <div class="nik">
