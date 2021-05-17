@@ -526,7 +526,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
             self):
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
@@ -550,7 +550,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types):
             with self.swap(
                 suggestion_models,

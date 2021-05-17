@@ -38,12 +38,6 @@ STATUS_CHOICES = [
     STATUS_REJECTED
 ]
 
-# The types of suggestions that are offered on the Contributor Dashboard.
-CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    feconf.SUGGESTION_TYPE_ADD_QUESTION
-]
-
 # Daily emails are sent to reviewers to notify them of suggestions on the
 # Contributor Dashboard to review. The constants below define the number of
 # question and translation suggestions to fetch to come up with these daily
@@ -361,7 +355,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             Exception. If there are no suggestion types offered on the
                 Contributor Dashboard.
         """
-        if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
+        if not feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
             raise Exception(
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.')
@@ -373,7 +367,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.last_updated < threshold_time)
             .filter(cls.suggestion_type.IN(
-                CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
             .order(cls.last_updated)
             .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
