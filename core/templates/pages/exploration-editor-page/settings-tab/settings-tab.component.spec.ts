@@ -93,7 +93,7 @@ describe('Settings Tab Component', () => {
     canModifyRoles: true,
     canReleaseOwnership: true,
     canUnpublish: true,
-    canAssignVoiceartist: true
+    canAssignVoiceArtist: true
   };
   let mockWindowDimensionsService = {
     isWindowNarrow: () => true
@@ -224,7 +224,7 @@ describe('Settings Tab Component', () => {
         expect(ctrl.canReleaseOwnership).toBe(true);
         expect(ctrl.canUnpublish).toBe(true);
         expect(ctrl.explorationId).toBe(explorationId);
-        expect(ctrl.canAssignVoiceartist).toBe(true);
+        expect(ctrl.canAssignVoiceArtist).toBe(true);
 
         expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
           id: 'Astrology',
