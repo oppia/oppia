@@ -23,6 +23,8 @@ jobs:
           architecture: 'x64'
       - name: Setup python by installing wheel
         run: pip install wheel==0.35.0
+      - name: Merge from Base Branch if Running on a PR
+        uses: ./.github/actions/merge-base-branch
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - id: check-risk
