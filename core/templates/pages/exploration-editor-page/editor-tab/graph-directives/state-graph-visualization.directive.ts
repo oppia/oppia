@@ -229,7 +229,10 @@ angular.module('oppia').directive('stateGraphVisualization', [
           };
 
           $scope.isCheckpoint = function(nodeId) {
-            return ExplorationStatesService.getState(nodeId).cardIsCheckpoint;
+            var state = ExplorationStatesService.getState(nodeId);
+            if(state) {
+              return state.cardIsCheckpoint;
+            }
           };
 
           $scope.getGraphHeightInPixels = function() {

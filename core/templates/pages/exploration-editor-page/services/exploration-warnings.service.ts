@@ -303,7 +303,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
         var state = _states.getState(stateName);
         var interactionId = state.interaction.id;
         if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
-          if (state.cardIsCheckpoint) {
+          if (state.cardIsCheckpoint && stateName !== initStateName) {
             _extendStateWarnings(
               stateName, CHECKPOINT_ERROR_MESSAGES.TERMINAL_CARD);
           }
