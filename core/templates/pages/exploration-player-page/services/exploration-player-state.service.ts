@@ -20,7 +20,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
@@ -141,7 +140,20 @@ export class ExplorationPlayerStateService {
     this.playerCorrectnessFeedbackEnabledService.init(
       returnDict.correctness_feedback_enabled);
     this.explorationEngineService.init(
-      returnDict.exploration, returnDict.version,
+      {
+        auto_tts_enabled: returnDict.auto_tts_enabled,
+        correctness_feedback_enabled: returnDict.correctness_feedback_enabled,
+        draft_changes: [],
+        is_version_of_draft_valid: true,
+        init_state_name: returnDict.exploration.init_state_name,
+        param_changes: returnDict.exploration.param_changes,
+        param_specs: returnDict.exploration.param_specs,
+        states: returnDict.exploration.states,
+        title: returnDict.exploration.title,
+        language_code: returnDict.exploration.language_code,
+        version: returnDict.version
+      },
+      returnDict.version,
       returnDict.preferred_audio_language_code,
       returnDict.auto_tts_enabled,
       returnDict.preferred_language_codes,
@@ -198,7 +210,7 @@ export class ExplorationPlayerStateService {
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
         this.explorationId),
     ]).then((combinedData) => {
-      let explorationData: ExplorationBackendDict = combinedData[0];
+      let explorationData = combinedData[0];
       let featuresData: ExplorationFeatures = combinedData[1];
 
       this.explorationFeaturesService.init({
