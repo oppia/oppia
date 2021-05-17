@@ -11,16 +11,18 @@ runs:
     - id: merge
       name: Merge
       run: |
-        if [[ ${{ github.event_name}} != "pull_request" && ${{ github.event_name }} != "pull_request_target" ]]
+        if [[ ${{ github.event_name}} != "pull_request" ]]
         then
           echo "Skipping merge because not triggered by a PR event."
           exit 0
         fi
         echo "Base Repository: ${{ github.repository }}"
         echo "Base Branch: ${{ github.base_ref }}"
+        echo "Head Repository: ${{ github.event.pull_request.head.repo.full_name }}"
         echo "Head Branch: $GITHUB_HEAD_REF"
-        git checkout $GITHUB_HEAD_REF
-        git remote add upstream "https://github.com/${{ github.repository }}.git"
-        git fetch upstream ${{ github.base_ref }}
-        git merge --ff-only upstream/${{ github.base_ref }}
+        git remote add source "https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
+        git checkout source/$GITHUB_HEAD_REF
+        git remote add base "https://github.com/${{ github.repository }}.git"
+        git fetch base ${{ github.base_ref }}
+        git merge --ff-only base/${{ github.base_ref }}
       shell: bash
