@@ -6,6 +6,11 @@ runs:
     - id: merge
       if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
       run: |
+        if [[ ${{ github.event_name}} != "pull_request" && ${{ github.event_name }} != "pull_request_target" ]]
+        then
+          echo "Skipping merge because not triggered by a PR event."
+          exit 0
+        fi
         echo "Base Repository: ${{ github.repository }}"
         echo "Base Branch: ${{ github.base_ref }}"
         git remote add -f upstream "https://github.com/${{ github.repository }}.git"
