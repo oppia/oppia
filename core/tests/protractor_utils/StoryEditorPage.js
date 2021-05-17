@@ -96,7 +96,7 @@ var StoryEditorPage = function() {
   var skillNameInputField = element(
     by.css('.protractor-test-skill-name-input'));
   var skillSaveButton = element(
-    by.css('.protractor-test-skill-selection-button'));
+    by.css('.protractor-test-confirm-skill-selection-button'));
   var skillListItems = element.all(
     by.css('.protractor-test-skills-list-item'));
   var deletePrerequisiteSkillButton = element.all(
@@ -421,7 +421,7 @@ var StoryEditorPage = function() {
         await this._selectSkillBasedOnIndex(0);
         await waitFor.elementToBeClickable(
           skillSaveButton,
-          'doneButton button takes too long to be clickable');
+          'doneButton takes too long to be clickable');
         await skillSaveButton.click();
       },
     };
