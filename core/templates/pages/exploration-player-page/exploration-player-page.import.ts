@@ -31,7 +31,7 @@ angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngAudio', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
+  'toastr', 'ui.bootstrap', 'ui-leaflet',
   'ui.sortable', 'ui.tree', uiValidate
 ]);
 
@@ -49,7 +49,7 @@ require(
   'exploration-footer.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'learner-local-nav.directive.ts');
+  'learner-local-nav.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');

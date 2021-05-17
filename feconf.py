@@ -1006,6 +1006,11 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
+ALLOWED_USER_ROLES = [
+    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
+    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_ADMIN]
+
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
 ROLE_ACTION_UPDATE = 'update'
@@ -1148,9 +1153,6 @@ CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
 FIREBASE_EMULATOR_PORT = 9099
-
-# TODO(#11462): Delete this after Firebase authentication has been deployed.
-ENABLE_USER_CREATION = True
 
 # The name of the cookie Oppia will place the session cookie into. The name is
 # arbitrary. If it is changed later on, then the cookie will live on in the

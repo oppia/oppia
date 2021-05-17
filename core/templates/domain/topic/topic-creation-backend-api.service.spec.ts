@@ -26,7 +26,7 @@ import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { NewlyCreatedTopic } from
   'domain/topics_and_skills_dashboard/newly-created-topic.model';
 import { TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts';
+  'domain/topic/topic-creation-backend-api.service';
 
 describe('Topic creation backend api service', () => {
   let csrfService: CsrfTokenService = null;
@@ -69,7 +69,7 @@ describe('Topic creation backend api service', () => {
     // We need to suppress this error because we need to mock the
     // `getTokenAsync` function for testing purposes.
     // @ts-expect-error
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(() => {
+    spyOn(csrfService, 'getTokenAsync').and.returnValue(async() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
       });
