@@ -152,6 +152,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
     user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
     user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
+    user_jobs_one_off.UserRolesPopulationOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
