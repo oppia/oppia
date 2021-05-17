@@ -35,15 +35,14 @@ class ValidateQuestionCommitCmdsSchemaTests(
 
     def test_validate_change_domain_implemented(self):
         invalid_commit_cmd_model = (
-            question_models.QuestionSnapshotMetadataModel(
-                id='model_id-1',
+            question_models.QuestionCommitLogEntryModel(
+                id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_type='test-type',
+                user_id='',
+                question_id='123',
+                post_commit_status='private',
                 commit_cmds=[{
                     'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
         )
@@ -59,15 +58,14 @@ class ValidateQuestionCommitCmdsSchemaTests(
 
     def test_change_dict_without_cmd(self):
         invalid_commit_cmd_model = (
-            question_models.QuestionSnapshotMetadataModel(
-                id='model_id-1',
+            question_models.QuestionCommitLogEntryModel(
+                id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_type='test-type',
+                user_id='',
+                question_id='123',
+                post_commit_status='private',
                 commit_cmds=[{'invalid': 'data'}])
         )
 
@@ -87,15 +85,14 @@ class ValidateQuestionCommitCmdsSchemaTests(
 
     def test_change_dict_with_invalid_cmd(self):
         invalid_commit_cmd_model = (
-            question_models.QuestionSnapshotMetadataModel(
-                id='model_id-1',
+            question_models.QuestionCommitLogEntryModel(
+                id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_cmds_user_ids=[
-                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
-                content_user_ids=['content_user_1_id', 'content_user_2_id'],
+                commit_type='test-type',
+                user_id='',
+                question_id='123',
+                post_commit_status='private',
                 commit_cmds=[{'cmd': 'invalid'}])
         )
 
