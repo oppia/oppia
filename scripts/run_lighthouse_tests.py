@@ -71,8 +71,6 @@ def run_lighthouse_puppeteer_script():
     else:
         python_utils.PRINT(script_output)
         for url in script_output:
-            python_utils.PRINT("ERIC 2")
-            python_utils.PRINT(url)
             export_url(url)
         python_utils.PRINT('Puppeteer script completed successfully.')
 

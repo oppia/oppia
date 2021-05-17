@@ -680,7 +680,7 @@ def wait_for_port_to_be_in_use(port_number):
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (is_port_in_use(port_number)
+    while (not is_port_in_use(port_number)
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1

@@ -261,17 +261,14 @@ const getSkillEditorUrl = async function(browser, page) {
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
     await page.waitForSelector(skillCkEditor, {visible: true});
     await page.click(skillCkEditor);
-    await page.keyboard.type('Skill Overview here');
+    await page.type('Skill Overview here');
 
     await page.waitForSelector(confirmSkillCreationButton, {visible: true});
-    // await page.waitForSelector(skillCkEditor, {visible: true});
     await page.click(confirmSkillCreationButton);
     // Doing waitForTimeout(15000) to handle new tab being opened.
     await page.waitForTimeout(15000);
     let pages = await browser.pages();
     skillEditorUrl = await pages[2].url();
-    console.log("ERIC 1");
-    console.log(skillEditorUrl);
     if (await skillEditorUrl.includes('topic_editor')) {
       skillEditorUrl = await pages[3].url();
     }
