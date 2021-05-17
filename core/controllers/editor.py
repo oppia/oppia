@@ -208,6 +208,9 @@ class UserExplorationPermissionsHandler(EditorHandler):
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
+            'can_assign_voiceartist':
+                rights_manager.check_can_modify_voiceartist_in_activity(
+                    self.user, exploration_rights),
         })
         self.render_json(self.values)
 

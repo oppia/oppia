@@ -135,6 +135,42 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
+      saveVoiceArtist: function(newVoiceartistUsername) {
+        var that = this;
+        var requestUrl = (
+          '/voiceartist_management_handler/' + 'exploration/' +
+          ExplorationDataService.explorationId);
+
+        return $http.post(requestUrl, {
+          username: newVoiceartistUsername}).then((response) => {
+          var data = response.data;
+          AlertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
+        });
+      },
+      removeVoiceArtistRoleAsync: function(voiceArtistUsername) {
+        var that = this;
+        var requestUrl = (
+          '/voiceartist_management_handler/' + 'exploration/' +
+          ExplorationDataService.explorationId);
+        return $http['delete'](requestUrl, {
+          params: {
+            voice_artist: voiceArtistUsername
+          }
+        }).then(function(response) {
+          var data = response.data;
+          AlertsService.clearWarnings();
+          that.init(
+            data.rights.owner_names, data.rights.editor_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
+        });
+      },
       checkUserAlreadyHasRoles: function(username) {
         return [...this.ownerNames, ...this.editorNames, ...this.viewerNames,
           ...this.voiceArtistNames].includes(username);

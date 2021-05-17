@@ -1119,6 +1119,53 @@ def can_voiceover_exploration(handler):
     return test_can_voiceover
 
 
+def can_assign_voice_artist(handler):
+    """Decorator to check whether the user can assign voice artist to an entity.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if a user
+        has permission to assign voice artist to the given entity.
+    """
+
+    def test_can_assign_voice_artist(self, entity_type, entity_id, **kwargs):
+        """Checks if the user can assign a voice artist to the given entity.
+
+        Args:
+            entity_type: str. The type of entity.
+            entity_id: str. The Id of the entity.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            PageNotFoundException. The page is not found.
+            UnauthorizedUserException. The user does not have the credentials
+                to assign a voice artist.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            entity_id, strict=False)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_modify_voiceartist_in_activity(
+                self.user, exploration_rights):
+            return handler(self, entity_type, entity_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to assign voice artist.')
+    test_can_assign_voice_artist.__wrapped__ = True
+
+    return test_can_assign_voice_artist
+
+
 def can_save_exploration(handler):
     """Decorator to check whether user can save exploration.
 

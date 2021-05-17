@@ -85,6 +85,7 @@ ACTION_SUGGEST_CHANGES = 'SUGGEST_CHANGES'
 ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
 ACTION_VISIT_ANY_QUESTION_EDITOR = 'VISIT_ANY_QUESTION_EDITOR'
 ACTION_VISIT_ANY_TOPIC_EDITOR = 'VISIT_ANY_TOPIC_EDITOR'
+ACTION_CAN_ASSIGN_VOICEARTIST = 'CAN_ASSIGN_VOICEARTIST'
 
 # Users can be updated to the following list of role IDs via admin interface.
 #
@@ -95,6 +96,7 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_EXPLORATION_EDITOR,
+    feconf.ROLE_ID_VOICEOVER_ADMIN,
     feconf.ROLE_ID_MODERATOR,
     feconf.ROLE_ID_TOPIC_MANAGER
 ]
@@ -107,6 +109,7 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_ADMIN,
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
+    feconf.ROLE_ID_VOICEOVER_ADMIN,
     feconf.ROLE_ID_MODERATOR,
     feconf.ROLE_ID_TOPIC_MANAGER
 ]
@@ -117,6 +120,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_BANNED_USER: 'banned user',
     feconf.ROLE_ID_COLLECTION_EDITOR: 'collection editor',
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
+    feconf.ROLE_ID_VOICEOVER_ADMIN: 'voiceover admin',
     feconf.ROLE_ID_GUEST: 'guest',
     feconf.ROLE_ID_LEARNER: 'learner',
     feconf.ROLE_ID_MODERATOR: 'moderator',
@@ -133,7 +137,7 @@ def _get_unique_actions_list(*actions):
     """Returns a list of unique actions out of the given list of actions.
 
     Args:
-        *actions: list(str). List of actions whcihcan contain duplicate items.
+        *actions: list(str). List of actions which can contain duplicate items.
 
     Returns:
         list(str). A list of unique action strings.
@@ -211,6 +215,10 @@ _ADMIN_ALLOWED_ACTIONS = _get_unique_actions_list(
     ACTION_PUBLISH_OWNED_SKILL,
     *_MODERATOR_ALLOWED_ACTIONS)
 
+_VOICEOVER_ADMIN_ALLOWED_ACTIONS = _get_unique_actions_list(
+    ACTION_CAN_ASSIGN_VOICEARTIST,
+    *_EXPLORATION_EDITOR_ALLOWED_ACTIONS)
+
 # This dict represents all the actions that belong to a particular role.
 _ROLE_ACTIONS = {
     feconf.ROLE_ID_ADMIN: _ADMIN_ALLOWED_ACTIONS,
@@ -220,7 +228,8 @@ _ROLE_ACTIONS = {
     feconf.ROLE_ID_GUEST: _GUEST_ALLOWED_ACTIONS,
     feconf.ROLE_ID_LEARNER: _LEARNER_ALLOWED_ACTIONS,
     feconf.ROLE_ID_MODERATOR: _MODERATOR_ALLOWED_ACTIONS,
-    feconf.ROLE_ID_TOPIC_MANAGER: _TOPIC_MANAGER_ALLOWED_ACTIONS
+    feconf.ROLE_ID_TOPIC_MANAGER: _TOPIC_MANAGER_ALLOWED_ACTIONS,
+    feconf.ROLE_ID_VOICEOVER_ADMIN: _VOICEOVER_ADMIN_ALLOWED_ACTIONS
 }
 
 

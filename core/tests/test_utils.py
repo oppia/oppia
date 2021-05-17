@@ -1554,6 +1554,8 @@ class GenericTestBase(AppEngineTestBase):
     TOPIC_MANAGER_USERNAME = 'topicmanager'
     VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
     VOICE_ARTIST_USERNAME = 'voiceartist'
+    VOICEOVER_ADMIN_EMAIL = 'voiceoveradm@example.com'
+    VOICEOVER_ADMIN_USERNAME = 'voiceoveradm'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -2037,6 +2039,15 @@ title: Title
         """
         for name in moderator_usernames:
             self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
+
+    def set_voiceover_admin(self, voiceover_admin_username):
+        """Sets role of given users as VOICEOVER ADMIN.
+
+        Args:
+            voiceover_admin_username: list(str). List of usernames.
+        """
+        for name in voiceover_admin_username:
+            self.set_user_role(name, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def set_banned_users(self, banned_usernames):
         """Sets role of given users as BANNED_USER.
