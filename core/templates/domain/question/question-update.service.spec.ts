@@ -145,6 +145,7 @@ describe('Question update service', function() {
         hints: [],
         id: 'TextInput',
       },
+      linked_skill_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},
@@ -206,6 +207,7 @@ describe('Question update service', function() {
         hints: [],
         id: 'TextInput',
       },
+      linked_skill_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},
