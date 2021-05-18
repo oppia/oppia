@@ -92,10 +92,11 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
         const { useFractionForDivision, placeholder } = (
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
-        // The escapeCharacters list represents a list of special characters in
-        // LaTeX so named as they play a special role in LaTeX.
-        const escapeCharacters =
-          ['&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
+        // This represents a list of special characters in LaTeX. These
+        // characters have a special meaning in LaTeX and thus need to be
+        // escaped.
+        const escapeCharacters = [
+          '&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
         for (var i = 0; i < placeholder.unicode.length; i++) {
           if (escapeCharacters.includes(placeholder.unicode[i])) {
             let newPlaceholder = `\\verb|${placeholder.unicode}|`;
