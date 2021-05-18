@@ -3,7 +3,6 @@
     <search-bar [enableDropup]="false"></search-bar>
   </div>
   <div *ngIf="!someResultsExist" class="oppia-search-results-intro">
-    {{someResultsExist}}
     <div class="oppia-search-results-no-match">
       <picture>
         <source type="image/webp" [srcset]="getStaticImageUrl('/general/no_explorations_found.webp')">

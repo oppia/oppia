@@ -28,32 +28,35 @@
  }
 
  interface EventToCodes {
-   enter?,
-   tab?,
-   shiftTab?,
+   enter?: string,
+   tab?: string,
+   shiftTab?: string,
  }
-  @Injectable({
-    providedIn: 'root'
-  })
+
+ export const KEYBOARD_EVENT_TO_KEY_CODES = {
+  enter: {
+    shiftKeyIsPressed: false,
+    keyCode: 13
+  },
+  tab: {
+    shiftKeyIsPressed: false,
+    keyCode: 9
+  },
+  shiftTab: {
+    shiftKeyIsPressed: true,
+    keyCode: 9
+  }
+} as const;
+
+@Injectable({
+  providedIn: 'root'
+})
+
  export class NavigationService {
+  activeMenuName: string;
+  ACTION_OPEN = 'open';
+  ACTION_CLOSE = 'close';
    constructor() {}
-     activeMenuName: string;
-     ACTION_OPEN: 'open';
-     ACTION_CLOSE: 'close';
-    KEYBOARD_EVENT_TO_KEY_CODES: {
-      enter: {
-        shiftKeyIsPressed: false,
-        keyCode: 13
-      },
-      tab: {
-        shiftKeyIsPressed: false,
-        keyCode: 9
-      },
-      shiftTab: {
-        shiftKeyIsPressed: true,
-        keyCode: 9
-      }
-    };
 
     /**
     * Opens the submenu.
@@ -87,14 +90,13 @@
       let targetEvents = Object.keys(eventsTobeHandled);
       for (let i = 0; i < targetEvents.length; i++) {
         let keyCodeSpec =
-          this.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+          KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
         if (keyCodeSpec.keyCode === evt.keyCode &&
           evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
           if (eventsTobeHandled[targetEvents[i]] === this.ACTION_OPEN) {
             this.openSubmenu(evt, menuName);
           } else if (eventsTobeHandled[targetEvents[i]] ===
             this.ACTION_CLOSE) {
-            this.closeSubmenu(evt);
           } else {
             throw new Error('Invalid action type.');
           }
@@ -103,5 +105,5 @@
     }
   }
 
-  angular.module('oppia').factory('NavigationService',
+  angular.module('oppia').service('NavigationService',
     downgradeInjectable(NavigationService));

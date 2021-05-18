@@ -57,7 +57,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
   };
 
   ngOnInit(): void {
-    this.someResultsExist = true;
+    this.someResultsExist = false;
     this.userIsLoggedIn = false;
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
@@ -70,7 +70,6 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
       this.searchService.onInitialSearchResultsLoaded.subscribe(
         (activityList) => {
           this.someResultsExist = activityList.length > 0;
-          console.log(this.someResultsExist)
           this.userService.getUserInfoAsync().then((userInfo) => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
             this.loaderService.hideLoadingScreen();
