@@ -349,7 +349,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
         if (terminalStateCount !== terminalUnreachableStateCount) {
           _extendStateWarnings(
             nonInitialCheckpointStateNames[i],
-            CHECKPOINT_ERROR_MESSAGES.BY_PASSABLE_CARD);
+            CHECKPOINT_ERROR_MESSAGES.BYPASSABLE_CARD);
         }
       }
 

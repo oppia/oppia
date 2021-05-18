@@ -935,13 +935,13 @@ describe('Exploration Warnings Service', function() {
           'Please make sure end exploration interactions do not ' +
           'have any answer groups.',
           'Checkpoints are not allowed on the last card of the lesson.',
-          'Checkpoints must not be assigned to cards that can be by-passed.'
+          'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
       });
     });
 
     it('should show warnings if checkpoint count is more than 8 and' +
-      ' by-passable state is made a checkpoint', function() {
+      ' bypassable state is made a checkpoint', function() {
       ExplorationStatesService.init({
         Hola: {
           card_is_checkpoint: true,
@@ -1347,17 +1347,17 @@ describe('Exploration Warnings Service', function() {
         State1: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be by-passed.'
+          'Checkpoints must not be assigned to cards that can be bypassed.'
         ],
         State2: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be by-passed.'
+          'Checkpoints must not be assigned to cards that can be bypassed.'
         ],
         State3: [
           'Placeholder text must be a string.',
           'Number of rows must be integral.',
-          'Checkpoints must not be assigned to cards that can be by-passed.'
+          'Checkpoints must not be assigned to cards that can be bypassed.'
         ],
         State4: [
           'Placeholder text must be a string.',
@@ -1379,7 +1379,7 @@ describe('Exploration Warnings Service', function() {
           'Please make sure end exploration interactions do not ' +
           'have any answer groups.',
           'Checkpoints are not allowed on the last card of the lesson.',
-          'Checkpoints must not be assigned to cards that can be by-passed.'
+          'Checkpoints must not be assigned to cards that can be bypassed.'
         ]
       });
     });
