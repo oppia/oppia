@@ -38,7 +38,7 @@ describe('Exploration Html Formatter Service', () => {
     ehfs = TestBed.get(ExplorationHtmlFormatterService);
   });
 
-  it('should correctly set interaction HTML for TextInput when it is in' +
+  it('should correctly set interaction HTML for FractionsInput when it is in' +
      ' editor mode', () => {
     var interactionId = 'FractionsInput';
     let custArgs = {

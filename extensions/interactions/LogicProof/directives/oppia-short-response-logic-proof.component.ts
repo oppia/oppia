@@ -19,11 +19,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
+
 @Component({
   selector: 'oppia-short-response-logic-proof',
   templateUrl: './logic-proof-short-response.component.html'
 })
-
 export class ShortResponseLogicProofComponent implements OnInit {
   @Input('answer') answerWithValue: string;
   answer;

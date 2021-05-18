@@ -34,6 +34,7 @@ import { LogicProofCustomizationArgs } from 'interactions/customization-args-def
 import cloneDeep from 'lodash/cloneDeep';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 @Component({
   selector: 'oppia-interactive-logic-proof',
   templateUrl: './logic-proof-interaction.component.html'
@@ -58,6 +59,7 @@ export class InteractiveLogicProofComponent implements OnInit {
   targetString: string;
   questionString: string;
   questionStringData: { target: string; assumptions: string; };
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:

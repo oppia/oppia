@@ -43,8 +43,6 @@ export class ShortResponseInteractiveMapComponent implements OnInit {
   }
 }
 
-require('services/html-escaper.service.ts');
-
 angular.module('oppia').directive(
   'oppiaShortResponseInteractiveMap',
   downgradeComponent({

@@ -34,6 +34,7 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
   @Input() answer;
   @Input() choices;
   response;
+
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private convertToPlainText: ConvertToPlainTextPipe,

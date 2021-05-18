@@ -19,6 +19,7 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -28,14 +29,14 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
 import { InteractiveMapRulesService } from './interactive-map-rules.service';
-import { icon, latLng, LeafletMouseEvent, marker, tileLayer } from 'leaflet';
+import { icon, LatLng, latLng, LeafletMouseEvent, marker, TileLayer, tileLayer } from 'leaflet';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 @Component({
   selector: 'oppia-interactive-interactive-map',
   templateUrl: './interactive-map-interaction.component.html'
 })
-
 export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   @Input() lastAnswer;
   @Input() latitudeWithValue: string;
@@ -58,7 +59,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   zoom: number;
   interactionIsActive: boolean;
   mapMarkers;
-  mapOptions: unknown = {};
+  mapOptions: {center: LatLng; layers: TileLayer[]; zoom: number};
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -102,7 +103,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
       center: latLng([this.coords[0], this.coords[1]])
     };
     if (!this.interactionIsActive) {
-      this.changeMarkerPosition(
+      this._changeMarkerPosition(
         this.lastAnswer[0], this.lastAnswer[1]);
     }
   }
@@ -115,7 +116,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     };
   }
 
-  private changeMarkerPosition(lat, lng) {
+  private _changeMarkerPosition(lat, lng) {
     const newMarker = marker(
       [lat, lng],
       {
@@ -149,7 +150,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     if (this.interactionIsActive) {
       const newLat = e.latlng.lat;
       const newLng = e.latlng.lng;
-      this.changeMarkerPosition(newLat, newLng);
+      this._changeMarkerPosition(newLat, newLng);
       this.currentInteractionService.onSubmit(
         [newLat, newLng] as unknown as string,
         this.interactiveMapRulesService as unknown as InteractionRulesService
@@ -171,7 +172,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
 
   setOverlay(): void {
     this.overlayStyle = {
-      'background-color': 'white',
+      'background-color': '#fff',
       opacity: 0.5,
       'z-index': 1001
     };
@@ -179,7 +180,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
 
   hideOverlay(): void {
     this.overlayStyle = {
-      'background-color': 'white'
+      'background-color': '#fff'
     };
   }
 

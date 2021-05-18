@@ -29,6 +29,7 @@ import { InteractionRulesService } from 'pages/exploration-player-page/services/
 import { SetInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { Schema } from 'services/schema-default-value.service';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 @Component({
   selector: 'oppia-interactive-set-input',
   templateUrl: './set-input-interaction.component.html'
@@ -39,11 +40,16 @@ export class InteractiveSetInputComponent implements OnInit {
   errorMessage: string;
   answer;
   schema: {
-    type: string; items: { type: string; }; 'ui_config': {
+    type: string;
+    items: {
+      type: string;
+    };
+    'ui_config': {
       'add_element_text': string;
     };
   };
   buttonText: string;
+
   constructor(
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:

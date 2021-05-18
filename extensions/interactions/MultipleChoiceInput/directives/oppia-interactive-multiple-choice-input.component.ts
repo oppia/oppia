@@ -38,6 +38,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
   @Input() showChoicesInShuffledOrderWithValue: string;
   choices;
   answer;
+
   constructor(
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
@@ -74,8 +75,11 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     );
 
     var shuffleChoices = (choices) => {
-      for (var currentIndex = choices.length - 1;
-        currentIndex >= 0; currentIndex--) {
+      for (
+        var currentIndex = choices.length - 1;
+        currentIndex >= 0;
+        currentIndex--
+      ) {
         var temporaryValue = null;
         var randomIndex = null;
         randomIndex = Math.floor(Math.random() * (currentIndex + 1));

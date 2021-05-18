@@ -40,10 +40,13 @@ export class InteractiveTextInputComponent implements OnInit {
   @Input() labelForFocusTarget: string;
   answer: string;
   placeholder: string;
-  schema: { type: string; 'ui_config': {
-    placeholder?: string;
-    rows?: number;
-  }; };
+  schema: {
+    type: string;
+    'ui_config': {
+      placeholder?: string;
+      rows?: number;
+    };
+  };
   rows: number;
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -69,8 +72,7 @@ export class InteractiveTextInputComponent implements OnInit {
       placeholder,
       rows
     } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'TextInput',
-      this._getAttrs()
+      'TextInput', this._getAttrs()
     ) as TextInputCustomizationArgs;
     this.placeholder = placeholder.value.unicode;
     this.rows = rows.value;

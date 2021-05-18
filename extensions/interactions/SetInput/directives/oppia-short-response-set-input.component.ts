@@ -28,10 +28,10 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   selector: 'oppia-short-response-set-input',
   templateUrl: './set-input-short-response.component.html'
 })
-
 export class ShortResponseSetInputComponent implements OnInit {
   @Input() answer;
   displayedAnswer: string;
+
   constructor(private htmlEscaperService: HtmlEscaperService) { }
 
   ngOnInit(): void {
@@ -42,9 +42,6 @@ export class ShortResponseSetInputComponent implements OnInit {
       'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
   }
 }
-
-require('domain/utilities/url-interpolation.service.ts');
-require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive(
   'oppiaShortResponseSetInput',
