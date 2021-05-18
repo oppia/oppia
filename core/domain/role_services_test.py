@@ -25,195 +25,31 @@ import feconf
 import python_utils
 
 
-class RoleDomainUnitTests(test_utils.GenericTestBase):
-    """Tests for PARENT_ROLES and ROLE_ACTIONS."""
+class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
+    """Tests for roles and actions."""
 
-    PARENT_ROLES = role_services.PARENT_ROLES
-    ACTIONS = role_services.ROLE_ACTIONS
+    def test_get_role_actions_return_value_in_correct_schema(self):
+        role_actions = role_services.get_role_actions()
 
-    def test_dicts_have_same_keys(self):
-        """Test that PARENT_ROLES and ROLE_ACTIONS have same keys."""
-        self.assertEqual(
-            set(self.PARENT_ROLES.keys()), set(self.ACTIONS.keys()))
-
-    def test_dicts_have_list_value(self):
-        """Test that PARENT_ROLES and ROLE_ACTIONS, both have list as value
-        to all the keys.
-        """
-        for role_name in self.PARENT_ROLES:
-            self.assertTrue(isinstance(self.PARENT_ROLES[role_name], list))
-
-        for role_name in self.ACTIONS:
-            self.assertTrue(isinstance(self.ACTIONS[role_name], list))
-
-    def test_every_dict_entry_is_string(self):
-        """Test that all keys and values(elements in lists) in PARENT_ROLES
-        and ROLE_ACTIONS are string.
-        """
-        for role_name in self.PARENT_ROLES:
+        self.assertTrue(isinstance(role_actions, dict))
+        for role_name, allotted_actions in role_actions.items():
             self.assertTrue(isinstance(role_name, python_utils.UNICODE))
-
-            for role in self.PARENT_ROLES[role_name]:
-                self.assertTrue(isinstance(role, python_utils.UNICODE))
-
-        for role_name in self.ACTIONS:
-            self.assertTrue(isinstance(role_name, python_utils.UNICODE))
-
-            for action_name in self.ACTIONS[role_name]:
+            self.assertTrue(isinstance(allotted_actions, list))
+            self.assertEqual(len(set(allotted_actions)), len(allotted_actions))
+            for action_name in allotted_actions:
                 self.assertTrue(
                     isinstance(action_name, python_utils.UNICODE))
 
-    def test_valid_parents(self):
-        """Test that all the roles present in value list for any key in
-        PARENT_ROLES are valid(i.e there exists a key with that name).
-        """
-        valid_roles = list(self.PARENT_ROLES.keys())
-
-        for role_name in self.PARENT_ROLES:
-            for role in self.PARENT_ROLES[role_name]:
-                self.assertIn(role, valid_roles)
-
-    def test_that_role_graph_has_no_directed_cycles(self):
-        """Visits each role and checks that there is no cycle from that
-        role.
-        """
-        visited = set()
-
-        def check_cycle(source, roles):
-            """Checks that source is not reachable from any of the given roles.
-
-            Args:
-                source: str. Role that should not be reachable via any path
-                    from roles.
-                roles: list(str). List of roles that should not be able to
-                    reach source.
-            """
-            for role in roles:
-                self.assertNotEqual(role, source)
-                if role not in visited:
-                    visited.add(role)
-                    check_cycle(source, self.PARENT_ROLES[role])
-
-        for role_name in self.PARENT_ROLES:
-            visited = set()
-            check_cycle(role_name, self.PARENT_ROLES[role_name])
-
     def test_get_all_actions(self):
-        """Test that get_all_actions works as expected."""
-
-        # Case when wrong input is given.
         with self.assertRaisesRegexp(
             Exception, 'Role TEST_ROLE does not exist.'):
             role_services.get_all_actions('TEST_ROLE')
 
-        # Case for collection editor is checked.
-        collection_editor_actions = list(
-            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_EXPLORATION_EDITOR]) |
-            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_BANNED_USER]) |
-            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_GUEST]) |
-            set(role_services.ROLE_ACTIONS[feconf.ROLE_ID_COLLECTION_EDITOR]))
-
-        # Sets are compared as their element order don't need to be same.
         self.assertEqual(
-            set(collection_editor_actions),
-            set(role_services.get_all_actions(
-                feconf.ROLE_ID_COLLECTION_EDITOR)))
+            role_services.get_all_actions(feconf.ROLE_ID_GUEST),
+            [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
 
-    def test_check_path_exists_in_roles_graph_invalid_source_raises_error(self):
-        invalid_role = 'role_x'
-        error_msg = (
-            'Role %s defined by the source node does not exist.'
-            % invalid_role)
-        with self.assertRaisesRegexp(Exception, error_msg):
-            role_services.check_if_path_exists_in_roles_graph(
-                invalid_role, feconf.ROLE_ID_LEARNER)
+    def test_action_allocated_to_all_allowed_roles(self):
+        role_actions = role_services.get_role_actions()
 
-    def test_check_path_exists_in_roles_graph_invalid_dest_raises_error(self):
-        invalid_role = 'role_x'
-        error_msg = (
-            'Role %s defined by the destination node does not exist.'
-            % invalid_role)
-        with self.assertRaisesRegexp(Exception, error_msg):
-            role_services.check_if_path_exists_in_roles_graph(
-                feconf.ROLE_ID_LEARNER, invalid_role)
-
-    def test_check_path_exists_in_roles_graph_same_source_and_destination(self):
-        self.assertTrue(
-            role_services.check_if_path_exists_in_roles_graph(
-                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_LEARNER))
-
-    def test_check_path_exists_in_roles_graph_for_true_cases(self):
-        superior_roles_dict = {
-            feconf.ROLE_ID_GUEST: [
-                feconf.ROLE_ID_BANNED_USER, feconf.ROLE_ID_LEARNER,
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
-                feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN
-            ],
-            feconf.ROLE_ID_BANNED_USER: [],
-            feconf.ROLE_ID_EXPLORATION_EDITOR: [
-                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
-                feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN
-            ],
-            feconf.ROLE_ID_COLLECTION_EDITOR: [
-                feconf.ROLE_ID_TOPIC_MANAGER, feconf.ROLE_ID_MODERATOR,
-                feconf.ROLE_ID_ADMIN
-            ],
-            feconf.ROLE_ID_TOPIC_MANAGER: [
-                feconf.ROLE_ID_MODERATOR, feconf.ROLE_ID_ADMIN
-            ],
-            feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_ADMIN],
-            feconf.ROLE_ID_ADMIN: []
-        }
-
-        for source_node, target_nodes in superior_roles_dict.items():
-            for target_node in target_nodes:
-                self.assertTrue(
-                    role_services.check_if_path_exists_in_roles_graph(
-                        source_node, target_node)
-                )
-
-    def test_check_path_exists_in_roles_graph_for_false_cases(self):
-        inferior_roles_dict = {
-            feconf.ROLE_ID_GUEST: [],
-            feconf.ROLE_ID_BANNED_USER: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_LEARNER,
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
-                feconf.ROLE_ID_MODERATOR
-            ],
-            feconf.ROLE_ID_LEARNER: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER
-            ],
-            feconf.ROLE_ID_EXPLORATION_EDITOR: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
-                feconf.ROLE_ID_LEARNER
-            ],
-            feconf.ROLE_ID_COLLECTION_EDITOR: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
-                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR
-            ],
-            feconf.ROLE_ID_TOPIC_MANAGER: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
-                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_COLLECTION_EDITOR
-            ],
-            feconf.ROLE_ID_MODERATOR: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
-                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER
-            ],
-            feconf.ROLE_ID_ADMIN: [
-                feconf.ROLE_ID_GUEST, feconf.ROLE_ID_BANNED_USER,
-                feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_COLLECTION_EDITOR, feconf.ROLE_ID_TOPIC_MANAGER,
-                feconf.ROLE_ID_MODERATOR
-            ]
-        }
-
-        for source_node, target_nodes in inferior_roles_dict.items():
-            for target_node in target_nodes:
-                self.assertFalse(
-                    role_services.check_if_path_exists_in_roles_graph(
-                        source_node, target_node)
-                )
+        self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)
