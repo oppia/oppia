@@ -463,9 +463,9 @@ def managed_portserver():
         except OSError:
             pass
         else:
-            # We wait KILL_TIMEOUT_SECS seconds for the portserver to shut down
-            # after sending CTRL-C (SIGINT). If the server fails to shut down,
-            # proc_context will use terminate() and/or kill() to end it.
+            # We wait 10 seconds for the portserver to shut down after sending
+            # CTRL-C (SIGINT). If the server fails to shut down, proc_context
+            # will use terminate() and/or kill() to end it.
             proc.wait(timeout=10)
 
 
