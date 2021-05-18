@@ -38,6 +38,8 @@ import { AttributionGuideComponent } from './common-layout-directives/common-ele
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
 import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import { StateSkillEditorComponent } from 'components/state-editor/state-skill-editor/state-skill-editor.component';
+import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
 import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
 import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
 import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
@@ -196,11 +198,13 @@ const toastrConfig = {
     ProfileLinkTextComponent,
     SideNavigationBarWrapperComponent,
     PromoBarComponent,
+    SelectSkillModalComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
+    StateSkillEditorComponent,
     SocialButtonsComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
@@ -241,8 +245,10 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
+    StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
@@ -296,9 +302,9 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
-    SharingLinksComponent,
-    SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
+    StateSkillEditorComponent,
+    SelectSkillModalComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
     SkillSelectorComponent,
