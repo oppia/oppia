@@ -38,8 +38,8 @@ interface EventToCodes {
 export class NavigationService {
   constructor() {}
     activeMenuName: string;
-    ACTION_OPEN: 'open';
-    ACTION_CLOSE: 'close';
+    ACTION_OPEN: string = 'open';
+    ACTION_CLOSE: string = 'close';
     KEYBOARD_EVENT_TO_KEY_CODES: {
       enter: {
         shiftKeyIsPressed: false,
