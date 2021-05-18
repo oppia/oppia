@@ -92,6 +92,18 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
         const { useFractionForDivision, placeholder } = (
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
+        // This represents a list of special characters in LaTeX. These
+        // characters have a special meaning in LaTeX and thus need to be
+        // escaped.
+        const escapeCharacters = [
+          '&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
+        for (var i = 0; i < placeholder.unicode.length; i++) {
+          if (escapeCharacters.includes(placeholder.unicode[i])) {
+            let newPlaceholder = `\\verb|${placeholder.unicode}|`;
+            placeholder.unicode = newPlaceholder;
+            break;
+          }
+        }
         GuppyConfigurationService.changeDivSymbol(useFractionForDivision);
         GuppyInitializationService.init(
           'guppy-div-learner',
