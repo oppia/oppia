@@ -621,6 +621,23 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(proc.terminate_count, 1)
         self.assertEqual(proc.kill_count, 0)
 
+    def test_managed_portserver_when_unresponsive(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
+        proc.unresponsive = True
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].program_args,
+            'python -m scripts.run_portserver '
+            '--portserver_unix_socket_address %s' % (
+                common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(proc.terminate_count, 1)
+        self.assertEqual(proc.kill_count, 1)
+
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
             outputs=['abc', 'Built at: 123', 'def']))

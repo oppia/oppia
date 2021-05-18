@@ -444,6 +444,15 @@ def managed_portserver():
     Yields:
         psutil.Popen. The Popen subprocess object.
     """
+    # TODO(#11549): Move this to top of the file.
+    if common.PSUTIL_DIR not in sys.path:
+        # Our unit tests already configure sys.path correctly, but the
+        # standalone scripts do not. Because of this, the following line cannot
+        # be covered. This is fine since we want to cleanup this code anyway in
+        # #11549.
+        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
+    import psutil
+
     portserver_args = [
         'python', '-m', 'scripts.run_portserver',
         '--portserver_unix_socket_address', common.PORTSERVER_SOCKET_FILEPATH,
@@ -461,12 +470,18 @@ def managed_portserver():
         try:
             proc.send_signal(signal.SIGINT)
         except OSError:
-            pass
-        else:
-            # We wait 10 seconds for the portserver to shut down after sending
-            # CTRL-C (SIGINT). If the server fails to shut down, proc_context
-            # will use terminate() and/or kill() to end it.
+            # Raises when the process has already shutdown, in which case we can
+            # just return immediately.
+            return
+
+        # Otherwise, give the portserver 10 seconds to shut down after sending
+        # CTRL-C (SIGINT).
+        try:
             proc.wait(timeout=10)
+        except psutil.TimeoutExpired:
+            # If the server fails to shut down, allow proc_context to end it by
+            # calling terminate() and/or kill().
+            pass
 
 
 @contextlib.contextmanager
