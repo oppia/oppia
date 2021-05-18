@@ -1415,12 +1415,13 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
     def test_that_incorrect_derived_class_raises_exception(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode(encoding='utf-8')
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message').encode(encoding='utf-8')
+        payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -1428,12 +1429,13 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
     def test_that_correct_derived_class_does_not_raise_exception(self):
         payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID.encode(encoding='utf-8')
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message').encode(encoding='utf-8')
+        payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)

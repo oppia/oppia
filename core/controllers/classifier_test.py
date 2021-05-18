@@ -117,8 +117,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto = (
             training_job_response_payload_pb2.TrainingJobResponsePayload())
         self.payload_proto.job_result.CopyFrom(self.job_result)
-        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID.encode(
-            encoding='utf-8')
+        self.payload_proto.vm_id = feconf.DEFAULT_VM_ID
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
@@ -127,14 +126,15 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             self.payload_proto.vm_id)
 
         self.payload_for_fetching_next_job_request = {
-            'vm_id': feconf.DEFAULT_VM_ID.encode(encoding='utf-8'),
-            'message': json.dumps({}).encode(encoding='utf-8')
+            'vm_id': feconf.DEFAULT_VM_ID,
+            'message': json.dumps({})
         }
 
         self.payload_for_fetching_next_job_request['signature'] = (
             classifier_services.generate_signature(
                 python_utils.convert_to_bytes(self.secret),
-                self.payload_for_fetching_next_job_request['message'],
+                python_utils.convert_to_bytes(
+                    self.payload_for_fetching_next_job_request['message']),
                 self.payload_for_fetching_next_job_request['vm_id']))
 
     def test_trained_classifier_handler(self):
@@ -543,12 +543,13 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         }
 
         self.payload = {}
-        self.payload['vm_id'] = feconf.DEFAULT_VM_ID.encode(encoding='utf-8')
+        self.payload['vm_id'] = feconf.DEFAULT_VM_ID
         secret = feconf.DEFAULT_VM_SHARED_SECRET
-        self.payload['message'] = json.dumps({}).encode(encoding='utf-8')
+        self.payload['message'] = json.dumps({})
         self.payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            self.payload['message'], self.payload['vm_id'])
+            python_utils.convert_to_bytes(self.payload['message']),
+            self.payload['vm_id'])
 
     def test_next_job_handler(self):
         json_response = self.post_json(
