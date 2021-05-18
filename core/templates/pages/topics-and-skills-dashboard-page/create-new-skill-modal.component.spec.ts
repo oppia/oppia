@@ -28,7 +28,8 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import { ContextService } from 'services/context.service';
 import { CreateNewSkillModalComponent } from './create-new-skill-modal.component';
 
-describe('Create new skill modal', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
   let contextService: ContextService;
@@ -99,7 +100,9 @@ describe('Create new skill modal', () => {
 
   it('should open concept card explanation editor', () => {
     componentInstance.openConceptCardExplanationEditor();
-    expect(componentInstance.conceptCardExplanationEditorIsShown).toBeTrue();
+    expect(
+      componentInstance.isEditorShown
+        .conceptCardExplanationEditorIsShown).toBeTrue();
   });
 
   it('should get html schema', () => {
