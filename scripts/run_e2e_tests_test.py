@@ -901,6 +901,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
+        def mock_check_if_on_ci():
+            return True
+
         swap_contexts = [
             self.swap(
                 run_e2e_tests, 'get_chrome_driver_version',
@@ -965,6 +968,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         'commands',
                     ],),
                 ]),
+            self.swap_with_checks(
+                flake_checker, 'check_if_on_ci', mock_check_if_on_ci),
             self.swap_with_checks(
                 flake_checker, 'report_pass', mock_report_pass,
                 expected_args=[('full',)]),
@@ -1089,7 +1094,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self.assertEqual(lines, ['sample', u'✓', 'output'])
 
-    def test_rerun_when_tests_fail(self):
+    def test_rerun_when_tests_fail_with_always_policy(self):
 
         mock_portserver = MockProcessClass()
 
@@ -1133,9 +1138,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'is_test_output_flaky',
             mock_is_test_output_flaky,
             expected_args=[
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
             ])
         on_ci_swap = self.swap(
             flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
@@ -1147,9 +1152,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap:
-                    run_e2e_tests.main(args=['--suite', 'mySuite'])
+                    run_e2e_tests.main(args=['--suite', 'always'])
 
-    def test_do_not_rerun_when_tests_fail(self):
+    def test_do_not_rerun_when_tests_fail_with_known_flakes_policy(self):
 
         mock_portserver = MockProcessClass()
 
@@ -1193,22 +1198,77 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'is_test_output_flaky',
             mock_is_test_output_flaky,
             expected_args=[
-                ('sample\noutput', 'mySuite')])
+                ('sample\noutput', 'known_flakes'),
+            ])
         on_ci_swap = self.swap(
             flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
         cleanup_swap = self.swap(
             run_e2e_tests, 'cleanup', mock_cleanup)
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
-        rerun_non_flaky_swap = self.swap(
-            run_e2e_tests, 'RERUN_NON_FLAKY', False)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap:
-                    with rerun_non_flaky_swap:
-                        run_e2e_tests.main(args=['--suite', 'mySuite'])
+                    run_e2e_tests.main(args=['--suite', 'known_flakes'])
 
-    def test_rerun_when_tests_flake(self):
+    def test_do_not_rerun_when_tests_fail_with_never_policy(self):
+
+        mock_portserver = MockProcessClass()
+
+        def mock_check_if_on_ci():
+            return True
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        def mock_is_test_output_flaky(
+                unused_output, unused_suite_name):
+            return False
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup_portserver():
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_start_portserver():
+            return mock_portserver
+
+        start_portserver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_portserver', mock_start_portserver,
+            expected_args=[tuple()])
+        cleanup_portserver_swap = self.swap(
+            run_e2e_tests, 'cleanup_portserver',
+            mock_cleanup_portserver)
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup_portserver, mock_portserver)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        is_test_output_flaky_swap = self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky,
+            expected_args=[
+                ('sample\noutput', 'never'),
+            ])
+        on_ci_swap = self.swap(
+            flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
+        cleanup_swap = self.swap(
+            run_e2e_tests, 'cleanup', mock_cleanup)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+        with register_swap, run_swap, is_test_output_flaky_swap:
+            with start_portserver_swap, cleanup_portserver_swap:
+                with on_ci_swap, cleanup_swap, exit_swap:
+                    run_e2e_tests.main(args=['--suite', 'never'])
+
+    def test_rerun_when_tests_flake_with_always_policy(self):
 
         mock_portserver = MockProcessClass()
 
@@ -1252,9 +1312,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'is_test_output_flaky',
             mock_is_test_output_flaky,
             expected_args=[
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
-                ('sample\noutput', 'mySuite'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
+                ('sample\noutput', 'always'),
             ])
         on_ci_swap = self.swap(
             flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
@@ -1266,7 +1326,124 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap:
-                    run_e2e_tests.main(args=['--suite', 'mySuite'])
+                    run_e2e_tests.main(args=['--suite', 'always'])
+
+    def test_rerun_when_tests_flake_with_known_flakes_policy(self):
+
+        mock_portserver = MockProcessClass()
+
+        def mock_check_if_on_ci():
+            return True
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        def mock_is_test_output_flaky(
+                unused_output, unused_suite_name):
+            return True
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup_portserver():
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_start_portserver():
+            return mock_portserver
+
+        start_portserver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_portserver', mock_start_portserver,
+            expected_args=[tuple()])
+        cleanup_portserver_swap = self.swap(
+            run_e2e_tests, 'cleanup_portserver',
+            mock_cleanup_portserver)
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup_portserver, mock_portserver)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        is_test_output_flaky_swap = self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky,
+            expected_args=[
+                ('sample\noutput', 'known_flakes'),
+                ('sample\noutput', 'known_flakes'),
+                ('sample\noutput', 'known_flakes'),
+            ])
+        on_ci_swap = self.swap(
+            flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
+        cleanup_swap = self.swap_with_checks(
+            run_e2e_tests, 'cleanup', mock_cleanup, expected_args=[
+                tuple(), tuple(), tuple()])
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+        with register_swap, run_swap, is_test_output_flaky_swap:
+            with start_portserver_swap, cleanup_portserver_swap:
+                with on_ci_swap, cleanup_swap, exit_swap:
+                    run_e2e_tests.main(args=['--suite', 'known_flakes'])
+
+    def test_do_not_rerun_when_tests_flake_with_never_policy(self):
+
+        mock_portserver = MockProcessClass()
+
+        def mock_check_if_on_ci():
+            return True
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        def mock_is_test_output_flaky(
+                unused_output, unused_suite_name):
+            return True
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup_portserver():
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_start_portserver():
+            return mock_portserver
+
+        start_portserver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_portserver', mock_start_portserver,
+            expected_args=[tuple()])
+        cleanup_portserver_swap = self.swap(
+            run_e2e_tests, 'cleanup_portserver',
+            mock_cleanup_portserver)
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup_portserver, mock_portserver)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        is_test_output_flaky_swap = self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky,
+            expected_args=[
+                ('sample\noutput', 'never'),
+            ])
+        on_ci_swap = self.swap(
+            flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
+        cleanup_swap = self.swap(
+            run_e2e_tests, 'cleanup', mock_cleanup)
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+        with register_swap, run_swap, is_test_output_flaky_swap:
+            with start_portserver_swap, cleanup_portserver_swap:
+                with on_ci_swap, cleanup_swap, exit_swap:
+                    run_e2e_tests.main(args=['--suite', 'never'])
 
     def test_no_reruns_off_ci_fail(self):
 
@@ -1420,6 +1597,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
+        def mock_check_if_on_ci():
+            return True
+
         swap_contexts = [
             self.swap(
                 run_e2e_tests, 'get_chrome_driver_version',
@@ -1485,6 +1665,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     ],),
                 ],
             ),
+            self.swap_with_checks(
+                flake_checker, 'check_if_on_ci', mock_check_if_on_ci),
             self.swap_with_checks(
                 flake_checker, 'report_pass', mock_report_pass,
                 expected_args=[('full',)]),
@@ -1594,6 +1776,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
+        def mock_check_if_on_ci():
+            return True
+
         swap_contexts = [
             self.swap(
                 run_e2e_tests, 'get_chrome_driver_version',
@@ -1660,6 +1845,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],
             ),
             self.swap_with_checks(
+                flake_checker, 'check_if_on_ci', mock_check_if_on_ci),
+            self.swap_with_checks(
                 flake_checker, 'report_pass', mock_report_pass,
                 expected_args=[('full',)]),
             self.swap_with_checks(
@@ -1718,6 +1905,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         def mock_report_pass(unused_suite_name):
             return
+
+        def mock_check_if_on_ci():
+            return True
 
         swap_contexts = [
             self.swap(
@@ -1783,6 +1973,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     ],),
                 ],
             ),
+            self.swap_with_checks(
+                flake_checker, 'check_if_on_ci', mock_check_if_on_ci),
             self.swap_with_checks(
                 flake_checker, 'report_pass', mock_report_pass,
                 expected_args=[('full',)]),

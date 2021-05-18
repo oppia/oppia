@@ -37,7 +37,6 @@ from scripts import install_third_party_libs
 
 
 MAX_RETRY_COUNT = 3
-RERUN_NON_FLAKY = True
 WEB_DRIVER_PORT = 4444
 OPPIA_SERVER_PORT = 8181
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -163,6 +162,48 @@ _PARSER.add_argument(
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
+
+RERUN_POLICIES = {
+    'accessibility': 'never',
+    'additionaleditorfeatures': 'known flakes',
+    'additionalplayerfeatures': 'always',
+    'adminpage': 'never',
+    'classroompage': 'never',
+    'classroompagefileuploadfeatures': 'never',
+    'collections': 'never',
+    'contributordashboard': 'always',
+    'coreeditorandplayerfeatures': 'known flakes',
+    'creatordashboard': 'always',
+    'embedding': 'known flakes',
+    'explorationfeedbacktab': 'never',
+    'explorationhistorytab': 'always',
+    'explorationstatisticstab': 'never',
+    'explorationtranslationtab': 'never',
+    'extensions': 'known flakes',
+    'fileuploadextensions': 'never',
+    'fileuploadfeatures': 'known flakes',
+    'learner': 'known flakes',
+    'learnerdashboard': 'known flakes',
+    'library': 'known flakes',
+    'navigation': 'never',
+    'playvoiceovers': 'never',
+    'preferences': 'known flakes',
+    'profilefeatures': 'never',
+    'profilemenu': 'never',
+    'publication': 'never',
+    'skilleditor': 'known flakes',
+    'subscriptions': 'never',
+    'topicandstoryeditor': 'always',
+    'topicandstoryeditorfileuploadfeatures': 'never',
+    'topicandstoryviewer': 'known flakes',
+    'topicsandskillsdashboard': 'always',
+    'users': 'known flakes',
+    'wipeout': 'known flakes',
+    # The following are not real suites; they're only for testing.
+    'never': 'never',
+    'known_flakes': 'known flakes',
+    'always': 'always',
+}
 
 
 def _kill_process(process):
@@ -607,9 +648,11 @@ def main(args=None):
             break
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)
-        # Don't rerun if the test was non-flaky and we are not
-        # rerunning non-flaky tests.
-        if not flaky and not RERUN_NON_FLAKY:
+        # Check whether we should rerun based on this suite's policy.
+        policy = RERUN_POLICIES.get(parsed_args.suite, 'always')
+        if policy == 'never':
+            break
+        if policy == 'known flakes' and not flaky:
             break
         # Prepare for rerun.
         cleanup()
