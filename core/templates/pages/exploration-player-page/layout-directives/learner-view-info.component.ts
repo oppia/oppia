@@ -31,6 +31,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
+import { InformationCardModalComponent } from '../templates/information-card-modal.component';
 
 @Component({
   selector: 'oppia-learner-view-info',
@@ -122,23 +123,17 @@ export class LearnerViewInfoComponent {
   }
 
   openInformationCardModal(): void {
-    // $uibModal.open({
-    //   animation: true,
-    //   template: require(
-    //     'pages/exploration-player-page/templates/' +
-    //     'information-card-modal.directive.html'),
-    //   windowClass: 'oppia-modal-information-card',
-    //   resolve: {
-    //     expInfo: function() {
-    //       return expInfo;
-    //     }
-    //   },
-    //   controller: 'InformationCardModalController'
-    // }).result.then(null, () => {
-    //   // Note to developers:
-    //   // This callback is triggered when the Cancel button is clicked.
-    //   // No further action is needed.
-    // });
+    let modalRef = this.ngbModal.open(InformationCardModalComponent, {
+      animation: true,
+      windowClass: 'oppia-modal-information-card'
+    });
+
+    modalRef.componentInstance.expInfo = this.expInfo;
+    modalRef.result.then(null, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 
   showInformationCard(): void {

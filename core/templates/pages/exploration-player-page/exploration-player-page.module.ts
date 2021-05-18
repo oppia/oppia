@@ -42,6 +42,7 @@ import { FeedbackPopupComponent } from './layout-directives/feedback-popup.compo
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
+import { InformationCardModalComponent } from './templates/information-card-modal.component';
 
 @NgModule({
   imports: [
@@ -59,6 +60,7 @@ import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.
     SwitchContentLanguageRefreshRequiredModalComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
@@ -69,6 +71,7 @@ import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
+    InformationCardModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,

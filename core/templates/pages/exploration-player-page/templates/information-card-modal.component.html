@@ -1,4 +1,4 @@
-<mat-card class="md-padding">
+<mat-card class="mat-padding">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)" class="oppia-info-card-bg-image">
     <h2 [ngStyle]="titleWrapper()" class="oppia-info-card-title">{{ explorationTitle }}</h2>
@@ -8,15 +8,15 @@
     <p *ngIf="objective">
       {{ objective | truncateAndCapitalize: 95 }}
     </p>
-    <p *ngIf="!objective" translate="I18N_PLAYER_NO_OBJECTIVE">No objective specified.</p>
-    <p *ngIf="explorationIsPrivate" class="private-card-info" translate="I18N_PLAYER_IS_PRIVATE">This exploration is private.</p>
+    <p *ngIf="!objective">{{ 'I18N_PLAYER_NO_OBJECTIVE' | translate }}</p>
+    <p *ngIf="explorationIsPrivate" class="private-card-info">{{ 'I18N_PLAYER_IS_PRIVATE' | translate }}</p>
 
     <ul *ngIf="!explorationIsPrivate" layout="row" class="card-metrics" layout-align="space-between center">
       <li class="protractor-test-info-card-rating">
         <span class="fas fa-star fa-lg" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}</span>
         </span>
-        <span *ngIf="!averageRating" translate="I18N_PLAYER_UNRATED">Unrated</span>
+        <span *ngIf="!averageRating"> {{ 'I18N_PLAYER_UNRATED' | translate }}</span>
         <span *ngIf="averageRating">{{ averageRating | number:1 }}</span>
       </li>
 
@@ -57,20 +57,19 @@
 
     <div *ngIf="!explorationIsPrivate" class="oppia-info-card-bottom-row">
       <div flex="40" class="pb-1">
-        <mat-content layout="row">
+        <mat-card-content layout="row">
           <div class="oppia-info-card-tag-icon">
             <span class="fas fa-tags oppia-info-card-modal-tooltip"
                   [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"
                   placement="top">
-              <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
+              <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_TAGS_TOOLTIP' | translate }}</span>
             </span>
           </div>
           <div layout-align="center center">
             <mat-chip *ngIf="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
                       [ngbTooltip]="explorationTags.tagsInTooltip.join(', ')"
                       placement="right">
-                      translate="I18N_PLAYER_PLUS_TAGS"
-                      translate-values="{additionalTagNumber: explorationTags.tagsInTooltip.length}"
+                      {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}"
             </mat-chip>
             <mat-chip *ngIf="explorationTags.tagsToShow.length > 0">
               {{ explorationTags.tagsToShow.join(", ") }}
@@ -80,7 +79,7 @@
               <span><em>{{ 'I18N_PLAYER_NO_TAGS' | translate }}</em></span>
             </mat-chip>
           </div>
-        </mat-content>
+        </mat-card-content>
       </div>
       <div flex="60">
         <sharing-links flex="45" layoutType="row wrap" layoutAlignType="end center"
@@ -118,5 +117,8 @@
   .fas.fa-tags.oppia-info-card-modal-tooltip {
     margin-left: 0.0625rem;
     margin-right: 0.1875rem;
+  }
+  .mat-padding {
+    padding: 0;
   }
 </style>
