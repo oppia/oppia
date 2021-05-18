@@ -271,36 +271,39 @@ class AppFeedbackReportModel(base_models.BaseModel):
             datetime.timedelta(days=1))
         return cls.query(
             cls.created_on < datetime_before_which_to_scrub,
-            cls.scrubbed_by is None).fetch()
+            cls.scrubbed_by == None).fetch()
 
     @classmethod
-    def get_filter_options_for_field(cls, filter_name):
+    def get_filter_options_for_field(cls, filter_field):
         """Fetches values that can be used to filter reports by.
 
+        Args:
+            filter_field: FILTER_FIELD_NAME. The enum type of the field we want to
+                fetch all possible values for.
         Returns:
             list(str). The possible values that the field name can have.
         """
-        query = cls.query(projection=[filter_name], distinct=True)
+        query = cls.query(projection=[filter_field.name], distinct=True)
         filter_values = []
-        if filter_name == FILTER_FIELD_NAMES.report_type:
+        if filter_field == FILTER_FIELD_NAMES.report_type:
             filter_values = [model.report_type for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.platform:
+        elif filter_field == FILTER_FIELD_NAMES.platform:
             filter_values = [model.platform for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.entry_point:
+        elif filter_field == FILTER_FIELD_NAMES.entry_point:
             filter_values = [model.entry_point for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.submitted_on:
+        elif filter_field == FILTER_FIELD_NAMES.submitted_on:
             filter_values = [model.submitted_on.date() for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.android_device_model:
+        elif filter_field == FILTER_FIELD_NAMES.android_device_model:
             filter_values = [model.android_device_model for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.android_sdk_version:
+        elif filter_field == FILTER_FIELD_NAMES.android_sdk_version:
             filter_values = [model.android_sdk_version for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.text_language_code:
+        elif filter_field == FILTER_FIELD_NAMES.text_language_code:
             filter_values = [model.text_language_code for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.audio_language_code:
+        elif filter_field == FILTER_FIELD_NAMES.audio_language_code:
             filter_values = [model.audio_language_code for model in query]
-        elif filter_name == FILTER_FIELD_NAMES.platform_version:
+        elif filter_field == FILTER_FIELD_NAMES.platform_version:
             filter_values = [model.platform_version for model in query]
-        elif filter_name == (
+        elif filter_field == (
                 FILTER_FIELD_NAMES.android_device_country_locale_code):
             filter_values = [
                 model.android_device_country_locale_code for model in query]

@@ -120,22 +120,22 @@ def _get_entry_point_from_json(entry_point_json):
         InvalidInputException. The given entry point is invalid.
     """
     entry_point_name = entry_point_json['entry_point_name']
-    if entry_point_name == constants.ENTRY_POINT.navigation_drawer:
+    if entry_point_name == constants.ENTRY_POINT.navigation_drawer.name:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == constants.ENTRY_POINT.lesson_player:
+    elif entry_point_name == constants.ENTRY_POINT.lesson_player.name:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_story_id'],
             entry_point_json['entry_point_exploration_id'])
-    elif entry_point_name == constants.ENTRY_POINT.revision_card:
+    elif entry_point_name == constants.ENTRY_POINT.revision_card.name:
         return app_feedback_report_domain.RevisionCardEntryPoint(
             entry_point_json['entry_point_topic_id'],
             entry_point_json['entry_point_subtopic_id'])
-    elif entry_point_name == constants.ENTRY_POINT.crash:
+    elif entry_point_name == constants.ENTRY_POINT.crash.name:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
-            'The given entry point %d is invalid.' % entry_point_name)
+            'The given entry point %s is invalid.' % entry_point_name)
 
 
 def store_incoming_report_stats(report_obj):
@@ -200,25 +200,25 @@ def _update_report_stats_model_in_transaction(
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            constants.STATS_PARAMETER_NAMES.report_type: {
+            constants.STATS_PARAMETER_NAMES.report_type.name: {
                 report_type: 1
             },
-            constants.STATS_PARAMETER_NAMES.country_locale_code: {
+            constants.STATS_PARAMETER_NAMES.country_locale_code.name: {
                 country_locale_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.entry_point_name: {
+            constants.STATS_PARAMETER_NAMES.entry_point_name.name: {
                 entry_point_name: 1
             },
-            constants.STATS_PARAMETER_NAMES.text_language_code: {
+            constants.STATS_PARAMETER_NAMES.text_language_code.name: {
                 text_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.audio_language_code: {
+            constants.STATS_PARAMETER_NAMES.audio_language_code.name: {
                 audio_language_code: 1
             },
-            constants.STATS_PARAMETER_NAMES.android_sdk_version: {
+            constants.STATS_PARAMETER_NAMES.android_sdk_version.name: {
                 sdk_version: 1
             },
-            constants.STATS_PARAMETER_NAMES.version_name: {
+            constants.STATS_PARAMETER_NAMES.version_name.name: {
                 version_name: 1
             }
         }
@@ -231,33 +231,38 @@ def _update_report_stats_model_in_transaction(
         # Update existing stats model.
         stats_dict = stats_model.daily_param_stats
 
-        stats_dict[constants.STATS_PARAMETER_NAMES.report_type] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.report_type],
+                stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name],
                 report_type, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code],
+                stats_dict[
+                    constants.STATS_PARAMETER_NAMES.country_locale_code.name],
                 country_locale_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name],
+                stats_dict[
+                    constants.STATS_PARAMETER_NAMES.entry_point_name.name],
                 entry_point_name, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code],
+                stats_dict[
+                    constants.STATS_PARAMETER_NAMES.audio_language_code.name],
                 audio_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code],
+                stats_dict[
+                    constants.STATS_PARAMETER_NAMES.text_language_code.name],
                 text_language_code, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version],
+                stats_dict[
+                    constants.STATS_PARAMETER_NAMES.android_sdk_version.name],
                 sdk_version, delta))
-        stats_dict[constants.STATS_PARAMETER_NAMES.version_name] = (
+        stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name] = (
             _calculate_new_stats_count_for_parameter(
-                stats_dict[constants.STATS_PARAMETER_NAMES.version_name],
+                stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
@@ -599,10 +604,10 @@ def get_all_filter_options():
     """
     filter_list = list()
     model_class = app_feedback_report_models.AppFeedbackReportModel
-    for filter_name in constants.ALLOWED_FILTERS:
-        filter_values = model_class.get_filter_options_for_field(filter_name)
+    for filter_field in constants.ALLOWED_FILTERS:
+        filter_values = model_class.get_filter_options_for_field(filter_field)
         filter_list.append(app_feedback_report_domain.AppFeedbackReportFilter(
-            filter_name, filter_values))
+            filter_field.name, filter_values))
     return filter_list
 
 
