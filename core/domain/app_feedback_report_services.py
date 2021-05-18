@@ -462,19 +462,19 @@ def _get_entry_point(
     Returns:
         AppFeedbackReport. The corresponding AppFeedbackReport domain object.
     """
-    if entry_point_name == constants.ENTRY_POINT.navigation_drawer:
+    if entry_point_name == constants.ENTRY_POINT.navigation_drawer.name:
         return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == constants.ENTRY_POINT.lesson_player:
+    elif entry_point_name == constants.ENTRY_POINT.lesson_player.name:
         return app_feedback_report_domain.LessonPlayerEntryPoint(
             topic_id, story_id, exploration_id)
-    elif entry_point_name == constants.ENTRY_POINT.revision_card:
+    elif entry_point_name == constants.ENTRY_POINT.revision_card.name:
         return app_feedback_report_domain.RevisionCardEntryPoint(
             topic_id, subtopic_id)
-    elif entry_point_name == constants.ENTRY_POINT.crash:
+    elif entry_point_name == constants.ENTRY_POINT.crash.name:
         return app_feedback_report_domain.CrashEntryPoint()
     else:
         raise utils.InvalidInputException(
-            'Received unexpected entry point type.')
+            'Received unexpected entry point type %r.' % entry_point_name)
 
 
 def scrub_all_unscrubbed_expiring_reports(scrubbed_by):

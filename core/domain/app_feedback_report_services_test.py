@@ -60,13 +60,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     TICKET_ID = '%s.%s.%s' % (
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC), '16CharString1234')
     USER_ID = 'user_1'
-    REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'other_suggestion'
+    REPORT_TYPE_SUGGESTION = constants.REPORT_TYPE.suggestion
+    CATEGORY_OTHER = constants.CATEGORY.other_suggestion
     ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
     ANDROID_SDK_VERSION = 23
-    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    ENTRY_POINT_NAVIGATION_DRAWER = constants.ENTRY_POINT.navigation_drawer
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
@@ -140,11 +140,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_models.AppFeedbackReportModel.create(
             self.android_report_id, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
-            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.REPORT_TYPE_SUGGESTION.name, self.CATEGORY_OTHER.name,
             self.ANDROID_PLATFORM_VERSION,
             self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.ENTRY_POINT_NAVIGATION_DRAWER.name, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
             self.ANDROID_REPORT_INFO, None)
         self.android_report_model = (
@@ -180,11 +180,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_1, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
-            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.REPORT_TYPE_SUGGESTION.name, self.CATEGORY_OTHER.name,
             self.ANDROID_PLATFORM_VERSION,
             self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.ENTRY_POINT_NAVIGATION_DRAWER.name, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
             self.ANDROID_REPORT_INFO, None)
         new_report_id_2 = (
@@ -193,11 +193,11 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_models.AppFeedbackReportModel.create(
             new_report_id_2, self.PLATFORM_ANDROID,
             self.REPORT_SUBMITTED_TIMESTAMP, 0,
-            self.REPORT_TYPE_SUGGESTION, self.CATEGORY_OTHER,
+            self.REPORT_TYPE_SUGGESTION.name, self.CATEGORY_OTHER.name,
             self.ANDROID_PLATFORM_VERSION,
             self.COUNTRY_LOCALE_CODE_INDIA,
             self.ANDROID_SDK_VERSION, self.ANDROID_DEVICE_MODEL,
-            self.ENTRY_POINT_NAVIGATION_DRAWER, None, None, None, None,
+            self.ENTRY_POINT_NAVIGATION_DRAWER.name, None, None, None, None,
             self.TEXT_LANGUAGE_CODE_ENGLISH, self.AUDIO_LANGUAGE_CODE_ENGLISH,
             self.ANDROID_REPORT_INFO, None)
 
@@ -451,13 +451,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         expected_json = {
             constants.STATS_PARAMETER_NAMES.report_type: {
-                self.REPORT_TYPE_SUGGESTION: 2
+                self.REPORT_TYPE_SUGGESTION.name: 2
             },
             constants.STATS_PARAMETER_NAMES.country_locale_code: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
             constants.STATS_PARAMETER_NAMES.entry_point_name: {
-                self.ENTRY_POINT_NAVIGATION_DRAWER: 2
+                self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
             constants.STATS_PARAMETER_NAMES.text_language_code: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
@@ -500,13 +500,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         expected_json = {
             constants.STATS_PARAMETER_NAMES.report_type: {
-                self.REPORT_TYPE_SUGGESTION: 2
+                self.REPORT_TYPE_SUGGESTION.name: 2
             },
             constants.STATS_PARAMETER_NAMES.country_locale_code: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 2
             },
             constants.STATS_PARAMETER_NAMES.entry_point_name: {
-                self.ENTRY_POINT_NAVIGATION_DRAWER: 2
+                self.ENTRY_POINT_NAVIGATION_DRAWER.name: 2
             },
             constants.STATS_PARAMETER_NAMES.text_language_code: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 2
@@ -551,13 +551,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             expected_val = None
             if filter_obj.filter_name == (
                     constants.FILTER_FIELD_NAMES.report_type):
-                expected_val = self.REPORT_TYPE_SUGGESTION
+                expected_val = self.REPORT_TYPE_SUGGESTION.name
             elif filter_obj.filter_name == (
                     constants.FILTER_FIELD_NAMES.platform):
                 expected_val = self.PLATFORM_ANDROID
             elif filter_obj.filter_name == (
                     constants.FILTER_FIELD_NAMES.entry_point):
-                expected_val = self.ENTRY_POINT_NAVIGATION_DRAWER
+                expected_val = self.ENTRY_POINT_NAVIGATION_DRAWER.name
             elif filter_obj.filter_name == (
                     constants.FILTER_FIELD_NAMES.submitted_on):
                 expected_val = self.REPORT_SUBMITTED_TIMESTAMP.date()
@@ -576,7 +576,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             elif filter_obj.filter_name == (
                     constants.FILTER_FIELD_NAMES.platform_version):
                 expected_val = self.ANDROID_PLATFORM_VERSION
-            elif filter_obj.filter_name == 
+            elif filter_obj.filter_name == (
                     constants.FILTER_FIELD_NAMES.android_device_country_locale_code):  # pylint: disable=line-too-long
                 expected_val = self.COUNTRY_LOCALE_CODE_INDIA
 
@@ -683,13 +683,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         expected_json = {
             constants.STATS_PARAMETER_NAMES.report_type: {
-                self.REPORT_TYPE_SUGGESTION: 1
+                self.REPORT_TYPE_SUGGESTION.name: 1
             },
             constants.STATS_PARAMETER_NAMES.country_locale_code: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 1
             },
             constants.STATS_PARAMETER_NAMES.entry_point_name: {
-                self.ENTRY_POINT_NAVIGATION_DRAWER: 1
+                self.ENTRY_POINT_NAVIGATION_DRAWER.name: 1
             },
             constants.STATS_PARAMETER_NAMES.text_language_code: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 1
@@ -736,13 +736,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         expected_json = {
             constants.STATS_PARAMETER_NAMES.report_type: {
-                self.REPORT_TYPE_SUGGESTION: 0
+                self.REPORT_TYPE_SUGGESTION.name: 0
             },
             constants.STATS_PARAMETER_NAMES.country_locale_code: {
                 self.COUNTRY_LOCALE_CODE_INDIA: 0
             },
             constants.STATS_PARAMETER_NAMES.entry_point_name: {
-                self.ENTRY_POINT_NAVIGATION_DRAWER: 0
+                self.ENTRY_POINT_NAVIGATION_DRAWER.name: 0
             },
             constants.STATS_PARAMETER_NAMES.text_language_code: {
                 self.TEXT_LANGUAGE_CODE_ENGLISH: 0
@@ -943,14 +943,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
+                report_type=self.REPORT_TYPE_SUGGESTION.name,
+                category=self.CATEGORY_OTHER.name,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
                     self.COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
                 text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
                 audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
                 android_report_info=self.ANDROID_REPORT_INFO,
@@ -974,14 +974,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
+                report_type=self.REPORT_TYPE_SUGGESTION.name,
+                category=self.CATEGORY_OTHER.name,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
                     self.COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
                 text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
                 audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
                 android_report_info=self.ANDROID_REPORT_INFO,
@@ -1006,14 +1006,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                     '16CharString1234'),
                 submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
                 local_timezone_offset_hrs=0,
-                report_type=self.REPORT_TYPE_SUGGESTION,
-                category=self.CATEGORY_OTHER,
+                report_type=self.REPORT_TYPE_SUGGESTION.name,
+                category=self.CATEGORY_OTHER.name,
                 platform_version=self.ANDROID_PLATFORM_VERSION,
                 android_device_country_locale_code=(
                     self.COUNTRY_LOCALE_CODE_INDIA),
                 android_device_model=self.ANDROID_DEVICE_MODEL,
                 android_sdk_version=self.ANDROID_SDK_VERSION,
-                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+                entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
                 text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
                 audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
                 android_report_info=self.ANDROID_REPORT_INFO,
