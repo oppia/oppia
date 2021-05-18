@@ -31,7 +31,7 @@ from jobs.transforms import base_validation
     config_models.ConfigPropertySnapshotMetadataModel)
 class ValidateConfigCommitCmdsSchema(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for config models """
+    """Overrides _get_change_domain_class for config models."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a Change domain class.

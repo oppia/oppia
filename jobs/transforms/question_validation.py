@@ -32,7 +32,7 @@ from jobs.transforms import base_validation
     question_models.QuestionCommitLogEntryModel)
 class ValidateQuestionCommitCmdsSchema(
         base_validation.BaseValidateCommitCmdsSchema):
-    """Overrides _get_change_domain_class for collection models """
+    """Overrides _get_change_domain_class for question models."""
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a Change domain class.
