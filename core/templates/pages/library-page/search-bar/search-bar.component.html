@@ -34,7 +34,7 @@
     <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul ngbDropdownMenu
         class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section"
-        role="menu"
+        role="menu" 
         (click)="$event.stopPropagation()">
       <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
         <li *ngIf="selectionDetails.categories.selections[item.id]">
