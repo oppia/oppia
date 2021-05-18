@@ -451,16 +451,22 @@ def managed_portserver():
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
-        portserver_args, human_readable_name='PortServer', shell=True)
+        portserver_args, human_readable_name='Portserver', shell=True)
     with proc_context as proc:
         yield proc
 
-        # When exiting, try to end the process with SIGINT. If that fails, let
-        # managed_process() try to kill and/or terminate it instead.
+        # Before exiting the proc_context, try to end the process with SIGINT.
+        # The portserver is configured to shut down cleanly upon receiving this
+        # signal.
         try:
             proc.send_signal(signal.SIGINT)
         except OSError:
             pass
+        else:
+            # We wait KILL_TIMEOUT_SECS seconds for the portserver to shut down
+            # after sending CTRL-C (SIGINT). If the server fails to shut down,
+            # proc_context will use terminate() and/or kill() to end it.
+            proc.wait(timeout=10)
 
 
 @contextlib.contextmanager
