@@ -40,7 +40,7 @@ class MockActiveModal {
   }
 }
 
-class MockImageObject {
+class mockImageObject {
   source = null;
   onload = null;
   constructor() {
@@ -53,7 +53,22 @@ class MockImageObject {
   }
 }
 
-describe('Edit Thumbnail Modal Component', () => {
+class mockReaderObject {
+  result = null;
+  onload = null;
+  constructor() {
+    this.onload = () => {
+      return 'Fake onload executed';
+    };
+  }
+  readAsDataURL(file) {
+    this.onload();
+    return 'The file is loaded';
+  }
+}
+
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Edit Thumbnail Modal Component', () => {
   let component: EditThumbnailModalComponent;
   let fixture: ComponentFixture<EditThumbnailModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -87,52 +102,29 @@ describe('Edit Thumbnail Modal Component', () => {
   });
 
   it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', fakeAsync(() => {
-    // This spy is to be sure that an image element will be returned from
-    // document.querySelector method.
-    spyOn(document, 'querySelector').and.callFake(() => {
-      return document.createElement('img');
-    });
-
-    // This is just a mocked base 64 in order to test the FileReader event
-    // and its result property.
-    const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
-    const file = new File([arrayBuffer], 'thumbnail.png', {
-      type: 'image/svg+xml'
-    });
-    component.uploadedImageMimeType = file.type;
-    component.invalidImageWarningIsShown = false;
-    component.invalidTagsAndAttributes = {
-      tags: [],
-      attrs: []
-    };
-    const image = document.createElement('img');
+    ' svg file', () => {
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". This is because
     // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
+    // @ts-expect-error
+    spyOn(window, 'Image').and.returnValue(new mockImageObject());
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". This is because
+    // 'FileReader' has around 15 more properties. We have only defined
     // the properties we need in 'mockReaderObject'.
     // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new MockImageObject());
-
-    // ---- Dispatch on load event ----
-    image.dispatchEvent(new Event('load'));
-
-    expect(component.invalidImageWarningIsShown).toBe(false);
-    component.onInvalidImageLoaded();
-
-    expect(component.invalidImageWarningIsShown).toBe(true);
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+    var fileContent = (
+      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
+      'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
+      'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
+      'WVsbG93IiAvPjwvc3ZnPg==');
+    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    component.invalidImageWarningIsShown = false;
     component.onFileChanged(file);
-
-    // ---- Dispatch on load event ----
-    expect(component.invalidTagsAndAttributes).toEqual({
-      tags: [],
-      attrs: []
-    });
-    expect(component.uploadedImage).toBe(null);
     expect(component.invalidImageWarningIsShown).toBe(false);
-  }));
+  });
 
   it('should not load file if it is not a svg type', () => {
     expect(component.invalidImageWarningIsShown).toBe(false);
