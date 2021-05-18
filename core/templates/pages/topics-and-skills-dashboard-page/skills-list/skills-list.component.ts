@@ -36,8 +36,8 @@ import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.componen
 import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
 export interface SkillsCategorizedByTopics {
-  [key: string]: {
-    [key: string]: ShortSkillSummary[]
+  [topicName: string]: {
+    [subtopicName: string]: ShortSkillSummary[]
   }
 }
 
