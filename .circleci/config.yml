@@ -19,12 +19,6 @@ workflows:
 
     jobs:
       - setup_and_typescript_tests
-      - e2e_new_structure_tests:
-          requires:
-            - e2e_library
-      - e2e_library:
-          requires:
-            - setup_and_typescript_tests
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -131,68 +125,6 @@ jobs:
             - oppia/third_party/
             - oppia_tools/
       - upload_screenshots
-
-  # Production environment e2e tests
-  # The following e2e tests are run in the production environment. Tests that require uploading files
-  # should be run in the non-prod environment.
-  e2e_library:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
-      - skip_for_low_risk_prs
-      - install_chrome
-      - run:
-          name: Run e2e library test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --deparallelize_terser --suite="library" --prod_env
-      - persist_to_workspace:
-          root: /home/circleci/
-          paths:
-            - oppia/app.yaml
-            - oppia/assets/constants.ts
-            - oppia/assets/hashes.json
-            - oppia/backend_prod_files/
-            - oppia/build/
-            - oppia/third_party/generated/
-      - upload_screenshots
-      - check_memory_usage
-
-  e2e_new_structure_tests:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - merge_target_branch
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          name: Set up python by installing protobuf and enum
-          command: pip install enum34==1.1.10 protobuf==3.13.0
-      - skip_for_low_risk_prs
-      - install_chrome
-      - run:
-          name: Run e2e topics and skills dashboard test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicsAndSkillsDashboard" --prod_env
-      - run:
-          name: Run e2e topics and story editor
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditor" --prod_env
-      - run:
-          name: Run e2e topic and story editor test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
-      - run:
-          name: Run e2e topic and story viewer test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer" --prod_env
-      - upload_screenshots
-      - check_memory_usage
 
 notify:
   webhooks:
