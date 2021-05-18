@@ -3,11 +3,6 @@ description: 'Merge from the base branch the PR is being merged into.'
 runs:
   using: 'composite'
   steps:
-    - name: Debugging
-      run: echo "$GITHUB_CONTEXT"
-      shell: bash
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
     - id: merge
       name: Merge
       run: |
