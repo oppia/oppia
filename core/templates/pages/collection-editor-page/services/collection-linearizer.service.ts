@@ -25,6 +25,16 @@ import { CollectionUpdateService } from 'domain/collection/collection-update.ser
 import { Collection } from 'domain/collection/collection.model';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
+interface SwapFunction {
+  (
+    collection: Collection,
+    linearNodeList: CollectionNode[], nodeIndex: number): void;
+  (
+    collection: Collection,
+    linearNodeList: CollectionNode[], nodeIndex: number): void;
+  (arg0: Collection, arg1: CollectionNode[], arg2: number): void;
+ }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -73,10 +83,10 @@ export class CollectionLinearizerService {
 
   // Swap the node at the specified index with the node immediately to the
   // left of it.
-  swapLeft(
+  swapLeft = (
       collection: Collection,
       linearNodeList: CollectionNode[],
-      nodeIndex: number): void {
+      nodeIndex: number): void => {
     let leftNodeIndex = nodeIndex > 0 ? nodeIndex - 1 : null;
 
     if (leftNodeIndex === null) {
@@ -85,23 +95,20 @@ export class CollectionLinearizerService {
 
     this.collectionUpdateService.swapNodes(
       collection, leftNodeIndex, nodeIndex);
-  }
+  };
 
-  swapRight(
+  swapRight = (
       collection: Collection,
-      linearNodeList: CollectionNode[], nodeIndex: number): void {
-    // Swapping right is the same as swapping the node one to the right
-    // leftward.
-    if (nodeIndex < linearNodeList.length - 1) {
-      this.swapLeft(collection, linearNodeList, nodeIndex + 1);
-    }
-    // Otherwise it is a no-op (cannot swap the last node right).
-  }
+      linearNodeList: CollectionNode[], nodeIndex: number): void => {
+    let rightNodeIndex = nodeIndex + 1;
+    this.collectionUpdateService.swapNodes(
+      collection, rightNodeIndex, nodeIndex
+    );
+  };
 
   shiftNode(
       collection: Collection, explorationId: string,
-      swapFunction: (arg0: Collection, arg1: CollectionNode[], arg2: number)
-       => void): boolean {
+      swapFunction: SwapFunction): boolean {
     // There is nothing to shift if the collection has only 1 node.
     if (collection.getCollectionNodeCount() > 1) {
       let linearNodeList = this._getCollectionNodesInPlayableOrder(collection);
@@ -113,6 +120,7 @@ export class CollectionLinearizerService {
     }
     return true;
   }
+
   /**
      * Given a collection and a list of completed exploration IDs within the
      * context of that collection, returns a list of which explorations in the

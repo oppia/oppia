@@ -28,19 +28,12 @@ import { OppiaAngularRootComponent } from
 
 import { CollectionHistoryTabComponent } from
   'pages/collection-editor-page/history-tab/collection-history-tab.component';
-import { CollectionDetailsEditor } from
-  // eslint-disable-next-line max-len
-  'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
-import { CollectionPermissionsCard } from
-  // eslint-disable-next-line max-len
-  'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
-import { CollectionSettingsTabComponent } from
-  'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
-import { CollectionStatisticsTabComponent } from
-  // eslint-disable-next-line max-len
-  'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+import { CollectionDetailsEditor } from 'pages/collection-editor-page/settings-tab/collection-details-editor.directive';
+import { CollectionNodeEditorComponent } from './editor-tab/collection-node-editor.component';
+import { CollectionPermissionsCard } from 'pages/collection-editor-page/settings-tab/collection-permissions-card.directive';
+import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 
 @NgModule({
   imports: [
@@ -54,13 +47,15 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent,
     CollectionDetailsEditor,
-    CollectionPermissionsCard
+    CollectionPermissionsCard,
+    CollectionNodeEditorComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CollectionHistoryTabComponent,
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent,
+    CollectionNodeEditorComponent
   ],
   providers: [
     {
