@@ -71,6 +71,7 @@ export class CreateNewSkillModalComponent {
 
   openConceptCardExplanationEditor(): void {
     this.conceptCardExplanationEditorIsShown = true;
+    this.changeDetectorRef.detectChanges();
   }
 
   getHtmlSchema(): { type: string } {
