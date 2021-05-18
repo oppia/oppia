@@ -28,8 +28,7 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import { ContextService } from 'services/context.service';
 import { CreateNewSkillModalComponent } from './create-new-skill-modal.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Create new skill modal', () => {
+describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
   let contextService: ContextService;
