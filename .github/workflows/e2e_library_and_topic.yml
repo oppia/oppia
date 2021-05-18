@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_learner_flow_skill_editor_and_embedding:
+  e2e_library_and_topic:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
