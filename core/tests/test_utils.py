@@ -82,6 +82,7 @@ import webtest
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 storage_services = models.Registry.import_storage_services()
 email_services = models.Registry.import_email_services()

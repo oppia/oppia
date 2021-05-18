@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import fs_domain
-
 from google.cloud import storage
 
 CLIENT = storage.Client()
@@ -52,7 +50,7 @@ def get(bucket_name, filepath):
     """
     blob = CLIENT.get_bucket(bucket_name).get_blob(filepath)
     data = blob.download_as_bytes()
-    return fs_domain.FileStream(data)
+    return data
 
 
 def commit(bucket_name, filepath, raw_bytes, mimetype):
@@ -64,7 +62,7 @@ def commit(bucket_name, filepath, raw_bytes, mimetype):
         raw_bytes: str. The content to be stored in the file.
         mimetype: str. The content-type of the cloud file.
     """
-    blob = CLIENT.get_bucket(bucket_name).Blob(filepath)
+    blob = CLIENT.get_bucket(bucket_name).blob(filepath)
     blob.upload_from_string(raw_bytes, content_type=mimetype)
 
 
@@ -103,9 +101,5 @@ def listdir(bucket_name, dir_name):
     Returns:
         list(str). A lexicographically-sorted list of filenames.
     """
-    # The trailing slash is necessary to prevent non-identical directory
-    # names with the same prefix from matching, e.g. /abcd/123.png should
-    if not dir_name.endswith('/'):
-        dir_name += '/'
-    # The prefix now ends and starts with '/'.
-    return CLIENT.list_blobs(CLIENT.get_bucket(bucket_name), prefix=dir_name)
+    return list(
+        CLIENT.list_blobs(CLIENT.get_bucket(bucket_name), prefix=dir_name))

@@ -164,8 +164,8 @@ class GcsFileSystem(GeneralFileSystem):
             exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
-            return storage_services.get(
-                self._bucket_name, self._get_gcs_file_url(filepath))
+            return FileStream(storage_services.get(
+                self._bucket_name, self._get_gcs_file_url(filepath)))
         else:
             return None
 
@@ -224,15 +224,22 @@ class GcsFileSystem(GeneralFileSystem):
         Returns:
             list(str). A lexicographically-sorted list of filenames.
         """
-        if dir_name.startswith('/'):
+        if dir_name.startswith('/') or dir_name.endswith('/'):
             raise IOError(
-                'The dir_name should not start with / : %s' % dir_name)
+                'The dir_name should not start with / or end with / : %s' %
+                dir_name
+            )
 
-        prefix = '%s' % utils.vfs_construct_path(self._assets_path, dir_name)
-        filepaths_in_dir = storage_services.listdir(self._bucket_name, prefix)
+        # The trailing slash is necessary to prevent non-identical directory
+        # names with the same prefix from matching.
+        if dir_name and not dir_name.endswith('/'):
+            dir_name += '/'
+
+        assets_path = '%s/' % self._assets_path
+        prefix = utils.vfs_construct_path(self._assets_path, dir_name)
+        blobs_in_dir = storage_services.listdir(self._bucket_name, prefix)
         return [
-            filepath.replace(prefix, '') for filepath in filepaths_in_dir]
-
+            blob.name.replace(assets_path, '') for blob in blobs_in_dir]
 
 
 class AbstractFileSystem(python_utils.OBJECT):

@@ -32,6 +32,8 @@ class Blob(python_utils.OBJECT):
 
     def __init__(self, name, raw_bytes, content_type):
         self._name = name
+        if isinstance(raw_bytes, str):
+            raw_bytes = raw_bytes.encode('utf-8')
         self._raw_bytes = raw_bytes
         self._content_type = content_type
 

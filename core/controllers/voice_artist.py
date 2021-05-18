@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import io
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
@@ -61,7 +63,7 @@ class AudioUploadHandler(base.BaseHandler):
                 'Invalid filename extension: it should have '
                 'one of the following extensions: %s' % allowed_formats)
 
-        tempbuffer = python_utils.string_io()
+        tempbuffer = io.BytesIO()
         tempbuffer.write(raw_audio_file)
         tempbuffer.seek(0)
         try:
