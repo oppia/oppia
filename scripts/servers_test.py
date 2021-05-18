@@ -23,6 +23,7 @@ import logging
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -590,7 +591,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_portserver(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_portserver())
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
@@ -599,6 +600,26 @@ class ManagedProcessTests(test_utils.TestBase):
             'python -m scripts.run_portserver '
             '--portserver_unix_socket_address %s' % (
                 common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(proc.terminate_count, 0)
+        self.assertEqual(proc.kill_count, 0)
+
+    def test_managed_portserver_when_signals_are_rejected(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
+        proc.reject_signal = True
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(
+            popen_calls[0].program_args,
+            'python -m scripts.run_portserver '
+            '--portserver_unix_socket_address %s' % (
+                common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(proc.terminate_count, 1)
+        self.assertEqual(proc.kill_count, 0)
 
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(

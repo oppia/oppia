@@ -22,6 +22,7 @@ import logging
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -453,6 +454,13 @@ def managed_portserver():
         portserver_args, human_readable_name='PortServer', shell=True)
     with proc_context as proc:
         yield proc
+
+        # When exiting, try to end the process with SIGINT. If that fails, let
+        # managed_process() try to kill and/or terminate it instead.
+        try:
+            proc.send_signal(signal.SIGINT)
+        except OSError:
+            pass
 
 
 @contextlib.contextmanager
