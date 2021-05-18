@@ -21,8 +21,7 @@ import { CollectionNode, CollectionNodeBackendDict } from 'domain/collection/col
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionLinearizerService } from './collection-linearizer.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Collection linearizer service', () => {
+describe('Collection linearizer service', () => {
   let collectionLinearizerService: CollectionLinearizerService;
   let firstCollectionNode;
   let secondCollectionNode;
