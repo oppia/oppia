@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Translation Suggestion Review Modal Controller', function() {
+fdescribe('Translation Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
   let SiteAnalyticsService = null;
@@ -68,9 +68,26 @@ describe('Translation Suggestion Review Modal Controller', function() {
       }
     };
 
-    const suggestionIdToSuggestion = {
-      suggestion_1: suggestion1,
-      suggestion_2: suggestion2
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: {
+        topic_name: 'topic_1',
+        story_title: 'story_1',
+        chapter_title: 'chapter_1'
+      }
+    };
+    const contribution2 = {
+      suggestion: suggestion2,
+      details: {
+        topic_name: 'topic_2',
+        story_title: 'story_2',
+        chapter_title: 'chapter_2'
+      }
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_2: contribution2
     };
     beforeEach(angular.mock.inject(function($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
@@ -96,7 +113,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         initialSuggestionId: 'suggestion_1',
         subheading: subheading,
         reviewable: reviewable,
-        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion),
+        suggestionIdToContribution: angular.copy(suggestionIdToContribution),
         userService: userService
       });
       $rootScope.$apply();
