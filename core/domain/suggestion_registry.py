@@ -593,6 +593,33 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change.language_code, self.language_code))
 
+    def pre_update_validate(self, change):
+        """Performs the pre update validation. This function needs to be called
+        before updating the suggestion.
+
+        Args:
+            change: ExplorationChange. The new change.
+
+        Raises:
+            ValidationError. Invalid new change.
+        """
+        if self.change.cmd != change.cmd:
+            raise utils.ValidationError(
+                'The new change cmd must be equal to %s' %
+                self.change.cmd)
+        elif self.change.state_name != change.state_name:
+            raise utils.ValidationError(
+                'The new change state_name must be equal to %s' %
+                self.change.state_name)
+        elif self.change.content_html != change.content_html:
+            raise utils.ValidationError(
+                'The new change content_html must be equal to %s' %
+                self.change.content_html)
+        elif self.change.language_code != change.language_code:
+            raise utils.ValidationError(
+                'The language code must be equal to %s' %
+                self.change.language_code)
+
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
@@ -878,10 +905,12 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
                 self.change.skill_id)
-        if self.change.question_dict == change.question_dict:
+
+        if (self.change.skill_difficulty == change.skill_difficulty) and (
+                self.change.question_dict == change.question_dict):
             raise utils.ValidationError(
-                'The new change question_dict must not be equal to the old '
-                'question_dict')
+                'At least one of the new skill_difficulty or question_dict '
+                'should be changed.')
 
     def _get_skill_difficulty(self):
         """Returns the suggestion's skill difficulty."""
@@ -906,7 +935,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         return []
 
     def convert_html_in_suggestion_change(self, conversion_fn):
-        """Checks for HTML fields in the suggestion change  and converts it
+        """Checks for HTML fields in the suggestion change and converts it
         according to the conversion function.
 
         Args:
@@ -922,7 +951,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 45)
+                        'question_state_data_schema_version'] < 46)
             )
         )
 

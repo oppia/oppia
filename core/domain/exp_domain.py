@@ -55,6 +55,7 @@ STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
+STATE_PROPERTY_LINKED_SKILL_ID = 'linked_skill_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
@@ -233,6 +234,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+        STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -704,6 +706,8 @@ class Exploration(python_utils.OBJECT):
                     sdict['written_translations']))
 
             state.next_content_id_index = sdict['next_content_id_index']
+
+            state.linked_skill_id = sdict['linked_skill_id']
 
             state.solicit_answer_details = sdict['solicit_answer_details']
 
@@ -1795,16 +1799,36 @@ class Exploration(python_utils.OBJECT):
             state_dict['card_is_checkpoint'] = bool(
                 state_name == init_state_name)
         return states_dict
-
+  
     @classmethod
     def _convert_states_v44_dict_to_v45_dict(cls, states_dict):
-        """Converts from version 44 to 45. Version 45 adds a new
-        customization arg to NumericInput interaction which allows
-        creators to set input should be grater than or equal to zero.
+        """Converts from version 44 to 45. Version 45 contains
+        linked skill id.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_dict['linked_skill_id'] = None
+        return states_dict
+
+    @classmethod
+    def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
+        """Converts from version 44 to 45. Version 45 adds a new
+        customization arg to NumericInput interaction which allows
+        creators to set input should be grater than or equal to zero.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -1858,7 +1882,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 50
+    CURRENT_EXP_SCHEMA_VERSION = 51
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1929,14 +1953,16 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+
     @classmethod
-    def _convert_v49_dict_to_v50_dict(cls, exploration_dict):   
-        """Converts a v49 exploration dict into a v40 exploration dict.
-        Adds a new customization arg to NumericInput interaction
-        which allows creators to set input greator than or equal to zero.
+    def _convert_v49_dict_to_v50_dict(cls, exploration_dict):
+        """Converts a v49 exploration dict into a v50 exploration dict.
+        Version 50 contains linked skill id to exploration state.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v49.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v50.
@@ -1946,6 +1972,26 @@ class Exploration(python_utils.OBJECT):
         exploration_dict['states'] = cls._convert_states_v44_dict_to_v45_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 45
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
+        """Converts a v50 exploration dict into a v40 exploration dict.
+        Adds a new customization arg to NumericInput interaction
+        which allows creators to set input greator than or equal to zero.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v50.
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v51.
+        """
+        exploration_dict['schema_version'] = 51
+
+        exploration_dict['states'] = cls._convert_states_v45_dict_to_v46_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 46
 
         return exploration_dict
 
@@ -1999,6 +2045,16 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v48_dict_to_v49_dict(
                 exploration_dict)
             exploration_schema_version = 49
+
+        if exploration_schema_version == 49:
+            exploration_dict = cls._convert_v49_dict_to_v50_dict(
+                exploration_dict)
+            exploration_schema_version = 50
+
+        if exploration_schema_version == 50:
+            exploration_dict = cls._convert_v50_dict_to_v51_dict(
+                exploration_dict)
+            exploration_schema_version = 51
 
         return exploration_dict
 
