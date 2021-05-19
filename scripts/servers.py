@@ -64,22 +64,23 @@ def managed_process(
         sys.path.insert(1, common.PSUTIL_DIR)
     import psutil
 
-    get_debug_info = lambda p: (
+    get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
-        if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid,))
+        if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid))
 
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
+    human_readable_command = command if shell else ' '.join(command)
     python_utils.PRINT(
-        'Starting new %s: %s' % (human_readable_name, ' '.join(command)))
+        'Starting new %s: %s' % (human_readable_name, human_readable_command))
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
 
     try:
         yield popen_proc
     finally:
-        python_utils.PRINT('Stopping %s...' % get_debug_info(popen_proc))
+        python_utils.PRINT('Stopping %s...' % get_proc_info(popen_proc))
         procs_still_alive = [popen_proc]
         try:
             if popen_proc.is_running():
@@ -91,24 +92,24 @@ def managed_process(
             procs_to_kill = []
             for proc in procs_still_alive:
                 if proc.is_running():
-                    logging.info('Terminating %s...' % get_debug_info(proc))
+                    logging.info('Terminating %s...' % get_proc_info(proc))
                     proc.terminate()
                     procs_to_kill.append(proc)
                 else:
-                    logging.info('%s has already ended.' % get_debug_info(proc))
+                    logging.info('%s has already ended.' % get_proc_info(proc))
 
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_debug_info(proc))
+                logging.warn('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
-                logging.info('%s has already ended.' % get_debug_info(proc))
+                logging.info('%s has already ended.' % get_proc_info(proc))
         except Exception:
             # NOTE: Raising an exception while exiting a context manager is bad
             # practice, so we log and suppress exceptions instead.
             logging.exception(
-                'Failed to stop %s gracefully!' % get_debug_info(popen_proc))
+                'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
 
 
 @contextlib.contextmanager
