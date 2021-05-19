@@ -190,12 +190,15 @@ def build_js_files(dev_mode, deparallelize_terser=False, source_maps=False):
 
 def run_tests(args):
     """Run the scripts to start end-to-end tests."""
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
     if is_oppia_server_already_running():
         sys.exit(1)
 
     install_third_party_libraries(args.skip_install)
 
-    with python_utils.ExitStack() as stack:
+    with contextlib2.ExitStack() as stack:
         dev_mode = not args.prod_env
 
         if args.skip_build:
