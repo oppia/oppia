@@ -135,7 +135,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.check_can_modify_voice_artist_in_activity(
                 self.user_a, exp_rights))
-        self.assertTrue(
+        self.assertFalse(
             rights_manager.check_can_modify_voice_artist_in_activity(
                 self.user_admin, exp_rights))
         self.assertFalse(
