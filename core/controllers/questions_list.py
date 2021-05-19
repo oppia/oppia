@@ -47,6 +47,7 @@ class QuestionsListHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
+        more = True
         offset = self.request.get('offset')
         if offset == '':
             offset = 0
@@ -73,6 +74,24 @@ class QuestionsListHandler(base.BaseHandler):
                 question_services.get_displayable_question_skill_link_details(
                     constants.NUM_QUESTIONS_PER_PAGE, skill_ids, offset=offset)
             )
+
+        # To check whether there are more questions.
+        (
+            _, _,
+            temp_next_offset
+        ) = (
+
+                question_services.get_displayable_question_skill_link_details(
+                    constants.NUM_QUESTIONS_PER_PAGE, skill_ids,
+                    offset=offset + constants.NUM_QUESTIONS_PER_PAGE)
+            )
+
+        if next_offset == temp_next_offset:
+            more = False
+
+        if not more:
+            next_offset = None
+
         return_dicts = []
         for index, summary in enumerate(question_summaries):
             if summary is not None:

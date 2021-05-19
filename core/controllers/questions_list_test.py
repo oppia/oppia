@@ -133,6 +133,17 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             self.assertNotEqual(
                 question_summary_dicts[0]['summary']['id'],
                 question_summary_dicts_2[0]['summary']['id'])
+
+            json_response = self.get_json(
+                '%s/%s?offset=3' % (
+                    feconf.QUESTIONS_LIST_URL_PREFIX,
+                    self.skill_id
+                ))
+            question_summary_dicts_4 = (
+                json_response['question_summary_dicts'])
+            next_offset_4 = json_response['next_offset']
+            self.assertEqual(len(question_summary_dicts_4), 1)
+            self.assertEqual(next_offset_4, None)
         self.logout()
 
     def test_get_fails_when_skill_id_not_valid(self):
