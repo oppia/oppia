@@ -173,7 +173,7 @@ describe('Audio translation bar directive', function() {
       spyOn(voiceoverRecordingService, 'status').and.returnValue({
         isAvailable: true
       });
-      spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+      spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
         $q.reject());
 
       $scope.checkAndStartRecording();
@@ -189,7 +189,7 @@ describe('Audio translation bar directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: false
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     $scope.checkAndStartRecording();
 
@@ -201,7 +201,7 @@ describe('Audio translation bar directive', function() {
     spyOn(voiceoverRecordingService, 'status').and.returnValue({
       isAvailable: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn($scope.voiceoverRecorder, 'getMp3Data').and.returnValue(
       $q.resolve([]));
@@ -243,7 +243,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -266,7 +266,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -291,7 +291,7 @@ describe('Audio translation bar directive', function() {
       isAvailable: true,
       isRecording: true
     });
-    spyOn(voiceoverRecordingService, 'startRecording').and.returnValue(
+    spyOn(voiceoverRecordingService, 'startRecordingAsync').and.returnValue(
       $q.resolve());
     spyOn(voiceoverRecordingService, 'stopRecord');
     spyOn(voiceoverRecordingService, 'closeRecorder');
@@ -550,7 +550,7 @@ describe('Audio translation bar directive', function() {
   it('should play a not loaded audio translation', function() {
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(false);
-    spyOn(audioPlayerService, 'load').and.returnValue($q.resolve());
+    spyOn(audioPlayerService, 'loadAsync').and.returnValue($q.resolve());
     spyOn(audioPlayerService, 'play');
 
     expect($scope.isPlayingUploadedAudio()).toBe(false);
@@ -646,6 +646,7 @@ describe('Audio translation bar directive', function() {
   it('should apply changed when view update emits', waitForAsync(() => {
     const applyAsyncSpy = spyOn($scope, '$applyAsync');
     audioPlayerService.viewUpdate.emit();
+    audioPlayerService.onAudioStop.next();
     expect(applyAsyncSpy).toHaveBeenCalled();
   }));
 

@@ -195,7 +195,7 @@ angular.module('oppia').directive('audioTranslationBar', [
 
           var showPermissionAndStartRecording = function() {
             $scope.checkingMicrophonePermission = true;
-            $scope.voiceoverRecorder.startRecording().then(function() {
+            $scope.voiceoverRecorder.startRecordingAsync().then(function() {
               // When the user accepts the microphone access.
               $scope.showRecorderWarning = true;
               $scope.isTranslationTabBusy = true;
@@ -402,14 +402,15 @@ angular.module('oppia').directive('audioTranslationBar', [
             var audioTranslation = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslation) {
-              (AudioPlayerService.load(audioTranslation.filename))
-                .then(function() {
+              AudioPlayerService.loadAsync(audioTranslation.filename).then(
+                function() {
                   $scope.audioLoadingIndicatorIsShown = false;
                   $scope.audioIsLoading = false;
                   $scope.audioTimerIsShown = true;
                   AudioPlayerService.play();
                   $scope.$applyAsync();
-                });
+                }
+              );
             }
           };
 
@@ -569,6 +570,11 @@ angular.module('oppia').directive('audioTranslationBar', [
             );
             ctrl.directiveSubscriptions.add(
               AudioPlayerService.viewUpdate.subscribe(() => {
+                $scope.$applyAsync();
+              })
+            );
+            ctrl.directiveSubscriptions.add(
+              AudioPlayerService.onAudioStop.subscribe(() => {
                 $scope.$applyAsync();
               })
             );
