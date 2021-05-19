@@ -839,11 +839,9 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var deleteNode = nodeElement.element(
-      by.css('.protractor-test-delete-node'));
-    await action.click('Delete Node', deleteNode);
-
-    await action.click('Confirm Delete State Button', confirmDeleteStateButton);
+    await nodeElement.element(by.css('.protractor-test-delete-node')).click();
+    expect(await confirmDeleteStateButton.isDisplayed());
+    await confirmDeleteStateButton.click();
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');
   };
