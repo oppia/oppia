@@ -31,6 +31,7 @@
     "@types/google-protobuf": "^3.7.4",
     "@types/google.visualization": "^0.0.55",
     "@types/gtag.js": "^0.0.4",
+    "@types/headroom.js": "^0.12.0",
     "@types/jasmine": "^3.3.12",
     "@types/jasminewd2": "^2.0.8",
     "@types/jquery": "^3.3.29",

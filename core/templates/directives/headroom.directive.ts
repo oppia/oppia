@@ -25,19 +25,21 @@ import Headroom from 'headroom.js';
   selector: '[headroom]'
 })
 export class HeadroomDirective {
-  @Input() tolerance?: Tolerance;
-  @Output() toleranceChange: EventEmitter<Tolerance> = new EventEmitter();
+  @Input() tolerance?: Headroom.Tolerance;
+  @Output() toleranceChange: EventEmitter<Headroom.Tolerance> = (
+    new EventEmitter());
   @Input() offset?: number;
   @Output() offsetChange?: number;
-  @Input() classes?: Classes;
-  @Output() classesChange: EventEmitter<Classes> = new EventEmitter();
+  @Input() classes?: { [key: string]: string };
+  @Output() classesChange: EventEmitter<{ [key: string]: string }> = (
+    new EventEmitter());
   @Input() scroller?: ElementRef;
   headroom: Headroom;
 
   constructor(
     private el: ElementRef
   ) {
-    let headroomOptions: HeadroomOptions = {
+    let headroomOptions: Headroom.HeadroomOptions = {
       tolerance: this.tolerance ? this.tolerance : Headroom.options.tolerance,
       offset: this.offset ? this.offset : Headroom.options.offset,
       scroller: this.scroller ? document.querySelector(
@@ -45,6 +47,7 @@ export class HeadroomDirective {
       classes: this.classes ? this.classes : Headroom.options.classes,
     };
 
-    this.headroom = new Headroom(this.el.nativeElement, headroomOptions).init();
+    this.headroom = new Headroom(this.el.nativeElement, headroomOptions);
+    this.headroom.init();
   }
 }

@@ -1307,6 +1307,11 @@
   resolved "https://registry.yarnpkg.com/@types/gtag.js/-/gtag.js-0.0.4.tgz#81427d703b5a889b4fd1c37eaae6f2a6db228e5a"
   integrity sha512-rn4yaEfryXklAtsiai4xHNUgLjGD8AEPQBNSCTa5QrvccFYYBWJQRGwaHiv2U/wdIzcjOuyyBC23YgdQfq5u/Q==
 
+"@types/headroom.js@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@types/headroom.js/-/headroom.js-0.12.0.tgz#649069768ca11ff1605b239f0f0521a887c2a3d9"
+  integrity sha512-X1/BOKd86HWVYLJIiU0IIyPyFqI0JNGCpISAyYNbGY5jdw39bb6aKRWlroS0SfEGMK3oD84cBlKe/7O0k1XHJQ==
+
 "@types/howler@^2.2.2":
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/@types/howler/-/howler-2.2.2.tgz#54f621983c3635e2e071a95644ba28eea84814c2"
