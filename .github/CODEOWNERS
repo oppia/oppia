@@ -71,6 +71,7 @@
 /typings/ @vojtechjelinek
 /tsconfig.json @vojtechjelinek
 /tsconfig-strict.json @vojtechjelinek
+/parser-tsconfig.eslint.json @vojtechjelinek @Hudda @DubeySandeep
 
 
 # Answer classification team.
