@@ -165,13 +165,9 @@ angular.module('oppia').controller(
           IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
           $scope.activeSuggestion.target_id);
         var details = $scope.activeSuggestionDetails;
-        if (details === null) {
-          $scope.subheading = '[The corresponding opportunity is deleted.]';
-        } else {
-          $scope.subheading = (
-            details.topic_name + ' / ' + details.story_title +
-            ' / ' + details.chapter_title);
-        }
+        $scope.subheading = (
+          details.topic_name + ' / ' + details.story_title +
+          ' / ' + details.chapter_title);
         $scope.init();
       };
 

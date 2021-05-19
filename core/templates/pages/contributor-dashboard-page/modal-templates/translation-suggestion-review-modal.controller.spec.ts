@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-describe('Translation Suggestion Review Modal Controller', function() {
+fdescribe('Translation Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
   let SiteAnalyticsService = null;
@@ -70,11 +70,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     const contribution1 = {
       suggestion: suggestion1,
-      details: {
-        topic_name: 'topic_1',
-        story_title: 'story_1',
-        chapter_title: 'chapter_1'
-      }
+      details: null
     };
     const contribution2 = {
       suggestion: suggestion2,
@@ -379,11 +375,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     const contribution1 = {
       suggestion: suggestion1,
-      details: {
-        topic_name: 'topic_1',
-        story_title: 'story_1',
-        chapter_title: 'chapter_1'
-      }
+      details: null
     };
     const contribution2 = {
       suggestion: suggestion2,
