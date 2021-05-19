@@ -679,8 +679,7 @@ class UpdateExplorationOpportunitySummaryModelJobTest(
         # Run the job.
         update_model_job_class = (
             opportunity_jobs_one_off
-            .UpdateExplorationOpportunitySummaryModelJob
-        )
+            .UpdateExplorationOpportunitySummaryModelJob)
         job_id = update_model_job_class.create_new()
         update_model_job_class.enqueue(job_id)
 
