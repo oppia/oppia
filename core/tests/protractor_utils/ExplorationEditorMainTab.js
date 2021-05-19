@@ -868,7 +868,7 @@ var ExplorationEditorMainTab = function() {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
-        await action.click('State Node: ' + i, stateNodes.get(i));
+        await stateNodes.get(i).click();
         matched = true;
         // Wait to re-load the entire state editor.
       }
