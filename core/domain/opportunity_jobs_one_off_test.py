@@ -677,7 +677,8 @@ class UpdateExplorationOpportunitySummaryModelJobTest(
             exploration.get_translation_counts())
 
         # Run the job.
-        update_model_job_class = (opportunity_jobs_one_off
+        update_model_job_class = (
+            opportunity_jobs_one_off
             .UpdateExplorationOpportunitySummaryModelJob
         )
         job_id = update_model_job_class.create_new()
