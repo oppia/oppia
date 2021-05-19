@@ -218,6 +218,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -255,6 +256,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:

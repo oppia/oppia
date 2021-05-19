@@ -241,17 +241,22 @@ def run_tests(args):
             'failed tests in ../protractor-screenshots/')
 
         output_lines = []
-        # Keep reading lines until an empty string is returned. Empty strings
-        # signal that the process has ended.
-        for line in iter(proc.stdout.readline, b''):
-            if isinstance(line, str):
-                # Although our unit tests always provide unicode strings, the
-                # actual server needs this failsafe since it can output
-                # non-unicode strings.
-                line = line.encode('utf-8') # pragma: nocover
-            output_lines.append(line.rstrip())
-            # Replaces non-ASCII characters with '?'.
-            sys.stdout.write(line.encode('ascii', errors='replace'))
+        while True:
+            # Keep reading lines until an empty string is returned. Empty
+            # strings signal that the process has ended.
+            for line in iter(proc.stdout.readline, b''):
+                if isinstance(line, str):
+                    # Although our unit tests always provide unicode strings,
+                    # the actual server needs this failsafe since it can output
+                    # non-unicode strings.
+                    line = line.decode('utf-8') # pragma: nocover
+                output_lines.append(line.rstrip())
+                # Replaces non-ASCII characters with '?'.
+                sys.stdout.write(line.encode('ascii', errors='replace'))
+            # The poll() method returns None while the process is running,
+            # otherwise it returns the return code of the process (an int).
+            if proc.poll() is not None:
+                break
 
         return output_lines, proc.returncode
 

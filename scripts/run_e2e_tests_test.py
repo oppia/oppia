@@ -44,7 +44,8 @@ def mock_managed_process(*unused_args, **unused_kwargs):
         Context manager. A context manager that always yields a mock
         process.
     """
-    return contextlib2.nullcontext(enter_result=scripts_test_utils.PopenStub())
+    return contextlib2.nullcontext(
+        enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
@@ -278,7 +279,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_managed_protractor_server(**unused_kwargs): # pylint: disable=unused-argument
             return contextlib2.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
-                    stdout='sample\n✓\noutput\n'))
+                    stdout='sample\n✓\noutput\n', alive=False))
 
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))

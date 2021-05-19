@@ -133,6 +133,16 @@ class InvalidCommitStatusError(BaseAuditError):
             'post_commit_status is %s' % model.post_commit_status)
 
 
+class InvalidPublicCommitStatusError(BaseAuditError):
+    """Error class for commit models with inconsistent public status values."""
+
+    def __init__(self, model):
+        super(InvalidPublicCommitStatusError, self).__init__(model)
+        self.message = (
+            'post_commit_status="%s" but post_commit_community_owned=%s' % (
+                model.post_commit_status, model.post_commit_community_owned))
+
+
 class InvalidPrivateCommitStatusError(BaseAuditError):
     """Error class for commit models with inconsistent private status values."""
 
@@ -211,3 +221,25 @@ class ModelRelationshipError(BaseAuditError):
         self.message = (
             '%s=%r should correspond to the ID of an existing %s, '
             'but no such model exists' % (id_property, target_id, target_kind))
+
+
+class CommitCmdsNoneError(BaseAuditError):
+    """Error class for None Commit Cmds."""
+
+    def __init__(self, model):
+        super(CommitCmdsNoneError, self).__init__(model)
+        self.message = (
+            'No commit command domain object '
+            'defined for entity with commands: %s' % (
+                model.commit_cmds))
+
+
+class CommitCmdsValidateError(BaseAuditError):
+    """Error class for wrong commit cmmds."""
+
+    def __init__(self, model, commit_cmd_dict, e):
+        super(CommitCmdsValidateError, self).__init__(model)
+        self.message = (
+            'Commit command domain validation for '
+            'command: %s failed with error: %s' % (
+                commit_cmd_dict, e))

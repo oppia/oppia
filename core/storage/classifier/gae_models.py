@@ -28,6 +28,8 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
+NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT = 100
+
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
@@ -171,17 +173,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def query_new_and_pending_training_jobs(cls, cursor=None):
+    def query_new_and_pending_training_jobs(cls, offset):
         """Gets the next 10 jobs which are either in status "new" or "pending",
         ordered by their next_scheduled_check_time attribute.
 
         Args:
-            cursor: str or None. The list of returned entities starts from this
-                datastore cursor.
+            offset: int. Number of query results to skip.
 
         Returns:
-            list(ClassifierTrainingJobModel). List of the
-            ClassifierTrainingJobModels with status new or pending.
+            tuple(list(ClassifierTrainingJobModel), int).
+            A tuple containing the list of the ClassifierTrainingJobModels
+            with status new or pending and the offset value.
         """
         query = cls.query(cls.status.IN([
             feconf.TRAINING_JOB_STATUS_NEW,
@@ -190,8 +192,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                     datetime.datetime.utcnow())).order(
                         cls.next_scheduled_check_time, cls._key)
 
-        job_models, cursor, more = query.fetch_page(10, start_cursor=cursor)
-        return job_models, cursor, more
+        job_models = query.fetch(
+            NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)
+        offset = offset + len(job_models)
+        return job_models, offset
 
     @classmethod
     def create_multi(cls, job_dicts_list):
