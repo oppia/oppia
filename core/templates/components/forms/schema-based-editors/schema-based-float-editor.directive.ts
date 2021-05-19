@@ -114,17 +114,11 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.onDownKeypress = function(evt) {
-            if (evt.keyCode === 40) {
-              if(NumericInputValidationService.isCustomizationArgTrue()
-              && ctrl.localValue < 0) {
-                ctrl.localValue = 0;
-                evt.preventDefault();
-              }
-            } /*else {
-              ctrl.isUserCurrentlyTyping = true;
-            }*/
-          };
+          ctrl.NumericInputCustArgEnabled = function() {
+            if(NumericInputValidationService.isCustomizationArgTrue())
+              return true;
+            return false;
+          }
 
           ctrl.$onInit = function() {
             ctrl.hasLoaded = false;

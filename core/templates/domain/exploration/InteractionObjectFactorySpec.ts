@@ -35,7 +35,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
-fdescribe('Interaction object factory', () => {
+describe('Interaction object factory', () => {
   let iof = null;
   let oof = null;
   let agof = null;
@@ -356,12 +356,14 @@ fdescribe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        input: false,
         placeholder: {
           value: {
             content_id: 'ca_placeholder_0',
             unicode_str: 'Input should be greater than zero.'
           }
+        },
+        input: {
+          value: false
         }
       },
       default_outcome: defaultOutcomeDict,
@@ -371,10 +373,16 @@ fdescribe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      input: false,
       placeholder: {
-        value: new SubtitledUnicode(
-          'Input should be greater than zero.', 'ca_placeholder_0')
+        value: {
+          content_id: 'ca_placeholder_0',
+          unicode_str: 'Input should be greater than zero.'
+        }
+        //value: new SubtitledUnicode(
+          //'Input should be greater than zero.', 'ca_placeholder_0')
+      },
+      input: {
+        value: false
       }
     });
   });
@@ -384,7 +392,15 @@ fdescribe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        input: false,
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            html: ''
+          }
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
