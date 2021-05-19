@@ -266,6 +266,24 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
             'but post_commit_is_private=True')
 
+    def test_message_for_public_post_commit_status_raise_exception(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='create',
+            user_id='',
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            commit_cmds=[])
+        error = base_validation_errors.InvalidPublicCommitStatusError(model)
+
+        self.assertEqual(
+            error.message,
+            'InvalidPublicCommitStatusError in '
+            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
+            'but post_commit_community_owned=False')
+
 
 class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 
@@ -366,3 +384,47 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
             'ModelRelationshipError in FooModel(id=\'123\'): '
             'FooModel.bar_id=\'123\' should correspond to the ID of an '
             'existing BarModel, but no such model exists')
+
+
+class CommitCmdsNoneErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='invalid',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{}])
+        error = base_validation_errors.CommitCmdsNoneError(model)
+
+        self.assertEqual(
+            error.message,
+            'CommitCmdsNoneError in BaseCommitLogEntryModel(id=\'invalid\'): '
+            'No commit command domain object '
+            'defined for entity with commands: [{}]')
+
+
+class CommitCmdsValidateErrorTests(AuditErrorsTestBase):
+
+    def test_message(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='invalid',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test',
+            user_id='',
+            post_commit_status='',
+            commit_cmds=[{'cmd-invalid': 'invalid_test_command'}])
+        error_message = 'Missing cmd key in change dict'
+        error = base_validation_errors.CommitCmdsValidateError(
+            model, {'cmd-invalid': 'invalid_test_command'},
+            error_message)
+
+        self.assertEqual(
+            error.message,
+            'CommitCmdsValidateError in BaseCommitLogEntryModel'
+            '(id=\'invalid\'): Commit command domain validation for '
+            'command: {u\'cmd-invalid\': u\'invalid_test_command\'} failed '
+            'with error: Missing cmd key in change dict')
