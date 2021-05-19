@@ -38,7 +38,7 @@ export class ExplorationDataBackendApiService {
   saveChangeList(
       url: string,
       changeList: ExplorationChange[],
-      version: string): Observable<DraftAutoSaveResponse> {
+      version: number): Observable<DraftAutoSaveResponse> {
     return this.httpClient.put<DraftAutoSaveResponse>(
       url, {
         change_list: changeList,

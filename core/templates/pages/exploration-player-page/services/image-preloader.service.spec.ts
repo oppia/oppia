@@ -49,6 +49,7 @@ describe('Image preloader service', () => {
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    correctness_feedback_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
