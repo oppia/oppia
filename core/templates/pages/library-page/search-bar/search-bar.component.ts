@@ -17,6 +17,7 @@
  */
 
 import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { Router } from '@angular/router';
@@ -28,6 +29,7 @@ import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-a
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchService } from 'services/search.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {debounceTime, distinctUntilChanged} from "rxjs/operators";
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlService } from 'services/contextual/url.service';
 import { TranslateService } from 'services/translate.service'
@@ -77,6 +79,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   SEARCH_DROPDOWN_CATEGORIES: SearchDropDownCategories[];
   KEYBOARD_EVENT_TO_KEY_CODES: {};
   searchQuery: string = '';
+  searchQueryChanged: Subject<string> = new Subject<string>();
   SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
   selectionDetails: SelectionDetails
   translationData = {};
@@ -106,6 +109,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   isSearchInProgress(): boolean {
     return this.searchService.isSearchInProgress();
   };
+
+  searchToBeExec(e: {target: {value: string}}): void {
+    if (this.classroomPageIsActive){
+      return
+    } else {
+    this.searchQueryChanged.next(e.target.value)
+    }
+  }
 
   /**
    * Opens the submenu.
@@ -196,12 +207,16 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   this.searchService.executeSearchQuery(
     this.searchQuery, this.selectionDetails.categories.selections,
     this.selectionDetails.languageCodes.selections, () => {
-        let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
+      let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
         this.searchQuery, this.selectionDetails.categories.selections,
         this.selectionDetails.languageCodes.selections
       );
-      if (this.windowRef.nativeWindow.location.pathname !== ('/search/find')) {
-        this.windowRef.nativeWindow.location.replace('/search/find?q=' + searchUrlQueryString);
+      if (this.windowRef.nativeWindow.location.pathname === ('/search/find')) {
+        let url = new URL(this.windowRef.nativeWindow.location.toString());
+        url.search = '?q=' + searchUrlQueryString;
+        this.windowRef.nativeWindow.history.pushState({},'',url.toString())
+      } else {
+        this.windowRef.nativeWindow.location.href ='/search/find?q=' + searchUrlQueryString;
       }
     });
   };
@@ -285,7 +300,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     for (let itemsType in this.selectionDetails) {
       this.updateSelectionDetails(itemsType);
     }
-    
+
+    this.searchQueryChanged
+    .pipe(debounceTime(1000), distinctUntilChanged())
+    .subscribe(model => {
+      this.searchQuery = model
+      this.onSearchQueryChangeExec()
+    })
+
     this.directiveSubscriptions.add(
       this.router.events.subscribe(() => {
         if (this.urlService.getUrlParams().hasOwnProperty('q')) {

@@ -99,7 +99,7 @@
             <div class="oppia-library-carousel"
                  ng-swipe-right="scroll(index, true)"
                  ng-swipe-left="scroll(index, false)">
-              <div class="oppia-library-carousel-tiles">
+              <div ngb-carousel class="oppia-library-carousel-tiles">
                 <div *ngFor="let tile of group.activity_summary_dicts" class="d-inline-block">
                   <oppia-collection-summary-tile *ngIf="tile.activity_type === 'collection'"
                                                  [getCollectionId]="tile.id"
@@ -142,7 +142,7 @@
             </div>
           </div>
 
-          <div ng-if="$ctrl.libraryWindowIsNarrow && $ctrl.leftmostCardIndices">
+          <div ng-if="libraryWindowIsNarrow && leftmostCardIndices">
             <div *ngIf="libraryWindowIsNarrow && leftmostCardIndices">
               <button mat-button class="md-no-ink oppia-library-carousel-scroller"
                       (click)="decrementLeftmostCardIndex(index)"
