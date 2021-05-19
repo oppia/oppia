@@ -595,11 +595,11 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s' % (
-                common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(popen_calls[0].program_args, [
+            'python', '-m', 'scripts.run_portserver',
+            '--portserver_unix_socket_address',
+            common.PORTSERVER_SOCKET_FILEPATH,
+        ])
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(proc.terminate_count, 0)
         self.assertEqual(proc.kill_count, 0)
@@ -612,11 +612,11 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s' % (
-                common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(popen_calls[0].program_args, [
+            'python', '-m', 'scripts.run_portserver',
+            '--portserver_unix_socket_address',
+            common.PORTSERVER_SOCKET_FILEPATH,
+        ])
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(proc.terminate_count, 1)
         self.assertEqual(proc.kill_count, 0)
@@ -629,11 +629,11 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s' % (
-                common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(popen_calls[0].program_args, [
+            'python', '-m', 'scripts.run_portserver',
+            '--portserver_unix_socket_address',
+            common.PORTSERVER_SOCKET_FILEPATH,
+        ])
         self.assertEqual(proc.signals_received, [signal.SIGINT])
         self.assertEqual(proc.terminate_count, 1)
         self.assertEqual(proc.kill_count, 1)

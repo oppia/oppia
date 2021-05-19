@@ -72,7 +72,8 @@ def managed_process(
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
-    python_utils.PRINT('Starting new %s: %s' % (human_readable_name, command))
+    python_utils.PRINT(
+        'Starting new %s: %s' % (human_readable_name, ' '.join(command)))
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
 
     try:
@@ -459,8 +460,8 @@ def managed_portserver():
     ]
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    proc_context = managed_process(
-        portserver_args, human_readable_name='Portserver', shell=True)
+    proc_context = (
+        managed_process(portserver_args, human_readable_name='Portserver'))
     with proc_context as proc:
         yield proc
 
