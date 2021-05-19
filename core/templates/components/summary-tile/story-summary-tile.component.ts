@@ -42,15 +42,16 @@ export class StorySummaryTileComponent implements OnInit {
   storyProgress: number;
   thumbnailUrl: string;
   showButton: boolean;
+  circumference = (20 * 2 * Math.PI);
+  gapLength = 5;
+  EXPLORE_PAGE_PREFIX = '/explore/';
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
-  circumference = (20 * 2 * Math.PI);
-  gapLength = 5;
-  EXPLORE_PAGE_PREFIX = '/explore/';
 
   getStoryLink(): string {
     // This component is being used in the topic editor as well and
