@@ -26,6 +26,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 from scripts import common
+from scripts import servers
 
 
 class RedisCacheServicesUnitTests(test_utils.TestBase):
@@ -33,13 +34,14 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
 
     @classmethod
     def setUpClass(cls):
-        common.start_redis_server()
         super(RedisCacheServicesUnitTests, cls).setUpClass()
+        cls._managed_redis_server = servers.managed_redis_server()
+        cls._managed_redis_server.__enter__()
 
     @classmethod
     def tearDownClass(cls):
+        cls._managed_redis_server.__exit__(None, None, None)
         super(RedisCacheServicesUnitTests, cls).tearDownClass()
-        common.stop_redis_server()
 
     def test_memory_stats_returns_dict(self):
         memory_stats = redis_cache_services.get_memory_cache_stats()
