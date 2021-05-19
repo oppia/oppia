@@ -20,23 +20,29 @@
  * followed by the name of the arg.
  */
 
-require('services/html-escaper.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-angular.module('oppia').directive('oppiaResponsePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./pencil-code-editor-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
-            $attrs.answer).code;
-        };
-      }]
-    };
+@Component({
+  selector: 'oppia-response-pencil-code-editor',
+  templateUrl: 'pencil-code-editor-response.component.html'
+})
+export class ResponsePencilCodeEditorComponent implements OnInit {
+  @Input() answer;
+  answerCode;
+  constructor(private htmlEscaperService: HtmlEscaperService) { }
+
+  ngOnInit(): void {
+    this.answerCode = (
+      this.htmlEscaperService.escapedJsonToObj(
+        this.answer
+      ) as {code: string}).code;
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaResponsePencilCodeEditor',
+  downgradeComponent({
+    component: ResponsePencilCodeEditorComponent
+  }));

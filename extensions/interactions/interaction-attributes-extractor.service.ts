@@ -41,6 +41,7 @@ export class InteractionAttributesExtractorService {
     'InteractiveMap',
     'LogicProof',
     'MultipleChoiceInput',
+    'PencilCodeEditor',
     'SetInput',
     'TextInput',
   ];

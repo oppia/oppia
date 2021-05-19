@@ -20,25 +20,33 @@
  * followed by the name of the arg.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+@Component({
+  selector: 'oppia-short-response-pencil-code-editor',
+  templateUrl: './pencil-code-editor-short-response.component.html'
+})
+export class ShortResponsePencilCodeEditorComponent implements OnInit {
+  @Input() answer;
+  answerCode;
+  constructor(private htmlEscaperService: HtmlEscaperService) { }
+
+  ngOnInit(): void {
+    this.answerCode = (
+      this.htmlEscaperService.escapedJsonToObj(
+        this.answer
+      ) as {code: string}).code;
+  }
+}
+
 require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaShortResponsePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./pencil-code-editor-short-response.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.answerCode = (
-            HtmlEscaperService.escapedJsonToObj($attrs.answer).code);
-        };
-      }]
-    };
-  }
-]);
+angular.module('oppia').directive(
+  'oppiaShortResponsePencilCodeEditor',
+  downgradeComponent({
+    component: ShortResponsePencilCodeEditorComponent
+  }));

@@ -31,6 +31,7 @@ import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.mod
 import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
 import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
+import { PencilCodeEditorInteractionModule } from './PencilCodeEditor/pencil-code-editor-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
 
@@ -47,6 +48,7 @@ import { TextInputInteractionModule } from './TextInput/text-input-interactions.
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
+    PencilCodeEditorInteractionModule,
     SetInputInteractionModule,
     TextInputInteractionModule
   ],
@@ -62,6 +64,7 @@ import { TextInputInteractionModule } from './TextInput/text-input-interactions.
     InteractiveMapInteractionModule,
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
+    PencilCodeEditorInteractionModule,
     SetInputInteractionModule,
     TextInputInteractionModule
   ],

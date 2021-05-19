@@ -45,6 +45,7 @@ export class ExplorationHtmlFormatterService {
     'InteractiveMap',
     'LogicProof',
     'MultipleChoiceInput',
+    'PencilCodeEditor',
     'SetInput',
     'TextInput',
   ];
