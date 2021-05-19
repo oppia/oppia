@@ -99,6 +99,7 @@ describe('ExplorationStatesService', function() {
           id: 'TextInput',
           solution: null,
         },
+        linked_skill_id: null,
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
