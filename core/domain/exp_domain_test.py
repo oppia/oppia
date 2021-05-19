@@ -3480,7 +3480,6 @@ tags: []
 title: Title
 """)
 
-<<<<<<< HEAD
     YAML_CONTENT_V50 = (
         """author_notes: ''
 auto_tts_enabled: true
@@ -3626,9 +3625,6 @@ title: Title
 """)
 
     _LATEST_YAML_CONTENT = YAML_CONTENT_V50
-=======
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V49
->>>>>>> upstream/develop
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -3759,7 +3755,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 49
+schema_version: 50
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4008,7 +4004,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 49
+schema_version: 50
 states:
   (untitled state):
     card_is_checkpoint: true
