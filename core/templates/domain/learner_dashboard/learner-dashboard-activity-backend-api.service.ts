@@ -24,7 +24,7 @@ import { AlertsService } from 'services/alerts.service';
 import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model.ts';
+import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 import { LearnerPlaylistModalComponent } from 'pages/learner-dashboard-page/modal-templates/learner-playlist-modal.component';
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
@@ -122,7 +122,7 @@ export class LearnerDashboardActivityBackendApiService {
   // This function will open a modal to remove an exploration
   // from the given list either 'Play Later' or 'In Progress'
   // in Learner Dashboard Page.
-  async removeActivityModal(
+  async removeActivityModalAsync(
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
     this.removeActivityModalStatus = null;
