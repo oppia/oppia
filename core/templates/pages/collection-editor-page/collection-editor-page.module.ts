@@ -43,19 +43,19 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
   ],
   declarations: [
     OppiaAngularRootComponent,
-    CollectionHistoryTabComponent,
-    CollectionSettingsTabComponent,
-    CollectionStatisticsTabComponent,
     CollectionDetailsEditor,
+    CollectionHistoryTabComponent,
+    CollectionNodeEditorComponent,
     CollectionPermissionsCard,
-    CollectionNodeEditorComponent
+    CollectionSettingsTabComponent,
+    CollectionStatisticsTabComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     CollectionHistoryTabComponent,
+    CollectionNodeEditorComponent,
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent,
-    CollectionNodeEditorComponent
   ],
   providers: [
     {

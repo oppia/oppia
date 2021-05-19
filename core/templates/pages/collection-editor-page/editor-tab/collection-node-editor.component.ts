@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying and editing a collection node. This
+ * @fileoverview Component for displaying and editing a collection node. This
  * directive allows creators to shift nodes to left or right
  * and also delete the collection node represented by this directive.
  */
+
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Collection } from 'domain/collection/collection.model';
@@ -39,6 +40,7 @@ export class CollectionNodeEditorComponent implements OnInit {
     private alertsService: AlertsService,
     private collectionEditorStateService: CollectionEditorStateService
   ) {}
+
   // Deletes this collection node from the frontend collection
   // object and also updates the changelist.
   deleteNode(): void {
