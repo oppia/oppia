@@ -65,9 +65,6 @@ var pageToFullyLoad = async function() {
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('.protractor-test-loading-fullpage'));
   await browser.driver.wait(
-    until.visibilityOf(loadingMessage), 15000,
-    'Loading message not visible');
-  await browser.driver.wait(
     until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
 };
