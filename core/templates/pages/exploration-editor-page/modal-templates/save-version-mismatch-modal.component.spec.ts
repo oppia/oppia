@@ -76,7 +76,7 @@ class MockWindowRef {
 }
 
 class MockExplorationDataService {
-  discardDraft(): Promise<void> {
+  discardDraftAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -161,7 +161,7 @@ describe('Save Version Mismatch Modal Component', () => {
       fixture.detectChanges();
 
       waitForAsync(() => {
-        expect(explorationDataService.discardDraft).toHaveBeenCalled();
+        expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
         expect(reloadSpy).toHaveBeenCalled();
       });
     });

@@ -56,7 +56,7 @@ describe('State Interaction controller', function() {
             provide: ExplorationDataService,
             useValue: {
               explorationId: 0,
-              autosaveChangeList() {
+              autosaveChangeListAsync() {
                 return;
               }
             }

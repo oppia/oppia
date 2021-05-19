@@ -31,11 +31,11 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 
 class MockExplorationDataService {
   explorationId: 0;
-  autosaveChangeList() {
+  autosaveChangeListAsync() {
     return;
   }
 
-  discardDraft(): Promise<void> {
+  discardDraftAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -84,7 +84,7 @@ describe('Change list service', function() {
 
       warningSpy = spyOn(alertsService, 'addWarning');
       autosaveChangeListSpy = spyOn(
-        explorationDataService, 'autosaveChangeList');
+        explorationDataService, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -285,7 +285,7 @@ describe('Exploration title service', function() {
       });
 
       autosaveChangeListSpy = spyOn(
-        explorationDataService, 'autosaveChangeList');
+        explorationDataService, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {

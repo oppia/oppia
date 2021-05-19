@@ -823,7 +823,7 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
-      spyOn(explorationDataService, 'autosaveChangeList').and.returnValue(null);
+      spyOn(explorationDataService, 'autosaveChangeListAsync').and.returnValue(null);
 
       explorationCategoryService.init('Astrology');
       routerService.refreshSettingsTabEmitter = new EventEmitter();

@@ -44,7 +44,7 @@ describe('Exploration Metadata Modal Controller', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeList() {
+            autosaveChangeListAsync() {
               return;
             }
           }

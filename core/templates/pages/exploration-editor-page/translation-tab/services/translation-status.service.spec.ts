@@ -81,7 +81,7 @@ describe('Translation status service', function() {
             provide: ExplorationDataService,
             useValue: {
               explorationId: 0,
-              autosaveChangeList() {
+              autosaveChangeListAsync() {
                 return;
               }
             }

@@ -33,7 +33,7 @@ describe('Exploration Correctness Feedback Service', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeList() {
+            autosaveChangeListAsync() {
               return;
             }
           }

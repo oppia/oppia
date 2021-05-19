@@ -55,7 +55,7 @@ describe('State content editor directive', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeList() {
+            autosaveChangeListAsync() {
               return;
             }
           }

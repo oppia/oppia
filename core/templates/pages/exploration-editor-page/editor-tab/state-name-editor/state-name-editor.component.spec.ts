@@ -35,11 +35,11 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 
 class MockExplorationDataService {
   explorationId: 0;
-  autosaveChangeList() {
+  autosaveChangeListAsync() {
     return;
   }
 
-  discardDraft(): Promise<void> {
+  discardDraftAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -87,7 +87,7 @@ describe('State Name Editor component', function() {
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
 
-    autosaveChangeListSpy = spyOn(explorationDataService, 'autosaveChangeList');
+    autosaveChangeListSpy = spyOn(explorationDataService, 'autosaveChangeListAsync');
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

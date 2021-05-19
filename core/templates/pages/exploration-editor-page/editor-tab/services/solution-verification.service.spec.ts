@@ -59,7 +59,7 @@ describe('Solution Verification Service', () => {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeList() {
+            autosaveChangeListAsync() {
               return;
             }
           }

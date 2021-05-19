@@ -90,7 +90,7 @@ describe('Exploration editor tab component', function() {
           provide: ExplorationDataService,
           useValue: {
             explorationId: 0,
-            autosaveChangeList() {
+            autosaveChangeListAsync() {
               return;
             }
           }

@@ -220,11 +220,11 @@ describe('Exploration editor page component', function() {
         {
           provide: ExplorationDataService,
           useValue: {
-            getData: function(callback) {
+            getDataAsync: function(callback) {
               callback();
               return $q.resolve(explorationData);
             },
-            autosaveChangeList: function() {
+            autosaveChangeListAsync: function() {
               return;
             }
           }
