@@ -464,26 +464,27 @@ def managed_portserver():
     proc_context = (
         managed_process(portserver_args, human_readable_name='Portserver'))
     with proc_context as proc:
-        yield proc
-
-        # Before exiting the proc_context, try to end the process with SIGINT.
-        # The portserver is configured to shut down cleanly upon receiving this
-        # signal.
         try:
-            proc.send_signal(signal.SIGINT)
-        except OSError:
-            # Raises when the process has already shutdown, in which case we can
-            # just return immediately.
-            return
-
-        # Otherwise, give the portserver 10 seconds to shut down after sending
-        # CTRL-C (SIGINT).
-        try:
-            proc.wait(timeout=10)
-        except psutil.TimeoutExpired:
-            # If the server fails to shut down, allow proc_context to end it by
-            # calling terminate() and/or kill().
-            pass
+            yield proc
+        finally:
+            # Before exiting the proc_context, try to end the process with
+            # SIGINT. The portserver is configured to shut down cleanly upon
+            # receiving this signal.
+            try:
+                proc.send_signal(signal.SIGINT)
+            except OSError:
+                # Raises when the process has already shutdown, in which case we
+                # can just return immediately.
+                pass
+            else:
+                # Otherwise, give the portserver 10 seconds to shut down after
+                # sending CTRL-C (SIGINT).
+                try:
+                    proc.wait(timeout=10)
+                except psutil.TimeoutExpired:
+                    # If the server fails to shut down, allow proc_context to
+                    # end it by calling terminate() and/or kill().
+                    pass
 
 
 @contextlib.contextmanager
