@@ -23,6 +23,7 @@ import ast
 
 from constants import constants
 from core.domain import caching_services
+from core.domain import exp_fetchers
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
 from core.domain import skill_services
@@ -628,3 +629,89 @@ class RenameExplorationOpportunitySummaryModelPropertiesJobTest(
             new_model.language_codes_with_assigned_voice_artists, ['hi'])
         self.assertEqual(
             new_model.language_codes_needing_voice_artists, ['en'])
+
+
+class UpdateExplorationOpportunitySummaryModelJobTest(
+        test_utils.GenericTestBase):
+    """Tests for the exploration opportunity summary model update job."""
+
+    def setUp(self):
+        super(
+            UpdateExplorationOpportunitySummaryModelJobTest, self).setUp()
+        # Create a default exploration.
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exp_id = 'exploration_id'
+        self.save_new_valid_exploration(
+            self.exp_id,
+            self.owner_id,
+            correctness_feedback_enabled=True
+        )
+        self.publish_exploration(self.owner_id, self.exp_id)
+
+    def test_job_updates_content_and_translation_counts(self):
+        # Create an ExplorationOpportunitySummaryModel with content_count and
+        # translation_counts not matching the exploration.
+        old_model = opportunity_models.ExplorationOpportunitySummaryModel(
+            id=self.exp_id,
+            topic_id='topic1',
+            topic_name='The Topic!',
+            story_id='story1',
+            story_title='The story!',
+            chapter_title='The content!',
+            content_count=5,
+            incomplete_translation_language_codes=['hi'],
+            translation_counts={'en': 5},
+            language_codes_needing_voice_artists=['hi'],
+            language_codes_with_assigned_voice_artists=['en'])
+        old_model.put()
+
+        # Validate model content_count and translation_counts differ from the
+        # exploration before the job run.
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        self.assertNotEqual(
+            old_model.content_count,
+            exploration.get_content_count())
+        self.assertNotEqual(
+            old_model.translation_counts,
+            exploration.get_translation_counts())
+
+        # Run the job.
+        update_model_job_class = (opportunity_jobs_one_off
+            .UpdateExplorationOpportunitySummaryModelJob
+        )
+        job_id = update_model_job_class.create_new()
+        update_model_job_class.enqueue(job_id)
+
+        # Assert job output.
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        output = update_model_job_class.get_output(job_id)
+        self.assertEqual(
+            [['SUCCESS', 1]],
+            [ast.literal_eval(x) for x in output])
+
+        # Assert model is updated as expected.
+        new_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
+                self.exp_id))
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        self.assertEqual(
+            new_model.content_count,
+            exploration.get_content_count())
+        self.assertEqual(
+            new_model.translation_counts,
+            exploration.get_translation_counts())
+        # Subtract the already supported
+        # language_codes_with_assigned_voice_artists.
+        self.assertEqual(
+            len(new_model.incomplete_translation_language_codes),
+            len(constants.SUPPORTED_AUDIO_LANGUAGES) - 1)
+        self.assertEqual(
+            new_model.language_codes_with_assigned_voice_artists,
+            old_model.language_codes_with_assigned_voice_artists)
+        self.assertEqual(
+            new_model.language_codes_needing_voice_artists,
+            old_model.language_codes_needing_voice_artists)

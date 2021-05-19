@@ -145,3 +145,26 @@ class RenameExplorationOpportunitySummaryModelPropertiesJob(
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class UpdateExplorationOpportunitySummaryModelJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job that updates ExplorationOpportunitySummaryModels according to
+    their corresponding explorations.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [opportunity_models.ExplorationOpportunitySummaryModel]
+
+    @staticmethod
+    def map(opportunity_model):
+        opportunity_services.update_opportunity_with_updated_exploration(
+            opportunity_model.id
+        )
+        yield ('SUCCESS', opportunity_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
