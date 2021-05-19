@@ -20,6 +20,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { CollectionNode } from 'domain/collection/collection-node.model';
 import { Collection } from 'domain/collection/collection.model';
 import { AlertsService } from 'services/alerts.service';
 import { CollectionEditorStateService } from '../services/collection-editor-state.service';
@@ -30,11 +31,12 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
   templateUrl: './collection-node-editor.component.html'
 })
 export class CollectionNodeEditorComponent implements OnInit {
-  @Input() collectionNode;
-  @Input() linearIndex;
+  @Input() collectionNode: CollectionNode;
+  @Input() linearIndex: number;
   explorationId: string;
   collection: Collection;
   hrefUrl: string;
+
   constructor(
     private collectionLinearizerService: CollectionLinearizerService,
     private alertsService: AlertsService,

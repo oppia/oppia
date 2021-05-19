@@ -39,7 +39,7 @@ interface SwapFunction {
   providedIn: 'root'
 })
 export class CollectionLinearizerService {
-  explorationIds: string | string[];
+  explorationIds: string[];
   explorationId: number;
   constructor(
       private collectionUpdateService: CollectionUpdateService
@@ -47,7 +47,7 @@ export class CollectionLinearizerService {
 
   _getNextExplorationId(
       collection: Collection,
-      completedExpIds: string | string[]): string | null {
+      completedExpIds: string[]): string | null {
     this.explorationIds = collection.getExplorationIds();
 
     for (let i = 0; i < this.explorationIds.length; i++) {
@@ -128,7 +128,7 @@ export class CollectionLinearizerService {
      * does not assume that the collection is linear.
      */
   getNextExplorationId(
-      collection: Collection, completedExpIds: string | string[]): string {
+      collection: Collection, completedExpIds: string[]): string {
     return this._getNextExplorationId(collection, completedExpIds);
   }
 
