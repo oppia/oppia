@@ -371,7 +371,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           return;
         }
 
-        ExplorationDataService.getLastSavedData().then(function(data) {
+        ExplorationDataService.getLastSavedDataAsync().then(function(data) {
           var oldStates = StatesObjectFactory.createFromBackendDict(
             data.states).getStateObjects();
           var newStates = ExplorationStatesService.getStates()

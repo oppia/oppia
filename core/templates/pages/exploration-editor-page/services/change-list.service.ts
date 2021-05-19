@@ -69,6 +69,7 @@ export class ChangeListService implements OnInit {
     recorded_voiceovers: true,
     default_outcome: true,
     hints: true,
+    linked_skill_id: true,
     next_content_id_index: true,
     param_changes: true,
     param_specs: true,
@@ -106,7 +107,7 @@ export class ChangeListService implements OnInit {
     // opened):
     // - Version Mismatch.
     // - Non-strict Validation Fail.
-    this.explorationDataService.autosaveChangeList(
+    this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList,
       response => {
         if (!response.is_version_of_draft_valid) {
@@ -177,7 +178,7 @@ export class ChangeListService implements OnInit {
   discardAllChanges(): Promise<void> {
     this.explorationChangeList = [];
     this.undoneChangeStack = [];
-    return this.explorationDataService.discardDraft();
+    return this.explorationDataService.discardDraftAsync();
   }
 
   /**

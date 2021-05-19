@@ -29,6 +29,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
+import { DeleteStateSkillModalComponent } from './editor-tab/templates/modal-templates/delete-state-skill-modal.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
@@ -47,6 +48,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
   declarations: [
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
+    DeleteStateSkillModalComponent,
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
@@ -58,6 +60,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
   entryComponents: [
     CkEditorCopyToolbarComponent,
     ContentLanguageSelectorComponent,
+    DeleteStateSkillModalComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
@@ -87,11 +90,11 @@ class ExplorationEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ExplorationEditorPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 

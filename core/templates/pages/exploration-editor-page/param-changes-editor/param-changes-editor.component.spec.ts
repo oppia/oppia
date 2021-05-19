@@ -42,7 +42,7 @@ import { AngularNameService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
-import { importAllAngularServices, setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils';
 import { ExplorationDataService } from '../services/exploration-data.service';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
@@ -418,12 +418,12 @@ describe('Upgraded component', () => {
   beforeEach(() => destroyPlatform());
   afterEach(() => destroyPlatform());
   it('should create the upgraded component', async(() => {
-    setupAndGetUpgradedComponent(
+    setupAndGetUpgradedComponentAsync(
       'param-changes-editor',
       'paramChangesEditor',
       [ParamChangesEditorDirective]
     ).then(
-      textContext => expect(textContext).toBe('Hello Oppia!')
+      async(textContext) => expect(textContext).toBe('Hello Oppia!')
     );
   }));
 });

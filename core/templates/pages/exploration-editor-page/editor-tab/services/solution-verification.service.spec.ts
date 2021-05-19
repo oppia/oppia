@@ -80,7 +80,6 @@ describe('Solution Verification Service', () => {
       $provide.value(key, value);
     }
   }));
-
   // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
   // block when ExplorationStateService has been migrated to Angular 8.
   beforeEach(angular.mock.inject(function($injector) {
