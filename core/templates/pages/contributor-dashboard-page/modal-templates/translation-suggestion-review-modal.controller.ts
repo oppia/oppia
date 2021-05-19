@@ -42,7 +42,7 @@ angular.module('oppia').controller(
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
       $scope.activeContribution = suggestionIdToContribution[
-        $scope.activeSuggestionId]
+        $scope.activeSuggestionId];
       $scope.activeSuggestion = $scope.activeContribution.suggestion;
       $scope.activeSuggestionDetails = $scope.activeContribution.details;
       $scope.subheading = subheading;
@@ -166,7 +166,7 @@ angular.module('oppia').controller(
           $scope.activeSuggestion.target_id);
         var details = $scope.activeSuggestionDetails;
         if (details === null) {
-          $scope.subheading = '[The corresponding opportunity has been deleted.]';
+          $scope.subheading = '[The corresponding opportunity is deleted.]';
         } else {
           $scope.subheading = (
             details.topic_name + ' / ' + details.story_title +

@@ -331,7 +331,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       });
   });
 
-  fdescribe('when viewing suggestion', function() {
+  describe('when viewing suggestion', function() {
     const reviewable = false;
     let $httpBackend = null;
     const subheading = 'subheading_title';
@@ -367,8 +367,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         story_title: 'story_1',
         chapter_title: 'chapter_1'
       }
-    }
-
+    };
     const contribution2 = {
       suggestion: suggestion2,
       details: {
@@ -376,7 +375,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         story_title: 'story_2',
         chapter_title: 'chapter_2'
       }
-    }
+    };
 
     const suggestionIdToContribution = {
       suggestion_1: contribution1,

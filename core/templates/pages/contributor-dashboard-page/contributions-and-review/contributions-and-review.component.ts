@@ -232,7 +232,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var _showTranslationSuggestionModal = function(
-        suggestionIdToContribution, initialSuggestionId, reviewable) {
+          suggestionIdToContribution, initialSuggestionId, reviewable) {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
