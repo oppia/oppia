@@ -87,7 +87,8 @@ describe('State Name Editor component', function() {
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
 
-    autosaveChangeListSpy = spyOn(explorationDataService, 'autosaveChangeListAsync');
+    autosaveChangeListSpy = spyOn(
+      explorationDataService, 'autosaveChangeListAsync');
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
