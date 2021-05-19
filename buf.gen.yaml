@@ -1,7 +1,7 @@
 version: v1beta1
 plugins:
   - name: python
-    out: proto
+    out: proto_files
 
   - name: js
     out: extensions/classifiers/proto
