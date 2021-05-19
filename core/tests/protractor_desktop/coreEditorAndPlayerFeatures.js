@@ -549,9 +549,6 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.setCategory('New');
     await explorationEditorPage.navigateToMainTab();
     await browser.refresh();
-    var loadingMessage = element(by.css('.protractor-test-loading-fullpage'));
-    await waitFor.visibilityOf(
-      loadingMessage, 'Loadig message takes too long to appear');
     await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.expectCategoryToBe('New');
