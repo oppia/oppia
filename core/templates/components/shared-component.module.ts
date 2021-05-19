@@ -55,6 +55,8 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import { StateSkillEditorComponent } from 'components/state-editor/state-skill-editor/state-skill-editor.component';
+import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
 import { ProfileLinkImageComponent } from 'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
@@ -166,11 +168,13 @@ const toastrConfig = {
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
+    SelectSkillModalComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
+    StateSkillEditorComponent,
     SocialButtonsComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
@@ -211,8 +215,10 @@ const toastrConfig = {
     SkillMasteryViewerComponent,
     SocialButtonsComponent,
     // These elements will remain here even after migration.
+    SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
+    StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     LearnerDashboardIconsComponent,
@@ -266,12 +272,13 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     PromoBarComponent,
     RubricsEditorComponent,
-    SideNavigationBarComponent,
+    SelectSkillModalComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
     SortByPipe,
+    StateSkillEditorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummarizeNonnegativeNumberPipe,
