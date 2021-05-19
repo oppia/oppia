@@ -401,8 +401,8 @@ class BaseHandler(webapp2.RequestHandler):
                     on the same origin as the page itself.
         """
 
-        # No store must be used to properly invalidate the cache when we deploy
-        # a new versions, using only doesn't work properly.
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
         self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
