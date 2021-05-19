@@ -101,13 +101,13 @@
               <strong>Thumbnail Image*</strong>
             </p>
             <oppia-thumbnail-uploader [filename]="$ctrl.subtopic.getThumbnailFilename()"
-                                      [update-filename]="$ctrl.updateSubtopicThumbnailFilename"
+                                      (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
                                       [bg-color]="$ctrl.subtopic.getThumbnailBgColor()"
-                                      [update-bg-color]="$ctrl.updateSubtopicThumbnailBgColor"
+                                      (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
                                       [allowed-bg-colors]="$ctrl.allowedBgColors"
-                                      [aspect-ratio]="'4:3'"
+                                      aspect-ratio="4:3"
                                       [preview-title]="$ctrl.editableTitle"
-                                      [preview-description-bg-color]="'#BE563C'">
+                                      preview-description-bg-color="#BE563C">
             </oppia-thumbnail-uploader>
           </div>
         </div>

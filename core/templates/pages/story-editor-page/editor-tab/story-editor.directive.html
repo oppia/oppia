@@ -89,15 +89,13 @@
             <div class="story-thumbnail">
               <label class="form-heading">Thumbnail Image*</label>
               <oppia-thumbnail-uploader [filename]="story.getThumbnailFilename()"
-                                        [update-filename]="updateStoryThumbnailFilename"
+                                        (update-filename)="updateStoryThumbnailFilename($event)"
                                         [bg-color]="story.getThumbnailBgColor()"
-                                        [update-bg-color]="updateStoryThumbnailBgColor"
+                                        (update-bg-color)="updateStoryThumbnailBgColor($event)"
                                         [allowed-bg-colors]="allowedBgColors"
-                                        [aspect-ratio]="'4:3'"
+                                        aspect-ratio="4:3"
                                         [preview-title]="editableTitle"
-                                        [preview-description]="editableDescription"
-                                        [preview-description-bg-color]=""
-                                        [preview-footer]="">
+                                        [preview-description]="editableDescription">
               </oppia-thumbnail-uploader>
             </div>
             <div class="story-notes">
@@ -155,11 +153,11 @@
           </div>
           <div ng-if="storyPreviewCardIsShown">
             <oppia-preview-thumbnail [name]="editableTitle"
-                                     [aspect-ratio]="'16:9'"
+                                     aspect-ratio="16:9"
                                      [description]="editableDescription"
                                      [filename]="story.getThumbnailFilename()"
                                      [thumbnail-bg-color]="story.getThumbnailBgColor()"
-                                     [bg-color]="'#2F6687'">
+                                     bg-color="#2F6687">
             </oppia-preview-thumbnail>
           </div>
         </div>

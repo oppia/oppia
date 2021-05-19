@@ -16,7 +16,7 @@
  * @fileoverview Component for uploading images.
  */
 
-import { OnInit } from '@angular/core';
+import { EventEmitter, OnInit, Output } from '@angular/core';
 import { OnChanges, SimpleChanges } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -44,8 +44,10 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   @Input() previewDescriptionBgColor: string;
   @Input() previewFooter: string;
   @Input() previewTitle: string;
-  @Input() updateBgColor;
-  @Input() updateFilename;
+  @Output() updateBgColor: EventEmitter<string> = (
+    new EventEmitter()) ;
+  @Output() updateFilename: EventEmitter<string> = (
+    new EventEmitter());
   openInUploadMode: boolean;
   tempBgColor: string;
   tempImageName: string;
@@ -61,6 +63,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       '/icons/story-image-icon.png'));
   transformedData: string;
   parsedResponse;
+
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
     private alertsService: AlertsService,
@@ -84,6 +87,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
           this.filename,
           this.contextService.getEntityType(),
           this.contextService.getEntityId()));
+      this.uploadedImage = this.editableThumbnailDataUrl;
     } else {
       this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
     }
@@ -123,7 +127,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
 
   saveThumbnailBgColor(newBgColor: string): void {
     if (newBgColor !== this.bgColor) {
-      this.updateBgColor(newBgColor);
+      this.updateBgColor.emit(newBgColor);
     }
   }
 
@@ -235,7 +239,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
               data.dimensions.height, data.dimensions.width, 'svg'));
           this.saveThumbnailImageData(data.newThumbnailDataUrl, () => {
             this.uploadedImage = data.newThumbnailDataUrl;
-            this.updateFilename(this.tempImageName);
+            this.updateFilename.emit(this.tempImageName);
             this.saveThumbnailBgColor(data.newBgColor);
           });
         } else {

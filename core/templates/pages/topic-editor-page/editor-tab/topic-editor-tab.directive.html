@@ -116,14 +116,13 @@
             <label class="form-heading">Thumbnail</label>
             <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
                                       [filename]="topic.getThumbnailFilename()"
-                                      [update-filename]="updateTopicThumbnailFilename"
+                                      (update-filename)="updateTopicThumbnailFilename($event)"
                                       [bg-color]="topic.getThumbnailBgColor()"
-                                      [update-bg-color]="updateTopicThumbnailBgColor"
+                                      (update-bg-color)="updateTopicThumbnailBgColor($event)"
                                       [allowed-bg-colors]="allowedBgColors"
-                                      [aspect-ratio]="'4:3'"
+                                      aspect-ratio="4:3"
                                       [preview-title]="editableName"
-                                      [preview-description]=""
-                                      [preview-description-bg-color]="'#2F6687'"
+                                      preview-description-bg-color="#2F6687"
                                       [preview-footer]="topic.getCanonicalStoryIds().length + ' Lessons'">
             </oppia-thumbnail-uploader>
           </div>

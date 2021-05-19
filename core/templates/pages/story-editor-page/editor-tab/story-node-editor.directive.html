@@ -67,15 +67,13 @@
           <div class="story-node-thumbnail">
             <label class="form-heading">Thumbnail Image*</label>
             <oppia-thumbnail-uploader [filename]="getThumbnailFilename()"
-                                      [update-filename]="updateThumbnailFilename"
+                                      (update-filename)="updateThumbnailFilename($event)"
                                       [bg-color]="getThumbnailBgColor()"
-                                      [update-bg-color]="updateThumbnailBgColor"
+                                      (update-bg-color)="updateThumbnailBgColor($event)"
                                       [allowed-bg-colors]="allowedBgColors"
                                       [aspect-ratio]="'16:9'"
                                       [preview-title]="editableTitle"
-                                      [preview-description]="editableDescription"
-                                      [preview-description-bg-color]=""
-                                      [preview-footer]="">
+                                      [preview-description]="editableDescription">
             </oppia-thumbnail-uploader>
           </div>
         </div>

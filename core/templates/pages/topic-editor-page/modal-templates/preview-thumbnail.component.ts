@@ -39,6 +39,7 @@ export class PreviewThumbnailComponent {
     private imageUploadHelperService: ImageUploadHelperService,
     private contextService: ContextService
   ) {}
+
   ngOnInit(): void {
     this.editableThumbnailDataUrl = (
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(

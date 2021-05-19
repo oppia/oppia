@@ -21,7 +21,6 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NO_ERRORS_SCHEMA, Pipe, SimpleChanges } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -40,9 +39,10 @@ class MockActiveModal {
   }
 }
 
-class mockImageObject {
+class MockImageObject {
   source = null;
   onload = null;
+
   constructor() {
     this.onload = () => {
       return 'Fake onload executed';
@@ -53,7 +53,7 @@ class mockImageObject {
   }
 }
 
-class mockReaderObject {
+class MockReaderObject {
   result = null;
   onload = null;
   constructor() {
@@ -73,7 +73,6 @@ describe('Edit Thumbnail Modal Component', () => {
   let ngbActiveModal: NgbActiveModal;
   let closeSpy: jasmine.Spy;
   let dismissSpy: jasmine.Spy;
-  importAllAngularServices();
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
@@ -102,24 +101,24 @@ describe('Edit Thumbnail Modal Component', () => {
 
   it('should load a image file in onchange event and save it if it\'s a' +
     ' svg file', () => {
-    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // This throws "Argument of type 'MockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". This is because
     // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockImageObject'.
+    // the properties we need in 'MockImageObject'.
     // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new mockImageObject());
-    // This throws "Argument of type 'mockReaderObject' is not assignable
+    spyOn(window, 'Image').and.returnValue(new MockImageObject());
+    // This throws "Argument of type 'MockReaderObject' is not assignable
     // to parameter of type 'FileReader'.". This is because
     // 'FileReader' has around 15 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
+    // the properties we need in 'MockReaderObject'.
     // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-    var fileContent = (
+    spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+    let fileContent = (
       'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
       'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
       'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
       'WVsbG93IiAvPjwvc3ZnPg==');
-    var file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
+    let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
     component.onFileChanged(file);
     expect(component.invalidImageWarningIsShown).toBe(false);

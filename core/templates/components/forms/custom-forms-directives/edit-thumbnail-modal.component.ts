@@ -22,6 +22,11 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
+interface InvalidTagsAndAttributes {
+  tags: string[];
+  attrs: string[];
+}
+
 @Component({
   selector: 'edit-thumbnail-modal',
   templateUrl: './edit-thumbnail-modal.component.html',
@@ -49,18 +54,16 @@ export class EditThumbnailModalComponent implements OnChanges {
   @Input() uploadedImageMimeType: string;
 
   invalidImageWarningIsShown = false;
-  invalidTagsAndAttributes: {
-    tags: string[];
-    attrs: string[];
-  };
   allowedImageFormats = ['svg'];
   file: Blob;
   tags: string[];
   attrs: string[];
   imgSrc: string;
+  invalidTagsAndAttributes: InvalidTagsAndAttributes;
+
   constructor(
     private svgSanitizerService: SvgSanitizerService,
-    private modalInstance: NgbActiveModal,
+    private ngbActiveModal: NgbActiveModal,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -139,7 +142,7 @@ export class EditThumbnailModalComponent implements OnChanges {
   }
 
   confirm(): void {
-    this.modalInstance.close({
+    this.ngbActiveModal.close({
       newThumbnailDataUrl: this.uploadedImage,
       newBgColor: this.tempBgColor,
       openInUploadMode: this.openInUploadMode,
@@ -148,6 +151,6 @@ export class EditThumbnailModalComponent implements OnChanges {
   }
 
   cancel(): void {
-    this.modalInstance.dismiss();
+    this.ngbActiveModal.dismiss();
   }
 }
