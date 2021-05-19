@@ -233,7 +233,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Called on page load.
       ctrl.initExplorationPage = () => {
         return $q.all([
-          ExplorationDataService.getData((explorationId, lostChanges) => {
+          ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
@@ -244,6 +244,7 @@ angular.module('oppia').component('explorationEditorPage', {
           ThreadDataBackendApiService.getOpenThreadsCountAsync()
         ]).then(async([explorationData, featuresData, openThreadsCount]) => {
           if (explorationData.exploration_is_linked_to_story) {
+            ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
 

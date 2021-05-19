@@ -169,7 +169,7 @@ angular.module('oppia').component('storyEditorPage', {
           }
           ctrl.forceValidateExplorations = false;
           if (explorationIds.length > 0) {
-            EditableStoryBackendApiService.validateExplorations(
+            EditableStoryBackendApiService.validateExplorationsAsync(
               ctrl.story.getId(), explorationIds
             ).then(function(validationIssues) {
               ctrl.explorationValidationIssues =

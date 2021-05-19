@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.tests import test_utils
 from jobs import job_options
 from jobs.io import stub_io
@@ -41,5 +43,5 @@ class JobOptionsTests(test_utils.TestBase):
 
     def test_unsupported_values(self):
         self.assertRaisesRegexp(
-            ValueError, r'Unsupported option\(s\): a, b',
+            ValueError, re.escape('Unsupported option(s): a, b'),
             lambda: job_options.JobOptions(a=1, b=2))
