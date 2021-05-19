@@ -253,6 +253,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             '-noninteractive-math>')
 
         state_dict = {
+            'linked_skill_id': None,
             'card_is_checkpoint': True,
             'classifier_model_id': None,
             'content': {
@@ -417,6 +418,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'linked_skill_id': None,
             'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
@@ -480,6 +482,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
 
         state_dict = {
+            'linked_skill_id': None,
             'card_is_checkpoint': True,
             'classifier_model_id': None,
             'content': {
@@ -666,6 +669,7 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
                 },
                 'id': 'MultipleChoiceInput'
             },
+            'linked_skill_id': None,
             'next_content_id_index': 3,
             'param_changes': [],
             'solicit_answer_details': False,
