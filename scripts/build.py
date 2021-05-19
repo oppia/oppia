@@ -30,6 +30,7 @@ import threading
 
 import python_utils
 from scripts import common
+from scripts import servers
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -87,7 +88,7 @@ WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
@@ -113,7 +114,7 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
-    'webpack_bundles/*'
+    'webpack_bundles/*',
 )
 
 PAGES_IN_APP_YAML = (
@@ -669,10 +670,10 @@ def build_using_webpack(config_path):
     """
 
     python_utils.PRINT('Building webpack')
-
-    cmd = '%s --max-old-space-size=2400 %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
-    subprocess.check_call(cmd, shell=True)
+    managed_webpack_compiler = servers.managed_webpack_compiler(
+        config_path=config_path, max_old_space_size=2400)
+    with managed_webpack_compiler as p:
+        p.wait()
 
 
 def hash_should_be_inserted(filepath):
