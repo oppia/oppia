@@ -20,7 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-fdescribe('Translation Suggestion Review Modal Controller', function() {
+describe('Translation Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
   let SiteAnalyticsService = null;
