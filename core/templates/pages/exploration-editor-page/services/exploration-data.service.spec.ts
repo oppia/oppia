@@ -38,7 +38,7 @@ describe('Exploration data service', function() {
   let csrfService: CsrfTokenService = null;
   let sampleDataResults: ExplorationBackendDict = {
     draft_change_list_id: 3,
-    version: '1',
+    version: 1,
     draft_changes: [],
     is_version_of_draft_valid: true,
     init_state_name: 'init',
@@ -46,7 +46,8 @@ describe('Exploration data service', function() {
     param_specs: {randomProp: {obj_type: 'randomVal'}},
     states: {},
     title: 'Test Exploration',
-    language_code: 'en'
+    language_code: 'en',
+    correctness_feedback_enabled: false
   };
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,
