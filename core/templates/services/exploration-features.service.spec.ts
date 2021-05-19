@@ -55,6 +55,7 @@ describe('ExplorationFeatureService', () => {
           classifier_model_id: '',
           content: null,
           interaction: null,
+          linked_skill_id: null,
           recorded_voiceovers: null,
           solicit_answer_details: false,
           card_is_checkpoint: false,

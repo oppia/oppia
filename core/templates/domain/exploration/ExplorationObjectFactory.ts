@@ -52,7 +52,7 @@ import { ExplorationChange } from './exploration-draft.model';
 
 export interface ExplorationBackendDict {
   'auto_tts_enabled'?: boolean;
-  'correctness_feedback_enabled'?: boolean;
+  'correctness_feedback_enabled': boolean;
   'draft_changes': ExplorationChange[];
   'is_version_of_draft_valid': boolean;
   'init_state_name': string;

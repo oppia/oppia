@@ -320,6 +320,7 @@ describe('Exploration Player State Service', () => {
     spyOn(
       editableExplorationBackendApiService, 'fetchApplyDraftExplorationAsync')
       .and.returnValue(Promise.resolve({
+        correctness_feedback_enabled: false,
         draft_changes: [],
         is_version_of_draft_valid: true,
         init_state_name: '',

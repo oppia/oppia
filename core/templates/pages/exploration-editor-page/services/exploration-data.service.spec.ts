@@ -46,7 +46,8 @@ describe('Exploration data service', function() {
     param_specs: {randomProp: {obj_type: 'randomVal'}},
     states: {},
     title: 'Test Exploration',
-    language_code: 'en'
+    language_code: 'en',
+    correctness_feedback_enabled: false
   };
   let sampleExploration: FetchExplorationBackendResponse = {
     can_edit: true,
