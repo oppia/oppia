@@ -64,7 +64,7 @@ export class SaveVersionMismatchModalComponent
   }
 
   discardChanges(): void {
-    this.explorationDataService.discardDraft().then(() => {
+    this.explorationDataService.discardDraftAsync().then(() => {
       this._refreshPage(this.MSECS_TO_REFRESH);
     });
   }
