@@ -76,11 +76,11 @@ class QuestionsListHandler(base.BaseHandler):
         )
 
         # To check whether there are more questions.
-            _, _, temp_next_offset = (
-                question_services.get_displayable_question_skill_link_details(
-                    constants.NUM_QUESTIONS_PER_PAGE, skill_ids,
-                    offset=next_offset)
-            )
+        _, _, temp_next_offset = (
+            question_services.get_displayable_question_skill_link_details(
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids,
+                offset=next_offset)
+        )
 
         if next_offset == temp_next_offset:
             more = False
