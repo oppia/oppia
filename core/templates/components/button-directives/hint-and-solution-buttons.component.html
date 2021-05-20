@@ -15,7 +15,7 @@
         <i class="material-icons">&#xE90F;</i>
       </button>
     </li>
-    <li *ngIf="$ctrl.isSolutionButtonVisible()">
+    <li *ngIf="isSolutionButtonVisible()">
       <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-solution"
               [ngClass]="{'viewed': isSolutionConsumed()}"
               (click)="onClickSolutionButton()">

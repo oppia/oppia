@@ -92,7 +92,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   isHintButtonVisible(index: number): boolean {
     return (
       this.hintsAndSolutionManagerService.isHintViewable(index) &&
-      this.displayedCard !== null &&
+      this.displayedCard &&
       this.displayedCard.doesInteractionSupportHints());
   }
 
@@ -101,11 +101,11 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     return this.hintsAndSolutionManagerService.isSolutionViewable();
   }
 
-  displayHintModal(index): void {
+  displayHintModal(index: number): void {
     this.activeHintIndex = index;
     let promise = (
       this.hintAndSolutionModalService.displayHintModal(index));
-    promise.result.then(null, function() {
+    promise.result.then(null, () => {
       this.activeHintIndex = null;
     });
     this.isVisible = false;
@@ -119,9 +119,9 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
       let interstitialModalPromise = (
         this.hintAndSolutionModalService
           .displaySolutionInterstitialModal());
-      interstitialModalPromise.result.then(function() {
+      interstitialModalPromise.result.then(() => {
         this.displaySolutionModal();
-      }, function() {
+      }, () => {
         this.solutionModalIsActive = false;
       });
     }
@@ -136,7 +136,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
         this.playerPositionService.getCurrentStateName());
     }
     let promise = this.hintAndSolutionModalService.displaySolutionModal();
-    promise.result.then(null, function() {
+    promise.result.then(null, () => {
       this.solutionModalIsActive = false;
     });
   }
