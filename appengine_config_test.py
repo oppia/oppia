@@ -48,10 +48,22 @@ class AppengineConfigTests(test_utils.GenericTestBase):
         with self.swap(
             appengine_config, 'old_get_distribution',
             self._mock_get_distribution_which_raises_error
-            ):
+        ):
             mock_distribution = appengine_config.monkeypatched_get_distribution(
                 'google-cloud-tasks')
         self.assertEqual(mock_distribution.version, '1.5.0')
+
+    def test_monkeypatched_get_distribution_for_google_cloud_translate(self):
+        """Test that the monkey-patched get_distribution() method returns an
+        object with a suitable version string for google-cloud-tasks.
+        """
+        with self.swap(
+            appengine_config, 'old_get_distribution',
+            self._mock_get_distribution_which_raises_error
+        ):
+            mock_distribution = appengine_config.monkeypatched_get_distribution(
+                'google-cloud-translate')
+        self.assertEqual(mock_distribution.version, '2.0.1')
 
     def test_monkeypatched_get_distribution_behaves_like_existing_one(self):
         """Test that the monkey-patched get_distribution() method returns an
