@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for headroom directive
+ */
+
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { HeadroomDirective } from './headroom.directive';
-
-/**
- * @fileoverview Unit tests for headroom directive
- */
 
 @Component({
   selector: 'mock-comp-a',
