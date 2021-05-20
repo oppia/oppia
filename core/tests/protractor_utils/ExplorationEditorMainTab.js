@@ -698,7 +698,7 @@ var ExplorationEditorMainTab = function() {
       feedbackBubble, 'Feedback bubble takes too long to be visible.');
     var feedbackEditor = await forms.RichTextEditor(
       feedbackBubble);
-    await feedbackEditor.clear();   
+    await feedbackEditor.clear();
     await richTextInstructions(feedbackEditor);
   };
 
