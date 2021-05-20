@@ -22,7 +22,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 var initializeMockDocument = function(svgFilenameCtrl) {
   var mockDocument = document.createElement('div');
