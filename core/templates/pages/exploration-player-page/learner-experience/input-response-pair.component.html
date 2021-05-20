@@ -1,44 +1,49 @@
 <div class="conversation-skin-learner-answer-container">
-  <img class="conversation-skin-user-avatar rounded-circle" ng-src="<[profilePicture()]>" alt="">
-  <div ng-if="!data.isHint">
-    <div ng-if="getShortAnswerHtml()"
-         popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
-         popover-trigger="click" class="oppia-popover">
-      <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
-      </angular-html-bind>
+  <img class="conversation-skin-user-avatar rounded-circle" [src]="profilePicture()" alt="">
+  <div *ngIf="!data.isHint">
+    <div *ngIf="getShortAnswerHtml()"
+         >
+         <!-- popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
+         popover-trigger="click" class="oppia-popover"> -->
+      <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getShortAnswerHtml()">
+      </angular-html-bind-wrapper>
     </div>
-    <div ng-if="!getShortAnswerHtml()">
-      <angular-html-bind class="oppia-rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
-      </angular-html-bind>
+    <div *ngIf="!getShortAnswerHtml()">
+      <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-learner-answer-content"
+                                 [htmlData]="getAnswerHtml()">
+      </angular-html-bind-wrapper>
     </div>
   </div>
-  <div ng-if="data.isHint">
+  <div *ngIf="data.isHint">
     <div class="oppia-rte-viewer conversation-skin-learner-answer-content">
-      <[data.learnerInput | translate]>
+      {{ data.learnerInput | translate }}
     </div>
   </div>
 </div>
 
-<div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
-  <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-     ng-href="<[OPPIA_AVATAR_LINK_URL]>"
+<div class="conversation-skin-oppia-feedback-container" *ngIf="data.oppiaResponse !== ''">
+  <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+     [href]="OPPIA_AVATAR_LINK_URL"
      target="_blank"
      rel="noopener">
-    <img class="conversation-skin-oppia-avatar rounded-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
+    <img class="conversation-skin-oppia-avatar rounded-circle"
+         [src]="oppiaAvatarImageUrl()" alt="">
   </a>
-  <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()" class="protractor-test-input-response-loading-dots">
+  <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
+       class="protractor-test-input-response-loading-dots">
     <div class="conversation-skin-feedback-dot-one"></div>
     <div class="conversation-skin-feedback-dot-two"></div>
     <div class="conversation-skin-feedback-dot-three"></div>
   </div>
-  <span id="<[getInputResponsePairId()]>"></span>
+  <span id="getInputResponsePairId()"></span>
   <div>
-    <angular-html-bind ng-if="data.oppiaResponse !== null"
-                       html-data="data.oppiaResponse"
-                       class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
-                       ng-style="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
-                       ng-class="getFeedbackAudioHighlightClass()">
-    </angular-html-bind>
+    <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
+                               [htmlData]="data.oppiaResponse"
+                               class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                               [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
+                               [ngClass]="getFeedbackAudioHighlightClass()">
+    </angular-html-bind-wrapper>
   </div>
 </div>
 
@@ -75,7 +80,7 @@
     border-color: rgba(236, 239, 241, 0.4) transparent transparent rgba(236, 239, 241, 0.4);
   }
 
-  input-response-pair .oppia-popover {
+  .oppia-popover {
     cursor: pointer;
   }
 </style>
