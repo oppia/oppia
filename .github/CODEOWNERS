@@ -323,6 +323,8 @@
 /extensions/domain*.py @brianrodri
 /extensions/interactions/ @iamprayush @vojtechjelinek
 /extensions/objects/ @iamprayush
+/extensions/objects/templates/filepath-editor.component*.ts @kevintab95
+/extensions/objects/templates/filepath-editor.component.html @kevintab95
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @iamprayush
 
@@ -722,8 +724,6 @@
 /core/domain/role_services*.py @seanlip
 /core/storage/ @seanlip
 /core/domain/user*.py @seanlip
-/extensions/objects/templates/filepath-editor.component*.ts @kevintab95
-/extensions/objects/templates/filepath-editor.component.html @kevintab95
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek

@@ -39,8 +39,6 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
-    '/extensions/objects/templates/filepath-editor.component*.ts',
-    '/extensions/objects/templates/filepath-editor.component.html',
     '/core/storage/',
     '/manifest.json',
     '/package.json',
