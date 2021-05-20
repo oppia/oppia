@@ -43,10 +43,16 @@ export class TranslateCustomParser extends TranslateParser {
     let interpolatedValue = this.translateDefaultParser
       .interpolate(expr, params);
 
-    if (!(params ||
-         params.hasOwnProperty('messageFormat') ||
-         interpolatedValue !== undefined ||
-         params.messageFormat)) {
+    if (!(params &&
+         interpolatedValue !== undefined)) {
+      return interpolatedValue;
+    }
+
+    if (!params.hasOwnProperty('messageFormat')) {
+      return interpolatedValue;
+    }
+
+    if (params.messageFormat !== true) {
       return interpolatedValue;
     }
 
