@@ -227,6 +227,15 @@ class _ReadFromDatastore(_DatastoreioTransform):
     """Stub implementation of Apache Beam's ReadFromDatastore PTransform."""
 
     def expand(self, pcoll):
+        """Returns models from storage using the ReadFromDatastore endpoint.
+
+        Args:
+            pcoll: PCollection. The source PCollection to attach the fetched
+                models onto.
+
+        Returns:
+            PCollection. The PCollection of models.
+        """
         return (
             pcoll
             | 'Get models from the ReadFromDatastore endpoint' >> beam.Create(
@@ -240,6 +249,15 @@ class _WriteToDatastore(_DatastoreioTransform):
     """Stub implementation of Apache Beam's WriteToDatastore PTransform."""
 
     def expand(self, model_pcoll):
+        """Puts models into storage using the WriteToDatastore endpoint.
+
+        Args:
+            model_pcoll: PCollection. The collection of models to put into
+                storage.
+
+        Returns:
+            PCollection. An empty PCollection.
+        """
         return (
             model_pcoll
             | 'Create Apache Beam entities for put operation' >> beam.Map(
@@ -262,6 +280,15 @@ class _DeleteFromDatastore(_DatastoreioTransform):
     """Stub implementation of Apache Beam's DeleteFromDatastore PTransform."""
 
     def expand(self, model_pcoll):
+        """Deletes models from storage using the DeleteFromDatastore endpoint.
+
+        Args:
+            model_pcoll: PCollection. The collection of models to delete from
+                storage.
+
+        Returns:
+            PCollection. An empty PCollection.
+        """
         return (
             model_pcoll
             | 'Create Apache Beam entities for delete operation' >> beam.Map(
