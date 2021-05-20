@@ -72,7 +72,7 @@ class QuestionsListHandler(base.BaseHandler):
         ) = (
 
             question_services.get_displayable_question_skill_link_details(
-                    constants.NUM_QUESTIONS_PER_PAGE, skill_ids, offset=offset)
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, offset=offset)
         )
 
         # To check whether there are more questions.
