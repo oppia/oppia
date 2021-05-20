@@ -22,7 +22,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import functools
 
 from google.cloud import datastore
-client = datastore.Client()
+
+
+def get_transaction():
+    client = datastore.Client()
+    return client.transaction()
 
 
 def run_in_transaction_wrapper(fn):
@@ -42,7 +46,7 @@ def run_in_transaction_wrapper(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         """Wrapper for the transaction."""
-        with client.transaction():
+        with get_transaction():
             return fn(*args, **kwargs)
 
     return wrapper

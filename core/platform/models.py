@@ -213,8 +213,8 @@ class _Gae(Platform):
         Returns:
             module. The gae_transaction_services module.
         """
-        from core.platform.transactions import gae_transaction_services
-        return gae_transaction_services
+        from core.platform.transactions import cloud_transaction_services
+        return cloud_transaction_services
 
     @classmethod
     def import_datastore_services(cls):

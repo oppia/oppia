@@ -48,19 +48,35 @@ _PARSER.add_argument(
     '--test_target',
     help='optional dotted module name of the test(s) to run',
     type=str)
+_PARSER.add_argument(
+    '--run_with_emulator',
+    help='optional dotted module name of the test(s) to run',
+    action='store_true')
 
 
-def create_test_suites(test_target=None):
+def create_test_suites(test_target=None, run_with_emulator=False):
     """Creates test suites. If test_dir is None, runs all tests."""
     if test_target and '/' in test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
     loader = unittest.TestLoader()
-    return (
-        [loader.loadTestsFromName(test_target)]
-        if test_target else [loader.discover(
-            CURR_DIR, pattern='[^core/tests/data]*_test.py',
-            top_level_dir=CURR_DIR)])
+    master_test_suite = (
+        loader.loadTestsFromName(test_target)
+        if test_target else
+        loader.discover(
+            CURR_DIR,
+            pattern='[^core/tests/data]*_test.py',
+            top_level_dir=CURR_DIR
+        )
+    )
+    for test_object in master_test_suite:
+        if isinstance(test_object, unittest.TestSuite):
+            for test_case in test_object:
+                test_case.run_with_emulator = run_with_emulator
+        elif isinstance(test_object, unittest.TestCase):
+            test_object.run_with_emulator = run_with_emulator
+
+    return [master_test_suite]
 
 
 def main(args=None):
@@ -98,7 +114,11 @@ def main(args=None):
         google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
 
-    suites = create_test_suites(test_target=parsed_args.test_target)
+    print(parsed_args.run_with_emulator)
+    suites = create_test_suites(
+        test_target=parsed_args.test_target,
+        run_with_emulator=parsed_args.run_with_emulator
+    )
 
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]

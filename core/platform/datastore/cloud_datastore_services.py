@@ -29,6 +29,7 @@ import python_utils
 from google.cloud import ndb
 
 transaction_services = models.Registry.import_transaction_services()
+
 Model = ndb.Model
 Key = ndb.Key
 Property = ndb.Property
@@ -41,6 +42,11 @@ FloatProperty = ndb.FloatProperty
 IntegerProperty = ndb.IntegerProperty
 JsonProperty = ndb.JsonProperty
 UserProperty = ndb.UserProperty
+
+
+def get_ndb_context(**kwargs):
+    client = ndb.Client()
+    return client.context(**kwargs)
 
 
 @functools.wraps(ndb.StringProperty)

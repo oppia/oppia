@@ -185,12 +185,19 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             A tuple containing the list of the ClassifierTrainingJobModels
             with status new or pending and the offset value.
         """
-        query = cls.query(cls.status.IN([
-            feconf.TRAINING_JOB_STATUS_NEW,
-            feconf.TRAINING_JOB_STATUS_PENDING])).filter(
-                cls.next_scheduled_check_time <= (
-                    datetime.datetime.utcnow())).order(
-                        cls.next_scheduled_check_time, cls._key)
+        query = (
+            cls.get_all()
+            .filter(
+                datastore_services.AND(
+                    cls.status.IN([
+                        feconf.TRAINING_JOB_STATUS_NEW,
+                        feconf.TRAINING_JOB_STATUS_PENDING
+                    ]),
+                    cls.next_scheduled_check_time <= datetime.datetime.utcnow()
+                )
+            )
+            .order(cls.next_scheduled_check_time)
+        )
 
         job_models = query.fetch(
             NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT, offset=offset)

@@ -59,6 +59,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.datastore import cloud_datastore_stub
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
@@ -85,6 +86,7 @@ import webtest
 app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 storage_services = models.Registry.import_storage_services()
+transaction_services = models.Registry.import_transaction_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_auth_services = models.Registry.import_auth_services()
@@ -955,7 +957,30 @@ class TestBase(unittest.TestCase):
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        with main.client.context(namespace=self.id()[-100:]):
+
+        with contextlib2.ExitStack() as stack:
+            if self.run_with_emulator:
+                stack.enter_context(
+                    datastore_services.get_ndb_context(
+                        namespace=self.id()[-100:]))
+            else:
+                stack.enter_context(
+                    self.swap(
+                        datastore_services,
+                        'get_ndb_context',
+                        contextlib.nullcontext
+                    )
+                )
+                stack.enter_context(
+                    self.swap(
+                        transaction_services,
+                        'get_transaction',
+                        contextlib.nullcontext
+                    )
+                )
+                stack.enter_context(
+                    cloud_datastore_stub.CloudDatastoreStub().install(self))
+
             super(TestBase, self).run(result=result)
 
     def _get_unicode_test_string(self, suffix):

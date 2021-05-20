@@ -232,10 +232,10 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_transaction_services(self):
         """Tests import transaction services function."""
-        from core.platform.transactions import gae_transaction_services
+        from core.platform.transactions import cloud_transaction_services
         self.assertEqual(
             self.registry_instance.import_transaction_services(),
-            gae_transaction_services)
+            cloud_transaction_services)
 
     def test_import_auth_services(self):
         """Tests import auth services function."""
