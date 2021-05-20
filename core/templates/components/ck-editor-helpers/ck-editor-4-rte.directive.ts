@@ -258,6 +258,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         ck.on('instanceReady', function() {
           // Show the editor now that it is fully loaded.
           el[0].setAttribute('style', 'display: block');
+          // Focus on the CK editor text box.
+          (<HTMLElement>el[0].children[0].children[1]).focus();
           // Remove the loading text.
           el[0].parentElement.removeChild(loadingDiv);
 
