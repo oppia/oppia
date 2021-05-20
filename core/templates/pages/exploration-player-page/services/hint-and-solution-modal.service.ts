@@ -22,7 +22,6 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DisplayHintModalComponent } from '../modals/display-hint-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from '../modals/display-solution-interstitial-modal.component';
 import { DisplaySolutionModalComponent } from '../modals/display-solution-modal.component';
-import { HintsAndSolutionManagerService } from './hints-and-solution-manager.service';
 
 @Injectable({
   providedIn: 'root'
@@ -55,4 +54,4 @@ export class HintAndSolutionModalService {
 }
 
 angular.module('oppia').factory('HintAndSolutionModalService',
-  downgradeInjectable(HintsAndSolutionManagerService));
+  downgradeInjectable(HintAndSolutionModalService));
