@@ -101,7 +101,7 @@ export const AboutPageConstants = {
     'Barnabas Makonda',
     'Ben Henning',
     'Ben Targan',
-    'Benjamin B',
+    'Benjamin Beeshma',
     'Bill Morrisson',
     'BJ Voth',
     'Bolaji Fatade',
