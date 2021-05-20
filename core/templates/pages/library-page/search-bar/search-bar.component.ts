@@ -28,14 +28,13 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SearchService } from 'services/search.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import {debounceTime, distinctUntilChanged} from "rxjs/operators";
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UrlService } from 'services/contextual/url.service';
-import { TranslateService } from 'services/translate.service'
+import { TranslateService } from 'services/translate.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { KEYBOARD_EVENT_TO_KEY_CODES } from 'services/navigation.service'
+import { KEYBOARD_EVENT_TO_KEY_CODES } from 'services/navigation.service';
 interface SearchDropDownCategories {
   id: string;
   text: string;
@@ -72,16 +71,16 @@ interface SelectionDetails {
 })
 
 export class SearchBarComponent implements OnInit, OnDestroy {
-  @Input() enableDropup: boolean;
+  @Input() enableDropup: boolean = false;
   directiveSubscriptions: Subscription = new Subscription();
-  ACTION_OPEN: string
-  ACTION_CLOSE: string
+  ACTION_OPEN: string;
+  ACTION_CLOSE: string;
   SEARCH_DROPDOWN_CATEGORIES: SearchDropDownCategories[];
   KEYBOARD_EVENT_TO_KEY_CODES: {};
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   SUPPORTED_CONTENT_LANGUAGES: LanguageIdAndText[];
-  selectionDetails: SelectionDetails
+  selectionDetails: SelectionDetails;
   translationData = {};
   activeMenuName: string='';
   searchBarPlaceholder: string;
@@ -89,7 +88,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   languageButtonText: string;
   // TODO(#12793): Remove the use of (
   // OppiaAngularRootComponent.ajsTranslate).
-  translate = OppiaAngularRootComponent.ajsTranslate
+  translate = OppiaAngularRootComponent.ajsTranslate;
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
@@ -99,22 +98,22 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     private classroomBackendApiService: ClassroomBackendApiService,
     private languageUtilService: LanguageUtilService,
     private constructTranslationIdsService: ConstructTranslationIdsService,
-    private translateService : TranslateService,
-    private router : Router
-  ){}
+    private translateService: TranslateService,
+    private router: Router,
+  ) {}
 
   classroomPageIsActive = (
         this.urlService.getPathname().startsWith('/learn'));
-  
+
   isSearchInProgress(): boolean {
     return this.searchService.isSearchInProgress();
-  };
+  }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (this.classroomPageIsActive){
-      return
+    if (this.classroomPageIsActive) {
+      return null;
     } else {
-    this.searchQueryChanged.next(e.target.value)
+      this.searchQueryChanged.next(e.target.value);
     }
   }
 
@@ -124,9 +123,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-  openSubmenu(evt, menuName): void {
+  openSubmenu(evt: object, menuName: string): void {
     this.navigationService.openSubmenu(evt, menuName);
-  };
+  }
 
   /**
    * Handles keydown events on menus.
@@ -140,14 +139,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
    *  onMenuKeypress($event, 'category', {enter: 'open'})
    */
 
-  onMenuKeypress(evt, menuName, eventsTobeHandled): void {
+  onMenuKeypress(evt: object, menuName: string, eventsTobeHandled: object): void {
     this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
-  };
+  }
 
   // Update the description, numSelections and summary fields of the
   // relevant entry of ctrl.selectionDetails.
-  updateSelectionDetails(itemsType): void {
+  updateSelectionDetails(itemsType: string): void {
     let itemsName = this.selectionDetails[itemsType].itemsName;
     let masterList = this.selectionDetails[itemsType].masterList;
 
@@ -182,9 +181,9 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.selectionDetails[itemsType].description = (
         'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() + '_SELECTED');
     }
-  };
+  }
 
-  toggleSelection(itemsType, optionName): void {
+  toggleSelection(itemsType: string, optionName: string): void {
     var selections = this.selectionDetails[itemsType].selections;
     if (!selections.hasOwnProperty(optionName)) {
       selections[optionName] = true;
@@ -194,32 +193,33 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
-  };
+  }
 
-  deselectAll(itemsType): void {
+  deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.onSearchQueryChangeExec();
-  };
+  }
 
   onSearchQueryChangeExec(): void {
-
-  this.searchService.executeSearchQuery(
-    this.searchQuery, this.selectionDetails.categories.selections,
-    this.selectionDetails.languageCodes.selections, () => {
-      let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
-        this.searchQuery, this.selectionDetails.categories.selections,
-        this.selectionDetails.languageCodes.selections
-      );
-      if (this.windowRef.nativeWindow.location.pathname === ('/search/find')) {
-        let url = new URL(this.windowRef.nativeWindow.location.toString());
-        url.search = '?q=' + searchUrlQueryString;
-        this.windowRef.nativeWindow.history.pushState({},'',url.toString())
-      } else {
-        this.windowRef.nativeWindow.location.href ='/search/find?q=' + searchUrlQueryString;
-      }
-    });
-  };
+    this.searchService.executeSearchQuery(
+      this.searchQuery, this.selectionDetails.categories.selections,
+      this.selectionDetails.languageCodes.selections, () => {
+        let searchUrlQueryString = this.searchService.getSearchUrlQueryString(
+          this.searchQuery, this.selectionDetails.categories.selections,
+          this.selectionDetails.languageCodes.selections
+        );
+        if (
+          this.windowRef.nativeWindow.location.pathname === ('/search/find')) {
+          let url = new URL(this.windowRef.nativeWindow.location.toString());
+          url.search = '?q=' + searchUrlQueryString;
+          this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
+        } else {
+          this.windowRef.nativeWindow.location.href = '/search/find?q='
+          + searchUrlQueryString;
+        }
+      });
+  }
 
   updateSearchFieldsBasedOnUrlQuery(): void {
     this.selectionDetails.categories.selections = {};
@@ -236,7 +236,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.searchQuery = newQuery;
       this.onSearchQueryChangeExec();
     }
-  };
+  }
 
   refreshSearchBarLabels(): void {
     // If you translate these strings in the html, then you must use a
@@ -254,7 +254,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.languageButtonText = this.translate.instant(
       this.selectionDetails.languageCodes.summary,
       this.translationData, 'messageformat');
-  };
+  }
 
   searchDropdownCategories(): SearchDropDownCategories[] {
     return constants.SEARCH_DROPDOWN_CATEGORIES.map((categoryName) => {
@@ -263,14 +263,14 @@ export class SearchBarComponent implements OnInit, OnDestroy {
         text: this.constructTranslationIdsService.getLibraryId(
           'categories', categoryName)
       };
-    })
+    });
   }
 
   ngOnInit(): void {
     this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
     this.KEYBOARD_EVENT_TO_KEY_CODES = KEYBOARD_EVENT_TO_KEY_CODES;
-    this.ACTION_OPEN = 'open'
-    this.ACTION_CLOSE = 'close'
+    this.ACTION_OPEN = 'open';
+    this.ACTION_CLOSE = 'close';
     this.SUPPORTED_CONTENT_LANGUAGES = (
       this.languageUtilService.getLanguageIdsAndTexts());
     this.searchQuery = '';
@@ -302,11 +302,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
 
     this.searchQueryChanged
-    .pipe(debounceTime(1000), distinctUntilChanged())
-    .subscribe(model => {
-      this.searchQuery = model
-      this.onSearchQueryChangeExec()
-    })
+      .pipe(debounceTime(1000), distinctUntilChanged())
+      .subscribe(model => {
+        this.searchQuery = model;
+        this.onSearchQueryChangeExec();
+      });
 
     this.directiveSubscriptions.add(
       this.router.events.subscribe(() => {
@@ -314,7 +314,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
           this.updateSearchFieldsBasedOnUrlQuery();
         }
       })
-    )
+    );
 
     this.directiveSubscriptions.add(
       this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.subscribe(
@@ -335,7 +335,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
             this.updateSearchFieldsBasedOnUrlQuery();
           }
 
-          if (this.windowRef.nativeWindow.location.pathname === '/search/find') {
+          if (
+            this.windowRef.nativeWindow.location.pathname === '/search/find') {
             this.onSearchQueryChangeExec();
           }
 
@@ -355,11 +356,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.classroomBackendApiService.onInitializeTranslation
         .subscribe(() => this.refreshSearchBarLabels()));
-  };
+  }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-  };
+  }
 }
 
 angular.module('oppia').directive(

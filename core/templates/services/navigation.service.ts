@@ -18,22 +18,22 @@
  */
 
 
- import { Injectable } from '@angular/core';
- import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
- interface KeyboardEvent {
-   keyCode?: number,
-   shiftKey?: boolean,
-   currentTarget?
- }
+interface KeyboardEvent {
+  keyCode?: number,
+  shiftKey?: boolean,
+  currentTarget?
+}
 
- interface EventToCodes {
-   enter?: string,
-   tab?: string,
-   shiftTab?: string,
- }
+interface EventToCodes {
+  enter?: string,
+  tab?: string,
+  shiftTab?: string,
+}
 
- export const KEYBOARD_EVENT_TO_KEY_CODES = {
+export const KEYBOARD_EVENT_TO_KEY_CODES = {
   enter: {
     shiftKeyIsPressed: false,
     keyCode: 13
@@ -52,58 +52,58 @@
   providedIn: 'root'
 })
 
- export class NavigationService {
+export class NavigationService {
   activeMenuName: string;
   ACTION_OPEN = 'open';
   ACTION_CLOSE = 'close';
-   constructor() {}
+  constructor() {}
 
-    /**
-    * Opens the submenu.
-    * @param {object} evt
-    * @param {String} menuName - name of menu, on which
-    * open/close action to be performed (category,language).
-    */
-    openSubmenu(evt: KeyboardEvent, menuName: string): void {
-      // Focus on the current target before opening its submenu.
-      this.activeMenuName = menuName;
-    }
+  /**
+  * Opens the submenu.
+  * @param {object} evt
+  * @param {String} menuName - name of menu, on which
+  * open/close action to be performed (category,language).
+  */
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {
+    // Focus on the current target before opening its submenu.
+    this.activeMenuName = menuName;
+  }
 
-    closeSubmenu(evt: KeyboardEvent): void {
-      this.activeMenuName = '';
-    }
-    /**
-     * Handles keydown events on menus.
-     * @param {object} evt
-     * @param {String} menuName - name of menu to perform action
-     * on(category/language)
-     * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
-     * corresponding actions to be performed(open/close).
-     *
-     * @example
-     *  onMenuKeypress($event, 'category', {enter: 'open'})
-     */
-    onMenuKeypress(
-        evt: KeyboardEvent,
-        menuName: string,
-        eventsTobeHandled: EventToCodes): void {
-      let targetEvents = Object.keys(eventsTobeHandled);
-      for (let i = 0; i < targetEvents.length; i++) {
-        let keyCodeSpec =
-          KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
-        if (keyCodeSpec.keyCode === evt.keyCode &&
-          evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-          if (eventsTobeHandled[targetEvents[i]] === this.ACTION_OPEN) {
-            this.openSubmenu(evt, menuName);
-          } else if (eventsTobeHandled[targetEvents[i]] ===
-            this.ACTION_CLOSE) {
-          } else {
-            throw new Error('Invalid action type.');
-          }
+  closeSubmenu(evt: KeyboardEvent): void {
+    this.activeMenuName = '';
+  }
+  /**
+   * Handles keydown events on menus.
+   * @param {object} evt
+   * @param {String} menuName - name of menu to perform action
+   * on(category/language)
+   * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
+   * corresponding actions to be performed(open/close).
+   *
+   * @example
+   *  onMenuKeypress($event, 'category', {enter: 'open'})
+   */
+  onMenuKeypress(
+    evt: KeyboardEvent,
+    menuName: string,
+    eventsTobeHandled: EventToCodes): void {
+    let targetEvents = Object.keys(eventsTobeHandled);
+    for (let i = 0; i < targetEvents.length; i++) {
+      let keyCodeSpec =
+        KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+      if (keyCodeSpec.keyCode === evt.keyCode &&
+        evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
+        if (eventsTobeHandled[targetEvents[i]] === this.ACTION_OPEN) {
+          this.openSubmenu(evt, menuName);
+        } else if (eventsTobeHandled[targetEvents[i]] ===
+          this.ACTION_CLOSE) {
+        } else {
+          throw new Error('Invalid action type.');
         }
       }
     }
   }
+}
 
-  angular.module('oppia').service('NavigationService',
-    downgradeInjectable(NavigationService));
+angular.module('oppia').service('NavigationService',
+  downgradeInjectable(NavigationService));

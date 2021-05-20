@@ -31,7 +31,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './search-results.component.html'
 })
 
-export class SearchResultsComponent implements OnInit, OnDestroy{
+export class SearchResultsComponent implements OnInit, OnDestroy {
   someResultsExist: boolean;
   userIsLoggedIn: boolean;
   directiveSubscriptions: Subscription = new Subscription();
@@ -42,19 +42,19 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
     private userService: UserService,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
-  ){}
+  ) {}
 
-  getStaticImageUrl(imagePath): string {
+  getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  };
+  }
 
-  onRedirectToLogin(destinationUrl): boolean {
+  onRedirectToLogin(destinationUrl: Location): boolean {
     this.siteAnalyticsService.registerStartLoginEvent('noSearchResults');
     setTimeout(() => {
       this.windowRef.nativeWindow.location = destinationUrl;
     }, 150);
     return false;
-  };
+  }
 
   ngOnInit(): void {
     this.someResultsExist = false;
@@ -64,8 +64,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
 
-  // Called when the first batch of search results is retrieved from
-  // the server.
+    // Called when the first batch of search results is retrieved from
+    // the server.
     this.directiveSubscriptions.add(
       this.searchService.onInitialSearchResultsLoaded.subscribe(
         (activityList) => {
@@ -76,11 +76,11 @@ export class SearchResultsComponent implements OnInit, OnDestroy{
           });
         })
     );
-  };
+  }
 
-  ngOnDestroy = function() {
+  ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-  };
+  }
 }
 
 angular.module('oppia').directive(

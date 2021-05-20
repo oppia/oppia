@@ -23,10 +23,11 @@
 </div>
 
 <div class="oppia-same-row-container">
-  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
-    <button (click)="openSubmenu($event, 'category')"
+  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector dropdown">
+    <button ngbDropdownToggle
+            data-toggle = "dropdown"
+            (click)="openSubmenu($event, 'category')"
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-            ngbDropdownToggle
             type="button"
             class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{selectionDetails.categories.description | translate}}">
@@ -34,12 +35,12 @@
     </button>
     <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul ngbDropdownMenu
-        class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section"
-        role="menu" 
+        class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+        role="menu"
         (click)="$event.stopPropagation()">
-      <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
-        <li *ngIf="selectionDetails.categories.selections[item.id]">
-          <a ngbDropdownItem (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
+        <ng-container *ngFor="let item of selectionDetails.categories.masterList; trackBy: index">
+        <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
+          <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="protractor-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
           </a>
@@ -78,16 +79,21 @@
     </ul>
   </div>
 </div>
-<div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : [enableDropup]}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector">
-  <button (click)="openSubmenu($event, 'language')"
+<div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown">
+
+  <button ngbDropdownToggle
+          (click)="openSubmenu($event, 'language')"
+          data-toggle="dropdown"
           (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-          ngbDropdownToggle type="button"
+          type="button"
           class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
           title="{{selectionDetails.languageCodes.description | translate}}">
     {{languageButtonText|truncate:14}}
   </button>
   <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-  <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section" role="menu" (click)="$event.stopPropagation()">
+  <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+      role="menu"
+      (click)="$event.stopPropagation()">
     <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList; trackBy: index">
       <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
         <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">

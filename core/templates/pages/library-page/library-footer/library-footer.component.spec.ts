@@ -67,10 +67,10 @@ describe('Library Footer Component', () => {
   });
 
   it('should show library footer when not searching for explorations', () => {
-      windowRef.nativeWindow.location.pathname = '/community-library';
-      component.ngOnInit();
-      expect(component.footerIsDisplayed).toBe(true);
-    });
+    windowRef.nativeWindow.location.pathname = '/community-library';
+    component.ngOnInit();
+    expect(component.footerIsDisplayed).toBe(true);
+  });
 
   it('should hide library footer when searching for explorations', () => {
     windowRef.nativeWindow.location.pathname = '/search/find';

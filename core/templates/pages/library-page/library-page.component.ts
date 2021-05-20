@@ -33,7 +33,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SearchService } from 'services/search.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service'
+import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 

@@ -26,15 +26,14 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 
-export class OppiaFooterComponent implements OnInit{
-  siteFeedbackFormUrl: string
+export class OppiaFooterComponent implements OnInit {
+  siteFeedbackFormUrl: string;
   constructor() {}
 
   ngOnInit(): void {
-  this.siteFeedbackFormUrl = constants.SITE_FEEDBACK_FORM_URL;
+    this.siteFeedbackFormUrl = constants.SITE_FEEDBACK_FORM_URL;
   }
 }
 
 angular.module('oppia').directive(
   'oppiaFooter', downgradeComponent({component: OppiaFooterComponent}));
-

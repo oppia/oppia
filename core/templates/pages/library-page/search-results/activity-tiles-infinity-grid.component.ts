@@ -41,7 +41,7 @@ export class ActivityTilesInfinityGridComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
   ) {}
 
-  showMoreActivities() {
+  showMoreActivities(): void {
     if (!this.loadingMessage && !this.endOfPageIsReached) {
       this.searchResultsAreLoading = true;
       this.searchService.loadMoreData((data, endOfPageIsReached) => {
@@ -55,7 +55,7 @@ export class ActivityTilesInfinityGridComponent implements OnInit, OnDestroy {
         this.searchResultsAreLoading = false;
       });
     }
-  };
+  }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
@@ -82,12 +82,13 @@ export class ActivityTilesInfinityGridComponent implements OnInit, OnDestroy {
           this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
       })
     );
-  };
+  }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-  };
+  }
 }
 
 angular.module('oppia').directive(
-  'activityTilesInfinityGrid', downgradeComponent({component: ActivityTilesInfinityGridComponent }));
+  'activityTilesInfinityGrid', downgradeComponent(
+    {component: ActivityTilesInfinityGridComponent }));

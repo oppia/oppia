@@ -15,15 +15,16 @@
 /**
  * @fileoverview Directive for the library footer.
  */
- import { Component, OnInit } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- import { LibraryPageConstants } from 'pages/library-page/library-page.constants';
- import { WindowRef } from 'services/contextual/window-ref.service';
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { LibraryPageConstants } from 'pages/library-page/library-page.constants';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
- @Component({
+@Component({
   selector: 'library-footer',
   templateUrl: './library-footer.component.html'
 })
+
 export class LibraryFooterComponent implements OnInit {
   footerIsDisplayed: boolean;
   constructor(
