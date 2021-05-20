@@ -1,10 +1,19 @@
+<ng-template #popContent>
+  <div class="oppia-answer-popup-container">
+    <div class="oppia-answer-popup">
+      <angular-html-bind-wrapper [htmlData]="getAnswerHtml()">
+      </angular-html-bind-wrapper>
+    </div>
+  </div>
+</ng-template>
+
 <div class="conversation-skin-learner-answer-container">
-  <img class="conversation-skin-user-avatar rounded-circle" [src]="profilePicture()" alt="">
+  <img class="conversation-skin-user-avatar rounded-circle" [src]="trustedProfilePicture" alt="">
   <div *ngIf="!data.isHint">
     <div *ngIf="getShortAnswerHtml()"
-         >
-         <!-- popover-placement="bottom" uib-popover-template="'<[getAnswerPopoverUrl()]>'"
-         popover-trigger="click" class="oppia-popover"> -->
+         [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
+         class="oppoa-popover" #popover="ngbPopover" [autoClose]="false"></div>
+
       <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getShortAnswerHtml()">
       </angular-html-bind-wrapper>
@@ -28,7 +37,7 @@
      target="_blank"
      rel="noopener">
     <img class="conversation-skin-oppia-avatar rounded-circle"
-         [src]="oppiaAvatarImageUrl()" alt="">
+         [src]="oppiaAvatarImageUrl" alt="">
   </a>
   <div *ngIf="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"
        class="protractor-test-input-response-loading-dots">
@@ -82,5 +91,9 @@
 
   .oppia-popover {
     cursor: pointer;
+  }
+  .oppia-answer-popup-container .oppia-answer-popup {
+    max-height: 300px;
+    overflow-y: scroll;
   }
 </style>
