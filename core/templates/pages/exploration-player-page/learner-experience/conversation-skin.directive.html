@@ -43,10 +43,10 @@
                   start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           displayed-card="displayedCard"
-                           is-learn-again-button="isLearnAgainButton()">
-        </supplemental-card>
+        <oppia-supplemental-card (click-continue-button)="showUpcomingCard()"
+                                 [displayed-card]="displayedCard"
+                                 [is-learn-again-button]="isLearnAgainButton()">
+        </oppia-supplemental-card>
       </div>
       <div ng-if="getCanAskLearnerForAnswerInfo()">
         <oppia-learner-answer-info-card (submit-answer)="submitAnswer($event.currentAnswer, $event.rulesService)">
@@ -79,10 +79,10 @@
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <div class="supplemental-card-parent-container">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           displayed-card="displayedCard"
-                           is-learn-again-button="isLearnAgainButton()">
-        </supplemental-card>
+        <oppia-supplemental-card (click-continue-button)="showUpcomingCard()"
+                                 [displayed-card]="displayedCard"
+                                 [is-learn-again-button]="isLearnAgainButton()">
+        </oppia-supplemental-card>
         <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                      ng-click="submitAnswerFromProgressNav()"

@@ -61,6 +61,7 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
+    SupplementalCardComponent,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -70,7 +71,8 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
+    LearnerAnswerInfoCard,
+    SupplementalCardComponent,
   ],
   providers: [
     {
@@ -93,6 +95,7 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { SupplementalCardComponent } from './learner-experience/supplemental-card.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

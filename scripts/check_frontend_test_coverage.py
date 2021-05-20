@@ -314,7 +314,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'suggestion-modal-for-exploration-editor.service.ts',
     'summarize-nonnegative-number.pipe.ts',
     'summary-list-header.component.ts',
-    'supplemental-card.directive.ts',
+    'supplemental-card.component.ts',
     'svm-prediction.service.ts',
     'teacher.ts',
     'teacher2.ts',
