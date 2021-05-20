@@ -19,16 +19,21 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 // Modules.
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { AngularFireModule } from '@angular/fire';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
+import { DirectivesModule } from 'directives/directives.module';
+import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { FormsModule } from '@angular/forms';
+import { MaterialModule } from './material.module';
 import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { FormsModule } from '@angular/forms';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { MaterialModule } from './material.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { ToastrModule } from 'ngx-toastr';
 
 
 // Components.
@@ -69,6 +74,9 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
+import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
+import { BaseContentComponent } from '../base-components/base-content.component';
 
 
 // Directives.
@@ -90,29 +98,9 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
-// TODO(#11462): Delete these conditional values once firebase auth is launched.
-const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireModule.initializeApp(AuthService.firebaseConfig),
-  AngularFireAuthModule,
-] : [];
-
-const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireAuth,
-  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
-] : [
-  {provide: AngularFireAuth, useValue: null},
-];
-
 import { HammerGestureConfig } from '@angular/platform-browser';
 import * as hammer from 'hammerjs';
-import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
-import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
-import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
-import { DirectivesModule } from 'directives/directives.module';
-import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { ToastrModule } from 'ngx-toastr';
-import { ObjectComponentsModule } from 'objects/object-components.module';
-import { BaseContentComponent } from '../base-components/base-content.component';
+
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = {
@@ -159,11 +147,13 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
-    ...firebaseAuthModules,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
   ],
 
   providers: [
-    ...firebaseAuthProviders,
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
