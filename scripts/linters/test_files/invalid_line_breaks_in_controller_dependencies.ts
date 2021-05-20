@@ -55,9 +55,6 @@ angular.module('oppia').directive('baseContent', [
           var ctrl = this;
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
-          ctrl.toggleSideBar = () => {
-            SidebarStatusService.toggleSideBar();
-          };
           ctrl.isBackgroundMaskActive = () => (
             BackgroundMaskService.isMaskActive());
           ctrl.skipToMainContent = function() {

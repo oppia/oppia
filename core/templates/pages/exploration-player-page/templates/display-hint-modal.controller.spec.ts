@@ -57,13 +57,6 @@ describe('Display Hint Modal Controller', function() {
 
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgZone', function() {
-      this.runOutsideAngular = function(callback) {
-        callback();
-      };
-    });
-  }));
 
   beforeEach(function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
