@@ -42,10 +42,12 @@ angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
           const interactionchoicesd = HtmlEscaperService.escapedJsonToObj(
             $attrs.interactionchoicesd);
           var answerResponse = [];
-          for (let [key] of answer) {
-            for (let elem of interactionchoicesd) {
-              if (key === elem._contentId) {
-                answerResponse.push(elem._html);
+          for (let ans of answer) {
+            for (let value of ans) {
+              for (let elem of interactionchoicesd) {
+                if (value === elem._contentId) {
+                  answerResponse.push(elem._html);
+                }
               }
             }
           }
