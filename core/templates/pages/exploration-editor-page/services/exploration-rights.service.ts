@@ -135,14 +135,14 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
-      saveVoiceArtist: function(newVoiceartistUsername) {
+      saveVoiceArtist: function(newVoiceArtistUsername) {
         var that = this;
         var requestUrl = (
-          '/voiceartist_management_handler/' + 'exploration/' +
+          '/voice_artist_management_handler/' + 'exploration/' +
           ExplorationDataService.explorationId);
 
         return $http.post(requestUrl, {
-          username: newVoiceartistUsername}).then((response) => {
+          username: newVoiceArtistUsername}).then((response) => {
           var data = response.data;
           AlertsService.clearWarnings();
           that.init(
@@ -155,7 +155,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
       removeVoiceArtistRoleAsync: function(voiceArtistUsername) {
         var that = this;
         var requestUrl = (
-          '/voiceartist_management_handler/' + 'exploration/' +
+          '/voice_artist_management_handler/' + 'exploration/' +
           ExplorationDataService.explorationId);
         return $http['delete'](requestUrl, {
           params: {

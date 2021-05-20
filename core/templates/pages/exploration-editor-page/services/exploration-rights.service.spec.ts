@@ -239,12 +239,12 @@ describe('Exploration rights service', function() {
       sampleDataResultsCopy.rights.viewer_names);
   });
 
-  it('should save a new voiceartist', function() {
+  it('should save a new voice artist', function() {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.voice_artist_names.push('newUser');
 
     $httpBackend.expect(
-      'POST', '/voiceartist_management_handler/exploration/12345').respond(
+      'POST', '/voice_artist_management_handler/exploration/12345').respond(
       200, sampleDataResultsCopy);
     ers.saveVoiceArtist('newUser').then(function() {
       expect(ers.voiceArtistNames).toEqual(
@@ -253,7 +253,7 @@ describe('Exploration rights service', function() {
     $httpBackend.flush();
   });
 
-  it('should remove existing voiceartist', function() {
+  it('should remove existing voice artist', function() {
     var sampleDataResultsCopy = angular.copy(sampleDataResults);
     sampleDataResultsCopy.rights.voice_artist_names.push('newUser');
 
@@ -261,7 +261,7 @@ describe('Exploration rights service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expectDELETE(
-      '/voiceartist_management_handler/exploration/12345?voice_artist=newUser')
+      '/voice_artist_management_handler/exploration/12345?voice_artist=newUser')
       .respond(200, sampleDataResultsCopy);
 
     ers.removeVoiceArtistRoleAsync('newUser').then(successHandler, failHandler);

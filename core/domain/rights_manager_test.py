@@ -940,7 +940,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.is_owner(self.user_id_b))
         self.assertFalse(collection_rights.is_editor(self.user_id_b))
 
-    def test_voiceartist_can_be_reassigned_as_owner(self):
+    def test_voice_artist_can_be_reassigned_as_owner(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)
@@ -1000,7 +1000,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.is_editor(self.user_id_b))
         self.assertFalse(collection_rights.is_viewer(self.user_id_b))
 
-    def test_voiceartist_can_be_reassigned_as_editor(self):
+    def test_voice_artist_can_be_reassigned_as_editor(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)
@@ -1020,7 +1020,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.is_editor(self.user_id_b))
         self.assertFalse(collection_rights.is_voice_artist(self.user_id_b))
 
-    def test_viewer_can_be_reassigned_as_voiceartist(self):
+    def test_viewer_can_be_reassigned_as_voice_artist(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)

@@ -368,7 +368,7 @@
         </div>
         <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.rolesCardIsShown">
           <div>
-            <div ng-show="!$ctrl.isVoiceoverFormOpen" class="oppia-no-voiceartist-message" ng-if="!$ctrl.ExplorationRightsService.voiceArtistNames.length">
+            <div ng-show="!$ctrl.isVoiceoverFormOpen" class="oppia-no-voice-artist-message" ng-if="!$ctrl.ExplorationRightsService.voiceArtistNames.length">
               No voice artists are assigned to this exploration.
             </div>
             <div ng-if="$ctrl.canAssignVoiceArtist" ng-hide="$ctrl.isVoiceoverFormOpen" class="oppia-edit-roles-btn-container">
@@ -392,10 +392,10 @@
 
           <div ng-if="$ctrl.canAssignVoiceArtist" ng-show="$ctrl.isVoiceoverFormOpen">
             <div class="form-group">
-              <form ng-submit="$ctrl.editVoiseArtist($ctrl.newVoiceartistUsername)">
+              <form ng-submit="$ctrl.editVoiseArtist($ctrl.newVoicAartistUsername)">
                 <div class="nik">
                   <label>Username: </label>
-                  <input id="$ctrl.newVoiceartistUsername" class="form-control" ng-model="$ctrl.newVoiceartistUsername" placeholder="username" type="text">
+                  <input id="$ctrl.newVoicAartistUsername" class="form-control" ng-model="$ctrl.newVoicAartistUsername" placeholder="username" type="text">
                 </div>
                 <div>
                   <span class="form-text">
@@ -734,7 +734,7 @@
   .oppia-user-list-item:hover {
     background-color: rgba(189, 189, 189, 0.678);
   }
-  .oppia-no-voiceartist-message {
+  .oppia-no-voice-artist-message {
     float: left;
   }
 </style>

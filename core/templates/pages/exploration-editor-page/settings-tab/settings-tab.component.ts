@@ -298,7 +298,7 @@ angular.module('oppia').component('settingsTab', {
 
       ctrl.openVoiceoverRolesForm = () => {
         ctrl.isVoiceoverFormOpen = true;
-        ctrl.newVoiceartistUsername = '';
+        ctrl.newVoiceArtistUsername = '';
       };
 
       ctrl.closeEditRolesForm = function() {
@@ -308,7 +308,7 @@ angular.module('oppia').component('settingsTab', {
       };
 
       ctrl.closeVoiceoverForm = () => {
-        ctrl.newVoiceartistUsername = '';
+        ctrl.newVoiceArtistUsername = '';
         ctrl.isVoiceoverFormOpen = false;
       };
 
@@ -349,8 +349,8 @@ angular.module('oppia').component('settingsTab', {
         });
       };
 
-      ctrl.editVoiseArtist = function(newVoiceartistUsername) {
-        ExplorationRightsService.saveVoiceArtist(newVoiceartistUsername);
+      ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
+        ExplorationRightsService.saveVoiceArtist(newVoiceArtistUsername);
         ctrl.closeVoiceoverForm();
         return;
       };

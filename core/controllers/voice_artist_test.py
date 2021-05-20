@@ -304,7 +304,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
             expected_status_int=200)
 
 
-class VoiceartistManagementTests(test_utils.GenericTestBase):
+class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     published_exp_id_1 = 'exp_1'
     published_exp_id_2 = 'exp_2'
@@ -313,7 +313,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(VoiceartistManagementTests, self).setUp()
+        super(VoiceArtistManagementTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
@@ -337,14 +337,14 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         user_services.update_user_role(
             self.voiceover_admin_id, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
-    def test_owner_cannot_assign_voiceartist(self):
+    def test_owner_cannot_assign_voice_artist(self):
         self.login(self.OWNER_EMAIL)
         params = {
             'username': self.VOICE_ARTIST_USERNAME
         }
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params,
             csrf_token=csrf_token, expected_status_int=401)
         self.logout()
@@ -356,7 +356,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params, csrf_token=csrf_token)
         self.logout()
 
@@ -367,10 +367,10 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params, csrf_token=csrf_token)
         self.delete_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params={
                 'voice_artist': self.VOICE_ARTIST_USERNAME})
         self.logout()
@@ -382,7 +382,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/voiceartist_management_handler/incorrect_activity/%s'
+            '/voice_artist_management_handler/incorrect_activity/%s'
             % self.published_exp_id_1, params,
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
@@ -396,7 +396,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params,
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
@@ -410,10 +410,10 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params, csrf_token=csrf_token)
         response = self.delete_json(
-            '/voiceartist_management_handler/incorrect_activity/%s'
+            '/voice_artist_management_handler/incorrect_activity/%s'
             % self.published_exp_id_1, params={
                 'voice_artist': self.VOICE_ARTIST_USERNAME},
             expected_status_int=400)
@@ -428,10 +428,10 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
         }
         csrf_token = self.get_new_csrf_token()
         self.post_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params, csrf_token=csrf_token)
         response = self.delete_json(
-            '/voiceartist_management_handler/exploration/%s'
+            '/voice_artist_management_handler/exploration/%s'
             % self.published_exp_id_1, params={
                 'voice_artist': 'random_user'}, expected_status_int=400)
         self.assertEqual(

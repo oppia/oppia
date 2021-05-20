@@ -405,7 +405,7 @@ describe('Settings Tab Component', () => {
       expect($uibModal.open).toHaveBeenCalled();
     });
 
-    it('should remove voiceartist when resolving remove-role-modal', () => {
+    it('should remove voice artist when resolving remove-role-modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('username', 'voice artist')
       });
@@ -420,7 +420,7 @@ describe('Settings Tab Component', () => {
         .toHaveBeenCalledWith('username');
     });
 
-    it('should not remove voiceartist when rejecting remove-role-modal', () => {
+    it('should not remove voice artist when rejecting remove-role-modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -662,13 +662,13 @@ describe('Settings Tab Component', () => {
       expect(ctrl.newMemberRole.value).toBe('owner');
     });
 
-    it('should open voiceartist edit roles form and edit username', () => {
+    it('should open voice artist edit roles form and edit username', () => {
       ctrl.openVoiceoverRolesForm();
       explorationRightsService.init(
         ['owner'], [], [], [], '', false, false, true);
 
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
-      expect(ctrl.newVoiceartistUsername).toBe('');
+      expect(ctrl.newVoiceArtistUsername).toBe('');
 
       spyOn(explorationRightsService, 'saveVoiceArtist');
       ctrl.editVoiseArtist('Username1');
@@ -678,16 +678,16 @@ describe('Settings Tab Component', () => {
       expect(ctrl.isVoiceoverFormOpen).toBe(false);
     });
 
-    it('should open voiceartist edit roles form and close it', () => {
+    it('should open voice artist edit roles form and close it', () => {
       ctrl.openVoiceoverRolesForm();
 
       expect(ctrl.isVoiceoverFormOpen).toBe(true);
-      expect(ctrl.newVoiceartistUsername).toBe('');
+      expect(ctrl.newVoiceArtistUsername).toBe('');
 
       ctrl.closeVoiceoverForm();
 
       expect(ctrl.isVoiceoverFormOpen).toBe(false);
-      expect(ctrl.newVoiceartistUsername).toBe('');
+      expect(ctrl.newVoiceArtistUsername).toBe('');
     });
 
     it('should evaluate when parameters are enabled', () => {

@@ -1155,7 +1155,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class VoiceartistManagementTests(test_utils.GenericTestBase):
+class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     role = rights_domain.ROLE_VOICE_ARTIST
     username = 'user'
@@ -1177,7 +1177,7 @@ class VoiceartistManagementTests(test_utils.GenericTestBase):
                 'entity_id': entity_id})
 
     def setUp(self):
-        super(VoiceartistManagementTests, self).setUp()
+        super(VoiceArtistManagementTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
