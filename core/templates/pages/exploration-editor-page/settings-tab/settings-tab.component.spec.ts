@@ -420,19 +420,20 @@ describe('Settings Tab Component', () => {
         .toHaveBeenCalledWith('username');
     });
 
-    it('should not remove voice artist when rejecting remove-role-modal', () => {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
+    it('should not remove voice artist when rejecting remove-role-modal',
+      () => {
+        spyOn($uibModal, 'open').and.returnValue({
+          result: $q.reject()
+        });
+        spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
+
+        ctrl.removeVoiceArtist('username');
+        $scope.$apply();
+
+        expect(
+          explorationRightsService.removeVoiceArtistRoleAsync)
+          .not.toHaveBeenCalled();
       });
-      spyOn(explorationRightsService, 'removeVoiceArtistRoleAsync');
-
-      ctrl.removeVoiceArtist('username');
-      $scope.$apply();
-
-      expect(
-        explorationRightsService.removeVoiceArtistRoleAsync)
-        .not.toHaveBeenCalled();
-    });
 
     it('should open a modal when reassignRole is called', () => {
       spyOn($uibModal, 'open').and.callThrough();
