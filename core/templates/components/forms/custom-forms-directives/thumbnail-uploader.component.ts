@@ -23,8 +23,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
@@ -70,8 +70,8 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private ngbModal: NgbModal,
-    private csrfTokenService: CsrfTokenService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
   placeholderImageDataUrl = (
     this.urlInterpolationService.getStaticImageUrl(
@@ -145,47 +145,17 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   }
 
   postImageToServer(resampledFile: Blob, callback: () => void): void {
-    let form = new FormData();
-    form.append('image', resampledFile);
-    form.append('payload', JSON.stringify({
-      filename: this.tempImageName,
-      filename_prefix: 'thumbnail'
-    }));
-    var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-      '<entity_type>/<entity_id>';
-    this.csrfTokenService.getTokenAsync().then((token) => {
-      form.append('csrf_token', token);
-      $.ajax({
-        url: this.urlInterpolationService.interpolateUrl(
-          imageUploadUrlTemplate, {
-            entity_type: this.contextService.getEntityType(),
-            entity_id: this.contextService.getEntityId()
-          }
-        ),
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        dataFilter: (data) => {
-          // Remove the XSSI prefix.
-          var transformedData = data.substring(5);
-          return JSON.parse(transformedData);
-        },
-        dataType: 'text'
-      }).done((data) => {
-        this.editableThumbnailDataUrl = (
-          this.imageUploadHelperService
-            .getTrustedResourceUrlForThumbnailFilename(
-              data.filename, this.contextService.getEntityType(),
-              this.contextService.getEntityId()));
-        callback();
-      }).fail((data) => {
-        // Remove the XSSI prefix.
-        var transformedData = data.responseText.substring(5);
-        var parsedResponse = JSON.parse(transformedData);
-        this.alertsService.addWarning(
-          parsedResponse.error || 'Error communicating with server.');
-      });
+    let entityType = this.contextService.getEntityType();
+    let entityId = this.contextService.getEntityId();
+    const result = this.assetsBackendApiService.postThumbnailFile(
+      resampledFile, this.tempImageName, entityType, entityId).toPromise();
+    result.then((data) => {
+      this.editableThumbnailDataUrl = (
+        this.imageUploadHelperService
+          .getTrustedResourceUrlForThumbnailFilename(
+            data.filename, this.contextService.getEntityType(),
+            this.contextService.getEntityId()));
+      callback();
     });
   }
 
