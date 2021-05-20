@@ -46,6 +46,7 @@ import { DisplayHintModalComponent } from './modals/display-hint-modal.component
 import { DisplaySolutionInterstititalModalComponent } from './modals/display-solution-interstitial-modal.component';
 import { DisplaySolutionModalComponent } from './modals/display-solution-modal.component';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
+import { HintAndSolutionButtonsComponent } from 'components/button-directives/hint-and-solution-buttons.component';
 
 @NgModule({
   imports: [
@@ -72,6 +73,7 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     DisplaySolutionModalComponent,
     LearnerAnswerInfoCard,
     RefresherExplorationConfirmationModal,
+    HintAndSolutionButtonsComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -87,6 +89,7 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     DisplaySolutionInterstititalModalComponent,
     DisplaySolutionModalComponent,
     RefresherExplorationConfirmationModal,
+    HintAndSolutionButtonsComponent
   ],
   providers: [
     {
