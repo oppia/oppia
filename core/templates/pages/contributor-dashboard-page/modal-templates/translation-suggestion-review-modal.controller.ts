@@ -44,7 +44,7 @@ angular.module('oppia').controller(
       $scope.activeContribution = suggestionIdToContribution[
         $scope.activeSuggestionId];
       $scope.activeSuggestion = $scope.activeContribution.suggestion;
-      $scope.activeSuggestionDetails = $scope.activeContribution.details;
+      $scope.activeContributionDetails = $scope.activeContribution.details;
       $scope.subheading = subheading;
       $scope.startedEditing = false;
       $scope.translationUpdated = false;
@@ -160,14 +160,14 @@ angular.module('oppia').controller(
         [$scope.activeSuggestionId, $scope.activeContribution] = (
           remainingContributions.pop());
         $scope.activeSuggestion = $scope.activeContribution.suggestion;
-        $scope.activeSuggestionDetails = $scope.activeContribution.details;
+        $scope.activeContributionDetails = $scope.activeContribution.details;
         ContextService.setCustomEntityContext(
           IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
           $scope.activeSuggestion.target_id);
-        var details = $scope.activeSuggestionDetails;
         $scope.subheading = (
-          details.topic_name + ' / ' + details.story_title +
-          ' / ' + details.chapter_title);
+          $scope.activeContributionDetails.topic_name + ' / ' +
+          $scope.activeContributionDetails.story_title +
+          ' / ' + $scope.activeContributionDetails.chapter_title);
         $scope.init();
       };
 
