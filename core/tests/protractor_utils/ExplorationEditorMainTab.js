@@ -465,7 +465,6 @@ var ExplorationEditorMainTab = function() {
     await action.click('Outcome Destination Option', outcomeDestOption);
 
     if (createNewDest) {
-      await editOutcomeDestStateInput.sendKeys(destName);
       await action.sendKeys(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
     } else if (refresherExplorationId) {
