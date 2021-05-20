@@ -104,19 +104,6 @@ import { MyMissingTranslationHandler } from 'pages/missing-translations-handler'
 import constants from 'assets/constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-// TODO(#11462): Delete these conditional values once firebase auth is launched.
-const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireModule.initializeApp(AuthService.firebaseConfig),
-  AngularFireAuthModule,
-] : [];
-
-const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireAuth,
-  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
-] : [
-  {provide: AngularFireAuth, useValue: null},
-];
-
 const toastrConfig = {
   allowHtml: false,
   iconClasses: {
@@ -174,12 +161,14 @@ const toastrConfig = {
       cacheMechanism: 'Cookie',
       cookieExpiry: 1
     }),
-    ...firebaseAuthModules,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
   ],
 
   providers: [
     TranslateDefaultParser,
-    ...firebaseAuthProviders
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
   ],
 
   declarations: [
