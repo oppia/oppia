@@ -122,8 +122,7 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  // eslint-disable-next-line oppia/no-test-blockers
-  fit('should pass their own test suites', async function() {
+  it('should pass their own test suites', async function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration(true);
