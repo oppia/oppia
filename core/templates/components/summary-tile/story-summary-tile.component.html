@@ -31,12 +31,9 @@
       <a [href]="getStoryLink()" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storySummary.getTitle() }} </a>
     </strong>
     <span class="oppia-chapters-count">
-      {{nodeCount}}
-      <span *ngIf="nodeCount === 1"
-            [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-      </span>
-      <span *ngIf="nodeCount > 1"
-            [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate">
+      <span [innerHTMl]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate"
+            translate-values="{count: $ctrl.nodeCount}"
+            translate-interpolation="messageformat">
       </span>
     </span>
   </div>
@@ -52,15 +49,15 @@
     </div>
     <div class="chapter-details">
       <div class="chapter-title"
-           *ngFor="let title of storySummary.getNodeTitles();let index = index">
+           *ngFor="let title of storySummary.getNodeTitles();let idx = index">
         <div *ngIf="storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
           done
         </div>
-        <div [ngClass]="{'border-bottom': index < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(index), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
-             *ngIf="index < chaptersDisplayed">
+        <div [ngClass]="{'border-bottom': idx < chaptersDisplayed, 'pending-chapter': !storySummary.isNodeCompleted(title) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(title), 'complete-chapter': storySummary.isNodeCompleted(title)}"
+             *ngIf="idx < chaptersDisplayed">
           <a [href]="getChapterUrl(title)" rel="noopener" target="_blank">
             <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
-            </span>{{ index + 1 }}: {{ title }}
+            </span>{{ idx + 1 }}: {{ title }}
           </a>
         </div>
       </div>
