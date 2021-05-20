@@ -53,9 +53,6 @@ AUTH_HANDLER_PATHS = (
     '/csrfhandler',
     '/session_begin',
     '/session_end',
-    # TODO(#11462): Delete this handler once the Firebase migration logic is
-    # rollback-safe and all backup data is using post-migration data.
-    '/seed_firebase',
 )
 
 
@@ -89,23 +86,6 @@ class SessionEndHandler(webapp2.RequestHandler):
     def get(self):
         """Destroys an existing auth session."""
         auth_services.destroy_auth_session(self.response)
-
-
-class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob.
-
-    TODO(#11462): Delete this handler once the Firebase migration logic is
-    rollback-safe and all backup data is using post-migration data.
-    """
-
-    def get(self):
-        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
-        try:
-            auth_services.seed_firebase()
-        except Exception:
-            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
-        finally:
-            self.redirect('/')
 
 
 class UserFacingExceptions(python_utils.OBJECT):
