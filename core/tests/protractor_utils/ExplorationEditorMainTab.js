@@ -698,8 +698,8 @@ var ExplorationEditorMainTab = function() {
       feedbackBubble, 'Feedback bubble takes too long to be visible.');
     var feedbackEditor = await forms.RichTextEditor(
       feedbackBubble);
-     await feedbackEditor.clear();   
-     await richTextInstructions(feedbackEditor);
+    await feedbackEditor.clear();   
+    await richTextInstructions(feedbackEditor);
   };
 
   // ---- RULES ----
@@ -867,8 +867,8 @@ var ExplorationEditorMainTab = function() {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
-         await action.click('State Node: ' + i, stateNodes.get(i));
-         matched = true;
+        await action.click('State Node: ' + i, stateNodes.get(i));
+        matched = true;
         // Wait to re-load the entire state editor.
       }
     }
