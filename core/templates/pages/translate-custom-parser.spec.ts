@@ -58,6 +58,9 @@ describe('Translate Custom Parser', () => {
       'other{Please select # or more choices.}}', {
         minChoiceNumber: 1, messageFormat: true }))
       .toEqual('Please select one or more choices.');
+    let params = { text: 'text' };
+    expect(translateCustomParser.interpolate(`<[${params.text}]>`, params))
+      .toEqual(params.text);
   });
 
 
