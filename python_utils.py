@@ -60,6 +60,45 @@ UNICODE = builtins.str
 ZIP = builtins.zip
 
 
+def SimpleXMLRPCServer( # pylint: disable=invalid-name
+        addr, requestHandler=None, logRequests=True, allow_none=False,
+        encoding=None, bind_and_activate=True):
+    """Returns SimpleXMLRPCServer from SimpleXMLRPCServer module if run under
+    Python 2 and from xmlrpc module if run under Python 3.
+
+    Args:
+        addr: tuple(str, int). The host and port of the server.
+        requestHandler: callable. A factory for request handler instances.
+            Defaults to SimpleXMLRPCRequestHandler.
+        logRequests: bool. Whether to log the requests sent to the server.
+        allow_none: bool. Permits None in the XML-RPC responses that will be
+            returned from the server.
+        encoding: str|None. The encoding used by the XML-RPC responses that will
+            be returned from the server.
+        bind_and_activate: bool. Whether server_bind() and server_activate() are
+            called immediately by the constructor; defaults to true. Setting it
+            to false allows code to manipulate the allow_reuse_address class
+            variable before the address is bound.
+
+    Returns:
+        SimpleXMLRPCServer. The SimpleXMLRPCServer object.
+    """
+    try:
+        from xmlrpc.server import SimpleXMLRPCServer as impl # pylint: disable=import-only-modules
+    except ImportError:
+        from SimpleXMLRPCServer import SimpleXMLRPCServer as impl # pylint: disable=import-only-modules
+    if requestHandler is None:
+        try:
+            from xmlrpc.server import SimpleXMLRPCRequestHandler # pylint: disable=import-only-modules
+        except ImportError:
+            from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler # pylint: disable=import-only-modules
+        requestHandler = SimpleXMLRPCRequestHandler
+    return impl(
+        addr, requestHandler=requestHandler, logRequests=logRequests,
+        allow_none=allow_none, encoding=encoding,
+        bind_and_activate=bind_and_activate)
+
+
 def string_io(buffer_value=b''):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.

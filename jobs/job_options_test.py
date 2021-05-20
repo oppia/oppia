@@ -31,15 +31,14 @@ class JobOptionsTests(test_utils.TestBase):
     def test_default_values(self):
         options = job_options.JobOptions()
 
-        self.assertIsNone(options.model_getter)
+        self.assertIsNone(options.datastoreio)
 
     def test_overwritten_values(self):
-        model_io_stub = stub_io.ModelIoStub()
-        get_models = model_io_stub.get_models_ptransform
+        datastoreio_stub = stub_io.DatastoreioStub()
 
-        options = job_options.JobOptions(model_getter=get_models)
+        options = job_options.JobOptions(datastoreio=datastoreio_stub)
 
-        self.assertIs(options.model_getter, get_models)
+        self.assertIs(options.datastoreio, datastoreio_stub)
 
     def test_unsupported_values(self):
         self.assertRaisesRegexp(

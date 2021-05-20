@@ -19,9 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import types
+
 import feconf
 
-import apache_beam as beam
 from apache_beam.options import pipeline_options
 
 
@@ -29,10 +30,9 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
-        'model_getter': (
-            beam.PTransform,
-            'The type of PTransform the pipeline should use to fetch models '
-            'from the datastore.'),
+        'datastoreio': (
+            lambda obj: isinstance(obj, (types.InstanceType, types.ModuleType)), # pylint: disable=deprecated-types-field
+            'Source of datastore operations for the pipeline to depend upon'),
     }
 
     def __init__(self, flags=None, **job_options):
