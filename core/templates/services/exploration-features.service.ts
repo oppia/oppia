@@ -22,23 +22,12 @@ import { Injectable } from '@angular/core';
 
 import { ExplorationFeatures } from
   'services/exploration-features-backend-api.service';
+import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 export interface ExplorationDataDict {
-  'param_changes': ParamChanges[] | [];
-  states: {
-    [propsName: string]: {
-      'param_changes': ParamChanges[] | []
-    }
-  };
-}
-
-export interface ParamChanges {
-  name: string;
-  'generator_id': string;
-  'customization_args': {
-    'parse_with_jinja': boolean,
-    value: string
-  };
+  'param_changes': ParamChangeBackendDict[] | [];
+  states: StateObjectsBackendDict;
 }
 
 @Injectable({
