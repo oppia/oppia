@@ -180,6 +180,17 @@ class JobTestBase(PipelinedTestBase):
         """
         return self.JOB_CLASS(self.pipeline).run()
 
+    def put_multi(self, models):
+        """Puts the input models into the datastore.
+
+        Since the datastore is stubbed during unit tests, no actual models are
+        created.
+
+        Args:
+            models: list(Model). The NDB models to put into the stub.
+        """
+        self.datastoreio_stub.put_multi(models)
+
     def assert_job_output_is(self, expected):
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
 
