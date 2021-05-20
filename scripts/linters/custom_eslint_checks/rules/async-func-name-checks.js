@@ -20,45 +20,41 @@
 'use strict';
 
 module.exports = {
-    meta: {
-      type: 'layout',
-      docs: {
-        description: 'There should be "Async" suffix at the end of asynchronous function names',
-        category: 'Stylistic Issues',
-        recommended: true
-      },
-      schema: [],
+  meta: {
+    type: 'layout',
+    docs: {
+      description: 'There should be "Async" suffix at' +
+        'the end of asynchronous function names',
+      category: 'Stylistic Issues',
+      recommended: true
     },
-
-   create: function(context) {
-
+    schema: [],
+  },
+  create: function(context) {
     var nodeRequireParent = ['FunctionExpression', 'ArrowFunctionExpression'];
     var parentToName = {
-        MethodDefinition: 'key',
-        Property: 'key',
-        VariableDeclarator: 'id',
-    }
+      MethodDefinition: 'key',
+      Property: 'key',
+      VariableDeclarator: 'id',
+    };
     var checkForAsyncSuffix = (node) => {
-        var name =  null;
-        if (nodeRequireParent.includes(node.type) && node.parent) {
-            node = node.parent[parentToName[node.parent.type]]
-            name = node.name;
-        
-        } else {
-            name =  node.id.name;
-            node = node.id;
-        }
-        if(!name.endsWith('Async')) {
-            context.report({
-            node: node,
-            message: 'Please use "Async" suffix for asynchronous function name.'
-            })
-        }
-        
+      var name = null;
+      if (nodeRequireParent.includes(node.type) && node.parent) {
+        node = node.parent[parentToName[node.parent.type]];
+        name = node.name;
+      } else {
+        name = node.id.name;
+        node = node.id;
+      }
+      if (!name.endsWith('Async')) {
+        context.report({
+          node: node,
+          message: 'Please use "Async" suffix for asynchronous function name.'
+        });
+      }
     };
     return {
-        ':function[async=true]': checkForAsyncSuffix,
+      ':function[async=true]': checkForAsyncSuffix,
     };
-   }
+  }
 };
-      

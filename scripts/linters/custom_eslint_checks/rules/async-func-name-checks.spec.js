@@ -21,73 +21,85 @@
 let rule = require('./async-func-name-checks');
 let RuleTester = require('eslint').RuleTester;
 
-let ruleTester = new RuleTester();
+
+let ruleTester = new RuleTester({
+  parser: require.resolve('@typescript-eslint/parser')
+});
 ruleTester.run('async-func-name-checks', rule, {
   valid: [
-      {
-          code:
-          `async function fooAsync(): {
-          }`,
-      },
-      {
-          code:
-          `const funcAsync = async function() {
-          }`,
-      },
-      {
-          code:
-          `var funcAsync = async() => {
-          }`,
-      },
-      {
-          code:
-          `foo() {
-              async function fooAsync() {
-              }
-          }`,
-      },
+    {
+      code:
+      `class MyClass {
+        async getInitAsync(): Promise<void> {
+          return this.initPromise;
+        }
+      }`
+    },
+    {
+      code:
+      `const funcAsync = async function() {
+      }`,
+    },
+    {
+      code:
+      `var funcAsync = async() => {
+      }`,
+    },
+    {
+      code:
+      `export class SomeClass {
+        async getInitAsync(): Promise<void> {
+          async function fooAsync() {
+          }
+        }
+      }`,
+    },
   ],
 
   invalid: [
-      {
-        code:
-        `async function foo() {
-        }`,
-        errors: [{
-          message: 'Please use "Async" suffix for asynchronous function name.',
-          type: 'FunctionExpression'
-        }]
-      },
-      {
-        code:
-        `const bar = async() => {
-            let foo = () => {
-            }
-          }`,
-        errors: [{
-          message: 'Please use "Async" suffix for asynchronous function name.',
-          type: null
-        }]
-      },
-      {
-        code:
-        `const barAsync = async() => {
-            let foo = async() => {
-            }
-          }`,
-        errors: [{
-          message: 'Please use "Async" suffix for asynchronous function name.',
-          type: null
-        }]
-      },
-      {
-        code:
-        `async bar(): Promise<void> {
-          python -m scripts.run_custom_eslint_tests }`,
-        errors: [{
-          message: 'Please use "Async" suffix for asynchronous function name.',
-          type: 'FunctionExpression'
-        }]
-      }
+    {
+      code:
+      `class MyClass {
+        async getInit(): Promise<void> {
+          return this.initPromise;
+        }
+      }`,
+      errors: [{
+        message: 'Please use "Async" suffix for asynchronous function name.',
+        type: 'Identifier'
+      }]
+    },
+    {
+      code:
+      `const func = async function() {
+        return this.initPromise;
+      }`,
+      errors: [{
+        message: 'Please use "Async" suffix for asynchronous function name.',
+        type: 'Identifier'
+      }]
+    },
+    {
+      code:
+      `var foo = async() => {
+      return }`,
+      errors: [{
+        message: 'Please use "Async" suffix for asynchronous function name.',
+        type: 'Identifier'
+      }]
+    },
+    {
+      code:
+      `export class SomeClass {
+        async getInitAsync(): Promise<void> {
+          async function foo() {
+          }
+        }
+      }`,
+      errors: [{
+        message: 'Please use "Async" suffix for asynchronous function name.',
+        type: 'Identifier'
+      }]
+    }
   ]
 });
