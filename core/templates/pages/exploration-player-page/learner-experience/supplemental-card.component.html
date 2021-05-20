@@ -16,6 +16,7 @@
     <div>
       <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback"
                                  [htmlData]="helpCardHtml"
+                                 [parentScope]="this"
                                  [ngClass]="getFeedbackAudioHighlightClass()">
       </angular-html-bind-wrapper>
     </div>
@@ -33,6 +34,7 @@
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.directive.html-->
   <div class="conversation-skin-interaction-container">
     <angular-html-bind-wrapper class="protractor-test-conversation-input"
+                               [parentScope]="this"
                                [htmlData]="currentDisplayedCard.getInteractionHtml()">
     </angular-html-bind-wrapper>
   </div>

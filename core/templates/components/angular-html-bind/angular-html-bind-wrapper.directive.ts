@@ -24,7 +24,8 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        htmlData: '<'
+        htmlData: '<',
+        parentScope: '<'
       },
       template:
         '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
@@ -34,6 +35,11 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
         function($rootScope) {
           var ctrl = this;
           ctrl.$onInit = function() {
+            if (ctrl.parentScope) {
+              for (let key of Object.keys(ctrl.parentScope)) {
+                ctrl[key] = ctrl.parentScope[key];
+              }
+            }
             $rootScope.$applyAsync();
           };
         }
@@ -56,6 +62,7 @@ export const ScopeProvider = {
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
+  @Input() parentScope;
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
   }
