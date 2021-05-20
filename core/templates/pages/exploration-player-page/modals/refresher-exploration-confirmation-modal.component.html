@@ -1,17 +1,3 @@
-<style>
-  .oppia-learner-refresher-exploration-confirmation-body {
-    word-wrap: break-word;
-  }
-
-  .oppia-learner-refresher-exploration-confirmation-title {
-    color: #00786D;
-    font-family: 'Capriola', 'Roboto', 'Arial', 'sans-serif';
-    font-size: 1.25em;
-    font-weight: bold;
-    padding-top: 20px;
-    text-align: center;
-  }
-</style>
 <div class="oppia-learner-refresher-exploration-confirmation-title">Would you like a refresher?</div>
 
 <div class="modal-body">
@@ -23,10 +9,25 @@
 </div>
 <div class="modal-footer">
   <button class="oppia-learner-got-it-button protractor-test-cancel-redirection-button md-button md-default-theme "
-          ng-click="cancel()">No
+          (click)="cancel()">No
   </button>
   <button class="oppia-learner-got-it-button protractor-test-confirm-redirection-button md-button md-default-theme "
-          ng-click="confirmRedirect()">Yes
+          (click)="confirmRedirect()">Yes
   </button>
 </div>
 <span class="clearfix"></span>
+
+<style>
+  .oppia-learner-refresher-exploration-confirmation-body {
+    word-wrap: break-word;
+  }
+
+  .oppia-learner-refresher-exploration-confirmation-title {
+    color: #00786D;
+    font-family: 'Capriola', Roboto, arial, sans-serif;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
+  }
+</style>
