@@ -22,6 +22,7 @@ import MessageFormat from 'messageformat';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 export class TranslateCustomParser extends TranslateParser {
+  messageFormat: MessageFormat;
   constructor(
     private translateDefaultParser: TranslateDefaultParser,
     private i18nLanguageCodeService: I18nLanguageCodeService
@@ -33,6 +34,7 @@ export class TranslateCustomParser extends TranslateParser {
      * So, here templateMatcher is modified to look for <[ ]> instead.
      */
     this.translateDefaultParser.templateMatcher = /<\[\s?([^{}\s]*)\s?\]>/g;
+    this.messageFormat = new MessageFormat();
   }
 
   interpolate(
@@ -56,13 +58,12 @@ export class TranslateCustomParser extends TranslateParser {
      * So, here we first try with the primary language, if messageformat throws
      * an error, we try with the default language.
      */
-    let messageFormat = new MessageFormat();
     try {
-      interpolatedValue = messageFormat.compile(
+      interpolatedValue = this.messageFormat.compile(
         interpolatedValue, this.i18nLanguageCodeService
           .getCurrentI18nLanguageCode())(params);
     } catch (e) {
-      interpolatedValue = messageFormat.compile(
+      interpolatedValue = this.messageFormat.compile(
         interpolatedValue, constants.DEFAULT_LANGUAGE_CODE)(params);
     }
   }
