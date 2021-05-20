@@ -54,6 +54,14 @@ ruleTester.run('async-func-name-checks', rule, {
         }
       }`,
     },
+    {
+      code:
+      `myObj = {
+        functionAsync: async () => {
+          //something
+        } 
+      }`,
+    },
   ],
 
   invalid: [
@@ -100,6 +108,18 @@ ruleTester.run('async-func-name-checks', rule, {
         message: 'Please use "Async" suffix for asynchronous function name.',
         type: 'Identifier'
       }]
-    }
+    },
+    {
+      code:
+      `myObj = {
+        function: async () => {
+          //something
+        } 
+      }`,
+      errors: [{
+        message: 'Please use "Async" suffix for asynchronous function name.',
+        type: 'Identifier'
+      }]
+    },
   ]
 });
