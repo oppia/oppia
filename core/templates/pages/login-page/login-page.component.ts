@@ -41,10 +41,6 @@ export class LoginPageComponent implements OnInit {
       private loaderService: LoaderService, private userService: UserService,
       private windowRef: WindowRef) {}
 
-  get enabled(): boolean {
-    return AppConstants.ENABLE_LOGIN_PAGE;
-  }
-
   get emulatorModeIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
   }

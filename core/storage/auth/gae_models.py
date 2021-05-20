@@ -39,8 +39,6 @@ class UserAuthDetailsModel(base_models.BaseModel):
     # full users. None for profile users.
     gae_id = datastore_services.StringProperty(indexed=True)
     # Authentication identifier from the Firebase authentication server.
-    # TODO(#11462): This will exist for all users after the Firebase migration,
-    # so update this description once it has succeeded.
     firebase_auth_id = datastore_services.StringProperty(indexed=True)
     # For profile users, the user ID of the full user associated with them.
     # None for full users. Required for profiles because gae_id/firebase_auth_id

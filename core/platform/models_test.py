@@ -223,13 +223,6 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertNotIn(base_models.BaseSnapshotMetadataModel, classes)
         self.assertNotIn(base_models.BaseSnapshotContentModel, classes)
 
-    def test_import_current_user_services(self):
-        """Tests import current user services function."""
-        from core.platform.users import gae_current_user_services
-        self.assertEqual(
-            self.registry_instance.import_current_user_services(),
-            gae_current_user_services)
-
     def test_import_datastore_services(self):
         """Tests import datastore services function."""
         from core.platform.datastore import gae_datastore_services
