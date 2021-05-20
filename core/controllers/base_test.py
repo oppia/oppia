@@ -52,7 +52,6 @@ from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
-current_user_services = models.Registry.import_current_user_services()
 auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -678,16 +677,6 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(call_counter.times_called, 1)
 
-    def test_seed_firebase_handler_is_not_rejected(self):
-        call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'seed_firebase'))
-
-        response = (
-            self.get_html_response('/seed_firebase', expected_status_int=302))
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-
     def test_signup_fails(self):
         with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -869,37 +858,6 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
             self.get_html_response('/session_end', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
-
-
-class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
-    """Tests for /seed_firebase handler."""
-
-    def test_get(self):
-        swap = self.swap_with_call_counter(
-            firebase_auth_services, 'seed_firebase')
-
-        with swap as call_counter:
-            response = self.get_html_response(
-                '/seed_firebase', expected_status_int=302)
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-
-    def test_get_with_error(self):
-        swap = self.swap_with_call_counter(
-            firebase_auth_services, 'seed_firebase', raises=Exception())
-
-        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
-
-        with swap as call_counter, captured_logging_context as logs:
-            response = self.get_html_response(
-                '/seed_firebase', expected_status_int=302)
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-        self.assert_matches_regexps(logs, [
-            'Failed to prepare for SeedFirebaseOneOffJob'
-        ])
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
