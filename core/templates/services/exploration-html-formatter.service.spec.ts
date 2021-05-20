@@ -38,18 +38,18 @@ describe('Exploration Html Formatter Service', () => {
     ehfs = TestBed.get(ExplorationHtmlFormatterService);
   });
 
-  it('should correctly set interaction HTML for FractionsInput when it is in' +
-     ' editor mode', () => {
-    var interactionId = 'FractionsInput';
+  it('should correctly set interaction HTML for a non migrated interaction ' +
+     'when it is in editor mode', () => {
+    var interactionId = 'nonMigratedInteraction';
     let custArgs = {
       placeholder: {value: new SubtitledUnicode('enter here', '')},
       rows: {value: 1}
     };
-    var expectedHtmlTag = '<oppia-interactive-fractions-input ' +
+    var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
       'placeholder-with-value="{&amp;quot;unicode_str&amp;quot;:&amp;quot;' +
       'enter here&amp;quot;,&amp;quot;content_id&amp;quot;:&amp;quot;&amp;' +
       'quot;}" rows-with-value="1" last-answer="lastAnswer">' +
-      '</oppia-interactive-fractions-input>';
+      '</oppia-interactive-non-migrated-interaction>';
     expect(ehfs.getInteractionHtml(interactionId, custArgs, true, null, null))
       .toBe(expectedHtmlTag);
   });
@@ -89,11 +89,11 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML when it is in player mode',
     () => {
-      var interactionId = 'FractionsInput';
+      var interactionId = 'nonMigratedInteraction';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-fractions-input ' +
+      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
         'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
-        '</oppia-interactive-fractions-input>';
+        '</oppia-interactive-non-migrated-interaction>';
       expect(
         ehfs.getInteractionHtml(interactionId, {}, false, focusLabel, null)
       ).toBe(expectedHtmlTag);
@@ -101,12 +101,12 @@ describe('Exploration Html Formatter Service', () => {
 
   it('should correctly set interaction HTML when solution has been provided',
     () => {
-      var interactionId = 'FractionsInput';
+      var interactionId = 'nonMigratedInteraction';
       var focusLabel = 'sampleLabel';
-      var expectedHtmlTag = '<oppia-interactive-fractions-input ' +
+      var expectedHtmlTag = '<oppia-interactive-non-migrated-interaction ' +
         'saved-solution="solution" ' +
         'label-for-focus-target="' + focusLabel + '" last-answer="null">' +
-        '</oppia-interactive-fractions-input>';
+        '</oppia-interactive-non-migrated-interaction>';
       expect(
         ehfs.getInteractionHtml(
           interactionId, {}, false, focusLabel, 'solution')

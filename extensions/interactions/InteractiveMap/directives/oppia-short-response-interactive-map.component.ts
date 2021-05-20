@@ -30,7 +30,8 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 })
 export class ShortResponseInteractiveMapComponent implements OnInit {
   @Input() answer: string;
-  formattedCoords: string = '';
+  formattedCoords: string;
+
   constructor(private htmlEscaperService: HtmlEscaperService) { }
 
   ngOnInit(): void {

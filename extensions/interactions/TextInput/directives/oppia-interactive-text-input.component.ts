@@ -48,6 +48,7 @@ export class InteractiveTextInputComponent implements OnInit {
     };
   };
   rows: number;
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private currentInteractionService: CurrentInteractionService,

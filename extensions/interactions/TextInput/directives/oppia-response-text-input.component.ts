@@ -31,6 +31,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 export class ResponseTextInputComponent implements OnInit {
   @Input('answer') answerWithValue: string;
   answer: string;
+
   constructor(private htmlEscaperService: HtmlEscaperService) { }
 
   ngOnInit(): void {

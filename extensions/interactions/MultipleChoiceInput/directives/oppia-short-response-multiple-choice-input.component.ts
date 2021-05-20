@@ -39,15 +39,15 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
     private htmlEscaperService: HtmlEscaperService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private truncateAtFirstLine: TruncateAtFirstLinePipe
-  ) {
+  ) { }
+
+  ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
       this.answer) as string;
     const _choices = this.htmlEscaperService.escapedJsonToObj(this.choices);
     const response = this.convertToPlainText.transform(_choices[_answer]);
     this.response = this.truncateAtFirstLine.transform(response);
   }
-
-  ngOnInit(): void { }
 }
 
 angular.module('oppia').directive(

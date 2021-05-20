@@ -27,6 +27,7 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 export class ShortResponseLogicProofComponent implements OnInit {
   @Input('answer') answerWithValue: string;
   answer;
+
   constructor(private htmlEscaperService: HtmlEscaperService) { }
 
   ngOnInit(): void {
