@@ -37,16 +37,8 @@ describe('Admin Data Service', () => {
   let httpTestingController: HttpTestingController;
   var sampleAdminData = {
     unfinished_job_data: [],
-    role_graph_data: {
-      links: [
-        {
-          source: 'TOPIC_MANAGER',
-          target: 'MODERATOR'
-        }
-      ],
-      nodes: {
-        TOPIC_MANAGER: 'topic manager'
-      }
+    role_to_actions: {
+      guest: ['action for guest']
     },
     topic_summaries: [
       {
@@ -144,7 +136,7 @@ describe('Admin Data Service', () => {
         sampleAdminData.audit_job_status_summaries.map(
           JobStatusSummary.createFromBackendDict),
       updatableRoles: sampleAdminData.updatable_roles,
-      roleGraphData: sampleAdminData.role_graph_data,
+      roleToActions: sampleAdminData.role_to_actions,
       configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
       unfinishedJobData: sampleAdminData.unfinished_job_data.map(

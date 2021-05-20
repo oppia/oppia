@@ -53,9 +53,6 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
     activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
-    auth_jobs_one_off.AuditFirebaseImportReadinessOneOffJob,
-    auth_jobs_one_off.PopulateFirebaseAccountsOneOffJob,
-    auth_jobs_one_off.SeedFirebaseOneOffJob,
     auth_jobs_one_off.SyncFirebaseAccountsOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
@@ -152,6 +149,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
     user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
     user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
+    user_jobs_one_off.UserRolesPopulationOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
