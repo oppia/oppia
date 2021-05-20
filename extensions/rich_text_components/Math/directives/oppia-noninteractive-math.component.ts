@@ -77,8 +77,11 @@ export class NoninteractiveMath implements OnInit {
       this.imagePreloaderService.inExplorationPlayer() &&
       !(this.contextService.getEntityType() === AppConstants.ENTITY_TYPE.SKILL)
     ) {
-      this.imagePreloaderService.getImageUrl(mathExpressionContent.svg_filename)
-        .then(objectUrl => this.imageUrl = objectUrl);
+      this.imagePreloaderService.getImageUrlAsync(
+        mathExpressionContent.svg_filename
+      ).then(
+        objectUrl => this.imageUrl = objectUrl
+      );
     } else {
       // This is the case when user is not in the exploration player. We
       // don't pre-load the images in this case. So we directly assign

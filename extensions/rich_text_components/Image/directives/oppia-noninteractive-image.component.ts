@@ -133,7 +133,8 @@ export class NoninteractiveImage implements OnInit {
   loadImage(): void {
     this.isLoadingIndicatorShown = true;
     this.isTryAgainShown = false;
-    this.imagePreloaderService.getImageUrl(this.filepath).then(objectUrl => {
+    this.imagePreloaderService.getImageUrlAsync(
+      this.filepath).then(objectUrl => {
       this.isTryAgainShown = false;
       this.isLoadingIndicatorShown = false;
       this.imageUrl = objectUrl;

@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { ContextService } from 'services/context.service';
+import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
 
@@ -34,6 +35,7 @@ export class NoninteractiveSkillreview implements OnInit {
   skillId: string;
   linkText: string;
   constructor(
+    private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
     private ngbModal: NgbModal
@@ -45,23 +47,25 @@ export class NoninteractiveSkillreview implements OnInit {
     this.linkText = this.htmlEscaperService.escapedJsonToObj(
       this.textWithValue) as string;
   }
+  // The default onclick behaviour for an element inside CKEditor
+  // is to open the customize RTE modal. Since this RTE has a custom
+  // onclick listener attached, the default behaviour is to open the
+  // concept card modal. To correct this, check if the element is
+  // inside the context of a CKEditor instance. If so, prevent
+  // the opening of the concept card and allow the customize RTE
+  // modal to get triggered. If the element is not inside a CKEditor
+  // instance, then open the concept card modal. To determine if the
+  // RTE is inside a CKEditor instance, check if the offsetParent
+  // element contains the data attribute ckeWidgetId.
+  private _shouldOpenRTEModal(event): boolean {
+    return (
+      event.currentTarget.offsetParent.dataset.ckeWidgetId ||
+      this.ckEditorCopyContentService.copyModeActive
+    );
+  }
 
   openConceptCard(event: MouseEvent): void {
-    // The default onclick behavior for an element inside CKEditor
-    // is to open the customize RTE modal. Since this RTE has a custom
-    // onclick listener attached, the default behavior is to open the
-    // concept card modal. To correct this, check if the element is
-    // inside the context of a CKEditor instance. If so, prevent
-    // the opening of the concept card and allow the customize RTE
-    // modal to get triggered. If the element is not inside a CKEditor
-    // instance, then open the concept card modal. To determine if the
-    // RTE is inside a CKEditor instance, check if the offsetParent
-    // element contains the data attribute ckeWidgetId.
-    if (
-      (
-        event.currentTarget as unknown as {
-          offsetParent: {dataset: {ckeWidgetId: string}}}
-      ).offsetParent.dataset.ckeWidgetId) {
+    if (this._shouldOpenRTEModal(event)) {
       return;
     }
     this.contextService.setCustomEntityContext(
