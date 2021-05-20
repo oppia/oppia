@@ -18,13 +18,13 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import Headroom from 'headroom.js';
 
 @Directive({
   selector: '[headroom]'
 })
-export class HeadroomDirective {
+export class HeadroomDirective implements OnDestroy {
   @Input() tolerance?: Headroom.Tolerance;
   @Output() toleranceChange: EventEmitter<Headroom.Tolerance> = (
     new EventEmitter());
@@ -49,5 +49,9 @@ export class HeadroomDirective {
 
     this.headroom = new Headroom(this.el.nativeElement, headroomOptions);
     this.headroom.init();
+  }
+
+  ngOnDestroy(): void {
+    this.headroom.destroy();
   }
 }

@@ -24,9 +24,9 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { FocusOnDirective } from './focus-on.directive';
+import { HeadroomDirective } from './headroom.directive';
 import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
-import { HeadroomDirective } from './headroom.directive';
 
 @NgModule({
   imports: [
