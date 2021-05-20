@@ -366,7 +366,8 @@ describe('Assets Backend API Service', () => {
   describe('on emulator mode', () => {
     let assetsBackendApiService: AssetsBackendApiService = null;
     let httpTestingController: HttpTestingController = null;
-    const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
+    const gcsPrefix: string = (
+      'https://storage.googleapis.com/app_default_bucket');
 
     beforeEach(() => {
       spyOnProperty(AssetsBackendApiService, 'EMULATOR_MODE', 'get')
