@@ -354,6 +354,7 @@ import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/se
 import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -456,6 +457,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
+  ['ExplorationPlayerStateService', ExplorationPlayerStateService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
