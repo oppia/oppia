@@ -41,12 +41,12 @@
           <!--Filler space for message-->
           <span class="audio-controls-message">&zwnj;</span>
         </div>
-        <div ng-if="!audioLoadingIndicatorIsShown">
-          <oppia-audio-slider [value]="AudioPlayerService.getCurrentTime()"
-                              [max]="AudioPlayerService.getAudioDuration()"
-                              (value-change)="setProgress($event)"
-                              aria-label="audio-slider">
-          </oppia-audio-slider>
+        <div class="oppia-audio-header-select">
+          <select class="audio-language-select protractor-test-audio-lang-select"
+                  ng-model="selectedLanguage.value"
+                  ng-options="o.value as o.displayed for o in languagesInExploration"
+                  ng-change="onNewLanguageSelected()">
+          </select>
         </div>
       </div>
     </div>
