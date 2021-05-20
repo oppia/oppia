@@ -351,6 +351,7 @@ import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { ModeratorPageBackendApiService } from 'pages/moderator-page/services/moderator-page-backend-api.service';
 import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -604,6 +605,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
+  ['RefresherExplorationConfirmationModalService',
+    RefresherExplorationConfirmationModalService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],

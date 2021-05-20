@@ -43,6 +43,7 @@ import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/explorati
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { AudioBarComponent } from './layout-directives/audio-bar.component';
 import { MaterialModule } from 'components/material.module';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -65,6 +66,8 @@ import { MaterialModule } from 'components/material.module';
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -75,7 +78,8 @@ import { MaterialModule } from 'components/material.module';
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal
   ],
   providers: [
     {
