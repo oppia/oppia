@@ -13,13 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Handler for the Missing translations.
+ * @fileoverview Handler for the missing translations.
  */
 
 import { MissingTranslationHandler, MissingTranslationHandlerParams } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 
-export class MyMissingTranslationHandler implements MissingTranslationHandler {
+export class MissingTranslationCustomHandler implements
+  MissingTranslationHandler {
   getAppConstants(): typeof AppConstants {
     return AppConstants;
   }
