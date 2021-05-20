@@ -48,7 +48,8 @@ export class NotificationsDashboardPageBackendApiService {
     private httpClient: HttpClient
   ) {}
 
-  getNotificationData(): Promise<NotificationsDashboardBackendDict> {
+  async getNotificationDataAsync(): Promise<
+    NotificationsDashboardBackendDict> {
     return this.httpClient.get<NotificationsDashboardBackendDict>
     ('/notificationsdashboardhandler/data').toPromise();
   }
