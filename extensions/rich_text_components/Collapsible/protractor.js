@@ -36,7 +36,6 @@ var expectComponentDetailsToMatch = async function(
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
-  debugger;
   const collapsibleElem = elem.element(by.css(
     '.protractor-test-collapsible-content'));
   await forms.expectRichText(collapsibleElem).toMatch(contentInstructions);

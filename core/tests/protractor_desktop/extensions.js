@@ -31,7 +31,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-fdescribe('rich-text components', function() {
+describe('rich-text components', function() {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
@@ -69,7 +69,6 @@ fdescribe('rich-text components', function() {
     });
 
     await explorationEditorPage.navigateToPreviewTab();
-    debugger;
     await explorationPlayerPage.expectContentToMatch(
       async function(richTextChecker) {
         await richTextChecker.readBoldText('bold');
@@ -102,6 +101,8 @@ fdescribe('rich-text components', function() {
       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
+      'The target origin provided (\'https://www.youtube.com\') does not ' +
+      'match the recipient window\'s origin (\'http://localhost:9001\').'
     ]);
   });
 });

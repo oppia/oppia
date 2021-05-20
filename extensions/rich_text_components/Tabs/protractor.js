@@ -37,18 +37,20 @@ var customizeComponent = async function(modal, tabArray) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, tabArray) {
-  var titleElems = elem.element(by.tagName('ul')).all(by.tagName('li'));
+  var titleElems = elem.all(
+    by.css('.protractor-non-interactive-tabs-headers'));
   expect(await titleElems.count()).toEqual(tabArray.length);
-  var contentElems = elem.element(by.css('.tab-content')).all(by.xpath('./*'));
 
   for (var i = 0; i < tabArray.length; i++) {
     // Click on each tab in turn to check its contents.
     expect(await (await titleElems.get(i)).getText()).toMatch(
       tabArray[i].title);
     await (await titleElems.get(i)).click();
-    await forms.expectRichText((await contentElems.get(i)).element(
-      by.css('.protractor-test-tab-content'))
-    ).toMatch(tabArray[i].content);
+    const tabContentEl = elem.element(
+      by.css('.protractor-test-tab-content-' + i));
+
+    await forms.expectRichText(tabContentEl).toMatch(
+      tabArray[i].content);
   }
 };
 

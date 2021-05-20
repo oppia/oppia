@@ -1,10 +1,12 @@
 <nav ngbNav #nav="ngbNav" class="nav-tabs">
-  <ng-container ngbNavItem *ngFor="let tabContent of tabContents">
-    <a ngbNavLink>{{ tabContent.title }}</a>
+  <ng-container ngbNavItem *ngFor="let tabContent of tabContents; let idx = index">
+    <div class="protractor-non-interactive-tabs-headers">
+      <a ngbNavLink>{{ tabContent.title }}</a>
+    </div>
     <ng-template ngbNavContent>
       <span>
         <br>
-        <angular-html-bind-wrapper str="protractor-test-tab-content" [htmlData]="tabContent.content">
+        <angular-html-bind-wrapper [str]="'protractor-test-tab-content-' + idx" [htmlData]="tabContent.content">
         </angular-html-bind-wrapper>
       </span>
     </ng-template>
