@@ -408,7 +408,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           stateName, 'solicit_answer_details', newSolicitAnswerDetails);
       },
       getWrittenTranslationsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'written_translations');
+        return _states.getState(stateName).writtenTranslations;
       },
       saveWrittenTranslation: function(
           contentId, dataFormat, languageCode, stateName,
@@ -416,6 +416,10 @@ angular.module('oppia').factory('ExplorationStatesService', [
         ChangeListService.addTranslation(
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate);
+        let stateData = _states.getState(stateName);
+        stateData.writtenTranslations.addWrittenTranslation(
+          contentId, languageCode, dataFormat, translationHtml);
+        _states.setState(stateName, angular.copy(stateData));
       },
       markWrittenTranslationAsNeedingUpdate: function(contentId, stateName) {
         ChangeListService.markTranslationAsNeedingUpdate(contentId, stateName);

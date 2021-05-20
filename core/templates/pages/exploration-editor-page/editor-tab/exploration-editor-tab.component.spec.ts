@@ -579,14 +579,27 @@ describe('Exploration editor tab component', function() {
       result: $q.resolve()
     });
     stateEditorService.setActiveStateName('First State');
+
     expect(
-      translationStatusService.getAllStatesNeedUpdatewarning()['First State']
-    ).toBeUndefined();
+      explorationStatesService.getState('First State')
+        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+      false);
+    expect(
+      explorationStatesService.getState('First State')
+        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      .toBe(false);
+
     ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
     $scope.$apply();
+
     expect(
-      translationStatusService.getAllStatesNeedUpdatewarning()['First State']
-    ).toEqual(['Translation needs update!']);
+      explorationStatesService.getState('First State')
+        .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
+      true);
+    expect(
+      explorationStatesService.getState('First State')
+        .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
+      .toBe(true);
   });
 
   it('should not mark all audio as needing update when dismissing modal',
