@@ -56,6 +56,7 @@ class MockImageObject {
 class MockReaderObject {
   result = null;
   onload = null;
+
   constructor() {
     this.onload = () => {
       return 'Fake onload executed';

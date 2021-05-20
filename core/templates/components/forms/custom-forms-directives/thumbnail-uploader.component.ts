@@ -131,8 +131,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     }
   }
 
-  saveThumbnailImageData(imageURI: string, callback: {
-     (): void; (): void; }): void {
+  saveThumbnailImageData(imageURI: string, callback: () => void): void {
     this.resampledFile = null;
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
