@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 describe('Language util service', function() {
-  var lus: LanguageUtilService = null;
+  var lus: LanguageUtilService;
   const mockSupportedContentLanguages = [{
     code: 'en',
     description: 'English',

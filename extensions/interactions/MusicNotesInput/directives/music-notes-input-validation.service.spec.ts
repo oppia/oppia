@@ -53,7 +53,7 @@ describe('MusicNotesInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], '')];
   });
 
   it('should be able to perform basic validation', () => {
