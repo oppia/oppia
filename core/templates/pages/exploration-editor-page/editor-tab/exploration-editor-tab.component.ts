@@ -79,8 +79,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
     'StateEditorService', 'StateTutorialFirstTimeService',
-    'TranslationStatusService', 'UrlInterpolationService',
-    'UserExplorationPermissionsService',
+    'UrlInterpolationService', 'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
@@ -89,8 +88,7 @@ angular.module('oppia').component('explorationEditorTab', {
         LoaderService,
         RouterService, SiteAnalyticsService, StateEditorRefreshService,
         StateEditorService, StateTutorialFirstTimeService,
-        TranslationStatusService, UrlInterpolationService,
-        UserExplorationPermissionsService) {
+        UrlInterpolationService, UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       // Replace the ng-joyride template with one that uses <[...]>
