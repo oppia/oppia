@@ -387,6 +387,9 @@ def apply_change_list(exploration_id, change_list):
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     state.update_next_content_id_index(change.new_value)
                 elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    state.update_linked_skill_id(change.new_value)
+                elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
@@ -434,6 +437,13 @@ def apply_change_list(exploration_id, change_list):
                             'Expected solicit_answer_details to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_solicit_answer_details(change.new_value)
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected card_is_checkpoint to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_card_is_checkpoint(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if not isinstance(change.new_value, dict):
@@ -1952,20 +1962,19 @@ def regenerate_missing_stats_for_exploration(exp_id):
             stats_services.create_stats_model(exp_stats_for_version)
         raise Exception('No ExplorationStatsModels found')
 
-    try:
-        snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
-            exp_id, exp_versions)
-        change_lists = [
-            [
+    snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
+        exp_id, exp_versions)
+    change_lists = []
+    for snapshot in snapshots:
+        try:
+            change_lists.append([
                 exp_domain.ExplorationChange(commit_cmd)
                 for commit_cmd in snapshot['commit_cmds']
-            ]
-            for snapshot in snapshots
-        ]
-    except utils.ValidationError:
-        raise Exception(
-            'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
-            % (exp_id, snapshot['commit_cmds']))
+            ])
+        except utils.ValidationError:
+            raise Exception(
+                'Exploration(id=%r) snapshots contain invalid commit_cmds: %r'
+                % (exp_id, snapshot['commit_cmds']))
 
     missing_exp_stats = []
     missing_state_stats = []

@@ -203,7 +203,7 @@ export class EditableTopicBackendApiService {
 
   private _updateTopic(
       topicId: string,
-      topicVersion: string,
+      topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[],
       successCallback: (value?: UpdateTopicResponse) => void,
@@ -270,19 +270,19 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  fetchTopic(topicId: string): Promise<FetchTopicResponse> {
+  async fetchTopicAsync(topicId: string): Promise<FetchTopicResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopic(topicId, resolve, reject);
     });
   }
 
-  fetchStories(topicId: string): Promise<StorySummaryBackendDict[]> {
+  async fetchStoriesAsync(topicId: string): Promise<StorySummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
       this._fetchStories(topicId, resolve, reject);
     });
   }
 
-  fetchSubtopicPage(
+  async fetchSubtopicPageAsync(
       topicId: string,
       subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
@@ -300,9 +300,9 @@ export class EditableTopicBackendApiService {
    * the success callback, if one is provided to the returned promise
    * object. Errors are passed to the error callback, if one is provided.
    */
-  updateTopic(
+  async updateTopicAsync(
       topicId: string,
-      topicVersion: string,
+      topicVersion: number,
       commitMessage: string,
       changeList: BackendChangeObject[]): Promise<UpdateTopicResponse> {
     return new Promise((resolve, reject) => {
@@ -312,7 +312,7 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  deleteTopic(topicId: string): Promise<number> {
+  async deleteTopicAsync(topicId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this._deleteTopic(topicId, resolve, reject);
     });

@@ -21,37 +21,6 @@ import { fakeAsync } from '@angular/core/testing';
 import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateTopAnswersStats } from
   'domain/statistics/state-top-answers-stats-object.factory';
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// exploration-editor-tab.directive.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementsService } from 'services/improvements.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 // ^^^ This block is to be removed.
@@ -70,43 +39,6 @@ describe('Exploration Warnings Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(),
-        new RuleObjectFactory()));
-    $provide.value(
-      'ExplorationFeaturesService', new ExplorationFeaturesService());
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory());
-    $provide.value('ImprovementsService', new ImprovementsService());
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory());
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value('SolutionValidityService', new SolutionValidityService());
-    $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService());
-    $provide.value(
-      'StateEditorService', new StateEditorService(
-        new SolutionValidityService()));
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-
   describe('when exploration param changes has jinja values', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('ExplorationInitStateNameService', {
@@ -925,6 +857,8 @@ describe('Exploration Warnings Service', function() {
           },
           classifier_model_id: null,
           solicit_answer_details: false,
+          linked_skill_id: null,
+          card_is_checkpoint: false,
           next_content_id_index: null,
         },
         State: {
@@ -953,6 +887,7 @@ describe('Exploration Warnings Service', function() {
             hints: []
           },
           solicit_answer_details: false,
+          card_is_checkpoint: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -960,6 +895,7 @@ describe('Exploration Warnings Service', function() {
             }
           },
           classifier_model_id: null,
+          linked_skill_id: null,
           next_content_id_index: null
         }
       });

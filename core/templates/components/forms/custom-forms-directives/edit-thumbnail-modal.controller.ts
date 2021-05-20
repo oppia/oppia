@@ -85,7 +85,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
           var reader = new FileReader();
           reader.onload = function(e) {
             var imgSrc = <string>((<FileReader>e.target).result);
-            $scope.$apply(function() {
+            $scope.$apply(() => {
               $scope.uploadedImage = (
                 (<FileReader>e.target).result);
             });
@@ -111,7 +111,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
             }
           };
           reader.readAsDataURL(file);
-          $timeout(function() {
+          $timeout(() => {
             $('.oppia-thumbnail-uploader').fadeIn();
           }, 100);
         });

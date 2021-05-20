@@ -120,6 +120,13 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
+    # Currently, "roles" and "banned" fields are not in use.
+    # A list of roles assigned to the user.
+    roles = datastore_services.StringProperty(
+        repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
+    # Flag to indicate whether the user is banned.
+    banned = datastore_services.BooleanProperty(indexed=True, default=False)
+
     @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id, model,
@@ -183,7 +190,12 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+
+            # TODO(#12755): Change export policy for roles and banned fields to
+            # "EXPORTED" once the fields are populated in the datastore.
+            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -1867,6 +1879,12 @@ class UserQueryModel(base_models.BaseModel):
     edited_at_least_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check if user has edited fewer than n explorations.
     edited_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
+    # Query option to check if user has created collection.
+    created_collection = datastore_services.BooleanProperty(default=False)
+    # Query option to check if user has used LogicProof interaction in any
+    # of the explorations that they created.
+    used_logic_proof_interaction = datastore_services.BooleanProperty(
+        default=False)
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
@@ -1911,6 +1929,9 @@ class UserQueryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_fewer_than_n_exps':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'used_logic_proof_interaction':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,

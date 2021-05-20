@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import os
+import re
 
 from constants import constants
 from core import jobs
@@ -29,7 +30,6 @@ from core.domain import param_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
 import mock
@@ -412,15 +412,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], [])
 
-    def test_error_is_raised_with_fake_reply_to_id(self):
-        # Generate reply email.
-        recipient_email = 'reply+%s@%s' % (
-            'fake_id', feconf.INCOMING_EMAILS_DOMAIN_NAME)
-        # Send email to Oppia.
-        self.post_email(
-            recipient_email, self.NEW_USER_EMAIL, 'feedback email reply',
-            'New reply', html_body='<p>New reply!</p>', expected_status_int=404)
-
     def test_cannot_perform_delete_json_with_non_dict_params(self):
         with self.assertRaisesRegexp(
             Exception, 'Expected params to be a dict'):
@@ -606,7 +597,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
         with self.assertRaisesRegexp(
-            ValueError, r'Exception raised from getcwd\(\)'):
+            ValueError, re.escape('Exception raised from getcwd()')
+        ):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 

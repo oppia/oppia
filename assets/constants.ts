@@ -4937,43 +4937,56 @@ export default {
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
-    "text": "Bahasa Indonesia"
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
   }, {
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "direction": "ltr"
   }, {
     "id": "es",
-    "text": "Español"
+    "text": "Español",
+    "direction": "ltr"
   }, {
     "id": "fr",
-    "text": "français (French)"
+    "text": "français (French)",
+    "direction": "ltr"
   }, {
     "id": "pt-br",
-    "text": "Português (Brasil)"
+    "text": "Português (Brasil)",
+    "direction": "ltr"
   }, {
     "id": "ar",
-    "text": "العربية"
+    "text": "العربية",
+    "direction": "rtl"
   }, {
     "id": "kab",
-    "text": "Taqbaylit (Kabyle)"
+    "text": "Taqbaylit (Kabyle)",
+    "direction": "ltr"
   }, {
     "id": "vi",
-    "text": "Tiếng Việt"
+    "text": "Tiếng Việt",
+    "direction": "ltr"
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)"
+    "text": "Türkçe (Turkish)",
+    "direction": "ltr"
   }, {
     "id": "hi",
-    "text": "हिन्दी"
+    "text": "हिन्दी",
+    "direction": "ltr"
   }, {
     "id": "bn",
-    "text": "বাংলা"
+    "text": "বাংলা",
+    "direction": "ltr"
   }, {
     "id": "zh-hans",
-    "text": "中文(简体)"
+    "text": "中文(简体)",
+    "direction": "ltr"
   }, {
     "id": "zh-hant",
-    "text": "中文(繁體)"
+    "text": "中文(繁體)",
+    "direction": "ltr"
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -5501,6 +5514,7 @@ export default {
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
+    "linked_skill_id": null,
     "content": {
       "html": "",
       "content_id": "content"
@@ -5533,6 +5547,7 @@ export default {
       }
     },
     "solicit_answer_details": false,
+    "card_is_checkpoint": false,
     "written_translations": {
       "translations_mapping": {
         "content": {},
@@ -5687,9 +5702,10 @@ export default {
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
-  // The bucket name is set to None-resources to enable it to be used
-  // in prod mode when the resource bucket name is not allowed to be null.
-  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+  // The bucket name is set to app_default_bucket which is used to store files
+  // in GCS when local development server is running. This should be changed
+  // in prod appropriately.
+  "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
@@ -5804,6 +5820,30 @@ export default {
         }]
       },
       "default_value": null
+    },
+    {
+      "backend_id": "created_collection",
+      "backend_attr": "created_collection",
+      "description": "Has created collection",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
+    },
+    {
+      "backend_id": "used_logic_proof_interaction",
+      "backend_attr": "used_logic_proof_interaction",
+      "description": "Has used LogicProof interaction in any exploration",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
     }
   ],
 

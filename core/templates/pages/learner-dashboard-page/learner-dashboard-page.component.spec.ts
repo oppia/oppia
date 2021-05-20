@@ -36,7 +36,6 @@ import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
@@ -69,7 +68,7 @@ class MockTrunctePipe {
 }
 
 class MockLearnerDashboardActivityBackendApiService {
-  removeActivityModal(): Promise<void> {
+  async removeActivityModalAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
       resolve();
     });
@@ -107,7 +106,6 @@ describe('Learner dashboard page', () => {
   let userService: UserService = null;
 
   let profilePictureDataUrl = 'profile-picture-url';
-  let windowRef: WindowRef = null;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -116,8 +114,9 @@ describe('Learner dashboard page', () => {
     param_changes: [],
     param_specs: {},
     is_version_of_draft_valid: true,
+    correctness_feedback_enabled: false,
     draft_changes: [],
-    version: '1',
+    version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
 
@@ -304,7 +303,6 @@ describe('Learner dashboard page', () => {
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
-          WindowRef,
         ],
         schemas: [NO_ERRORS_SCHEMA]
       }).compileComponents();
@@ -324,9 +322,8 @@ describe('Learner dashboard page', () => {
       suggestionModalForLearnerDashboardService =
         TestBed.inject(SuggestionModalForLearnerDashboardService);
       userService = TestBed.inject(UserService);
-      windowRef = TestBed.inject(WindowRef);
 
-      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(() => {
+      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
         return Promise.resolve('sample-csrf-token');
       });
       // Generate completed explorations and exploration playlist.
@@ -388,12 +385,12 @@ describe('Learner dashboard page', () => {
       }
 
       spyOn(userService, 'getProfileImageDataUrlAsync').and
-        .callFake(() => {
+        .callFake(async() => {
           return Promise.resolve(profilePictureDataUrl);
         });
 
       spyOn(userService, 'getUserInfoAsync').and
-        .callFake(() => {
+        .callFake(async() => {
           return Promise.resolve(userInfo);
         });
 
@@ -461,16 +458,11 @@ describe('Learner dashboard page', () => {
       expect(component.explorationPlaylist.length).toBe(10);
     }));
 
-    it('should set focus on browse lesson btn and' +
-      ' scroll back to top of window after focusing', fakeAsync(() => {
-      const focusSpy = spyOn(focusManagerService, 'setFocus');
-      const windowSpy = spyOn(windowRef.nativeWindow, 'scrollTo');
-      component.addFocusWithoutScroll('ourLessonsBtn');
-
+    it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
+      const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      component.ngOnInit();
       flush();
-
       expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
-      expect(windowSpy).toHaveBeenCalled();
     }));
 
     it('should get static image url', () => {

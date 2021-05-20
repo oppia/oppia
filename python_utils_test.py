@@ -256,6 +256,36 @@ class PythonUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             python_utils.get_args_of_function(func), ['a', 'b'])
 
+    def test_create_enum_method_and_check_its_values(self):
+        """Test create_enum method."""
+        enums = python_utils.create_enum('first', 'second', 'third')
+        self.assertEqual(enums.first.value, 'first')
+        self.assertEqual(enums.second.value, 'second')
+        self.assertEqual(enums.third.value, 'third')
+
+    def test_create_enum_method_and_check_its_names(self):
+        """Test create_enum method."""
+        enums = python_utils.create_enum('first', 'second', 'third')
+        self.assertEqual(enums.first.name, 'first')
+        self.assertEqual(enums.second.name, 'second')
+        self.assertEqual(enums.third.name, 'third')
+
+    def test_enum_for_invalid_attribute(self):
+        enums = python_utils.create_enum('first', 'second', 'third')
+        with self.assertRaisesRegexp(AttributeError, 'fourth'):
+            getattr(enums, 'fourth')
+
+    def test_zip_longest(self):
+        self.assertEqual(
+            [list(g) for g in python_utils.zip_longest(
+                [0, 1, 2, 3], [4, 5, 6], [7, 8])],
+            [[0, 4, 7], [1, 5, 8], [2, 6, None], [3, None, None]])
+        # Zip longest with fillvalue.
+        self.assertEqual(
+            [''.join(g) for g in python_utils.zip_longest(
+                'ABC', 'DE', 'F', fillvalue='x')],
+            ['ADF', 'BEx', 'Cxx'])
+
 
 @unittest.skipUnless(
     sys.version[0] == '2', 'Test cases for ensuring Python 2 behavior only')

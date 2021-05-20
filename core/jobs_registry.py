@@ -152,6 +152,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
     user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
     user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
+    user_jobs_one_off.UserRolesPopulationOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
@@ -218,9 +219,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob),
     prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
@@ -230,7 +228,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
-    prod_validation_jobs_one_off.MachineTranslatedTextModelAuditOneOffJob,
+    prod_validation_jobs_one_off.MachineTranslationModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,
     prod_validation_jobs_one_off.PlatformParameterModelAuditOneOffJob,
     (
