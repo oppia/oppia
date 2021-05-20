@@ -174,7 +174,6 @@ angular.module('oppia').factory('TranslationStatusService', [
                 noVoiceoverCount++;
               }
             }
-            console.error(`contentId: ${contentId} | needsUpdate: ${availabilityStatus.needsUpdate}`);
             if (availabilityStatus.needsUpdate) {
               if (TranslationTabActiveModeService.isTranslationModeActive()) {
                 stateNeedsUpdateWarnings[stateName] = (

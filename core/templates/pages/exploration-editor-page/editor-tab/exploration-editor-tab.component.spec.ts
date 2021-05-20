@@ -79,7 +79,6 @@ describe('Exploration editor tab component', function() {
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
   var mockRefreshStateEditorEventEmitter = null;
-  var translationStatusService = null;
 
   importAllAngularServices();
 
@@ -138,7 +137,6 @@ describe('Exploration editor tab component', function() {
     focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
       'ExplorationInitStateNameService');
-    translationStatusService = $injector.get('TranslationStatusService');
     explorationStatesService = $injector.get('ExplorationStatesService');
     explorationWarningsService = $injector.get('ExplorationWarningsService');
     routerService = $injector.get('RouterService');
