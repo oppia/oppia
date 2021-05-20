@@ -352,6 +352,8 @@ import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-pag
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -451,6 +453,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
+  ['ExplorationPlayerStateService', ExplorationPlayerStateService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
@@ -604,6 +607,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
+  ['RefresherExplorationConfirmationModalService',
+    RefresherExplorationConfirmationModalService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],

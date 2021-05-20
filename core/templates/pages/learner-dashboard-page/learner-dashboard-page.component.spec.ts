@@ -114,8 +114,9 @@ describe('Learner dashboard page', () => {
     param_changes: [],
     param_specs: {},
     is_version_of_draft_valid: true,
+    correctness_feedback_enabled: false,
     draft_changes: [],
-    version: '1',
+    version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
 

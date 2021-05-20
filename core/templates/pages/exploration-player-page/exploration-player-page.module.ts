@@ -44,6 +44,7 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
 import { DisplayHintModalComponent } from './modals/display-hint-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from './modals/display-solution-interstitial-modal.component';
 import { DisplaySolutionModalComponent } from './modals/display-solution-modal.component';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -66,7 +67,9 @@ import { DisplaySolutionModalComponent } from './modals/display-solution-modal.c
     FeedbackPopupComponent,
     DisplayHintModalComponent,
     DisplaySolutionInterstititalModalComponent,
-    DisplaySolutionModalComponent
+    DisplaySolutionModalComponent,
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -79,7 +82,8 @@ import { DisplaySolutionModalComponent } from './modals/display-solution-modal.c
     LearnerAnswerInfoCard,
     DisplayHintModalComponent,
     DisplaySolutionInterstititalModalComponent,
-    DisplaySolutionModalComponent
+    DisplaySolutionModalComponent,
+    RefresherExplorationConfirmationModal,
   ],
   providers: [
     {

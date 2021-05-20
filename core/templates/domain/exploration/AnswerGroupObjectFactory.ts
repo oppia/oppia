@@ -30,18 +30,22 @@ export interface AnswerGroupBackendDict {
   'rule_specs': RuleBackendDict[];
   'outcome': OutcomeBackendDict;
   'training_data': readonly InteractionAnswer[];
-  'tagged_skill_misconception_id': string;
+  // Note: Here the type 'null' comes from file
+  // 'add-answer-group-modal.controller.ts'. Property
+  // 'tmpTaggedSkillMisconceptionId' has been initialized
+  // as 'null' there.
+  'tagged_skill_misconception_id': string | null;
 }
 
 export class AnswerGroup {
   rules: Rule[];
   outcome: Outcome;
   trainingData: readonly InteractionAnswer[];
-  taggedSkillMisconceptionId: string;
+  taggedSkillMisconceptionId: string | null;
   constructor(
       rules: Rule[], outcome: Outcome,
       trainingData: readonly InteractionAnswer[],
-      taggedSkillMisconceptionId: string) {
+      taggedSkillMisconceptionId: string | null) {
     this.rules = rules;
     this.outcome = outcome;
     this.trainingData = trainingData;
@@ -79,7 +83,7 @@ export class AnswerGroupObjectFactory {
   createNew(
       rules: Rule[], outcome: Outcome,
       trainingData: readonly InteractionAnswer[],
-      taggedSkillMisconceptionId: string): AnswerGroup {
+      taggedSkillMisconceptionId: string | null): AnswerGroup {
     return new AnswerGroup(
       rules, outcome, trainingData, taggedSkillMisconceptionId);
   }
