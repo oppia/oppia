@@ -321,7 +321,7 @@ fdescribe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?offset=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
 
@@ -343,7 +343,7 @@ fdescribe('Question backend Api service', () => {
       questionBackendApiService.fetchQuestionSummariesAsync(
         '1').then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?offset=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'Error loading questions.'
@@ -364,7 +364,7 @@ fdescribe('Question backend Api service', () => {
       let failHandler = jasmine.createSpy('fail');
 
       questionBackendApiService.fetchQuestionSummariesAsync(
-        '1', '1').then(successHandler, failHandler);
+        '1', 1).then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/questions_list_handler/1?offset=1');
       expect(req.request.method).toEqual('GET');

@@ -88,7 +88,7 @@ fdescribe('Questions List Service', () => {
     fakeAsync(() => {
       qls.getQuestionSummariesAsync('1', true, true);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?offset=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
       flushMicrotasks();
@@ -98,7 +98,7 @@ fdescribe('Questions List Service', () => {
 
       qls.getQuestionSummariesAsync('1', true, true);
       req = httpTestingController.expectOne(
-        '/questions_list_handler/1?offset=');
+        '/questions_list_handler/1?offset=0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
       flushMicrotasks();
@@ -111,7 +111,7 @@ fdescribe('Questions List Service', () => {
     ' increase', fakeAsync(() => {
     qls.getQuestionSummariesAsync('1', true, false);
     let req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=');
+      '/questions_list_handler/1?offset=0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse);
     flushMicrotasks();
@@ -122,7 +122,7 @@ fdescribe('Questions List Service', () => {
     // Try to get questions again before incresing pagenumber.
     qls.getQuestionSummariesAsync('1', true, true);
     req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=');
+      '/questions_list_handler/1?offset=0');
     flushMicrotasks();
     httpTestingController.verify();
 
@@ -133,7 +133,7 @@ fdescribe('Questions List Service', () => {
 
     qls.getQuestionSummariesAsync('1', true, false);
     req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=');
+      '/questions_list_handler/1?offset=0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse);
     flushMicrotasks();
@@ -144,7 +144,7 @@ fdescribe('Questions List Service', () => {
   it('should get cached question summaries', fakeAsync(() => {
     qls.getQuestionSummariesAsync('1', true, true);
     const req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=');
+      '/questions_list_handler/1?offset=0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse);
     flushMicrotasks();

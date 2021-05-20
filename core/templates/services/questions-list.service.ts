@@ -34,7 +34,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 })
 export class QuestionsListService {
   private _questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
-  private _nextOffsetForQuestions: string = '';
+  private _nextOffsetForQuestions: number = 0;
   private _currentPage: number = 0;
   private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter<void>());
@@ -57,14 +57,13 @@ export class QuestionsListService {
     this._questionSummartiesInitializedEventEmitter.emit();
   }
 
-  private _setNextQuestionsOffset(nextOffset: string): void {
+  private _setNextQuestionsOffset(nextOffset: number): void {
     this._nextOffsetForQuestions = nextOffset;
   }
 
   isLastQuestionBatch(): boolean {
     return (
-      Number(this._nextOffsetForQuestions) >=
-      this._questionSummariesForOneSkill.length &&
+      this._nextOffsetForQuestions === null &&
       (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
         this._questionSummariesForOneSkill.length);
   }
@@ -73,7 +72,7 @@ export class QuestionsListService {
       skillId: string, fetchMore: boolean, resetHistory: boolean): void {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
-      this._nextOffsetForQuestions = '';
+      this._nextOffsetForQuestions = 0;
     }
 
     const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
@@ -94,11 +93,7 @@ export class QuestionsListService {
               createFromBackendDict(summary));
         });
 
-        var nextOffset = '';
-        if (response.nextOffset !== null) {
-          var nextOffset = response.nextOffset.toString();
-        }
-        this._setNextQuestionsOffset(nextOffset);
+        this._setNextQuestionsOffset(response.nextOffset);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
       });

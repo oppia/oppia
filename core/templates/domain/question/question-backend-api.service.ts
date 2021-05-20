@@ -106,7 +106,7 @@ export class QuestionBackendApiService {
   }
 
   private _fetchQuestionSummaries(
-      skillId: string, offset: string,
+      skillId: string, offset: number,
       successCallback: (value: QuestionSummariesResponse) => void,
       errorCallback: (reason: string) => void): void|boolean {
     const skillIds = [skillId];
@@ -114,7 +114,7 @@ export class QuestionBackendApiService {
     var questionsDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE, {
         comma_separated_skill_ids: skillIds.join(','),
-        offset: offset
+        offset: offset.toString()
       });
     this.http.get<QuestionSummariesBackendResponse>(
       questionsDataUrl
@@ -199,7 +199,7 @@ export class QuestionBackendApiService {
 
   async fetchQuestionSummariesAsync(
       skillId: string,
-      offset: string = ''): Promise<QuestionSummariesResponse> {
+      offset: number = 0): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestionSummaries(skillId, offset, resolve, reject);
     });
