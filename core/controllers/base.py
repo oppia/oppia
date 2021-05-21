@@ -380,7 +380,10 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        self.response.cache_control.no_cache = True
+
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
             b'max-age=31536000; includeSubDomains')

@@ -218,6 +218,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
+    def test_html_requests_have_no_store_cache_policy(self):
+        response = self.get_html_response('/community-library')
+        # We set 'no-store' and 'must-revalidate', but webapp
+        # adds 'no-cache' since it is basically a subset of 'no-store'.
+        self.assertEqual(
+            response.headers['Cache-Control'],
+            'must-revalidate, no-cache, no-store'
+        )
+
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
