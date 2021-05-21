@@ -2,6 +2,7 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
+    // TODO(#12859): Remove the use of parser-tsconfig.eslint.json.
     "project": "parser-tsconfig.eslint.json"
   },
   "extends": [
@@ -121,7 +122,8 @@
       // We exlude all javascript files from 'Async' suffix check for
       // asynchronous function names.We run it for only typescript files.
       "files": [
-        "**/*.js"
+        "**/*.js",
+        "core/templates/Polyfills.ts"
       ],
       "rules": {
         "oppia/async-func-name-checks": "off"
