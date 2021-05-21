@@ -71,8 +71,10 @@ export class CreateNewSkillModalComponent {
   }
 
   openConceptCardExplanationEditor(): void {
-    this.isEditorShown.conceptCardExplanationEditorIsShown = true;
-    this.changeDetectorRef.detectChanges();
+    if (this.isEditorShown.conceptCardExplanationEditorIsShown !== true) {
+      this.isEditorShown.conceptCardExplanationEditorIsShown = true;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   getHtmlSchema(): { type: string } {
@@ -149,6 +151,3 @@ export class CreateNewSkillModalComponent {
     this.ngbActiveModal.dismiss('cancel');
   }
 }
-
-angular.module('oppia').directive('oppiaCreateNewSkillModal',
-  downgradeComponent({ component: CreateNewSkillModalComponent }));
