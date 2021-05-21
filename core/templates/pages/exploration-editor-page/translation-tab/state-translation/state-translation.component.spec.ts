@@ -178,6 +178,7 @@ describe('State translation component', function() {
           }
         }]
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -247,6 +248,7 @@ describe('State translation component', function() {
           }
         }]
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -310,6 +312,7 @@ describe('State translation component', function() {
           }
         }]
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -351,6 +354,7 @@ describe('State translation component', function() {
         answer_groups: [],
         hints: []
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
@@ -1026,6 +1030,7 @@ describe('State translation component', function() {
               }
             }]
           },
+          linked_skill_id: null,
           next_content_id_index: 0,
           param_changes: [],
           solicit_answer_details: false,

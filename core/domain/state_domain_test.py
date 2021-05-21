@@ -34,10 +34,9 @@ from core.domain import state_domain
 from core.domain import translatable_object_registry
 from core.tests import test_utils
 import feconf
+import python_utils
 import schema_utils
 import utils
-
-import contextlib2
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -974,6 +973,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'id': None,
                 'solution': None,
             },
+            'linked_skill_id': None,
             'next_content_id_index': 0,
             'param_changes': [],
             'recorded_voiceovers': {
@@ -1639,6 +1639,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
 
+    def test_update_linked_skill_id(self):
+        """Test updating linked_skill_id."""
+        state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(state.linked_skill_id, None)
+        state.update_linked_skill_id('string_2')
+        self.assertEqual(state.linked_skill_id, 'string_2')
+
     def test_update_card_is_checkpoint(self):
         """Test update card_is_checkpoint."""
         state = state_domain.State.create_default_state('state_1')
@@ -1820,6 +1827,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -1901,6 +1909,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2075,6 +2084,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2145,6 +2155,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2280,6 +2291,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2339,6 +2351,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2459,6 +2472,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2508,6 +2522,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -2670,6 +2685,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_old_math_schema],
@@ -2751,6 +2767,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'answer_groups': [answer_group_dict_with_new_math_schema],
@@ -2874,6 +2891,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -2982,6 +3000,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3066,6 +3085,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': {
@@ -3159,6 +3179,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3201,6 +3222,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations': {'content': {}},
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -3501,7 +3523,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         # Object type of answer must match that of correct_answer.
         with self.assertRaisesRegexp(
-            AssertionError, r'Expected unicode string, received \[0, 0\]'):
+            AssertionError,
+            re.escape('Expected unicode string, received [0, 0]')
+        ):
             init_state.interaction.solution = (
                 state_domain.Solution.from_dict(
                     init_state.interaction.id, solution_dict))
@@ -3594,6 +3618,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, True)
+
+    def test_validate_state_linked_skill_id(self):
+        """Test validation of linked_skill_id."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.linked_skill_id, None)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected linked_skill_id to be ' +
+            'a str, received 12.'):
+            with self.swap(init_state, 'linked_skill_id', 12):
+                exploration.validate()
+        self.assertEqual(init_state.linked_skill_id, None)
 
     def test_validate_state_card_is_checkpoint(self):
         """Test validation of card_is_checkpoint."""
@@ -3805,7 +3841,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(

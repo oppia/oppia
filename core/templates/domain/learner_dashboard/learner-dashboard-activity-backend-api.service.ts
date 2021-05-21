@@ -121,7 +121,7 @@ export class LearnerDashboardActivityBackendApiService {
   // This function will open a modal to remove an exploration
   // from the given list either 'Play Later' or 'In Progress'
   // in Learner Dashboard Page.
-  async removeActivityModal(
+  async removeActivityModalAsync(
       sectionNameI18nId: string, subsectionName: string,
       activityId: string, activityTitle: string): Promise<void> {
     this.removeActivityModalStatus = null;
