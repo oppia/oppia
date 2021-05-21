@@ -119,7 +119,6 @@ export class SkillBackendApiService {
           skill_id: skillId
         });
 
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(skillDataUrl).toPromise().then(() => {
         resolve();
       }, function(errorResponse) {

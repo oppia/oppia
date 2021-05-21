@@ -501,7 +501,7 @@ export class AdminBackendApiService {
   }
 
   async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http['delete']<void>(
+    return this.http.delete<void>(
       AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
         params: {username},
       }
@@ -526,7 +526,6 @@ export class AdminBackendApiService {
 
   async deleteUserAsync(userId: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(
         AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {
           params: {
