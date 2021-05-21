@@ -15,17 +15,12 @@
 /**
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 
 import constants from 'assets/constants';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
-import { CreatorExplorationSummaryBackendDict } from 'domain/summary/creator-exploration-summary.model';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LibraryPageConstants } from 'pages/library-page/library-page.constants';
 import { LoaderService } from 'services/loader.service';
@@ -36,13 +31,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
-interface LibraryPageGroupData {
-  'activity_list': ActivityDicts[],
-  'header_i18n_id': string,
-  'preferred_language_codes': string[],
-}
-
+import { LibraryIndexData, 
+         LibraryBackendApiService } from 'domain/library/library-page-data-backend-api.service';
 interface ActivityDicts {  
     'activity_type': string                                        
     'category': string,
@@ -57,28 +47,9 @@ interface ActivityDicts {
     'thumbnail_icon_url': string,
     'title': string,
 }
-interface SummaryDicts {
-  'activity_summary_dicts': ActivityDicts[],
-  'categories': [],
-  'header_i18n_id': string,
-  'has_full_results_page': boolean,
-  'full_results_url': string,
-  'protractor_id' ?: string,
-}
-
-interface LibraryIndexData {
-  'activity_summary_dicts_by_category': SummaryDicts[],
-  'preferred_language_codes': string[]
-}
-
 interface Activities {
   explorations: {},
   collections: {}
-}
-
-interface CreatorDashboardData {
-  'explorations_list': CreatorExplorationSummaryBackendDict[];
-  'collections_list': CollectionSummaryBackendDict[];
 }
 
 interface LibraryPageModes {
@@ -118,7 +89,6 @@ export class LibraryPageComponent implements OnInit, OnDestroy {
   LIBRARY_PAGE_MODES: LibraryPageModes;  
 
   constructor(
-    private http: HttpClient,
     private classroomBackendApiService: ClassroomBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
@@ -129,6 +99,7 @@ export class LibraryPageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
+    private libraryBackendApiService: LibraryBackendApiService,
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -139,38 +110,30 @@ export class LibraryPageComponent implements OnInit, OnDestroy {
     this.activeGroupIndex = groupIndex;
   };
 
-
   clearActiveGroup(): void {
     this.activeGroupIndex = null;
   };
 
   getLibraryPageGroupData(): void {
-    this.http.get<LibraryPageGroupData>('/librarygrouphandler', {
-      params: {
-        group_name: this.groupName
-      }
-    }).toPromise().then((response) => {
+    this.libraryBackendApiService.fetchLibraryGroupDataAsync(
+      this.groupName).then((response) => {
         this.activityList = response.activity_list;
-
         this.groupHeaderI18nId = response.header_i18n_id;
-
         this.i18nLanguageCodeService.onPreferredLanguageCodesLoaded.emit(
           response.preferred_language_codes);
-
         this.loaderService.hideLoadingScreen();
       })
   }
 
   getCreatorDashboardPageData(): void {
-    this.http.get<CreatorDashboardData>('/creatordashboardhandler/data').toPromise()
-    .then((response) => {
-      console.log(response)
+    this.libraryBackendApiService.fetchCreatorDashboardDataAsync().then(
+      (response) => {
       this.libraryGroups.forEach((libraryGroup) => {
-        var activitySummaryDicts = (
+        let activitySummaryDicts = (
           libraryGroup.activity_summary_dicts);
 
-        var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-        var ACTIVITY_TYPE_COLLECTION = 'collection';
+        let ACTIVITY_TYPE_EXPLORATION = 'exploration';
+        let ACTIVITY_TYPE_COLLECTION = 'collection';
         activitySummaryDicts.forEach((
             activitySummaryDict) => {
           if (activitySummaryDict.activity_type === (
@@ -203,12 +166,13 @@ export class LibraryPageComponent implements OnInit, OnDestroy {
           this.activitiesOwned.collections[
             ownedCollections.id] = true;
         });
-    });
+      });
     this.loaderService.hideLoadingScreen();
-  });
-}
+    });
+  }
+
   getLibraryIndexPageData(): void {
-    this.http.get<LibraryIndexData>('/libraryindexhandler').toPromise().then(
+    this.libraryBackendApiService.fetchLibraryIndexDataAsync().then(
       (response) => {
       this.libraryGroups =
         response.activity_summary_dicts_by_category;
@@ -227,7 +191,6 @@ export class LibraryPageComponent implements OnInit, OnDestroy {
       // // Pause is necessary to ensure all elements have loaded.
       // setTimeout(this.initCarousels(), 390);
       // this.keyboardShortcutService.bindLibraryPageShortcuts();
-
 
       // Check if actual and expected widths are the same.
       // If not produce an error that would be caught by e2e tests.
