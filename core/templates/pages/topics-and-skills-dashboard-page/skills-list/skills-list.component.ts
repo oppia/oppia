@@ -77,7 +77,7 @@ export class SkillsListComponent {
   ) {}
 
   getSkillEditorUrl(skillId: string): string {
-    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
+    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       SKILL_EDITOR_URL_TEMPLATE, {
         skill_id: skillId
