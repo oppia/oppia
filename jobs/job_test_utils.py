@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import contextlib
 import datetime
 import re
 
@@ -32,7 +33,6 @@ import python_utils
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
-import contextlib2
 
 
 class PipelinedTestBase(test_utils.TestBase):
@@ -52,7 +52,7 @@ class PipelinedTestBase(test_utils.TestBase):
 
     def setUp(self):
         super(PipelinedTestBase, self).setUp()
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(decorate_beam_errors())
             stack.enter_context(self.pipeline)
             self._close_stack = stack.pop_all().close
@@ -187,7 +187,7 @@ class JobTestBase(PipelinedTestBase):
         self.assert_pcoll_empty(self.run_job())
 
 
-@contextlib2.contextmanager
+@contextlib.contextmanager
 def decorate_beam_errors():
     """Context manager to improve the readability of beam_testing_util errors.
 
