@@ -31,9 +31,10 @@ import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
+import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
-
+import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
@@ -93,6 +94,15 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 // Services.
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { HttpClient } from '@angular/common/http';
+
+// Miscellaneous.
+import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
+import { TranslateCacheFactory } from 'pages/translate-cache.factory';
+import { TranslateCustomParser } from 'pages/translate-custom-parser';
+import { MissingTranslationCustomHandler } from 'pages/missing-translations-handler';
+import constants from 'assets/constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const toastrConfig = {
   allowHtml: false,
@@ -124,11 +134,52 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    /**
+     * The Translate Module will look for translations in the following pattern:
+     * 1. Look for translation in primary language (fetched from backend)
+     * 2. Look for translation in default language (fetched from backend)
+     * 3. Look for translation presnt in AppConstants.ts (
+     *    used until translations after fetched from backend)
+     * 4. shows the key itself, if the translation is not found.
+     */
+    TranslateModule.forRoot({
+      defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslationCustomHandler
+      },
+      loader: {
+        provide: TranslateLoader,
+        useFactory: TranslateLoaderFactory.createHttpLoader,
+        deps: [HttpClient],
+      },
+      parser: {
+        provide: TranslateParser,
+        useClass: TranslateCustomParser,
+        deps: [TranslateDefaultParser, I18nLanguageCodeService]
+      }
+    }),
+    /**
+     * The cookie shares a common name with angular-translate's cookie.
+     * This way, we have a single source of truth for both frameworks.
+     * The cookie will expire after 24 hrs.
+     */
+    TranslateCacheModule.forRoot({
+      cacheService: {
+        provide: TranslateCacheService,
+        useFactory: TranslateCacheFactory.createTranslateCacheService,
+        deps: [TranslateService, TranslateCacheSettings]
+      },
+      cacheName: 'NG_TRANSLATE_LANG_KEY',
+      cacheMechanism: 'Cookie',
+      cookieExpiry: 1
+    }),
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
   ],
 
   providers: [
+    TranslateDefaultParser,
     AngularFireAuth,
     {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
   ],
@@ -232,6 +283,7 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    TranslateModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioFileUploaderComponent,

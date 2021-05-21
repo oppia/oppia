@@ -26,20 +26,11 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateService } from 'services/translate.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
   }
 }
 
@@ -118,10 +109,6 @@ describe('Playbook Page', () => {
         {
           provide: SiteAnalyticsService,
           useClass: MockSiteAnalyticsService
-        },
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService
         },
         UrlInterpolationService,
         {

@@ -29,13 +29,15 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
     SharedComponentsModule,
-    SharedPipesModule
+    SharedPipesModule,
+    TranslateModule
   ],
   declarations: [
     PendingAccountDeletionPageComponent,

@@ -122,6 +122,8 @@ angular.module('oppia').directive('oppiaRoot', [
             OppiaAngularRootComponent.ajsTranslate = $translate;
             const translateService = (
               OppiaAngularRootComponent.translateService);
+            const translateCacheService = (
+              OppiaAngularRootComponent.translateCacheService);
             const i18nLanguageCodeService = (
               OppiaAngularRootComponent.i18nLanguageCodeService);
             translateService.use(
@@ -129,6 +131,7 @@ angular.module('oppia').directive('oppiaRoot', [
             i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
               (code) => translateService.use(code)
             );
+            translateCacheService.init();
             i18nLanguageCodeService.setI18nLanguageCode(
               $translate.proposedLanguage() || $translate.use());
 
