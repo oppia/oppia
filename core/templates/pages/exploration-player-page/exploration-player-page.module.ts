@@ -62,7 +62,8 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
