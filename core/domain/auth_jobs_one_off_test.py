@@ -27,8 +27,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services_test
 from core.tests import test_utils
 import feconf
-
-import contextlib2
+import python_utils
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -48,7 +47,7 @@ class SyncFirebaseAccountsOneOffJobTests(test_utils.AppEngineTestBase):
 
     def setUp(self):
         super(SyncFirebaseAccountsOneOffJobTests, self).setUp()
-        self.exit_stack = contextlib2.ExitStack()
+        self.exit_stack = python_utils.ExitStack()
         self.firebase_sdk_stub = (
             firebase_auth_services_test.FirebaseAdminSdkStub())
 
