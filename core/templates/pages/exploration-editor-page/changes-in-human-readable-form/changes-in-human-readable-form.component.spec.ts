@@ -101,8 +101,8 @@ describe('Changes in Human Readable Form Directive', () => {
 
     let html = fixture.debugElement.nativeElement
       .querySelector('.oppia-lost-changes').outerHTML;
-
     let result = removeComments(html);
+    
     expect(result).toBe(
       '<div class="oppia-lost-changes">' +
       '<ul>' +
