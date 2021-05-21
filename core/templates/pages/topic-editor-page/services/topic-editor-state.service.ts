@@ -87,7 +87,8 @@ export class TopicEditorStateService {
   }
 
   private _getSubtopicPageId(topicId: number, subtopicId: number): string {
-    return topicId.toString() + '-' + subtopicId.toString();
+    return topicId.toString() + '-' + (
+      subtopicId !== null ? subtopicId.toString() : '');
   }
 
   private _updateGroupedSkillSummaries(
