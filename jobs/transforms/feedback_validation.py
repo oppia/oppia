@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Beam DoFns and PTransforms to provide validation of feedback models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import feedback_services
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
