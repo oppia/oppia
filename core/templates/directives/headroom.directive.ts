@@ -18,8 +18,10 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-// TODO #12855: Remove angularjs headroom,
-// once all directives using it after migrated to angular.
+/**
+ * TODO(#12855): Remove angularjs headroom,
+ * once all directives using it after migrated to angular.
+ */
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import Headroom from 'headroom.js';
 
