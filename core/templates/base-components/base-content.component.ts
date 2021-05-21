@@ -18,7 +18,7 @@
 
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -37,7 +37,7 @@ export class BaseContentComponent {
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean;
-  DEV_MODE = constants.DEV_MODE;
+  DEV_MODE = AppConstants.DEV_MODE;
   getHeaderText: () => string;
   getSubheaderText: () => string;
 
@@ -53,8 +53,9 @@ export class BaseContentComponent {
   ) {}
 
   ngOnInit(): void {
-    if (this.windowRef.nativeWindow.location.hostname ===
-      'oppiaserver.appspot.com') {
+    // Mimic redirection behaviour in the backend (see issue #7867 for
+    // details).
+    if (this.isOppiaAppspotServer()) {
       this.windowRef.nativeWindow.location.href = (
         'https://oppiatestserver.appspot.com' +
         this.windowRef.nativeWindow.location.pathname +
@@ -68,10 +69,9 @@ export class BaseContentComponent {
     this.keyboardShortcutService.bindNavigationShortcuts();
 
     /**
-     * Note to developers
-     * pageTitleService variable is undefined when defining functions in the
-     * conventional way
-     * It only becomes properly defined when used in ngOnInit
+     * Note to developers: pageTitleService variable is undefined when
+     * defining functions in a conventional way. It only becomes
+     * properly defined when used in ngOnInit.
      */
     this.getHeaderText = () => {
       return this.pageTitleService.getPageTitleForMobileView();
@@ -80,6 +80,11 @@ export class BaseContentComponent {
     this.getSubheaderText = () => {
       return this.pageTitleService.getPageSubtitleForMobileView();
     };
+  }
+
+  isOppiaAppspotServer(): boolean {
+    return this.windowRef.nativeWindow.location.hostname ===
+      'oppiaserver.appspot.com';
   }
 
   /**
