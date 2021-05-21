@@ -1386,7 +1386,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -1399,7 +1400,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)
