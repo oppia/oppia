@@ -352,15 +352,17 @@ def fetch_next_job():
         ClassifierTrainingJob. Domain object of the next training Job.
     """
     classifier_training_jobs = []
-    # Initially the cursor for query is set to None.
-    cursor = None
+    # Initially the offset for query is set to None.
+    offset = 0
     valid_jobs = []
     timed_out_job_ids = []
 
     while len(valid_jobs) == 0:
-        classifier_training_jobs, cursor, more = (
+        classifier_training_jobs, offset = (
             classifier_models.ClassifierTrainingJobModel.
-            query_new_and_pending_training_jobs(cursor))
+            query_new_and_pending_training_jobs(offset))
+        if len(classifier_training_jobs) == 0:
+            break
         for training_job in classifier_training_jobs:
             if (training_job.status == (
                     feconf.TRAINING_JOB_STATUS_PENDING)):
@@ -369,8 +371,6 @@ def fetch_next_job():
                     timed_out_job_ids.append(training_job.id)
             else:
                 valid_jobs.append(training_job)
-        if not more:
-            break
 
     if timed_out_job_ids:
         mark_training_jobs_failed(timed_out_job_ids)
