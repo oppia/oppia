@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
-from core.domain import feedback_services
 from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.types import feedback_validation_errors
@@ -29,7 +28,8 @@ import apache_beam as beam
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
-@validation_decorators.AuditsExisting(feedback_models.GeneralFeedbackThreadModel)
+@validation_decorators.AuditsExisting(
+    feedback_models.GeneralFeedbackThreadModel)
 class ValidateEntityType(beam.DoFn):
     """DoFn to validate the entity type."""
 
@@ -47,4 +47,3 @@ class ValidateEntityType(beam.DoFn):
         if (model.entity_type not in
                 feedback_services.TARGET_TYPE_TO_TARGET_MODEL):
             yield feedback_validation_errors.InvalidEntityTypeError(model)
-
