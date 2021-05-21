@@ -354,6 +354,7 @@ import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/se
 import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
+import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
@@ -396,6 +397,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
+  ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
