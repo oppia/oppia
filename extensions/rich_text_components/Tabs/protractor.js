@@ -18,6 +18,8 @@
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
@@ -43,12 +45,21 @@ var expectComponentDetailsToMatch = async function(elem, tabArray) {
 
   for (var i = 0; i < tabArray.length; i++) {
     // Click on each tab in turn to check its contents.
+    await waitFor.visibilityOf(
+      elem.element(by.css('.protractor-non-interactive-tabs-headers')),
+      '.protractor-non-interactive-tabs-headers is taking too long to appear'
+    );
     expect(await (await titleElems.get(i)).getText()).toMatch(
       tabArray[i].title);
     await (await titleElems.get(i)).click();
+
     const tabContentEl = elem.element(
       by.css('.protractor-test-tab-content-' + i));
 
+    await waitFor.visibilityOf(
+      tabContentEl,
+      '.protractor-test-tab-content-' + i + 'is taking too long to appear'
+    );
     await forms.expectRichText(tabContentEl).toMatch(
       tabArray[i].content);
   }

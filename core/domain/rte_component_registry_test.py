@@ -52,6 +52,7 @@ _COMPONENT_CONFIG_SCHEMA = [
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 
+
 class RteComponentUnitTests(test_utils.GenericTestBase):
     """Tests that all the default RTE components are valid."""
 
