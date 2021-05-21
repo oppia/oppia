@@ -60,7 +60,7 @@ ENTRY_POINT_CRASH = 'crash'
 ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
 LANGUAGE_LOCALE_CODE_ENGLISH = 'en'
 ANDROID_PACKAGE_VERSION_CODE = 1
-NETWORK_WIFI = 'wifi'
+NETWORK_WIFI = constants.ANDROID_NETWORK_TYPES.wifi
 ANDROID_TEXT_SIZE = constants.ANDROID_TEXT_SIZE.medium_text_size
 ANDROID_BUILD_FINGERPRINT = 'example_fingerprint_id'
 EVENT_LOGS = ['event1', 'event2']
@@ -74,7 +74,7 @@ ANDROID_REPORT_INFO = {
     'logcat_logs': ['logcat1', 'logcat2'],
     'package_version_code': ANDROID_PACKAGE_VERSION_CODE,
     'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
-    'network_type': NETWORK_WIFI,
+    'network_type': NETWORK_WIFI.name,
     'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
     'entry_point_info': {
         'entry_point_name': ENTRY_POINT_NAVIGATION_DRAWER,
@@ -167,7 +167,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 'device_model': ANDROID_DEVICE_MODEL,
                 'sdk_version': ANDROID_SDK_VERSION,
                 'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
-                'network_type': NETWORK_WIFI
+                'network_type': NETWORK_WIFI.name
             },
             'app_context': {
                 'entry_point': {
@@ -369,7 +369,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             'device_model': ANDROID_DEVICE_MODEL,
             'sdk_version': ANDROID_SDK_VERSION,
             'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
-            'network_type': NETWORK_WIFI
+            'network_type': NETWORK_WIFI.name
         }
         self.assertDictEqual(
             expected_dict, self.device_system_context.to_dict())
@@ -470,11 +470,6 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
         self.device_system_context.network_type = None
         self._assert_validation_error(
             self.device_system_context, 'No network type supplied.')
-
-    def test_validation_network_type_not_a_string_fails(self):
-        self.device_system_context.network_type = 123
-        self._assert_validation_error(
-            self.device_system_context, 'Network type  must be a string')
 
     def test_validation_invalid_network_type_fails(self):
         self.device_system_context.network_type = 'invaid_network_type'

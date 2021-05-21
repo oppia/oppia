@@ -492,7 +492,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             sdk_version: int. The Android SDK version running on the device.
             build_fingerprint: str. The unique build fingerprint of this app
                 version.
-            network_type: str. The network type the device is connected to.
+            network_type: ANDROID_NETWORK_TYPE. The enum for the network type
+                the device was connected to.
         """
         super(AndroidDeviceSystemContext, self).__init__(
             version_name, device_country_locale_code)
@@ -519,7 +520,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             'device_model': self.device_model,
             'sdk_version': self.sdk_version,
             'build_fingerprint': self.build_fingerprint,
-            'network_type': self.network_type
+            'network_type': self.network_type.name
         }
 
     def validate(self):
@@ -667,9 +668,8 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """Checks that the Android device's network type is valid.
 
         Args:
-            network_type: str. The network type the device was connected to when
-                sending the report, correponding to one of the
-                ALLOWED_ANDROID_NETWORK_TYPES enums.
+            network_type: ANDROID_NETWORK_TYPES. The network type the device
+                was connected to when sending the report, as an enum.
 
         Raises:
             ValidationError. The given network is not a string.
@@ -677,9 +677,6 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         """
         if network_type is None:
             raise utils.ValidationError('No network type supplied.')
-        if not isinstance(network_type, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Network type  must be a string, received: %r.' % network_type)
         if network_type not in (
                 constants.ALLOWED_ANDROID_NETWORK_TYPES):
             raise utils.ValidationError(

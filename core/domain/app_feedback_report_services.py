@@ -64,8 +64,9 @@ def create_android_report_from_json(report_json):
     user_supplied_feedback_json = report_json['user_supplied_feedback']
     user_supplied_feedback_obj = (
         app_feedback_report_domain.UserSuppliedFeedback(
-            user_supplied_feedback_json['report_type'],
-            user_supplied_feedback_json['category'],
+            _get_report_type_from_json(
+                user_supplied_feedback_json['report_type']),
+            _get_category_from_json(user_supplied_feedback_json['category']),
             user_supplied_feedback_json['user_feedback_selected_items'],
             user_supplied_feedback_json['user_feedback_other_text_input']))
 
@@ -80,14 +81,15 @@ def create_android_report_from_json(report_json):
             device_context_json['android_device_model'],
             device_context_json['android_sdk_version'],
             device_context_json['build_fingerprint'],
-            device_context_json['network_type']))
+            _get_network_type_from_json(device_context_json['network_type'])))
 
     app_context_json = report_json['app_context']
     entry_point_obj = _get_entry_point_from_json(
         app_context_json['entry_point'])
     app_context_obj = app_feedback_report_domain.AndroidAppContext(
         entry_point_obj, app_context_json['text_language_code'],
-        app_context_json['audio_language_code'], app_context_json['text_size'],
+        app_context_json['audio_language_code'],
+        _get_android_text_size_from_json(app_context_json['text_size']),
         app_context_json['only_allows_wifi_download_and_update'],
         app_context_json['automatically_update_topics'],
         app_context_json['account_is_profile_admin'],
@@ -106,9 +108,95 @@ def create_android_report_from_json(report_json):
     return report_obj
 
 
+def _get_report_type_from_json(report_type_name):
+    """Determines the report type based on the JSON value.
+
+    Args:
+        report_type_name: str. The name of the report type.
+
+    Returns:
+        REPORT_TYPE. The enum representing this report type.
+    """
+    if report_type_name == constants.REPORT_TYPE.suggestion.name:
+        return constants.REPORT_TYPE.suggestion
+    elif report_type_name == constants.REPORT_TYPE.issue.name:
+        return constants.REPORT_TYPE.issue
+    elif report_type_name == constants.REPORT_TYPE.crash.name:
+        return constants.REPORT_TYPE.crash
+    else:
+        raise utils.InvalidInputException(
+            'The given report type %s is invalid.' % report_type_name)
+
+
+def _get_category_from_json(category_name):
+    """Determines the category based on the JSON value.
+
+    Args:
+        category_name: str. The name of the report type.
+
+    Returns:
+        CATEGORY. The enum representing this category.
+    """
+    if category_name == constants.CATEGORY.feature_suggestion.name:
+        return constants.CATEGORY.feature_suggestion
+    elif category_name == constants.CATEGORY.language_suggestion.name:
+        return constants.CATEGORY.language_suggestion
+    elif category_name == constants.CATEGORY.other_suggestion.name:
+        return constants.CATEGORY.other_suggestion
+    elif category_name == constants.CATEGORY.lesson_question_issue.name:
+        return constants.CATEGORY.lesson_question_issue
+    elif category_name == constants.CATEGORY.language_general_issue.name:
+        return constants.CATEGORY.language_general_issue
+    elif category_name == constants.CATEGORY.language_audio_issue.name:
+        return constants.CATEGORY.language_audio_issue
+    elif category_name == constants.CATEGORY.language_text_issue.name:
+        return constants.CATEGORY.language_text_issue
+    elif category_name == constants.CATEGORY.topics_issue.name:
+        return constants.CATEGORY.topics_issue
+    elif category_name == constants.CATEGORY.profile_issue.name:
+        return constants.CATEGORY.profile_issue
+    elif category_name == constants.CATEGORY.other_issue.name:
+        return constants.CATEGORY.other_issue
+    elif category_name == constants.CATEGORY.lesson_player_crash.name:
+        return constants.CATEGORY.lesson_player_crash
+    elif category_name == constants.CATEGORY.practice_questions_crash.name:
+        return constants.CATEGORY.practice_questions_crash
+    elif category_name == constants.CATEGORY.options_page_crash.name:
+        return constants.CATEGORY.options_page_crash
+    elif category_name == constants.CATEGORY.profile_page_crash.name:
+        return constants.CATEGORY.profile_page_crash
+    elif category_name == constants.CATEGORY.other_crash.name:
+        return constants.CATEGORY.other_crash
+    else:
+        raise utils.InvalidInputException(
+            'The given category %s is invalid.' % category_name)
+
+
+def _get_android_text_size_from_json(text_size_name):
+    """Determines the app text size based on the JSON value.
+
+    Args:
+        text_size_name: str. The name of the app's text size set.
+
+    Returns:
+        ANDROID_TEXT_SIZE. The enum representing the text size.
+    """
+    if text_size_name == constants.ANDROID_TEXT_SIZE.small_text_size.name:
+        return constants.ANDROID_TEXT_SIZE.small_text_size
+    elif text_size_name == constants.ANDROID_TEXT_SIZE.medium_text_size.name:
+        return constants.ANDROID_TEXT_SIZE.medium_text_size
+    elif text_size_name == constants.ANDROID_TEXT_SIZE.large_text_size.name:
+        return constants.ANDROID_TEXT_SIZE.large_text_size
+    elif text_size_name == (
+        constants.ANDROID_TEXT_SIZE.extra_large_text_size.name):
+        return constants.ANDROID_TEXT_SIZE.extra_large_text_size
+    else:
+        raise utils.InvalidInputException(
+            'The given Android app text size %s is invalid.' % text_size_name)
+
+
 def _get_entry_point_from_json(entry_point_json):
-    """Saves an incoming report and updates the aggregate report stats with the
-    new report's data.
+    """Determines the entry point type based on the rececived JSON.
 
     Args:
         entry_point_json: dict. The JSON data of the entry point.
@@ -137,6 +225,25 @@ def _get_entry_point_from_json(entry_point_json):
         raise utils.InvalidInputException(
             'The given entry point %s is invalid.' % entry_point_name)
 
+
+def _get_network_type_from_json(network_type_name):
+    """Determines the network type based on the JSON value.
+
+    Args:
+        network_type_name: str. The name of the network type.
+
+    Returns:
+        ANDROID_NETWORK_TYPES. The enum representing the network type.
+    """
+    if network_type_name == constants.ANDROID_NETWORK_TYPES.wifi.name:
+        return constants.ANDROID_NETWORK_TYPES.wifi
+    elif network_type_name == constants.ANDROID_NETWORK_TYPES.cellular.name:
+        return constants.ANDROID_NETWORK_TYPES.cellular
+    elif network_type_name == constants.ANDROID_NETWORK_TYPES.none.name:
+        return constants.ANDROID_NETWORK_TYPES.none
+    else:
+        raise utils.InvalidInputException(
+            'The given Android network type %s is invalid.' % network_type_name)
 
 def store_incoming_report_stats(report_obj):
     """Adds a new report's stats to the aggregate stats model.
