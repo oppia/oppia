@@ -402,19 +402,7 @@ interface StoryNodeOutlineStatusChange {
   'new_value': boolean;
 }
 
-interface DeleteCanonicalStoryChange {
-  'cmd': 'delete_canonical_story',
-  'story_id': string
-}
-
-interface DeleteAdditionalStoryChange {
-  'cmd': 'delete_additional_story',
-  'story_id': string
-}
-
 export type StoryChange = (
-  DeleteAdditionalStoryChange |
-  DeleteCanonicalStoryChange |
   StoryPropertyChange |
   StoryContentsChange |
   StoryNodePropertyChange |
@@ -590,12 +578,12 @@ export interface TopicRemoveSkillFromSubtopicChange {
   'skill_id': string;
 }
 
-interface TopicDeleteAdditionalStoryChange {
+export interface TopicDeleteAdditionalStoryChange {
   'cmd': 'delete_additional_story';
   'story_id': string;
 }
 
-interface TopicDeleteCanonicalStoryChange {
+export interface TopicDeleteCanonicalStoryChange {
   'cmd': 'delete_canonical_story';
   'story_id': string;
 }
