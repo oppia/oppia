@@ -217,6 +217,10 @@
             <input type="checkbox" class="protractor-test-email-updates-checkbox" ng-model="$ctrl.canReceiveEmailUpdates" ng-change="$ctrl.saveEmailPreferences($ctrl.canReceiveEmailUpdates, $ctrl.canReceiveEditorRoleEmail, $ctrl.canReceiveFeedbackMessageEmail, $ctrl.canReceiveSubscriptionEmail)">
             <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
           </label>
+          <div class="alert alert-warning" ng-if="$ctrl.showEmailSignupLink">
+            <span class="help-block oppia-form-text" translate="I18N_PREFERENCES_EMAIL_SIGNUP_TEXT"></span>
+            <a class="help-block oppia-form-text" href="<[$ctrl.emailSignupLink]>" target="_blank" rel="noopener"><[$ctrl.emailSignupLink]></a>
+          </div>
         </div>
         <div class="checkbox">
           <label>

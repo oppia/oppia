@@ -473,6 +473,7 @@
     "I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Receive emails when someone sends you feedback on an exploration",
     "I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Receive news and updates about the site",
     "I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Receive emails when a creator you've subscribed to publishes a new exploration",
+    "I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "We were not able to add you to our mailing list automatically. Please visit the following link to signup to our mailing list: ",
     "I18N_PREFERENCES_HEADING": "Preferences",
     "I18N_PREFERENCES_HEADING_SUBTEXT": "Any changes that you make on this page will be auto-saved.",
     "I18N_PREFERENCES_NO_SUBSCRIPTIONS": "You've not subscribed to any creators yet. Feel free to subscribe to your favourite author by clicking on the 'subscribe' button in the author profile page. By subscribing to an author, you will be notified by e-mail when the author publishes a new lesson.",

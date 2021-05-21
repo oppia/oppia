@@ -5472,6 +5472,8 @@ export default {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
+
   // The default number of opportunities to show on the contributor dashboard
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,

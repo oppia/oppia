@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 import hashlib
 import imghdr
@@ -1420,6 +1421,10 @@ def update_email_preferences(
         update_bulk_email_db: bool. Whether to update the bulk email provider's
             db as well. This is set to false only when called from the webhook
             controller in which case the bulk email DB is already updated.
+
+    Returns:
+        bool. Whether to send a mail to the user to complete bulk email serviec
+        signup.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)
@@ -1434,11 +1439,23 @@ def update_email_preferences(
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
     email_preferences_model.site_updates = can_receive_email_updates
+    email = get_email_from_user_id(user_id)
     if update_bulk_email_db:
-        bulk_email_services.add_or_update_user_status(
-            get_email_from_user_id(user_id), can_receive_email_updates)
+        try:
+            bulk_email_services.add_or_update_user_status(
+                email, can_receive_email_updates)
+        except Exception as error_message:
+            error_message = ast.literal_eval(
+                python_utils.UNICODE(error_message))
+            if error_message['title'] == 'Forgotten Email Not Subscribed':
+                email_preferences_model.site_updates = False
+                email_preferences_model.update_timestamps()
+                email_preferences_model.put()
+                return True
+            raise Exception(error_message)
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
+    return False
 
 
 def get_email_preferences(user_id):

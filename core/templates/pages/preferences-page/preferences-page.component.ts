@@ -49,14 +49,14 @@ angular.module('oppia').component('preferencesPage', {
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
     '$window', 'AlertsService', 'I18nLanguageCodeService',
     'LanguageUtilService', 'LoaderService', 'PreventPageUnloadEventService',
-    'UrlInterpolationService', 'UserService',
+    'UrlInterpolationService', 'UserService', 'BULK_EMAIL_SERVICE_SIGNUP_URL',
     'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
     'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
     'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, PreventPageUnloadEventService,
-        UrlInterpolationService, UserService,
+        UrlInterpolationService, UserService, BULK_EMAIL_SERVICE_SIGNUP_URL,
         DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
         ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
         SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
@@ -71,9 +71,14 @@ angular.module('oppia').component('preferencesPage', {
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        }).then(() => {
+        }).then((returnData) => {
           PreventPageUnloadEventService.removeListener();
-          AlertsService.addInfoMessage('Saved!', 1000);
+          if (returnData.data.show_bulk_email_signup_message) {
+            ctrl.canReceiveEmailUpdates = false;
+            ctrl.showEmailSignupLink = true;
+          } else {
+            AlertsService.addInfoMessage('Saved!', 1000);
+          }
         });
       };
 
@@ -185,6 +190,8 @@ angular.module('oppia').component('preferencesPage', {
         ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
         ctrl.username = '';
+        ctrl.showEmailSignupLink = false;
+        ctrl.emailSignupLink = BULK_EMAIL_SERVICE_SIGNUP_URL;
         LoaderService.showLoadingScreen('Loading');
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {

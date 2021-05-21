@@ -473,6 +473,7 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive emails when someone sends them feedback on an exploration",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive periodic emails from the site.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Text displayed in the preferences page. - Text shown to the left of a checkbox that allows the user to agree or disagree to receive emails related to user subscriptions.",
+	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "Text displayed in the preferences page. Text shown to the bottom of the checkbox to subscribe to Oppia's newsletter when we are not able to automatically add the user to the mailing list.",
 	"I18N_PREFERENCES_HEADING": "Text displayed in the preferences page. - Text shown as the title.\n{{Identical|Preferences}}",
 	"I18N_PREFERENCES_HEADING_SUBTEXT": "Text displayed in the preferences page. - Text shown below the title. Indicates that the changes made on the profile are going to be saved even if the user does not click a save button.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Text displayed in the preferences page. - Text shown if the user has no subscribed creators",

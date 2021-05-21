@@ -214,7 +214,7 @@ class PreferencesHandler(base.BaseHandler):
         """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
-
+        show_bulk_email_signup_message = False
         if update_type == 'user_bio':
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
                 raise self.InvalidInputException(
@@ -237,16 +237,19 @@ class PreferencesHandler(base.BaseHandler):
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':
-            user_services.update_email_preferences(
-                self.user_id, data['can_receive_email_updates'],
-                data['can_receive_editor_role_email'],
-                data['can_receive_feedback_message_email'],
-                data['can_receive_subscription_email'])
+            show_bulk_email_signup_message = (
+                user_services.update_email_preferences(
+                    self.user_id, data['can_receive_email_updates'],
+                    data['can_receive_editor_role_email'],
+                    data['can_receive_feedback_message_email'],
+                    data['can_receive_subscription_email']))
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
 
-        self.render_json({})
+        self.render_json({
+            'show_bulk_email_signup_message': show_bulk_email_signup_message
+        })
 
 
 class ProfilePictureHandler(base.BaseHandler):
@@ -359,11 +362,12 @@ class SignupHandler(base.BaseHandler):
                 raise self.InvalidInputException(e)
 
         if can_receive_email_updates is not None:
-            user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            show_bulk_email_signup_message = (
+                user_services.update_email_preferences(
+                    self.user_id, can_receive_email_updates,
+                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE))
 
         # Note that an email is only sent when the user registers for the first
         # time.
@@ -377,7 +381,9 @@ class SignupHandler(base.BaseHandler):
             user_services.update_user_default_dashboard(
                 self.user_id, default_dashboard)
 
-        self.render_json({})
+        self.render_json({
+            'show_bulk_email_signup_message': show_bulk_email_signup_message
+        })
 
 
 class DeleteAccountPage(base.BaseHandler):
