@@ -13,49 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Oppia 'edit preferences' page.
+ * @fileoverview Component for the Oppia 'Delete Account' page.
  */
 
-require('base-components/base-content.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require(
-  'pages/delete-account-page/templates/delete-account-modal.controller.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DeleteAccountBackendApiService } from './services/delete-account-backend-api.service';
+import { DeleteAccountModalComponent } from './templates/delete-account-modal.component';
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/site-analytics.service.ts');
+@Component({
+  selector: 'oppia-delete-account-page',
+  templateUrl: './delete-account-page.component.html'
+})
+export class DeleteAccountPageComponent {
+  constructor(
+    private ngbModal: NgbModal,
+    private deleteAccountBackendApiService: DeleteAccountBackendApiService
+  ) {}
 
-angular.module('oppia').component('deleteAccountPage', {
-  template: require('./delete-account-page.component.html'),
-  controller: [
-    '$http', '$uibModal', '$window', 'SiteAnalyticsService',
-    'UrlInterpolationService',
-    function(
-        $http, $uibModal, $window, SiteAnalyticsService,
-        UrlInterpolationService) {
-      var ctrl = this;
-      ctrl.deleteAccount = function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/delete-account-page/templates/' +
-            'delete-account-modal.template.html'),
-          backdrop: true,
-          controller: 'DeleteAccountModalController'
-        }).result.then(function() {
-          $http['delete']('/delete-account-handler').then(function() {
-            SiteAnalyticsService.registerAccountDeletion();
-            setTimeout(() => {
-              $window.location = (
-                '/logout?redirect_url=pending-account-deletion');
-            }, SiteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
-          });
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-    }
-  ]
-});
+  deleteAccount(): void {
+    const modelRef = this.ngbModal.open(
+      DeleteAccountModalComponent, { backdrop: true });
+    modelRef.result.then(() => {
+      this.deleteAccountBackendApiService.deleteAccount();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaDeleteAccountPage', downgradeComponent(
+    {component: DeleteAccountPageComponent}));
