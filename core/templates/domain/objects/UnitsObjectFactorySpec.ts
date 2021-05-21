@@ -21,7 +21,7 @@ import { Units, UnitsObjectFactory } from
   'domain/objects/UnitsObjectFactory';
 
 describe('UnitsObjectFactory', () => {
-  let units: UnitsObjectFactory = null;
+  let units: UnitsObjectFactory;
 
   beforeEach(() => {
     units = TestBed.get(UnitsObjectFactory);
@@ -173,6 +173,9 @@ describe('UnitsObjectFactory', () => {
     expect(units.unitWithMultiplier(
       ['cent', '*', '(', 'kg', '/', 'N', ')']))
       .toEqual([['cent', 1], ['kg', 1], ['N', -1]]);
+    expect(() => units.unitWithMultiplier(
+      ['cm', '/', 'kg', '/', 'N', ')']))
+      .toThrowError('Close parenthesis with no open parenthesis');
   });
 
   it('should convert a unit dict to a list', () => {

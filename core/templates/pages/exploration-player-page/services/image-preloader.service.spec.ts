@@ -49,6 +49,7 @@ describe('Image preloader service', () => {
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    correctness_feedback_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
@@ -101,6 +102,7 @@ describe('Image preloader service', () => {
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -135,6 +137,7 @@ describe('Image preloader service', () => {
             content: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -241,6 +244,7 @@ describe('Image preloader service', () => {
             feedback_2: {}
           }
         },
+        linked_skill_id: null,
         next_content_id_index: null,
       },
       'State 6': {
@@ -347,6 +351,7 @@ describe('Image preloader service', () => {
             hint_1: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       }
