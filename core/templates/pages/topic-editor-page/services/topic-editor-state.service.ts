@@ -33,7 +33,8 @@ import { TopicRights, TopicRightsBackendDict } from 'domain/topic/topic-rights.m
 import { Topic, TopicBackendDict, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import cloneDeep from 'lodash/cloneDeep';
 import { AlertsService } from 'services/alerts.service';
-import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange } from 'domain/editor/undo_redo/change.model'
+import { TopicDeleteCanonicalStoryChange, TopicDeleteAdditionalStoryChange }
+  from 'domain/editor/undo_redo/change.model';
 
 @Injectable({
   providedIn: 'root'
