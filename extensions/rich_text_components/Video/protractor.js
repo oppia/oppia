@@ -37,8 +37,14 @@ var customizeComponent = async function(
 
 var expectComponentDetailsToMatch = async function(
     elem, youtubeId, startTime, endTime, ifAutoplay) {
+  var youtubePlayer = await elem.element(by.css('.protractor-youtube-player'));
   var videoInfo = await elem.element(by.tagName('iframe')).getAttribute('src');
   expect(videoInfo).toMatch(youtubeId);
+  const startSeconds = await youtubePlayer.getAttribute(
+    'ng-reflect-start-seconds');
+  const endSeconds = await youtubePlayer.getAttribute('ng-reflect-end-seconds');
+  expect(startTime).toBe(+startSeconds);
+  expect(endTime).toBe(+endSeconds);
   expect(videoInfo).toMatch('autoplay=' + (ifAutoplay ? 1 : 0));
 };
 

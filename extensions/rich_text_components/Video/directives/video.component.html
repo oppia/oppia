@@ -1,7 +1,10 @@
 <div class="oppia-noninteractive-video-iframe-container">
   <div class="oppia-noninteractive-video-iframe">
-    <youtube-player [videoId]="videoId" [startSeconds]="start"
-                    [endSeconds]="end" [playerVars]="playerVars">
+    <youtube-player class="protractor-youtube-player"
+                    [videoId]="videoId"
+                    [startSeconds]="start"
+                    [endSeconds]="end"
+                    [playerVars]="playerVars">
     </youtube-player>
   </div>
 </div>
