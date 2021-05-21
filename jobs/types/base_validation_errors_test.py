@@ -266,6 +266,24 @@ class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
             'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
             'but post_commit_is_private=True')
 
+    def test_message_for_public_post_commit_status_raise_exception(self):
+        model = base_models.BaseCommitLogEntryModel(
+            id='123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='create',
+            user_id='',
+            post_commit_status='public',
+            post_commit_community_owned=False,
+            commit_cmds=[])
+        error = base_validation_errors.InvalidPublicCommitStatusError(model)
+
+        self.assertEqual(
+            error.message,
+            'InvalidPublicCommitStatusError in '
+            'BaseCommitLogEntryModel(id=\'123\'): post_commit_status="public" '
+            'but post_commit_community_owned=False')
+
 
 class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
 

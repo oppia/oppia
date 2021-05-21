@@ -40,6 +40,7 @@ import { StateGraphLayoutService } from 'components/graph-services/graph-layout.
 import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+import { StateLinkedSkillIdService } from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
@@ -351,6 +352,9 @@ import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-pag
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
+import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
+import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -390,6 +394,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CodeReplValidationService', CodeReplValidationService],
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
+  ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
@@ -450,6 +455,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
+  ['ExplorationPlayerStateService', ExplorationPlayerStateService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
@@ -602,6 +608,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
+  ['RefresherExplorationConfirmationModalService',
+    RefresherExplorationConfirmationModalService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
@@ -633,6 +641,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateCardObjectFactory', StateCardObjectFactory],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
+  ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
