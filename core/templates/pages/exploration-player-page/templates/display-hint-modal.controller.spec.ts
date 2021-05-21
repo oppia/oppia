@@ -57,7 +57,7 @@ describe('Display Hint Modal Controller', function() {
 
   importAllAngularServices();
 
-
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
