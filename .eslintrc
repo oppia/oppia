@@ -116,6 +116,16 @@
       "rules": {
         "oppia/no-testonly": "off"
       }
+    },
+    {
+      // We exlude all javascript files from 'Async' suffix check for
+      // asynchronous function names.We run it for only typescript files.
+      "files": [
+        "**/*.js"
+      ],
+      "rules": {
+        "oppia/async-func-name-checks": "off"
+      }
     }
   ],
   "rules": {
