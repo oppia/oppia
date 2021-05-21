@@ -21,7 +21,7 @@ require(
   'collection-node-creator.directive.ts');
 require(
   'pages/collection-editor-page/editor-tab/' +
-  'collection-node-editor.directive.ts');
+  'collection-node-editor.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
