@@ -24,6 +24,7 @@ import re
 from core.tests import test_utils
 from jobs import job_options
 from jobs.io import stub_io
+import python_utils
 
 
 class JobOptionsTests(test_utils.TestBase):
@@ -39,6 +40,18 @@ class JobOptionsTests(test_utils.TestBase):
         options = job_options.JobOptions(datastoreio=datastoreio_stub)
 
         self.assertIs(options.datastoreio, datastoreio_stub)
+
+    def test_valid_datastoreio_value(self):
+        obj = stub_io.DatastoreioStub()
+
+        self.assertIs(obj, job_options.validate_datastoreio_stub(obj))
+
+    def test_invalid_datastoreio_value(self):
+        obj = python_utils.OBJECT()
+
+        self.assertRaisesRegexp(
+            TypeError, 'not an instance of DatastoreioStub',
+            lambda: job_options.validate_datastoreio_stub(obj))
 
     def test_unsupported_values(self):
         self.assertRaisesRegexp(

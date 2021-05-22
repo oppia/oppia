@@ -31,8 +31,7 @@ import python_utils
 import apache_beam as beam
 
 AUDIT_DO_FN_TYPES_BY_KIND = (
-    base_validation_registry.
-    get_audit_do_fn_types_by_kind())
+    base_validation_registry.get_audit_do_fn_types_by_kind())
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
 # Type is: dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
@@ -79,13 +78,13 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             ValueError. When the `datastoreio` option, which provides the
                 PTransforms for performing datastore IO operations, is None.
         """
-        if self.job_options.datastoreio is None:
+        datastoreio = self.job_options.datastoreio
+        if datastoreio is None:
             raise ValueError('JobOptions.datastoreio must not be None')
 
         existing_models, deleted_models = (
             self.pipeline
-            | 'Get all models' >> (
-                self.job_options.datastoreio.ReadFromDatastore())
+            | 'Get all models' >> datastoreio.ReadFromDatastore()
             | 'Partition by model.deleted' >> (
                 beam.Partition(lambda model, _: int(model.deleted), 2))
         )
