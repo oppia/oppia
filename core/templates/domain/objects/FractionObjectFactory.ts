@@ -94,6 +94,17 @@ export class Fraction {
   isImproperFraction(): boolean {
     return this.denominator <= this.numerator;
   }
+
+  isEqualTo(fractionToCompare: Fraction): boolean {
+    const fraction = this.convertToSimplestForm();
+    fractionToCompare = fractionToCompare.convertToSimplestForm();
+    return (
+      fraction.denominator === fractionToCompare.denominator &&
+      fraction.numerator === fractionToCompare.numerator &&
+      fraction.wholeNumber === fractionToCompare.wholeNumber &&
+      fraction.isNegative === fractionToCompare.isNegative
+    );
+  }
 }
 
 @Injectable({

@@ -22,17 +22,17 @@ require(
   'components/question-directives/question-player/services/' +
   'question-player-state.service.ts');
 require('components/ratings/rating-display/rating-display.directive.ts');
-require('components/summary-tile/exploration-summary-tile.directive.ts');
-require('components/summary-tile/collection-summary-tile.directive.ts');
+require('components/summary-tile/exploration-summary-tile.component.ts');
+require('components/summary-tile/collection-summary-tile.component.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/exploration-player-page/layout-directives/' +
-  'correctness-footer.directive.ts');
+  'correctness-footer.component.ts');
 require(
   'pages/exploration-player-page/layout-directives/progress-nav.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'learner-answer-info-card.directive.ts');
+  'learner-answer-info-card.component.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
   'supplemental-card.directive.ts');
@@ -776,7 +776,7 @@ angular.module('oppia').directive('conversationSkin', [
                     classroom_url_fragment: classroomUrlFragment,
                     story_url_fragment: storyUrlFragment
                   });
-                StoryViewerBackendApiService.fetchStoryData(
+                StoryViewerBackendApiService.fetchStoryDataAsync(
                   topicUrlFragment, classroomUrlFragment,
                   storyUrlFragment).then(
                   function(res) {
@@ -797,7 +797,7 @@ angular.module('oppia').directive('conversationSkin', [
                     $rootScope.$apply();
                   });
                 if ($scope.isLoggedIn) {
-                  StoryViewerBackendApiService.recordChapterCompletion(
+                  StoryViewerBackendApiService.recordChapterCompletionAsync(
                     topicUrlFragment, classroomUrlFragment,
                     storyUrlFragment, nodeId
                   ).then(function(returnObject) {
@@ -962,7 +962,8 @@ angular.module('oppia').directive('conversationSkin', [
                       oldStateName, nextCard.getStateName(), answer,
                       LearnerParamsService.getAllParams(), isFirstHit);
 
-                    StatsReportingService.recordStateCompleted(oldStateName);
+                    StatsReportingService.recordStateCompleted(
+                      oldStateName);
                   }
                   if (nextCard.isTerminal()) {
                     StatsReportingService.recordStateCompleted(
@@ -1298,6 +1299,12 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              // TODO(#11996): Remove when migrating to Angular2+.
+              CurrentInteractionService.onAnswerChanged$.subscribe(() => {
+                $rootScope.$applyAsync();
+              })
+            );
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isLoggedIn = null;
             $scope.storyNodeIdToAdd = null;
@@ -1401,6 +1408,7 @@ angular.module('oppia').directive('conversationSkin', [
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
                 AlertsService.addSuccessMessage('Rating saved!', 1000);
+                $rootScope.$applyAsync();
               })
             );
             ctrl.directiveSubscriptions.add(

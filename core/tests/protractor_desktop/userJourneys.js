@@ -25,6 +25,7 @@ var CreatorDashboardPage =
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ModeratorPage = require('../protractor_utils/ModeratorPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
@@ -45,9 +46,11 @@ var _selectLanguage = async function(language) {
 describe('Basic user journeys', function() {
   describe('Account creation', function() {
     var libraryPage = null;
+    var moderatorPage = null;
 
     beforeAll(function() {
       libraryPage = new LibraryPage.LibraryPage();
+      moderatorPage = new ModeratorPage.ModeratorPage();
     });
 
     it('should create users', async function() {
@@ -58,7 +61,8 @@ describe('Basic user journeys', function() {
       await libraryPage.get();
       await general.checkForConsoleErrors([]);
 
-      await browser.get(general.MODERATOR_URL_SUFFIX);
+      await moderatorPage.get();
+      await general.expectErrorPage(401);
       await general.checkForConsoleErrors([
         'Failed to load resource: the server responded with a status of 401']);
       await users.logout();
@@ -69,7 +73,8 @@ describe('Basic user journeys', function() {
         'mod@userManagement.com', 'moderatorUserManagement');
 
       await users.login('mod@userManagement.com');
-      await browser.get(general.MODERATOR_URL_SUFFIX);
+      await moderatorPage.get();
+      await moderatorPage.expectModeratorPageToBeVisible();
       await general.openProfileDropdown();
       await users.logout();
       await general.checkForConsoleErrors([]);
@@ -110,7 +115,9 @@ describe('Site language', function() {
     var EDITOR_USERNAME = 'langCollections';
 
     await users.createUser('lang@collections.com', EDITOR_USERNAME);
-    await users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    await users.createAndLoginAdminUser(
+      'langCreator@explorations.com', CREATOR_USERNAME);
+    await users.logout();
     await users.createAndLoginAdminUser(
       'testlangadm@collections.com', 'testlangadm');
     await adminPage.get();
@@ -118,7 +125,7 @@ describe('Site language', function() {
     await users.logout();
 
     await users.login('langCreator@explorations.com');
-    await workflow.createExploration();
+    await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
       await forms.toRichText('Language Test'));
@@ -234,12 +241,11 @@ describe('Site language', function() {
   );
 
   it('should not change in an exploration', async function() {
-    await users.login('langCreator@explorations.com', true);
+    await users.login('langCreator@explorations.com');
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('Español');
-
-    await general.openEditor(firstExplorationId);
+    await general.openEditor(firstExplorationId, false);
 
     // Spanish is still selected.
     var placeholder = await element(by.css('.protractor-test-float-form-input'))

@@ -35,6 +35,15 @@ import { InteractionCustomizationArgs } from
   providedIn: 'root'
 })
 export class ExplorationHtmlFormatterService {
+  private readonly migratedInteractions: string[] = [
+    'AlgebraicExpressionInput',
+    'CodeRepl',
+    'Continue',
+    'FractionInput',
+    'GraphInput',
+    'ImageClickInput'
+  ];
+
   constructor(
       private camelCaseToHyphens: CamelCaseToHyphensPipe,
       private extensionTagAssembler: ExtensionTagAssemblerService,
@@ -53,24 +62,60 @@ export class ExplorationHtmlFormatterService {
    *   Otherwise, parentHasLastAnswerProperty should be set to false.
    * @param {string} labelForFocusTarget - The label for setting focus on
    *   the interaction.
+   * @param {string} savedSolution - The name of property that needs to be bound
+   *   containing the savedSolution in the scope. The scope here is the
+   *   scope where the return value of this function is compiled.
    */
   getInteractionHtml(
       interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs,
       parentHasLastAnswerProperty: boolean,
-      labelForFocusTarget: string): string {
+      labelForFocusTarget: string,
+      savedSolution: string | null): string {
     var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
     var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
     element = (
       this.extensionTagAssembler.formatCustomizationArgAttrs(
         element, interactionCustomizationArgs));
-    element.attr(
-      'last-answer', parentHasLastAnswerProperty ? 'lastAnswer' : 'null');
-    if (labelForFocusTarget) {
-      element.attr('label-for-focus-target', labelForFocusTarget);
+    const tagEnd = '></oppia-interactive-' + htmlInteractionId + '>';
+    let directiveOuterHtml = element.get(0).outerHTML.replace(tagEnd, '');
+    let spaceToBeAdded = true;
+    const getLastAnswer = (): string => {
+      let propValue = parentHasLastAnswerProperty ? 'lastAnswer' : 'null';
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        return '[last-answer]="' + propValue + '"';
+      } else {
+        return 'last-answer="' + propValue + '"';
+      }
+    };
+    if (savedSolution) {
+      // TODO(#12292): Refactor this once all interactions have been migrated to
+      // Angular 2+, such that we don't need to parse the string in the
+      // interaction directives/components.
+      if (spaceToBeAdded) {
+        directiveOuterHtml += ' ';
+      }
+      if (this.migratedInteractions.indexOf(interactionId) >= 0) {
+        directiveOuterHtml += '[saved-solution]="' + savedSolution + '" ';
+      } else {
+        directiveOuterHtml += 'saved-solution="' + savedSolution + '" ';
+      }
+      spaceToBeAdded = false;
     }
-    return element.get(0).outerHTML;
+    if (labelForFocusTarget) {
+      if (spaceToBeAdded) {
+        directiveOuterHtml += ' ';
+      }
+      directiveOuterHtml += (
+        'label-for-focus-target="' + labelForFocusTarget + '" ');
+      spaceToBeAdded = false;
+    }
+    if (spaceToBeAdded) {
+      directiveOuterHtml += ' ';
+    }
+    directiveOuterHtml += getLastAnswer() + tagEnd;
+    return directiveOuterHtml;
   }
 
   getAnswerHtml(
@@ -96,7 +141,7 @@ export class ExplorationHtmlFormatterService {
 
   getShortAnswerHtml(
       answer: InteractionAnswer, interactionId: string,
-      interactionCustomizationArgs: InteractionCustomizationArgs) : string {
+      interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
 
     // TODO(sll): Get rid of this special case for multiple choice.

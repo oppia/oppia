@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerStatsObjectFactory, AnswerStatsBackendDict } from
-  'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats, AnswerStatsBackendDict } from
+  'domain/exploration/answer-stats.model';
 import {
   ExplorationTask,
   ExplorationTaskType,
@@ -58,7 +58,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
-  let answerStatsObjectFactory: AnswerStatsObjectFactory;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory;
   let statesObjectFactory: StatesObjectFactory;
 
@@ -83,7 +82,6 @@ describe('Exploration improvements task registrar service', () => {
     taskRegistryService = (
       TestBed.get(ExplorationImprovementsTaskRegistryService));
 
-    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.get(StatesObjectFactory);
 
@@ -136,9 +134,11 @@ describe('Exploration improvements task registrar service', () => {
         },
         id: 'TextInput'
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {
           content: {},
@@ -244,7 +244,7 @@ describe('Exploration improvements task registrar service', () => {
     return ExplorationStats.createFromBackendDict(dict);
   };
   const makeAnswerStats = (dict = answerStatsBackendDict) => {
-    return answerStatsObjectFactory.createFromBackendDict(dict);
+    return AnswerStats.createFromBackendDict(dict);
   };
   const makeCstPlaythroughIssue = (dict = cstPlaythroughIssueBackendDict) => {
     return <CyclicStateTransitionsPlaythroughIssue> (

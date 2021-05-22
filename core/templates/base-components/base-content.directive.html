@@ -2,8 +2,8 @@
   <div ng-if="$ctrl.iframed">
     <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content"
          ng-cloak>
-      <loading-message message="$ctrl.loadingMessage"></loading-message>
-      <warnings-and-alerts></warnings-and-alerts>
+      <oppia-loading-message [message]="$ctrl.loadingMessage"></oppia-loading-message>
+      <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
       <div ng-show="!$ctrl.loadingMessage">
         <div ng-transclude="content">
         </div>
@@ -18,8 +18,8 @@
     <div role="button" tabindex="0" ng-click="$ctrl.skipToMainContent()"
          class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content
     </div>
-    <promo-bar>
-    </promo-bar>
+    <oppia-promo-bar>
+    </oppia-promo-bar>
     <div ng-if="$ctrl.isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
     </div>
 
@@ -56,8 +56,8 @@
             </div>
             <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content"
                  class="protractor-test-main-content" ng-cloak>
-              <loading-message message="$ctrl.loadingMessage"></loading-message>
-              <warnings-and-alerts></warnings-and-alerts>
+              <oppia-loading-message [message]="$ctrl.loadingMessage"></oppia-loading-message>
+              <oppia-warnings-and-alerts></oppia-warnings-and-alerts>
               <div ng-show="!$ctrl.loadingMessage">
                 <div ng-transclude="content">
                 </div>
@@ -69,7 +69,7 @@
             </div>
           </div>
 
-          <side-navigation-bar></side-navigation-bar>
+          <oppia-side-navigation-bar [display]="$ctrl.isSidebarShown()"></oppia-side-navigation-bar>
         </div>
       </div>
     </div>

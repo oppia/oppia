@@ -16,80 +16,102 @@
  * @fileoverview Service for managing images in localStorage.
  */
 
-require('services/alerts.service.ts');
-require('services/image-upload-helper.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('ImageLocalStorageService', [
-  '$window', 'AlertsService', 'ImageUploadHelperService', function(
-      $window, AlertsService, ImageUploadHelperService) {
-    var storedImageFilenames = [];
-    // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
-    // minimum limit, for all browsers, per hostname, that can be stored in
-    // sessionStorage and 100kB is the max size limit for uploaded images, hence
-    // the limit below.
-    var MAX_IMAGES_STORABLE = 5 * 1024 / 100;
-    var thumbnailBgColor = null;
+import { AlertsService } from 'services/alerts.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-    return {
-      getObjectUrlForImage: function(filename) {
-        var urlCreator = window.URL || window.webkitURL;
-        var imageBlob = ImageUploadHelperService.convertImageDataToImageFile(
-          $window.sessionStorage.getItem(filename));
-        return urlCreator.createObjectURL(imageBlob);
-      },
+export interface ImagesData {
+  filename: string;
+  imageBlob: Blob;
+}
 
-      /**
-       * Saves the image data in localStorage.
-       * @param {string} filename - Filename of the image.
-       * @param {string} rawImage - Raw base64/URLEncoded data of the image.
-       */
-      saveImage: function(filename, rawImage) {
-        if (storedImageFilenames.length + 1 > MAX_IMAGES_STORABLE) {
-          // Since the service is going to be used in the create modal for
-          // entities, more images can be added after entity creation, when
-          // local storage would no longer be used.
-          AlertsService.addInfoMessage(
-            'Image storage limit reached. More images can be added after ' +
-            'creation.');
-          return;
-        }
-        $window.sessionStorage.setItem(filename, rawImage);
-        storedImageFilenames.push(filename);
-      },
+@Injectable({
+  providedIn: 'root'
+})
+export class ImageLocalStorageService {
+  storedImageFilenames: string[] = [];
+  // According to https://en.wikipedia.org/wiki/Web_storage, 5MB is the
+  // minimum limit, for all browsers, per hostname, that can be stored in
+  // sessionStorage and 100kB is the max size limit for uploaded images, hence
+  // the limit below.
+  MAX_IMAGES_STORABLE: number = 5 * 1024 / 100;
+  thumbnailBgColor: string = null;
 
-      deleteImage: function(filename) {
-        $window.sessionStorage.removeItem(filename);
-        var index = storedImageFilenames.indexOf(filename);
-        storedImageFilenames.splice(index, 1);
-      },
+  constructor(
+    private alertsService: AlertsService,
+    private imageUploadHelperService: ImageUploadHelperService,
+    private windowRef: WindowRef) {}
 
-      getStoredImagesData: function() {
-        var returnData = [];
-        for (var idx in storedImageFilenames) {
-          returnData.push({
-            filename: storedImageFilenames[idx],
-            imageBlob: ImageUploadHelperService.convertImageDataToImageFile(
-              $window.sessionStorage.getItem(storedImageFilenames[idx]))
-          });
-        }
-        return returnData;
-      },
-
-      isInStorage: function(filename) {
-        return storedImageFilenames.indexOf(filename) !== -1;
-      },
-
-      setThumbnailBgColor: function(bgColor) {
-        thumbnailBgColor = bgColor;
-      },
-      getThumbnailBgColor: function() {
-        return thumbnailBgColor;
-      },
-      flushStoredImagesData: function() {
-        $window.sessionStorage.clear();
-        storedImageFilenames.length = 0;
-        thumbnailBgColor = null;
-      }
-    };
+  getObjectUrlForImage(filename: string): string {
+    const urlCreator = URL || webkitURL;
+    const imageBlob = this.imageUploadHelperService.convertImageDataToImageFile(
+      this.windowRef.nativeWindow.sessionStorage.getItem(filename));
+    return urlCreator.createObjectURL(imageBlob);
   }
-]);
+
+  getRawImageData(filename: string): string {
+    return this.windowRef.nativeWindow.sessionStorage.getItem(filename);
+  }
+
+  /**
+   * Saves the image data in localStorage.
+   * @param {string} filename - Filename of the image.
+   * @param {string} rawImage - Raw base64/URLEncoded data of the image.
+   */
+  saveImage(filename: string, rawImage: string): void {
+    if (this.storedImageFilenames.length + 1 > this.MAX_IMAGES_STORABLE) {
+      // Since the service is going to be used in the create modal for
+      // entities, more images can be added after entity creation, when
+      // local storage would no longer be used.
+      this.alertsService.addInfoMessage(
+        'Image storage limit reached. More images can be added after ' +
+        'creation.');
+      return;
+    }
+    this.windowRef.nativeWindow.sessionStorage.setItem(filename, rawImage);
+    this.storedImageFilenames.push(filename);
+  }
+
+  deleteImage(filename: string): void {
+    this.windowRef.nativeWindow.sessionStorage.removeItem(filename);
+    const index = this.storedImageFilenames.indexOf(filename);
+    this.storedImageFilenames.splice(index, 1);
+  }
+
+  getStoredImagesData(): ImagesData[] {
+    const returnData = [];
+    for (const idx in this.storedImageFilenames) {
+      returnData.push({
+        filename: this.storedImageFilenames[idx],
+        imageBlob: this.imageUploadHelperService.convertImageDataToImageFile(
+          this.windowRef.nativeWindow.sessionStorage.getItem(
+            this.storedImageFilenames[idx]))
+      });
+    }
+    return returnData;
+  }
+
+  isInStorage(filename: string): boolean {
+    return this.storedImageFilenames.indexOf(filename) !== -1;
+  }
+
+  setThumbnailBgColor(bgColor: string): void {
+    this.thumbnailBgColor = bgColor;
+  }
+
+  getThumbnailBgColor(): string {
+    return this.thumbnailBgColor;
+  }
+
+  flushStoredImagesData(): void {
+    this.windowRef.nativeWindow.sessionStorage.clear();
+    this.storedImageFilenames.length = 0;
+    this.thumbnailBgColor = null;
+  }
+}
+
+angular.module('oppia').factory(
+  'ImageLocalStorageService', downgradeInjectable(ImageLocalStorageService));

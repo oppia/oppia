@@ -45,11 +45,9 @@ describe('Topic editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     await users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
-    await users.logout();
   });
 
   beforeEach(async function() {
-    await users.login('creator@topicEditor.com');
     await topicsAndSkillsDashboardPage.get();
   });
 
@@ -164,6 +162,9 @@ describe('Topic editor functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+  });
+
+  afterAll(async function() {
     await users.logout();
   });
 });
@@ -184,6 +185,7 @@ describe('Chapter editor functionality', function() {
     for (var i = 0; i < numExplorations; i++) {
       var info = dummyExplorationInfo.slice();
       info[0] += i.toString();
+      info.push(i === 0);
       await workflow.createAndPublishExploration.apply(workflow, info);
       var url = await browser.getCurrentUrl();
       var id = url.split('/')[4].replace('#', '');
@@ -203,11 +205,6 @@ describe('Chapter editor functionality', function() {
     await users.createAndLoginAdminUser(
       USER_EMAIL, 'creatorChapterTest');
     dummyExplorationIds = await createDummyExplorations(1);
-    await users.logout();
-  });
-
-  beforeEach(async function() {
-    await users.login(USER_EMAIL);
   });
 
   it('should create a basic chapter with a thumbnail.', async function() {

@@ -19,18 +19,21 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
+require(
+  'components/forms/custom-forms-directives/' +
+  'thumbnail-display.component.ts');
 
-require('services/image-upload-helper.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 angular.module('oppia').controller('EditThumbnailModalController', [
   '$controller', '$scope', '$timeout', '$uibModalInstance',
-  'ImageUploadHelperService', 'allowedBgColors', 'aspectRatio',
+  'SvgSanitizerService', 'allowedBgColors', 'aspectRatio',
   'dimensions', 'getPreviewDescription', 'getPreviewDescriptionBgColor',
   'getPreviewFooter', 'getPreviewTitle', 'openInUploadMode',
   'tempBgColor', 'uploadedImage', 'uploadedImageMimeType',
   function(
       $controller, $scope, $timeout, $uibModalInstance,
-      ImageUploadHelperService, allowedBgColors, aspectRatio,
+      SvgSanitizerService, allowedBgColors, aspectRatio,
       dimensions, getPreviewDescription, getPreviewDescriptionBgColor,
       getPreviewFooter, getPreviewTitle, openInUploadMode,
       tempBgColor, uploadedImage, uploadedImageMimeType) {
@@ -38,6 +41,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.bgColor = allowedBgColors.length > 0 ? allowedBgColors[0] : '#fff';
     $scope.uploadedImage = uploadedImage;
     $scope.invalidImageWarningIsShown = false;
     $scope.invalidTagsAndAttributes = {
@@ -66,11 +70,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
     };
 
     $scope.updateBackgroundColor = function(color) {
-      var thumbnailImageElement = (
-        <HTMLElement>document.querySelector(
-          '.oppia-thumbnail-image'));
-      thumbnailImageElement.style.background = color;
-      tempBgColor = color;
+      $scope.bgColor = color;
     };
 
     $scope.onFileChanged = function(file) {
@@ -85,7 +85,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
           var reader = new FileReader();
           reader.onload = function(e) {
             var imgSrc = <string>((<FileReader>e.target).result);
-            $scope.$apply(function() {
+            $scope.$apply(() => {
               $scope.uploadedImage = (
                 (<FileReader>e.target).result);
             });
@@ -102,7 +102,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
             };
             img.src = imgSrc;
             $scope.invalidTagsAndAttributes = (
-              ImageUploadHelperService.getInvalidSvgTagsAndAttrs(
+              SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
                 imgSrc));
             var tags = $scope.invalidTagsAndAttributes.tags;
             var attrs = $scope.invalidTagsAndAttributes.attrs;
@@ -111,7 +111,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
             }
           };
           reader.readAsDataURL(file);
-          $timeout(function() {
+          $timeout(() => {
             $('.oppia-thumbnail-uploader').fadeIn();
           }, 100);
         });

@@ -24,7 +24,7 @@ import { ReadOnlyTopic } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { Subtopic, SkillIdToDescriptionMap } from
-  'domain/topic/SubtopicObjectFactory';
+  'domain/topic/subtopic.model';
 import { DegreesOfMastery } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from
@@ -83,7 +83,7 @@ export class TopicViewerPageComponent implements OnInit {
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
 
     this.loaderService.showLoadingScreen('Loading');
-    this.topicViewerBackendApiService.fetchTopicData(
+    this.topicViewerBackendApiService.fetchTopicDataAsync(
       this.topicUrlFragment, this.classroomUrlFragment).then(
       (readOnlyTopic: ReadOnlyTopic) => {
         this.topicId = readOnlyTopic.getTopicId();

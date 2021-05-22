@@ -29,6 +29,7 @@ from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import html_cleaner
 from core.domain import html_validation_service
+from core.domain import question_domain
 from core.domain import suggestion_registry
 from core.domain import user_domain
 from core.domain import user_services
@@ -111,8 +112,8 @@ def create_suggestion(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
             raise Exception(
-                'The given content_html does not match the content of the '
-                'exploration.')
+                'The Exploration content has changed since this translation '
+                'was submitted.')
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
@@ -131,7 +132,7 @@ def create_suggestion(
             suggestion_type])
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category, language_code)
+        None, change, score_category, language_code, False)
     suggestion.validate()
 
     suggestion_models.GeneralSuggestionModel.create(
@@ -165,7 +166,7 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.language_code,
-        suggestion_model.last_updated)
+        suggestion_model.edited_by_reviewer, suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):
@@ -294,6 +295,7 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.change_cmd = suggestion.change.to_dict()
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
+        suggestion_model.edited_by_reviewer = suggestion.edited_by_reviewer
 
     suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
@@ -362,6 +364,9 @@ def accept_suggestion(
                 suggestion.suggestion_id)
         )
 
+    if suggestion.edited_by_reviewer:
+        commit_message = '%s (with edits)' % commit_message
+
     suggestion.set_suggestion_status_to_accepted()
     suggestion.set_final_reviewer_id(reviewer_id)
 
@@ -379,7 +384,7 @@ def accept_suggestion(
 
     feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
-        None, review_message)
+        None, review_message, should_send_email=False)
 
     # When recording of scores is enabled, the author of the suggestion gets an
     # increase in their score for the suggestion category.
@@ -469,7 +474,7 @@ def reject_suggestions(suggestion_ids, reviewer_id, review_message):
 
     feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
-        None, review_message
+        None, review_message, should_send_email=False
     )
 
 
@@ -1178,7 +1183,7 @@ def get_suggestion_types_that_need_reviewers():
         dict. A dictionary that uses the presence of its keys to indicate which
         suggestion types need more reviewers. The possible key values are the
         suggestion types listed in
-        suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
+        feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
         values for each suggestion type are the following:
         - for question suggestions the value is an empty set
         - for translation suggestions the value is a nonempty set containing the
@@ -1265,3 +1270,56 @@ def _update_suggestion_counts_in_community_contribution_stats(
     """
     _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount)
+
+
+def update_translation_suggestion(suggestion_id, translation_html):
+    """Updates the translation_html of a suggestion with the given
+    suggestion_id.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be updated.
+        translation_html: str. The new translation_html string.
+    """
+    suggestion = get_suggestion_by_id(suggestion_id)
+
+    suggestion.change.translation_html = html_cleaner.clean(translation_html)
+    suggestion.edited_by_reviewer = True
+    suggestion.pre_update_validate(suggestion.change)
+    _update_suggestion(suggestion)
+
+
+def update_question_suggestion(
+        suggestion_id, skill_difficulty, question_state_data):
+    """Updates skill_difficulty and question_state_data of a suggestion with
+    the given suggestion_id.
+
+    Args:
+        suggestion_id: str. The id of the suggestion to be updated.
+        skill_difficulty: double. The difficulty level of the question.
+        question_state_data: obj. Details of the question.
+    """
+    suggestion = get_suggestion_by_id(suggestion_id)
+    new_change_obj = question_domain.QuestionSuggestionChange(
+        {
+            'cmd': suggestion.change.cmd,
+            'question_dict': {
+                'question_state_data': question_state_data,
+                'language_code': suggestion.change.question_dict[
+                    'language_code'],
+                'question_state_data_schema_version': (
+                    suggestion.change.question_dict[
+                        'question_state_data_schema_version']),
+                'linked_skill_ids': suggestion.change.question_dict[
+                    'linked_skill_ids'],
+                'inapplicable_skill_misconception_ids': (
+                    suggestion.change.question_dict[
+                        'inapplicable_skill_misconception_ids'])
+            },
+            'skill_id': suggestion.change.skill_id,
+            'skill_difficulty': skill_difficulty
+        })
+    suggestion.pre_update_validate(new_change_obj)
+    suggestion.edited_by_reviewer = True
+    suggestion.change = new_change_obj
+
+    _update_suggestion(suggestion)

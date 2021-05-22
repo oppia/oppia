@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { OutcomeObjectFactory } from
@@ -29,11 +29,11 @@ import { RuleObjectFactory, RuleInputs } from
 import { TestBed } from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
-  let pcevs: PencilCodeEditorValidationService = null;
-  let oof: OutcomeObjectFactory = null;
-  let rof: RuleObjectFactory = null;
-  let inputBackend: RuleInputs = null;
-  let agof : AnswerGroupObjectFactory = null;
+  let pcevs: PencilCodeEditorValidationService;
+  let oof: OutcomeObjectFactory;
+  let rof: RuleObjectFactory;
+  let inputBackend: RuleInputs;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     oof = TestBed.get(OutcomeObjectFactory);
@@ -64,7 +64,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-      var answergroup1 = [];
+      var answergroup1: AnswerGroup[] = [];
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -86,7 +86,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
+      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], '');
 
       // It also returns the error when feedback is not provided.
       expect(pcevs.getAllWarnings(
@@ -110,7 +110,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);
@@ -130,7 +130,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-      var answergroup1 = [];
+      var answergroup1: AnswerGroup[] = [];
 
       spyOn(pcevs, 'getCustomizationArgsWarnings')
         .withArgs(customizationArgs).and.returnValue([]);
@@ -141,6 +141,39 @@ describe('Pencil Code Editor Validation Service', () => {
 
       // It checks the getCustomizationArgsWarnings has been called or not.
       expect(pcevs.getCustomizationArgsWarnings).toHaveBeenCalled();
+    });
+
+    it('should catch non-string value for initialCode', () => {
+      var statename = 'Introduction';
+      var customizationArgs = {
+        initialCode: {
+          value: 1
+        }
+      };
+      inputBackend = {
+        x: [['<p>one</p>']]
+      };
+      const testOutcome = oof.createNew(
+        'Introduction', 'feedback_0', '<p>YES</p>', []);
+      let rulesDict = rof.createNew('CodeEquals', inputBackend, {
+        x: 'CodeString'
+      });
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      const testOutcome2 = oof.createNew(
+        'Introduction', 'default_outcome',
+        '<p>no</p>', []);
+      var partialWarningsList = [];
+      partialWarningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The initialCode must be a string.'
+      });
+      expect(pcevs.getAllWarnings(
+        // This throws "Type '1' is not assignable to type 'string'."
+        // Here we are assigning the wrong type of value to
+        // "customizationArguments" in order to test validations.
+        // @ts-expect-error
+        statename, customizationArgs, [answergroup2], testOutcome2)
+      ).toEqual(partialWarningsList);
     });
   });
 });

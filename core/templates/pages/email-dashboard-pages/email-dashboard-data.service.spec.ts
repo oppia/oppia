@@ -32,6 +32,14 @@ describe('Email Dashboard Services', () => {
     let csrfService: CsrfTokenService = null;
     let emailDashboardDataService: EmailDashboardDataService = null;
     let httpTestingController: HttpTestingController;
+    let defaultData = {
+      inactive_in_last_n_days: null,
+      has_not_logged_in_for_n_days: null,
+      created_at_least_n_exps: null,
+      created_fewer_than_n_exps: null,
+      edited_at_least_n_exps: null,
+      edited_fewer_than_n_exps: null
+    };
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -42,7 +50,7 @@ describe('Email Dashboard Services', () => {
       emailDashboardDataService = TestBed.get(EmailDashboardDataService);
       httpTestingController = TestBed.get(HttpTestingController);
 
-      spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
         return new Promise((resolve) => {
           resolve('sample-csrf-token');
         });
@@ -91,14 +99,8 @@ describe('Email Dashboard Services', () => {
 
     it('should post correct data to backend',
       fakeAsync(() => {
-        var data = {
-          hasNotLoggedInForNDays: 'value1',
-          inactiveInLastNDays: null,
-          createdAtLeastNExps: null,
-          createdFewerThanNExps: null,
-          editedAtLeastNExps: null,
-          editedFewerThanNExps: null
-        };
+        var data = defaultData;
+        data.inactive_in_last_n_days = 10;
         var queryDataDict = {
           id: 'qnew',
           status: 'processing',
@@ -230,14 +232,8 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getQueries()).toEqual([]);
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(0);
 
-        var data = {
-          hasNotLoggedInForNDays: 'value1',
-          inactiveInLastNDays: null,
-          createdAtLeastNExps: null,
-          createdFewerThanNExps: null,
-          editedAtLeastNExps: null,
-          editedFewerThanNExps: null
-        };
+        var data = defaultData;
+        data.inactive_in_last_n_days = 10;
         // Maintain list of all submitted queries for cross checking.
         var totalQueries = [];
         // Submit 25 new queries.

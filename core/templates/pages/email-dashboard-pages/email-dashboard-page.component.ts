@@ -21,34 +21,31 @@ require('base-components/base-content.directive.ts');
 require('services/user.service.ts');
 
 require('./email-dashboard-data.service');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
 angular.module('oppia').component('emailDashboardPage', {
   template: require('./email-dashboard-page.component.html'),
   controller: [
     '$rootScope', 'EmailDashboardDataService', 'LoaderService',
-    'UserService', function(
+    'UserService', 'EMAIL_DASHBOARD_PREDICATE_DEFINITION', function(
         $rootScope, EmailDashboardDataService, LoaderService,
-        UserService) {
+        UserService, EMAIL_DASHBOARD_PREDICATE_DEFINITION) {
       var ctrl = this;
       ctrl.resetForm = function() {
-        ctrl.hasNotLoggedInForNDays = null;
-        ctrl.inactiveInLastNDays = null;
-        ctrl.createdAtLeastNExps = null;
-        ctrl.createdFewerThanNExps = null;
-        ctrl.editedAtLeastNExps = null;
-        ctrl.editedFewerThanNExps = null;
+        ctrl.data = {};
+        EMAIL_DASHBOARD_PREDICATE_DEFINITION.forEach(predicate => {
+          ctrl.data[predicate.backend_attr] = predicate.default_value;
+        });
+      };
+
+      ctrl.areAllInputsEmpty = function() {
+        return Object.values(ctrl.data).every(
+          value => value === null || value === false);
       };
 
       ctrl.submitQueryAsync = async function() {
-        var data = {
-          hasNotLoggedInForNDays: ctrl.hasNotLoggedInForNDays,
-          inactiveInLastNDays: ctrl.inactiveInLastNDays,
-          createdAtLeastNExps: ctrl.createdAtLeastNExps,
-          createdFewerThanNExps: ctrl.createdFewerThanNExps,
-          editedAtLeastNExps: ctrl.editedAtLeastNExps,
-          editedFewerThanNExps: ctrl.editedFewerThanNExps
-        };
-        EmailDashboardDataService.submitQueryAsync(data).then(
+        EmailDashboardDataService.submitQueryAsync(ctrl.data).then(
           function(queries) {
             ctrl.currentPageOfQueries = queries;
             // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -108,6 +105,9 @@ angular.module('oppia').component('emailDashboardPage', {
       ctrl.$onInit = function() {
         ctrl.username = '';
         LoaderService.showLoadingScreen('Loading');
+        ctrl.customizationArgSpecs = EMAIL_DASHBOARD_PREDICATE_DEFINITION;
+        ctrl.resetForm();
+
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           LoaderService.hideLoadingScreen();

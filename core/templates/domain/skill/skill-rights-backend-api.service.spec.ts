@@ -24,10 +24,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from
 import { SkillRightsBackendDict, SkillRights } from
   'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService} from
-  'domain/skill/skill-rights-backend-api.service.ts';
+  'domain/skill/skill-rights-backend-api.service';
 
 describe('Skill rights backend API service', () => {
-  let skillRightsBackendApiService:SkillRightsBackendApiService = null;
+  let skillRightsBackendApiService: SkillRightsBackendApiService = null;
   let httpTestingController: HttpTestingController = null;
   let sampleSkillRights: SkillRightsBackendDict = {
     skill_id: '0',

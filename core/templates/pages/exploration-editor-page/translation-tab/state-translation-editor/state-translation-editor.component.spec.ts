@@ -108,6 +108,7 @@ describe('State Translation Editor Component', function() {
         }
       }
     },
+    linked_skill_id: null,
     param_changes: [],
     recorded_voiceovers: {
       voiceovers_mapping: {
@@ -345,7 +346,7 @@ describe('State Translation Editor Component', function() {
 
       expect(
         stateWrittenTranslationsService.displayed.getWrittenTranslation()
-          .getHtml()
+          .getTranslation()
       ).toBe('This is a html');
     });
 
@@ -433,6 +434,15 @@ describe('State Translation Editor Component', function() {
       expect($scope.translationEditorIsOpen).toBe(true);
       expect($scope.activeWrittenTranslation).toEqual(
         writtenTranslationObjectFactory.createNew('html', ''));
+    });
+
+    it('should open translation editor when it is editable and with a ' +
+       'Translatable object as data format', function() {
+      $scope.dataFormat = 'set_of_unicode_string';
+      $scope.openTranslationEditor();
+      expect($scope.translationEditorIsOpen).toBe(true);
+      expect($scope.activeWrittenTranslation).toEqual(
+        writtenTranslationObjectFactory.createNew('set_of_unicode_string'));
     });
 
     it('should add written translation html when clicking on save' +

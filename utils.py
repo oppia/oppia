@@ -22,6 +22,7 @@ import collections
 import datetime
 import hashlib
 import imghdr
+import itertools
 import json
 import os
 import random
@@ -67,22 +68,9 @@ class ExplorationConversionError(Exception):
     pass
 
 
-def create_enum(*sequential, **names):
-    """Creates a enumerated constant.
-
-    Args:
-        *sequential: *. Sequence List to generate the enumerations.
-        **names: *. Names of the enumerration.
-
-    Returns:
-        dict. Dictionary containing the enumerated constants.
-    """
-    enums = dict(python_utils.ZIP(sequential, sequential), **names)
-    return type(b'Enum', (), enums)
-
-
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
-    """Gets the contents of a file, given a relative filepath from oppia/.
+    """Gets the contents of a file, given a relative filepath
+    from oppia.
 
     Args:
         filepath: str. A full path to the file.
@@ -435,7 +423,8 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    return base64.b64encode(bytes([value]))
+    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']'
+    return base64.b64encode(byte_value)
 
 
 def get_time_in_millisecs(datetime_obj):
@@ -613,12 +602,12 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
 
     Raises:
-        Exception. Name isn't a string.
-        Exception. The length of the name_type isn't between
+        ValidationError. Name isn't a string.
+        ValidationError. The length of the name_type isn't between
             1 and 50.
-        Exception. Name starts or ends with whitespace.
-        Exception. Adjacent whitespace in name_type isn't collapsed.
-        Exception. Invalid character is present in name.
+        ValidationError. Name starts or ends with whitespace.
+        ValidationError. Adjacent whitespace in name_type isn't collapsed.
+        ValidationError. Invalid character is present in name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
@@ -658,10 +647,10 @@ def require_valid_url_fragment(name, name_type, allowed_length):
         allowed_length: int. Allowed length for the name.
 
     Raises:
-        Exception. Name is not a string.
-        Exception. Name is empty.
-        Exception. The length of the name_type is not correct.
-        Exception. Invalid character is present in the name.
+        ValidationError. Name is not a string.
+        ValidationError. Name is empty.
+        ValidationError. The length of the name_type is not correct.
+        ValidationError. Invalid character is present in the name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError(
@@ -688,6 +677,14 @@ def require_valid_thumbnail_filename(thumbnail_filename):
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
+
+        Raises:
+            ValidationError. Thumbnail filename is not a string.
+            ValidationError. Thumbnail filename does start with a dot.
+            ValidationError. Thumbnail filename includes slashes
+                or consecutive dots.
+            ValidationError. Thumbnail filename does not include an extension.
+            ValidationError. Thumbnail filename extension is not svg.
         """
     if thumbnail_filename is not None:
         if not isinstance(thumbnail_filename, python_utils.BASESTRING):
@@ -718,6 +715,10 @@ def require_valid_meta_tag_content(meta_tag_content):
 
         Args:
             meta_tag_content: str. The meta tag content to validate.
+
+        Raises:
+            ValidationError. Meta tag content is not a string.
+            ValidationError. Meta tag content is longer than expected.
         """
     if not isinstance(meta_tag_content, python_utils.BASESTRING):
         raise ValidationError(
@@ -736,8 +737,8 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         page_title_fragment_for_web: str. The page title fragment to validate.
 
     Raises:
-        Exception. Page title fragment is not a string.
-        Exception. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is not a string.
+        ValidationError. Page title fragment is too lengthy.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
@@ -988,56 +989,76 @@ def compute_list_difference(list_a, list_b):
     return list(set(list_a) - set(list_b))
 
 
-def is_local_server_environment():
-    """Returns wheter the app is being run locally in a development server.
-    More information can be found here:
-    https://cloud.google.com/appengine/docs/standard/python/tools/
-    using-local-server#detecting_application_runtime_environment
-
-    This is necessary because the DEV_MODE constant only differentiates between
-    local development and operations on the production server. However,
-    the e2e tests and the development server can operate with the flag
-    '--prod_env' flag which creates a simulated production environment; this use
-    case still falls under local development mode and requires the usage of
-    stubs to mock out important functionality of certain production APIs. For
-    this reason, we need this function to check if we are actually in the
-    production server.
-
-    Returns:
-        bool. Whether the current instance is running locally on a developer's
-        computer.
-    """
-    return (
-        'APPENGINE_RUNTIME' in os.environ and
-        'Development/' in os.environ['SERVER_SOFTWARE'])
-
-
-def is_appengine_cloud_environment():
-    """Returns whether the app is being run in production in the Google App
-    Engine Cloud.
-
-    More information can be found here:
-    https://cloud.google.com/appengine/docs/standard/python/tools/
-    using-local-server#detecting_application_runtime_environment
-
-    This is necessary because the DEV_MODE constant only differentiates between
-    local development and operations on the production server. However,
-    the e2e tests and the development server can operate with the flag
-    '--prod_env' flag which creates a simulated production environment; this use
-    case still falls under local development mode and requires the usage of
-    stubs to mock out important functionality of certain production APIs. For
-    this reason, we need this function to check if we are actually in the
-    production server.
-
-    Returns:
-        bool. Whether the current instance is running in production.
-    """
-    return (
-        'APPENGINE_RUNTIME' in os.environ and
-        'Google App Engine/' in os.environ['SERVER_SOFTWARE'])
-
-
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
 
     pass
+
+
+def grouper(iterable, chunk_len, fillvalue=None):
+    """Collect data into fixed-length chunks.
+
+    Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
+
+    Example:
+        grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        chunk_len: int. The chunk size of each group.
+        fillvalue: *. The value used to fill out the last chunk in case the
+            iterable is exhausted.
+
+    Returns:
+        iterable(iterable). A sequence of chunks over the input data.
+    """
+    # To understand how/why this works, please refer to the following
+    # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
+    args = [iter(iterable)] * chunk_len
+    return python_utils.zip_longest(*args, fillvalue=fillvalue)
+
+
+def partition(iterable, predicate=bool, enumerated=False):
+    """Returns two generators which split the iterable based on the predicate.
+
+    NOTE: The predicate is called AT MOST ONCE per item.
+
+    Example:
+        is_even = lambda n: (n % 2) == 0
+        evens, odds = partition([10, 8, 1, 5, 6, 4, 3, 7], is_even)
+        assert list(evens) == [10, 8, 6, 4]
+        assert list(odds) == [1, 5, 3, 7]
+
+
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+        errors, others = partition(logs, is_error, enumerated=True)
+
+        for i, error in errors:
+            raise Exception('Log index=%d failed for reason: %s' % (i, error))
+        for i, message in others:
+            logging.info('Log index=%d: %s' % (i, message))
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        predicate: callable. A function which accepts an item and returns True
+            or False.
+        enumerated: bool. Whether the partitions should include their original
+            indices.
+
+    Returns:
+        tuple(iterable, iterable). Two distinct generators. The first generator
+        will hold values which passed the predicate. The second will hold the
+        values which did not. If enumerated is True, then the generators will
+        yield (index, item) pairs. Otherwise, the generators will yield items by
+        themselves.
+    """
+    if enumerated:
+        iterable = enumerate(iterable)
+        old_predicate = predicate
+        predicate = lambda pair: old_predicate(pair[1])
+    # Creates two distinct generators over the same iterable. Memory-efficient.
+    true_part, false_part = itertools.tee((i, predicate(i)) for i in iterable)
+    return (
+        (i for i, predicate_is_true in true_part if predicate_is_true),
+        (i for i, predicate_is_true in false_part if not predicate_is_true))

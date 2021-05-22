@@ -24,34 +24,6 @@ import functools
 from google.appengine.ext import ndb
 
 
-# TODO(#11431): Remove this in favor of run_in_transaction_wrapper.
-def run_in_transaction(fn, *args, **kwargs):
-    """Runs a function in a transaction. Either all of the operations in
-    the transaction are applied, or none of them are applied.
-
-    If an exception is raised, the transaction is likely not safe to
-    commit, since TransactionOptions.ALLOWED is used.
-
-    Args:
-        fn: callable. A function (or callable) to be called.
-        *args: list(*). Variable length argument list passed to the callable.
-        **kwargs: *. Arbitrary keyword arguments passed to the callable.
-
-    Returns:
-        *. Whatever fn() returns.
-
-    Raises:
-        Exception. Whatever fn() raises.
-        datastore_errors.TransactionFailedError. The transaction failed.
-    """
-    # XG enables cross-group transaction that can handle up to 25 model groups.
-    return ndb.transaction(
-        lambda: fn(*args, **kwargs),
-        xg=True,
-        propagation=ndb.TransactionOptions.ALLOWED,
-    )
-
-
 def run_in_transaction_wrapper(fn):
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
@@ -69,7 +41,11 @@ def run_in_transaction_wrapper(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         """Wrapper for the transaction."""
-        return run_in_transaction(fn, *args, **kwargs)
+        return ndb.transaction(
+            lambda: fn(*args, **kwargs),
+            xg=True,
+            propagation=ndb.TransactionOptions.ALLOWED,
+        )
 
     return wrapper
 

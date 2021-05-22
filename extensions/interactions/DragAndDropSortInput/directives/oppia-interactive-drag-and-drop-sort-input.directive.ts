@@ -34,7 +34,9 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require(
         './drag-and-drop-sort-input-interaction.directive.html'),
       controllerAs: '$ctrl',
@@ -54,6 +56,20 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
             );
 
             return choices[ctrl.choices.indexOf(html)].contentId;
+          };
+
+          const getHtmlOfContentId = function(contentId) {
+            const {
+              choices
+            } = InteractionAttributesExtractorService.getValuesFromAttributes(
+              'DragAndDropSortInput',
+              $attrs
+            );
+            for (let choice of choices) {
+              if (choice.contentId === contentId) {
+                return choice.html;
+              }
+            }
           };
 
           ctrl.submitAnswer = function() {
@@ -93,9 +109,30 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               ctrl.dataMaxDepth = 1;
             }
 
-            // Make list of dicts from the list of choices.
-            for (var i = 0; i < ctrl.choices.length; i++) {
-              ctrl.list.push({title: ctrl.choices[i], items: []});
+            let savedSolution = (
+              ctrl.savedSolution !== undefined ? ctrl.savedSolution : []
+            );
+
+            if (savedSolution.length) {
+              // Pre populate with the saved solution, if present.
+              for (let contentIds of savedSolution) {
+                let item = {
+                  title: getHtmlOfContentId(contentIds[0]),
+                  items: []
+                };
+                for (let i = 1; i < contentIds.length; i++) {
+                  item.items.push({
+                    title: getHtmlOfContentId(contentIds[i]),
+                    items: []
+                  });
+                }
+                ctrl.list.push(item);
+              }
+            } else {
+              // Make list of dicts from the list of choices.
+              for (let choice of ctrl.choices) {
+                ctrl.list.push({title: choice, items: []});
+              }
             }
 
             ctrl.treeOptions = {

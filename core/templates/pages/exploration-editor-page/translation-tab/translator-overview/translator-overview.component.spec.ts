@@ -31,7 +31,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -58,6 +58,8 @@ describe('Translator Overview component', function() {
   var translationStatusService = null;
   var translationTabActiveModeService = null;
   var explorationLanguageCode = 'hi';
+  var focusManagerService = null;
+  var routerService = null;
 
   var mockWindow = null;
   beforeEach(angular.mock.module('oppia'));
@@ -70,6 +72,7 @@ describe('Translator Overview component', function() {
     });
 
     languageUtilService = TestBed.get(LanguageUtilService);
+    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -98,6 +101,8 @@ describe('Translator Overview component', function() {
     translationStatusService = $injector.get('TranslationStatusService');
     translationTabActiveModeService = $injector.get(
       'TranslationTabActiveModeService');
+    focusManagerService = $injector.get('FocusManagerService');
+    routerService = $injector.get('RouterService');
 
     spyOn(translationTabActiveModeService, 'isTranslationModeActive').and
       .returnValue(true);
@@ -203,4 +208,13 @@ describe('Translator Overview component', function() {
     expect($scope.getTranslationProgressAriaLabel()).toBe(
       '1 item translated out of 2 items');
   });
+
+  it('should apply autofocus to history tab element when tab is switched',
+    function() {
+      spyOn(routerService, 'getActiveTabName').and.returnValue('translation');
+      spyOn(focusManagerService, 'setFocus');
+      ctrl.$onInit();
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'audioTranslationLanguageCodeField');
+    });
 });

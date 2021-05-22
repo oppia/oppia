@@ -16,6 +16,7 @@
  * @fileoverview Controller for add or update solution modal.
  */
 
+import { Subscription } from 'rxjs';
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
@@ -36,13 +37,13 @@ require('services/context.service.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'ContextService',
+  '$controller', '$rootScope', '$scope', '$uibModalInstance', 'ContextService',
   'CurrentInteractionService', 'ExplorationHtmlFormatterService',
   'SolutionObjectFactory', 'StateCustomizationArgsService',
   'StateInteractionIdService', 'StateSolutionService',
   'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
   function(
-      $controller, $scope, $uibModalInstance, ContextService,
+      $controller, $rootScope, $scope, $uibModalInstance, ContextService,
       CurrentInteractionService, ExplorationHtmlFormatterService,
       SolutionObjectFactory, StateCustomizationArgsService,
       StateInteractionIdService, StateSolutionService,
@@ -51,13 +52,18 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.directiveSubscriptions = new Subscription();
     $scope.StateSolutionService = StateSolutionService;
+    $scope.savedMemento = () => {
+      return StateSolutionService.savedMemento?.correctAnswer;
+    };
     $scope.correctAnswerEditorHtml = (
       ExplorationHtmlFormatterService.getInteractionHtml(
         StateInteractionIdService.savedMemento,
         StateCustomizationArgsService.savedMemento,
         false,
-        $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+        $scope.SOLUTION_EDITOR_FOCUS_LABEL,
+        $scope.savedMemento() ? 'savedMemento()' : null));
     $scope.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
@@ -118,5 +124,18 @@ angular.module('oppia').controller('AddOrUpdateSolutionModalController', [
         throw new Error('Cannot save invalid solution');
       }
     };
+
+    $scope.$onInit = function() {
+      $scope.directiveSubscriptions.add(
+        // TODO(#11996): Remove when migrating to Angular2+.
+        CurrentInteractionService.onAnswerChanged$.subscribe(() => {
+          $rootScope.$applyAsync();
+        })
+      );
+    };
+
+    $scope.$on('$destroy', function() {
+      $scope.directiveSubscriptions.unsubscribe();
+    });
   }
 ]);

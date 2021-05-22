@@ -16,8 +16,9 @@
         Note: The uploaded svg may not be rendered exactly.
       </div>
       <div ng-if="!$ctrl.isFileUploaded()">
-        <image-uploader on-file-changed="$ctrl.onFileChanged" allowed-image-formats="$ctrl.allowedImageFormats">
-        </image-uploader>
+        <oppia-image-uploader (file-changed)="$ctrl.onFileChanged($event)"
+                              [allowed-image-formats]="$ctrl.allowedImageFormats">
+        </oppia-image-uploader>
       </div>
       <div ng-if="$ctrl.isFileUploaded()">
         <img ng-src="<[$ctrl.uploadedSvgDataUrl]>" class="uploaded-svg-image">
@@ -237,8 +238,9 @@
     </div>
   </div>
   <div ng-if="$ctrl.isDiagramCreated()" class="diagram-editor-save-box">
-    <button type="button" class="btn btn-success float-right protractor-test-save-diagram" ng-click="$ctrl.saveSvgFile()" ng-disabled="$ctrl.isUserDrawing()">
-      Use This Image
+    <button type="button" class="btn btn-success float-right protractor-test-save-diagram" ng-click="$ctrl.saveSvgFile()" ng-disabled="$ctrl.isUserDrawing() || $ctrl.loadingIndicatorIsShown">
+      <span ng-if="!$ctrl.loadingIndicatorIsShown">Use This Image</span>
+      <span ng-if="$ctrl.loadingIndicatorIsShown"><md-progress-circular md-diameter="25px" md-mode="indeterminate" class="oppia-diagram-spinning-button"></md-progress-circular></span>
     </button>
   </div>
 </div>
@@ -255,16 +257,16 @@
   }
 
   svg-filename-editor .diagram-editor-saved-image-container .edit-icon {
-    color: #000000;
+    color: #000;
     cursor: pointer;
     position: absolute;
     right: 6px;
-    text-shadow: 0px 0px 1px #ffffff;
+    text-shadow: 0 0 1px #fff;
     top: 6px;
   }
 
   svg-filename-editor .svg-editor {
-    background-color: #ffffff;
+    background-color: #fff;
     min-height: 450px;
     position: relative;
   }
@@ -281,7 +283,7 @@
   }
 
   svg-filename-editor .svg-editor .fabric-canvas {
-    border: 1px solid #555555;
+    border: 1px solid #555;
     bottom: 31px;
     cursor: default;
     left: 62px;
@@ -292,8 +294,8 @@
   }
 
   .svg-editor .fabric-canvas.custom-tool-form {
-    background-color: #ffffff;
-    bottom: 0px;
+    background-color: #fff;
+    bottom: 0;
     overflow: auto;
   }
 
@@ -302,7 +304,7 @@
   }
 
   .svg-editor .fabric-canvas .upload-warning {
-    color: #ff0000;
+    color: #f00;
   }
 
   .svg-editor .fabric-canvas .uploaded-svg-image {
@@ -330,8 +332,8 @@
   }
 
   svg-filename-editor .svg-editor .horizontal-toolbar {
-    background-color: #ffffff;
-    border: 1px solid #555555;
+    background-color: #fff;
+    border: 1px solid #555;
     height: 31px;
     left: 62px;
     right: 0;
@@ -378,8 +380,8 @@
   }
 
   svg-filename-editor .svg-editor .vertical-toolbar {
-    background-color: #ffffff;
-    border: 1px solid #555555;
+    background-color: #fff;
+    border: 1px solid #555;
     bottom: 0;
     left: 0;
     top: 0;
@@ -411,7 +413,7 @@
   }
 
   svg-filename-editor .svg-editor .vertical-toolbar .toolbar-button {
-    background-color: #ffffff;
+    background-color: #fff;
     border: 2px solid transparent;
     border-radius: 3px;
     height: 26px;
@@ -434,7 +436,7 @@
   }
 
   .svg-editor .vertical-toolbar .tooltip-inner {
-    background-color: #555555;
+    background-color: #555;
   }
 
   svg-filename-editor .svg-editor .vertical-toolbar .vert-bottom-toolbar {
@@ -453,8 +455,8 @@
   }
 
   svg-filename-editor .svg-editor .color-well .colorPicker {
-    background-color: #000000;
-    border: 1px solid #000000;
+    background-color: #000;
+    border: 1px solid #000;
     border-radius: 3px;
     cursor: pointer;
     height: 28px;
@@ -463,7 +465,7 @@
   }
 
   svg-filename-editor .svg-editor .color-well .alphaSquare {
-    background-color: #000000;
+    background-color: #000;
     height: 13px;
     width: 13px;
   }
@@ -496,4 +498,11 @@
   svg-filename-editor .oppia-font-styles-text {
     padding-left: 3px;
   }
+
+  svg-filename-editor .oppia-diagram-spinning-button {
+    margin-left: 30px;
+    margin-right: 30px;
+  }
+
+  svg-filename-editor  .oppia-diagram-spinning-button svg path { stroke: #f8f6e1; }
 </style>

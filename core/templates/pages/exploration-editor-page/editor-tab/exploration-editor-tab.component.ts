@@ -53,6 +53,7 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
+require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -66,20 +67,25 @@ require('services/site-analytics.service.ts');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorTab', {
+  bindings: {
+    explorationIsLinkedToStory: '='
+  },
   template: require('./exploration-editor-tab.component.html'),
   controller: [
-    '$scope', '$templateCache', '$uibModal', 'EditabilityService',
+    '$scope', '$templateCache', '$timeout', '$uibModal', 'EditabilityService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
     'ExplorationInitStateNameService', 'ExplorationStatesService',
-    'ExplorationWarningsService', 'GraphDataService', 'LoaderService',
+    'ExplorationWarningsService', 'FocusManagerService', 'GraphDataService',
+    'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
     'StateEditorService', 'StateTutorialFirstTimeService',
     'UrlInterpolationService', 'UserExplorationPermissionsService',
     function(
-        $scope, $templateCache, $uibModal, EditabilityService,
+        $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
         ExplorationInitStateNameService, ExplorationStatesService,
-        ExplorationWarningsService, GraphDataService, LoaderService,
+        ExplorationWarningsService, FocusManagerService, GraphDataService,
+        LoaderService,
         RouterService, SiteAnalyticsService, StateEditorRefreshService,
         StateEditorService, StateTutorialFirstTimeService,
         UrlInterpolationService, UserExplorationPermissionsService) {
@@ -156,9 +162,25 @@ angular.module('oppia').component('explorationEditorTab', {
           }
 
           LoaderService.hideLoadingScreen();
+          // $timeout is used to ensure that focus acts only after
+          // element is visible in DOM.
+          $timeout(() => ctrl.windowOnload(), 100);
         }
         if (EditabilityService.inTutorialMode()) {
           ctrl.startTutorial();
+        }
+      };
+
+      ctrl.windowOnload = function() {
+        ctrl.TabName = RouterService.getActiveTabName();
+        if (ctrl.TabName === 'main') {
+          FocusManagerService.setFocus('oppiaEditableSection');
+        }
+        if (ctrl.TabName === 'feedback') {
+          FocusManagerService.setFocus('newThreadButton');
+        }
+        if (ctrl.TabName === 'history') {
+          FocusManagerService.setFocus('usernameInputField');
         }
       };
 
@@ -173,6 +195,13 @@ angular.module('oppia').component('explorationEditorTab', {
         // Show the interaction when the text content is saved, even if no
         // content is entered.
         ctrl.interactionIsShown = true;
+      };
+
+      ctrl.saveLinkedSkillId = function(displayedValue) {
+        ExplorationStatesService.saveLinkedSkillId(
+          StateEditorService.getActiveStateName(),
+          angular.copy(displayedValue));
+        StateEditorService.setLinkedSkillId(angular.copy(displayedValue));
       };
 
       ctrl.saveInteractionId = function(displayedValue) {
@@ -260,7 +289,7 @@ angular.module('oppia').component('explorationEditorTab', {
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
             contentIds.forEach(contentId => {

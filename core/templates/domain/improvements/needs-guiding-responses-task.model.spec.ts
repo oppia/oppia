@@ -18,12 +18,13 @@
 
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/needs-guiding-response-task.model';
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 
-describe('Needs guiding responses task model', function() {
+describe('Needs guiding responses task model', () => {
+  let newTop10AnswerStats: (numUnaddressedAnswers: number) => AnswerStats[];
   beforeEach(() => {
-    this.newTop10AnswerStats = (numUnaddressedAnswers: number) => {
-      const answerStats = [];
+    newTop10AnswerStats = (numUnaddressedAnswers: number) => {
+      const answerStats: AnswerStats[] = [];
       for (let i = 0; i < 10; ++i) {
         const newAnswerStats = new AnswerStats(
           `Answer #${i}`, `Answer #${i}`, (10 - i) * 100,
@@ -36,7 +37,7 @@ describe('Needs guiding responses task model', function() {
 
   it('should return new task if state answer needs a guiding response', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', this.newTop10AnswerStats(3));
+      'eid', 1, 'Introduction', newTop10AnswerStats(3));
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -52,7 +53,7 @@ describe('Needs guiding responses task model', function() {
 
   it('should return obsolete task if all answers are addressed', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', this.newTop10AnswerStats(0));
+      'eid', 1, 'Introduction', newTop10AnswerStats(0));
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -163,35 +164,35 @@ describe('Needs guiding responses task model', function() {
 
   it('should update status based on changes to exploration stats', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', this.newTop10AnswerStats(3));
+      'eid', 1, 'Introduction', newTop10AnswerStats(3));
     expect(task.isOpen()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
 
-    task.refreshStatus(this.newTop10AnswerStats(0));
+    task.refreshStatus(newTop10AnswerStats(0));
     expect(task.isOpen()).toBeFalse();
     expect(task.isResolved()).toBeTrue();
 
-    task.refreshStatus(this.newTop10AnswerStats(7));
+    task.refreshStatus(newTop10AnswerStats(7));
     expect(task.isOpen()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
   });
 
   it('should not change issue description after it is generated', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', this.newTop10AnswerStats(0));
+      'eid', 1, 'Introduction', newTop10AnswerStats(0));
     expect(task.getIssueDescription()).toBeNull();
 
-    task.refreshStatus(this.newTop10AnswerStats(7));
+    task.refreshStatus(newTop10AnswerStats(7));
     expect(task.getIssueDescription()).toEqual(
       '7 of the top 10 answers for this card did not have explicit feedback ' +
       'from Oppia.');
 
-    task.refreshStatus(this.newTop10AnswerStats(0));
+    task.refreshStatus(newTop10AnswerStats(0));
     expect(task.getIssueDescription()).toEqual(
       '7 of the top 10 answers for this card did not have explicit feedback ' +
       'from Oppia.');
 
-    task.refreshStatus(this.newTop10AnswerStats(3));
+    task.refreshStatus(newTop10AnswerStats(3));
     expect(task.getIssueDescription()).toEqual(
       '7 of the top 10 answers for this card did not have explicit feedback ' +
       'from Oppia.');

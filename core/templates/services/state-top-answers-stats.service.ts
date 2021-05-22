@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AnswerStats } from
-  'domain/exploration/AnswerStatsObjectFactory';
+  'domain/exploration/answer-stats.model';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
@@ -86,7 +86,7 @@ export class StateTopAnswersStatsService {
     return this.initPromise;
   }
 
-  getInitPromise(): Promise<void> {
+  async getInitPromiseAsync(): Promise<void> {
     return this.initPromise;
   }
 

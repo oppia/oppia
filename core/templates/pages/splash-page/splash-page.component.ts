@@ -23,8 +23,8 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
-import { LoaderService } from 'services/loader.service.ts';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 
 export interface Testimonial {
@@ -43,7 +43,7 @@ export interface Testimonial {
 export class SplashPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   classroomUrlFragment: string;
-  classroomUrl :string;
+  classroomUrl: string;
   displayedTestimonialId: number;
   testimonialCount: number;
   testimonials = [];
@@ -74,7 +74,7 @@ export class SplashPageComponent implements OnInit {
 
   onClickStartTeachingButton(): void {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
-    this.windowRef.nativeWindow.location.href = ('/teach');
+    this.windowRef.nativeWindow.location.href = ('/creator-guidelines');
   }
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
@@ -126,7 +126,6 @@ export class SplashPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
@@ -139,6 +138,10 @@ export class SplashPageComponent implements OnInit {
     this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
+    });
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    this.windowDimensionService.getResizeEvent().subscribe(() => {
+      this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     });
   }
 }

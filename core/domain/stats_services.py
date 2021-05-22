@@ -142,6 +142,11 @@ def _update_stats_transactional(
 
     for state_name, stats in aggregated_stats['state_stats_mapping'].items():
         if state_name not in exp_stats.state_stats_mapping:
+            # Some events in the past seems to have 'undefined' state names
+            # passed from the frontend code. These are invalid and should be
+            # discarded.
+            if state_name == 'undefined':
+                return
             raise Exception(
                 'ExplorationStatsModel id="%s.%s": state_stats_mapping[%r] '
                 'does not exist' % (exp_id, exp_version, state_name))
@@ -207,6 +212,7 @@ def get_stats_for_new_exp_version(
     Returns:
         ExplorationStats. The newly created exploration stats object.
     """
+    old_exp_stats = None
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
     exploration_stats = get_exploration_stats_by_id(
@@ -218,39 +224,78 @@ def get_stats_for_new_exp_version(
     # Handling reverts.
     if revert_to_version:
         old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
+
+    return advance_version_of_exp_stats(
+        new_exp_version, exp_versions_diff, exploration_stats, old_exp_stats,
+        revert_to_version)
+
+
+def advance_version_of_exp_stats(
+        exp_version, exp_versions_diff, exp_stats,
+        reverted_exp_stats, revert_to_version):
+    """Makes required changes to the structure of ExplorationStatsModel of an
+    old exp_version and a new ExplorationStatsModel is created for the new
+    exp_version. Note: This function does not save the newly created model, it
+    returns it. Callers should explicitly save the model if required.
+
+    Args:
+        exp_version: int. Version of the exploration.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
+        exp_stats: ExplorationStats. The ExplorationStats model.
+        reverted_exp_stats: ExplorationStats|None. The reverted
+            ExplorationStats model.
+        revert_to_version: int|None. If the change is a revert, the version.
+            Otherwise, None.
+
+    Returns:
+        ExplorationStats. The newly created exploration stats object.
+    """
+
+    # Handling reverts.
+    if revert_to_version:
         # If the old exploration issues model doesn't exist, the current model
         # is carried over (this is a fallback case for some tests, and can never
         # happen in production.)
-        if old_exp_stats:
-            exploration_stats.num_starts_v2 = old_exp_stats.num_starts_v2
-            exploration_stats.num_actual_starts_v2 = (
-                old_exp_stats.num_actual_starts_v2)
-            exploration_stats.num_completions_v2 = (
-                old_exp_stats.num_completions_v2)
-            exploration_stats.state_stats_mapping = (
-                old_exp_stats.state_stats_mapping)
-        exploration_stats.exp_version = new_exp_version
+        if reverted_exp_stats:
+            exp_stats.num_starts_v2 = reverted_exp_stats.num_starts_v2
+            exp_stats.num_actual_starts_v2 = (
+                reverted_exp_stats.num_actual_starts_v2)
+            exp_stats.num_completions_v2 = (
+                reverted_exp_stats.num_completions_v2)
+            exp_stats.state_stats_mapping = (
+                reverted_exp_stats.state_stats_mapping)
+        exp_stats.exp_version = exp_version
 
-        return exploration_stats
+        return exp_stats
 
-    # Handling state deletions.
-    for state_name in exp_versions_diff.deleted_state_names:
-        exploration_stats.state_stats_mapping.pop(state_name)
+    new_state_name_stats_mapping = {}
 
-    # Handling state additions.
+    # Handle unchanged states.
+    unchanged_state_names = set(utils.compute_list_difference(
+        exp_stats.state_stats_mapping,
+        exp_versions_diff.deleted_state_names +
+        exp_versions_diff.new_to_old_state_names.values()))
+    for state_name in unchanged_state_names:
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[state_name].clone())
+
+    # Handle renamed states.
+    for state_name in exp_versions_diff.new_to_old_state_names:
+        old_state_name = exp_versions_diff.new_to_old_state_names[
+            state_name]
+        new_state_name_stats_mapping[state_name] = (
+            exp_stats.state_stats_mapping[old_state_name].clone())
+
+    # Handle newly-added states.
     for state_name in exp_versions_diff.added_state_names:
-        exploration_stats.state_stats_mapping[state_name] = (
+        new_state_name_stats_mapping[state_name] = (
             stats_domain.StateStats.create_default())
 
-    # Handling state renames.
-    for new_state_name in exp_versions_diff.new_to_old_state_names:
-        exploration_stats.state_stats_mapping[new_state_name] = (
-            exploration_stats.state_stats_mapping.pop(
-                exp_versions_diff.new_to_old_state_names[new_state_name]))
+    exp_stats.state_stats_mapping = new_state_name_stats_mapping
+    exp_stats.exp_version = exp_version
 
-    exploration_stats.exp_version = new_exp_version
-
-    return exploration_stats
+    return exp_stats
 
 
 def assign_playthrough_to_corresponding_issue(

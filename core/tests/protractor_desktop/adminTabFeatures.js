@@ -38,12 +38,12 @@ describe('Admin Page', function() {
       'management@adminTab.com', 'management');
     await adminPage.get();
     await adminPage.updateRole('moderator1', 'moderator');
-    await adminPage.viewRolesbyUsername('moderator1');
+    await adminPage.viewRolesByUsername('moderator1', true);
     await adminPage.expectUsernamesToMatch(['moderator1']);
 
     await adminPage.get();
     await adminPage.updateRole('moderator2', 'moderator');
-    await adminPage.viewRolesbyUsername('moderator2');
+    await adminPage.viewRolesByUsername('moderator2', true);
     await adminPage.expectUsernamesToMatch(['moderator2']);
 
     await adminPage.getUsersAsssignedToRole('moderator');
@@ -76,6 +76,7 @@ describe('Admin Page', function() {
 
     await adminPage.stopOneOffJob('ExplorationValidityJobManager');
     await adminPage.expectNumberOfRunningOneOffJobs(0);
+    await users.logout();
   });
 
   afterEach(async function() {

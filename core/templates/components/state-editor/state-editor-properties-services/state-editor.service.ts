@@ -27,7 +27,7 @@ import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -64,6 +64,7 @@ export class StateEditorService {
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
+  private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -75,6 +76,7 @@ export class StateEditorService {
   // interaction.
   interaction: Interaction = null;
   misconceptionsBySkill: {} = {};
+  linkedSkillId: string = null;
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = null;
   stateContentEditorInitialised: boolean = false;
@@ -163,6 +165,14 @@ export class StateEditorService {
 
   setInteractionId(newId: string): void {
     this.interaction.setId(newId);
+  }
+
+  setLinkedSkillId(newLinkedSkillId: string): void {
+    this.linkedSkillId = newLinkedSkillId;
+  }
+
+  getLinkedSkillId(): string {
+    return this.linkedSkillId;
   }
 
   setInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
@@ -311,6 +321,10 @@ export class StateEditorService {
 
   get onHandleCustomArgsUpdate(): EventEmitter<AnswerChoice[]> {
     return this._handleCustomArgsUpdateEventEmitter;
+  }
+
+  get onObjectFormValidityChange(): EventEmitter<boolean> {
+    return this._objectFormValidityChangeEventEmitter;
   }
 }
 

@@ -577,6 +577,46 @@ def can_access_admin_page(handler):
     return test_super_admin
 
 
+def can_delete_any_user(handler):
+    """Decorator that checks if the current user can delete any user.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        can delete any user.
+    """
+
+    def test_primary_admin(self, **kwargs):
+        """Checks if the user is logged in and is a primary admin e.g. user with
+        email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user is not a primary admin of the
+                application.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        email = user_services.get_email_from_user_id(self.user_id)
+        if email != feconf.SYSTEM_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                '%s cannot delete any user.' % self.user_id)
+
+        return handler(self, **kwargs)
+    test_primary_admin.__wrapped__ = True
+
+    return test_primary_admin
+
+
 def can_upload_exploration(handler):
     """Decorator that checks if the current user can upload exploration.
 
@@ -800,6 +840,12 @@ def can_view_feedback_thread(handler):
         """
         if '.' not in thread_id:
             raise self.InvalidInputException('Thread ID must contain a .')
+
+        entity_type = feedback_services.get_thread(thread_id).entity_type
+        entity_types_with_unrestricted_view_suggestion_access = (
+            feconf.ENTITY_TYPES_WITH_UNRESTRICTED_VIEW_SUGGESTION_ACCESS)
+        if entity_type in entity_types_with_unrestricted_view_suggestion_access:
+            return handler(self, thread_id, **kwargs)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
@@ -1778,7 +1824,7 @@ def can_delete_question(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (role_services.ACTION_DELETE_ANY_QUESTION in
                 user_actions_info.actions):
@@ -1969,7 +2015,7 @@ def can_delete_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
@@ -2009,7 +2055,7 @@ def can_create_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
@@ -2106,7 +2152,7 @@ def can_delete_topic(handler):
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
@@ -2147,7 +2193,7 @@ def can_create_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
             return handler(self, **kwargs)
@@ -2191,7 +2237,7 @@ def can_access_topics_and_skills_dashboard(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in
@@ -2239,7 +2285,7 @@ def can_view_any_topic_editor(handler):
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
@@ -2283,7 +2329,7 @@ def can_manage_rights_for_topic(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_MANAGE_TOPIC_RIGHTS in
@@ -2332,7 +2378,7 @@ def can_change_topic_publication_status(handler):
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 role_services.ACTION_CHANGE_TOPIC_STATUS in
@@ -2405,7 +2451,7 @@ def can_access_topic_viewer_page(handler):
         topic_id = topic.id
         topic_rights = topic_fetchers.get_topic_rights(
             topic_id, strict=False)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
 
         if (
                 topic_rights.topic_is_published or
@@ -2472,7 +2518,7 @@ def can_access_story_viewer_page(handler):
         topic_is_published = False
         topic_id = story.corresponding_topic_id
         story_id = story.id
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
             if topic.url_fragment != topic_url_fragment:
@@ -2563,7 +2609,7 @@ def can_access_subtopic_viewer_page(handler):
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         topic_rights = topic_fetchers.get_topic_rights(topic.id)
 
         if (
@@ -2665,10 +2711,10 @@ def get_decorator_for_accepting_suggestion(decorator):
             """
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
-            if (
-                    role_services.ACTION_ACCEPT_ANY_SUGGESTION in
-                    user_actions_info.actions):
+            user_actions = user_services.get_user_actions_info(
+                self.user_id
+            ).actions
+            if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             if len(suggestion_id.split('.')) != 3:
@@ -2887,3 +2933,84 @@ def is_from_oppia_ml(handler):
     test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
 
     return test_request_originates_from_valid_oppia_ml_instance
+
+
+def can_update_suggestion(handler):
+    """Decorator to check whether the current user can update suggestions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+        if the user can update a given suggestion.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            edit this suggestion.
+        InvalidInputException. The submitted suggestion id is not valid.
+        PageNotFoundException. A suggestion is not found with the given
+            suggestion id.
+    """
+    def test_can_update_suggestion(
+            self, suggestion_id, **kwargs):
+        """Returns a handler to test whether a suggestion can be updated based
+        on the user's roles.
+
+        Args:
+            suggestion_id: str. The suggestion id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            function. The handler for updating a suggestion.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                edit this suggestion.
+            InvalidInputException. The submitted suggestion id is not valid.
+            PageNotFoundException. A suggestion is not found with the given
+                suggestion id.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        user_actions = self.user.actions
+
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException(
+                'Invalid format for suggestion_id.' +
+                ' It must contain 3 parts separated by \'.\'')
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if suggestion is None:
+            raise self.PageNotFoundException
+
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
+
+        if suggestion.author_id == self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You are not allowed to update suggestions that you created.')
+
+        if suggestion.suggestion_type not in (
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
+            raise self.InvalidInputException('Invalid suggestion type.')
+
+        if suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(
+                    self.user_id,
+                    language_code=suggestion.change.language_code):
+                return handler(self, suggestion_id, **kwargs)
+        elif suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            if user_services.can_review_question_suggestions(self.user_id):
+                return handler(self, suggestion_id, **kwargs)
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You are not allowed to update the suggestion.')
+
+    test_can_update_suggestion.__wrapped__ = True
+    return test_can_update_suggestion

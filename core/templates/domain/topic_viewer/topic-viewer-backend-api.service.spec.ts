@@ -22,9 +22,6 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
-import { ShortSkillSummaryObjectFactory } from
-  'domain/skill/ShortSkillSummaryObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -41,11 +38,7 @@ describe('Topic viewer backend API service', () => {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
-    $provide.value(
-      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
-        new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
-        new ShortSkillSummaryObjectFactory()));
+      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory());
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -118,7 +111,7 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
+      topicViewerBackendApiService.fetchTopicDataAsync('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/topic_data_handler/staging/0');
@@ -136,7 +129,7 @@ describe('Topic viewer backend API service', () => {
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      topicViewerBackendApiService.fetchTopicData('0', 'staging').then(
+      topicViewerBackendApiService.fetchTopicDataAsync('0', 'staging').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(
         '/topic_data_handler/staging/0');

@@ -102,7 +102,7 @@ export class StoryEditorStateService {
    */
   loadStory(storyId: string): void {
     this._storyIsLoading = true;
-    this.editableStoryBackendApiService.fetchStory(storyId).then(
+    this.editableStoryBackendApiService.fetchStoryAsync(storyId).then(
       (newBackendStoryObject) => {
         this._setTopicName(newBackendStoryObject.topicName);
         this._setStoryPublicationStatus(
@@ -195,8 +195,7 @@ export class StoryEditorStateService {
   saveStory(
       commitMessage: string,
       successCallback: (value?: Object) => void,
-      errorCallback: (value?: Object) => void)
-  : boolean {
+      errorCallback: (value?: Object) => void): boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');
@@ -207,7 +206,7 @@ export class StoryEditorStateService {
       return false;
     }
     this._storyIsBeingSaved = true;
-    this.editableStoryBackendApiService.updateStory(
+    this.editableStoryBackendApiService.updateStoryAsync(
       this._story.getId(), this._story.getVersion(), commitMessage,
       <StoryChange[]> this.undoRedoService.getCommittableChangeList()).then(
       (storyBackendObject) => {
@@ -238,14 +237,13 @@ export class StoryEditorStateService {
 
   changeStoryPublicationStatus(
       newStoryStatusIsPublic: boolean,
-      successCallback: (value?: Object) => void)
-  : boolean {
+      successCallback: (value?: Object) => void): boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot publish a story before one is loaded.');
     }
 
-    this.editableStoryBackendApiService.changeStoryPublicationStatus(
+    this.editableStoryBackendApiService.changeStoryPublicationStatusAsync(
       this._story.getId(), newStoryStatusIsPublic).then(
       (storyBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);
@@ -300,8 +298,7 @@ export class StoryEditorStateService {
    */
   updateExistenceOfStoryUrlFragment(
       storyUrlFragment: string,
-      successCallback: (value?: Object) => void)
-  : void {
+      successCallback: (value?: Object) => void): void {
     this.editableStoryBackendApiService.doesStoryWithUrlFragmentExistAsync(
       storyUrlFragment).then(
       (storyUrlFragmentExists) => {

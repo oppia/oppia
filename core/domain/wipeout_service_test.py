@@ -47,17 +47,18 @@ import feconf
 import python_utils
 
 (
-    auth_models, collection_models, config_models,
-    email_models, exp_models, feedback_models,
-    improvements_models, question_models, skill_models,
-    story_models, subtopic_models, suggestion_models,
-    topic_models, user_models
+    app_feedback_report_models, auth_models, collection_models, config_models,
+    email_models, exp_models, feedback_models, improvements_models,
+    question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -187,11 +188,11 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
-        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
+        self.user_1_actions = user_services.get_user_actions_info(
+            self.user_1_id)
 
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -503,7 +504,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
+        self.user_1_actions = user_services.get_user_actions_info(
+            self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
         self.pending_deletion_request = (
@@ -587,6 +589,350 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
 
+class WipeoutServiceDeleteAppFeedbackReportModelsTests(
+        test_utils.GenericTestBase):
+    """Tests that the wipeout services properly deletes references in any
+    AppFeedbackReportModels with the deleted user.
+    """
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
+    # The timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615199836)
+    # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+
+    PLATFORM_ANDROID = 'android'
+    REPORT_ID_1 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_1.second,
+        'randomInteger123')
+    REPORT_ID_2 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'randomInteger321')
+    REPORT_ID_3 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'differentInt')
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 28
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
+
+    def setUp(self):
+        super(WipeoutServiceDeleteAppFeedbackReportModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_2,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_3,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_user_is_pseudonymized_from_report(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report.value])
+
+        # Verify the user is pseudonymized.
+        report_model = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_1))
+        self.assertEqual(
+            report_model.scrubbed_by, report_mappings[self.REPORT_ID_1])
+        self.assertNotEqual(report_model.scrubbed_by, self.user_1_id)
+
+    def test_same_pseudonym_used_for_same_user(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report.value])
+
+        # Verify the pseudonym is the same for all report instances.
+        report_model_2 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_2))
+        report_model_3 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_3))
+        self.assertEqual(
+            report_model_2.scrubbed_by, report_mappings[self.REPORT_ID_2])
+        self.assertEqual(
+            report_model_3.scrubbed_by, report_mappings[self.REPORT_ID_3])
+        self.assertNotEqual(report_model_2.scrubbed_by, self.user_2_id)
+        self.assertNotEqual(report_model_3.scrubbed_by, self.user_2_id)
+
+        self.assertEqual(
+            report_model_2.scrubbed_by, report_model_3.scrubbed_by)
+
+    def test_different_users_have_different_pseudonyms(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_2_id))
+        user_1_report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report.value])
+        user_2_report_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_2_id).pseudonymizable_entity_mappings[
+                    models.NAMES.app_feedback_report.value])
+
+        # Verify pseudonyms are different for different users.
+        report_model_1 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_1))
+        report_model_2 = (
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                self.REPORT_ID_2))
+        self.assertEqual(
+            report_model_1.scrubbed_by,
+            user_1_report_mappings[self.REPORT_ID_1])
+        self.assertEqual(
+            report_model_2.scrubbed_by,
+            user_2_report_mappings[self.REPORT_ID_2])
+
+        self.assertNotEqual(
+            report_model_1.scrubbed_by, report_model_2.scrubbed_by)
+
+
+class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
+        test_utils.GenericTestBase):
+    """Tests that the wipeout services properly verifies the deleted status of
+    AppFeedbackReportModels with previous references to a deleted user.
+    """
+
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    # The timestamp in sec since epoch for Mar 7 2021 21:17:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_1 = datetime.datetime.fromtimestamp(1615151836)
+    # The timestamp in sec since epoch for Mar 8 2021 10:7:16 UTC.
+    REPORT_SUBMITTED_TIMESTAMP_2 = datetime.datetime.fromtimestamp(1615199836)
+    # The timestamp in sec since epoch for Mar 19 2021 17:10:36 UTC.
+    TICKET_CREATION_TIMESTAMP = datetime.datetime.fromtimestamp(1616173836)
+
+    PLATFORM_ANDROID = 'android'
+    REPORT_ID_1 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_1.second,
+        'randomInteger123')
+    REPORT_ID_2 = '%s.%s.%s' % (
+        PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP_2.second,
+        'randomInteger321')
+    TICKET_ID = '%s.%s.%s' % (
+        'random_hash', TICKET_CREATION_TIMESTAMP.second, '16CharString1234')
+    REPORT_TYPE_SUGGESTION = 'suggestion'
+    CATEGORY_OTHER = 'other'
+    PLATFORM_VERSION = '0.1-alpha-abcdef1234'
+    COUNTRY_LOCALE_CODE_INDIA = 'in'
+    ANDROID_DEVICE_MODEL = 'Pixel 4a'
+    ANDROID_SDK_VERSION = 28
+    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    TEXT_LANGUAGE_CODE_ENGLISH = 'en'
+    AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
+    ANDROID_REPORT_INFO = {
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'download_and_update_only_on_wifi': True,
+        'automatically_update_topics': False,
+        'is_admin': False
+    }
+    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
+
+    def setUp(self):
+        super(
+            WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests,
+            self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_2,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_2_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_2,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+    def test_verify_user_delete_when_user_is_deleted_returns_true(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+    def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+        app_feedback_report_models.AppFeedbackReportModel(
+            id=self.REPORT_ID_1,
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=self.user_1_id,
+            ticket_id='%s.%s.%s' % (
+                'random_hash', self.TICKET_CREATION_TIMESTAMP.second,
+                '16CharString1234'),
+            submitted_on=self.REPORT_SUBMITTED_TIMESTAMP_1,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        ).put()
+
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
+
+
 class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
@@ -618,7 +964,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         metadata_model = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -650,7 +996,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         self.assertEqual(
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID])
@@ -666,7 +1012,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         metadata_model_1 = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -695,7 +1041,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         metadata_model_1 = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -719,7 +1065,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         metadata_model_3 = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -740,7 +1086,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         metadata_model_1 = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -763,7 +1109,7 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         config_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.config]
+            ).pseudonymizable_entity_mappings[models.NAMES.config.value]
         )
         metadata_model_3 = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -836,7 +1182,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
         self.publish_collection(self.user_1_id, self.COL_1_ID)
         rights_manager.assign_role_for_collection(
-            user_services.UserActionsInfo(self.user_1_id),
+            user_services.get_user_actions_info(self.user_1_id),
             self.COL_1_ID,
             self.user_2_id,
             feconf.ROLE_OWNER)
@@ -851,7 +1197,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         metadata_model = (
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
@@ -893,7 +1239,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         rights_content_model_1 = (
             collection_models.CollectionRightsSnapshotContentModel.get_by_id(
@@ -923,7 +1269,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         commit_log_model_1 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
@@ -941,6 +1287,8 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             collection_mappings[self.COL_1_ID])
 
     def test_one_collection_with_missing_snapshot_is_pseudonymized(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
         collection_models.CollectionCommitLogEntryModel(
             id='collection-%s-1' % self.COL_2_ID,
             collection_id=self.COL_2_ID,
@@ -952,8 +1300,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(min_level=logging.ERROR) as log_messages:
-            wipeout_service.pre_delete_user(self.user_1_id)
-            self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -966,12 +1312,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
                 '\'CollectionRightsSnapshotMetadataModel\'] IDs differ. '
                 'Snapshots without commit logs: [], '
                 'commit logs without snapshots: [u\'%s\'].' % self.COL_2_ID,
-                '[WIPEOUT] The commit log model '
-                '\'ExplorationCommitLogEntryModel\' and '
-                'snapshot models [\'ExplorationSnapshotMetadataModel\', '
-                '\'ExplorationRightsSnapshotMetadataModel\'] IDs differ. '
-                'Snapshots without commit logs: [], '
-                'commit logs without snapshots: [u\'an_exploration_id\'].'
             ]
         )
 
@@ -979,7 +1319,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         metadata_model = (
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
@@ -1032,7 +1372,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         metadata_model = (
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
@@ -1137,7 +1477,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         collection_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.collection]
+            ).pseudonymizable_entity_mappings[models.NAMES.collection.value]
         )
         metadata_model = (
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
@@ -1187,7 +1527,9 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_collection(self.COL_1_ID, self.user_1_id)
+        self.publish_collection(self.user_1_id, self.COL_1_ID)
         self.save_new_valid_collection(self.COL_2_ID, self.user_1_id)
+        self.publish_collection(self.user_1_id, self.COL_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1235,7 +1577,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
         self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         rights_manager.assign_role_for_exploration(
-            user_services.UserActionsInfo(self.user_1_id),
+            user_services.get_user_actions_info(self.user_1_id),
             self.EXP_1_ID,
             self.user_2_id,
             feconf.ROLE_OWNER)
@@ -1250,7 +1592,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exploration_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.exploration]
+            ).pseudonymizable_entity_mappings[models.NAMES.exploration.value]
         )
         metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -1292,7 +1634,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exploration_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.exploration]
+            ).pseudonymizable_entity_mappings[models.NAMES.exploration.value]
         )
         rights_content_model_1 = (
             exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
@@ -1322,7 +1664,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exploration_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.exploration]
+            ).pseudonymizable_entity_mappings[models.NAMES.exploration.value]
         )
         commit_log_model_1 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
@@ -1371,7 +1713,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exploration_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.exploration]
+            ).pseudonymizable_entity_mappings[models.NAMES.exploration.value]
         )
         metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -1421,7 +1763,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exploration_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.exploration]
+            ).pseudonymizable_entity_mappings[models.NAMES.exploration.value]
         )
         metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -1520,7 +1862,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         exploration_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.exploration]
+            ).pseudonymizable_entity_mappings[models.NAMES.exploration.value]
         )
         metadata_model = (
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
@@ -1566,7 +1908,9 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
+        self.publish_exploration(self.user_1_id, self.EXP_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -1586,132 +1930,6 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
             commit_message='123',
             commit_type='create',
             commit_cmds={}
-        ).put()
-
-        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-
-class WipeoutServiceDeleteEmailModelsTests(test_utils.GenericTestBase):
-    """Provides testing of the deletion part of wipeout service."""
-
-    USER_1_EMAIL = 'some@email.com'
-    USER_1_USERNAME = 'username1'
-    USER_2_EMAIL = 'some-other@email.com'
-    USER_2_USERNAME = 'username2'
-    THREAD_1_ID = 'thread_1_id'
-    THREAD_2_ID = 'thread_2_id'
-    REPLY_1_ID = 'reply_1_id'
-    REPLY_2_ID = 'reply_2_id'
-
-    def setUp(self):
-        super(WipeoutServiceDeleteEmailModelsTests, self).setUp()
-        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_1_ID,
-            reply_to_id=self.REPLY_1_ID
-        ).put()
-        wipeout_service.pre_delete_user(self.user_1_id)
-        wipeout_service.pre_delete_user(self.user_2_id)
-        self.process_and_flush_pending_tasks()
-
-    def test_one_email_is_deleted(self):
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_1_ID)))
-
-    def test_multiple_emails_are_deleted(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_2_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_2_ID,
-            reply_to_id=self.REPLY_2_ID
-        ).put()
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_1_ID)))
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_2_ID)))
-
-    def test_multiple_emails_from_multiple_users_are_deleted(self):
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_2_id, self.THREAD_2_ID),
-            user_id=self.user_2_id,
-            thread_id=self.THREAD_2_ID,
-            reply_to_id=self.REPLY_2_ID
-        ).put()
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_1_id, self.THREAD_1_ID)))
-        self.assertIsNotNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_2_id, self.THREAD_2_ID)))
-
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_2_id))
-        self.assertIsNone(
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
-                '%s.%s' % (self.user_2_id, self.THREAD_2_ID)))
-
-
-class WipeoutServiceVerifyDeleteEmailModelsTests(test_utils.GenericTestBase):
-    """Provides testing of the verification part of wipeout service."""
-
-    USER_1_EMAIL = 'some@email.com'
-    USER_1_USERNAME = 'username1'
-    THREAD_1_ID = 'thread_1_id'
-    THREAD_2_ID = 'thread_2_id'
-    REPLY_1_ID = 'reply_1_id'
-    REPLY_2_ID = 'reply_2_id'
-
-    def setUp(self):
-        super(WipeoutServiceVerifyDeleteEmailModelsTests, self).setUp()
-        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_1_ID,
-            reply_to_id=self.REPLY_1_ID
-        ).put()
-        wipeout_service.pre_delete_user(self.user_1_id)
-        self.process_and_flush_pending_tasks()
-
-    def test_verify_user_delete_when_user_is_deleted_returns_true(self):
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-    def test_verify_user_delete_when_user_is_not_deleted_returns_false(self):
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_1_id))
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
-        email_models.GeneralFeedbackEmailReplyToIdModel(
-            id='%s.%s' % (self.user_1_id, self.THREAD_1_ID),
-            user_id=self.user_1_id,
-            thread_id=self.THREAD_1_ID,
-            reply_to_id=self.REPLY_1_ID
         ).put()
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
@@ -1784,7 +2002,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         feedback_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.feedback]
+            ).pseudonymizable_entity_mappings[models.NAMES.feedback.value]
         )
         feedback_thread_model = (
             feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -1825,7 +2043,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         feedback_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.feedback]
+            ).pseudonymizable_entity_mappings[models.NAMES.feedback.value]
         )
         new_feedback_thread_model = (
             feedback_models.GeneralFeedbackThreadModel.get_by_id(
@@ -1874,7 +2092,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         feedback_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.feedback]
+            ).pseudonymizable_entity_mappings[models.NAMES.feedback.value]
         )
 
         pseudonymized_feedback_thread_models = (
@@ -1906,7 +2124,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         feedback_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.feedback]
+            ).pseudonymizable_entity_mappings[models.NAMES.feedback.value]
         )
 
         # Verify first user is pseudonymized.
@@ -1931,7 +2149,7 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         feedback_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.feedback]
+            ).pseudonymizable_entity_mappings[models.NAMES.feedback.value]
         )
 
         # Verify second user is pseudonymized.
@@ -2184,7 +2402,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2225,7 +2443,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2272,7 +2490,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2303,7 +2521,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2349,7 +2567,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2389,7 +2607,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2429,7 +2647,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2469,7 +2687,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         question_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.question]
+            ).pseudonymizable_entity_mappings[models.NAMES.question.value]
         )
         metadata_model = (
             question_models.QuestionSnapshotMetadataModel.get_by_id(
@@ -2578,7 +2796,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
@@ -2615,7 +2833,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
@@ -2650,7 +2868,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
@@ -2670,7 +2888,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
@@ -2699,7 +2917,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
@@ -2725,7 +2943,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_2_ID)
@@ -2756,7 +2974,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-1' % self.SKILL_1_ID)
@@ -2782,7 +3000,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         skill_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.skill]
+            ).pseudonymizable_entity_mappings[models.NAMES.skill.value]
         )
         metadata_model = skill_models.SkillSnapshotMetadataModel.get_by_id(
             '%s-2' % self.SKILL_1_ID)
@@ -2882,7 +3100,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
@@ -2919,7 +3137,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
@@ -2954,7 +3172,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
@@ -2977,7 +3195,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
@@ -3009,7 +3227,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
@@ -3035,7 +3253,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_2_ID)
@@ -3065,7 +3283,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-1' % self.STORY_1_ID)
@@ -3091,7 +3309,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         story_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.story]
+            ).pseudonymizable_entity_mappings[models.NAMES.story.value]
         )
         metadata_model = story_models.StorySnapshotMetadataModel.get_by_id(
             '%s-2' % self.STORY_1_ID)
@@ -3197,7 +3415,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3239,7 +3457,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3275,7 +3493,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3299,7 +3517,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3336,7 +3554,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3368,7 +3586,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3409,7 +3627,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings_1 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3441,7 +3659,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         subtopic_mappings_2 = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_2_id
-            ).pseudonymizable_entity_mappings[models.NAMES.subtopic]
+            ).pseudonymizable_entity_mappings[models.NAMES.subtopic.value]
         )
         metadata_model = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
@@ -3548,7 +3766,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         suggestion_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.suggestion]
+            ).pseudonymizable_entity_mappings[models.NAMES.suggestion.value]
         )
 
         # Verify user is pseudonymized.
@@ -3663,8 +3881,10 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             self.user_1_id, feconf.ROLE_ID_ADMIN)
         user_services.update_user_role(
             self.user_2_id, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
-        self.user_2_actions = user_services.UserActionsInfo(self.user_2_id)
+        self.user_1_actions = user_services.get_user_actions_info(
+            self.user_1_id)
+        self.user_2_actions = user_services.get_user_actions_info(
+            self.user_2_id)
         self.save_new_topic(self.TOP_1_ID, self.user_1_id)
         topic_services.assign_role(
             self.user_1_actions,
@@ -3687,7 +3907,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         metadata_model = (
             topic_models.TopicSnapshotMetadataModel.get_by_id(
@@ -3727,7 +3947,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         rights_content_model_1 = (
             topic_models.TopicRightsSnapshotContentModel.get_by_id(
@@ -3756,7 +3976,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         commit_log_model_1 = (
             topic_models.TopicCommitLogEntryModel.get_by_id(
@@ -3797,7 +4017,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         metadata_model = (
             topic_models.TopicSnapshotMetadataModel.get_by_id(
@@ -3846,7 +4066,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         metadata_model = (
             topic_models.TopicSnapshotMetadataModel.get_by_id(
@@ -3877,7 +4097,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         topic_mappings = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.topic]
+            ).pseudonymizable_entity_mappings[models.NAMES.topic.value]
         )
         metadata_model = (
             topic_models.TopicSnapshotMetadataModel.get_by_id(

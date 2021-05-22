@@ -1,5 +1,229 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.0.9 (29 Mar 2021)
+------------------------
+Contributor Pages
+* Fix part of #11464: Fix task 8 by allowing user to edit skill difficulty . (#12308)
+* Fix #12260: Add media queries to prevent overflow of tabs in question editor (#12281)
+
+Angular Migration
+* Upgrade component wrapper for Angular html Bind (#12138)
+* Fix part of #9749: Migrate graph interaction (#12090)
+* Fix part Of #10700: Refactor ThreadMessageSummaryObjectFactory and ThreadMessageObjectFactory to Model (#12060)
+* Fix part of #8472: Migrate collection-editor-state.service.ts along with spec (#12027)
+* Fix part of #9749: Migrate summary list header directive to Angular (#12019)
+* Fix part of #11920: Add `RatioExpressionInputRulesService` to `UpgradedServices.ts` (#12009)
+* Migrate skill editor navbar breadcrumb to Angular (#12001)
+* Migrate thread table component (#12000)
+* Fix part of #9749: Migrate all fraction interactions (#11990)
+* Fix part of #9749: Migrate all the Algebraic Interactions to angular components. (#11958)
+* Delete learner-answer-details-data service as it was dead code (#11954)
+* Migrate user email preferences service from AngularJS to Angular (#11949)
+* Fix part of #10700: Refactor Suggestions object factory (#11942)
+* Fix part of #9749: Migrate all the continue interaction related directives to angular components (#11935)
+* Fix part of #8472: Migrate story-update.service (#11889)
+* Fix part of #9749: Migrate Splash page to angular (#11826)
+* Fix part of #8472: Migrate Collection Update Service (#11663)
+* Fix part of #8472: Migrate state-tutorial-first-time.service.ts to Angular 8 (#11368)
+* Fix part of #9749: Migrate Collection Local Nav to Angular (#11352)
+* Fix part of #8472: Migrate image-upload-helper.service (#11306)
+* Fix part of #9749: Migrate subtopic-viewer-navbar-pre-logo-action.component.ts to Angular (#11983)
+* Fix part of #9749: Migrate admin-prod-mode-activities-tab directive to angular component (#11787)
+
+Translations
+* Fix part of #11721: Add i18n for delete button text on preferences page (#11762)
+
+Developer UX
+* Relax Lighthouse Accessibility Assertions (#12183)
+* Use pip 20 and explain `deparallelize_terser` param more (#12145)
+* Fix part of #12117: Remove loop from html linter file (#12129)
+* Fix #11070: Fix empty docstring linter error (#12119)
+* Fix css linter script issue (#12105)
+* Fix part of #5097: Add length-zero-no-unit rule for CSS lint check (#12095)
+* Fix part of #11462: Only start firebase emulator in EMULATOR_MODE (#12093)
+* Fix part of #4057: Add tests in image-upload-helper.service.spec.ts (#11991)
+* Add emulator mode (#11906)
+* Move _check_extra_js_files to the general linter (#11864)
+* Fix #9008: Fix FetchIssuesHandler responds with a JSON object instead of an array (#11852)
+* Fix part of #11431: Replace run_in_transaction call with decorator (#11821)
+* Fix part of #8423: Add Args to docstrings in some files (#11770)
+* Fix part of #11496: Lint Check for E2E Action Functions (#11734)
+
+Data handling
+* Introduce wipeout related utils to admin page (#12101)
+* Clear old drafts and fix format of content suggestions (#12068)
+* Fix part of #10049: Remove deprecated fields from ExplorationRightsModel (#12052)
+* Fix part of #3446: Add frontend validators to PencilCodeEditor (#12033)
+* Fix part of #10049: Remove deprecated fields from ExplorationModel (#11998)
+* Fix part of #10415: Refactor activity validators (#11926)
+* Fix #9427: Remove email access in admin-page (#11869)
+
+Miscellaneous
+* Add a polyfill for globalThis (#12268)
+
+Release team
+* Rename release constant key (#12284)
+
+Bug fixes
+* Fix missing login required modal (#11858)
+
+Python Migration
+* Lift minimal App Engine setup to new base classes (#12124)
+* Fix part of #11462: Add one-off job to populate Firebase servers (#12086)
+* Fix part of #11462: Transition backend to manage Firebase authentication using HTTP cookies (#12054)
+* Fix part of #11462: Transition frontend to manage Firebase authentication using HTTP cookies (#11973)
+* Fix part of #11475: Migrate Base Model Validator to Apache Beam (#11955)
+
+Learner/Creator Pages
+* Show skillreview RTE component when submitting a question via the community dashboard (#12340)
+* Fix #12178: Make questions appear on practice session (#12295)
+* Update classroom card to show # of chapters instead of # of stories (#12218)
+* Use EditabilityService to determine when solution can be edited (#12162)
+* Fix #12070: Adding creator-guidelines page (#12144)
+* Ensure `n`-th term of ratio equals `x` (#12103)
+* Preload functionality for images in state writtenTranslations (#12063)
+* Fix part of #11919: Add styles to prevent errors from looking clickable (#12039)
+* Fix Teach Page: Make teach page responsive and removes broken link (#12038)
+* Add e2e test for student user journey (#12010)
+* Add 'Classroom' option in the sidebar menu (mobile specific) with 'Basic Mathematics' option in submenu (#11985)
+* Fix part of #11950: Add jobs for migrating all snapshots of explorations and questions to the latest schema version (#11952)
+* Fix #11887: Fix audio player position in tablet,mobile view (#11948)
+* Fix part of #11433: Add new TranslatableHtml and TranslatableUnicode objects (#11937)
+* Fix classroom page tasks adding topic in lesson player (#11923)
+* Fix part of #10306: Add async keyword to asynchronous functions that return a promise (#11915)
+* Fix part of #10700: Convert Object factory to Model Class (#11902)
+* Fix #11886: Add padding at the bottom of the search bar container to make it visible (#11893)
+* Fix part of #10667: Unblock profile icon and commit message for topics (#11875)
+* Fix Classroom page navbar in mobile view. (#11873)
+* Hide previously assigned topics for a skill in the 'Assign Skill to Topic' modal (#11865)
+* Fix #3984: Change tooltip from "Add to playlist" to "Watch later" in exploration library (#11780)
+* Fix #11639: Improve style of navbar-menu:focus  (#11731)
+* Fix part of #11485: Revisit old completed lessons in story (#11563)
+* Remove suggestion submission functionality from the learner view (#12096)
+* Fix #10919, #8800 & #4932: Make "Play later" section tiles consistent with other sections (#12048)
+* Fix #11898: Fix misaligned social media icons (#11913)
+
+Automated QA Team
+* Fix part of #11462: Add logout at the end of end-to-end tests (#12118)
+* Fix part of #10798: Add End-to-End tests for libraryFlow.js (#12083)
+* Fix part of #4057: Add a unit test for Graph Utils Service (#12072)
+* Fix #12026: Skip E2E Tests for Changelog Update PRs (#12035)
+* Fix #12029: Escape Protractor Screenshot File Names (#12034)
+* Fix part of #4057: Add a test file for state-tutorial-first-time.service.ts (#12007)
+* Fix part of #10798: Fix E2E tests for accessibility.js (#11999)
+* Fix #11947 and #11993: Fix URLs Reported to E2E Logging Server and Report Branch Name (#11995)
+* Fix part of #10798: Add end-to-end test general.js file (#11965)
+* Fix frontend test failing flakily due to coverage (#11907)
+* Shard backend tests (#11792)
+
+
+v3.0.8 (25 Feb 2021)
+------------------------
+Contributor Pages
+* Contributor dashboard bug fixes (#12008)
+* Fix part of #11900: Disable opportunities list next button if there are no more results to display (#11982)
+* Fix #11901: aligns bullets points properly. (#11976)
+* Fix #11840 and #11899: Allow admin to view, add, and remove users to use submit question tab on contributor dashboard + misc admin roles fixes (#11862)
+
+Bug fixes
+* Fix part of #11462: Avoid initializing AngularFire by default (#11845)
+
+Angular Migration
+* Fix part of #11920: Add `RatioExpressionInputRulesService` to `UpgradedServices.ts` (#12009)
+* Fix part of #8472: Migrate translation-tab-active-content-id.service (#11760)
+* Fixes Part of #8472: Migrate Exploration data service (#11564)
+
+Translations
+* Add hi-en to SUPPORTED_CONTENT_LANGUAGES and fixes revision card not showing content (#11917)
+
+Developer UX
+* Fix #9887: Adds inline comment checker for codeowner (#11835)
+* Fix part of #10474: Enable strict check on audio language model (#11813)
+* Fix #11477: Update codeowners in preparation for vacation. (#11810)
+* Upgrade libraries (#11754)
+* Fix #11727: Update the CODEOWNERS file and lint check to ensure new files don’t fall under blanket code owners (#11745)
+* Fix part of #11431: Replace run_in_transaction call with decorator (#11741)
+* Fix #9726 Relocated sidebar-status.service.ts file from domain to services directory. (#11729)
+* Fix part of #11572: Tighten some try/excepts and use `exception` instead of `error` in some places (#11728)
+* Fix part of #10306: Added async keyword to functions that return a promise (#11710)
+* Fix css linter chekcs never stops because of re.sub() call (#11672)
+* Clean up ElasticSearch server after e2e run. (#11662)
+* Fix part of #10728: Move python regex lint check to pylint (#11579)
+* Fix part of #10474: Cover more files with strict checks (#11574)
+* Fix part of #7450: Modify private methods in SuggestionIntegrationTests (#11797)
+* Fix of #10306 added async keyword before functions that return a promise (#11755)
+* Fix part of #10306 adding async in ansynchronous functions of Translations-backend-api.service (#11740)
+* Fix part of #10306: Added async keyword to asynchronous functions that return a promise (#11739)
+
+Data handling
+* Fix signup process for user marked as deleted (#11946)
+* Add notification email when Wipeout fails (#11775)
+* Refactor controllers to not user storage models directly (#11673)
+* Fix #11469, #11623: Fix audit jobs, adding ID validation and reducing shards for audit jobs (#11646)
+* Fix part of #5914: Truncate commit_message lengths to enable projection queries for Takeout (#11465)
+* Fix part of #10049: Remove deprecated fields from `CollectionModel` and `CollectionRightsModel` (#11350)
+* Fix part of #10049: Remove deprecated field from `UserSubscriptionsModel` (#11597)
+
+Miscellaneous
+* Fix installation issues with gtag (#11908)
+* Pin webdriver-manager package to ^12.1.8 (#11794)
+* Add code snippet for Google Optimize (#11773)
+* Fix #8174: Remove duplicate DIRS_TO_ADD_TO_SYS_PATH from the code base (#11860)
+* Upgrade GA version to use gtag. (#11882)
+* Change Version to Browser-version in the bug report issue template (#11689)
+* Replace logging mocks with TestBase.capture_logging (#11688)
+
+Release team
+* Add correct release constants for migration job names list (#11648)
+
+QA Team
+* fix preferencePages as part of #10798 (#11669)
+* Use waitFor.invisibilityOf immediately after waitFor.visibilityOf for toast messages in ExplorationEditorPage.saveChanges (#11846)
+* fix "confirm delete skill button is not clickable" flake in topicsAndSkillsDashboard (#11801)
+* Fix part of #10798: Fix end to end tests for ExplorationEditorImprovementsTab.js (#11619)
+
+Python Migration
+* Fix part of #11462: Initialize AngularFire with Firebase constants (#11796)
+* Fix part of #11314: Switch over to elasticsearch in dev and prod. (#11774)
+* Fix part of #11462: Lift GAE-specific auth services to the platform layer (#11588)
+
+Learner/Creator Pages
+* Fix images not loading when offline (#11964)
+* Fix #11912: Implements delay before cards can be rearranged. (#11931)
+* Fix #11898: The social media icons are missaligned and different sizes (#11913)
+* Fix Skill editor console error (#11989)
+* Fix #11887: fixes audio player position in tablet,mobile view (#11948)
+* Fix #11918: Added text to that conveys the interaction used (#11941)
+* Fix #11919 : Refactor CSS styles to prevent errors from looking clickable (#11940)
+* Fix #11892:Added a specific height to the cards. (#11911)
+* Fix #11885: added media query to change to mobile view (#11894)
+* Fix #11886 : Added padding at the bottom of the search bar container to make it visible (#11893)
+* Fix #10201 and #11682: Editor and translation tutorials fully working (#11857)
+* Remove deleted skills from skillIdToRubricsObject in the topic editor (#11855)
+* Fix #11679: Success alert on merging two skills (#11766)
+* Fix minor syntax issues in the correctness footer (#11719)
+* Add End-to-end test for topic and story viewer page (#11701)
+* Fix part of #11464 task 12 highlighting interaction selection modal (#11674)
+* Hide create topic/skill buttons for users with insufficient access rights; Update page title guidelines; (#11670)
+* Fix #11181: Changed button CSS (#11667)
+* Fix #11519: Removes "Uncategorized Skills" from topic editor if all skills have been categorized (#11656)
+* Fix #11536: Fix overflowing map container in exploration editor (#11651)
+* Fix part of #11464:Changes question editor flow in skill editor tab and Fixes task 7 (#11625)
+* Fix question editor issues (#11573)
+* Fix part of #10306: Adds async keyword in read-only-collection-backend-api.service (#11568)
+* Deprecate parameters in exploration editor settings (#11513)
+* Fix part of #10667: Prevent duplicate skill creation (#11375)
+* Increase duration that success toast stays on the screen (save exp) (#11842)
+* Make categories visible (#11832)
+* Fix #11105: Adds correct styling in the audio player to maintain its height (#11819)
+* Add metrics for 'curated lesson completed' (#11799)
+* Introduce an Audit job to list all interaction ids in a topic (#11712)
+* Add few methods for site analytics (#11668)
+* Fix #11247: Duplicated Number Input interaction into General tab (#11664)
+* Fix #10261: Displays "Reload Site?" modal/alert (#11654)
+* Fix part of #8038: Changes translation-file-hash-loader.service.ts name to  translation-file-hash-loader-backend-api.service.ts (#11650)
+* Fix part of #11464 task 20 and 21 fixing border-bottom (#11567)
+
 v3.0.7 (04 Feb 2021)
 ------------------------
 Contributor Pages

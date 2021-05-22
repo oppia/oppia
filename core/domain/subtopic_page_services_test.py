@@ -19,11 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_fetchers
 from core.platform import models
 from core.tests import test_utils
 
@@ -46,7 +48,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubtopicPageServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
@@ -219,13 +221,15 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID, 1)
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            r'Entity for class SubtopicPageModel with id %s not found' % (
-                subtopic_page_id)):
+            re.escape(
+                'Entity for class SubtopicPageModel with id %s not found' % (
+                    subtopic_page_id))):
             subtopic_models.SubtopicPageModel.get(subtopic_page_id)
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            r'Entity for class SubtopicPageModel with id %s not found' % (
-                subtopic_page_id)):
+            re.escape(
+                'Entity for class SubtopicPageModel with id %s not found' % (
+                    subtopic_page_id))):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
 

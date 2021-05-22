@@ -30,6 +30,7 @@ import threading
 
 import python_utils
 from scripts import common
+from scripts import servers
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -87,7 +88,7 @@ WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
 WEBPACK_TERSER_CONFIG = 'webpack.terser.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
+FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.gitkeep')
 # Files with these name patterns shouldn't be moved to build directory, and will
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
@@ -113,7 +114,7 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
-    'webpack_bundles/*'
+    'webpack_bundles/*',
 )
 
 PAGES_IN_APP_YAML = (
@@ -121,10 +122,21 @@ PAGES_IN_APP_YAML = (
     'webpack_bundles/contact-page.mainpage.html',
     'webpack_bundles/donate-page.mainpage.html',
     'webpack_bundles/get-started-page.mainpage.html',
+    'webpack_bundles/login-page.mainpage.html',
+    'webpack_bundles/logout-page.mainpage.html',
     'webpack_bundles/privacy-page.mainpage.html',
+    'webpack_bundles/playbook.mainpage.html',
     'webpack_bundles/teach-page.mainpage.html',
     'webpack_bundles/terms-page.mainpage.html',
     'webpack_bundles/thanks-page.mainpage.html'
+)
+
+# NOTE: These pages manage user sessions. Thus, we should never reject or
+# replace them when running in maintenance mode; otherwise admins will be unable
+# to access the site.
+AUTH_PAGE_PATHS = (
+    'webpack_bundles/login-page.mainpage.html',
+    'webpack_bundles/logout-page.mainpage.html',
 )
 
 # Hashes for files with these paths should be provided to the frontend in
@@ -192,49 +204,63 @@ def generate_app_yaml(deploy_mode=False, maintenance_mode=False):
     with python_utils.open_file(APP_DEV_YAML_FILEPATH, 'r') as yaml_file:
         content += yaml_file.read()
     for file_path in PAGES_IN_APP_YAML:
-        if maintenance_mode:
+        if maintenance_mode and file_path not in AUTH_PAGE_PATHS:
             content = content.replace(
                 file_path, prod_file_prefix + maintenance_page_path)
         else:
             content = content.replace(
                 file_path, prod_file_prefix + file_path)
 
-    # The version: default line is required to run jobs on a local server (
-    # both in prod & non-prod env). This line is not required when app.yaml
-    # is generated during deployment. So, we remove this if the build process
-    # is being run from the deploy script.
     if deploy_mode:
+        # The version: default line is required to run jobs on a local server (
+        # both in prod & non-prod env). This line is not required when app.yaml
+        # is generated during deployment. So, we remove this if the build
+        # process is being run from the deploy script.
         content = content.replace('version: default', '')
+        # The FIREBASE_AUTH_EMULATOR_HOST environment variable is only needed to
+        # test locally, and MUST NOT be included in the deployed file.
+        content = re.sub('  FIREBASE_AUTH_EMULATOR_HOST: ".*"\n', '', content)
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
         prod_yaml_file.write(content)
 
 
-def modify_constants(prod_env=False, maintenance_mode=False):
+def modify_constants(
+        prod_env=False, emulator_mode=True, maintenance_mode=False):
     """Modify constants.ts and feconf.py.
 
     Args:
         prod_env: bool. Whether the server is started in prod mode.
+        emulator_mode: bool. Whether the server is started in emulator mode.
         maintenance_mode: bool. Whether the site should be put into
             the maintenance mode.
     """
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
     common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
+        common.CONSTANTS_FILE_PATH,
+        r'"DEV_MODE": (true|false)',
+        dev_mode_variable)
+    emulator_mode_variable = (
+        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
+    common.inplace_replace_file(
+        common.CONSTANTS_FILE_PATH,
+        r'"EMULATOR_MODE": (true|false)',
+        emulator_mode_variable
+    )
 
     enable_maintenance_mode_variable = (
         'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
     common.inplace_replace_file(
         common.FECONF_PATH,
-        r'ENABLE_MAINTENANCE_MODE = .*',
+        r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable)
 
 
 def set_constants_to_default():
     """Set variables in constants.ts and feconf.py to default values."""
-    modify_constants(prod_env=False, maintenance_mode=False)
+    modify_constants(prod_env=False, emulator_mode=True, maintenance_mode=False)
 
 
 def _minify(source_path, target_path):
@@ -644,10 +670,10 @@ def build_using_webpack(config_path):
     """
 
     python_utils.PRINT('Building webpack')
-
-    cmd = '%s %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
-    subprocess.check_call(cmd, shell=True)
+    managed_webpack_compiler = servers.managed_webpack_compiler(
+        config_path=config_path, max_old_space_size=2400)
+    with managed_webpack_compiler as p:
+        p.wait()
 
 
 def hash_should_be_inserted(filepath):
@@ -1337,7 +1363,9 @@ def main(args=None):
                 'set in non-prod env.')
 
     modify_constants(
-        prod_env=options.prod_env, maintenance_mode=options.maintenance_mode)
+        prod_env=options.prod_env,
+        emulator_mode=not options.deploy_mode,
+        maintenance_mode=options.maintenance_mode)
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()

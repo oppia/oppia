@@ -136,7 +136,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
             thumbnail_filename, feconf.ENTITY_TYPE_STORY, entity_id, raw_image,
             filename_prefix, image_is_compressible)
 
-        story_services.update_story(
+        topic_services.update_story_and_topic_summary(
             self.user_id, new_story_id, [story_domain.StoryChange({
                 'cmd': 'update_story_property',
                 'property_name': 'thumbnail_filename',
@@ -147,7 +147,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
                 'property_name': 'thumbnail_bg_color',
                 'old_value': None,
                 'new_value': thumbnail_bg_color
-            }), ], 'Added story thumbnail.')
+            }), ], 'Added story thumbnail.', topic_id)
 
         self.render_json({
             'storyId': new_story_id
@@ -237,7 +237,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 
             if deleted_skill_ids:
                 deleted_skills_string = ', '.join(deleted_skill_ids)
-                logging.error(
+                logging.exception(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
@@ -327,7 +327,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.error(
+            logging.exception(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )
@@ -369,7 +369,7 @@ class TopicRightsHandler(base.BaseHandler):
         if topic_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid topic id to be provided.')
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_topic = topic_services.check_can_edit_topic(
             user_actions_info, topic_rights)
 

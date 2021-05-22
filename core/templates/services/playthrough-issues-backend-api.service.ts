@@ -28,10 +28,10 @@ import {
   PlaythroughIssueBackendDict,
   PlaythroughIssue,
   PlaythroughIssueObjectFactory
-} from 'domain/statistics/PlaythroughIssueObjectFactory.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+} from 'domain/statistics/PlaythroughIssueObjectFactory';
+import { ServicesConstants } from 'services/services.constants';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service.ts';
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({ providedIn: 'root' })
 export class PlaythroughIssuesBackendApiService {
@@ -42,7 +42,7 @@ export class PlaythroughIssuesBackendApiService {
       private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchIssues(
+  async fetchIssuesAsync(
       explorationId: string,
       explorationVersion: number): Promise<PlaythroughIssue[]> {
     if (this.cachedIssues !== null) {
@@ -62,7 +62,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  fetchPlaythrough(
+  async fetchPlaythroughAsync(
       explorationId: string,
       playthroughId: string): Promise<PlaythroughIssue> {
     return new Promise((resolve, reject) => {
@@ -77,7 +77,7 @@ export class PlaythroughIssuesBackendApiService {
     });
   }
 
-  resolveIssue(
+  async resolveIssueAsync(
       issueToResolve: PlaythroughIssue,
       explorationId: string, explorationVersion: number): Promise<void> {
     return new Promise((resolve, reject) => {

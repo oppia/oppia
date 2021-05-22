@@ -31,7 +31,7 @@ class SkillOpportunitiesDict {
   more: boolean;
 }
 
-class ExplorationOpportunitiesDict {
+export class ExplorationOpportunitiesDict {
   opportunities: ExplorationOpportunitySummary[];
   more: boolean;
 }
@@ -54,7 +54,7 @@ export class ContributionOpportunitiesService {
   private _moreTranslationOpportunitiesAvailable = true;
   private _moreVoiceoverOpportunitiesAvailable = true;
 
-  private _getSkillOpportunities(cursor: string):
+  private async _getSkillOpportunitiesAsync(cursor: string):
   Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor)
@@ -67,7 +67,8 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-  private _getTranslationOpportunities(languageCode: string, cursor: string) {
+  private async _getTranslationOpportunitiesAsync(
+      languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(languageCode, cursor)
       .then(({ opportunities, nextCursor, more }) => {
@@ -79,7 +80,8 @@ export class ContributionOpportunitiesService {
         };
       });
   }
-  private _getVoiceoverOpportunities(languageCode: string, cursor: string) {
+  private async _getVoiceoverOpportunitiesAsync(
+      languageCode: string, cursor: string) {
     return this.contributionOpportunitiesBackendApiService
       .fetchVoiceoverOpportunitiesAsync(languageCode, cursor)
       .then(({ opportunities, nextCursor, more }) => {
@@ -96,32 +98,32 @@ export class ContributionOpportunitiesService {
   }
 
   async getSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
-    return this._getSkillOpportunities('');
+    return this._getSkillOpportunitiesAsync('');
   }
   async getTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunities(languageCode, '');
+    return this._getTranslationOpportunitiesAsync(languageCode, '');
   }
-  async getVoiceoverOpportunities(languageCode: string):
+  async getVoiceoverOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
-    return this._getVoiceoverOpportunities(languageCode, '');
+    return this._getVoiceoverOpportunitiesAsync(languageCode, '');
   }
   async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
-      return this._getSkillOpportunities(this._skillOpportunitiesCursor);
+      return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
   }
   async getMoreTranslationOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
-      return this._getTranslationOpportunities(
+      return this._getTranslationOpportunitiesAsync(
         languageCode, this._translationOpportunitiesCursor);
     }
   }
-  async getMoreVoiceoverOpportunities(languageCode: string):
+  async getMoreVoiceoverOpportunitiesAsync(languageCode: string):
   Promise<ExplorationOpportunitiesDict> {
     if (this._moreVoiceoverOpportunitiesAvailable) {
-      return this._getVoiceoverOpportunities(
+      return this._getVoiceoverOpportunitiesAsync(
         languageCode, this._voiceoverOpportunitiesCursor);
     }
   }

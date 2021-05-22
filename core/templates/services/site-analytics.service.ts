@@ -43,7 +43,7 @@ export class SiteAnalyticsService {
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.windowRef.nativeWindow.gtag && this.CAN_SEND_ANALYTICS_EVENTS) {
+    if (this.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.gtag('event', eventAction, {
         event_category: eventCategory,
         event_label: eventLabel
@@ -298,14 +298,24 @@ export class SiteAnalyticsService {
       'PlayerFinishExploration', 'engage', explorationId);
   }
 
-  registerCuratedLessonCompleted(explorationId: string): void {
+  registerCuratedLessonStarted(
+      topicName: string, explorationId: string): void {
     this._sendEventToGoogleAnalytics(
-      'CuratedLessonCompleted', 'engage', explorationId);
+      'CuratedLessonStarted', `start ${topicName}`, explorationId);
   }
 
-  registerClassroomLessonActiveUse(): void {
+  registerCuratedLessonCompleted(
+      topicName: string, explorationId: string): void {
     this._sendEventToGoogleAnalytics(
-      'ClassroomActiveUserStartAndSawCards', 'engage', '');
+      'CuratedLessonCompleted', `start ${topicName}`, explorationId);
+  }
+
+  registerClassroomLessonActiveUse(
+      topicName: string, explorationId: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomActiveUserStartAndSawCards',
+      `start ${topicName}`,
+      explorationId);
   }
 
   registerClassoomHeaderClickEvent(): void {

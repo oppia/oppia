@@ -144,14 +144,22 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     expected_last_updated_ms))
 
     def test_basic_computation_ignores_automated_exploration_commits(self):
+        swap_states_schema_41 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41)
+        swap_exp_schema_46 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46)
+        with swap_states_schema_41, swap_exp_schema_46:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                EXP_ID, title=EXP_TITLE)
+            exp_services.save_new_exploration(USER_ID, exploration)
+
+        # Confirm that the exploration is at version 1.
+        exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
+        self.assertEqual(exploration.version, 1)
+
         with self.swap(
             user_jobs_continuous, 'DashboardRecentUpdatesAggregator',
             MockRecentUpdatesAggregator):
-            self.save_new_exp_with_states_schema_v0(EXP_ID, USER_ID, EXP_TITLE)
-
-            # Confirm that the exploration is at version 1.
-            exploration = exp_fetchers.get_exploration_by_id(EXP_ID)
-            self.assertEqual(exploration.version, 1)
 
             v1_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
@@ -389,7 +397,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
-            user_a = user_services.UserActionsInfo(user_a_id)
+            user_a = user_services.get_user_actions_info(user_a_id)
 
             # User A creates an exploration.
             self.save_new_valid_exploration(
@@ -632,7 +640,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
-        self.user_a = user_services.UserActionsInfo(self.user_a_id)
+        self.user_a = user_services.get_user_actions_info(self.user_a_id)
 
     def mock_get_statistics(self, exp_id, unused_version):
         current_completions = {

@@ -16,16 +16,14 @@
  * @fileoverview Unit tests for the topics and skills dashboard controller.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 import { EventEmitter } from '@angular/core';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { SkillSummary, SkillSummaryBackendDict } from
+  'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardFilter } from
-  // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
-import { TopicSummary, TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
-
+import { TopicSummary, TopicSummaryBackendDict } from
+  'domain/topic/topic-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -35,12 +33,7 @@ require(
 describe('Topics and Skills Dashboard Page', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var $scope = null, ctrl = null;
   var $uibModal = null;
@@ -79,7 +72,7 @@ describe('Topics and Skills Dashboard Page', function() {
       can_delete_topic: true,
       can_delete_skill: true
     };
-    var SkillCreationService;
+    let CreateNewSkillModalService;
 
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $rootScope = $injector.get('$rootScope');
@@ -123,7 +116,7 @@ describe('Topics and Skills Dashboard Page', function() {
       var MockWindowDimensionsService = {
         isWindowNarrow: () => false
       };
-      SkillCreationService = $injector.get('SkillCreationService');
+      CreateNewSkillModalService = $injector.get('CreateNewSkillModalService');
 
       ctrl = $componentController('topicsAndSkillsDashboardPage', {
         $scope: $scope,
@@ -204,24 +197,9 @@ describe('Topics and Skills Dashboard Page', function() {
     });
 
     it('should open Create Skill Modal', function() {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      let modalSpy = spyOn(CreateNewSkillModalService, 'createNewSkill');
       ctrl.createSkill();
       expect(modalSpy).toHaveBeenCalled();
-    });
-
-    it('should call the skill creation service', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          description: 'Description',
-          rubrics: 'Easy',
-          explanation: 'Explanation'
-        })
-      });
-
-      var skillSpy = spyOn(SkillCreationService, 'createNewSkill');
-      ctrl.createSkill();
-      $rootScope.$apply();
-      expect(skillSpy).toHaveBeenCalled();
     });
 
     it('should navigate the page', function() {

@@ -42,12 +42,14 @@ angular.module('oppia').component('historyTab', {
   controller: [
     '$http', '$log', '$rootScope', '$uibModal', 'CompareVersionsService',
     'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
-    'LoaderService', 'RouterService', 'UrlInterpolationService',
+    'LoaderService', 'RouterService',
+    'UrlInterpolationService',
     'VersionTreeService', 'WindowRef',
     function(
         $http, $log, $rootScope, $uibModal, CompareVersionsService,
         DateTimeFormatService, EditabilityService, ExplorationDataService,
-        LoaderService, RouterService, UrlInterpolationService,
+        LoaderService, RouterService,
+        UrlInterpolationService,
         VersionTreeService, WindowRef) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -86,7 +88,7 @@ angular.module('oppia').component('historyTab', {
       // Refreshes the displayed version history log.
       ctrl.refreshVersionHistory = function() {
         LoaderService.showLoadingScreen('Loading');
-        ExplorationDataService.getData().then(function(data) {
+        ExplorationDataService.getDataAsync().then(function(data) {
           var currentVersion = data.version;
           ctrl.currentVersion = currentVersion;
           // The ctrl.compareVersionMetadata is an object with keys

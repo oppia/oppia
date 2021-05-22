@@ -29,10 +29,37 @@
   </li>
 
   <!-- Player -->
-  <li class="nav-item">
+  <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount() || $ctrl.getChangeListCount() > 0}" ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>" class="nav-item">
     <a ng-href="/collection/<[$ctrl.collectionId]>" target="_blank" rel="noopener" uib-tooltip="Player (new tab)" tooltip-placement="bottom" class="nav-link">
       <i class="material-icons">&#xE037;</i>
     </a>
+    <div ng-show="$ctrl.getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="$ctrl.selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        <[$ctrl.getWarningsCount()]>
+      </span>
+    </div>
+    <div ng-show="$ctrl.getChangeListCount() > 0"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="$ctrl.selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        1
+      </span>
+    </div>
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li ng-if="$ctrl.getWarningsCount()"
+          class="oppia-editor-warnings-text"
+          ng-repeat="issue in $ctrl.validationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
+      <li ng-if="$ctrl.getChangeListCount() && $ctrl.isCollectionSaveable()"
+          class="oppia-editor-warnings-text">
+        Save Draft to preview latest changes.
+      </li>
+    </ul>
   </li>
 </ul>
 

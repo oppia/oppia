@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
 
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'continue-button.directive.ts');
+  'continue-button.component.ts');
 
 require('domain/utilities/browser-checker.service.ts');
 require(
@@ -34,6 +34,7 @@ require('services/contextual/window-dimensions.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('progressNav', [
   function() {
@@ -49,14 +50,16 @@ angular.module('oppia').directive('progressNav', [
       },
       template: require('./progress-nav.directive.html'),
       controller: [
-        '$scope', 'BrowserCheckerService',
+        '$scope', '$timeout', 'BrowserCheckerService',
         'ExplorationEngineService', 'ExplorationPlayerStateService',
+        'FocusManagerService',
         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
         function(
-            $scope, BrowserCheckerService,
+            $scope, $timeout, BrowserCheckerService,
             ExplorationEngineService, ExplorationPlayerStateService,
+            FocusManagerService,
             PlayerPositionService, PlayerTranscriptService, UrlService,
             WindowDimensionsService, CONTINUE_BUTTON_FOCUS_LABEL,
             INTERACTION_SPECS, TWO_CARD_THRESHOLD_PX) {
@@ -66,6 +69,7 @@ angular.module('oppia').directive('progressNav', [
           var interactionIsInline = true;
           var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
             'ItemSelectionInput', 'MultipleChoiceInput'];
+
           var updateDisplayedCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
             $scope.displayedCardIndex =
@@ -83,6 +87,13 @@ angular.module('oppia').directive('progressNav', [
               $scope.interactionCustomizationArgs =
                 $scope.displayedCard.getInteractionCustomizationArgs();
               $scope.interactionId = $scope.displayedCard.getInteractionId();
+              if ($scope.interactionId === 'Continue') {
+                // To ensure that focus is added after all functions
+                // in main thread are completely executed.
+                $timeout(() => {
+                  FocusManagerService.setFocusWithoutScroll('continue-btn');
+                }, 0);
+              }
             }
 
             $scope.helpCardHasContinueButton = false;

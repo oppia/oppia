@@ -28,9 +28,11 @@ import 'third-party-imports/ui-tree.import';
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngAudio', 'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree',
   uiValidate
 ]);
+
+require('Polyfills.ts');
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
@@ -39,6 +41,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
-require(
-  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.component.ts');

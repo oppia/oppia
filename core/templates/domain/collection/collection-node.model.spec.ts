@@ -16,59 +16,177 @@
  * @fileoverview Tests for collection-node.model.
  */
 
-import { CollectionNode } from
-  'domain/collection/collection-node.model';
+import { CollectionNode, CollectionNodeBackendDict}
+  from 'domain/collection/collection-node.model';
+import { LearnerExplorationSummaryBackendDict } from
+  'domain/summary/learner-exploration-summary.model';
 
 describe('Collection node model', () => {
   it('should provide an immutable exploration summary', () => {
-    var explorationSummaryBackendObject = {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      num_views: 0,
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      human_readable_contributors_summary: {},
-      language_code: 'en',
-      thumbnail_bg_color: '#cd672b',
-      created_on_msec: 1591296635736.666,
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0
-      },
-      status: 'public',
-      tags: [],
-      activity_type: 'exploration',
-      category: 'Algebra',
-      title: 'exp title'
-    };
-    var collectionNodeBackendObject = {
-      exploration_id: 'exp_id0',
-      exploration_summary: explorationSummaryBackendObject
-    };
+    let explorationSummaryBackendObject:
+      LearnerExplorationSummaryBackendDict = {
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 0,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'exp title'
+      };
+    let collectionNodeBackendObject:
+      CollectionNodeBackendDict = {
+        exploration_id: 'exp_id0',
+        exploration_summary: explorationSummaryBackendObject
+      };
 
-    var collectionNode = CollectionNode.create(
+    let collectionNode: CollectionNode = CollectionNode.create(
       collectionNodeBackendObject);
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(collectionNode.getExplorationTitle()).toEqual('exp title');
 
-    var summaryObject = collectionNode.getExplorationSummaryObject();
+    let summaryObject: LearnerExplorationSummaryBackendDict | null =
+      collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
-
-    delete summaryObject.category;
-    expect(summaryObject).not.toEqual(
-      collectionNode.getExplorationSummaryObject());
   });
 
   it('should be able to create a new collection node by exploration ID',
     () => {
-      var collectionNode = CollectionNode.createFromExplorationId(
-        'exp_id0');
+      let collectionNode: CollectionNode =
+        CollectionNode.createFromExplorationId('exp_id0');
       expect(collectionNode.getExplorationId()).toEqual('exp_id0');
       expect(collectionNode.doesExplorationExist()).toBe(false);
     }
   );
+
+  it('should be able to detect if exploration is private',
+    () => {
+      let explorationSummaryBackendObject:
+        LearnerExplorationSummaryBackendDict = {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'private',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'exp title'
+        };
+      let collectionNodeBackendObject:
+        CollectionNodeBackendDict = {
+          exploration_id: 'exp_id0',
+          exploration_summary: explorationSummaryBackendObject
+        };
+
+      let collectionNode: CollectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      expect(collectionNode.isExplorationPrivate()).toBe(true);
+    }
+  );
+
+  it('should be able to set exploration summary object',
+    () => {
+      let explorationSummaryBackendObject:
+        LearnerExplorationSummaryBackendDict = {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'exp title'
+        };
+      let collectionNodeBackendObject:
+        CollectionNodeBackendDict = {
+          exploration_id: 'exp_id0',
+          exploration_summary: null
+        };
+
+      let collectionNode: CollectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      let summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toBeNull();
+      expect(collectionNode.getExplorationTitle()).toBeNull();
+      expect(collectionNode.isExplorationPrivate()).toBeFalse();
+
+      collectionNode.setExplorationSummaryObject(
+        explorationSummaryBackendObject);
+      summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toEqual(explorationSummaryBackendObject);
+      expect(collectionNode.getCapitalizedObjective()).toBe('Test Objective');
+    });
+
+  it('should return null when Exploration Summary Object is null',
+    () => {
+      let explorationSummaryBackendObject:
+      LearnerExplorationSummaryBackendDict | null = null;
+      let collectionNodeBackendObject:
+      CollectionNodeBackendDict = {
+        exploration_id: 'exp_id0',
+        exploration_summary: null
+      };
+
+      let collectionNode: CollectionNode = CollectionNode.create(
+        collectionNodeBackendObject);
+
+      let summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toBeNull();
+      expect(collectionNode.getExplorationTitle()).toBeNull();
+      expect(collectionNode.isExplorationPrivate()).toBeFalse();
+
+      collectionNode.setExplorationSummaryObject(
+        explorationSummaryBackendObject);
+      summaryObject = collectionNode.getExplorationSummaryObject();
+
+      expect(summaryObject).toEqual(explorationSummaryBackendObject);
+      expect(collectionNode.getCapitalizedObjective()).toBeNull();
+    });
 });

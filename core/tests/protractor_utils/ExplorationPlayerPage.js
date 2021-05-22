@@ -29,10 +29,6 @@ var ExplorationPlayerPage = function() {
   var conversationInput = element(
     by.css('.protractor-test-conversation-input'));
   var nextCardButton = element(by.css('.protractor-test-next-card-button'));
-  var suggestionDescriptionInput = element(
-    by.css('.protractor-test-suggestion-description-input'));
-  var closeSuggestionModalButton = element(
-    by.css('.protractor-test-exploration-close-suggestion-modal-btn'));
   var conversationSkinCardsContainer = element(
     by.css('.protractor-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
@@ -43,15 +39,11 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-exploration-header'));
   var infoCardRating = element(
     by.css('.protractor-test-info-card-rating'));
-  var explorationSuggestionModal = element(
-    by.css('.protractor-test-exploration-suggestion-modal'));
   var feedbackTextArea = element(
     by.css('.protractor-test-exploration-feedback-textarea'));
   var waitingForResponseElem = element(by.css(
     '.protractor-test-input-response-loading-dots'));
   var ratingStars = element.all(by.css('.protractor-test-rating-star'));
-  var suggestionSubmitButton = element(
-    by.css('.protractor-test-suggestion-submit-btn'));
   var feedbackCloseButton = element(
     by.css('.protractor-test-exploration-feedback-close-button'));
   var reportExplorationButton = element(
@@ -133,35 +125,6 @@ var ExplorationPlayerPage = function() {
     expect(buttonText).toMatch(text);
   };
 
-  this.fillAndSubmitSuggestion = async function(
-      suggestionTitle, suggestionDescription) {
-    var suggestionModal = element(
-      by.css('.protractor-test-exploration-suggestion-modal'));
-    await waitFor.visibilityOf(
-      suggestionModal, 'Suggestion Modal is taking too long to appear.');
-    var suggestionHeader = element(by.css('.oppia-rte'));
-    await action.click('Suggestion Header', suggestionHeader);
-    await action.sendKeys(
-      'Suggestion Header', suggestionHeader, suggestionTitle);
-    var suggestionModalDescription = element(
-      by.css('.protractor-test-suggestion-description-input'));
-    await action.click(
-      'Suggestion Modal Description', suggestionModalDescription);
-    await action.sendKeys(
-      'Suggestion Modal Description',
-      suggestionModalDescription,
-      suggestionDescription);
-    var submitSuggestionBtn = element(
-      by.css('.protractor-test-suggestion-submit-btn'));
-
-    await action.click('Submit Suggestion Button', submitSuggestionBtn);
-    var AFTER_SUBMIT_RESPONSE_STRING =
-        'Your suggestion has been forwarded to the ' +
-        'exploration author for review.';
-    var afterSubmitModalText = await element(by.tagName('p')).getText();
-    expect(afterSubmitModalText).toMatch(AFTER_SUBMIT_RESPONSE_STRING);
-  };
-
   this.reportExploration = async function() {
     await action.click('Report Exploration Button', reportExplorationButton);
     let radioButton = await element.all(by.tagName('input')).get(0);
@@ -172,7 +135,8 @@ var ExplorationPlayerPage = function() {
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
     let submitButton = await element.all(by.tagName('button')).get(1);
     await action.click('Submit Button', submitButton);
-    let afterSubmitText = await element(by.tagName('p')).getText();
+    let afterSubmitText = await element(
+      by.css('.protractor-exploration-flagged-success-message')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };
@@ -220,13 +184,6 @@ var ExplorationPlayerPage = function() {
   this.clickOnReturnToParentButton = async function() {
     await waitFor.elementToBeClickable(returnToParentButton);
     await action.click('Return To Parent Button', returnToParentButton);
-    await waitFor.pageToFullyLoad();
-  };
-
-  this.clickOnCloseSuggestionModalButton = async function() {
-    await waitFor.elementToBeClickable(closeSuggestionModalButton);
-    await action.click(
-      'Close Suggestion Modal Button', closeSuggestionModalButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -320,7 +277,8 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
-    await waitFor.visibilityOf(
+    // TODO(#11969): Move this wait to interactions submitAnswer function.
+    await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
@@ -338,19 +296,6 @@ var ExplorationPlayerPage = function() {
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
-  };
-
-  this.submitSuggestion = async function(suggestion, description) {
-    await waitFor.elementToBeClickable(suggestionPopupLink);
-    await action.click('Suggestion Popup Link', suggestionPopupLink);
-    var editor = await forms.RichTextEditor(explorationSuggestionModal);
-    await editor.setPlainText(suggestion);
-    await action.sendKeys(
-      'Suggestion Description Input', suggestionDescriptionInput, description);
-    await waitFor.elementToBeClickable(suggestionSubmitButton);
-    await action.click('Suggestion Submit Button', suggestionSubmitButton);
-    await waitFor.invisibilityOf(
-      suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
   };
 
   this.expectCorrectFeedback = async function() {

@@ -16,9 +16,10 @@
  * @fileoverview Directive for uploading images.
  */
 
+require('./thumbnail-display.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'alert-message.directive.ts');
+  'alert-message.component.ts');
 require(
   'components/forms/custom-forms-directives/' +
   'edit-thumbnail-modal.controller.ts');

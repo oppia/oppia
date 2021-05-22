@@ -103,12 +103,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             pin=self.GENERIC_PIN
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserSettingsModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
@@ -296,12 +290,6 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.CompletedActivitiesModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CompletedActivitiesModel.get_deletion_policy(),
@@ -372,12 +360,6 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.IncompleteActivitiesModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -470,12 +452,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             last_played_state_name=self.STATE_NAME_2,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.ExpUserLastPlaythroughModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -596,12 +572,6 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.LearnerPlaylistModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1438,12 +1408,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.CollectionProgressModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
-
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.CollectionProgressModel.get_deletion_policy(),
@@ -1552,12 +1516,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             completed_node_ids=self.COMPLETED_NODE_IDS_1,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.StoryProgressModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -1710,6 +1668,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_at_least_n_exps = 2
         edited_fewer_than_n_exps = 5
         has_not_logged_in_for_n_days = 10
+        created_collection = True
+        used_logic_proof_interaction = True
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1718,6 +1678,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             edited_at_least_n_exps=edited_at_least_n_exps,
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+            created_collection=created_collection,
+            used_logic_proof_interaction=used_logic_proof_interaction,
             submitter_id=self.USER_ID_1).put()
 
         query_model = user_models.UserQueryModel.get(self.QUERY_1_ID)
@@ -1735,6 +1697,10 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             query_model.edited_at_least_n_exps, edited_at_least_n_exps)
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
+        self.assertEqual(query_model.created_collection, created_collection)
+        self.assertEqual(
+            query_model.used_logic_proof_interaction,
+            used_logic_proof_interaction)
 
     def test_fetch_page(self):
         inactive_in_last_n_days = 5
@@ -1743,6 +1709,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_at_least_n_exps = 2
         edited_fewer_than_n_exps = 5
         has_not_logged_in_for_n_days = 10
+        created_collection = True
+        used_logic_proof_interaction = True
         user_models.UserQueryModel(
             id=self.QUERY_1_ID,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1751,6 +1719,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             edited_at_least_n_exps=edited_at_least_n_exps,
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+            created_collection=created_collection,
+            used_logic_proof_interaction=used_logic_proof_interaction,
             submitter_id=self.USER_ID_1).put()
 
         submitter_id = 'submitter_2'
@@ -1761,6 +1731,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         edited_at_least_n_exps = 3
         edited_fewer_than_n_exps = 6
         has_not_logged_in_for_n_days = 11
+        created_collection = False
+        used_logic_proof_interaction = False
         user_models.UserQueryModel(
             id=query_id,
             inactive_in_last_n_days=inactive_in_last_n_days,
@@ -1769,6 +1741,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             edited_at_least_n_exps=edited_at_least_n_exps,
             edited_fewer_than_n_exps=edited_fewer_than_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+            created_collection=created_collection,
+            used_logic_proof_interaction=used_logic_proof_interaction,
             submitter_id=submitter_id).put()
 
         # Fetch only one entity.
@@ -1784,6 +1758,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
+        self.assertFalse(query_models[0].created_collection)
+        self.assertFalse(query_models[0].used_logic_proof_interaction)
 
         # Fetch both entities.
         query_models, _, _ = user_models.UserQueryModel.fetch_page(
@@ -1798,6 +1774,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
         self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
         self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
+        self.assertFalse(query_models[0].created_collection)
+        self.assertFalse(query_models[0].used_logic_proof_interaction)
 
         self.assertEqual(query_models[1].submitter_id, self.USER_ID_1)
         self.assertEqual(query_models[1].id, self.QUERY_1_ID)
@@ -1807,6 +1785,8 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(query_models[1].edited_at_least_n_exps, 2)
         self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
         self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
+        self.assertTrue(query_models[1].created_collection)
+        self.assertTrue(query_models[1].used_logic_proof_interaction)
 
 
 class UserBulkEmailsModelTests(test_utils.GenericTestBase):
@@ -1877,12 +1857,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             degree_of_mastery=self.DEGREE_OF_MASTERY,
             deleted=True
         ).put()
-
-    def test_get_lowest_supported_role(self):
-        self.assertEqual(
-            user_models.UserSkillMasteryModel.get_lowest_supported_role(),
-            feconf.ROLE_ID_LEARNER
-        )
 
     def test_get_deletion_policy(self):
         self.assertEqual(

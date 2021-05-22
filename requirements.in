@@ -3,12 +3,17 @@
 #    python -m scripts.install_third_party
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
+apache-beam[gcp]==2.24.0
 backports.functools-lru-cache==1.6.1
 beautifulSoup4==4.9.1
-bleach==3.1.5
+bleach==3.3.0
 callbacks==0.3.0
 contextlib2==0.6.0.post1
-firebase-admin==3.2.1
+# TODO(#11474): Use a regular dependency after upgrading to Python 3. Until
+# then, we must depend on a patched version of firebase-admin==3.2.1 (hosted on
+# the following repository) because that is the last version which supports
+# Python 2, but is missing a feature which we were forced to patch in.
+git+git://github.com/oppia/firebase-admin-python@8d6deee889733d09ef5327d78c09e4d7b17785ac#egg=firebase-admin
 future==0.18.2
 GoogleAppEngineCloudStorageClient==1.9.22.1
 GoogleAppEngineMapReduce==1.9.22.0
@@ -27,6 +32,7 @@ requests==2.24.0
 requests-mock==1.5.2
 requests-toolbelt==0.9.1
 google-cloud-tasks==1.5.0
+google-cloud-translate==2.0.1
 googleapis_common_protos==1.52.0
 webapp2==3.0.0b1
 elasticsearch==7.10.0

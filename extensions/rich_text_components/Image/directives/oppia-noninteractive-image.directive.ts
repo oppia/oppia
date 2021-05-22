@@ -28,12 +28,12 @@ require('services/html-escaper.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
-  'AssetsBackendApiService', 'ContextService',
+  '$rootScope', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
   'UrlInterpolationService', 'ENTITY_TYPE',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'LOADING_INDICATOR_URL',
   function(
-      AssetsBackendApiService, ContextService,
+      $rootScope, AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
       UrlInterpolationService, ENTITY_TYPE,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, LOADING_INDICATOR_URL) {
@@ -82,14 +82,16 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
             ctrl.loadImage = function() {
               ctrl.isLoadingIndicatorShown = true;
               ctrl.isTryAgainShown = false;
-              ImagePreloaderService.getImageUrl(ctrl.filepath)
+              ImagePreloaderService.getImageUrlAsync(ctrl.filepath)
                 .then(function(objectUrl) {
                   ctrl.isTryAgainShown = false;
                   ctrl.isLoadingIndicatorShown = false;
                   ctrl.imageUrl = objectUrl;
+                  $rootScope.$applyAsync();
                 }, function() {
                   ctrl.isTryAgainShown = true;
                   ctrl.isLoadingIndicatorShown = false;
+                  $rootScope.$applyAsync();
                 });
             };
             ctrl.loadImage();

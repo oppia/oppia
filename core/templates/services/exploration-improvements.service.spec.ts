@@ -14,7 +14,7 @@
 
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answer-stats.model';
 import { StateObjectsBackendDict } from
   'domain/exploration/StatesObjectFactory';
 import { ExplorationPermissions } from
@@ -118,9 +118,11 @@ describe('ExplorationImprovementsService', function() {
       },
       id: 'TextInput',
     },
+    linked_skill_id: null,
     next_content_id_index: 0,
     param_changes: [],
     solicit_answer_details: false,
+    card_is_checkpoint: false,
     written_translations: {
       translations_mapping: {
         content: {},
@@ -174,7 +176,7 @@ describe('ExplorationImprovementsService', function() {
     this.essGetExplorationStatsSpy = (
       spyOn(explorationStatsService, 'getExplorationStatsAsync'));
     this.pibasFetchIssuesSpy = (
-      spyOn(playthroughIssuesBackendApiService, 'fetchIssues'));
+      spyOn(playthroughIssuesBackendApiService, 'fetchIssuesAsync'));
     this.stassGetTopAnswersByStateNameAsyncSpy = (
       spyOn(stateTopAnswersStatsService, 'getTopAnswersByStateNameAsync'));
 

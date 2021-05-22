@@ -1,8 +1,13 @@
+require('dotenv').config();
+var FirebaseAdmin = require('firebase-admin');
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
 var glob = require('glob');
 var path = require('path');
+var fs = require('fs');
+var childProcess = require('child_process');
 var Constants = require('./protractor_utils/ProtractorConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
+var exitCode = 0;
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -53,6 +58,10 @@ var suites = {
 
     creatorDashboard: [
       'protractor_desktop/creatorDashboard.js'
+    ],
+
+    emailDashboard: [
+      'protractor_desktop/emailDashboard.js'
     ],
 
     embedding: [
@@ -314,9 +323,55 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-    var _ADD_SCREENSHOT_REPORTER = true;
 
-    if (_ADD_SCREENSHOT_REPORTER) {
+    var spw = null;
+    var vidPath = '';
+    // Enable ALL_VIDEOS if you want success videos to be saved.
+    const ALL_VIDEOS = false;
+
+    // Only running video recorder on Github Actions, since running it on
+    // CicleCI causes RAM issues (meaning very high flakiness).
+
+    if (process.env.GITHUB_ACTIONS) {
+      jasmine.getEnv().addReporter({
+        specStarted: function(result){
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1285x1000',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-loglevel', '16',
+          ];
+          const uniqueString = Math.random().toString(36).substring(2,8);
+          var name = uniqueString + '.mp4';
+          var dirPath = path.resolve('__dirname', '..', '..', 'protractor-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          vidPath = path.resolve(dirPath, name);
+          console.log('Test name: ' + result.fullName + ' has video path ' + vidPath);
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.on('message', (message) => {console.log(`ffmpeg stdout: ${message}`)});
+          spw.on('error', (errorMessage) => {console.error(`ffmpeg stderr: ${errorMessage}`)});
+          spw.on('close', (code) => {console.log(`ffmpeg exited with code ${code}`)});
+        },
+        specDone: function(result) {
+          spw.kill();
+          if (result.status == 'passed' && !ALL_VIDEOS && fs.existsSync(vidPath)) {
+            fs.unlinkSync(vidPath);
+            console.log(`Video for test: ${result.fullName} was deleted successfully (test passed).`);
+          }
+        },
+      });
+    }
+
+    // Screenshots will only run on CircleCI, since we don't have videos here.
+    // We don't need these on Github Actions since we have videos. 
+
+    if (process.env.CIRCLECI) {
       // This takes screenshots of failed tests. For more information see
       // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
       jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
@@ -324,7 +379,8 @@ exports.config = {
         dest: '../protractor-screenshots',
         // Function to build filenames of screenshots.
         pathBuilder: function(currentSpec) {
-          return currentSpec.fullName;
+          let filename = currentSpec.fullName;
+          return filename.replace(/[\":<>|*?]/g, 'ESCAPED_CHARACTER');
         },
         captureOnlyFailedSpecs: true,
         reportFailedUrl: true,
@@ -341,6 +397,13 @@ exports.config = {
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.driver.manage().window().setSize(1285, 1000);
+
+    // Configure the Firebase Admin SDK to communicate with the emulator.
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+
+    // Navigate to the splash page so that tests can begin on an Angular page.
+    browser.driver.get('http://localhost:9001');
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -399,10 +462,26 @@ exports.config = {
 
   SELENIUM_PROMISE_MANAGER: false,
 
+  // A callback function called once tests are finished. onComplete can
+  // optionally return a promise, which Protractor will wait for before
+  // shutting down webdriver.
+
+  // At this point, tests will be done but global objects will still be
+  // available.
+  onComplete: function(success){
+    if (!success) {
+      exitCode = 1;
+    }
+  },
+
   // ----- The cleanup step -----
   //
   // A callback function called once the tests have finished running and
   // the webdriver instance has been shut down. It is passed the exit code
   // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  onCleanUp: function() {
+    if (exitCode !== 0){
+      process.exit(exitCode);
+    }
+  }
 };

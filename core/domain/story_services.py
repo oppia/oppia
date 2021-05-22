@@ -27,9 +27,9 @@ import copy
 import logging
 
 from constants import constants
-from core.domain import android_validation_constants
 from core.domain import caching_services
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import story_domain
@@ -43,6 +43,7 @@ import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
+transaction_services = models.Registry.import_transaction_services()
 
 
 def get_new_story_id():
@@ -312,20 +313,20 @@ def validate_prerequisite_skills_in_story_contents(
             nodes_queue.append(node_id)
 
 
-def validate_explorations_for_story(exp_ids, raise_error):
+def validate_explorations_for_story(exp_ids, strict):
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app and ready for publishing.
 
     Args:
         exp_ids: list(str). The exp IDs to validate.
-        raise_error: bool. Whether to raise an Exception when a validation error
+        strict: bool. Whether to raise an Exception when a validation error
             is encountered. If not, a list of the error messages are
-            returned. raise_error should be True when this is called before
+            returned. strict should be True when this is called before
             saving the story and False when this function is called from the
             frontend.
 
     Returns:
-        list(str). The various validation error messages (if raise_error is
+        list(str). The various validation error messages (if strict is
         False).
 
     Raises:
@@ -334,11 +335,6 @@ def validate_explorations_for_story(exp_ids, raise_error):
             explorations before adding them to a story.
         ValidationError. All explorations in a story should be of the same
             category.
-        ValidationError. Invalid language found for exploration.
-        ValidationError. Expected no exploration to have parameter values in it.
-        ValidationError. Invalid interaction in exploration.
-        ValidationError. RTE content in state of exploration with ID is not
-            supported on mobile.
     """
     validation_error_messages = []
 
@@ -361,7 +357,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                 'Expected story to only reference valid explorations, but found'
                 ' a reference to an invalid exploration with ID: %s'
                 % exp_id)
-            if raise_error:
+            if strict:
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
         else:
@@ -370,7 +366,7 @@ def validate_explorations_for_story(exp_ids, raise_error):
                     'Exploration with ID %s is not public. Please publish '
                     'explorations before adding them to a story.'
                     % exp_id)
-                if raise_error:
+                if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
 
@@ -387,66 +383,17 @@ def validate_explorations_for_story(exp_ids, raise_error):
                     'All explorations in a story should be of the '
                     'same category. The explorations with ID %s and %s have'
                     ' different categories.' % (sample_exp_id, exp_id))
-                if raise_error:
+                if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
-            if (
-                    exp.language_code not in
-                    android_validation_constants.SUPPORTED_LANGUAGES):
-                error_string = (
-                    'Invalid language %s found for exploration '
-                    'with ID %s.' % (exp.language_code, exp_id))
-                if raise_error:
-                    raise utils.ValidationError(error_string)
-                validation_error_messages.append(error_string)
-
-            if exp.param_specs or exp.param_changes:
-                error_string = (
-                    'Expected no exploration to have parameter '
-                    'values in it. Invalid exploration: %s' % exp.id)
-                if raise_error:
-                    raise utils.ValidationError(error_string)
-                validation_error_messages.append(error_string)
-
-            if not exp.correctness_feedback_enabled:
-                error_string = (
-                    'Expected all explorations to have correctness feedback '
-                    'enabled. Invalid exploration: %s' % exp.id)
-                if raise_error:
-                    raise utils.ValidationError(error_string)
-                validation_error_messages.append(error_string)
-
-            for state_name in exp.states:
-                state = exp.states[state_name]
-                if not state.interaction.is_supported_on_android_app():
-                    error_string = (
-                        'Invalid interaction %s in exploration '
-                        'with ID: %s.' % (state.interaction.id, exp.id))
-                    if raise_error:
-                        raise utils.ValidationError(error_string)
-                    validation_error_messages.append(error_string)
-
-                if not state.is_rte_content_supported_on_android():
-                    error_string = (
-                        'RTE content in state %s of exploration '
-                        'with ID %s is not supported on mobile.'
-                        % (state_name, exp.id))
-                    if raise_error:
-                        raise utils.ValidationError(error_string)
-                    validation_error_messages.append(error_string)
-
-                if state.interaction.id == 'EndExploration':
-                    recommended_exploration_ids = (
-                        state.interaction.customization_args[
-                            'recommendedExplorationIds'].value)
-                    if len(recommended_exploration_ids) != 0:
-                        error_string = (
-                            'Exploration with ID: %s contains exploration '
-                            'recommendations in its EndExploration interaction.'
-                            % (exp.id))
-                        if raise_error:
-                            raise utils.ValidationError(error_string)
-                        validation_error_messages.append(error_string)
+            try:
+                validation_error_messages.extend(
+                    exp_services.validate_exploration_for_story(exp, strict))
+            except Exception as e:
+                logging.exception(
+                    'Exploration validation failed for exploration with ID: '
+                    '%s. Error: %s' % (exp_id, e))
+                raise Exception(e)
 
     return validation_error_messages
 
@@ -563,6 +510,9 @@ def update_story(
         committer_id, story_id, change_list, commit_message):
     """Updates a story. Commits changes.
 
+    # NOTE: This function should not be called on its own. Access it
+    # through `topic_services.update_story_and_topic_summary`.
+
     Args:
         committer_id: str. The id of the user who is performing the update
             action.
@@ -649,24 +599,29 @@ def delete_story(committer_id, story_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    story_model = story_models.StoryModel.get(story_id)
-    story = story_fetchers.get_story_from_model(story_model)
-    exp_ids = story.story_contents.get_all_linked_exp_ids()
-    story_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
-        force_deletion=force_deletion)
-    exp_ids_to_be_removed = []
-    for node in story.story_contents.nodes:
-        exp_ids_to_be_removed.append(node.exploration_id)
 
-    exploration_context_models_to_be_deleted = (
-        exp_models.ExplorationContextModel.get_multi(
-            exp_ids_to_be_removed))
-    exploration_context_models_to_be_deleted = [
-        model for model in exploration_context_models_to_be_deleted
-        if model is not None]
+    story_model = story_models.StoryModel.get(story_id, strict=False)
+    if story_model is not None:
+        story = story_fetchers.get_story_from_model(story_model)
+        exp_ids = story.story_contents.get_all_linked_exp_ids()
+        story_model.delete(
+            committer_id,
+            feconf.COMMIT_MESSAGE_STORY_DELETED,
+            force_deletion=force_deletion
+        )
+        # Reject the suggestions related to the exploration used in
+        # the story.
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
+            exp_ids)
+
+    exploration_context_models = (
+        exp_models.ExplorationContextModel.get_all().filter(
+            exp_models.ExplorationContextModel.story_id == story_id
+        ).fetch()
+    )
     exp_models.ExplorationContextModel.delete_multi(
-        exploration_context_models_to_be_deleted)
+        exploration_context_models
+    )
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -677,11 +632,9 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # force_deletion is True or not).
     delete_story_summary(story_id)
 
-    # Delete the opportunities available and reject the suggestions related to
-    # the exploration used in the story.
-    opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
-        exp_ids)
+    # Delete the opportunities available.
+    opportunity_services.delete_exp_opportunities_corresponding_to_story(
+        story_id)
 
 
 def delete_story_summary(story_id):

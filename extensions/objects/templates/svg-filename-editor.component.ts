@@ -16,7 +16,7 @@
  * @fileoverview Component for svg filename editor.
  */
 
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('objects/templates/svg-filename-editor.constants.ajs.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
@@ -27,6 +27,7 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-local-storage.service.ts');
 require('services/image-upload-helper.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 import { fabric } from 'fabric';
 import Picker from 'vanilla-picker';
@@ -40,16 +41,18 @@ angular.module('oppia').component('svgFilenameEditor', {
     '$http', '$q', '$sce', '$scope', 'AlertsService',
     'AssetsBackendApiService', 'ContextService', 'CsrfTokenService',
     'DeviceInfoService', 'ImageLocalStorageService', 'ImagePreloaderService',
-    'ImageUploadHelperService', 'UrlInterpolationService',
-    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'MAX_SVG_DIAGRAM_HEIGHT',
-    'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT', 'MIN_SVG_DIAGRAM_WIDTH',
+    'ImageUploadHelperService', 'SvgSanitizerService',
+    'UrlInterpolationService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'MAX_SVG_DIAGRAM_HEIGHT', 'MAX_SVG_DIAGRAM_WIDTH', 'MIN_SVG_DIAGRAM_HEIGHT',
+    'MIN_SVG_DIAGRAM_WIDTH',
     function(
         $http, $q, $sce, $scope, AlertsService,
         AssetsBackendApiService, ContextService, CsrfTokenService,
         DeviceInfoService, ImageLocalStorageService, ImagePreloaderService,
-        ImageUploadHelperService, UrlInterpolationService,
-        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, MAX_SVG_DIAGRAM_HEIGHT,
-        MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT, MIN_SVG_DIAGRAM_WIDTH) {
+        ImageUploadHelperService, SvgSanitizerService,
+        UrlInterpolationService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE,
+        MAX_SVG_DIAGRAM_HEIGHT, MAX_SVG_DIAGRAM_WIDTH, MIN_SVG_DIAGRAM_HEIGHT,
+        MIN_SVG_DIAGRAM_WIDTH) {
       const ctrl = this;
       // These constants are used to identify the tool that is currently being
       // used so that other tools can be disabled accordingly.
@@ -332,7 +335,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           'data:image/svg+xml;base64,' +
           btoa(unescape(encodeURIComponent(svgString))));
         var invalidTagsAndAttr = (
-          ImageUploadHelperService.getInvalidSvgTagsAndAttrs(dataURI));
+          SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
         if (invalidTagsAndAttr.tags.length !== 0) {
           var errorText = (
             'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());
@@ -373,6 +376,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             ctrl.saveImageToLocalStorage(dimensions, resampledFile);
           } else {
+            ctrl.loadingIndicatorIsShown = true;
             ctrl.postSvgToServer(
               dimensions, resampledFile).then(function(data) {
               // Pre-load image before marking the image as saved.
@@ -386,9 +390,11 @@ angular.module('oppia').component('svgFilenameEditor', {
                   width: dimensions.width + 'px'
                 };
                 $scope.$applyAsync();
+                ctrl.loadingIndicatorIsShown = false;
               };
               img.src = getTrustedResourceUrlForSvgFileName(data.filename);
             }, function(parsedResponse) {
+              ctrl.loadingIndicatorIsShown = false;
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
               $scope.$applyAsync();

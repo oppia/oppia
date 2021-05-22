@@ -25,24 +25,24 @@ import { Injectable } from '@angular/core';
 import { AlertsService } from 'services/alerts.service';
 import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { StoryChange } from 'domain/editor/undo_redo/change.model';
-import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
-import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
-import { Story } from 'domain/story/StoryObjectFactory.ts';
-import { StoryContents } from 'domain/story/StoryContentsObjectFactory.ts';
+import { StoryDomainConstants } from 'domain/story/story-domain.constants';
+import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
+import { Story } from 'domain/story/StoryObjectFactory';
+import { StoryContents } from 'domain/story/StoryContentsObjectFactory';
 import { StoryNode } from './story-node.model';
 
 type StoryUpdateApply = (storyChange: StoryChange, story: Story) => void;
-type StoryUpdateReverse = (storyChange : StoryChange, story: Story) => void;
+type StoryUpdateReverse = (storyChange: StoryChange, story: Story) => void;
 
 interface Params {
-  'node_id' ?: string;
-  'title' ?: string;
-  'old_value' ?: string | string[] | boolean | number;
-  'new_value' ?: string | string[] | boolean | number;
-  'property_name' ?: string;
-  'cmd' ?: string;
+  'node_id'?: string;
+  'title'?: string;
+  'old_value'?: string | string[] | boolean | number;
+  'new_value'?: string | string[] | boolean | number;
+  'property_name'?: string;
+  'cmd'?: string;
 }
 
 type Command = BackendChangeObject['cmd'];
@@ -118,7 +118,7 @@ export class StoryUpdateService {
       story: Story, propertyName: string,
       nodeId: string, oldValue: string | string[],
       newValue: string | string[],
-      apply: StoryUpdateApply, reverse: StoryUpdateReverse):void {
+      apply: StoryUpdateApply, reverse: StoryUpdateReverse): void {
     this._applyChange(
       story, StoryDomainConstants.CMD_UPDATE_STORY_NODE_PROPERTY, {
         node_id: nodeId,

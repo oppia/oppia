@@ -24,38 +24,22 @@ import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 
-import { Observable, of } from 'rxjs';
 import { angularServices } from 'services/angular-services.index';
 
 
 declare var angular: ng.IAngularStatic;
 
-// AngularFireAuth is an Angular-only service (i.e., _not_ AngularJS) that Oppia
-// depends on to provide authentication services.
-//
-// Since the library is not @Injectable, we mock an interface and value during
-// unit tests to satisfy dependents.
-export class MockAngularFireAuth {
-  constructor(public idToken: Observable<string> = of(null)) {
-  }
-  signOut(): Promise<void> {
-    return Promise.resolve();
-  }
-}
-
 export const importAllAngularServices = (): void => {
-  const mockAngularFireAuth = new MockAngularFireAuth();
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{provide: AngularFireAuth, useValue: mockAngularFireAuth}],
+      providers: [{provide: AngularFireAuth, useValue: null}],
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     for (let [serviceName, serviceType] of angularServices) {
       $provide.value(serviceName, TestBed.inject(serviceType));
     }
-    $provide.value('AngularFireAuth', mockAngularFireAuth);
   }));
 };
 
@@ -101,7 +85,7 @@ export const multiTrim = (
  * @param {angular.IModule} ng1Module - The angularjs module to be included
  *  in angular zone.
  */
-export const bootstrap = (
+export const bootstrapAsync = async(
     platform: PlatformRef,
     Ng2Module: Type<{}>,
     element: Element,
@@ -143,7 +127,7 @@ export const bootstrap = (
  * @param {unknown} upgradedComponentTypes - An array consisting of only
  *   one element. That element is the type of the upgraded component.
  */
-export const setupAndGetUpgradedComponent = (
+export const setupAndGetUpgradedComponentAsync = async(
     kebabCaseName: string,
     camelCaseName: string,
     upgradedComponentTypes: unknown): Promise<string> => {
@@ -171,7 +155,7 @@ export const setupAndGetUpgradedComponent = (
 
   // Bootstrap.
   const element = html('<mock-comp></mock-comp>');
-  return bootstrap(
+  return bootstrapAsync(
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
     () => multiTrim(element.textContent));
 };

@@ -38,8 +38,9 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import requests_mock
 import utils
+
+import requests_mock
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -200,7 +201,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_when_deleted_user_had_same_username(self):
         username = 'userName123'
         user_services.save_deleted_username(
-            user_services.UserSettings.normalize_username(username)
+            user_domain.UserSettings.normalize_username(username)
         )
         self.assertTrue(user_services.is_username_taken(username))
 
@@ -618,6 +619,154 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
+
+    def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
+            self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+    def test_assign_ban_user_to_exp_editor_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+    def test_assign_exp_editor_to_other_roles_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_TOPIC_MANAGER])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_MODERATOR)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_MODERATOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_ADMIN)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_ADMIN])
+        self.assertFalse(user_settings_model.banned)
+
+    def test_profile_user_settings_have_correct_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings_model.pin = '12346'
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        profile_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_user_data = user_domain.ModifiableUserData.from_raw_dict(
+            profile_user_data_dict)
+        profile_user_id = user_services.create_new_profiles(
+            auth_id, user_email, [modifiable_user_data])[0].user_id
+        profile_user_settings_model = user_models.UserSettingsModel.get_by_id(
+            profile_user_id)
+
+        self.assertEqual(
+            profile_user_settings_model.role, feconf.ROLE_ID_LEARNER)
+        self.assertEqual(
+            profile_user_settings_model.roles, [feconf.ROLE_ID_LEARNER])
+        self.assertFalse(profile_user_settings_model.banned)
 
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
         non_existent_user_id = 'id_x'
@@ -1118,8 +1267,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
@@ -1723,336 +1872,6 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         self.assertGreater(
             (owner_settings.last_created_an_exploration),
             previous_last_created_an_exploration)
-
-
-class UserSettingsTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(UserSettingsTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner = user_services.UserActionsInfo(self.owner_id)
-
-        self.user_settings = user_services.get_user_settings(self.owner_id)
-        self.user_settings.validate()
-        self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
-        user_data_dict = {
-            'schema_version': 1,
-            'display_alias': 'display_alias',
-            'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'user_id': 'user_id',
-        }
-        self.modifiable_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(user_data_dict))
-        new_user_data_dict = {
-            'schema_version': 1,
-            'display_alias': 'display_alias_3',
-            'pin': None,
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'user_id': None,
-        }
-        self.modifiable_new_user_data = (
-            user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
-
-    def test_validate_non_str_user_id_raises_exception(self):
-        self.user_settings.user_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected user_id to be a string'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_wrong_format_user_id_raises_exception(self):
-        self.user_settings.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_settings.validate()
-
-        self.user_settings.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_settings.validate()
-
-        self.user_settings.user_id = 'a' * 36
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The user ID is in a wrong format.'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_non_str_pin_id(self):
-        self.user_settings.pin = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected PIN to be a string'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_invalid_length_pin_raises_error(self):
-        invalid_pin_values_list = ['1', '12', '1234', '123@#6', 'ABCa', '1!#a']
-        error_msg = (
-            'User PIN can only be of length %s or %s' %
-            (feconf.FULL_USER_PIN_LENGTH, feconf.PROFILE_USER_PIN_LENGTH)
-        )
-        for pin in invalid_pin_values_list:
-            with self.assertRaisesRegexp(
-                utils.ValidationError, error_msg
-            ):
-                self.user_settings.pin = pin
-                self.user_settings.validate()
-
-    def test_validate_valid_length_with_numeric_char_pin_works_fine(self):
-        valid_pin_values_list = ['123', '12345', '764', '42343']
-        for pin in valid_pin_values_list:
-            self.user_settings.pin = pin
-            self.user_settings.validate()
-
-    def test_validate_valid_length_pin_with_non_numeric_char_raises_error(self):
-        valid_pin_values_list = ['AbC', '123A}', '1!2', 'AB!', '[123]']
-        error_msg = 'Only numeric characters are allowed in PIN'
-        for pin in valid_pin_values_list:
-            with self.assertRaisesRegexp(
-                utils.ValidationError, error_msg
-            ):
-                self.user_settings.pin = pin
-                self.user_settings.validate()
-
-    def test_validate_empty_user_id_raises_exception(self):
-        self.user_settings.user_id = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'No user id specified.'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_non_str_role_raises_exception(self):
-        self.user_settings.role = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected role to be a string'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_invalid_role_name_raises_exception(self):
-        self.user_settings.role = 'invalid_role'
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Role invalid_role does not exist.'):
-            self.user_settings.validate()
-
-    def test_validate_non_str_display_alias_raises_error(self):
-        self.user_settings.display_alias = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected display_alias to be a string,'
-            ' received %s' % self.user_settings.display_alias):
-            self.user_settings.validate()
-
-    def test_validate_non_str_creator_dashboard_display_pref_raises_error(self):
-        self.user_settings.creator_dashboard_display_pref = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected dashboard display preference to be a string'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_invalid_creator_dashboard_display_pref_raises_error(self):
-        self.user_settings.creator_dashboard_display_pref = (
-            'invalid_creator_dashboard_display_pref')
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'invalid_creator_dashboard_display_pref is not a valid '
-            'value for the dashboard display preferences.'
-        ):
-            self.user_settings.validate()
-
-    def test_validate_empty_display_alias_for_profiles_raises_error(self):
-        self.modifiable_user_data.user_id = self.owner_id
-        self.modifiable_user_data.pin = '12345'
-        self.modifiable_user_data.display_alias = 'temp_name'
-        user_services.update_multiple_users_data([self.modifiable_user_data])
-
-        auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
-        profile_pin = '123'
-        error_msg = 'Expected display_alias to be a string, received'
-        with self.assertRaisesRegexp(utils.ValidationError, error_msg):
-            self.modifiable_new_user_data.display_alias = ''
-            self.modifiable_new_user_data.pin = profile_pin
-            user_services.create_new_profiles(
-                auth_id, self.OWNER_EMAIL, [self.modifiable_new_user_data]
-            )
-
-    def test_has_not_fully_registered_for_guest_user_is_false(self):
-        self.assertFalse(user_services.has_fully_registered_account(None))
-
-    def test_create_new_user_with_existing_auth_id_raises_error(self):
-        user_id = self.user_settings.user_id
-        user_auth_id = auth_services.get_auth_id_from_user_id(user_id)
-        with self.assertRaisesRegexp(
-            Exception, 'User %s already exists for auth_id %s.'
-            % (user_id, user_auth_id)
-        ):
-            user_services.create_new_user(user_auth_id, self.OWNER_EMAIL)
-
-    def test_cannot_set_existing_username(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Sorry, the username \"%s\" is already taken! Please pick '
-            'a different one.' % self.OWNER_USERNAME
-        ):
-            user_services.set_username(self.owner_id, self.OWNER_USERNAME)
-
-    def test_cannot_update_user_role_with_invalid_role(self):
-        with self.assertRaisesRegexp(
-            Exception, 'Role invalid_role does not exist.'
-        ):
-            user_services.update_user_role(self.owner_id, 'invalid_role')
-
-    def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_user_not_found = self.assertRaisesRegexp(
-            Exception, 'User not found.')
-
-        with logging_swap, assert_raises_user_not_found:
-            user_services.get_human_readable_user_ids(['invalid_user_id'])
-
-        self.assertEqual(
-            observed_log_messages,
-            [
-                'User id invalid_user_id not known in list of user_ids '
-                '[u\'invalid_user_id\']'
-            ])
-
-    def test_get_human_readable_user_ids(self):
-        # Create an unregistered user who has no username.
-        user_models.UserSettingsModel(
-            id='unregistered_user_id',
-            email='user@example.com',
-            username=''
-        ).put()
-
-        user_ids = user_services.get_human_readable_user_ids(
-            [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
-        expected_user_ids = [
-            'owner', 'admin',
-            '[Awaiting user registration: u..@example.com]']
-
-        self.assertEqual(user_ids, expected_user_ids)
-
-    def test_get_human_readable_user_ids_with_nonexistent_id_non_strict_passes(
-            self):
-        user_id = user_services.create_new_user(
-            'auth_id', 'user@example.com').user_id
-        user_services.set_username(user_id, 'username')
-        user_services.mark_user_for_deletion(user_id)
-        human_readable_user_ids = user_services.get_human_readable_user_ids(
-            [user_id], strict=False)
-
-        self.assertEqual(
-            human_readable_user_ids,
-            [user_services.LABEL_FOR_USER_BEING_DELETED])
-
-    def test_created_on_gets_updated_correctly(self):
-        # created_on should not be updated upon updating other attributes of
-        # the user settings model.
-        user_settings = user_services.create_new_user(
-            'auth_id', 'user@example.com')
-
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            user_settings.user_id)
-        time_of_creation = user_settings_model.created_on
-
-        user_services.update_user_bio(user_settings.user_id, 'New bio.')
-
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            user_settings.user_id)
-        self.assertEqual(user_settings_model.created_on, time_of_creation)
-
-
-class UserContributionsTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(UserContributionsTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_contributions = user_services.get_user_contributions(
-            self.owner_id)
-        self.user_contributions.validate()
-
-    def test_validate_non_str_user_id(self):
-        self.user_contributions.user_id = 0
-        with self.assertRaisesRegexp(
-            Exception, 'Expected user_id to be a string'):
-            self.user_contributions.validate()
-
-    def test_validate_user_id(self):
-        self.user_contributions.user_id = ''
-        with self.assertRaisesRegexp(Exception, 'No user id specified.'):
-            self.user_contributions.validate()
-
-    def test_validate_non_list_created_exploration_ids(self):
-        self.user_contributions.created_exploration_ids = 0
-        with self.assertRaisesRegexp(
-            Exception, 'Expected created_exploration_ids to be a list'):
-            self.user_contributions.validate()
-
-    def test_validate_created_exploration_ids(self):
-        self.user_contributions.created_exploration_ids = [0]
-        with self.assertRaisesRegexp(
-            Exception, 'Expected exploration_id in created_exploration_ids '
-            'to be a string'):
-            self.user_contributions.validate()
-
-    def test_validate_non_list_edited_exploration_ids(self):
-        self.user_contributions.edited_exploration_ids = 0
-        with self.assertRaisesRegexp(
-            Exception, 'Expected edited_exploration_ids to be a list'):
-            self.user_contributions.validate()
-
-    def test_validate_edited_exploration_ids(self):
-        self.user_contributions.edited_exploration_ids = [0]
-        with self.assertRaisesRegexp(
-            Exception, 'Expected exploration_id in edited_exploration_ids '
-            'to be a string'):
-            self.user_contributions.validate()
-
-    def test_cannot_create_user_contributions_with_migration_bot(self):
-        self.assertIsNone(
-            user_services.create_user_contributions(
-                feconf.MIGRATION_BOT_USER_ID, [], []))
-
-    def test_cannot_create_user_contributions_with_existing_user_id(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'User contributions model for user %s already exists.'
-            % self.owner_id):
-            user_services.create_user_contributions(self.owner_id, [], [])
-
-    def test_cannot_update_user_contributions_with_invalid_user_id(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'User contributions model for user invalid_user_id does not exist'):
-            user_services.update_user_contributions('invalid_user_id', [], [])
-
-    def test_cannot_update_dashboard_stats_log_with_invalid_schema_version(
-            self):
-        model = user_models.UserStatsModel.get_or_create(self.owner_id)
-        model.schema_version = 0
-        model.update_timestamps()
-        model.put()
-
-        self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
-        with self.assertRaisesRegexp(
-            Exception,
-            'Sorry, we can only process v1-v%d dashboard stats schemas at '
-            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
-            user_services.update_dashboard_stats_log(self.owner_id)
 
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):

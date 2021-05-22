@@ -17,7 +17,7 @@
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
-        <div>
+        <div tabindex="1">
           <angular-html-bind class="protractor-test-conversation-content"
                              html-data="getDisplayedCard().getContentHtml()">
           </angular-html-bind>
@@ -233,7 +233,7 @@
     padding: 6px 12px;
   }
   tutor-card .oppia-no-interaction-text {
-    color: #FF0000;
+    color: #F00;
   }
 
   /* When the size of the browser is reduced, and the answer submitted is
@@ -249,7 +249,7 @@
   @media screen and (max-width: 959px) {
     .oppia-learner-view-card .instructions-button {
       background-color: #0D48A1;
-      color: #ffffff;
+      color: #fff;
       padding: 6px 12px;
       white-space: normal;
     }

@@ -61,7 +61,7 @@ angular.module('oppia').component('stateTranslationEditor', {
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/components/forms/forms-templates/' +
               'mark-audio-as-needing-update-modal.directive.html'),
-            backdrop: true,
+            backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'
           }).result.then(function() {
             recordedVoiceovers.toggleNeedsUpdateAttribute(
@@ -145,8 +145,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
             $scope.activeWrittenTranslation = (
-              WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+              WrittenTranslationObjectFactory.createNew($scope.dataFormat));
           }
         }
       };
@@ -173,12 +172,23 @@ angular.module('oppia').component('stateTranslationEditor', {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
       };
+
       ctrl.$onInit = function() {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
 
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
+        };
+
+        $scope.SET_OF_STRINGS_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          validators: [{
+            id: 'is_uniquified'
+          }]
         };
 
         ctrl.directiveSubscriptions.add(

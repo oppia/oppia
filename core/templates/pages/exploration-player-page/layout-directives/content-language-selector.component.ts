@@ -23,6 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
+import { ContextService } from 'services/context.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { PlayerPositionService } from
@@ -32,6 +33,7 @@ import { PlayerTranscriptService } from
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 
 @Component({
   selector: 'content-language-selector',
@@ -42,9 +44,11 @@ export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
+    private contextService: ContextService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private imagePreloaderService: ImagePreloaderService
   ) {}
 
   selectedLanguageCode: string;
@@ -66,6 +70,12 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.contentTranslationLanguageService.setCurrentContentLanguageCode(
         newLanguageCode);
       this.selectedLanguageCode = newLanguageCode;
+    }
+
+    // Image preloading is disabled in the exploration editor preview mode.
+    if (!this.contextService.isInExplorationEditorPage()) {
+      this.imagePreloaderService.restartImagePreloader(
+        this.playerTranscriptService.getCard(0).getStateName());
     }
 
     return this.selectedLanguageCode;

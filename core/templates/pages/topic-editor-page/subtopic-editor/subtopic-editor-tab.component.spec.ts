@@ -18,6 +18,9 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
@@ -33,9 +36,6 @@ describe('Subtopic editor tab', function() {
   var SubtopicValidationService = null;
   var TopicEditorRoutingService = null;
   var TopicObjectFactory = null;
-  var SubtopicObjectFactory = null;
-  var ShortSkillSummaryObjectFactory = null;
-  var SubtopicPageObjectFactory = null;
   var MockWindowDimensionsService = {
     isWindowNarrow: () => false
   };
@@ -49,24 +49,20 @@ describe('Subtopic editor tab', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
-    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    ShortSkillSummaryObjectFactory = $injector.get(
-      'ShortSkillSummaryObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIdsAsync: async() => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');
+    var subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
     subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
-    skillSummary = ShortSkillSummaryObjectFactory.create(
+    skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');
     topic._uncategorizedSkillSummaries = [skillSummary];
-    var subtopicPage = SubtopicPageObjectFactory.createDefault('asd2r42', '1');
+    var subtopicPage = SubtopicPage.createDefault('asd2r42', 1);
     topic._id = 'sndsjfn42';
 
     topicInitializedEventEmitter = new EventEmitter();
@@ -197,7 +193,7 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should return if skill is deleted', function() {
-    var skillSummary = ShortSkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummary.create(
       '1', 'Skill description');
     expect(ctrl.isSkillDeleted(skillSummary)).toEqual(false);
   });
@@ -336,8 +332,9 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should redirect to topic editor if subtopic id is invalid', function() {
+    spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl').and
+      .returnValue(99);
     var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
-    $location.path('/subtopic_editor/99');
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

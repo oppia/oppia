@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -94,7 +95,7 @@ class EmailDashboardDataHandler(base.BaseHandler):
         self._validate(kwargs)
 
         user_query_id = user_query_services.save_new_user_query(
-            self.user_id, **kwargs)
+            self.user_id, kwargs)
 
         # Start MR job in background.
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
@@ -111,16 +112,12 @@ class EmailDashboardDataHandler(base.BaseHandler):
 
     def _validate(self, data):
         """Validator for data obtained from frontend."""
-        possible_keys = [
-            'has_not_logged_in_for_n_days', 'inactive_in_last_n_days',
-            'created_at_least_n_exps', 'created_fewer_than_n_exps',
-            'edited_at_least_n_exps', 'edited_fewer_than_n_exps']
+        predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+        possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
-        for key, value in data.items():
-            if (key not in possible_keys or not isinstance(value, int) or
-                    value < 0):
-                # Raise exception if key is not one of the allowed keys or
-                # corresponding value is not of type integer..
+        for key, _ in data.items():
+            if key not in possible_keys:
+                # Raise exception if key is not one of the allowed keys.
                 raise self.InvalidInputException('400 Invalid input for query.')
 
 

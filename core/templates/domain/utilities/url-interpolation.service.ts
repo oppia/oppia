@@ -24,7 +24,7 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
-import Constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 const hashes = require('hashes.json');
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
@@ -43,7 +43,7 @@ export class UrlInterpolationService {
     private utilsService: UtilsService) {}
 
   get DEV_MODE(): boolean {
-    return Constants.DEV_MODE;
+    return AppConstants.DEV_MODE;
   }
 
   validateResourcePath(resourcePath: string): void {
@@ -115,7 +115,7 @@ export class UrlInterpolationService {
    */
   interpolateUrl(
       urlTemplate: string,
-      interpolationValues: InterpolationValuesType): string {
+      interpolationValues: InterpolationValuesType): string | null {
     if (!urlTemplate) {
       this.alertsService.fatalWarning(
         'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
@@ -155,7 +155,7 @@ export class UrlInterpolationService {
           ([key, val]) => key + ': ' + angular.toJson(val)).join(', ') + '}');
     }
 
-    let escapedInterpolationValues = {};
+    let escapedInterpolationValues: Record<string, string> = {};
     for (let varName in interpolationValues) {
       let value = interpolationValues[varName];
       escapedInterpolationValues[varName] = encodeURIComponent(value);

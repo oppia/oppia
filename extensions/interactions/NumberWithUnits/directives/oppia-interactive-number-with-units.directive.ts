@@ -34,7 +34,9 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        savedSolution: '<'
+      },
       template: require('./number-with-units-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
@@ -99,7 +101,14 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                   FORM_ERROR_TYPE, false);
               }
             });
-            ctrl.answer = '';
+            if (ctrl.savedSolution !== undefined) {
+              let savedSolution = ctrl.savedSolution;
+              savedSolution = NumberWithUnitsObjectFactory.fromDict(
+                savedSolution).toString();
+              ctrl.answer = savedSolution;
+            } else {
+              ctrl.answer = '';
+            }
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
             ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {

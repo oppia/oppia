@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
@@ -120,7 +120,8 @@ export class QuestionPlayerEngineService {
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId, interaction.customizationArgs, true, nextFocusLabel);
+        interactionId, interaction.customizationArgs, true, nextFocusLabel,
+        null);
     }
     var initialCard =
       this.stateCardObjectFactory.createNewCard(
@@ -144,7 +145,8 @@ export class QuestionPlayerEngineService {
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
       true,
-      labelForFocusTarget);
+      labelForFocusTarget,
+      null);
   }
 
   init(
@@ -158,7 +160,7 @@ export class QuestionPlayerEngineService {
 
     if (!this.questionPlayerMode) {
       this.readOnlyExplorationBackendApiService
-        .loadExploration(this.explorationId, this.version)
+        .loadExplorationAsync(this.explorationId, this.version)
         .then(function(exploration) {
           this.version = exploration.version;
         });

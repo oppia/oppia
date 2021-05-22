@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import itertools
+import json
 import os
 import re
 import shutil
@@ -26,10 +28,53 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-import pkg_resources
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
+from scripts import scripts_test_utils
+
+import pkg_resources
+
+
+class Distribution(python_utils.OBJECT):
+    """Mock distribution object containing python library information."""
+
+    def __init__(self, library_name, version_string, metadata_dict):
+        """Creates mock distribution metadata class that contains the name and
+        version information for a python library.
+
+        Args:
+            library_name: str. The name of the library this object is
+                representing.
+            version_string: str. The stringified version of this library.
+            metadata_dict: dict(str: str). The stringified metadata contents of
+                the library.
+        """
+        self.project_name = library_name
+        self.version = version_string
+        self.metadata_dict = metadata_dict
+
+    def has_metadata(self, key):
+        """Returns whether the given metadata key exists.
+
+        Args:
+            key: str. The key corresponding to the metadata.
+
+        Returns:
+            bool. Whether the metadata exists.
+        """
+        return key in self.metadata_dict
+
+    def get_metadata(self, key):
+        """The contents of the corresponding metadata.
+
+        Args:
+            key: str. The key corresponding to the metadata.
+
+        Returns:
+            str. The contents of the metadata.
+        """
+        return self.metadata_dict[key]
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -38,8 +83,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     THIRD_PARTY_DATA_DIRECTORY_FILE_PATH = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
 
-    TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
+    REQUIREMENTS_TEST_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
+    INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH = os.path.join(
+        THIRD_PARTY_DATA_DIRECTORY_FILE_PATH,
+        'invalid_git_requirements_test.txt')
 
     def setUp(self):
         super(InstallBackendPythonLibsTests, self).setUp()
@@ -73,20 +121,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.open_file_swap = self.swap(
             python_utils, 'open_file', MockOpenFile)
 
-        class MockProcess(python_utils.OBJECT):
-            """Return object with required attributes."""
-
-            def __init__(self):
-                self.returncode = 0
-
-            def communicate(self):
-                """Return required method."""
-                return '', ''
-
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens[2:])
-            return MockProcess()
+            return scripts_test_utils.PopenStub()
 
         self.swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)
@@ -109,45 +147,87 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.swap_Popen_error = self.swap(
             subprocess, 'Popen', mock_check_call_error)
 
+    def get_git_version_string(self, name, sha1_piece):
+        """Utility function for constructing a GitHub URL for testing.
+
+        Args:
+            name: str. Name of the package.
+            sha1_piece: str. Commit hash of the package. The piece is
+                concatenated with itself to construct a full 40-character hash.
+
+        Returns:
+            str. The full GitHub URL dependency.
+        """
+        sha1 = ''.join(itertools.islice(itertools.cycle(sha1_piece), 40))
+        return 'git+git://github.com/oppia/%s@%s' % (name, sha1)
+
+    def test_wrong_pip_version_raises_import_error(self):
+        import pip
+
+        with self.swap_Popen, self.swap(pip, '__version__', '20.2.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [
+            ['pip', 'install', 'pip==20.3.4'],
+        ])
+
+    def test_correct_pip_version_does_nothing(self):
+        import pip
+
+        with self.swap_check_call, self.swap(pip, '__version__', '20.3.4'):
+            install_backend_python_libs.verify_pip_is_installed()
+
+        self.assertEqual(self.cmd_token_list, [])
+
+    def test_invalid_git_dependency_raises_an_exception(self):
+        swap_requirements = self.swap(
+            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
+            self.INVALID_GIT_REQUIREMENTS_TEST_TXT_FILE_PATH)
+
+        with swap_requirements:
+            self.assertRaisesRegexp(
+                Exception, 'does not match GIT_DIRECT_URL_REQUIREMENT_PATTERN',
+                install_backend_python_libs.get_mismatches)
+
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
-            self.TEST_REQUIREMENTS_TXT_FILE_PATH)
+            self.REQUIREMENTS_TEST_TXT_FILE_PATH)
 
         def mock_find_distributions(paths): # pylint: disable=unused-argument
-            class Distribution(python_utils.OBJECT):
-                """Distribution object containing python library information."""
-
-                def __init__(self, library_name, version_string):
-                    """Creates mock distribution metadata class that contains
-                    the name and version information for a python library.
-
-                    Args:
-                        library_name: str. The name of the library this object
-                            is representing.
-                        version_string: str. The stringified version of this
-                            library.
-                    """
-                    self.project_name = library_name
-                    self.version = version_string
             return [
-                Distribution('dependency1', '1.5.1'),
-                Distribution('dependency2', '4.9.1.2'),
-                Distribution('dependency5', '0.5.3')
+                Distribution('dependency1', '1.5.1', {}),
+                Distribution('dependency2', '4.9.1.2', {}),
+                Distribution('dependency5', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency5',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'b' * 40},
+                    })
+                }),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                })
             ]
 
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
         with swap_requirements, swap_find_distributions:
-            self.assertEqual(
-                {
-                    u'dependency1': (u'1.6.1', u'1.5.1'),
-                    u'dependency2': (u'4.9.1', u'4.9.1.2'),
-                    u'dependency3': (u'3.1.5', None),
-                    u'dependency4': (u'0.3.0.1', None),
-                    u'dependency5': (None, u'0.5.3')
-                },
-                install_backend_python_libs.get_mismatches())
+            self.assertEqual(install_backend_python_libs.get_mismatches(), {
+                u'dependency1': (u'1.6.1', u'1.5.1'),
+                u'dependency2': (u'4.9.1', u'4.9.1.2'),
+                u'dependency3': (u'3.1.5', None),
+                u'dependency4': (u'0.3.0.1', None),
+                u'dependency5': (
+                    self.get_git_version_string('dependency5', 'a'),
+                    self.get_git_version_string('dependency5', 'b')),
+                u'dependency6': (
+                    None, self.get_git_version_string('dependency6', 'z')),
+                u'dependency7': (
+                    self.get_git_version_string('dependency7', 'b'), None),
+            })
 
     def test_library_removal_runs_correct_commands(self):
         """Library exists in the 'third_party/python_libs' directory but it is
@@ -160,7 +240,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {
                 u'flask': (None, u'10.0.1'),
-                u'six': (None, u'10.13.0.1')
+                u'six': (None, u'10.13.0.1'),
             }
 
         def mock_validate_metadata_directories():
@@ -178,12 +258,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with swap_validate_metadata_directories:
                     install_backend_python_libs.main()
 
-        self.assertEqual(
-            removed_dirs,
-            [
-                common.THIRD_PARTY_PYTHON_LIBS_DIR
-            ]
-        )
+        self.assertEqual(removed_dirs, [common.THIRD_PARTY_PYTHON_LIBS_DIR])
 
         self.assertEqual(
             self.cmd_token_list,
@@ -207,7 +282,11 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return {
                 u'flask': (u'1.1.0.1', u'1.1.1.0'),
                 u'six': (u'1.15.0', None),
-                u'protobuf': (u'2.0.1.3', u'2.0.0.0')
+                u'git-dep1': (
+                    self.get_git_version_string('git-dep1', 'a'),
+                    self.get_git_version_string('git-dep1', 'b')),
+                u'git-dep2': (
+                    self.get_git_version_string('git-dep2', 'a'), None),
             }
 
         def mock_validate_metadata_directories():
@@ -228,6 +307,20 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             [
                 ['scripts.regenerate_requirements'],
                 [
+                    'pip', 'install',
+                    '%s#egg=git-dep1' % (
+                        self.get_git_version_string('git-dep1', 'a')),
+                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--upgrade', '--no-dependencies',
+                ],
+                [
+                    'pip', 'install',
+                    '%s#egg=git-dep2' % (
+                        self.get_git_version_string('git-dep2', 'a')),
+                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--upgrade', '--no-dependencies',
+                ],
+                [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.0.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
@@ -237,11 +330,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
-                [
-                    'pip', 'install', '%s==%s' % ('protobuf', '2.0.1.3'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
-                    '--upgrade', '--no-dependencies',
-                ]
             ]
         )
 
@@ -387,13 +475,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 install_backend_python_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
-        self.assertEqual(
-            print_statements,
-            [
-                'Regenerating "requirements.txt" file...',
-                'All third-party Python libraries are already installed '
-                'correctly.'
-            ])
+        self.assertEqual(print_statements, [
+            'Checking if pip is installed on the local machine',
+            'Regenerating "requirements.txt" file...',
+            'All third-party Python libraries are already installed '
+            'correctly.'
+        ])
 
     def test_library_version_change_is_handled_correctly(self):
         directory_names = [
@@ -418,7 +505,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             paths_to_delete.append(
                 path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
 
         def mock_get_mismatches():
@@ -481,30 +568,54 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 u'google_cloud_datastore-1.13.0.dist-info'
             ])
 
-    def test_exception_raised_when_metadata_directory_names_are_missing(self):
-        def mock_find_distributions(paths): # pylint: disable=unused-argument
-            class Distribution(python_utils.OBJECT):
-                """Distribution object containing python library information."""
-
-                def __init__(self, library_name, version_string):
-                    """Creates mock distribution metadata class that contains
-                    the name and version information for a python library.
-
-                    Args:
-                        library_name: str. The name of the library this object
-                            is representing.
-                        version_string: str. The stringified version of this
-                            library.
-                    """
-                    self.project_name = library_name
-                    self.version = version_string
+    def test_correct_metadata_directory_names_do_not_throw_error(self):
+        def mock_find_distributions(unused_paths):
             return [
-                Distribution('dependency1', '1.5.1'),
-                Distribution('dependency2', '5.0.0'),
-                Distribution('dependency5', '0.5.3')
+                Distribution('dependency-1', '1.5.1', {}),
+                Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency-5', '0.5.3', {}),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                }),
             ]
 
-        def mock_list_dir(path): # pylint: disable=unused-argument
+        def mock_list_dir(unused_path):
+            return [
+                'dependency-1-1.5.1.dist-info',
+                'dependency2-5.0.0.egg-info',
+                'dependency-5-0.5.3-py2.7.egg-info',
+                'dependency_6-0.5.3-py2.7.egg-info',
+            ]
+
+        def mock_is_dir(unused_path):
+            return True
+
+        swap_find_distributions = self.swap(
+            pkg_resources, 'find_distributions', mock_find_distributions)
+        swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
+        swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+
+        with swap_find_distributions, swap_list_dir, swap_is_dir:
+            install_backend_python_libs.validate_metadata_directories()
+
+    def test_exception_raised_when_metadata_directory_names_are_missing(self):
+        def mock_find_distributions(unused_paths):
+            return [
+                Distribution('dependency1', '1.5.1', {}),
+                Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency5', '0.5.3', {}),
+                Distribution('dependency6', '0.5.3', {
+                    'direct_url.json': json.dumps({
+                        'url': 'git://github.com/oppia/dependency6',
+                        'vcs_info': {'vcs': 'git', 'commit_id': 'z' * 40},
+                    })
+                }),
+            ]
+
+        def mock_list_dir(unused_path):
             return [
                 'dependency1-1.5.1.dist-info',
                 'dependency1',
@@ -514,7 +625,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency5-0.5.3.metadata',
             ]
 
-        def mock_is_dir(path): # pylint: disable=unused-argument
+        def mock_is_dir(unused_path):
             return True
         swap_find_distributions = self.swap(
             pkg_resources, 'find_distributions', mock_find_distributions)
@@ -548,7 +659,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
@@ -558,18 +669,16 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_pip_install_without_import_error(self):
         with self.swap_Popen:
-            install_backend_python_libs.pip_install(
-                'package', 'version', 'path')
+            install_backend_python_libs.pip_install('package==version', 'path')
 
     def test_pip_install_with_user_prefix_error(self):
         with self.swap_Popen_error, self.swap_check_call:
-            install_backend_python_libs.pip_install('pkg', 'ver', 'path')
+            install_backend_python_libs.pip_install('pkg==ver', 'path')
 
     def test_pip_install_exception_handling(self):
         with self.assertRaisesRegexp(
             Exception, 'Error installing package') as context:
-            install_backend_python_libs.pip_install(
-                'package', 'version', 'path')
+            install_backend_python_libs.pip_install('package==version', 'path')
         self.assertTrue('Error installing package' in context.exception)
 
     def test_pip_install_with_import_error_and_darwin_os(self):
@@ -582,7 +691,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     ImportError, 'Error importing pip: No module named pip'):
                     install_backend_python_libs.pip_install(
-                        'package', 'version', 'path')
+                        'package==version', 'path')
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
@@ -599,7 +708,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     Exception, 'Error importing pip: No module named pip'):
                     install_backend_python_libs.pip_install(
-                        'package', 'version', 'path')
+                        'package==version', 'path')
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
@@ -615,7 +724,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegexp(
                     Exception, 'Error importing pip: No module named pip'):
                     install_backend_python_libs.pip_install(
-                        'package', 'version', 'path')
+                        'package==version', 'path')
         finally:
             sys.modules['pip'] = pip
         self.assertTrue(
@@ -628,7 +737,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
@@ -647,7 +756,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if trimmed_line.startswith('#') or len(trimmed_line) == 0:
+                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')

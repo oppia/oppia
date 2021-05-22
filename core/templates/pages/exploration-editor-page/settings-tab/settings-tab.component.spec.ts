@@ -57,98 +57,100 @@ class MockRouterService {
   }
 }
 
-describe('Settings Tab Component', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $uibModal = null;
-  var alertsService = null;
-  var changeListService = null;
-  var explorationDataService = null;
-  var contextService = null;
-  var editableExplorationBackendApiService = null;
-  var explorationCategoryService = null;
-  var explorationInitStateNameService = null;
-  var explorationLanguageCodeService = null;
-  var explorationObjectiveService = null;
-  var explorationRightsService = null;
-  var explorationStatesService = null;
-  var explorationTagsService = null;
-  var explorationTitleService = null;
-  var explorationWarningsService = null;
-  var userEmailPreferencesService = null;
-  var userExplorationPermissionsService = null;
-  var windowRef = null;
-  var routerService = null;
+describe('Settings Tab Component', () => {
+  let ctrl = null;
+  let $httpBackend = null;
+  let $q = null;
+  let $rootScope = null;
+  let $scope = null;
+  let $uibModal = null;
+  let alertsService = null;
+  let changeListService = null;
+  let explorationDataService = null;
+  let contextService = null;
+  let editableExplorationBackendApiService = null;
+  let explorationCategoryService = null;
+  let explorationInitStateNameService = null;
+  let explorationLanguageCodeService = null;
+  let explorationObjectiveService = null;
+  let explorationRightsService = null;
+  let explorationStatesService = null;
+  let explorationTagsService = null;
+  let explorationTitleService = null;
+  let explorationWarningsService = null;
+  let userEmailPreferencesService = null;
+  let userExplorationPermissionsService = null;
+  let userService = null;
+  let windowRef = null;
+  let routerService = null;
 
-  var testSubscriptipns = null;
-  var refreshGraphSpy = null;
+  let testSubscriptipns = null;
+  let refreshGraphSpy = null;
 
-  var explorationId = 'exp1';
-  var userPermissions = {
+  let explorationId = 'exp1';
+  let userPermissions = {
     canDelete: true,
     canModifyRoles: true,
     canReleaseOwnership: true,
     canUnpublish: true
   };
-  var mockWindowDimensionsService = {
+  let mockWindowDimensionsService = {
     isWindowNarrow: () => true
   };
 
   importAllAngularServices();
 
-  beforeEach(function() {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    alertsService = TestBed.get(AlertsService);
+    alertsService = TestBed.inject(AlertsService);
     userExplorationPermissionsService = (
-      TestBed.get(UserExplorationPermissionsService));
-    windowRef = TestBed.get(WindowRef);
+      TestBed.inject(UserExplorationPermissionsService));
+    windowRef = TestBed.inject(WindowRef);
     routerService = new MockRouterService();
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
     };
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value('WindowDimensionsService', TestBed.get(
+  beforeEach(angular.mock.module('oppia', ($provide) => {
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
+    $provide.value('WindowDimensionsService', TestBed.inject(
       WindowDimensionsService));
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
+    $provide.value(
+      'StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
       data: {
         param_changes: []
       },
-      getData: () => $q.resolve(),
-      autosaveChangeList: () => {}
+      getDataAsync: () => $q.resolve(),
+      autosaveChangeListAsync: () => {}
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   afterEach(() => {
     ctrl.$onDestroy();
   });
 
-  describe('when the device is narrow', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+  describe('when the device is narrow', () => {
+    beforeEach(angular.mock.inject(($injector, $componentController) => {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
@@ -173,12 +175,18 @@ describe('Settings Tab Component', function() {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
+      userService = $injector.get('UserService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
+        .returnValue($q.resolve(userPermissions));
+      spyOn(userExplorationPermissionsService, 'fetchPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+        getUsername: () => 'username1'
+      }));
 
       explorationCategoryService.init('Astrology');
 
@@ -208,7 +216,7 @@ describe('Settings Tab Component', function() {
     });
 
     it('should initialize controller properties after its initialization',
-      function() {
+      () => {
         expect(ctrl.isRolesFormOpen).toBe(false);
         expect(ctrl.canDelete).toBe(true);
         expect(ctrl.canModifyRoles).toBe(true);
@@ -223,10 +231,11 @@ describe('Settings Tab Component', function() {
 
         expect(ctrl.stateNames).toEqual(['Introduction']);
         expect(ctrl.hasPageLoaded).toBe(true);
+        expect(ctrl.loggedInUser).toBe('username1');
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
-        'broadcasted', function() {
+        'broadcasted', () => {
       routerService.onRefreshSettingsTab.emit();
       $scope.$apply();
 
@@ -234,7 +243,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.hasPageLoaded).toBe(true);
     });
 
-    it('should get explore page url based on the exploration id', function() {
+    it('should get explore page url based on the exploration id', () => {
       spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
         location: {
           protocol: 'https:',
@@ -244,7 +253,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.getExplorePageUrl()).toBe('https://oppia.org/explore/exp1');
     });
 
-    it('should save exploration title', function() {
+    it('should save exploration title', () => {
       spyOn(explorationTitleService, 'saveDisplayedValue');
       explorationTitleService.init('New title');
 
@@ -254,7 +263,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.isTitlePresent()).toBe(true);
     });
 
-    it('should save exploration category', function() {
+    it('should save exploration category', () => {
       spyOn(explorationCategoryService, 'saveDisplayedValue');
       explorationCategoryService.init('New Category');
 
@@ -263,7 +272,7 @@ describe('Settings Tab Component', function() {
       expect(explorationCategoryService.saveDisplayedValue).toHaveBeenCalled();
     });
 
-    it('should save exploration language code', function() {
+    it('should save exploration language code', () => {
       spyOn(explorationLanguageCodeService, 'saveDisplayedValue');
       explorationLanguageCodeService.init('hi-en');
 
@@ -273,7 +282,7 @@ describe('Settings Tab Component', function() {
         .toHaveBeenCalled();
     });
 
-    it('should save exploration objective', function() {
+    it('should save exploration objective', () => {
       spyOn(explorationObjectiveService, 'saveDisplayedValue');
       explorationObjectiveService.init('New Objective');
 
@@ -282,7 +291,7 @@ describe('Settings Tab Component', function() {
       expect(explorationObjectiveService.saveDisplayedValue).toHaveBeenCalled();
     });
 
-    it('should save exploration tags', function() {
+    it('should save exploration tags', () => {
       spyOn(explorationTagsService, 'saveDisplayedValue');
       explorationTagsService.init('testing');
 
@@ -292,7 +301,7 @@ describe('Settings Tab Component', function() {
     });
 
     it('should not save exploration init state name if it\'s invalid',
-      function() {
+      () => {
         explorationInitStateNameService.init('First State');
         spyOn(explorationStatesService, 'getState').and.returnValue(false);
         spyOn(alertsService, 'addWarning');
@@ -303,7 +312,7 @@ describe('Settings Tab Component', function() {
       });
 
     it('should save exploration init state name successfully and refresh graph',
-      function() {
+      () => {
         explorationInitStateNameService.init('Introduction');
         spyOn(explorationStatesService, 'getState').and.returnValue(true);
         spyOn(explorationInitStateNameService, 'saveDisplayedValue');
@@ -316,12 +325,12 @@ describe('Settings Tab Component', function() {
       });
 
     it('should delete exploration when closing delete exploration modal',
-      function() {
+      () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve()
         });
-        spyOn(editableExplorationBackendApiService, 'deleteExploration').and
-          .returnValue($q.resolve());
+        spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync')
+          .and.returnValue($q.resolve());
         spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
           location: {
             reload: () => {}
@@ -335,7 +344,7 @@ describe('Settings Tab Component', function() {
       });
 
     it('should not delete exploration when dismissing delete exploration modal',
-      function() {
+      () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.reject()
         });
@@ -351,8 +360,104 @@ describe('Settings Tab Component', function() {
         expect(windowRef.nativeWindow.location).toBe('');
       });
 
+    it('should open a modal when removeRole is called', function() {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.removeRole('username', 'editor');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should remove role when resolving remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      spyOn(explorationRightsService, 'removeRoleAsync').and
+        .returnValue($q.resolve());
+
+      ctrl.removeRole('username', 'editor');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeRoleAsync).toHaveBeenCalled();
+    });
+
+    it('should not remove role when rejecting remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      spyOn(explorationRightsService, 'removeRoleAsync');
+
+      ctrl.removeRole('username', 'editor');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
+    });
+
+    it('should open a modal when reassignRole is called', () => {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.openEditRolesForm();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue({result: $q.resolve()});
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+        result: $q.resolve()
+      });
+      ctrl.editRole('Username1', 'editor');
+      ctrl.editRole('Username1', 'owner');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should reassign role when resolving reassign-role-modal', () => {
+      ctrl.openEditRolesForm();
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue({result: $q.resolve()});
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+        result: $q.resolve()
+      });
+      ctrl.editRole('Username1', 'editor');
+      $scope.$apply();
+      ctrl.editRole('Username1', 'owner');
+      $scope.$apply();
+
+      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
+        'Username1', 'owner');
+    });
+
+    it('should not reassign role when rejecting remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue({result: $q.resolve()});
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+        result: $q.resolve()
+      });
+      ctrl.editRole('Username1', 'editor');
+      $scope.$apply();
+      ctrl.editRole('Username1', 'owner');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.saveRoleChanges).not.toHaveBeenCalled();
+    });
+
     it('should transfer exploration ownership when closing transfer ownership' +
-    ' modal', function() {
+    ' modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve()
       });
@@ -365,7 +470,7 @@ describe('Settings Tab Component', function() {
     });
 
     it('should not transfer exploration ownership when dismissing transfer' +
-    ' ownership modal', function() {
+    ' ownership modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject()
       });
@@ -378,7 +483,7 @@ describe('Settings Tab Component', function() {
     });
 
     it('should open preview summary tile modal with $uibModal',
-      function() {
+      () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve()
         });
@@ -390,7 +495,7 @@ describe('Settings Tab Component', function() {
       });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
-      function() {
+      () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.reject()
         });
@@ -402,7 +507,7 @@ describe('Settings Tab Component', function() {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
       });
 
-    it('should open preview summary tile modal with $uibModal', function() {
+    it('should open preview summary tile modal with $uibModal', () => {
       spyOn($uibModal, 'open').and.callThrough();
 
       $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
@@ -416,11 +521,16 @@ describe('Settings Tab Component', function() {
     });
 
     it('should save moderator changes to backend when closing preview summary' +
-    ' tile modal', function() {
+    ' tile modal', () => {
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve('Email body')
       });
-      spyOn(explorationRightsService, 'saveModeratorChangeToBackend');
+      spyOn(explorationRightsService, 'saveModeratorChangeToBackendAsync').and
+        .callFake((emailBody) => {
+          return $q.resolve();
+        });
+      ctrl.canUnpublish = false;
+      ctrl.canReleaseOwnership = false;
 
       $httpBackend.expect('GET', '/moderatorhandler/email_draft').respond({
         draft_email_body: 'Draf message'
@@ -429,12 +539,16 @@ describe('Settings Tab Component', function() {
       $httpBackend.flush();
       $scope.$apply();
 
-      expect(explorationRightsService.saveModeratorChangeToBackend)
+      expect(explorationRightsService.saveModeratorChangeToBackendAsync)
         .toHaveBeenCalledWith('Email body');
+      expect(userExplorationPermissionsService.fetchPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
+      expect(ctrl.canReleaseOwnership).toBe(true);
     });
 
     it('should clear alerts warning when dismissing preview summary tile modal',
-      function() {
+      () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.reject()
         });
@@ -450,27 +564,38 @@ describe('Settings Tab Component', function() {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
       });
 
-    it('should toggle notifications', function() {
-      var feedbackNotificationsSpy = spyOn(
-        userEmailPreferencesService, 'setFeedbackNotificationPreferences');
-      var suggestionNotificationsSpy = spyOn(
-        userEmailPreferencesService, 'setSuggestionNotificationPreferences');
-
+    it('should toggle notifications', () => {
+      let feedbackNotificationsSpy = spyOn(
+        userEmailPreferencesService, 'setFeedbackNotificationPreferences')
+        .and.callFake((mute: boolean, callb: () => void) => {
+          callb();
+        });
+      let suggestionNotificationsSpy = spyOn(
+        userEmailPreferencesService, 'setSuggestionNotificationPreferences')
+        .and.callFake((mute: boolean, callb: () => void) => {
+          callb();
+        });
       ctrl.muteFeedbackNotifications();
-      expect(feedbackNotificationsSpy).toHaveBeenCalledWith(true);
+      expect(feedbackNotificationsSpy)
+        .toHaveBeenCalledWith(true, ctrl._successCallback);
 
       ctrl.unmuteFeedbackNotifications();
-      expect(feedbackNotificationsSpy).toHaveBeenCalledWith(false);
+      expect(feedbackNotificationsSpy)
+        .toHaveBeenCalledWith(false, ctrl._successCallback);
 
       ctrl.muteSuggestionNotifications();
-      expect(suggestionNotificationsSpy).toHaveBeenCalledWith(true);
+      expect(suggestionNotificationsSpy)
+        .toHaveBeenCalledWith(true, ctrl._successCallback);
 
       ctrl.unmuteSuggestionNotifications();
-      expect(suggestionNotificationsSpy).toHaveBeenCalledWith(false);
+      expect(suggestionNotificationsSpy)
+        .toHaveBeenCalledWith(false, ctrl._successCallback);
     });
 
-    it('should open edit roles form and edit username and role', function() {
+    it('should open edit roles form and edit username and role', () => {
       ctrl.openEditRolesForm();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
 
       expect(ctrl.isRolesFormOpen).toBe(true);
       expect(ctrl.newMemberUsername).toBe('');
@@ -484,7 +609,7 @@ describe('Settings Tab Component', function() {
       expect(ctrl.isRolesFormOpen).toBe(false);
     });
 
-    it('should open edit roles form and close it', function() {
+    it('should open edit roles form and close it', () => {
       ctrl.openEditRolesForm();
 
       expect(ctrl.isRolesFormOpen).toBe(true);
@@ -498,27 +623,27 @@ describe('Settings Tab Component', function() {
       expect(ctrl.newMemberRole.value).toBe('owner');
     });
 
-    it('should evaluate when parameters are enabled', function() {
+    it('should evaluate when parameters are enabled', () => {
       ctrl.enableParameters();
       expect(ctrl.areParametersEnabled()).toBe(true);
     });
 
-    it('should evaluate when automatic text to speech is enabled', function() {
+    it('should evaluate when automatic text to speech is enabled', () => {
       ctrl.toggleAutomaticTextToSpeech();
       expect(ctrl.isAutomaticTextToSpeechEnabled()).toBe(true);
       ctrl.toggleAutomaticTextToSpeech();
       expect(ctrl.isAutomaticTextToSpeechEnabled()).toBe(false);
     });
 
-    it('should evaluate when correctness feedback is enabled', function() {
+    it('should evaluate when correctness feedback is enabled', () => {
       ctrl.toggleCorrectnessFeedback();
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(true);
       ctrl.toggleCorrectnessFeedback();
       expect(ctrl.isCorrectnessFeedbackEnabled()).toBe(false);
     });
 
-    it('should check if exploration is locked for editing', function() {
-      var changeListSpy = spyOn(
+    it('should check if exploration is locked for editing', () => {
+      let changeListSpy = spyOn(
         changeListService, 'isExplorationLockedForEditing');
 
       changeListSpy.and.returnValue(true);
@@ -528,15 +653,15 @@ describe('Settings Tab Component', function() {
       expect(ctrl.isExplorationLockedForEditing()).toBe(false);
     });
 
-    it('should update warnings when save param changes hook', function() {
+    it('should update warnings when save param changes hook', () => {
       spyOn(explorationWarningsService, 'updateWarnings');
 
       ctrl.postSaveParamChangesHook();
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
     });
 
-    it('should check if parameters are used', function() {
-      var paramChangeBackendDict = {
+    it('should check if parameters are used', () => {
+      let paramChangeBackendDict = {
         customization_args: {
           parse_with_jinja: false,
           value: 'test value'
@@ -550,7 +675,70 @@ describe('Settings Tab Component', function() {
       expect(ctrl.areParametersUsed()).toBe(true);
     });
 
-    it('should toggle exploration visibility', function() {
+    describe('on calling onRolesFormUsernameBlur', function() {
+      it('should disable save button when exploration title is empty', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.rolesSaveButtonEnabled = true;
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(false);
+
+        explorationTitleService.init('');
+        ctrl.saveExplorationTitle();
+
+        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+        expect(ctrl.errorMessage).toBe(
+          'Please provide a title before inviting.');
+      });
+
+      it('should disable save button when adding same role to existing users.',
+        () => {
+          ctrl.openEditRolesForm();
+          ctrl.rolesSaveButtonEnabled = true;
+          explorationRightsService.init(
+            ['Username1'], [], [], [], '', false, false, true);
+          ctrl.newMemberUsername = 'Username1';
+          explorationTitleService.init('Exploration title');
+          ctrl.saveExplorationTitle();
+          spyOn(explorationRightsService, 'getOldRole')
+            .and.returnValue('owner');
+
+          ctrl.onRolesFormUsernameBlur();
+
+          expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+          expect(ctrl.errorMessage).toBe('User is already owner.');
+        });
+
+      it('should disable save button when adding another role to itself',
+        () => {
+          ctrl.newMemberUsername = ctrl.loggedInUser;
+          ctrl.rolesSaveButtonEnabled = true;
+          explorationTitleService.init('Exploration title');
+          ctrl.saveExplorationTitle();
+
+          spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+            .and.returnValue(true);
+
+          ctrl.onRolesFormUsernameBlur();
+
+          expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+          expect(ctrl.errorMessage).toBe(
+            'Users are not allowed to assign other roles to themselves.');
+        });
+
+      it('should enable save button when tile and username are valid', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.newMemberRole = 'owner';
+        ctrl.rolesSaveButtonEnabled = true;
+        explorationTitleService.init('Exploration title');
+        ctrl.saveExplorationTitle();
+        spyOn(explorationRightsService, 'getOldRole')
+          .and.returnValue('editor');
+        expect(ctrl.rolesSaveButtonEnabled).toBe(true);
+        expect(ctrl.errorMessage).toBe('');
+      });
+    });
+
+    it('should toggle exploration visibility', () => {
       spyOn(explorationRightsService, 'setViewability');
       spyOn(explorationRightsService, 'viewableIfPrivate').and.returnValue(
         false);
@@ -561,13 +749,13 @@ describe('Settings Tab Component', function() {
     });
 
     it('should refresh settings tab when refreshSettingsTab event occurs',
-      function() {
+      () => {
         spyOn(ctrl, 'refreshSettingsTab').and.callThrough();
         routerService.onRefreshSettingsTab.emit();
         expect(ctrl.refreshSettingsTab).toHaveBeenCalled();
       });
 
-    it('should toggle the preview cards', function() {
+    it('should toggle the preview cards', () => {
       expect(ctrl.basicSettingIsShown).toEqual(false);
       ctrl.toggleCards('settings');
       expect(ctrl.basicSettingIsShown).toEqual(true);
@@ -594,13 +782,13 @@ describe('Settings Tab Component', function() {
     });
   });
 
-  describe('when device is not narrow', function() {
+  describe('when device is not narrow', () => {
     beforeEach(() => {
       mockWindowDimensionsService = {
         isWindowNarrow: () => false
       };
     });
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
+    beforeEach(angular.mock.inject(($injector, $componentController) => {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       $rootScope = $injector.get('$rootScope');
@@ -632,7 +820,6 @@ describe('Settings Tab Component', function() {
         'Introduction']);
 
       explorationCategoryService.init('Astrology');
-
       routerService.refreshSettingsTabEmitter = new EventEmitter();
       $scope = $rootScope.$new();
       ctrl = $componentController('settingsTab', {
@@ -658,10 +845,36 @@ describe('Settings Tab Component', function() {
       testSubscriptipns.unsubscribe();
     });
 
-    it('should not toggle the preview cards', function() {
+    it('should not toggle the preview cards', () => {
       expect(ctrl.basicSettingIsShown).toEqual(true);
       ctrl.toggleCards('settings');
       expect(ctrl.basicSettingIsShown).toEqual(true);
+    });
+
+    it('should display Unpublish button', function() {
+      ctrl.canUnpublish = false;
+      expect(ctrl.canUnpublish).toBe(false);
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canUnpublish).toBe(true);
+    });
+
+    it('should display Transfer ownership button', function() {
+      ctrl.canReleaseOwnership = false;
+      expect(ctrl.canReleaseOwnership).toBe(false);
+
+      userExplorationPermissionsService.
+        onUserExplorationPermissionsFetched.emit();
+      $scope.$apply();
+
+      expect(userExplorationPermissionsService.getPermissionsAsync)
+        .toHaveBeenCalled();
+      expect(ctrl.canReleaseOwnership).toBe(true);
     });
   });
 });

@@ -16,6 +16,8 @@
  * @fileoverview Directive for showing and reviewing contributions.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
+
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
@@ -71,7 +73,7 @@ angular.module('oppia').component('contributionsAndReview', {
           color: '#8ed274'
         },
         rejected: {
-          text: 'Rejected',
+          text: 'Revisions Requested',
           color: '#e76c8c'
         }
       };
@@ -184,6 +186,9 @@ angular.module('oppia').component('contributionsAndReview', {
           backdrop: 'static',
           size: 'lg',
           resolve: {
+            suggestion: function() {
+              return cloneDeep(suggestion);
+            },
             authorName: function() {
               return authorName;
             },
@@ -207,13 +212,18 @@ angular.module('oppia').component('contributionsAndReview', {
             },
             skillDifficulty: function() {
               return skillDifficulty;
+            },
+            suggestionId: function() {
+              return suggestionId;
             }
           },
           controller: 'QuestionSuggestionReviewModalController'
         }).result.then(function(result) {
           ContributionAndReviewService.resolveSuggestiontoSkill(
             targetId, suggestionId, result.action, result.reviewMessage,
-            result.skillDifficulty, resolveSuggestionSuccess);
+            result.skillDifficulty, resolveSuggestionSuccess, () => {
+              AlertsService.addInfoMessage('Failed to submit suggestion.');
+            });
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -226,20 +236,26 @@ angular.module('oppia').component('contributionsAndReview', {
         var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/contributor-dashboard-page/modal-templates/' +
           'translation-suggestion-review.directive.html');
-
+        var details = ctrl.contributions[initialSuggestionId].details;
+        var subheading = (
+          details.topic_name + ' / ' + details.story_title +
+          ' / ' + details.chapter_title);
         $uibModal.open({
           templateUrl: _templateUrl,
           backdrop: 'static',
           size: 'lg',
           resolve: {
             suggestionIdToSuggestion: function() {
-              return angular.copy(suggestionIdToSuggestion);
+              return cloneDeep(suggestionIdToSuggestion);
             },
             initialSuggestionId: function() {
               return initialSuggestionId;
             },
             reviewable: function() {
               return reviewable;
+            },
+            subheading: function() {
+              return subheading;
             }
           },
           controller: 'TranslationSuggestionReviewModalController'
@@ -270,7 +286,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var skillId = suggestion.change.skill_id;
           ContextService.setCustomEntityContext(
             IMAGE_CONTEXT.QUESTION_SUGGESTIONS, skillId);
-          SkillBackendApiService.fetchSkill(skillId).then((skillDict) => {
+          SkillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
             var misconceptionsBySkill = {};
             var skill = skillDict.skill;
             misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();

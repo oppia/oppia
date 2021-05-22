@@ -23,6 +23,7 @@ import ast
 import collections
 import contextlib
 import copy
+import functools
 import inspect
 import itertools
 import json
@@ -49,7 +50,6 @@ from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -63,19 +63,17 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
-import main_mail
 import main_taskqueue
-from proto import text_classifier_pb2
+from proto_files import text_classifier_pb2
 import python_utils
-import requests_mock
 import schema_utils
 import utils
 
 import contextlib2
 import elasticsearch
-from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
+import requests_mock
 import webtest
 
 (
@@ -184,9 +182,8 @@ def get_storage_model_module_names():
     """Get all module names in storage."""
     # As models.NAMES is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES.__dict__:
-        if '__' not in name:
-            yield name
+    for name in models.NAMES:
+        yield name
 
 
 def get_storage_model_classes():
@@ -531,7 +528,7 @@ class AuthServicesStub(python_utils.OBJECT):
         """Installs a new instance of the stub onto the given test instance.
 
         Args:
-            test: AppEngineTestBase. The test instance to install the stub on.
+            test: GenericTestBase. The test instance to install the stub on.
 
         Returns:
             callable. A function that will uninstall the stub when called.
@@ -539,6 +536,12 @@ class AuthServicesStub(python_utils.OBJECT):
         with contextlib2.ExitStack() as stack:
             stub = cls()
 
+            stack.enter_context(test.swap(
+                platform_auth_services, 'establish_auth_session',
+                stub.establish_auth_session))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'destroy_auth_session',
+                stub.destroy_auth_session))
             stack.enter_context(test.swap(
                 platform_auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
@@ -579,6 +582,28 @@ class AuthServicesStub(python_utils.OBJECT):
             # in reverse order.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
+
+    @classmethod
+    def establish_auth_session(cls, unused_request, unused_response):
+        """Sets login cookies to maintain a user's sign-in session.
+
+        Args:
+            unused_request: webapp2.Request. Unused because os.environ handles
+                sessions.
+            unused_response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        pass
+
+    @classmethod
+    def destroy_auth_session(cls, unused_response):
+        """Clears login cookies from the given response headers.
+
+        Args:
+            unused_response: webapp2.Response. Unused because os.environ handles
+                sessions.
+        """
+        pass
 
     @classmethod
     def get_auth_claims_from_request(cls, unused_request):
@@ -751,7 +776,7 @@ class TaskqueueServicesStub(python_utils.OBJECT):
         functionality of core.platform.taskqueue.
 
         Args:
-            test_base: AppEngineTestBase. The current test base.
+            test_base: GenericTestBase. The current test base.
         """
         self._test_base = test_base
         self._client = cloud_tasks_emulator.Emulator(
@@ -1070,8 +1095,41 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
+        """Swap obj.attr with a CallCounter instance.
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raises: Exception|None. The exception raised by the swapped
+                function. If None, then no exception is raised.
+            returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
+
+        Yields:
+            CallCounter. A CallCounter instance that's installed as obj.attr's
+            implementation while within the context manager returned.
+        """
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
+        with self.swap(obj, attr, call_counter):
+            yield call_counter
+
+    @contextlib.contextmanager
     def swap_with_checks(
-            self, obj, attr, new_value, expected_args=None,
+            self, obj, attr, new_function, expected_args=None,
             expected_kwargs=None, called=True):
         """Swap an object's function value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -1097,7 +1155,7 @@ class TestBase(unittest.TestCase):
         Args:
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
-            new_value: function. The new function you want to use.
+            new_function: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you want
                 this function to be invoked with. When its value is None, args
                 will not be checked. If the value type is list, the function
@@ -1111,53 +1169,84 @@ class TestBase(unittest.TestCase):
         Yields:
             context. The context with function replaced.
         """
-        original = getattr(obj, attr)
-        # The actual error message will also include detail assert error message
-        # via the `self.longMessage` below.
-        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+        original_function = getattr(obj, attr)
+        original_long_message_value = self.longMessage
+        msg = '%s.%s() failed the expectations of swap_with_checks()' % (
             obj.__name__, attr)
 
-        def wrapper(*args, **kwargs):
-            """Wrapper function for the new value. This function will do the
-            check before the wrapped function is invoked. After the function
-            finished, the wrapper will update how many times this function is
-            invoked.
+        expected_args_iter = iter(expected_args or ())
+        expected_kwargs_iter = iter(expected_kwargs or ())
+
+        @functools.wraps(original_function)
+        def new_function_with_checks(*args, **kwargs):
+            """Wrapper function for the new value which keeps track of how many
+            times this function is invoked.
 
             Args:
                 *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                *. Result of `new_value`.
+                *. Result of `new_function`.
             """
-            wrapper.called = True
-            if expected_args is not None:
-                self.assertEqual(args, expected_args[0], msg=msg)
-                expected_args.pop(0)
-            if expected_kwargs is not None:
-                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
-                expected_kwargs.pop(0)
-            result = new_value(*args, **kwargs)
-            return result
+            new_function_with_checks.call_num += 1
 
-        wrapper.called = False
-        setattr(obj, attr, wrapper)
-        error_occurred = False
-        try:
-            # This will show the detailed assert message.
+            # Includes assertion error information in addition to the message.
             self.longMessage = True
+
+            if expected_args:
+                next_args = python_utils.NEXT(expected_args_iter, None)
+                self.assertEqual(
+                    args, next_args, msg='*args to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            if expected_kwargs:
+                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                self.assertEqual(
+                    kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            # Reset self.longMessage just in case `new_function()` raises.
+            self.longMessage = original_long_message_value
+
+            return new_function(*args, **kwargs)
+
+        new_function_with_checks.call_num = 0
+        setattr(obj, attr, new_function_with_checks)
+
+        try:
             yield
-        except Exception:
-            error_occurred = True
-            # Raise issues thrown by the called function or assert error.
-            raise
+            # Includes assertion error information in addition to the message.
+            self.longMessage = True
+
+            self.assertEqual(
+                new_function_with_checks.call_num > 0, called, msg=msg)
+            pretty_unused_args = [
+                ', '.join(itertools.chain(
+                    (repr(a) for a in args),
+                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                for args, kwargs in python_utils.zip_longest(
+                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+            ]
+            if pretty_unused_args:
+                num_expected_calls = (
+                    new_function_with_checks.call_num + len(pretty_unused_args))
+                missing_call_summary = '\n'.join(
+                    '\tCall %d of %d: %s(%s)' % (
+                        i, num_expected_calls, attr, call_args)
+                    for i, call_args in enumerate(
+                        pretty_unused_args,
+                        start=new_function_with_checks.call_num + 1))
+                self.fail(
+                    msg='Only %d of the %d expected calls were made.\n'
+                    '\n'
+                    'Missing:\n'
+                    '%s : %s' % (
+                        new_function_with_checks.call_num, num_expected_calls,
+                        missing_call_summary, msg))
         finally:
-            setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
+            self.longMessage = original_long_message_value
+            setattr(obj, attr, original_function)
 
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
@@ -1217,18 +1306,234 @@ class TestBase(unittest.TestCase):
 
 
 class AppEngineTestBase(TestBase):
-    """Base class for tests requiring App Engine services."""
+    """Minimal base class for tests that need Google App Engine functionality.
 
-    # This is the value that gets returned by default when
-    # app_identity.get_application_id() is called during tests.
-    EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
+    This class is primarily designed for unit tests in core.platform, where we
+    write adapters around Oppia's third-party dependencies. Generally, our unit
+    tests depend on stub implementations of these adapters to protect them from
+    platform-specific behavior. Such stubs are installed in the
+    GenericTestBase.run() method.
 
-    # Environment values our tests assume to have.
+    Most of the unit tests in our code base do, and should, inherit from
+    `GenericTestBase` to stay platform-agnostic. The platform layer itself,
+    however, can _not_ mock out platform-specific behavior. Those unit tests
+    need to interact with a real implementation. This base class provides the
+    bare-minimum functionality and stubs necessary to do so.
+    """
+
+    # Environment values that our tests depend on.
     AUTH_DOMAIN = 'example.com'
     HTTP_HOST = 'localhost'
     SERVER_NAME = 'localhost'
     SERVER_PORT = '8080'
     DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
+
+    def __init__(self, *args, **kwargs):
+        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        # Defined outside of setUp() because we access it from methods, but can
+        # only install it during the run() method. Defining it in __init__
+        # satisfies pylint's attribute-defined-outside-init warning.
+        self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
+
+    def setUp(self):
+        super(AppEngineTestBase, self).setUp()
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+
+        self.testbed.setup_env(
+            overwrite=True,
+            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
+            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
+            default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
+
+        # Google App Engine service stubs.
+        self.testbed.init_app_identity_stub()
+        self.testbed.init_blobstore_stub()
+        self.testbed.init_files_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_search_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_user_stub()
+
+        policy = (
+            datastore_services.make_instantaneous_global_consistency_policy())
+        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
+
+        # The root path tells the testbed where to find the queue.yaml file.
+        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
+        self._testbed_taskqueue_stub = (
+            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
+
+        # Set up apps for testing.
+        self.testapp = webtest.TestApp(main.app)
+        self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
+
+    def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
+        self.testbed.deactivate()
+        super(AppEngineTestBase, self).tearDown()
+
+    def run(self, result=None):
+        """Run the test, collecting the result into the specified TestResult.
+
+        Reference URL:
+        https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
+
+        AppEngineTestBase's override of run() wraps super().run() in "swap"
+        contexts which stub out the platform taskqueue services.
+
+        Args:
+            result: TestResult | None. Holds onto the results of each test. If
+                None, a temporary result object is created (by calling the
+                defaultTestResult() method) and used instead.
+        """
+        platform_taskqueue_services_swap = self.swap(
+            platform_taskqueue_services, 'create_http_task',
+            self._platform_taskqueue_services_stub.create_http_task)
+        with platform_taskqueue_services_swap:
+            super(AppEngineTestBase, self).run(result=result)
+
+    def _get_all_queue_names(self):
+        """Returns a list of all queue names."""
+        return [q['name'] for q in self._testbed_taskqueue_stub.GetQueues()]
+
+    def count_jobs_in_taskqueue(self, queue_name):
+        """Returns the total number of tasks in a single queue if a queue name
+        is specified or the entire taskqueue if no queue name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            int. The total number of tasks in a single queue or in the entire
+            taskqueue.
+        """
+        return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
+            queue_name=queue_name)
+
+    def process_and_flush_pending_tasks(self, queue_name=None):
+        """Executes all of the tasks in a single queue if a queue name is
+        specified or all of the tasks in the taskqueue if no queue name is
+        specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+        """
+        self._platform_taskqueue_services_stub.process_and_flush_tasks(
+            queue_name=queue_name)
+
+    def get_pending_tasks(self, queue_name=None):
+        """Returns a list of the tasks in a single queue if a queue name is
+        specified or a list of all of the tasks in the taskqueue if no queue
+        name is specified.
+
+        Args:
+            queue_name: str|None. Name of the queue. Pass in None if no specific
+                queue is designated.
+
+        Returns:
+            list(Task). List of tasks in a single queue or in the entire
+            taskqueue.
+        """
+        return self._platform_taskqueue_services_stub.get_pending_tasks(
+            queue_name=queue_name)
+
+    def count_jobs_in_mapreduce_taskqueue(self, queue_name):
+        """Counts the jobs in the given MapReduce taskqueue."""
+        return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
+
+    def get_pending_mapreduce_tasks(self, queue_name=None):
+        """Returns the jobs in the given MapReduce taskqueue. If queue_name is
+        None, defaults to returning the jobs in all available queues.
+        """
+        queue_names = None if queue_name is None else [queue_name]
+        return self._testbed_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_names)
+
+    def _execute_mapreduce_tasks(self, tasks):
+        """Execute MapReduce queued tasks.
+
+        Args:
+            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
+                queued tasks.
+        """
+        for task in tasks:
+            if task.url == '/_ah/queue/deferred':
+                deferred.run(task.payload)
+            else:
+                # All other tasks will be for MapReduce or taskqueue.
+                params = task.payload or ''
+                headers = {
+                    'Content-Length': python_utils.convert_to_bytes(len(params))
+                }
+                headers.update(
+                    (key, python_utils.convert_to_bytes(val))
+                    for key, val in task.headers.items())
+
+                app = (
+                    self.taskqueue_testapp if task.url.startswith('/task') else
+                    self.testapp)
+                response = app.post(
+                    task.url, params=params, headers=headers,
+                    expect_errors=True)
+
+                if response.status_code != 200:
+                    raise RuntimeError('MapReduce task failed: %r' % task)
+
+    def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
+        """Runs and flushes pending MapReduce tasks. If queue_name is None, does
+        so for all queues; otherwise, this only runs and flushes tasks for the
+        specified queue.
+
+        For more information on taskqueue_stub, see:
+        https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
+        """
+        queue_names = (
+            self._get_all_queue_names() if queue_name is None else [queue_name])
+
+        get_enqueued_tasks = lambda: list(
+            self._testbed_taskqueue_stub.get_filtered_tasks(
+                queue_names=queue_names))
+
+        # Loops until get_enqueued_tasks() returns an empty list.
+        for tasks in iter(get_enqueued_tasks, []):
+            for queue in queue_names:
+                self._testbed_taskqueue_stub.FlushQueue(queue)
+            self._execute_mapreduce_tasks(tasks)
+
+    def run_but_do_not_flush_pending_mapreduce_tasks(self):
+        """"Runs, but does not flush, the pending MapReduce tasks."""
+        queue_names = self._get_all_queue_names()
+        tasks = self._testbed_taskqueue_stub.get_filtered_tasks(
+            queue_names=queue_names)
+
+        for queue in queue_names:
+            self._testbed_taskqueue_stub.FlushQueue(queue)
+
+        self._execute_mapreduce_tasks(tasks)
+
+
+class GenericTestBase(AppEngineTestBase):
+    """Base test class with common/generic helper methods.
+
+    Unless a class is testing for "platform"-specific behavior (e.g., testing
+    third-party library code or database model implementations), always inherit
+    from this base class. Otherwise, inherit from unittest.TestCase (preferred)
+    or AppEngineTestBase if Google App Engine services/behavior is needed.
+
+    TODO(#12135): Split this enormous test base into smaller, focused pieces.
+    """
+
+    # NOTE: For tests that do not/can not use the default super admin, authors
+    # can override the following class-level constant.
+    AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
+
+    # This is the value that gets returned by default when
+    # app_identity.get_application_id() is called during tests.
+    EXPECTED_TEST_APP_ID = 'dummy-cloudsdk-project-id'
 
     SUPER_ADMIN_EMAIL = 'tmpsuperadmin@example.com'
     SUPER_ADMIN_USERNAME = 'tmpsuperadm1n'
@@ -1329,76 +1634,6 @@ class AppEngineTestBase(TestBase):
             }],
         },
         'classifier_model_id': None,
-    }
-
-    VERSION_21_STATE_DICT = {
-        'END': {
-            'classifier_model_id': None,
-            'content': {
-                'content_id': 'content',
-                'html': 'Congratulations, you have finished!',
-            },
-            'content_ids_to_audio_translations': {'content': {}},
-            'interaction': {
-                'answer_groups': [],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'recommendedExplorationIds': {'value': []},
-                },
-                'default_outcome': None,
-                'hints': [],
-                'id': 'EndExploration',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
-        'Introduction': {
-            'classifier_model_id': None,
-            'content': {'content_id': 'content', 'html': ''},
-            'content_ids_to_audio_translations': {
-                'content': {},
-                'default_outcome': {},
-                'feedback_1': {},
-            },
-            'interaction': {
-                'answer_groups': [{
-                    'outcome': {
-                        'dest': 'END',
-                        'feedback': {
-                            'content_id': 'feedback_1',
-                            'html': '<p>Correct!</p>',
-                        },
-                        'labelled_as_correct': False,
-                        'missing_prerequisite_skill_id': None,
-                        'param_changes': [],
-                        'refresher_exploration_id': None,
-                    },
-                    'rule_specs': [{
-                        'inputs': {'x': 'InputString'},
-                        'rule_type': 'Equals',
-                    }],
-                    'tagged_misconception_id': None,
-                    'training_data': ['answer1', 'answer2', 'answer3'],
-                }],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'placeholder': {'value': ''},
-                    'rows': {'value': 1},
-                },
-                'default_outcome': {
-                    'dest': 'Introduction',
-                    'feedback': {'content_id': 'default_outcome', 'html': ''},
-                    'labelled_as_correct': False,
-                    'missing_prerequisite_skill_id': None,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                },
-                'hints': [],
-                'id': 'TextInput',
-                'solution': None,
-            },
-            'param_changes': [],
-        },
     }
 
     VERSION_1_STORY_CONTENTS_DICT = {
@@ -1515,6 +1750,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1535,6 +1771,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1547,6 +1784,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1567,6 +1805,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1587,76 +1826,13 @@ title: Title
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    SAMPLE_UNTITLED_YAML_CONTENT = (
-        """author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-    def __init__(self, *args, **kwargs):
-        super(AppEngineTestBase, self).__init__(*args, **kwargs)
-        # Defined outside of setUp() because we want to swap it in during tests,
-        # while minimizing the swap's scope. We accomplish this by using a
-        # context manager over run().
-        self._taskqueue_services_stub = TaskqueueServicesStub(self)
-        self._es_stub = ElasticSearchStub()
-
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
 
         Reference URL:
         https://docs.python.org/3/library/unittest.html#unittest.TestCase.run
 
-        AppEngineTestBase's override of run() wraps super().run() in swap
+        GenericTestBase's override of run() wraps super().run() in swap
         contexts to mock out the cache and taskqueue services.
 
         Args:
@@ -1666,34 +1842,29 @@ tags: []
         """
         memory_cache_services_stub = MemoryCacheServicesStub()
         memory_cache_services_stub.flush_cache()
+        es_stub = ElasticSearchStub()
+        es_stub.reset()
 
         with contextlib2.ExitStack() as stack:
+            stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
-                self._es_stub.mock_create_index))
+                es_stub.mock_create_index))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'index',
-                self._es_stub.mock_index))
+                es_stub.mock_index))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'exists',
-                self._es_stub.mock_exists))
+                es_stub.mock_exists))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'delete',
-                self._es_stub.mock_delete))
+                es_stub.mock_delete))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'delete_by_query',
-                self._es_stub.mock_delete_by_query))
+                es_stub.mock_delete_by_query))
             stack.enter_context(self.swap(
                 elastic_search_services.ES, 'search',
-                self._es_stub.mock_search))
-
-            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
-                stack.callback(AuthServicesStub.install_stub(self))
-
-            stack.enter_context(self.swap(
-                platform_taskqueue_services, 'create_http_task',
-                self._taskqueue_services_stub.create_http_task))
-
+                es_stub.mock_search))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
@@ -1710,48 +1881,12 @@ tags: []
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
 
-            super(AppEngineTestBase, self).run(result=result)
+            super(GenericTestBase, self).run(result=result)
 
     def setUp(self):
-        self.testbed = testbed.Testbed()
-        self.testbed.activate()
-
-        self.testbed.setup_env(
-            overwrite=True,
-            auth_domain=self.AUTH_DOMAIN, http_host=self.HTTP_HOST,
-            server_name=self.SERVER_NAME, server_port=self.SERVER_PORT,
-            default_version_hostname=self.DEFAULT_VERSION_HOSTNAME)
-
-        # Declare any relevant App Engine service stubs here.
-        self.testbed.init_app_identity_stub()
-        self.testbed.init_blobstore_stub()
-        self.testbed.init_files_stub()
-        self.testbed.init_memcache_stub()
-        self.testbed.init_search_stub()
-        self.testbed.init_urlfetch_stub()
-        self.testbed.init_user_stub()
-
-        policy = (
-            datastore_services.make_instantaneous_global_consistency_policy())
-        self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-
-        # The root path tells the testbed where to find the queue.yaml file.
-        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
-        self._taskqueue_stub = (
-            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
-
-        # Set up the app to be tested.
-        self.testapp = webtest.TestApp(main.app)
-        self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
-        self.mail_testapp = webtest.TestApp(main_mail.app)
-
-        self.signup_superadmin_user()
-        self._es_stub.reset()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        self.testbed.deactivate()
+        super(GenericTestBase, self).setUp()
+        if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
+            self.signup_superadmin_user()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -1822,16 +1957,19 @@ tags: []
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username):
+    def signup(self, email, username, is_super_admin=False):
         """Complete the signup process for the user with the given username.
 
         Args:
             email: str. Email of the given user.
             username: str. Username of the given user.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        login_context = self.login_context(email, is_super_admin=is_super_admin)
+
+        with login_context, requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
@@ -2187,40 +2325,6 @@ tags: []
             url, params=data, headers=headers, status=expected_status_int,
             upload_files=upload_files, expect_errors=expect_errors)
 
-    def post_email(
-            self, recipient_email, sender_email, subject, body, html_body=None,
-            expect_errors=False, expected_status_int=200):
-        """Post an email from the sender to the recipient.
-
-        Args:
-            recipient_email: str. The email of the recipient.
-            sender_email: str. The email of the sender.
-            subject: str. The subject of the email.
-            body: str. The body of the email.
-            html_body: str. The HTML body of the email.
-            expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code of the JSON
-                response.
-
-        Returns:
-            json. A JSON response generated by _send_post_request function.
-        """
-        email = mail.EmailMessage(
-            sender=sender_email, to=recipient_email, subject=subject, body=body)
-        if html_body is not None:
-            email.html = html_body
-
-        mime_email = email.to_mime_message()
-        headers = {
-            'Content-Type': mime_email.get_content_type(),
-        }
-        data = mime_email.as_string()
-        incoming_email_url = '/_ah/mail/%s' % recipient_email
-
-        return self._send_post_request(
-            self.mail_testapp, incoming_email_url, data, expect_errors,
-            headers=headers, expected_status_int=expected_status_int)
-
     def post_task(
             self, url, payload, headers, csrf_token=None, expect_errors=False,
             expected_status_int=200):
@@ -2393,7 +2497,8 @@ tags: []
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2410,6 +2515,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2424,6 +2531,7 @@ tags: []
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2431,60 +2539,15 @@ tags: []
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
-
-    def save_new_exp_with_states_schema_v0(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 0 states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=0,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_0_STATES_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
-        # Create an ExplorationIssues model to match the behavior of creating
-        # new explorations.
-        stats_services.create_exp_issues_for_new_exploration(exp_id, 1)
 
     def save_new_exp_with_custom_states_schema_version(
             self, exp_id, user_id, states_dict, version):
@@ -2532,52 +2595,6 @@ tags: []
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
-        """Saves a new default exploration with a default version 21 states
-        dictionary. Version 21 is where training data of exploration is stored
-        with the states dict.
-
-        This function should only be used for creating explorations in tests
-        involving migration of datastore explorations that use an old states
-        schema version.
-
-        Note that it makes an explicit commit to the datastore instead of using
-        the usual functions for updating and creating explorations. This is
-        because the latter approach would result in an exploration with the
-        *current* states schema version.
-
-        Args:
-            exp_id: str. The exploration ID.
-            user_id: str. The user_id of the creator.
-            title: str. The title of the exploration.
-        """
-        exp_model = exp_models.ExplorationModel(
-            id=exp_id, category='category', title=title,
-            objective='Old objective', language_code='en', tags=[], blurb='',
-            author_notes='', states_schema_version=21,
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
-            states=self.VERSION_21_STATE_DICT, param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)
-
-        commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
-        exp_summary_model = exp_models.ExpSummaryModel(
-            id=exp_id, title=title, category='category',
-            objective='Old objective', language_code='en', tags=[],
-            ratings=feconf.get_empty_ratings(),
-            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-            status=exp_rights.status,
-            community_owned=exp_rights.community_owned,
-            owner_ids=exp_rights.owner_ids, contributor_ids=[],
-            contributors_summary={})
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
 
@@ -2585,7 +2602,7 @@ tags: []
             owner_id: str. The user_id of the owner of the exploration.
             exploration_id: str. The ID of the new exploration.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
@@ -2657,7 +2674,7 @@ tags: []
             owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
-        committer = user_services.UserActionsInfo(owner_id)
+        committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
@@ -3125,122 +3142,6 @@ tags: []
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def _get_all_queue_names(self):
-        """Returns a list of all queue names."""
-        return [q['name'] for q in self._taskqueue_stub.GetQueues()]
-
-    def count_jobs_in_taskqueue(self, queue_name):
-        """Returns the total number of tasks in a single queue if a queue name
-        is specified or the entire taskqueue if no queue name is specified.
-
-        Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
-
-        Returns:
-            int. The total number of tasks in a single queue or in the entire
-            taskqueue.
-        """
-        return self._taskqueue_services_stub.count_jobs_in_taskqueue(
-            queue_name=queue_name)
-
-    def process_and_flush_pending_tasks(self, queue_name=None):
-        """Executes all of the tasks in a single queue if a queue name is
-        specified or all of the tasks in the taskqueue if no queue name is
-        specified.
-
-        Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
-        """
-        self._taskqueue_services_stub.process_and_flush_tasks(
-            queue_name=queue_name)
-
-    def get_pending_tasks(self, queue_name=None):
-        """Returns a list of the tasks in a single queue if a queue name is
-        specified or a list of all of the tasks in the taskqueue if no queue
-        name is specified.
-
-        Args:
-            queue_name: str|None. Name of the queue. Pass in None if no specific
-                queue is designated.
-
-        Returns:
-            list(Task). List of tasks in a single queue or in the entire
-            taskqueue.
-        """
-        return self._taskqueue_services_stub.get_pending_tasks(
-            queue_name=queue_name)
-
-    def count_jobs_in_mapreduce_taskqueue(self, queue_name):
-        """Counts the jobs in the given mapreduce taskqueue."""
-        return len(self.get_pending_mapreduce_tasks(queue_name=queue_name))
-
-    def get_pending_mapreduce_tasks(self, queue_name=None):
-        """Returns the jobs in the given mapreduce taskqueue. If queue_name is
-        None, defaults to returning the jobs in all available queues.
-        """
-        queue_names = None if queue_name is None else [queue_name]
-        return self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-
-    def _execute_mapreduce_tasks(self, tasks):
-        """Execute mapreduce queued tasks.
-
-        Args:
-            tasks: list(google.appengine.api.taskqueue.taskqueue.Task). The
-                queued tasks.
-        """
-        for task in tasks:
-            if task.url == '/_ah/queue/deferred':
-                deferred.run(task.payload)
-            else:
-                # All other tasks are expected to be for mapreduce or taskqueue.
-                params = task.payload or ''
-                headers = {
-                    'Content-Length': python_utils.convert_to_bytes(len(params))
-                }
-                headers.update(
-                    (key, python_utils.convert_to_bytes(val))
-                    for key, val in task.headers.items())
-
-                app = (
-                    self.taskqueue_testapp if task.url.startswith('/task') else
-                    self.testapp)
-                response = app.post(
-                    task.url, params=params, headers=headers,
-                    expect_errors=True)
-                if response.status_code != 200:
-                    raise RuntimeError('MapReduce task failed: %r' % task)
-
-    def process_and_flush_pending_mapreduce_tasks(self, queue_name=None):
-        """Runs and flushes pending mapreduce tasks. If queue_name is None, does
-        so for all queues; otherwise, this only runs and flushes tasks for the
-        specified queue.
-
-        For more information on taskqueue_stub, see:
-        https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
-        """
-        queue_names = (
-            self._get_all_queue_names() if queue_name is None else [queue_name])
-
-        get_enqueued_tasks = lambda: list(
-            self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names))
-
-        # Loop until get_enqueued_tasks() returns an empty list.
-        for tasks in iter(get_enqueued_tasks, []):
-            for queue in queue_names:
-                self._taskqueue_stub.FlushQueue(queue)
-            self._execute_mapreduce_tasks(tasks)
-
-    def run_but_do_not_flush_pending_mapreduce_tasks(self):
-        """"Runs but not flushes mapreduce pending tasks."""
-        queue_names = self._get_all_queue_names()
-
-        tasks = self._taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for queue in queue_names:
-            self._taskqueue_stub.FlushQueue(queue)
-        self._execute_mapreduce_tasks(tasks)
-
     def _create_valid_question_data(self, default_dest_state_name):
         """Creates a valid question_data dict.
 
@@ -3282,9 +3183,6 @@ tags: []
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         return state
-
-
-GenericTestBase = AppEngineTestBase
 
 
 class LinterTestBase(GenericTestBase):

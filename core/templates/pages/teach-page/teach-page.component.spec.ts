@@ -21,18 +21,19 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
-import { LoaderService } from 'services/loader.service.ts';
+import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
+import { of } from 'rxjs';
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
+  transform(value: string, params: Object | undefined): string {
     return value;
   }
 }
@@ -59,6 +60,8 @@ describe('Teach Page', () => {
     new WindowRef());
   let loaderService: LoaderService = null;
   let userService: UserService;
+  let windowDimensionsService: WindowDimensionsService;
+  var resizeEvent = new Event('resize');
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -70,7 +73,8 @@ describe('Teach Page', () => {
         {
           provide: WindowDimensionsService,
           useValue: {
-            isWindowNarrow: () => true
+            isWindowNarrow: () => true,
+            getResizeEvent: () => of(resizeEvent)
           }
         },
         { provide: TranslateService, useClass: MockTranslateService },
@@ -97,12 +101,13 @@ describe('Teach Page', () => {
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
+    windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
   let component;
-
+  let teachPageComponent;
   beforeEach(() => {
-    const teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
   });
 
@@ -110,7 +115,6 @@ describe('Teach Page', () => {
     () => {
       expect(component).toBeDefined();
     });
-
   it('should get static image url', function() {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
@@ -121,6 +125,8 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(0);
     expect(component.testimonialCount).toBe(3);
     expect(component.classroomUrl).toBe('/learn/math');
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
+    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
     expect(component.isWindowNarrow).toBe(true);
   });
 

@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -43,9 +44,12 @@ describe('Image preloader service', () => {
   let imagePreloaderService: ImagePreloaderService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
+  let ctms: ContentTranslationManagerService;
+
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    correctness_feedback_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
@@ -91,12 +95,14 @@ describe('Image preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -125,11 +131,13 @@ describe('Image preloader service', () => {
           hints: []
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       },
@@ -227,6 +235,7 @@ describe('Image preloader service', () => {
           solution: null
         },
         solicit_answer_details: false,
+        card_is_checkpoint: true,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -235,6 +244,7 @@ describe('Image preloader service', () => {
             feedback_2: {}
           }
         },
+        linked_skill_id: null,
         next_content_id_index: null,
       },
       'State 6': {
@@ -331,6 +341,7 @@ describe('Image preloader service', () => {
           solution: null,
         },
         solicit_answer_details: false,
+        card_is_checkpoint: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -340,6 +351,7 @@ describe('Image preloader service', () => {
             hint_1: {}
           }
         },
+        linked_skill_id: null,
         classifier_model_id: null,
         next_content_id_index: null,
       }
@@ -370,10 +382,15 @@ describe('Image preloader service', () => {
     explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
     contextService = TestBed.get(ContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+    ctms = TestBed.get(ContentTranslationManagerService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
+    spyOn(ctms, 'getTranslatedHtml').and.callFake(
+      (unusedWrittenTranslations, unusedLanguageCode, content) => {
+        return content.html;
+      });
 
     exploration = (
       explorationObjectFactory.createFromBackendDict(explorationDict));
@@ -625,7 +642,8 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
     flushMicrotasks();
 
     expect(onSuccess).toHaveBeenCalled();
@@ -655,7 +673,8 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     flushMicrotasks();
@@ -688,7 +707,8 @@ describe('Image preloader service', () => {
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
 
-      imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+      imagePreloaderService.getImageUrlAsync(filename1)
+        .then(onSuccess, onFailure);
 
       httpTestingController.expectOne(requestUrl1)
         .flush(imageBlob, {status: 404, statusText: 'Status Text'});
@@ -707,7 +727,8 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
@@ -734,7 +755,8 @@ describe('Image preloader service', () => {
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
 
-    imagePreloaderService.getImageUrl(filename1).then(onSuccess, onFailure);
+    imagePreloaderService.getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
 
     httpTestingController.expectOne(requestUrl1)
       .flush(imageBlob, {status: 404, statusText: 'Status Text'});

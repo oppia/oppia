@@ -2,10 +2,17 @@
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Oppia"})
+    <style>
+      @media(max-width: 768px) {
+        .collapse:not(.show) {
+          display: flex;
+        }
+      }
+    </style>
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
+      <div ng-controller="Base" dir="<[direction]>">
         <base-content>
           <navbar-breadcrumb>
             <topic-viewer-navbar-breadcrumb>

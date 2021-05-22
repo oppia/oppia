@@ -24,6 +24,8 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('testInteractionPanel', {
   bindings: {
     getStateName: '&stateName',
@@ -31,12 +33,15 @@ angular.module('oppia').component('testInteractionPanel', {
   },
   template: require('./test-interaction-panel.component.html'),
   controller: [
-    '$scope', 'CurrentInteractionService', 'ExplorationStatesService',
-    'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
+    '$rootScope', '$scope', 'CurrentInteractionService',
+    'ExplorationStatesService', 'INTERACTION_DISPLAY_MODE_INLINE',
+    'INTERACTION_SPECS',
     function(
-        $scope, CurrentInteractionService, ExplorationStatesService,
-        INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
+        $rootScope, $scope, CurrentInteractionService,
+        ExplorationStatesService, INTERACTION_DISPLAY_MODE_INLINE,
+        INTERACTION_SPECS) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       $scope.onSubmitAnswerFromButton = function() {
         CurrentInteractionService.submitAnswer();
       };
@@ -44,11 +49,21 @@ angular.module('oppia').component('testInteractionPanel', {
       $scope.isSubmitButtonDisabled = (
         CurrentInteractionService.isSubmitButtonDisabled);
       ctrl.$onInit = function() {
+        ctrl.directiveSubscriptions.add(
+          // TODO(#11996): Remove when migrating to Angular2+.
+          CurrentInteractionService.onAnswerChanged$.subscribe(() => {
+            $rootScope.$applyAsync();
+          })
+        );
         var _stateName = ctrl.getStateName();
         var _state = ExplorationStatesService.getState(_stateName);
         $scope.interactionIsInline = (
           INTERACTION_SPECS[_state.interaction.id].display_mode ===
           INTERACTION_DISPLAY_MODE_INLINE);
+      };
+
+      ctrl.$onDestroy = function() {
+        ctrl.directiveSubscriptions.unsubscribe();
       };
     }
   ]

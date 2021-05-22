@@ -37,18 +37,19 @@ CI_INFO = {
         'env': {
             'identifier': 'CIRCLECI',
             'user_info': 'CIRCLE_USERNAME',
-            'build_url': 'CIRCLE_BUILD_URL',
-            'build_id': None
-        }
+            'branch': 'CIRCLE_BRANCH',
+            'build_url_template_vars': ['CIRCLE_BUILD_URL']
+        },
+        'build_url_template': '%s',
     },
     'githubActions': {
         'env': {
             'identifier': 'GITHUB_ACTIONS',
             'user_info': 'GITHUB_ACTOR',
-            'build_url': None,
-            'build_id': 'GITHUB_RUN_ID',
+            'branch': 'GITHUB_REF',
+            'build_url_template_vars': ['GITHUB_REPOSITORY', 'GITHUB_RUN_ID'],
         },
-        'build_url_template': 'https://github.com/oppia/oppia/actions/runs/%s'
+        'build_url_template': 'https://github.com/%s/actions/runs/%s',
     }
 }
 
@@ -89,16 +90,21 @@ def _get_build_info():
         if not os.getenv(ci_env['identifier']):
             continue
 
-        if os.getenv(ci_env['build_url']) is not None:
-            build_url = os.getenv(ci_env['build_url'])
-        else:
-            build_url = info['build_url_template'] % os.getenv(
-                ci_env['build_id'])
+        template_values = []
+        for template_var in ci_env['build_url_template_vars']:
+            value = os.getenv(template_var)
+            if value is None:
+                raise RuntimeError(
+                    'Expected environment variable %s missing' %
+                    template_var)
+            template_values.append(value)
+        build_url = info['build_url_template'] % tuple(template_values)
         timestamp = datetime.datetime.utcnow().isoformat() + '+00:00'
 
         build_info['username'] = os.getenv(ci_env['user_info'])
         build_info['build_url'] = build_url
         build_info['timestamp'] = timestamp
+        build_info['branch'] = os.getenv(ci_env['branch'])
 
         return build_info
 

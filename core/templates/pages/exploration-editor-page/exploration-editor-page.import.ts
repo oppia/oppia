@@ -33,9 +33,11 @@ angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngAudio', 'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui-leaflet',
+  'toastr', 'ui.bootstrap', 'ui-leaflet',
   'ui.sortable', 'ui.tree', uiValidate,
 ]);
+
+require('Polyfills.ts');
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.

@@ -71,6 +71,7 @@
                         ng-model="editableDescription" maxlength="<[MAX_CHARS_IN_TOPIC_DESCRIPTION]>"
                         ng-change="updateTopicDescriptionStatus(editableDescription)"
                         ng-blur="updateTopicDescription(editableDescription)"
+                        aria-label="Topic Description"
                         placeholder="Enter the description of the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
@@ -87,6 +88,7 @@
               <textarea type="text" class="form-control topic-description protractor-test-topic-page-title-fragment-field"
                         ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
                         ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
+                        aria-label="Page Title Fragment"
                         placeholder="Enter the page title for the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
@@ -101,7 +103,8 @@
               <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
                         ng-model="editableMetaTagContent" maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
                         ng-blur="updateTopicMetaTagContent(editableMetaTagContent)"
-                        placeholder="Enter the meta tag content for the topic">
+                        placeholder="Enter the meta tag content for the topic"
+                        aria-label="Meta Tag Content">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
@@ -143,7 +146,7 @@
           <preview-thumbnail name="editableName"
                              aspect-ratio="'4:3'"
                              preview-footer="getPreviewFooter()"
-                             filename = "topic.getThumbnailFilename()"
+                             filename="topic.getThumbnailFilename()"
                              thumbnail-bg-color="topic.getThumbnailBgColor()"
                              bg-color="'#2F6687'">
           </preview-thumbnail>
@@ -168,7 +171,7 @@
       <div ng-if="subtopicsListIsShown" class="oppia-mobile-collapsible-card-content">
         <div>
           <label>
-            <input class="practice-tab-checkbox" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)">
+            <input class="practice-tab-checkbox protractor-test-toggle-practice-tab" type="checkbox" ng-model="editablePracticeIsDisplayed" ng-change="updatePracticeTabIsDisplayed(editablePracticeIsDisplayed)">
             <span class="practice-tab-text"> Show Practice Tab to learners.</span>
           </label>
           <i class="fas fa-info-circle practice-tab-info-circle" title="This setting show/hides the practice tab in the topic viewer page. It is recommended that this option be enabled only if there are at least 5 questions attached to the topic"></i>
@@ -279,8 +282,8 @@
         </i>
       </div>
       <div ng-if="storiesListIsShown" class="oppia-mobile-collapsible-card-content">
-        <button class="btn add-story-btn protractor-test-create-story-button"
-                ng-click="createCanonicalStory()">
+        <button class="btn add-story-btn protractor-test-create-story-button oppia-autofocus"
+                ng-click="createCanonicalStory()" focus-on="addStoryBtn">
           + ADD STORY
         </button>
         <div class="canonical-stories">
@@ -354,6 +357,7 @@
   }
 
   topic-editor-tab .topic-dashboard-link a {
+    color: #015F9C;
     text-decoration: none;
   }
 
@@ -468,7 +472,7 @@
   .topic-editor .add-skill-btn,
   .topic-editor .add-story-btn {
     background-color: #008098;
-    color: #FFFFFF;
+    color: #FFF;
     font-weight: bold;
     text-align: left;
   }
@@ -621,7 +625,7 @@
   }
 
   .topic-editor .practice-tab-checkbox {
-    box-shadow: rgb(102, 102, 102) 0px 0px 0px 2px inset;
+    box-shadow: rgb(102, 102, 102) 0 0 0 2px inset;
   }
 
   .topic-editor .practice-tab-text {

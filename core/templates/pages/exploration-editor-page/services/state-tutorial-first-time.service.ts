@@ -19,7 +19,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service.ts';
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
 @Injectable({
@@ -39,7 +39,7 @@ export class StateTutorialFirstTimeService {
   private _openTranslationTutorialEventEmitter = new EventEmitter();
 
   constructor(
-    private editorFirstTimeEventsService : EditorFirstTimeEventsService,
+    private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private tutorialEventsBackendApiService: TutorialEventsBackendApiService) {}
 
   initEditor(firstTime: boolean, expId: string): void {

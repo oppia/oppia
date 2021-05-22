@@ -47,6 +47,102 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
+class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to collections.
+
+    A new instance of this model is created and saved every time a commit to
+    CollectionModel or CollectionRightsModel occurs.
+
+    The id for this model is of the form 'collection-[collection_id]-[version]'.
+    """
+
+    # The id of the collection being edited.
+    collection_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
+        """
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def get_instance_id(cls, collection_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            collection_id: str. The id of the collection being edited.
+            version: int. The version number of the collection after the commit.
+
+        Returns:
+            str. The commit id with the collection id and version number.
+        """
+        return 'collection-%s-%s' % (collection_id, version)
+
+    @classmethod
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
+        """Fetches a list of all the non-private commits sorted by their last
+        updated attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+            max_age: datetime.timedelta. An instance of datetime.timedelta
+                representing the maximum age of the non-private commits to be
+                fetched.
+
+        Raises:
+            ValueError. The max_age is neither an instance of datetime.timedelta
+                nor None.
+
+        Returns:
+            3-tuple of (results, cursor, more). Where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
+            raise ValueError(
+                'max_age must be a datetime.timedelta instance or None.')
+
+        query = cls.query(
+            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+        if max_age:
+            query = query.filter(
+                cls.last_updated >= datetime.datetime.utcnow() - max_age)
+        return cls._fetch_page_sorted_by_last_updated(
+            query, page_size, urlsafe_start_cursor)
+
+
 class CollectionModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia collection.
 
@@ -56,6 +152,7 @@ class CollectionModel(base_models.VersionedModel):
 
     SNAPSHOT_METADATA_CLASS = CollectionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = CollectionCommitLogEntryModel
     ALLOW_REVERT = True
 
     # What this collection is called.
@@ -180,9 +277,6 @@ class CollectionModel(base_models.VersionedModel):
 
         collection_rights = CollectionRightsModel.get_by_id(self.id)
 
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when collections
-        # are changed).
         collection_commit_log = CollectionCommitLogEntryModel.create(
             self.id, self.version, committer_id, commit_type, commit_message,
             commit_cmds, collection_rights.status,
@@ -549,102 +643,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             'voiced_collection_ids': voiced_collection_ids,
             'viewable_collection_ids': viewable_collection_ids
         }
-
-
-class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
-    """Log of commits to collections.
-
-    A new instance of this model is created and saved every time a commit to
-    CollectionModel or CollectionRightsModel occurs.
-
-    The id for this model is of the form 'collection-[collection_id]-[version]'.
-    """
-
-    # The id of the collection being edited.
-    collection_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
-
-    @staticmethod
-    def get_deletion_policy():
-        """Model contains data to pseudonymize or delete corresponding
-        to a user: user_id field.
-        """
-        return (
-            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
-        )
-
-    @staticmethod
-    def get_model_association_to_user():
-        """The history of commits is not relevant for the purposes of
-        Takeout, since commits do not contain any personal user data.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model contains data corresponding to a user, but this isn't exported
-        because the history of commits is not relevant for the purposes of
-        Takeout, since commits do not contain any personal user data.
-        """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-    @classmethod
-    def _get_instance_id(cls, collection_id, version):
-        """This function returns the generated id for the get_commit function
-        in the parent class.
-
-        Args:
-            collection_id: str. The id of the collection being edited.
-            version: int. The version number of the collection after the commit.
-
-        Returns:
-            str. The commit id with the collection id and version number.
-        """
-        return 'collection-%s-%s' % (collection_id, version)
-
-    @classmethod
-    def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
-        """Fetches a list of all the non-private commits sorted by their last
-        updated attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-            max_age: datetime.timedelta. An instance of datetime.timedelta
-                representing the maximum age of the non-private commits to be
-                fetched.
-
-        Raises:
-            ValueError. The max_age is neither an instance of datetime.timedelta
-                nor None.
-
-        Returns:
-            3-tuple of (results, cursor, more). Where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError(
-                'max_age must be a datetime.timedelta instance or None.')
-
-        query = cls.query(
-            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
-        if max_age:
-            query = query.filter(
-                cls.last_updated >= datetime.datetime.utcnow() - max_age)
-        return cls._fetch_page_sorted_by_last_updated(
-            query, page_size, urlsafe_start_cursor)
 
 
 class CollectionSummaryModel(base_models.BaseModel):

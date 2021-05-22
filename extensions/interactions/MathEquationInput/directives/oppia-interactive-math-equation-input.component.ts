@@ -33,6 +33,9 @@ require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
   template: require('./math-equation-input-interaction.component.html'),
+  bindings: {
+    savedSolution: '<'
+  },
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
@@ -81,9 +84,13 @@ angular.module('oppia').component('oppiaInteractiveMathEquationInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
+        GuppyConfigurationService.changeDivSymbol(
+          JSON.parse($attrs.useFractionForDivisionWithValue || 'false'));
         GuppyInitializationService.init(
           'guppy-div-learner',
-          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+          MATH_INTERACTION_PLACEHOLDERS.MathEquationInput,
+          ctrl.savedSolution !== undefined ? ctrl.savedSolution : ''
+        );
         GuppyInitializationService.setCustomOskLetters(
           HtmlEscaperService.escapedJsonToObj(
             $attrs.customOskLettersWithValue));

@@ -703,6 +703,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
 
+        @transaction_services.run_in_transaction_wrapper
         def _increment_counter():
             """Increments the count, if the realtime model corresponding to the
             active real-time model id exists.
@@ -715,7 +716,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
                 id=realtime_model_id, count=1,
                 realtime_layer=active_realtime_layer).put()
 
-        transaction_services.run_in_transaction(_increment_counter)
+        _increment_counter()
 
     # Public query method.
     @classmethod
@@ -891,13 +892,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
-            # Enqueue the batch computation. (It is running on 0 events).
-            StartExplorationEventCounter._kickoff_batch_job()  # pylint: disable=protected-access
-            # Record an event while this job is in the queue. Simulate
-            # this by directly calling on_incoming_event(), because using
-            # StartExplorationEventHandler.record() would just put the event
-            # in the task queue, which we don't want to flush yet.
-            event_services.StartExplorationEventHandler._handle_event(  # pylint: disable=protected-access
+            # We will be handling the event for recording exploration start
+            # events by calling StartExplorationEventLogEntryModel. This
+            # will record an event while this job is in this queue.
+            stats_models.StartExplorationEventLogEntryModel.create(
                 self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id',
                 {}, feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(
@@ -1008,10 +1006,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         ):
             self.assertEqual(MockContinuousComputationManager.TIMES_RUN, 0)
             MockContinuousComputationManager.start_computation()
-            (
-                MockContinuousComputationManager  # pylint: disable=protected-access
-                ._kickoff_batch_job_after_previous_one_ends()
-            )
+            MockContinuousComputationManager.on_batch_job_completion()
             status = MockContinuousComputationManager.get_status_code()
 
             self.assertEqual(

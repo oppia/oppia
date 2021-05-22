@@ -23,7 +23,7 @@
   <!-- Results Page -->
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
-      <h3 class="oppia-question-player-header" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
+      <h3 class="oppia-question-player-header protractor-test-practice-complete-message" ng-if="$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_PASSED"></h3>
       <h3 class="oppia-question-player-header" ng-if="!$ctrl.testIsPassed" translate="I18N_QUESTION_PLAYER_TEST_FAILED"></h3>
       <score-ring score="$ctrl.totalScore"
                   test-is-passed="$ctrl.testIsPassed">
@@ -99,7 +99,7 @@
 
   .oppia-question-player-container .action-button {
     border-radius: 4px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     display: inline-block;
     height: 100px;
@@ -150,9 +150,9 @@
   }
 
   .oppia-question-player-container .oppia-question-player-card {
-    background: #FFFFFF;
+    background: #FFF;
     border-radius: 4px;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     height: 100px;
     margin: 0 20px;
     text-align: center;
@@ -181,7 +181,7 @@
   }
 
   .oppia-question-player-container .oppia-question-player-progress {
-    background: #FFFFFF;
+    background: #FFF;
     border: 2px solid #0D48A1;
     box-sizing: border-box;
     height: 20px;
@@ -215,7 +215,7 @@
   }
 
   .oppia-question-player-container .skill-score-table .oppia-skill-score-container {
-    background: #FFFFFF;
+    background: #FFF;
     border: 1px solid rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     height: 10px;

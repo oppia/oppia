@@ -33,6 +33,7 @@ from core.domain import exp_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import wipeout_service
@@ -68,9 +69,9 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
         self.system_user = user_services.get_system_user()
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
     def assert_can_edit(self, exp_id):
         """Returns True if the current user can edit the exploration
@@ -264,59 +265,13 @@ class EditorTests(BaseEditorControllerTests):
         self.logout()
 
 
-class ExplorationEditorLogoutTest(BaseEditorControllerTests):
-    """Test handler for logout from exploration editor page."""
-
-    def test_logout_from_unpublished_exploration_editor(self):
-        """Logout from unpublished exploration should redirect
-        to library page.
-        """
-
-        unpublished_exp_id = '_unpublished_eid123'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            unpublished_exp_id)
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        current_page_url = '%s/%s' % (
-            feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(current_page_url)
-
-        response = self.get_html_response('/logout', expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-        self.assertEqual(response.headers['location'], 'http://localhost/')
-        self.logout()
-
-    def test_logout_from_published_exploration_editor(self):
-        """Logout from published exploration should redirect
-        to same page.
-        """
-
-        published_exp_id = 'published_eid-123'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            published_exp_id)
-        exp_services.save_new_exploration(self.owner_id, exploration)
-
-        current_page_url = '%s/%s' % (
-            feconf.EDITOR_URL_PREFIX, published_exp_id)
-        self.login(self.OWNER_EMAIL)
-        response = self.get_html_response(current_page_url)
-
-        rights_manager.publish_exploration(self.owner, published_exp_id)
-
-        response = self.get_html_response('/logout', expected_status_int=302)
-        self.assertEqual(response.status_int, 302)
-        self.assertEqual(
-            response.headers['location'], 'http://localhost/')
-        self.logout()
-
-
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
         'State A': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -342,6 +297,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -357,7 +313,8 @@ written_translations:
     default_outcome: {}
 """),
         'State B': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -383,6 +340,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -398,7 +356,8 @@ written_translations:
     default_outcome: {}
 """),
         feconf.DEFAULT_INIT_STATE_NAME: (
-            """classifier_model_id: null
+            """card_is_checkpoint: true
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -424,6 +383,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -441,7 +401,8 @@ written_translations:
     }
 
     SAMPLE_STATE_STRING = (
-        """classifier_model_id: null
+        """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -467,6 +428,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -1475,7 +1437,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
                 'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_domain.ROLE_EDITOR
             }, csrf_token=csrf_token)
-
         self.logout()
 
         # Check that viewer can access editor page but cannot edit.
@@ -1572,6 +1533,186 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
+        # Check that existing editor can be assigned to any other role.
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_OWNER
+            }, csrf_token=csrf_token)
+        self.logout()
+
+    def test_for_deassign_editor_role(self):
+        self.signup(
+            self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+
+        # Owner creates exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+        self.logout()
+
+        self.login(self.COLLABORATOR_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.COLLABORATOR_EMAIL)
+        self.assert_can_edit(exp_id)
+        self.assert_can_voiceover(exp_id)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        self.delete_json(
+            rights_url, params={
+                'member_role': rights_domain.ROLE_EDITOR,
+                'username': self.COLLABORATOR_USERNAME
+            })
+        self.logout()
+
+        self.login(self.COLLABORATOR_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+    def test_for_deassign_sole_owner_from_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+
+        response = self.delete_json(
+            rights_url, params={
+                'member_role': rights_domain.ROLE_OWNER,
+                'username': self.OWNER_USERNAME
+            }, expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, users cannot remove their own roles.')
+        self.logout()
+
+    def test_users_cannot_assign_other_role_to_itself(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.OWNER_USERNAME,
+                'new_member_role': rights_domain.ROLE_EDITOR
+            }, csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Users are not allowed to assign other roles to themselves')
+        self.logout()
+
+    def test_for_deassign_viewer_role_from_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='Title for rights handler test!',
+            category='My category')
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        self.set_interaction_for_state(
+            exploration.states['State A'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 2'], 'TextInput')
+        self.set_interaction_for_state(
+            exploration.states['State 3'], 'TextInput')
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.VIEWER_USERNAME,
+                'new_member_role': rights_domain.ROLE_VIEWER
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        self.assert_cannot_edit(exp_id)
+        self.assert_cannot_voiceover(exp_id)
+        self.logout()
+
+        self.login(self.OWNER_EMAIL)
+        self.delete_json(
+            rights_url, params={
+                'member_role': rights_domain.ROLE_VIEWER,
+                'username': self.VIEWER_USERNAME
+            })
+        self.logout()
+
+        self.login(self.VIEWER_EMAIL)
+        self.get_json(
+            '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id),
+            expected_status_int=404)
+        self.logout()
+
+    def test_for_checking_username_is_valid(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        response = self.delete_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Sorry, we could not find the specified user.')
+        self.logout()
+
     def test_transfering_ownership_to_the_community(self):
         """Test exploration rights handler for transfering ownership to the
         community.
@@ -1621,7 +1762,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             category='category',
             title='title',
             language_code='invalid_language_code',
-            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states={
+                feconf.DEFAULT_INIT_STATE_NAME: (
+                    state_domain.State.create_default_state(
+                        'End', is_initial_state=True
+                    ).to_dict()),
+            },
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
         commit_cmd = exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_CREATE_NEW,
@@ -1848,7 +1996,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         super(ModeratorEmailsTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -2016,7 +2164,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         super(FetchIssuesPlaythroughHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -2174,7 +2322,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
         super(ResolveIssueHandlerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.editor = user_services.UserActionsInfo(self.editor_id)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])

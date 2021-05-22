@@ -16,23 +16,30 @@
  * @fileoverview Unit tests for QuestionEditorModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TestBed } from '@angular/core/testing';
+
+class MockNgbModalRef {
+  componentInstance: {
+    skillSummaries: null,
+    skillsInSameTopicCount: null,
+    categorizedSkills: null,
+    allowSkillsFromOtherTopics: null,
+    untriagedSkillSummaries: null
+  };
+}
 
 describe('Question Editor Modal Controller', function() {
   let $q = null;
   let $scope = null;
+  let ngbModal: NgbModal;
   let $uibModal = null;
   let $uibModalInstance = null;
   let AlertsService = null;
   let QuestionObjectFactory = null;
   let QuestionUndoRedoService = null;
-  let ShortSkillSummaryObjectFactory = null;
   let StateEditorService = null;
   importAllAngularServices();
 
@@ -62,30 +69,22 @@ describe('Question Editor Modal Controller', function() {
   const skillName = [];
   let associatedSkillSummaries = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
   describe('when question is valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
+      ngbModal = TestBed.inject(NgbModal);
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      ShortSkillSummaryObjectFactory = $injector.get(
-        'ShortSkillSummaryObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
       associatedSkillSummaries = associatedSkillSummariesDict.map(a => (
-        ShortSkillSummaryObjectFactory.create(a.id, a.description)));
+        ShortSkillSummary.create(a.id, a.description)));
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -172,7 +171,8 @@ describe('Question Editor Modal Controller', function() {
         untriagedSkillSummaries: untriagedSkillSummaries,
         questionStateData: questionStateData,
         rubric: rubric,
-        skillName: skillName
+        skillName: skillName,
+        NgbModal: ngbModal
       });
     }));
 
@@ -245,104 +245,56 @@ describe('Question Editor Modal Controller', function() {
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
-    it('should open a modal when adding a new skill', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-
-      $scope.addSkill();
-
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should not add a new skill when it\'s already exists', function() {
-      spyOn(AlertsService, 'addInfoMessage').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({
-          id: '1'
-        })
+    it('should open add skill modal when adding a new skill', function() {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.resolve('success')
+          });
       });
       $scope.addSkill();
       $scope.$apply();
-
-      expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
-        'Skill already linked to question');
-      expect($scope.associatedSkillSummaries).toEqual(associatedSkillSummaries);
+      expect(modalSpy).toHaveBeenCalled();
     });
 
-    it('should add a new skill successfully', function() {
-      const skillSummaryDict = {
-        id: '4',
-        description: 'Description 4'
-      };
-      const openModalSpy = spyOn($uibModal, 'open');
-      openModalSpy.and.returnValue({
-        result: $q.resolve(skillSummaryDict)
+    it('should not add a new skill when it\'s already exists',
+      () => {
+        const summary = {id: '1', description: 'Description 1'};
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          setTimeout(opt.beforeDismiss);
+          return <NgbModalRef>(
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve(summary)
+            });
+        });
+        $scope.addSkill();
+        $scope.$apply();
+        expect(modalSpy).toHaveBeenCalled();
       });
-      expect($scope.associatedSkillSummaries.length).toEqual(3);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
+
+    it('should close add skill modal on clicking cancel', () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>(
+          { componentInstance: MockNgbModalRef,
+            result: Promise.reject()
+          });
+      });
       $scope.addSkill();
       $scope.$apply();
-
-      expect($scope.associatedSkillSummaries).toContain(
-        ShortSkillSummaryObjectFactory.create(
-          skillSummaryDict.id, skillSummaryDict.description));
-      expect($scope.associatedSkillSummaries.length).toEqual(4);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(1);
-    });
-
-    it('should not add skill when dismissing the add skill modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      expect($scope.associatedSkillSummaries.length).toEqual(3);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
-      $scope.addSkill();
-      $scope.$apply();
-
-      expect($scope.associatedSkillSummaries.length).toEqual(3);
-      expect($scope.getSkillLinkageModificationsArray().length).toBe(0);
+      expect(modalSpy).toHaveBeenCalled();
     });
 
     it('should save and commit when there is no pending changes', function() {
-      const skillSummaryDict = {
-        id: '4',
-        description: 'Description 4'
-      };
-      const openModalSpy = spyOn($uibModal, 'open');
-      openModalSpy.and.returnValue({
-        result: $q.resolve(skillSummaryDict)
-      });
-
-      $scope.addSkill();
-      $scope.$apply();
-
-      expect($scope.associatedSkillSummaries).toContain(
-        ShortSkillSummaryObjectFactory.create(
-          skillSummaryDict.id, skillSummaryDict.description));
-
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
-      expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
+      expect($scope.isSaveAndCommitButtonDisabled()).toBe(true);
       $scope.saveAndCommit();
-
       expect($uibModalInstance.close).toHaveBeenCalled();
     });
 
     it('should save and commit after modifying skills', function() {
-      const skillSummaryDict = {
-        id: '4',
-        description: 'Description 4'
-      };
       const openModalSpy = spyOn($uibModal, 'open');
-      openModalSpy.and.returnValue({
-        result: $q.resolve(skillSummaryDict)
-      });
-
-      $scope.addSkill();
-      $scope.$apply();
-
-      expect($scope.associatedSkillSummaries).toContain(
-        ShortSkillSummaryObjectFactory.create(
-          skillSummaryDict.id, skillSummaryDict.description));
-
       spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
       expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
       const commitMessage = 'Commiting skills';
@@ -361,22 +313,7 @@ describe('Question Editor Modal Controller', function() {
 
     it('should not save and commit when dismissing the add skill modal',
       function() {
-        const skillSummaryDict = {
-          id: '4',
-          description: 'Description 4'
-        };
         const openModalSpy = spyOn($uibModal, 'open');
-        openModalSpy.and.returnValue({
-          result: $q.resolve(skillSummaryDict)
-        });
-
-        $scope.addSkill();
-        $scope.$apply();
-
-        expect($scope.associatedSkillSummaries).toContain(
-          ShortSkillSummaryObjectFactory.create(
-            skillSummaryDict.id, skillSummaryDict.description));
-
         spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
         expect($scope.isSaveAndCommitButtonDisabled()).toBe(false);
         openModalSpy.and.returnValue({
@@ -422,20 +359,19 @@ describe('Question Editor Modal Controller', function() {
   describe('when question is not valid', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
+      ngbModal = TestBed.inject(NgbModal);
       $q = $injector.get('$q');
       const $rootScope = $injector.get('$rootScope');
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      ShortSkillSummaryObjectFactory = $injector.get(
-        'ShortSkillSummaryObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
       associatedSkillSummaries = associatedSkillSummariesDict.map(a => (
-        ShortSkillSummaryObjectFactory.create(a.id, a.description)));
+        ShortSkillSummary.create(a.id, a.description)));
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -523,7 +459,8 @@ describe('Question Editor Modal Controller', function() {
         questionStateData: questionStateData,
         untriagedSkillSummaries: [],
         rubric: rubric,
-        skillName: skillName
+        skillName: skillName,
+        NgbModal: ngbModal
       });
     }));
 

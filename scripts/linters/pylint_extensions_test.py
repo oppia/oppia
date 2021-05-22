@@ -736,6 +736,21 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_space_after_docstring)
 
+    def test_two_lines_empty_docstring_raise_correct_message(self):
+        node_with_docstring = astroid.extract_node(
+            u"""def func():
+                    \"\"\"
+                    \"\"\"
+                    pass
+        """)
+        message = testutils.Message(
+            msg_id='single-line-docstring-span-two-lines',
+            node=node_with_docstring)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            self.checker_test_object.checker.visit_functiondef(
+                node_with_docstring)
+
     def test_single_line_docstring_span_two_lines(self):
         node_single_line_docstring_span_two_lines = astroid.extract_node(
             u"""def func(): #@
@@ -3257,3 +3272,71 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
+
+
+class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
+
+    def test_wrong_metaclass_usage_raises_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowDunderMetaclassChecker)
+        checker_test_object.setup_method()
+
+        metaclass_node = astroid.extract_node(
+            """
+            class FakeClass(python_utils.OBJECT):
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+                def fake_method(self, name):
+                    yield (name, name)
+            class MyObject: #@
+                __metaclass__ = FakeClass
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+            """)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-dunder-metaclass',
+                node=metaclass_node
+            )
+        ):
+            checker_test_object.checker.visit_classdef(metaclass_node)
+
+    def test_no_metaclass_usage_raises_no_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowDunderMetaclassChecker)
+        checker_test_object.setup_method()
+
+        metaclass_node = astroid.extract_node(
+            """
+            class MyObject: #@
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+            """)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_classdef(metaclass_node)
+
+    def test_correct_metaclass_usage_raises_no_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowDunderMetaclassChecker)
+        checker_test_object.setup_method()
+
+        metaclass_node = astroid.extract_node(
+            """
+            class FakeClass(python_utils.OBJECT):
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+                def fake_method(self, name):
+                    yield (name, name)
+            class MyObject: #@
+                python_utils.with_metaclass(FakeClass)
+                def __init__(self, fake_arg):
+                    self.fake_arg = fake_arg
+            """)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_classdef(metaclass_node)

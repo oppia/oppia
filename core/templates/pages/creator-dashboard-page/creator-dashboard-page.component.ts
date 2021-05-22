@@ -16,6 +16,7 @@
  * @fileoverview Component for the creator dashboard.
  */
 
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -23,11 +24,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/collection-summary-tile.directive.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.component.ts');
-
+require('components/summary-tile/collection-summary-tile.component.ts');
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
@@ -36,6 +33,7 @@ require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/creator-dashboard-backend-api.service.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'suggestion-modal-for-creator-view.service.ts');
@@ -46,7 +44,6 @@ require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/suggestions.service.ts');
 require('services/user.service.ts');
-
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 
 angular.module('oppia').component('creatorDashboardPage', {
@@ -56,7 +53,7 @@ angular.module('oppia').component('creatorDashboardPage', {
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
-    'ThreadMessageObjectFactory', 'ThreadStatusDisplayService',
+    'ThreadStatusDisplayService',
     'UrlInterpolationService', 'UserService',
     'ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS',
     'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -69,7 +66,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
-        ThreadMessageObjectFactory, ThreadStatusDisplayService,
+        ThreadStatusDisplayService,
         UrlInterpolationService, UserService,
         ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS,
         DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR, EXPLORATIONS_SORT_BY_KEYS,
@@ -174,7 +171,7 @@ angular.module('oppia').component('creatorDashboardPage', {
           for (var i = 0; i < allThreads.length; i++) {
             if (allThreads[i].threadId === threadId) {
               allThreads[i].setMessages(response.data.messages.map(
-                m => ThreadMessageObjectFactory.createFromBackendDict(m)));
+                m => ThreadMessage.createFromBackendDict(m)));
               break;
             }
           }
@@ -263,7 +260,7 @@ angular.module('oppia').component('creatorDashboardPage', {
         });
 
         var dashboardDataPromise = (
-          CreatorDashboardBackendApiService.fetchDashboardData());
+          CreatorDashboardBackendApiService.fetchDashboardDataAsync());
         dashboardDataPromise.then(
           function(response) {
             // The following condition is required for Karma testing. The
@@ -322,8 +319,6 @@ angular.module('oppia').component('creatorDashboardPage', {
 
         ctrl.getAverageRating = RatingComputationService
           .computeAverageRating;
-        ctrl.createNewExploration = (
-          ExplorationCreationService.createNewExploration);
         ctrl.getLocaleAbbreviatedDatetimeString = (
           DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
         ctrl.getHumanReadableStatus = (
@@ -336,6 +331,13 @@ angular.module('oppia').component('creatorDashboardPage', {
         angular.element($window).on('resize', function() {
           ctrl.updatesGivenScreenWidth();
         });
+      };
+
+      ctrl.createNewExploration = function() {
+        ExplorationCreationService.createNewExploration();
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the directive is migrated to angular.
+        $rootScope.$applyAsync();
       };
     }
   ]

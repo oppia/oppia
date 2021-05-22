@@ -12,7 +12,7 @@
       </i>
     </div>
     <div class="oppia-mobile-collapsible-card-content" ng-if="skillEditorCardIsShown">
-      <skill-description-editor></skill-description-editor>
+      <oppia-skill-description-editor></oppia-skill-description-editor>
       <div class="oppia-editor-card-section review-material-container">
         <strong class="heading-text">Review Material</strong>
         <div class="concept-card-subtitle">
@@ -65,14 +65,14 @@
               <a ng-click="changeActiveWorkedExampleIndex($index)"
                  class="oppia-rule-tab protractor-test-worked-example-<[$index]>"
                  ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
-                <summary-list-header index="$index"
-                                     disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
-                                     summary="getWorkedExampleSummary(workedExample.getQuestion().html)"
-                                     short-summary="getWorkedExampleSummary(workedExample.getQuestion().html)"
-                                     is-active="$index === activeWorkedExampleIndex"
-                                     is-delete-available="isEditable"
-                                     on-delete-fn="deleteWorkedExample">
-                </summary-list-header>
+                <oppia-summary-list-header [index]="$index"
+                                           [disable-sorting]="bindableFieldsDict.displayedWorkedExamples.length === 1"
+                                           [summary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
+                                           [short-summary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
+                                           [is-active]="$index === activeWorkedExampleIndex"
+                                           [is-delete-available]="isEditable"
+                                           (summary-delete)="deleteWorkedExample()">
+                </oppia-summary-list-header>
               </a>
               <div ng-if="activeWorkedExampleIndex === $index">
                 <div class="oppia-editor-card-section">
@@ -112,11 +112,11 @@
   }
   skill-concept-card-editor .btn-add-skill-example {
     background-color: #058CA6;
-    color: #FFFFFF;
+    color: #FFF;
   }
   skill-concept-card-editor .btn-show-preview {
     border-top: 1px solid #c1c1c1;
-    color: #419889;
+    color: #00645D;
     font-size: 14px;
     padding: 10px 0;
   }

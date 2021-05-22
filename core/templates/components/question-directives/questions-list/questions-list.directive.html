@@ -60,7 +60,8 @@
         </span>
       </div>
       <div ng-repeat="questionSummaryForOneSkill in $ctrl.getQuestionSummariesForOneSkill() track by $index" class="question-list-item protractor-test-question-list-item" ng-if="$ctrl.getQuestionSummariesForOneSkill().length > 0">
-        <div ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
+        <div ng-if="!$ctrl.deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
+             ng-click="$ctrl.editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
           <div class="question-data">
             <angular-html-bind class="question-text" html-data="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind>
             <span ng-if="!$ctrl.showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
@@ -125,7 +126,7 @@
       <button title="To Save please add: interaction, hint, solution and address all misconceptions"
               class="btn add-question-btn question-edit-save-button protractor-test-save-question-button"
               ng-click="$ctrl.saveQuestion()"
-              ng-disabled="!$ctrl.isQuestionValid()">
+              ng-disabled="!$ctrl.isQuestionSavable()">
         SAVE
       </button>
     </div>
@@ -136,9 +137,9 @@
         <div class="list-header create-question-header">
           <h3>Create a new question</h3>
         </div>
-        <button class="btn add-question-btn protractor-test-create-question-button"
+        <button class="btn add-question-btn protractor-test-create-question-button oppia-autofocus"
                 ng-disabled="$ctrl.selectSkillModalIsShown() && !$ctrl.getSelectedSkillId()"
-                ng-click="$ctrl.createQuestion()">
+                ng-click="$ctrl.createQuestion()" focus-on="newQuestionBtn">
           + ADD QUESTION
         </button>
       </div>
@@ -146,6 +147,10 @@
   </div>
 </div>
 <style>
+  md-card.oppia-autofocus:focus {
+    outline: #000;
+    outline-width: 4px;
+  }
   questions-list .oppia-editor-publish-button {
     margin-top: 2%;
   }
@@ -207,7 +212,7 @@
   }
   questions-list .add-question-btn {
     background-color: #008098;
-    color: #FFFFFF;
+    color: #FFF;
     font-weight: bold;
     text-align: center;
   }
@@ -280,7 +285,7 @@
     padding-top: 20px;
   }
   questions-list .oppia-cross-icon {
-    color: #FF0000;
+    color: #F00;
   }
   questions-list .linked-skills-container {
     margin-top: 40px;

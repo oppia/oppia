@@ -104,6 +104,62 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
+    def _convert_states_v44_dict_to_v45_dict(cls, draft_change_list):
+        """Converts draft change list from state version 44 to 45. State
+        version 45 adds a linked skill id property to the
+        state. As this is a new property and therefore doesn't affect any
+        pre-existing drafts, there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v43_dict_to_v44_dict(cls, draft_change_list):
+        """Converts draft change list from state version 43 to 44. State
+        version 44 adds card_is_checkpoint boolean variable to the
+        state, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v42_dict_to_v43_dict(cls, draft_change_list):
+        """Converts draft change list from state version 42 to 43.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        for change in draft_change_list:
+            if (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                # Converting the answer groups depends on getting an
+                # exploration state of v42, because we need an interaction's
+                # customization arguments to properly convert ExplorationChanges
+                # that set DragAndDropSortInput and ItemSelectionInput rules.
+                # Since we do not yet support passing an exploration state of a
+                # given version into draft conversion functions, we throw an
+                # Exception to indicate that the conversion cannot be completed.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+        return draft_change_list
+
+    @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, draft_change_list):
         """Converts draft change list from state version 41 to 42.
 
@@ -342,7 +398,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                                         language_code]['html'])
                             )
             elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                  exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
+                  new_value is not None):
                 new_value = (
                     state_domain.Outcome.convert_html_in_outcome(
                         new_value, conversion_fn))
@@ -353,7 +410,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         hint_dict, conversion_fn))
                     for hint_dict in new_value]
             elif (change.property_name ==
-                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                  exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION and
+                  new_value is not None):
                 new_value['explanation']['html'] = (
                     conversion_fn(new_value['explanation']['html']))
                 # TODO(#9413): Find a way to include a reference to the
