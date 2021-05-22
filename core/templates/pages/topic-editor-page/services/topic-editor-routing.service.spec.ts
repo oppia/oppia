@@ -22,8 +22,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { PageTitleService } from 'services/page-title.service';
 import { TopicEditorRoutingService } from './topic-editor-routing.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Topic Editor Routing Service', () => {
+describe('Topic Editor Routing Service', () => {
   let ters: TopicEditorRoutingService;
   let mockWindowRef: MockWindowRef;
 
