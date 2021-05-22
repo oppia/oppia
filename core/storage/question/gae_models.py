@@ -352,14 +352,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
-            offset: str. The starting point from which the batch of
-                questions are to be returned. This value should be urlsafe.
+            offset: int. Number of query results to skip.
 
         Returns:
-            list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
-            corresponding to given skill_ids, the next cursor value to be
-            used for the next page (or None if no more pages are left). The
-            returned next cursor value is urlsafe.
+            list(QuestionSkillLinkModel), int. The QuestionSkillLinkModels
+            corresponding to given skill_ids, the next offset value for
+            next batch of questions.
         """
         question_skill_count = min(
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
@@ -373,8 +371,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ).order(-cls.last_updated, cls.key).fetch(
             question_skill_count, offset=offset)
 
-        offset = offset + len(question_skill_link_models)
-        return question_skill_link_models, offset
+        return (
+            question_skill_link_models,
+            offset + len(question_skill_link_models)
+            )
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(

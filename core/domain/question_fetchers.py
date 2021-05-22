@@ -38,15 +38,12 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         question_count: int. The number of questions to return.
         skill_ids: list(str). The ID of the skills to which the questions are
             linked.
-        offset: int. The starting point from which the batch of
-            questions are to be returned. This value should be urlsafe.
+        offset: int. Number of query results to skip.
 
     Returns:
-        list(Question), list(list(str)), str. The list of questions and the
+        list(Question), list(list(str)), int. The list of questions and the
         corresponding linked skill descriptions which are linked to the
-        given skill ids and the next cursor value to be used for the next
-        batch of questions (or None if no more pages are left). The returned
-        next cursor value is urlsafe.
+        given skill ids and the next offset value for next batch of questions.
     """
     if not skill_ids:
         return [], [], None

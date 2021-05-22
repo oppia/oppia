@@ -454,19 +454,17 @@ def get_displayable_question_skill_link_details(
         question_count: int. The number of questions to fetch.
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
-        offset: str. The starting point from which the batch of
-            questions are to be returned. This value should be urlsafe.
+        offset: int. Number of query results to skip.
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
             a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
+        list(QuestionSummary), list(MergedQuestionSkillLink), int.
         The list of questions linked to the given skill ids, the list of
-        MergedQuestionSkillLink objects, keyed by question ID and the next
-        cursor value to be used for the next batch of questions (or None if
-        no more pages are left). The returned next cursor value is urlsafe.
+        MergedQuestionSkillLink objects, keyed by question ID and the
+        next offset value for next batch of questions.
     """
     if len(skill_ids) == 0:
         return [], [], None

@@ -75,16 +75,17 @@ class QuestionsListHandler(base.BaseHandler):
                 constants.NUM_QUESTIONS_PER_PAGE, skill_ids, offset=offset)
         )
 
-        # To check whether there are more questions.
         _, _, temp_next_offset = (
             question_services.get_displayable_question_skill_link_details(
                 constants.NUM_QUESTIONS_PER_PAGE, skill_ids,
                 offset=next_offset)
         )
 
+        # To check whether there are more questions
         if next_offset == temp_next_offset:
             more = False
 
+        # Pass null to frontend if there are no more questions
         if not more:
             next_offset = None
 
