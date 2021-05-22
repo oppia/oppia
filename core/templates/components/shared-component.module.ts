@@ -95,6 +95,8 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 // Services.
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 
 const toastrConfig = {
   allowHtml: false,
@@ -140,9 +142,11 @@ const toastrConfig = {
     AudioFileUploaderComponent,
     AlertMessageComponent,
     AttributionGuideComponent,
+    AudioBarComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -191,9 +195,11 @@ const toastrConfig = {
   entryComponents: [
     AudioFileUploaderComponent,
     AlertMessageComponent,
+    AudioBarComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
@@ -242,10 +248,12 @@ const toastrConfig = {
     // Components, directives, and pipes.
     AttributionGuideComponent,
     AudioFileUploaderComponent,
+    AudioBarComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
+    ContentLanguageSelectorComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,

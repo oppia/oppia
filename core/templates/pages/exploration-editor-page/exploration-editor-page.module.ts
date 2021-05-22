@@ -44,7 +44,6 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
-    ContentLanguageSelectorComponent,
     DeleteStateSkillModalComponent,
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
@@ -53,7 +52,6 @@ import { InteractionExtensionsModule } from 'interactions/interactions.module';
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
-    ContentLanguageSelectorComponent,
     DeleteStateSkillModalComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent,
