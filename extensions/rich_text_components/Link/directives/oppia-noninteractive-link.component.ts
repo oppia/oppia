@@ -44,8 +44,10 @@ export class NoninteractiveLink implements OnInit {
   ngOnInit(): void {
     let untrustedUrl = encodeURI(this.htmlEscaperService.escapedJsonToObj(
       this.urlWithValue) as string);
-    if (untrustedUrl.indexOf('http://') !== 0 &&
-      untrustedUrl.indexOf('https://') !== 0) {
+    if (
+      untrustedUrl.startsWith('http://') &&
+      untrustedUrl.startsWith('https://')
+    ) {
       untrustedUrl = 'https://' + untrustedUrl;
     }
     this.url = untrustedUrl;
@@ -72,8 +74,6 @@ export class NoninteractiveLink implements OnInit {
     }
   }
 }
-require('services/context.service.ts');
-require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveLink',
   downgradeComponent({

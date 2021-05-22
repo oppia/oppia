@@ -52,7 +52,7 @@ export class NoninteractiveVideo implements OnInit {
   constructor(
     private autoplayedVideosService: AutoplayedVideosService,
     private contextService: ContextService,
-    private el: ElementRef,
+    private elementRed: ElementRef,
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
@@ -81,10 +81,10 @@ export class NoninteractiveVideo implements OnInit {
 
     // This code helps in visibility of video. It checks whether
     // mid point of video frame is in the view or not.
-    const rect = this.el.nativeElement.getBoundingClientRect();
+    const rect = this.elementRed.nativeElement.getBoundingClientRect();
     const clientHeight = window.innerHeight;
     const clientWidth = window.innerWidth;
-    this.width = this.el.nativeElement.width;
+    this.width = this.elementRed.nativeElement.width;
     const isVisible = (
       (rect.left + rect.right) / 2 < clientWidth &&
       (rect.top + rect.bottom) / 2 < clientHeight) &&
@@ -93,19 +93,17 @@ export class NoninteractiveVideo implements OnInit {
     // Autoplay if user is in learner view and creator has specified
     // to autoplay given video.
     if (this.contextService.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER && autoplayVal) {
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER && autoplayVal
+    ) {
       // If it has been autoplayed then do not autoplay again.
       if (
         !this.autoplayedVideosService.hasVideoBeenAutoplayed(
-          this.videoId) && isVisible) {
+          this.videoId) && isVisible
+      ) {
         this.playerVars.autoplay = 1;
         this.autoplayedVideosService.addAutoplayedVideo(this.videoId);
       }
     }
-    // (^)Here timeout is set to 900ms. This is time it takes to bring
-    // the frame to correct point in browser and bring user to the main
-    // content. Smaller delay causes checks to be performed even before
-    // the player displays the content of the new card.
 
     // This following check disables the video in Editor being caught
     // by tabbing while in Exploration Editor mode.

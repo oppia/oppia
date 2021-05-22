@@ -26,7 +26,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
   ConfirmOrCancelModal implements OnInit {
-  skillId: string = '';
+  skillId: string;
   skillIds: string[] = [];
   index = 0;
   modalHeader = 'Concept Card';

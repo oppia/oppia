@@ -34,6 +34,7 @@ export class NoninteractiveSkillreview implements OnInit {
   @Input() textWithValue: string;
   skillId: string;
   linkText: string;
+
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
@@ -47,6 +48,7 @@ export class NoninteractiveSkillreview implements OnInit {
     this.linkText = this.htmlEscaperService.escapedJsonToObj(
       this.textWithValue) as string;
   }
+
   // The default onclick behaviour for an element inside CKEditor
   // is to open the customize RTE modal. Since this RTE has a custom
   // onclick listener attached, the default behaviour is to open the

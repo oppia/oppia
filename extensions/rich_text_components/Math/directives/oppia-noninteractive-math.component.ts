@@ -34,6 +34,11 @@ export interface MathExpression {
   'svg_filename': string;
 }
 
+interface ImageContainerStyle {
+  height: string;
+  width: string;
+  'vertical-align': string;
+}
 @Component({
   selector: 'oppia-noninteractive-math',
   templateUrl: './math.component.html',
@@ -41,8 +46,7 @@ export interface MathExpression {
 })
 export class NoninteractiveMath implements OnInit {
   @Input() mathContentWithValue: string;
-  imageContainerStyle: {
-    height: string, width: string, 'vertical-align': string};
+  imageContainerStyle: ImageContainerStyle;
   imageUrl: string;
 
   constructor(

@@ -41,7 +41,7 @@ export class NoninteractiveSvgdiagram implements OnInit {
   dimensions: ImageDimensions;
   filename: string;
   svgAltText: string = '';
-  svgContainerStyle: {height: string, width: string};
+  svgContainerStyle: { height: string, width: string };
   svgUrl: string;
 
   constructor(

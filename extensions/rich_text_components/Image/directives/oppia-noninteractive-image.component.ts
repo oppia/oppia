@@ -29,6 +29,11 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AppConstants } from 'app.constants';
 import { downgradeComponent } from '@angular/upgrade/static';
+
+interface Dimension {
+  height: string;
+  width: string;
+}
 @Component({
   selector: 'oppia-noninteractive-image',
   templateUrl: './image.component.html',
@@ -46,8 +51,8 @@ export class NoninteractiveImage implements OnInit {
   isLoadingIndicatorShown: boolean = false;
   isTryAgainShown: boolean = false;
   dimensions: ImageDimensions;
-  imageContainerStyle: {height: string, width: string};
-  loadingIndicatorStyle: {height: string, width: string};
+  imageContainerStyle: Dimension;
+  loadingIndicatorStyle: Dimension;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -77,7 +82,8 @@ export class NoninteractiveImage implements OnInit {
     // preloader service beforehand.
     if (
       this.imagePreloaderService.inExplorationPlayer() &&
-      this.contextService.getEntityType() !== AppConstants.ENTITY_TYPE.SKILL) {
+      this.contextService.getEntityType() !== AppConstants.ENTITY_TYPE.SKILL
+    ) {
       const loadingIndicatorSize = this.dimensions.height < 124 ? 24 : 120;
       this.loadingIndicatorStyle = {
         height: loadingIndicatorSize + 'px',
