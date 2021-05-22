@@ -168,12 +168,8 @@ export class ProgressNavComponent {
       this.displayedCard.getLastOppiaResponse());
   }
 
-
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
-    // $scope.$watch(function() {
-    //   return this.playerPositionService.getDisplayedCardIndex();
-    // }, updateDisplayedCardInfo);
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(
