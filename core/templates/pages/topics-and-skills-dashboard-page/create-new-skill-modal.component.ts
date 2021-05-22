@@ -17,6 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
@@ -150,3 +151,6 @@ export class CreateNewSkillModalComponent {
     this.ngbActiveModal.dismiss('cancel');
   }
 }
+
+angular.module('oppia').directive('oppiaCreateNewSkillModalComponent',
+  downgradeComponent({ component: CreateNewSkillModalComponent }));
