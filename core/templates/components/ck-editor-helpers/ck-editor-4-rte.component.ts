@@ -23,6 +23,14 @@ import { OppiaAngularRootComponent } from 'components/oppia-angular-root.compone
 import { ContextService } from 'services/context.service';
 import { CkEditorCopyContentService } from './ck-editor-copy-content-service';
 
+interface UiConfig {
+  (): UiConfig;
+  'hide_complex_extensions': boolean;
+  'startupFocusEnabled'?: boolean;
+  'language'?: string;
+  'languageDirection'?: string;
+}
+
 @Component({
   selector: 'ck-editor-4-rte',
   template: '<div><div></div>' +
@@ -311,7 +319,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
         }
         this.ngZone.run(() => this.valueChange.emit(elt.html()));
         this.value = elt.html();
-        ck.setData(this.value);
       });
       ck.setData(this.value);
       this.ck = ck;
@@ -322,14 +329,6 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.ck.destroy();
   }
-}
-
-interface UiConfig {
-  (): UiConfig;
-  'hide_complex_extensions': boolean;
-  'startupFocusEnabled'?: boolean;
-  'language'?: string;
-  'languageDirection'?: string;
 }
 
 angular.module('oppia').directive('ckEditor4Rte', downgradeComponent({
