@@ -33,11 +33,11 @@
                              displayed-card="displayedCard">
           </supplemental-card>
         </div>
-        <oppia-progress-nav (on-submit)="submitAnswerFromProgressNav()"
+        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [submit-button-is-disabled]="submitButtonIsDisabled()"
                             [displayed-card]="displayedCard"
                             [submit-button-is-shown]="!answerIsBeingProcessed"
-                            (on-click-continue-button)="showUpcomingCard()">
+                            (click-continue-button)="showUpcomingCard()">
         </oppia-progress-nav>
       </div>
 

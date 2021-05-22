@@ -36,9 +36,9 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './progress-nav.component.html'
 })
 export class ProgressNavComponent {
-  @Output() onSubmit: EventEmitter<void> = (
+  @Output() submit: EventEmitter<void> = (
     new EventEmitter());
-  @Output() onClickContinueButton: EventEmitter<void> = (
+  @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
   @Input() isLearnAgainButton: boolean;
   @Input() displayedCard: StateCard;
