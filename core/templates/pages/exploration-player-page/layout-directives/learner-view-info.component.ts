@@ -23,6 +23,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
@@ -42,10 +43,9 @@ export class LearnerViewInfoComponent {
   directiveSubscriptions: Subscription = new Subscription();
   explorationTitle: string;
   isLinkedToTopic: boolean;
-  storyViewBackendApiService;
   storyPlaythroughObject;
-  topicName;
-  expInfo;
+  topicName: string;
+  expInfo: LearnerExplorationSummaryBackendDict;
 
   constructor(
     private ngbModal: NgbModal,
@@ -166,127 +166,3 @@ angular.module('oppia').directive('oppiaLearnerViewInfo',
   downgradeComponent({
     component: LearnerViewInfoComponent
   }) as angular.IDirectiveFactory);
-
-// Angular.module('oppia').directive('learnerViewInfo', [
-//   function() {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       template: require('./learner-view-info.directive.html'),
-//       controllerAs: '$ctrl',
-//       controller: [
-//         '$log', '$rootScope', '$uibModal', 'ContextService',
-//         'LearnerViewInfoBackendApiService',
-//         'ReadOnlyExplorationBackendApiService', 'SiteAnalyticsService',
-//         'StatsReportingService', 'UrlInterpolationService', 'UrlService',
-//         'TOPIC_VIEWER_STORY_URL_TEMPLATE',
-//         function(
-//             $log, $rootScope, $uibModal, ContextService,
-//             LearnerViewInfoBackendApiService,
-//             ReadOnlyExplorationBackendApiService, SiteAnalyticsService,
-//             StatsReportingService, UrlInterpolationService, UrlService,
-//             TOPIC_VIEWER_STORY_URL_TEMPLATE
-//         ) {
-//           var ctrl = this;
-//           var explorationId = ContextService.getExplorationId();
-//           var expInfo = null;
-//           ctrl.directiveSubscriptions = new Subscription();
-
-//           ctrl.showInformationCard = function() {
-//             let stringifiedExpIds = JSON.stringify(
-//               [explorationId]);
-//             let includePrivateExplorations = JSON.stringify(true);
-//             if (expInfo) {
-//               openInformationCardModal();
-//             } else {
-//               LearnerViewInfoBackendApiService.fetchLearnerInfo(
-//                 stringifiedExpIds,
-//                 includePrivateExplorations
-//               ).then(function(response) {
-//                 expInfo = response.summaries[0];
-//                 openInformationCardModal();
-//                 $rootScope.$applyAsync();
-//               }, function() {
-//                 $log.error(
-//                   'Information card failed to load for exploration ' +
-//                   explorationId);
-//                 $rootScope.$applyAsync();
-//               });
-//             }
-//           };
-
-//           var openInformationCardModal = function() {
-//             $uibModal.open({
-//               animation: true,
-//               template: require(
-//                 'pages/exploration-player-page/templates/' +
-//                 'information-card-modal.directive.html'),
-//               windowClass: 'oppia-modal-information-card',
-//               resolve: {
-//                 expInfo: function() {
-//                   return expInfo;
-//                 }
-//               },
-//               controller: 'InformationCardModalController'
-//             }).result.then(null, () => {
-//               // Note to developers:
-//               // This callback is triggered when the Cancel button is clicked.
-//               // No further action is needed.
-//             });
-//           };
-
-//           ctrl.getTopicUrl = function() {
-//             var topicUrlFragment = (
-//               UrlService.getTopicUrlFragmentFromLearnerUrl());
-//             var classroomUrlFragment = (
-//               UrlService.getClassroomUrlFragmentFromLearnerUrl());
-//             return topicUrlFragment &&
-//              classroomUrlFragment &&
-//               UrlInterpolationService.interpolateUrl(
-//                 TOPIC_VIEWER_STORY_URL_TEMPLATE, {
-//                   topic_url_fragment: topicUrlFragment,
-//                   classroom_url_fragment: classroomUrlFragment,
-//                 });
-//           };
-
-//           ctrl.$onInit = function() {
-//             ctrl.explorationTitle = 'Loading...';
-//             ReadOnlyExplorationBackendApiService.fetchExploration(
-//               explorationId, UrlService.getExplorationVersionFromUrl())
-//               .then(function(response) {
-//                 ctrl.explorationTitle = response.exploration.title;
-//                 $rootScope.$applyAsync();
-//               });
-//             // To check if the exploration is linked to the topic or not.
-//             ctrl.isLinkedToTopic = ctrl.getTopicUrl() ? true : false;
-//             // If linked to topic then print topic name in the lesson player.
-//             if (ctrl.isLinkedToTopic) {
-//               ctrl.storyViewerBackendApiService = (
-//                 OppiaAngularRootComponent.storyViewerBackendApiService);
-//               var topicUrlFragment = (
-//                 UrlService.getTopicUrlFragmentFromLearnerUrl());
-//               var classroomUrlFragment = (
-//                 UrlService.getClassroomUrlFragmentFromLearnerUrl());
-//               var storyUrlFragment = (
-//                 UrlService.getStoryUrlFragmentFromLearnerUrl());
-//               ctrl.storyViewerBackendApiService.fetchStoryDataAsync(
-//                 topicUrlFragment,
-//                 classroomUrlFragment,
-//                 storyUrlFragment).then(
-//                 function(storyDataDict) {
-//                   ctrl.storyPlaythroughObject = storyDataDict;
-//                   var topicName = ctrl.storyPlaythroughObject.topicName;
-//                   ctrl.topicName = topicName;
-//                   StatsReportingService.setTopicName(ctrl.topicName);
-//                   SiteAnalyticsService.registerCuratedLessonStarted(
-//                     ctrl.topicName, explorationId);
-//                 });
-//             }
-//           };
-//           ctrl.$onDestroy = function() {
-//             ctrl.directiveSubscriptions.unsubscribe();
-//           };
-//         }
-//       ]
-//     };
-//   }]);

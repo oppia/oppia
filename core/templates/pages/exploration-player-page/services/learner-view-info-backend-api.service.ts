@@ -19,13 +19,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
 interface LearnerViewBackendDict {
   'summaries': string[];
 }
 
 interface LearnerViewResposne {
-  summaries: string[];
+  summaries: LearnerExplorationSummaryBackendDict[]
 }
 
 @Injectable({

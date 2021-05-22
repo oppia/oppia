@@ -21,6 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import constants from 'assets/constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 
@@ -33,17 +34,18 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     .DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
   averageRating: number;
   contributorsSummary = {};
-  contributorNames;
-  expInfo;
+  contributorNames: string[];
+  expInfo: LearnerExplorationSummaryBackendDict;
   explorationId: string;
   explorationTags;
-  explorationTitle;
-  infoCardBackgroundCss;
-  infoCardBackgroundImageUrl;
-  lastUpdatedString;
+  explorationTitle: string;
+  infoCardBackgroundCss: object;
+  infoCardBackgroundImageUrl: string;
+  lastUpdatedString: string;
   numViews: number;
-  objective;
+  objective: string;
   explorationIsPrivate: boolean;
+  math = Math;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -124,92 +126,3 @@ export class InformationCardModalComponent extends ConfirmOrCancelModal {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-
-// angular.module('oppia').controller('InformationCardModalController', [
-//   '$controller', '$scope', '$uibModalInstance',
-//   'DateTimeFormatService', 'RatingComputationService',
-//   'UrlInterpolationService', 'expInfo',
-//   'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
-//   function(
-//       $controller, $scope, $uibModalInstance,
-//       DateTimeFormatService, RatingComputationService,
-//       UrlInterpolationService, expInfo,
-//       DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
-//     $controller('ConfirmOrCancelModalController', {
-//       $scope: $scope,
-//       $uibModalInstance: $uibModalInstance
-//     });
-//     var getExplorationTagsSummary = function(arrayOfTags) {
-//       var tagsToShow = [];
-//       var tagsInTooltip = [];
-//       var MAX_CHARS_TO_SHOW = 45;
-
-//       for (var i = 0; i < arrayOfTags.length; i++) {
-//         var newLength = (
-//           tagsToShow.toString() + arrayOfTags[i]).length;
-
-//         if (newLength < MAX_CHARS_TO_SHOW) {
-//           tagsToShow.push(arrayOfTags[i]);
-//         } else {
-//           tagsInTooltip.push(arrayOfTags[i]);
-//         }
-//       }
-
-//       return {
-//         tagsToShow: tagsToShow,
-//         tagsInTooltip: tagsInTooltip
-//       };
-//     };
-
-//     var getLastUpdatedString = function(millisSinceEpoch) {
-//       return DateTimeFormatService
-//         .getLocaleAbbreviatedDatetimeString(
-//           millisSinceEpoch);
-//     };
-
-//     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = (
-//       DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-//     $scope.averageRating = (
-//       RatingComputationService.computeAverageRating(
-//         expInfo.ratings));
-//     var contributorsSummary = (
-//       expInfo.human_readable_contributors_summary || {});
-//     $scope.contributorNames = Object.keys(
-//       contributorsSummary).sort(
-//       function(contributorUsername1, contributorUsername2) {
-//         var commitsOfContributor1 = contributorsSummary[
-//           contributorUsername1].num_commits;
-//         var commitsOfContributor2 = contributorsSummary[
-//           contributorUsername2].num_commits;
-//         return commitsOfContributor2 - commitsOfContributor1;
-//       }
-//     );
-//     $scope.explorationId = expInfo.id;
-//     $scope.explorationTags = getExplorationTagsSummary(
-//       expInfo.tags);
-//     $scope.explorationTitle = expInfo.title;
-//     $scope.infoCardBackgroundCss = {
-//       'background-color': expInfo.thumbnail_bg_color
-//     };
-//     $scope.titleWrapper = function() {
-//       var titleHeight = (
-//         document.querySelectorAll(
-//           '.oppia-info-card-logo-thumbnail')[0].clientWidth - 20);
-//       var titleCss = {
-//         'word-wrap': 'break-word',
-//         width: titleHeight.toString()
-//       };
-//       return titleCss;
-//     };
-//     $scope.infoCardBackgroundImageUrl = expInfo
-//       .thumbnail_icon_url;
-//     $scope.getStaticImageUrl = function(imagePath) {
-//       return UrlInterpolationService.getStaticImageUrl(imagePath);
-//     };
-//     $scope.lastUpdatedString = getLastUpdatedString(
-//       expInfo.last_updated_msec);
-//     $scope.numViews = expInfo.num_views;
-//     $scope.objective = expInfo.objective;
-//     $scope.explorationIsPrivate = (expInfo.status === 'private');
-//   }
-// ]);
