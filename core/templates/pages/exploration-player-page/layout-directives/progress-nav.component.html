@@ -25,7 +25,7 @@
       <!-- Special case for the 'Continue' interaction. -->
       <button mat-button
               *ngIf="interactionId === 'Continue'"
-              (click)="onSubmit.emit()"
+              (click)="submit.emit()"
               class="oppia-learner-confirm-button protractor-test-continue-button oppia-autofocus"
               oppiaFocusOn="continue-btn">
         {{ interactionCustomizationArgs.buttonText.value.unicode }}
@@ -34,7 +34,7 @@
       <button mat-button
               *ngIf="shouldGenericSubmitButtonBeShown()"
               class="oppia-learner-confirm-button protractor-test-submit-answer-button"
-              (click)="onSubmit.emit()"
+              (click)="submit.emit()"
               [disabled]="submitButtonDisabled">
         {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
       </button>
@@ -42,7 +42,7 @@
     <oppia-continue-button *ngIf="shouldContinueButtonBeShown()"
                            [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL"
                            [isLearnAgainButton]="isLearnAgainButton"
-                           (clickContinueButton)="onClickContinueButton.emit()"
+                           (clickContinueButton)="clickContinueButton.emit()"
                            class="d-block continue-button">
     </oppia-continue-button>
   </div>
