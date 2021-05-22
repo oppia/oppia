@@ -65,10 +65,11 @@
           </span>
         </div>
         <div class="center">
-          <span *ngIf="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
-                    [ngbTooltip]="explorationTags.tagsInTooltip.join(', ')"
-                    placement="right">
-                    {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}"
+          <span *ngIf="explorationTags.tagsInTooltip.length > 0"
+                class="oppia-info-card-tooltip-more"
+                [ngbTooltip]="explorationTags.tagsInTooltip.join(', ')"
+                placement="right">
+                {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}"
           </span>
           <span *ngIf="explorationTags.tagsToShow.length > 0">
             {{ explorationTags.tagsToShow.join(", ") }}
