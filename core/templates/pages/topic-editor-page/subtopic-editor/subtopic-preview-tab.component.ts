@@ -61,7 +61,7 @@ export class SubtopicPreviewTab {
 
     if (this.topic.getId() && this.subtopic) {
       this.topicEditorStateService.loadSubtopicPage(
-        this.topic.getId(), this.subtopicId);
+        parseInt(this.topic.getId()), this.subtopicId);
       this.editableTitle = this.subtopic.getTitle();
       this.editableThumbnailFilename = (
         this.subtopic.getThumbnailFilename());

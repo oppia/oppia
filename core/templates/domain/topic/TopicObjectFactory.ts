@@ -58,7 +58,7 @@ export interface TopicBackendDict {
 import constants from 'assets/constants';
 
 export class Topic {
-  _id: number;
+  _id: string;
   _name: string;
   _abbreviatedName: string;
   _description: string;
@@ -114,7 +114,7 @@ export class Topic {
   }
 
   // ---- Instance methods ----
-  getId(): number {
+  getId(): string {
     return this._id;
   }
 
