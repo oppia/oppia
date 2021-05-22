@@ -16,7 +16,7 @@
  * @fileoverview Directive for the concept card rich-text component.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -29,7 +29,7 @@ import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia
   selector: 'oppia-noninteractive-skillreview',
   templateUrl: './skillreview.component.html'
 })
-export class NoninteractiveSkillreview implements OnInit {
+export class NoninteractiveSkillreview implements OnInit, OnChanges {
   @Input() skillIdWithValue: string;
   @Input() textWithValue: string;
   skillId: string;
@@ -42,11 +42,18 @@ export class NoninteractiveSkillreview implements OnInit {
     private ngbModal: NgbModal
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnNewSkillSelected(): void {
+    if (!this.skillIdWithValue || !this.textWithValue) {
+      return;
+    }
     this.skillId = this.htmlEscaperService.escapedJsonToObj(
       this.skillIdWithValue) as string;
     this.linkText = this.htmlEscaperService.escapedJsonToObj(
       this.textWithValue) as string;
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnNewSkillSelected();
   }
 
   // The default onclick behaviour for an element inside CKEditor
@@ -90,6 +97,15 @@ export class NoninteractiveSkillreview implements OnInit {
         throw new Error(res);
       }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.skillIdWithValue ||
+      changes.textWithValue
+    ) {
+      this._updateViewOnNewSkillSelected();
+    }
   }
 }
 

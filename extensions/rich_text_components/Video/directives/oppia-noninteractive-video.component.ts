@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AutoplayedVideosService } from 'services/autoplayed-videos.service';
 import { ContextService } from 'services/context.service';
@@ -33,7 +33,7 @@ let apiLoaded = false;
   templateUrl: './video.component.html',
   styleUrls: []
 })
-export class NoninteractiveVideo implements OnInit {
+export class NoninteractiveVideo implements OnInit, OnChanges {
   @Input() autoplayWithValue: string;
   @Input() endWithValue: string;
   @Input() startWithValue: string;
@@ -56,7 +56,15 @@ export class NoninteractiveVideo implements OnInit {
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnNewVideo(): void {
+    if (
+      !this.autoplayWithValue ||
+      !this.endWithValue ||
+      !this.startWithValue ||
+      !this.videoIdWithValue
+    ) {
+      return;
+    }
     if (!apiLoaded) {
       // This code loads the IFrame Player API code asynchronously, according to
       // the instructions at
@@ -109,6 +117,21 @@ export class NoninteractiveVideo implements OnInit {
     // by tabbing while in Exploration Editor mode.
     if (this.contextService.isInExplorationEditorMode()) {
       this.tabIndexVal = -1;
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnNewVideo();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.autoplayWithValue ||
+      changes.endWithValue ||
+      changes.startWithValue ||
+      changes.videoIdWithValue
+    ) {
+      this._updateViewOnNewVideo();
     }
   }
 }

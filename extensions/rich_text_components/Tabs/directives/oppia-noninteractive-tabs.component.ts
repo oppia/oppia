@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
@@ -34,15 +34,28 @@ export interface TabContent {
   templateUrl: './tabs.component.html',
   styleUrls: []
 })
-export class NoninteractiveTabs implements OnInit {
+export class NoninteractiveTabs implements OnInit, OnChanges {
   @Input() tabContentsWithValue: string;
   tabContents: TabContent[] = [];
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  private _updateViewOnTabContentChange(): void {
+    if (!this.tabContentsWithValue) {
+      return;
+    }
     this.tabContents = this.htmlEscaperService.escapedJsonToObj(
       this.tabContentsWithValue) as TabContent[];
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnTabContentChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.tabContentsWithValue) {
+      this._updateViewOnTabContentChange();
+    }
   }
 }
 

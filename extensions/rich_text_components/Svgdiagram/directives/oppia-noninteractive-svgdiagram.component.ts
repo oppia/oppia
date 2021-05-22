@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -34,7 +34,7 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
   templateUrl: './svgdiagram.component.html',
   styleUrls: []
 })
-export class NoninteractiveSvgdiagram implements OnInit {
+export class NoninteractiveSvgdiagram implements OnInit, OnChanges {
   @Input() svgFilenameWithValue: string;
   @Input() altWithValue: string;
 
@@ -52,7 +52,10 @@ export class NoninteractiveSvgdiagram implements OnInit {
     private imagePreloaderService: ImagePreloaderService
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnSvgFileChange(): void {
+    if (!this.svgFilenameWithValue || !this.altWithValue) {
+      return;
+    }
     this.filename = this.htmlEscaperService.escapedJsonToObj(
       this.svgFilenameWithValue) as string;
     this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
@@ -74,6 +77,19 @@ export class NoninteractiveSvgdiagram implements OnInit {
     if (this.altWithValue) {
       this.svgAltText = this.htmlEscaperService.escapedJsonToObj(
         this.altWithValue) as string;
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnSvgFileChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.svgFilenameWithValue ||
+      changes.altWithValue
+    ) {
+      this._updateViewOnSvgFileChange();
     }
   }
 }

@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -44,7 +44,7 @@ interface ImageContainerStyle {
   templateUrl: './math.component.html',
   styleUrls: []
 })
-export class NoninteractiveMath implements OnInit {
+export class NoninteractiveMath implements OnInit, OnChanges {
   @Input() mathContentWithValue: string;
   imageContainerStyle: ImageContainerStyle;
   imageUrl: string;
@@ -57,9 +57,15 @@ export class NoninteractiveMath implements OnInit {
     private imagePreloaderService: ImagePreloaderService
   ) {}
 
-  ngOnInit(): void {
+  private _updateImage() {
+    if (!this.mathContentWithValue) {
+      return;
+    }
     const mathExpressionContent = this.htmlEscaperService.escapedJsonToObj(
       this.mathContentWithValue) as MathExpression;
+    if (mathExpressionContent as unknown as string === '') {
+      return;
+    }
     if (mathExpressionContent.hasOwnProperty('raw_latex')) {
       const svgFilename = mathExpressionContent.svg_filename;
       const dimensions = this.imagePreloaderService.getDimensionsOfMathSvg(
@@ -118,6 +124,16 @@ export class NoninteractiveMath implements OnInit {
         e.message += additionalInfo;
         throw e;
       }
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateImage();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.mathContentWithValue) {
+      this._updateImage();
     }
   }
 }

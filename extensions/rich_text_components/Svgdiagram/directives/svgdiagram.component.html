@@ -1,6 +1,7 @@
 <figure>
   <div>
-    <img [src]="svgUrl"
+    <img *ngIf="svgUrl"
+         [src]="svgUrl"
          alt="{{ svgAltText }}"
          class="center-element-horizontally protractor-test-svg-diagram"
          [ngStyle]="svgContainerStyle">

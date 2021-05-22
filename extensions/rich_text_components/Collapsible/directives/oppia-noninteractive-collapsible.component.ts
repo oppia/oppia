@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
@@ -29,18 +29,34 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
   templateUrl: './collapsible.component.html',
   styleUrls: []
 })
-export class NoninteractiveCollapsible implements OnInit {
+export class NoninteractiveCollapsible implements OnInit, OnChanges {
   @Input() headingWithValue: string;
   @Input() contentWithValue: string;
   heading: string = '';
   content: string = '';
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  private _updateViewOnInputChange(): void {
+    if (!this.headingWithValue || !this.contentWithValue) {
+      return;
+    }
     this.heading = this.htmlEscaperService.escapedJsonToObj(
       this.headingWithValue) as string;
     this.content = this.htmlEscaperService.escapedJsonToObj(
       this.contentWithValue) as string;
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnInputChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.headingWithValue ||
+      changes.contentWithValue
+    ) {
+      this._updateViewOnInputChange();
+    }
   }
 }
 

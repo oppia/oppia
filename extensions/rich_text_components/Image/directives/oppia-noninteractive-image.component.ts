@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -39,7 +39,7 @@ interface Dimension {
   templateUrl: './image.component.html',
   styleUrls: []
 })
-export class NoninteractiveImage implements OnInit {
+export class NoninteractiveImage implements OnInit, OnChanges {
   @Input() filepathWithValue: string;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
@@ -62,9 +62,19 @@ export class NoninteractiveImage implements OnInit {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnNewImage(): void {
+    if (
+      !this.filepathWithValue ||
+      !this.altWithValue ||
+      !this.captionWithValue
+    ) {
+      return;
+    }
     this.filepath = this.htmlEscaperService.escapedJsonToObj(
       this.filepathWithValue) as string;
+    if (!this.filepath) {
+      return;
+    }
     this.loadingIndicatorUrl = this.urlInterpolationService.getStaticImageUrl(
       AppConstants.LOADING_INDICATOR_URL);
     this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
@@ -136,6 +146,10 @@ export class NoninteractiveImage implements OnInit {
     }
   }
 
+  ngOnInit(): void {
+    this._updateViewOnNewImage();
+  }
+
   loadImage(): void {
     this.isLoadingIndicatorShown = true;
     this.isTryAgainShown = false;
@@ -148,6 +162,16 @@ export class NoninteractiveImage implements OnInit {
       this.isTryAgainShown = true;
       this.isLoadingIndicatorShown = false;
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.filepathWithValue ||
+      changes.altWithValue ||
+      changes.captionWithValue
+    ) {
+      this._updateViewOnNewImage();
+    }
   }
 }
 
