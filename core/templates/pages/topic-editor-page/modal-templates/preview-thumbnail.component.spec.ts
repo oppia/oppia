@@ -17,6 +17,7 @@
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ThumbnailDisplayComponent } from 'components/forms/custom-forms-directives/thumbnail-display.component';
 import { ContextService } from 'services/context.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PreviewThumbnailComponent } from './preview-thumbnail.component';
@@ -25,10 +26,14 @@ describe('Preview Thumbnail Component', function() {
   let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;
+  let testUrl = 'test_url';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PreviewThumbnailComponent],
+      declarations: [
+        PreviewThumbnailComponent,
+        ThumbnailDisplayComponent
+      ],
       providers: [
         ImageUploadHelperService,
         ContextService
@@ -39,10 +44,12 @@ describe('Preview Thumbnail Component', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
     componentInstance = fixture.componentInstance;
-    fixture.detectChanges();
     imageUploadHelperService = (
       TestBed.inject(ImageUploadHelperService) as unknown) as
         jasmine.SpyObj<ImageUploadHelperService>;
+    spyOn(
+      imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
+      .and.returnValue(testUrl);
   });
 
   it('should create', () => {
@@ -50,10 +57,6 @@ describe('Preview Thumbnail Component', function() {
   });
 
   it('should initialize', () => {
-    let testUrl = 'test_url';
-    spyOn(
-      imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
-      .and.returnValue(testUrl);
     componentInstance.ngOnInit();
     expect(componentInstance.editableThumbnailDataUrl).toEqual(testUrl);
   });
