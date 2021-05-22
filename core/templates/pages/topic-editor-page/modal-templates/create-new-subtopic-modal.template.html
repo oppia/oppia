@@ -64,9 +64,9 @@
       <div class="thumbnail-editor create-new-subtopic-input-field">
         <strong>Thubmnail Image*</strong>
         <oppia-thumbnail-uploader [filename]="$ctrl.editableThumbnailFilename"
-                                  [update-filename]="$ctrl.updateSubtopicThumbnailFilename($event)"
+                                  (update-filename)="$ctrl.updateSubtopicThumbnailFilename($event)"
                                   [bg-color]="$ctrl.editableThumbnailBgColor"
-                                  [update-bg-color]="$ctrl.updateSubtopicThumbnailBgColor($event)"
+                                  (update-bg-color)="$ctrl.updateSubtopicThumbnailBgColor($event)"
                                   [allowed-bg-colors]="$ctrl.allowedBgColors"
                                   aspect-ratio="4:3"
                                   [preview-title]="$ctrl.subtopicTitle"
