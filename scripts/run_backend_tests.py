@@ -129,6 +129,10 @@ _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
+_PARSER.add_argument(
+    '--run_with_emulator',
+    help='whether to run the tests with the Cloud Datastore emulator',
+    action='store_true')
 
 
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -163,8 +167,10 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TestingTaskSpec(python_utils.OBJECT):
     """Executes a set of tests given a test class name."""
 
-    def __init__(self, test_target, generate_coverage_report):
+    def __init__(
+            self, test_target, run_with_emulator, generate_coverage_report):
         self.test_target = test_target
+        self.run_with_emulator = run_with_emulator
         self.generate_coverage_report = generate_coverage_report
 
     def run(self):
@@ -173,9 +179,15 @@ class TestingTaskSpec(python_utils.OBJECT):
         if self.generate_coverage_report:
             exc_list = [
                 sys.executable, COVERAGE_MODULE_PATH, 'run', '-p',
-                TEST_RUNNER_PATH, test_target_flag]
+                TEST_RUNNER_PATH, test_target_flag
+            ]
         else:
-            exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
+            exc_list = [
+                sys.executable, TEST_RUNNER_PATH, test_target_flag
+            ]
+
+        if self.run_with_emulator:
+            exc_list.append('--run_with_emulator')
 
         result = run_shell_cmd(exc_list)
 
@@ -332,7 +344,12 @@ def main(args=None):
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    with servers.managed_cloud_datastore_emulator():
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
+    with contextlib2.ExitStack() as stack:
+        if parsed_args.run_with_emulator:
+            stack.enter_context(servers.managed_cloud_datastore_emulator())
         if parsed_args.test_target:
             if '_test' in parsed_args.test_target:
                 all_test_targets = [parsed_args.test_target]
@@ -370,7 +387,9 @@ def main(args=None):
         tasks = []
         for test_target in all_test_targets:
             test = TestingTaskSpec(
-                test_target, parsed_args.generate_coverage_report)
+                test_target,
+                parsed_args.run_with_emulator,
+                parsed_args.generate_coverage_report)
             task = concurrent_task_utils.create_task(
                 test.run, parsed_args.verbose, semaphore, name=test_target,
                 report_enabled=False)
@@ -490,7 +509,7 @@ def main(args=None):
         python_utils.PRINT(report_stdout)
 
         coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+            rb'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
         if (coverage_result.group('total') != '100'
                 and not parsed_args.ignore_coverage):
             raise Exception('Backend test coverage is not 100%')

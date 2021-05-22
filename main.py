@@ -69,7 +69,7 @@ import feconf
 import webapp2
 from webapp2_extras import routes
 
-transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
@@ -837,18 +837,13 @@ for subject in feconf.AVAILABLE_LANDING_PAGES:
 # 404 error handler (Needs to be at the end of the URLS list).
 URLS.append(get_redirect_route(r'/<:.*>', base.Error404Handler))
 
-from google.cloud import ndb
-
-
-client = ndb.Client()
-
 class NdbWsgiMiddleware:
     """Wraps the WSGI application into the NDB client context."""
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-      with client.context():
+      with datastore_services.get_ndb_context():
           return self.wsgi_app(environ, start_response)
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
