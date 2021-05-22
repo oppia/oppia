@@ -8,12 +8,11 @@
 </ng-template>
 
 <div class="conversation-skin-learner-answer-container">
-  <img class="conversation-skin-user-avatar rounded-circle" [src]="trustedProfilePicture" alt="">
+  <img class="conversation-skin-user-avatar rounded-circle" [src]="profilePicture" alt="">
   <div *ngIf="!data.isHint">
     <div *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
-         class="oppoa-popover" #popover="ngbPopover" [autoClose]="false"></div>
-
+         class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
       <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getShortAnswerHtml()">
       </angular-html-bind-wrapper>
