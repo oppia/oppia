@@ -66,7 +66,6 @@ export class TranslateCustomParser extends TranslateParser {
       interpolatedValue = this._messageFormat.compile(
         interpolatedValue, constants.DEFAULT_LANGUAGE_CODE)(params);
     }
-    return interpolatedValue;
   }
 
   getValue(target: Object, key: string): string {
