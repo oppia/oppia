@@ -780,7 +780,6 @@ URLS = [
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
     get_redirect_route(r'/session_end', base.SessionEndHandler),
-    get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (

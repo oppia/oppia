@@ -243,9 +243,6 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
     Yields:
         psutil.Process. The emulator process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     emulator_hostport = '%s:%d' % (
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
         feconf.CLOUD_DATASTORE_EMULATOR_PORT)
@@ -257,7 +254,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
-    with contextlib2.ExitStack() as stack:
+    with python_utils.ExitStack() as stack:
         data_dir_exists = os.path.exists(
             common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
         if clear_datastore and data_dir_exists:
@@ -369,9 +366,6 @@ def managed_webpack_compiler(
     Yields:
         psutil.Process. The Webpack compiler process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     if config_path is not None:
         pass
     elif use_prod_env:
@@ -393,7 +387,7 @@ def managed_webpack_compiler(
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
 
-    with contextlib2.ExitStack() as exit_stack:
+    with python_utils.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
@@ -503,9 +497,6 @@ def managed_webdriver_server(chrome_version=None):
     Yields:
         psutil.Process. The Webdriver process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     if chrome_version is None:
         # Although there are spaces between Google and Chrome in the path, we
         # don't need to escape them for Popen (as opposed to on the terminal, in
@@ -544,7 +535,7 @@ def managed_webdriver_server(chrome_version=None):
         '--versions.chrome', chrome_version,
     ])
 
-    with contextlib2.ExitStack() as exit_stack:
+    with python_utils.ExitStack() as exit_stack:
         if common.is_windows_os():
             # NOTE: webdriver-manager (version 13.0.0) uses `os.arch()` to
             # determine the architecture of the operating system, however, this

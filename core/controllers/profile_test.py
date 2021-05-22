@@ -796,7 +796,8 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/delete-account')
             self.assertIn(
-                b'<delete-account-page></delete-account-page>', response.body)
+                b'<oppia-delete-account-page></oppia-delete-account-page>',
+                response.body)
 
     def test_get_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):

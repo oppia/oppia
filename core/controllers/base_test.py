@@ -218,6 +218,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
+    def test_html_requests_have_no_store_cache_policy(self):
+        response = self.get_html_response('/community-library')
+        # We set 'no-store' and 'must-revalidate', but webapp
+        # adds 'no-cache' since it is basically a subset of 'no-store'.
+        self.assertEqual(
+            response.headers['Cache-Control'],
+            'must-revalidate, no-cache, no-store'
+        )
+
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
@@ -400,7 +409,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual('http://localhost/', response.headers['location'])
 
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
-        with contextlib2.ExitStack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -417,7 +426,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
-        with contextlib2.ExitStack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -443,7 +452,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MaintenanceModeTests, self).setUp()
-        with contextlib2.ExitStack() as context_stack:
+        with python_utils.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()
@@ -522,16 +531,6 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         self.get_html_response('/session_end', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
-
-    def test_seed_firebase_handler_is_not_rejected(self):
-        call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'seed_firebase'))
-
-        response = (
-            self.get_html_response('/seed_firebase', expected_status_int=302))
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
 
     def test_signup_fails(self):
         with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
@@ -714,37 +713,6 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
             self.get_html_response('/session_end', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
-
-
-class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
-    """Tests for /seed_firebase handler."""
-
-    def test_get(self):
-        swap = self.swap_with_call_counter(
-            firebase_auth_services, 'seed_firebase')
-
-        with swap as call_counter:
-            response = self.get_html_response(
-                '/seed_firebase', expected_status_int=302)
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-
-    def test_get_with_error(self):
-        swap = self.swap_with_call_counter(
-            firebase_auth_services, 'seed_firebase', raises=Exception())
-
-        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
-
-        with swap as call_counter, captured_logging_context as logs:
-            response = self.get_html_response(
-                '/seed_firebase', expected_status_int=302)
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-        self.assert_matches_regexps(logs, [
-            'Failed to prepare for SeedFirebaseOneOffJob'
-        ])
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -1261,7 +1229,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -1274,7 +1243,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)

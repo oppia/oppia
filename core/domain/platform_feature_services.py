@@ -33,13 +33,10 @@ docstrings in this file.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
 from constants import constants
 from core import platform_feature_list
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.platform import models
-
 
 ALL_FEATURES_LIST = (
     platform_feature_list.DEV_FEATURES_LIST +

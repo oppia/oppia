@@ -135,9 +135,6 @@ def run_lighthouse_checks(lighthouse_mode):
 
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     parsed_args = _PARSER.parse_args(args=args)
 
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
@@ -161,7 +158,7 @@ def main(args=None):
         build.main(args=[])
         run_webpack_compilation()
 
-    with contextlib2.ExitStack() as stack:
+    with python_utils.ExitStack() as stack:
         stack.enter_context(common.inplace_replace_file_context(
             common.CONSTANTS_FILE_PATH,
             '"ENABLE_ACCOUNT_DELETION": .*',
