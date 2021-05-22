@@ -18,17 +18,16 @@
 
 import { EventEmitter, Injectable, NgZone } from '@angular/core';
 import { AudioFile } from 'domain/utilities/audio-file.model';
-import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import { AudioTranslationManagerService, AudioTranslations } from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import { AssetsBackendApiService } from './assets-backend-api.service';
 import { ContextService } from './context.service';
 import { Howl } from 'howler';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
-interface AutoPlayAudioEvent {
-  audioTranslations: RecordedVoiceovers;
+export interface AutoPlayAudioEvent {
+  audioTranslations: AudioTranslations;
   html: string;
   componentName: string;
 }
@@ -186,6 +185,19 @@ export class AudioPlayerService {
       return this._currentTrack.duration();
     } else {
       return 0;
+    }
+  }
+
+  getProgress(): number {
+    if (this.getAudioDuration() > 0) {
+      return this.getCurrentTime() / this.getAudioDuration();
+    }
+    return 0;
+  }
+
+  setProgress(progress: number): void {
+    if (progress > 0 && progress < 1) {
+      this.setCurrentTime(this.getAudioDuration() * progress);
     }
   }
 
