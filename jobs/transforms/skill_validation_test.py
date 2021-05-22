@@ -146,7 +146,7 @@ class ValidateSkillCommitCmdsSchemaTests(
                 skill_validation.ValidateSkillCommitCmdsSchema())
         )
 
-        # add comment explaining whyyy
+        # TODO(ybcs): convert to dict after python3 migration.
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
@@ -160,14 +160,15 @@ class ValidateSkillCommitCmdsSchemaTests(
 
     def test_skill_change_object_with_invalid_skill_property(self):
         invalid_commit_cmd_model = (
-            skill_models.SkillCommitLogEntryModel(
+            skill_models.SkillSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                skill_id='123',
-                post_commit_status='private',
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': 'update_skill_property',
                     'property_name': 'invalid',
@@ -198,14 +199,15 @@ class ValidateSkillCommitCmdsSchemaTests(
 
     def test_skill_change_object_with_invalid_skill_misconceptions(self):
         invalid_commit_cmd_model = (
-            skill_models.SkillCommitLogEntryModel(
+            skill_models.SkillSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                skill_id='123',
-                post_commit_status='private',
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': 'update_skill_misconceptions_property',
                     'misconception_id': 'id',
@@ -239,14 +241,15 @@ class ValidateSkillCommitCmdsSchemaTests(
 
     def test_skill_change_object_with_invalid_skill_contents_property(self):
         invalid_commit_cmd_model = (
-            skill_models.SkillCommitLogEntryModel(
+            skill_models.SkillSnapshotMetadataModel(
                 id='123',
                 created_on=self.YEAR_AGO,
                 last_updated=self.NOW,
-                commit_type='test-type',
-                user_id='',
-                skill_id='123',
-                post_commit_status='private',
+                committer_id='committer_id',
+                commit_type='create',
+                commit_cmds_user_ids=[
+                    'commit_cmds_user_1_id', 'commit_cmds_user_2_id'],
+                content_user_ids=['content_user_1_id', 'content_user_2_id'],
                 commit_cmds=[{
                     'cmd': 'update_skill_contents_property',
                     'property_name': 'invalid',
