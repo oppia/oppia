@@ -338,7 +338,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'truncate-input-based-on-interaction-answer-type.filter.ts',
     'truncate.filter.ts',
     'truncate.pipe.ts',
-    'tutor-card.directive.ts',
+    'tutor-card.component.ts',
     'unicode-string-editor.directive.ts',
     'unit-test-utils.ts', # Please don't try to cover this file.
     'url-interpolation.service.ts',

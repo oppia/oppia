@@ -73,6 +73,8 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import { TutorCardComponent } from 'pages/exploration-player-page/learner-experience/tutor-card.component';
 
 
 // Directives.
@@ -93,7 +95,6 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 // Services.
 import { AuthService } from 'services/auth.service';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
-import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 
 const toastrConfig = {
   allowHtml: false,
@@ -178,6 +179,7 @@ const toastrConfig = {
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TruncateAndCapitalizePipe,
+    TutorCardComponent,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     UploadActivityModalComponent,
@@ -217,6 +219,7 @@ const toastrConfig = {
     SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    TutorCardComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -271,6 +274,7 @@ const toastrConfig = {
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TutorCardComponent,
     WarningsAndAlertsComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,
