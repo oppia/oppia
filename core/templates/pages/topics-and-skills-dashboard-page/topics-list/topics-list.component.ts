@@ -61,7 +61,7 @@ export class TopicsListComponent {
    * topic ID provided in the args.
    */
   getTopicEditorUrl(topicId: string): string {
-    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
+    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       TOPIC_EDITOR_URL_TEMPLATE, {
         topic_id: topicId
