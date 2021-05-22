@@ -136,6 +136,9 @@ export class State {
           allContentIds.delete(contentId);
         }
       });
+      // Excluding default_outcome content status as default outcome's
+      // content is left empty so the translation or voiceover is not
+      // required.
       allContentIds.delete('default_outcome');
     }
 
