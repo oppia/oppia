@@ -259,7 +259,6 @@
         "scripts.linters.general_purpose_linter_test",
         "scripts.linters.js_ts_linter_test",
         "scripts.pre_push_hook_test",
-        "core.platform.search.gae_search_services_test",
         "scripts.release_scripts.update_configs_test",
         "core.storage.improvements.gae_models_test",
         "core.platform.email.mailgun_email_services_test",
