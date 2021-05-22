@@ -40,8 +40,9 @@ describe('Preview Thumbnail Component', function() {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
     componentInstance = fixture.componentInstance;
     fixture.detectChanges();
-    imageUploadHelperService = (TestBed.inject(ImageUploadHelperService) as
-    unknown) as jasmine.SpyObj<ImageUploadHelperService>;
+    imageUploadHelperService = (
+      TestBed.inject(ImageUploadHelperService) as unknown) as
+        jasmine.SpyObj<ImageUploadHelperService>;
   });
 
   it('should create', () => {
