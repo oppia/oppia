@@ -1,51 +1,51 @@
-<audio-bar ng-if="showAudioBar()"></audio-bar>
+<audio-bar *ngIf="showAudioBar()"></audio-bar>
 <div class="oppia-learner-view-card"
-     ng-class="{'animate-card-width': startCardChangeAnimation}"
-     ng-style="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
+     [ngClass]="{'animate-card-width': startCardChangeAnimation}"
+     [ngStyle]="isAudioBarExpandedOnMobileDevice() ? {'margin-top': '60px'} : {'margin-top': '30px'}">
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
-       ng-class="{'animate-card-change': startCardChangeAnimation}">
+       [ngClass]="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
       <content-language-selector></content-language-selector>
-      <a ng-class="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
-         ng-href="<[OPPIA_AVATAR_LINK_URL]>"
+      <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+         [href]="OPPIA_AVATAR_LINK_URL"
          target="_blank"
          rel="noopener">
         <img class="conversation-skin-oppia-avatar"
-             ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt=""
-             ng-if="isAvatarImageShown()">
+             [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
+             *ngIf="isAvatarImageShown()">
       </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
-           ng-class="getContentAudioHighlightClass()"
-           focus-on="<[getContentFocusLabel($index)]>">
+           [ngClass]="getContentAudioHighlightClass()"
+           [oppiaFocusOn]="getContentFocusLabel($index)">
         <div tabindex="1">
-          <angular-html-bind class="protractor-test-conversation-content"
-                             html-data="getDisplayedCard().getContentHtml()">
-          </angular-html-bind>
+          <angular-html-bind-wrapper class="protractor-test-conversation-content"
+                                     [htmlData]="displayedCard.getContentHtml()">
+          </angular-html-bind-wrapper>
         </div>
-        <div ng-if="isContentAudioTranslationAvailable()"
+        <div *ngIf="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
         </div>
       </div>
     </div>
 
-    <div ng-if="(getDisplayedCard().getInputResponsePairs().length > 1 && isInteractionInline()) || (getDisplayedCard().getInputResponsePairs().length > 0 && !isInteractionInline())">
+    <div *ngIf="(displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
       <h4 class="conversation-skin-responses-dropdown-container"
-          ng-click="toggleShowPreviousResponses()">
+          (click)="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
-          <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
-                translate-values="{previousResponses: getDisplayedCard().getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)}">
+          <span>
+            {{ 'I18N_PLAYER_PREVIOUS_RESPONSES' | translate:{previousResponses: displayedCard.getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)} }}
           </span>
           <span class="conversation-skin-responses-dropdown-icon">
-            <i class="material-icons conversation-skin-responses-dropdown-icon" ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
+            <i class="material-icons conversation-skin-responses-dropdown-icon" [ngClass]="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
           </span>
         </span>
       </h4>
     </div>
 
-    <div ng-if="arePreviousResponsesShown && !conceptCardIsBeingShown"
+    <div *ngIf="arePreviousResponsesShown && !conceptCardIsBeingShown"
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
-      <div ng-repeat="responsePair in getDisplayedCard().getInputResponsePairs() track by $index">
-        <div ng-if="(!$last || !isInteractionInline())">
+      <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
+        <div *ngIf="(!$last || !isInteractionInline())">
           <input-response-pair data="responsePair"
                                profile-picture="profilePicture"
                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
