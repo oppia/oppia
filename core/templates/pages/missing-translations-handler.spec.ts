@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for the Missing Translations Handler.
  */
 
 import { AppConstants } from 'app.constants';
-import { MissingTranslationCustomHandler } from './missing-translations-handler';
+import { MyMissingTranslationHandler } from './missing-translations-handler';
 
 describe('Missing Translations Handler', () => {
-  let mth = new MissingTranslationCustomHandler();
+  let mth = new MyMissingTranslationHandler();
 
-  it ('should return correct value for existing default translations', () => {
+  it ('should create handle default translations', () => {
     let value = 'Library';
     spyOn(mth, 'getAppConstants').and.returnValue(
       {DEFAULT_TRANSLATIONS: {
@@ -34,17 +35,16 @@ describe('Missing Translations Handler', () => {
     })).toEqual(value);
   });
 
-  it('should return key if correct value is not available in app constants',
-    () => {
-      let key = 'I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB';
-      spyOn(mth, 'getAppConstants').and.returnValue(
-        {DEFAULT_TRANSLATIONS: {}} as
-        unknown as typeof AppConstants);
-      expect(mth.handle({
-        key,
-        translateService: null,
-      })).toEqual(key);
-    });
+  it('should return key if not available in app constants', () => {
+    let key = 'I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB';
+    spyOn(mth, 'getAppConstants').and.returnValue(
+      {DEFAULT_TRANSLATIONS: {}} as
+      unknown as typeof AppConstants);
+    expect(mth.handle({
+      key,
+      translateService: null,
+    })).toEqual(key);
+  });
 
   it('should get app constants', () => {
     expect(mth.getAppConstants()).toBeDefined();

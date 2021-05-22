@@ -100,7 +100,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';
-import { MissingTranslationCustomHandler } from 'pages/missing-translations-handler';
+import { MyMissingTranslationHandler } from 'pages/missing-translations-handler';
 import constants from 'assets/constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
@@ -135,23 +135,15 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
-    /**
-     * The Translate Module will look for translations in the following pattern:
-     * 1. Look for translation in primary language (fetched from backend)
-     * 2. Look for translation in default language (fetched from backend)
-     * 3. Look for translation presnt in AppConstants.ts (
-     *    used until translations after fetched from backend)
-     * 4. shows the key itself, if the translation is not found.
-     */
     TranslateModule.forRoot({
       defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
-        useClass: MissingTranslationCustomHandler
+        useClass: MyMissingTranslationHandler
       },
       loader: {
         provide: TranslateLoader,
-        useFactory: TranslateLoaderFactory.createHttpLoader,
+        useFactory: (TranslateLoaderFactory.createHttpLoader),
         deps: [HttpClient],
       },
       parser: {
@@ -160,11 +152,6 @@ const toastrConfig = {
         deps: [TranslateDefaultParser, I18nLanguageCodeService]
       }
     }),
-    /**
-     * The cookie shares a common name with angular-translate's cookie.
-     * This way, we have a single source of truth for both frameworks.
-     * The cookie will expire after 24 hrs.
-     */
     TranslateCacheModule.forRoot({
       cacheService: {
         provide: TranslateCacheService,
