@@ -42,6 +42,7 @@ import { FeedbackPopupComponent } from './layout-directives/feedback-popup.compo
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
+import { ProgressNavComponent } from './layout-directives/progress-nav.component';
 
 @NgModule({
   imports: [
@@ -99,7 +100,6 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { ProgressNavComponent } from './layout-directives/progress-nav.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
