@@ -231,7 +231,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
           $scope.isCheckpoint = function(nodeId) {
             var state = ExplorationStatesService.getState(nodeId);
             if (state) {
-              return state.cardIsCheckpoint;
+              return !!state && state.cardIsCheckpoint;
             }
           };
 

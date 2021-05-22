@@ -11,7 +11,13 @@
         <strong class="clickable">⚠️</strong>
       </span>
       <span ng-class="{'checkpoint-count-error': $ctrl.showCheckpointCountWarningSign()}">
-        {{$ctrl.getCheckpointCount()}} Checkpoint
+        {{$ctrl.getCheckpointCount()}}
+        <span ng-if="$ctrl.getCheckpointCount() <= 1">
+          Checkpoint
+        </span>
+        <span ng-if="$ctrl.getCheckpointCount() > 1">
+          Checkpoints
+        </span>
       </span>
       <span uib-tooltip="Learners start at their last saved checkpoint when returning back from the lesson."
             tooltip-placement="right-top"
