@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
+import re
+
 from constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -221,13 +223,6 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertNotIn(base_models.BaseSnapshotMetadataModel, classes)
         self.assertNotIn(base_models.BaseSnapshotContentModel, classes)
 
-    def test_import_current_user_services(self):
-        """Tests import current user services function."""
-        from core.platform.users import gae_current_user_services
-        self.assertEqual(
-            self.registry_instance.import_current_user_services(),
-            gae_current_user_services)
-
     def test_import_datastore_services(self):
         """Tests import datastore services function."""
         from core.platform.datastore import gae_datastore_services
@@ -326,5 +321,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests NotImplementedError of Platform."""
         with self.assertRaisesRegexp(
             NotImplementedError,
-            r'import_models\(\) method is not overwritten in derived classes'):
+            re.escape(
+                'import_models() method is not overwritten in '
+                'derived classes')):
             models.Platform().import_models()

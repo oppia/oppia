@@ -161,7 +161,7 @@ describe('Skills List Component', () => {
 
   class MockSkillBackendApiService {
     doesNotHaveSkillLinked: boolean = false;
-    deleteSkill(skillId: string) {
+    deleteSkillAsync(skillId: string) {
       return {
         then: (callb: () => void) => {
           callb();
@@ -204,7 +204,7 @@ describe('Skills List Component', () => {
   }
 
   class MockEditableBackendApiService {
-    updateTopic(
+    updateTopicAsync(
         topicId: string,
         topicVersion: number,
         msg: string,
@@ -320,7 +320,7 @@ describe('Skills List Component', () => {
 
   it('should get skill editor url', () => {
     expect(componentInstance.getSkillEditorUrl('test_id'))
-      .toEqual('/skill_editor/test_id');
+      .toEqual('/skill_editor/test_id#/');
   });
 
   it('should delete skill', fakeAsync(() => {
