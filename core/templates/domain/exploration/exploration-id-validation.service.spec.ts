@@ -86,7 +86,7 @@ describe('Exploration id validation service', function() {
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.isExpPublished('0')
+    explorationIdValidationService.isExpPublishedAsync('0')
       .then(successHandler, failHandler);
     let req = httpTestingController
       .expectOne(requestUrl);
@@ -99,7 +99,7 @@ describe('Exploration id validation service', function() {
 
     // The service should respond false when the summaries array
     // contains null.
-    explorationIdValidationService.isExpPublished('0')
+    explorationIdValidationService.isExpPublishedAsync('0')
       .then(successHandler, failHandler);
     req = httpTestingController
       .expectOne(requestUrl);
@@ -112,7 +112,7 @@ describe('Exploration id validation service', function() {
 
     // The service should respond false when the summaries array
     // contains more than one element.
-    explorationIdValidationService.isExpPublished('0')
+    explorationIdValidationService.isExpPublishedAsync('0')
       .then(successHandler, failHandler);
     req = httpTestingController
       .expectOne(requestUrl);
@@ -134,7 +134,7 @@ describe('Exploration id validation service', function() {
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 
-    explorationIdValidationService.isExpPublished('0')
+    explorationIdValidationService.isExpPublishedAsync('0')
       .then(successHandler, failHandler);
     const req = httpTestingController
       .expectOne(requestUrl);

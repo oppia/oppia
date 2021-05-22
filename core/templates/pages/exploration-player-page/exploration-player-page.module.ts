@@ -43,6 +43,7 @@ import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/explorati
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
 import { InformationCardModalComponent } from './templates/information-card-modal.component';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -52,7 +53,7 @@ import { InformationCardModalComponent } from './templates/information-card-moda
     MatButtonModule,
     NgbModalModule,
     SharedComponentsModule,
-    NgbPopoverModule
+    NgbPopoverModule,
   ],
   declarations: [
     ContentLanguageSelectorComponent,
@@ -65,6 +66,8 @@ import { InformationCardModalComponent } from './templates/information-card-moda
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerViewInfoComponent,
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -77,6 +80,7 @@ import { InformationCardModalComponent } from './templates/information-card-moda
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     LearnerViewInfoComponent,
+    RefresherExplorationConfirmationModal,
   ],
   providers: [
     {
@@ -100,11 +104,11 @@ class ExplorationPlayerPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ExplorationPlayerPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 
