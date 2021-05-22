@@ -41,6 +41,9 @@ module.exports = {
       var name = null;
       if (nodeRequireParent.includes(node.type) && node.parent) {
         node = node.parent[parentToName[node.parent.type]];
+        if (node === undefined) {
+          return;
+        }
         name = node.name;
       } else {
         name = node.id.name;
