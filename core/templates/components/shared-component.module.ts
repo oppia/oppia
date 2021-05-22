@@ -103,6 +103,7 @@ import { TranslateCustomParser } from 'pages/translate-custom-parser';
 import { MissingTranslationCustomHandler } from 'pages/missing-translations-handler';
 import constants from 'assets/constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 
 const toastrConfig = {
   allowHtml: false,
@@ -223,6 +224,7 @@ const toastrConfig = {
     WrapTextWithEllipsisPipe,
     WarningsAndAlertsComponent,
     ThumbnailDisplayComponent,
+    PreviewThumbnailComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TruncateAndCapitalizePipe,
@@ -264,6 +266,7 @@ const toastrConfig = {
     SideNavigationBarComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
+    PreviewThumbnailComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
@@ -317,6 +320,7 @@ const toastrConfig = {
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    PreviewThumbnailComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
     UploadActivityModalComponent,
