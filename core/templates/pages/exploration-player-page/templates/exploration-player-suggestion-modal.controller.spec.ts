@@ -105,6 +105,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     function() {
       expect($scope.originalHtml).toBe('Content html');
       expect($scope.description).toBe('');
+      $scope.updateValue('Content html');
       expect($scope.suggestionData).toEqual({
         suggestionHtml: 'Content html'
       });

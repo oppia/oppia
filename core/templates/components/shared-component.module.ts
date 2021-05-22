@@ -94,6 +94,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 
 const toastrConfig = {
   allowHtml: false,
@@ -125,6 +126,7 @@ const toastrConfig = {
     RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
@@ -232,9 +234,10 @@ const toastrConfig = {
     MaterialModule,
     NgbTooltipModule,
     NgbNavModule,
-    RichTextComponentsModule,
     NgbModalModule,
+    RichTextComponentsModule,
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     // Components, directives, and pipes.

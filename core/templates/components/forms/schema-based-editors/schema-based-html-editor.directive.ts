@@ -32,6 +32,11 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
       },
       template: require('./schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [function() {
+        var ctrl = this;
+        ctrl.updateValue = function(value: string) {
+          ctrl.localValue = value;
+        };
+      }]
     };
   }]);

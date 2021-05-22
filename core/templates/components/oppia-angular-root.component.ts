@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
@@ -160,6 +160,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private classroomBackendApiService: ClassroomBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private htmlEscaperService: HtmlEscaperService,
+    private ngZone: NgZone,
     private pageTitleService: PageTitleService,
     private profilePageBackendApiService: ProfilePageBackendApiService,
     private ratingComputationService: RatingComputationService,
@@ -181,11 +182,14 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    ckEditorInitializer(
-      OppiaAngularRootComponent.rteHelperService,
-      this.htmlEscaperService,
-      OppiaAngularRootComponent.contextService
-    );
+    this.ngZone.runOutsideAngular(() => {
+      ckEditorInitializer(
+        OppiaAngularRootComponent.rteHelperService,
+        this.htmlEscaperService,
+        OppiaAngularRootComponent.contextService,
+        this.ngZone
+      );
+    });
     OppiaAngularRootComponent.classroomBackendApiService = (
       this.classroomBackendApiService);
     OppiaAngularRootComponent.i18nLanguageCodeService = (
