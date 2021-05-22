@@ -47,7 +47,6 @@ class QuestionsListHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-        more = True
         offset = self.request.get('offset')
         if offset == '':
             offset = 0
@@ -81,12 +80,8 @@ class QuestionsListHandler(base.BaseHandler):
                 offset=next_offset)
         )
 
-        # To check whether there are more questions.
+        # To set next_offset to None if there are no more questions.
         if next_offset == temp_next_offset:
-            more = False
-
-        # Pass null to frontend if there are no more questions.
-        if not more:
             next_offset = None
 
         return_dicts = []
