@@ -95,13 +95,13 @@ describe('State classifier mapping service', () => {
       it('should fetch classifier data correctly', waitForAsync(async() => {
         spyOn(
           classifierDataBackendApiService,
-          'getClassifierDataAsync').and.callFake(() => {
+          'getClassifierDataAsync').and.callFake(async() => {
           return new Promise((resolve, reject) => {
             resolve(classifierData);
           });
         });
         mappingService.init(expId, expVersion);
-        await mappingService.initializeClassifierDataForState(stateName);
+        await mappingService.initializeClassifierDataForStateAsync(stateName);
         expect(mappingService.hasClassifierData(stateName)).toBe(true);
       }));
 
@@ -109,13 +109,13 @@ describe('State classifier mapping service', () => {
         async() => {
           spyOn(
             classifierDataBackendApiService,
-            'getClassifierDataAsync').and.callFake(() => {
+            'getClassifierDataAsync').and.callFake(async() => {
             return new Promise((resolve, reject) => {
               reject('No classifier data found for exploration');
             });
           });
           mappingService.init(expId, expVersion);
-          await mappingService.initializeClassifierDataForState(stateName);
+          await mappingService.initializeClassifierDataForStateAsync(stateName);
           expect(mappingService.hasClassifierData(stateName)).toBe(false);
         }));
 

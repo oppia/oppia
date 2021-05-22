@@ -62,6 +62,12 @@ ruleTester.run('async-func-name-checks', rule, {
         } 
       }`,
     },
+    {
+      code:
+      `navigator.mediaDevices.getUserMedia = async function() {
+        // something
+      }`
+    }
   ],
 
   invalid: [

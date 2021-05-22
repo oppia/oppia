@@ -112,7 +112,7 @@ describe('Auth service', function() {
       .and.rejectWith({code: 'auth/user-not-found'});
     angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(this.creds);
 
-    await expectAsync(authService.signInWithEmail(this.email))
+    await expectAsync(authService.signInWithEmailAsync(this.email))
       .toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword)
@@ -128,7 +128,7 @@ describe('Auth service', function() {
     spyOn(window, 'prompt').and.returnValue(this.email);
     angularFireAuth.signInWithEmailAndPassword.and.rejectWith(unknownError);
 
-    await expectAsync(authService.signInWithEmail(this.email))
+    await expectAsync(authService.signInWithEmailAsync(this.email))
       .toBeRejectedWith(unknownError);
   });
 
@@ -140,7 +140,7 @@ describe('Auth service', function() {
     angularFireAuth.createUserWithEmailAndPassword
       .and.rejectWith(unknownError);
 
-    await expectAsync(authService.signInWithEmail(this.email))
+    await expectAsync(authService.signInWithEmailAsync(this.email))
       .toBeRejectedWith(unknownError);
     expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
   });
@@ -161,7 +161,7 @@ describe('Auth service', function() {
     });
 
     it('should fail to call signInWithEmail', async() => {
-      await expectAsync(authService.signInWithEmail(this.email))
+      await expectAsync(authService.signInWithEmailAsync(this.email))
         .toBeRejectedWithError(
           'signInWithEmail can only be called in emulator mode');
 

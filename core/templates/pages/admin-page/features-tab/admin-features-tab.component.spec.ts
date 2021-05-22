@@ -125,7 +125,7 @@ describe('Admin page feature tab', function() {
       ]
     } as AdminPageData);
 
-    updateApiSpy = spyOn(featureApiService, 'updateFeatureFlag')
+    updateApiSpy = spyOn(featureApiService, 'updateFeatureFlagAsync')
       .and.resolveTo(null);
 
     component.ngOnInit();
@@ -680,7 +680,7 @@ describe('Admin page feature tab', function() {
     beforeEach(() => {
       dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
 
-      dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled')
+      dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabledAsync')
         .and.resolveTo(null);
     });
 

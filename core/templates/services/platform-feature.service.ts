@@ -81,7 +81,7 @@ export class PlatformFeatureService {
       private loggerService: LoggerService,
       private urlService: UrlService,
       private browserCheckerService: BrowserCheckerService) {
-    this.initialize();
+    this.initializeAsync();
   }
 
   /**
@@ -91,9 +91,9 @@ export class PlatformFeatureService {
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
    */
-  async initialize(): Promise<void> {
+  async initializeAsync(): Promise<void> {
     if (!PlatformFeatureService.initializationPromise) {
-      PlatformFeatureService.initializationPromise = this._initialize();
+      PlatformFeatureService.initializationPromise = this._initializeAsync();
     }
     return PlatformFeatureService.initializationPromise;
   }
@@ -143,7 +143,7 @@ export class PlatformFeatureService {
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
    */
-  private async _initialize(): Promise<void> {
+  private async _initializeAsync(): Promise<void> {
     try {
       const item = this.loadSavedResults();
       if (item && this.validateSavedResults(item)) {
@@ -164,7 +164,7 @@ export class PlatformFeatureService {
       }
 
       PlatformFeatureService.featureStatusSummary = await this
-        .loadFeatureFlagsFromServer();
+        .loadFeatureFlagsFromServerAsync();
       this.saveResults();
     } catch (err) {
       this.loggerService.error(
@@ -178,9 +178,11 @@ export class PlatformFeatureService {
     }
   }
 
-  private async loadFeatureFlagsFromServer(): Promise<FeatureStatusSummary> {
+  private async loadFeatureFlagsFromServerAsync():
+    Promise<FeatureStatusSummary> {
     const context = this.generateClientContext();
-    return this.platformFeatureBackendApiService.fetchFeatureFlags(context);
+    return this.platformFeatureBackendApiService
+      .fetchFeatureFlagsAsync(context);
   }
 
   /**
@@ -310,7 +312,7 @@ export class PlatformFeatureService {
 
 export const platformFeatureInitFactory = (
     service: PlatformFeatureService) => {
-  return async(): Promise<void> => service.initialize();
+  return async(): Promise<void> => service.initializeAsync();
 };
 
 angular.module('oppia').factory(

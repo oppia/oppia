@@ -133,6 +133,7 @@ exports.config = {
   },
 
   // Code to start browserstack local before start of test.
+  /* eslint-disable-next-line @typescript-eslint/promise-function-async */
   beforeLaunch: function() {
     var checkSuites = function() {
       // eslint-disable-next-line no-console
@@ -177,6 +178,7 @@ exports.config = {
   },
 
   // Code to stop browserstack local after end of test.
+  /* eslint-disable-next-line @typescript-eslint/promise-function-async */
   afterLaunch: function() {
     return new Promise(function(resolve, reject) {
       exports.bs_local.stop(resolve);

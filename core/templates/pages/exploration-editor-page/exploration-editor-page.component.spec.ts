@@ -264,7 +264,7 @@ describe('Exploration editor page component', function() {
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
+      spyOn(eis, 'flushUpdatedTasksToBackendAsync')
         .and.returnValue(Promise.resolve());
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
@@ -481,7 +481,7 @@ describe('Exploration editor page component', function() {
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
+      spyOn(eis, 'flushUpdatedTasksToBackendAsync')
         .and.returnValue(Promise.resolve());
       spyOnProperty(eps, 'onExplorationPropertyChanged').and.returnValue(
         mockExplorationPropertyChangedEventEmitter);
@@ -649,7 +649,7 @@ describe('Exploration editor page component', function() {
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue(Promise.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
+      spyOn(eis, 'flushUpdatedTasksToBackendAsync')
         .and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
@@ -710,7 +710,7 @@ describe('Exploration editor page component', function() {
       spyOn(efbas, 'fetchExplorationFeaturesAsync')
         .and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
-      spyOn(eis, 'flushUpdatedTasksToBackend')
+      spyOn(eis, 'flushUpdatedTasksToBackendAsync')
         .and.returnValue(Promise.resolve());
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();

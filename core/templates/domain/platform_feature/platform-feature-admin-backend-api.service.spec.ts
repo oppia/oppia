@@ -56,7 +56,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
         })
       ];
 
-      featureAdminService.updateFeatureFlag(
+      featureAdminService.updateFeatureFlagAsync(
         'feature_name', 'update message', newRules
       ).then(successHandler, failHandler);
 
@@ -83,7 +83,7 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       })
     ];
 
-    featureAdminService.updateFeatureFlag(
+    featureAdminService.updateFeatureFlagAsync(
       'feature_name', 'update message', newRules
     ).then(successHandler, failHandler);
 

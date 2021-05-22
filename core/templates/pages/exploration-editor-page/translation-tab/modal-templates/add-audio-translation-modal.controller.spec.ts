@@ -80,7 +80,7 @@ describe('Add Audio Translation Modal Controller', function() {
     var response = {
       duration_secs: 10
     };
-    spyOn(AssetsBackendApiService, 'saveAudio').and.returnValue(
+    spyOn(AssetsBackendApiService, 'saveAudioAsync').and.returnValue(
       $q.resolve(response));
     $scope.confirm();
     $scope.$apply();
@@ -103,7 +103,8 @@ describe('Add Audio Translation Modal Controller', function() {
     $scope.updateUploadedFile(file);
 
     spyOn(ContextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(AssetsBackendApiService, 'saveAudio').and.returnValue($q.reject({}));
+    spyOn(AssetsBackendApiService, 'saveAudioAsync')
+      .and.returnValue($q.reject({}));
     $scope.confirm();
 
     expect($scope.saveButtonText).toBe('Saving...');

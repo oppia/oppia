@@ -42,7 +42,7 @@ export class PlatformFeatureDummyBackendApiService {
    * @returns {Promise<boolean>} - A promise that resolves to true if request
    * to the dummy handler succeeded without 404 error.
    */
-  async isHandlerEnabled(): Promise<boolean> {
+  async isHandlerEnabledAsync(): Promise<boolean> {
     try {
       await this.http.get(PlatformFeatureDomainConstants.DUMMY_HANDLER_URL)
         .toPromise();

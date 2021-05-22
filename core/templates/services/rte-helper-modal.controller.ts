@@ -150,7 +150,7 @@ angular.module('oppia').controller('RteHelperModalController', [
           return;
         }
         $q.when(
-          AssetsBackendApiService.saveMathExpresionImage(
+          AssetsBackendApiService.saveMathExpresionImageAsync(
             resampledFile, svgFileName, ContextService.getEntityType(),
             ContextService.getEntityId())
         ).then(function(response) {

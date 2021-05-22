@@ -75,7 +75,7 @@ angular.module('oppia').controller('AddAudioTranslationModalController', [
         var explorationId = (
           ContextService.getExplorationId());
         $q.when(
-          AssetsBackendApiService.saveAudio(
+          AssetsBackendApiService.saveAudioAsync(
             explorationId, generatedFilename, uploadedFile)
         ).then(function(response) {
           $uibModalInstance.close({

@@ -318,7 +318,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               [$scope.audioBlob], filename, {type: fileType});
             $scope.showRecorderWarning = false;
             $q.when(
-              AssetsBackendApiService.saveAudio(
+              AssetsBackendApiService.saveAudioAsync(
                 ContextService.getExplorationId(), filename, recordedAudioFile)
             ).then(function(response) {
               if ($scope.audioIsUpdating) {

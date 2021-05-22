@@ -58,7 +58,7 @@ describe('PlatformFeatureBackendApiService', () => {
           feature_b: false,
         };
 
-        platformFeatureBackendApiService.fetchFeatureFlags(context)
+        platformFeatureBackendApiService.fetchFeatureFlagsAsync(context)
           .then(successHandler, failHandler);
 
         flushMicrotasks();
@@ -84,7 +84,7 @@ describe('PlatformFeatureBackendApiService', () => {
       const context = ClientContext.create('Web', 'Chrome');
       const contextDict = context.toBackendDict();
 
-      platformFeatureBackendApiService.fetchFeatureFlags(context)
+      platformFeatureBackendApiService.fetchFeatureFlagsAsync(context)
         .then(successHandler, failHandler);
 
       flushMicrotasks();

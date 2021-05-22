@@ -42,12 +42,12 @@ describe('PlatformFeatureDummyBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  describe('.isHandlerEnabled', () => {
+  describe('.isHandlerEnabledAsync', () => {
     it('should resolve to true if the handler is enabled', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      apiService.isHandlerEnabled()
+      apiService.isHandlerEnabledAsync()
         .then(successHandler, failHandler);
 
       httpTestingController
@@ -64,7 +64,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      apiService.isHandlerEnabled()
+      apiService.isHandlerEnabledAsync()
         .then(successHandler, failHandler);
 
       httpTestingController
@@ -84,7 +84,7 @@ describe('PlatformFeatureDummyBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      apiService.isHandlerEnabled()
+      apiService.isHandlerEnabledAsync()
         .then(successHandler, failHandler);
 
       httpTestingController

@@ -48,7 +48,8 @@ export class StateClassifierMappingService {
     this.stateClassifierMapping = {};
   }
 
-  async initializeClassifierDataForState(stateName: string): Promise<void> {
+  async initializeClassifierDataForStateAsync(
+      stateName: string): Promise<void> {
     if (this.appService.isMachineLearningClassificationEnabled()) {
       this.stateClassifierMapping[stateName] = null;
       this.loggerService.info('Fetching classifier data for ' + stateName);

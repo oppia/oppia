@@ -140,7 +140,7 @@ export class AuthService {
     }
   }
 
-  async signInWithEmail(email: string): Promise<void> {
+  async signInWithEmailAsync(email: string): Promise<void> {
     if (!AuthService.firebaseEmulatorIsEnabled) {
       throw new Error('signInWithEmail can only be called in emulator mode');
     }

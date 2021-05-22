@@ -91,7 +91,7 @@ describe('PlatformFeatureService', () => {
     spyOn(urlService, 'getPathname').and.callFake(() => pathName);
     mockPathName = path => pathName = path;
 
-    apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
+    apiSpy = spyOn(apiService, 'fetchFeatureFlagsAsync').and.resolveTo(
       FeatureStatusSummary.createFromBackendDict({
         [FeatureNames.DummyFeature]: true,
       })
@@ -103,12 +103,12 @@ describe('PlatformFeatureService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       platformFeatureService = TestBed.get(PlatformFeatureService);
-      platformFeatureService.initialize()
+      platformFeatureService.initializeAsync()
         .then(successHandler, failHandler);
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+      expect(apiService.fetchFeatureFlagsAsync).toHaveBeenCalled();
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
       expect(platformFeatureService.isInitialzedWithError).toBeFalse();
@@ -123,7 +123,7 @@ describe('PlatformFeatureService', () => {
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+      expect(apiService.fetchFeatureFlagsAsync).toHaveBeenCalled();
       expect(
         windowRef.nativeWindow.sessionStorage.getItem('SAVED_FEATURE_FLAGS')
       ).not.toBeNull();
@@ -197,7 +197,7 @@ describe('PlatformFeatureService', () => {
 
         flushMicrotasks();
 
-        expect(apiService.fetchFeatureFlags).not.toHaveBeenCalled();
+        expect(apiService.fetchFeatureFlagsAsync).not.toHaveBeenCalled();
         expect(platformFeatureService.isInitialzedWithError).toBeFalse();
       })
     );
@@ -223,7 +223,7 @@ describe('PlatformFeatureService', () => {
 
         flushMicrotasks();
 
-        expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+        expect(apiService.fetchFeatureFlagsAsync).toHaveBeenCalled();
         expect(platformFeatureService.isInitialzedWithError).toBeFalse();
       })
     );
@@ -247,7 +247,7 @@ describe('PlatformFeatureService', () => {
 
         flushMicrotasks();
 
-        expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+        expect(apiService.fetchFeatureFlagsAsync).toHaveBeenCalled();
         expect(
           JSON.parse(windowRef.nativeWindow.sessionStorage.getItem(
             'SAVED_FEATURE_FLAGS'))
@@ -273,7 +273,7 @@ describe('PlatformFeatureService', () => {
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalled();
+      expect(apiService.fetchFeatureFlagsAsync).toHaveBeenCalled();
       expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
@@ -281,12 +281,12 @@ describe('PlatformFeatureService', () => {
       '.initialize.', fakeAsync(() => {
       platformFeatureService = TestBed.get(PlatformFeatureService);
 
-      platformFeatureService.initialize();
-      platformFeatureService.initialize();
+      platformFeatureService.initializeAsync();
+      platformFeatureService.initializeAsync();
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).toHaveBeenCalledTimes(1);
+      expect(apiService.fetchFeatureFlagsAsync).toHaveBeenCalledTimes(1);
       expect(platformFeatureService.isInitialzedWithError).toBeFalse();
     }));
 
@@ -310,7 +310,7 @@ describe('PlatformFeatureService', () => {
 
       flushMicrotasks();
 
-      expect(apiService.fetchFeatureFlags).not.toHaveBeenCalled();
+      expect(apiService.fetchFeatureFlagsAsync).not.toHaveBeenCalled();
       expect(platformFeatureService.isSkipped).toBeTrue();
     }));
   });
@@ -340,7 +340,7 @@ describe('PlatformFeatureService', () => {
 
   describe('platformFeatureInitFactory', () => {
     let factoryFn = (service: PlatformFeatureService) => {
-      return async(): Promise<void> => service.initialize();
+      return async(): Promise<void> => service.initializeAsync();
     };
 
     beforeEach(() => {
@@ -350,7 +350,7 @@ describe('PlatformFeatureService', () => {
 
     it('should return a function that calls initialize', async() => {
       const mockPromise = Promise.resolve(null);
-      const spy = spyOn(platformFeatureService, 'initialize')
+      const spy = spyOn(platformFeatureService, 'initializeAsync')
         .and.returnValue(mockPromise);
 
       const returnedFn = factoryFn(platformFeatureService);

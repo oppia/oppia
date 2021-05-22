@@ -35,7 +35,7 @@ export class PlatformFeatureAdminBackendApiService {
     private http: HttpClient,
   ) {}
 
-  async updateFeatureFlag(
+  async updateFeatureFlagAsync(
       name: string, message: string, newRules: PlatformParameterRule[]):
       Promise<void> {
     await this.http.post(

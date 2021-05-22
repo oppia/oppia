@@ -72,26 +72,27 @@ export class AssetsBackendApiService {
     return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
-  async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {
+  async loadAudioAsync(
+      explorationId: string, filename: string): Promise<AudioFile> {
     if (this.isCached(filename)) {
       return new AudioFile(filename, this.assetsCache.get(filename));
     }
-    return this.fetchFile(
+    return this.fetchFileAsync(
       AppConstants.ENTITY_TYPE.EXPLORATION, explorationId, filename,
       AppConstants.ASSET_TYPE_AUDIO);
   }
 
-  async loadImage(
+  async loadImageAsync(
       entityType: string, entityId: string,
       filename: string): Promise<ImageFile> {
     if (this.isCached(filename)) {
       return new ImageFile(filename, this.assetsCache.get(filename));
     }
-    return this.fetchFile(
+    return this.fetchFileAsync(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_IMAGE);
   }
 
-  async saveAudio(
+  async saveAudioAsync(
       explorationId: string, filename: string,
       rawAssetData: Blob): Promise<SaveAudioResponse> {
     const form = new FormData();
@@ -106,7 +107,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  async saveMathExpresionImage(
+  async saveMathExpresionImageAsync(
       resampledFile: Blob, filename: string, entityType: string,
       entityId: string): Promise<SaveImageResponse> {
     const form = new FormData();
@@ -181,7 +182,7 @@ export class AssetsBackendApiService {
     }
   }
 
-  private async fetchFile(
+  private async fetchFileAsync(
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
     let onResolve: (_: Blob) => void;

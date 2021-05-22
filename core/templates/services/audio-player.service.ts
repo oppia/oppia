@@ -59,7 +59,7 @@ export class AudioPlayerService {
     if (this._currentTrackFilename === filename) {
       return;
     }
-    this.assetsBackendApiService.loadAudio(
+    this.assetsBackendApiService.loadAudioAsync(
       this.contextService.getExplorationId(),
       filename).then(
       (loadedAudioFile: AudioFile) => {

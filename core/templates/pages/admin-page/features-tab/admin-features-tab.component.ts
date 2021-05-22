@@ -205,7 +205,7 @@ export class AdminFeaturesTabComponent implements OnInit {
     try {
       this.adminTaskManager.startTask();
 
-      await this.apiService.updateFeatureFlag(
+      await this.apiService.updateFeatureFlagAsync(
         feature.name, commitMessage, feature.rules);
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
@@ -301,7 +301,8 @@ export class AdminFeaturesTabComponent implements OnInit {
 
   async reloadDummyHandlerStatusAsync(): Promise<void> {
     if (this.isDummyFeatureEnabled) {
-      this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
+      this.isDummyApiEnabled = await (
+        this.dummyApiService.isHandlerEnabledAsync());
     }
   }
 

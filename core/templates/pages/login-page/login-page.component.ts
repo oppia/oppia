@@ -87,7 +87,7 @@ export class LoginPageComponent implements OnInit {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
 
     try {
-      await this.authService.signInWithEmail(email);
+      await this.authService.signInWithEmailAsync(email);
     } catch (error) {
       this.onSignInError(error);
       return;

@@ -108,7 +108,7 @@ export class AudioPreloaderService {
   }
 
   private loadAudio(audioFilename: string): void {
-    this.assetsBackendApiService.loadAudio(
+    this.assetsBackendApiService.loadAudioAsync(
       this.contextService.getExplorationId(), audioFilename
     ).then(loadedAudio => {
       const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(

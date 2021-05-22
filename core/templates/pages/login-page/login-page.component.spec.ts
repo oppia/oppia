@@ -90,9 +90,9 @@ describe('Login Page', () => {
     return pending;
   };
 
-  const spyOnSignInWithEmail = () => {
+  const spyOnSignInWithEmailAsync = () => {
     const pending = new PendingPromise();
-    authService.signInWithEmail.and.returnValue(pending.promise);
+    authService.signInWithEmailAsync.and.returnValue(pending.promise);
     return pending;
   };
 
@@ -103,7 +103,7 @@ describe('Login Page', () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
       handleRedirectResultAsync: Promise.resolve(false),
       signInWithRedirectAsync: Promise.resolve(),
-      signInWithEmail: Promise.resolve(),
+      signInWithEmailAsync: Promise.resolve(),
     });
     loaderService = jasmine.createSpyObj<LoaderService>('LoaderService', [
       'showLoadingScreen',
@@ -176,14 +176,14 @@ describe('Login Page', () => {
     }));
 
     it('should redirect to sign up after successful sign in', fakeAsync(() => {
-      const signInPromise = spyOnSignInWithEmail();
+      const signInPromise = spyOnSignInWithEmailAsync();
 
       loginPageComponent.onClickSignInButtonAsync(this.email);
 
       flushMicrotasks();
 
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(authService.signInWithEmail).toHaveBeenCalled();
+      expect(authService.signInWithEmailAsync).toHaveBeenCalled();
       expect(windowRef.location).toBeNull();
 
       signInPromise.resolve();
@@ -193,7 +193,7 @@ describe('Login Page', () => {
     }));
 
     it('should acknowledge a user pending account deletion', fakeAsync(() => {
-      const signInPromise = spyOnSignInWithEmail();
+      const signInPromise = spyOnSignInWithEmailAsync();
 
       loginPageComponent.onClickSignInButtonAsync(this.email);
 
@@ -208,7 +208,7 @@ describe('Login Page', () => {
     }));
 
     it('should add a warning message when signin fails', fakeAsync(() => {
-      const signInPromise = spyOnSignInWithEmail();
+      const signInPromise = spyOnSignInWithEmailAsync();
 
       loginPageComponent.onClickSignInButtonAsync(this.email);
 
@@ -225,7 +225,7 @@ describe('Login Page', () => {
     }));
 
     it('should redirect to given url', fakeAsync(() => {
-      const signInPromise = spyOnSignInWithEmail();
+      const signInPromise = spyOnSignInWithEmailAsync();
       windowRef.searchParams = '?return_url=/admin';
 
       loginPageComponent.onClickSignInButtonAsync(this.email);

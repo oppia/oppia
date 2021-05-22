@@ -85,7 +85,7 @@ describe('Assets Backend API Service', () => {
       expect(assetsBackendApiService.isCached('myfile.mp3')).toBeFalse();
 
 
-      assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
@@ -107,7 +107,7 @@ describe('Assets Backend API Service', () => {
       const failHandler = jasmine.createSpy('fail');
 
       expect(assetsBackendApiService.isCached('myfile.mp3')).toBeFalse();
-      assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
@@ -118,7 +118,7 @@ describe('Assets Backend API Service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
 
-      assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
         (cachedFile: AudioFile) => {
           expect(cachedFile).toEqual(new AudioFile('myfile.mp3', audioBlob));
         });
@@ -130,7 +130,7 @@ describe('Assets Backend API Service', () => {
 
       expect(assetsBackendApiService.isCached('myfile.mp3')).toBeFalse();
 
-      assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
@@ -146,8 +146,8 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveAudio('0', 'a.mp3', new File([], 'a.mp3'))
-        .then(onSuccess, onFailure);
+      assetsBackendApiService.saveAudioAsync(
+        '0', 'a.mp3', new File([], 'a.mp3')).then(onSuccess, onFailure);
       flushMicrotasks();
 
       httpTestingController.expectOne('/createhandler/audioupload/0')
@@ -163,7 +163,7 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveMathExpresionImage(
+      assetsBackendApiService.saveMathExpresionImageAsync(
         imageBlob, 'newMathExpression.svg', 'exploration', 'expid12345')
         .then(onSuccess, onFailure);
       flushMicrotasks();
@@ -181,7 +181,7 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveMathExpresionImage(
+      assetsBackendApiService.saveMathExpresionImageAsync(
         imageBlob, 'new.svg', 'exploration', 'expid12345')
         .then(onSuccess, onFailure);
       flushMicrotasks();
@@ -199,7 +199,7 @@ describe('Assets Backend API Service', () => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
 
-      assetsBackendApiService.saveAudio('0', 'a.mp3', audioBlob)
+      assetsBackendApiService.saveAudioAsync('0', 'a.mp3', audioBlob)
         .then(onSuccess, onFailure);
       flushMicrotasks();
 
@@ -218,7 +218,7 @@ describe('Assets Backend API Service', () => {
 
       expect(assetsBackendApiService.isCached('myfile.png')).toBeFalse();
 
-      assetsBackendApiService.loadImage(
+      assetsBackendApiService.loadImageAsync(
         AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
       const req = httpTestingController.expectOne(imageRequestUrl);
@@ -243,7 +243,7 @@ describe('Assets Backend API Service', () => {
 
       expect(assetsBackendApiService.isCached('myfile.png')).toBeFalse();
 
-      assetsBackendApiService.loadImage(
+      assetsBackendApiService.loadImageAsync(
         AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(imageRequestUrl);
@@ -255,7 +255,7 @@ describe('Assets Backend API Service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
 
-      assetsBackendApiService.loadImage(
+      assetsBackendApiService.loadImageAsync(
         AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
         (cachedFile: ImageFile) => {
           expect(cachedFile).toEqual(new ImageFile('myfile.png', new Blob()));
@@ -267,7 +267,7 @@ describe('Assets Backend API Service', () => {
         let successHandler = jasmine.createSpy('success');
         let failHandler = jasmine.createSpy('fail');
 
-        assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+        assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
           successHandler, failHandler);
 
         let req = httpTestingController.expectOne(audioRequestUrl);
@@ -284,7 +284,7 @@ describe('Assets Backend API Service', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        assetsBackendApiService.loadImage(
+        assetsBackendApiService.loadImageAsync(
           AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
           successHandler, failHandler);
 
@@ -302,7 +302,7 @@ describe('Assets Backend API Service', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+        assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(audioRequestUrl);
         expect(req.request.method).toEqual('GET');
@@ -322,7 +322,7 @@ describe('Assets Backend API Service', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        assetsBackendApiService.loadImage(
+        assetsBackendApiService.loadImageAsync(
           AppConstants.ENTITY_TYPE.EXPLORATION, '0', 'myfile.png').then(
           successHandler, failHandler);
         let req = httpTestingController.expectOne(imageRequestUrl);
@@ -342,7 +342,7 @@ describe('Assets Backend API Service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      assetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      assetsBackendApiService.loadAudioAsync('0', 'myfile.mp3').then(
         successHandler, failHandler);
       let req = httpTestingController.expectOne(audioRequestUrl);
       expect(req.request.method).toEqual('GET');
