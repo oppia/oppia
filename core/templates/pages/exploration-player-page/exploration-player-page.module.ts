@@ -63,7 +63,8 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
-    RefresherExplorationConfirmationModal
+    RefresherExplorationConfirmationModal,
+    ProgressNavComponent,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -74,7 +75,8 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
-    RefresherExplorationConfirmationModal
+    RefresherExplorationConfirmationModal,
+    ProgressNavComponent,
   ],
   providers: [
     {
@@ -97,6 +99,7 @@ class ExplorationPlayerPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { ProgressNavComponent } from './layout-directives/progress-nav.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

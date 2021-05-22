@@ -16,187 +16,180 @@
  * @fileoverview Component for navigation in the conversation skin.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { StateCard } from 'domain/state_card/StateCardObjectFactory';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { Subscription } from 'rxjs';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ExplorationPlayerConstants } from '../exploration-player-page.constants';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
+import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
+import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
 
 @Component({
   selector: 'oppia-progress-nav',
   templateUrl: './progress-nav.component.html'
 })
 export class ProgressNavComponent {
-  @Input() onSubmit;
-  @Input() onClickContinueButton;
+  @Output() onSubmit: EventEmitter<void> = (
+    new EventEmitter());
+  @Output() onClickContinueButton: EventEmitter<void> = (
+    new EventEmitter());
   @Input() isLearnAgainButton: boolean;
-  @Input() displayedCard;
+  @Input() displayedCard: StateCard;
   @Input() submitButtonIsShown: boolean;
   @Input() submitButtonIsDisabled: boolean;
+  directiveSubscriptions = new Subscription();
+  transcriptLength = 0;
+  interactionIsInline = true;
+  CONTINUE_BUTTON_FOCUS_LABEL = (
+    ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);
+  SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
+    'ItemSelectionInput', 'MultipleChoiceInput'];
+  displayedCardIndex: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+  conceptCardIsBeingShown: boolean;
+  interactionCustomizationArgs;
+  interactionId: string;
+  helpCardHasContinueButton: boolean;
+  isIframed: boolean;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
-    private explorationEngineService: ExplorationEngineService
+    private explorationEngineService: ExplorationEngineService,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private focusManagerService: FocusManagerService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private urlService: UrlService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
+
+  updateDisplayedCardInfo(): void {
+    this.transcriptLength = this.playerTranscriptService.getNumCards();
+    this.hasPrevious = this.displayedCardIndex > 0;
+    this.hasNext = !this.playerTranscriptService.isLastCard(
+      this.displayedCardIndex);
+    this.conceptCardIsBeingShown = (
+      this.displayedCard.getStateName() === null &&
+      !this.explorationPlayerStateService.isInQuestionMode());
+    if (!this.conceptCardIsBeingShown) {
+      this.interactionIsInline = this.displayedCard.isInteractionInline();
+      this.interactionCustomizationArgs = this.displayedCard
+        .getInteractionCustomizationArgs();
+      this.interactionId = this.displayedCard.getInteractionId();
+
+      if (this.interactionId === 'Continue') {
+        // To ensure that focus is added after all functions
+        // in main thread are completely executed.
+        setTimeout(() => {
+          this.focusManagerService.setFocusWithoutScroll('continue-btn');
+        }, 0);
+      }
+    }
+    this.helpCardHasContinueButton = false;
+  }
+
+  doesInteractionHaveNavSubmitButton(): boolean {
+    try {
+      return (
+        Boolean(this.interactionId) &&
+        InteractionSpecsConstants.INTERACTION_SPECS[this.interactionId].
+          show_generic_submit_button);
+    } catch (e) {
+      let additionalInfo = (
+        '\nSubmit button debug logs:\ninterationId: ' +
+        this.interactionId);
+      e.message += additionalInfo;
+      throw e;
+    }
+  }
+
+  doesInteractionHaveSpecialCaseForMobile(): boolean {
+    // The submit button should be shown:
+    // 1. In mobile mode, if the current interaction is either
+    //    ItemSelectionInput or MultipleChoiceInput.
+    // 2. In desktop mode, if the current interaction is
+    //    ItemSelectionInput with maximum selectable choices > 1.
+    if (this.browserCheckerService.isMobileDevice()) {
+      return (this.SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
+        this.interactionId) >= 0);
+    } else {
+      return (
+        this.interactionId === 'ItemSelectionInput' &&
+              this.interactionCustomizationArgs
+                .maxAllowableSelectionCount.value > 1);
+    }
+  }
+
+  changeCard(index: number): void {
+    if (index >= 0 && index < this.transcriptLength) {
+      this.playerPositionService.recordNavigationButtonClick();
+      this.playerPositionService.setDisplayedCardIndex(index);
+      this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
+        this.playerPositionService.getCurrentStateName());
+      this.playerPositionService.changeCurrentQuestion(index);
+    } else {
+      throw new Error('Target card index out of bounds.');
+    }
+  }
+
+  // Returns whether the screen is wide enough to fit two
+  // cards (e.g., the tutor and supplemental cards) side-by-side.
+  canWindowShowTwoCards(): boolean {
+    return this.windowDimensionsService.getWidth() >
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX;
+  }
+
+  shouldGenericSubmitButtonBeShown(): boolean {
+    if (this.doesInteractionHaveSpecialCaseForMobile()) {
+      return true;
+    }
+
+    return (this.doesInteractionHaveNavSubmitButton() && (
+      this.interactionIsInline ||
+      !this.canWindowShowTwoCards()
+    ));
+  }
+
+  shouldContinueButtonBeShown(): boolean {
+    if (this.conceptCardIsBeingShown) {
+      return true;
+    }
+    return Boolean(
+      this.interactionIsInline &&
+      this.displayedCard.isCompleted() &&
+      this.displayedCard.getLastOppiaResponse());
+  }
+
+
+  ngOnInit(): void {
+    this.isIframed = this.urlService.isIframed();
+    // $scope.$watch(function() {
+    //   return this.playerPositionService.getDisplayedCardIndex();
+    // }, updateDisplayedCardInfo);
+
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onHelpCardAvailable.subscribe(
+        (helpCard) => {
+          this.helpCardHasContinueButton = helpCard.hasContinueButton;
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
 }
 
 angular.module('oppia').directive('oppiaProgressNav',
   downgradeComponent({
     component: ProgressNavComponent
   }) as angular.IDirectiveFactory);
-
-// angular.module('oppia').directive('progressNav', [
-//   function() {
-//     return {
-//       restrict: 'E',
-//       scope: {
-//         onSubmit: '&',
-//         onClickContinueButton: '&',
-//         isLearnAgainButton: '&',
-//         getDisplayedCard: '&displayedCard',
-//         isSubmitButtonShown: '&submitButtonIsShown',
-//         isSubmitButtonDisabled: '&submitButtonIsDisabled'
-//       },
-//       template: require('./progress-nav.directive.html'),
-//       controller: [
-//         '$scope', '$timeout', 'BrowserCheckerService',
-//         'ExplorationEngineService', 'ExplorationPlayerStateService',
-//         'FocusManagerService',
-//         'PlayerPositionService', 'PlayerTranscriptService', 'UrlService',
-//         'WindowDimensionsService', 'CONTINUE_BUTTON_FOCUS_LABEL',
-//         'INTERACTION_SPECS', 'TWO_CARD_THRESHOLD_PX',
-//         function(
-//             $scope, $timeout, BrowserCheckerService,
-//             ExplorationEngineService, ExplorationPlayerStateService,
-//             FocusManagerService,
-//             PlayerPositionService, PlayerTranscriptService, UrlService,
-//             WindowDimensionsService, CONTINUE_BUTTON_FOCUS_LABEL,
-//             INTERACTION_SPECS, TWO_CARD_THRESHOLD_PX) {
-//           var ctrl = this;
-//           ctrl.directiveSubscriptions = new Subscription();
-//           var transcriptLength = 0;
-//           var interactionIsInline = true;
-//           var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
-//             'ItemSelectionInput', 'MultipleChoiceInput'];
-
-//           var updateDisplayedCardInfo = function() {
-//             transcriptLength = PlayerTranscriptService.getNumCards();
-//             $scope.displayedCardIndex =
-//               PlayerPositionService.getDisplayedCardIndex();
-//             $scope.displayedCard = $scope.getDisplayedCard();
-//             $scope.hasPrevious = $scope.displayedCardIndex > 0;
-//             $scope.hasNext = !PlayerTranscriptService.isLastCard(
-//               $scope.displayedCardIndex);
-//             $scope.conceptCardIsBeingShown = (
-//               $scope.displayedCard.getStateName() === null &&
-//               !ExplorationPlayerStateService.isInQuestionMode());
-//             if (!$scope.conceptCardIsBeingShown) {
-//               interactionIsInline = (
-//                 $scope.displayedCard.isInteractionInline());
-//               $scope.interactionCustomizationArgs =
-//                 $scope.displayedCard.getInteractionCustomizationArgs();
-//               $scope.interactionId = $scope.displayedCard.getInteractionId();
-//               if ($scope.interactionId === 'Continue') {
-//                 // To ensure that focus is added after all functions
-//                 // in main thread are completely executed.
-//                 $timeout(() => {
-//                   FocusManagerService.setFocusWithoutScroll('continue-btn');
-//                 }, 0);
-//               }
-//             }
-
-//             $scope.helpCardHasContinueButton = false;
-//           };
-
-//           var doesInteractionHaveNavSubmitButton = function() {
-//             try {
-//               return (
-//                 Boolean($scope.interactionId) &&
-//                 INTERACTION_SPECS[$scope.interactionId].
-//                   show_generic_submit_button);
-//             } catch (e) {
-//               var additionalInfo = (
-//                 '\nSubmit button debug logs:\ninterationId: ' +
-//                 $scope.interactionId);
-//               e.message += additionalInfo;
-//               throw e;
-//             }
-//           };
-
-//           var doesInteractionHaveSpecialCaseForMobile = function() {
-//             // The submit button should be shown:
-//             // 1. In mobile mode, if the current interaction is either
-//             //    ItemSelectionInput or MultipleChoiceInput.
-//             // 2. In desktop mode, if the current interaction is
-//             //    ItemSelectionInput with maximum selectable choices > 1.
-//             if (BrowserCheckerService.isMobileDevice()) {
-//               return (SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
-//                 $scope.interactionId) >= 0);
-//             } else {
-//               return (
-//                 $scope.interactionId === 'ItemSelectionInput' &&
-//                       $scope.interactionCustomizationArgs
-//                         .maxAllowableSelectionCount.value > 1);
-//             }
-//           };
-
-//           $scope.changeCard = function(index) {
-//             if (index >= 0 && index < transcriptLength) {
-//               PlayerPositionService.recordNavigationButtonClick();
-//               PlayerPositionService.setDisplayedCardIndex(index);
-//               ExplorationEngineService.onUpdateActiveStateIfInEditor.emit(
-//                 PlayerPositionService.getCurrentStateName());
-//               PlayerPositionService.changeCurrentQuestion(index);
-//             } else {
-//               throw new Error('Target card index out of bounds.');
-//             }
-//           };
-
-//           // Returns whether the screen is wide enough to fit two
-//           // cards (e.g., the tutor and supplemental cards) side-by-side.
-//           $scope.canWindowShowTwoCards = function() {
-//             return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
-//           };
-
-//           $scope.shouldGenericSubmitButtonBeShown = function() {
-//             if (doesInteractionHaveSpecialCaseForMobile()) {
-//               return true;
-//             }
-
-//             return (doesInteractionHaveNavSubmitButton() && (
-//               interactionIsInline ||
-//               !$scope.canWindowShowTwoCards()
-//             ));
-//           };
-
-//           $scope.shouldContinueButtonBeShown = function() {
-//             if ($scope.conceptCardIsBeingShown) {
-//               return true;
-//             }
-//             return Boolean(
-//               interactionIsInline &&
-//               $scope.displayedCard.isCompleted() &&
-//               $scope.displayedCard.getLastOppiaResponse());
-//           };
-
-//           ctrl.$onInit = function() {
-//             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
-//             $scope.isIframed = UrlService.isIframed();
-//             $scope.$watch(function() {
-//               return PlayerPositionService.getDisplayedCardIndex();
-//             }, updateDisplayedCardInfo);
-
-//             ctrl.directiveSubscriptions.add(
-//               PlayerPositionService.onHelpCardAvailable.subscribe(
-//                 (helpCard) => {
-//                   $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
-//                 }
-//               )
-//             );
-//           };
-//           ctrl.$onDestroy = function() {
-//             ctrl.directiveSubscriptions.unsubscribe();
-//           };
-//         }
-//       ]
-//     };
-//   }]);
