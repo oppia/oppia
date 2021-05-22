@@ -57,27 +57,27 @@
 
     <div *ngIf="!explorationIsPrivate" class="oppia-info-card-bottom-row">
       <div class="row">
-          <div class="oppia-info-card-tag-icon">
-            <span class="fas fa-tags oppia-info-card-modal-tooltip"
-                  [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"
-                  placement="top">
-              <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_TAGS_TOOLTIP' | translate }}</span>
+        <div class="oppia-info-card-tag-icon">
+          <span class="fas fa-tags oppia-info-card-modal-tooltip"
+                [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"
+                placement="top">
+            <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_TAGS_TOOLTIP' | translate }}</span>
+          </span>
+        </div>
+        <div class="center">
+            <span *ngIf="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
+                      [ngbTooltip]="explorationTags.tagsInTooltip.join(', ')"
+                      placement="right">
+                      {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}"
             </span>
-          </div>
-          <div class="center">
-              <span *ngIf="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
-                        [ngbTooltip]="explorationTags.tagsInTooltip.join(', ')"
-                        placement="right">
-                        {{ 'I18N_PLAYER_PLUS_TAGS' | translate:{ additionalTagNumber: explorationTags.tagsInTooltip.length } }}"
-              </span>
-              <span *ngIf="explorationTags.tagsToShow.length > 0">
-                {{ explorationTags.tagsToShow.join(", ") }}
-              </span>
-              <span *ngIf="explorationTags.tagsToShow.length === 0 &&
-                explorationTags.tagsInTooltip.length === 0">
-                <span><em>{{ 'I18N_PLAYER_NO_TAGS' | translate }}</em></span>
-              </span>
-          </div>
+            <span *ngIf="explorationTags.tagsToShow.length > 0">
+              {{ explorationTags.tagsToShow.join(", ") }}
+            </span>
+            <span *ngIf="explorationTags.tagsToShow.length === 0 &&
+              explorationTags.tagsInTooltip.length === 0">
+              <span><em>{{ 'I18N_PLAYER_NO_TAGS' | translate }}</em></span>
+            </span>
+        </div>
       </div>
       <div flex="60">
         <sharing-links flex="45" layoutType="row wrap" layoutAlignType="end center"
@@ -127,15 +127,15 @@
     justify-content: space-between;
   }
   .center {
-    align-items: center;
     align-content: center;
+    align-items: center;
   }
   .row-item {
     flex-grow: 1;
   }
   .card-metrics {
-    max-width: 100%;
     box-sizing: border-box  ;
+    max-width: 100%;
   }
   .oppia-info-card-exploration-contributors-profile {
     justify-content: flex-end;
