@@ -81,11 +81,11 @@ class QuestionsListHandler(base.BaseHandler):
                 offset=next_offset)
         )
 
-        # To check whether there are more questions
+        # To check whether there are more questions.
         if next_offset == temp_next_offset:
             more = False
 
-        # Pass null to frontend if there are no more questions
+        # Pass null to frontend if there are no more questions.
         if not more:
             next_offset = None
 
