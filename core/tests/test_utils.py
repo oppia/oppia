@@ -956,7 +956,7 @@ class TestBase(unittest.TestCase):
                 defaultTestResult() method) and used instead.
         """
 
-        with contextlib2.ExitStack() as stack:
+        with contextlib.ExitStack() as stack:
             if self.run_with_emulator:
                 stack.enter_context(
                     datastore_services.get_ndb_context(
