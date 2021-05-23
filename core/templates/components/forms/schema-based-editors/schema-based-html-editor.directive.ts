@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-rte.component.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 angular.module('oppia').directive('schemaBasedHtmlEditor', [
@@ -32,10 +32,11 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
       },
       template: require('./schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {
+      controller: ['$scope', function($scope) {
         var ctrl = this;
         ctrl.updateValue = function(value: string) {
           ctrl.localValue = value;
+          $scope.$applyAsync();
         };
       }]
     };

@@ -57,7 +57,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'Base.ts',
     'boolean-editor.component.ts',
     'change-list.service.ts',
-    'ck-editor-4-rte.directive.ts',
+    'ck-editor-4-rte.component.ts',
     'ck-editor-4-widgets.initializer.ts',
     'code-string-editor.component.ts',
     'collection-details-editor.directive.ts',

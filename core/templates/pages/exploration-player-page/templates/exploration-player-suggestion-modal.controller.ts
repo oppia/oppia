@@ -51,6 +51,7 @@ angular.module('oppia').controller(
 
       $scope.updateValue = function(value: string) {
         $scope.suggestionData.suggestionHtml = value;
+        $scope.$applyAsync();
       };
 
       $scope.submitSuggestion = function() {

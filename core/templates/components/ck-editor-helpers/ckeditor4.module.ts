@@ -22,14 +22,12 @@ import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { CodemirrorModule } from '@ctrl/ngx-codemirror';
-import { CkEditor4RteComponent } from './ck-editor-4-rte.directive';
+import { CkEditor4RteComponent } from './ck-editor-4-rte.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    CodemirrorModule,
   ],
   declarations: [
     CkEditor4RteComponent

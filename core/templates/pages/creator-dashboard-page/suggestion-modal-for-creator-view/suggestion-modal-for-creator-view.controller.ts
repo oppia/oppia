@@ -117,6 +117,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
 
     $scope.updateValue = function(value: string) {
       $scope.suggestionData.newSuggestionHtml = value;
+      $scope.$applyAsync();
     };
 
     $scope.resubmitChanges = function() {

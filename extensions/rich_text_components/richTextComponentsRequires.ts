@@ -40,3 +40,4 @@ require(
 require(
   'rich_text_components/Video/directives/' +
   'oppia-noninteractive-video.component.ts');
+require('rich_text_components/rte-output-display.component.ts');

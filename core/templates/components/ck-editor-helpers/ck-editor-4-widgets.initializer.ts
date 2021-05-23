@@ -21,9 +21,31 @@ import { NgZone } from '@angular/core';
 import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
+interface RteComponentSpecs {
+  backendId: string;
+  customizationArgSpecs: {
+    name: string, value: unknown, 'default_value': unknown
+  }[];
+  id: string;
+  iconDataUrl: string;
+  isComplex: boolean;
+  isBlockElement: boolean;
+  requiresFs: boolean;
+  tooltip: string;
+}
+
+interface RteHelperService {
+  createCustomizationArgDictFromAttrs: (attrs) => Record<string, unknown>;
+  getRichTextComponents: () => RteComponentSpecs[];
+  isInlineComponent: (string) => boolean;
+  openCustomizationModal: (
+    customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+    onDismissCallback) => void
+}
+
 // eslint-disable-next-line func-style
 export function ckEditorInitializer(
-  rteHelperService: any,
+  rteHelperService: RteHelperService,
   htmlEscaperService: HtmlEscaperService,
   contextService: ContextService, ngZone: NgZone): void {
   ngZone.runOutsideAngular(() => {
@@ -201,7 +223,7 @@ export function ckEditorInitializer(
                     spec.name, htmlEscaperService.escapedJsonToObj(value));
                 }
               });
-              ngZone.runOutsideAngular(() => {
+              setTimeout(() => {
                 editor.fire('unlockSnapshot');
                 editor.fire('saveSnapshot');
               });
