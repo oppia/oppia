@@ -36,6 +36,7 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
+import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 
 @NgModule({
   imports: [
@@ -50,6 +51,7 @@ import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.compo
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
+    TopicPreviewTabComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -57,6 +59,7 @@ import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.compo
     StoriesListComponent,
     SubtopicsListComponent,
     SubtopicPreviewTab,
+    TopicPreviewTabComponent,
   ],
   providers: [
     {
