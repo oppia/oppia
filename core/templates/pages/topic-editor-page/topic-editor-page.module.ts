@@ -37,6 +37,8 @@ import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { SubtopicPreviewTab } from './subtopic-editor/subtopic-preview-tab.component';
 import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
+import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
+import { QuestionDifficultySelectorComponent } from 'components/question-difficulty-selector/question-difficulty-selector.component';
 
 @NgModule({
   imports: [
@@ -52,6 +54,8 @@ import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.compon
     SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
+    TopicEditorNavbarBreadcrumbComponent,
+    QuestionDifficultySelectorComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
@@ -60,6 +64,8 @@ import { TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.compon
     SubtopicsListComponent,
     SubtopicPreviewTab,
     TopicPreviewTabComponent,
+    TopicEditorNavbarBreadcrumbComponent,
+    QuestionDifficultySelectorComponent
   ],
   providers: [
     {
