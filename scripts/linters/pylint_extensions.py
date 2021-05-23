@@ -2165,7 +2165,7 @@ class StringConcatenationChecker(checkers.BaseChecker):
 
     def is_node_string_constant(self, node):
         """Helper function for visit_binop. Called to check if any of the
-        operand is a string constant.
+         operand is a string constant.
 
         Args:
             node: astroid.node_classes.NodeNG. Node containing the operand.

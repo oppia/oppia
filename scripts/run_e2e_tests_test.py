@@ -24,6 +24,7 @@ import sys
 import time
 
 from core.tests import test_utils
+import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
@@ -31,8 +32,6 @@ from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 from scripts import scripts_test_utils
 from scripts import servers
-
-import contextlib2
 
 CHROME_DRIVER_VERSION = '77.0.3865.40'
 
@@ -44,7 +43,8 @@ def mock_managed_process(*unused_args, **unused_kwargs):
         Context manager. A context manager that always yields a mock
         process.
     """
-    return contextlib2.nullcontext(enter_result=scripts_test_utils.PopenStub())
+    return python_utils.nullcontext(
+        enter_result=scripts_test_utils.PopenStub(alive=False))
 
 
 class RunE2ETestsTests(test_utils.GenericTestBase):
@@ -52,7 +52,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RunE2ETestsTests, self).setUp()
-        self.exit_stack = contextlib2.ExitStack()
+        self.exit_stack = python_utils.ExitStack()
 
     def tearDown(self):
         try:
@@ -276,9 +276,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_work_with_non_ascii_chars(self):
         def mock_managed_protractor_server(**unused_kwargs): # pylint: disable=unused-argument
-            return contextlib2.nullcontext(
+            return python_utils.nullcontext(
                 enter_result=scripts_test_utils.PopenStub(
-                    stdout='sample\n✓\noutput\n'))
+                    stdout='sample\n✓\noutput\n', alive=False))
 
         self.exit_stack.enter_context(self.swap_with_checks(
             run_e2e_tests, 'is_oppia_server_already_running', lambda *_: False))

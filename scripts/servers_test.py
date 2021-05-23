@@ -23,6 +23,7 @@ import logging
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -34,7 +35,6 @@ from scripts import common
 from scripts import scripts_test_utils
 from scripts import servers
 
-import contextlib2
 import mock
 import psutil
 
@@ -47,7 +47,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def setUp(self):
         super(ManagedProcessTests, self).setUp()
-        self.exit_stack = contextlib2.ExitStack()
+        self.exit_stack = python_utils.ExitStack()
 
     def tearDown(self):
         try:
@@ -130,7 +130,7 @@ class ManagedProcessTests(test_utils.TestBase):
         new_makedirs = test_utils.CallCounter(
             lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw))
 
-        with contextlib2.ExitStack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             exit_stack.enter_context(self.swap(os.path, 'exists', new_exists))
             exit_stack.enter_context(self.swap(shutil, 'rmtree', new_rmtree))
             exit_stack.enter_context(self.swap(os, 'makedirs', new_makedirs))
@@ -590,21 +590,58 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_portserver(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        self.exit_stack.enter_context(servers.managed_portserver())
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
-        self.assertEqual(
-            popen_calls[0].program_args,
-            'python -m scripts.run_portserver '
-            '--portserver_unix_socket_address %s' % (
-                common.PORTSERVER_SOCKET_FILEPATH))
+        self.assertEqual(popen_calls[0].program_args, [
+            'python', '-m', 'scripts.run_portserver',
+            '--portserver_unix_socket_address',
+            common.PORTSERVER_SOCKET_FILEPATH,
+        ])
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(proc.terminate_count, 0)
+        self.assertEqual(proc.kill_count, 0)
+
+    def test_managed_portserver_when_signals_are_rejected(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
+        proc.reject_signal = True
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(popen_calls[0].program_args, [
+            'python', '-m', 'scripts.run_portserver',
+            '--portserver_unix_socket_address',
+            common.PORTSERVER_SOCKET_FILEPATH,
+        ])
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(proc.terminate_count, 1)
+        self.assertEqual(proc.kill_count, 0)
+
+    def test_managed_portserver_when_unresponsive(self):
+        popen_calls = self.exit_stack.enter_context(self.swap_popen())
+
+        proc = self.exit_stack.enter_context(servers.managed_portserver())
+        proc.unresponsive = True
+        self.exit_stack.close()
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertEqual(popen_calls[0].program_args, [
+            'python', '-m', 'scripts.run_portserver',
+            '--portserver_unix_socket_address',
+            common.PORTSERVER_SOCKET_FILEPATH,
+        ])
+        self.assertEqual(proc.signals_received, [signal.SIGINT])
+        self.assertEqual(proc.terminate_count, 1)
+        self.assertEqual(proc.kill_count, 1)
 
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen(
             outputs=['abc', 'Built at: 123', 'def']))
         str_io = python_utils.string_io()
-        self.exit_stack.enter_context(contextlib2.redirect_stdout(str_io))
+        self.exit_stack.enter_context(python_utils.redirect_stdout(str_io))
         logs = self.exit_stack.enter_context(self.capture_logging())
 
         proc = self.exit_stack.enter_context(servers.managed_webpack_compiler(
@@ -628,7 +665,7 @@ class ManagedProcessTests(test_utils.TestBase):
         # NOTE: The 'Built at: ' message is never printed.
         self.exit_stack.enter_context(self.swap_popen(outputs=['abc', 'def']))
         str_io = python_utils.string_io()
-        self.exit_stack.enter_context(contextlib2.redirect_stdout(str_io))
+        self.exit_stack.enter_context(python_utils.redirect_stdout(str_io))
 
         self.assertRaisesRegexp(
             IOError, 'First build never completed',
@@ -737,6 +774,9 @@ class ManagedProcessTests(test_utils.TestBase):
                      '--versions.chrome', '123'],
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(
             servers.managed_webdriver_server(chrome_version='123'))
@@ -745,7 +785,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 123 --detach --quiet' % (
+            '%s %s start --versions.chrome 123 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_on_mac_os(self):
@@ -769,6 +809,9 @@ class ManagedProcessTests(test_utils.TestBase):
                     '/LATEST_RELEASE_4.5.6',
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(servers.managed_webdriver_server())
         self.exit_stack.close()
@@ -776,7 +819,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 4.5.6 --detach --quiet' % (
+            '%s %s start --versions.chrome 4.5.6 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_on_non_mac_os(self):
@@ -796,6 +839,9 @@ class ManagedProcessTests(test_utils.TestBase):
                     '/LATEST_RELEASE_1.2.3',
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(servers.managed_webdriver_server())
         self.exit_stack.close()
@@ -803,7 +849,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 1.2.3 --detach --quiet' % (
+            '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_webdriver_fails_to_get_chrome_version(self):
@@ -811,6 +857,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
         self.exit_stack.enter_context(self.swap_to_always_raise(
             subprocess, 'check_output', error=OSError))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None, called=False))
 
         expected_regexp = 'Failed to execute "google-chrome --version" command'
         with self.assertRaisesRegexp(Exception, expected_regexp):
@@ -831,7 +879,7 @@ class ManagedProcessTests(test_utils.TestBase):
             common, 'is_x64_architecture', value=True))
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'inplace_replace_file_context',
-            lambda *_: contextlib2.nullcontext(), expected_args=[
+            lambda *_: python_utils.nullcontext(), expected_args=[
                 (
                     common.CHROME_PROVIDER_FILE_PATH,
                     r'this\.osArch\ \=\ os\.arch\(\)\;',
@@ -843,6 +891,9 @@ class ManagedProcessTests(test_utils.TestBase):
                     'this.osArch = "x64";',
                 ),
             ]))
+        self.exit_stack.enter_context(self.swap_with_checks(
+            common, 'wait_for_port_to_be_in_use', lambda _: None,
+            expected_args=[(4444,)]))
 
         self.exit_stack.enter_context(servers.managed_webdriver_server())
         self.exit_stack.close()
@@ -850,7 +901,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s %s start --versions.chrome 1.2.3 --detach --quiet' % (
+            '%s %s start --versions.chrome 1.2.3 --quiet --standalone' % (
                 common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH))
 
     def test_managed_protractor_with_invalid_sharding_instances(self):
@@ -883,10 +934,8 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.PROTRACTOR_CONFIG_FILE_PATH),
             program_args)
         self.assertNotIn('--inspect-brk', program_args)
-        self.assertIn('--capabilities.shardTestFiles=True', program_args)
-        self.assertIn('--capabilities.maxInstances=1', program_args)
         self.assertIn('--params.devMode=True', program_args)
-        self.assertIn('--suite=full', program_args)
+        self.assertIn('--suite full', program_args)
 
     def test_managed_protractor_with_explicit_args(self):
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -908,4 +957,4 @@ class ManagedProcessTests(test_utils.TestBase):
         # From dev_mode=True.
         self.assertIn('--params.devMode=False', program_args)
         # From suite='full'.
-        self.assertIn('--suite=abc', program_args)
+        self.assertIn('--suite abc', program_args)

@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import io
+import itertools
 import os
 import sys
 
@@ -57,6 +58,57 @@ RANGE = builtins.range
 ROUND = builtins.round
 UNICODE = builtins.str
 ZIP = builtins.zip
+
+
+def redirect_stdout(new_target):
+    """Returns redirect_stdout from contextlib2 if run under Python 2 and from
+    contextlib if run under Python 3.
+
+    Args:
+        new_target: FileLike. The file-like object all messages printed to
+            stdout will be redirected to.
+
+    Returns:
+        contextlib.redirect_stdout or contextlib2.redirect_stdout. The
+        redirect_stdout object.
+    """
+    try:
+        from contextlib import redirect_stdout as impl # pylint: disable=import-only-modules
+    except ImportError:
+        from contextlib2 import redirect_stdout as impl # pylint: disable=import-only-modules
+    return impl(new_target)
+
+
+def nullcontext(enter_result=None):
+    """Returns nullcontext from contextlib2 if run under Python 2 and from
+    contextlib if run under Python 3.
+
+    Args:
+        enter_result: *. The object returned by the nullcontext when entered.
+
+    Returns:
+        contextlib.nullcontext or contextlib2.nullcontext. The nullcontext
+        object.
+    """
+    try:
+        from contextlib import nullcontext as impl # pylint: disable=import-only-modules
+    except ImportError:
+        from contextlib2 import nullcontext as impl # pylint: disable=import-only-modules
+    return impl(enter_result=enter_result)
+
+
+def ExitStack(): # pylint: disable=invalid-name
+    """Returns ExitStack from contextlib2 if run under Python 2 and from
+    contextlib if run under Python 3.
+
+    Returns:
+        contextlib.ExitStack or contextlib2.ExitStack. The ExitStack object.
+    """
+    try:
+        from contextlib import ExitStack as impl # pylint: disable=import-only-modules
+    except ImportError:
+        from contextlib2 import ExitStack as impl # pylint: disable=import-only-modules
+    return impl()
 
 
 def string_io(buffer_value=b''):
@@ -511,7 +563,8 @@ def create_enum(*sequential):
     enum_values = dict(ZIP(sequential, sequential))
     try:
         from enum import Enum # pylint: disable=import-only-modules
-        return Enum('Enum', enum_values)
+        # The type() of argument 1 in Enum must be str, not unicode.
+        return Enum(str('Enum'), enum_values) # pylint: disable=disallowed-function-calls
     except ImportError:
         _enums = {}
         for name, value in enum_values.items():
@@ -521,3 +574,23 @@ def create_enum(*sequential):
             }
             _enums[name] = type(b'Enum', (), _value)
         return type(b'Enum', (), _enums)
+
+
+def zip_longest(*args, **kwargs):
+    """Creates an iterator that aggregates elements from each of the iterables.
+    If the iterables are of uneven length, missing values are
+    filled-in with fillvalue.
+
+    Args:
+        *args: list(*). Iterables that needs to be aggregated into an iterable.
+        **kwargs: dict. It contains fillvalue.
+
+    Returns:
+        iterable(iterable). A sequence of aggregates elements
+        from each of the iterables.
+    """
+    fillvalue = kwargs.get('fillvalue')
+    try:
+        return itertools.zip_longest(*args, fillvalue=fillvalue)
+    except AttributeError:
+        return itertools.izip_longest(*args, fillvalue=fillvalue)

@@ -621,6 +621,154 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_role_from_id(user_id),
             feconf.ROLE_ID_COLLECTION_EDITOR)
 
+    def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
+            self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+    def test_assign_ban_user_to_exp_editor_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_BANNED_USER)
+        self.assertEqual(user_settings_model.roles, [])
+        self.assertTrue(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        self.assertEqual(
+            user_services.get_user_role_from_id(user_id),
+            feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+    def test_assign_exp_editor_to_other_roles_updates_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_COLLECTION_EDITOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_TOPIC_MANAGER])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_MODERATOR)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_MODERATOR)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_MODERATOR])
+        self.assertFalse(user_settings_model.banned)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_ADMIN)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+
+        self.assertEqual(
+            user_settings_model.role, feconf.ROLE_ID_ADMIN)
+        self.assertEqual(
+            user_settings_model.roles, [
+                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_ADMIN])
+        self.assertFalse(user_settings_model.banned)
+
+    def test_profile_user_settings_have_correct_roles(self):
+        auth_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings_model.pin = '12346'
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        profile_user_data_dict = {
+            'schema_version': 1,
+            'display_alias': 'display_alias3',
+            'pin': '12345',
+            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None,
+            'user_id': None,
+        }
+        modifiable_user_data = user_domain.ModifiableUserData.from_raw_dict(
+            profile_user_data_dict)
+        profile_user_id = user_services.create_new_profiles(
+            auth_id, user_email, [modifiable_user_data])[0].user_id
+        profile_user_settings_model = user_models.UserSettingsModel.get_by_id(
+            profile_user_id)
+
+        self.assertEqual(
+            profile_user_settings_model.role, feconf.ROLE_ID_LEARNER)
+        self.assertEqual(
+            profile_user_settings_model.roles, [feconf.ROLE_ID_LEARNER])
+        self.assertFalse(profile_user_settings_model.banned)
+
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
         non_existent_user_id = 'id_x'
         error_msg = 'Parent user not found.'

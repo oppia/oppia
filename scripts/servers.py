@@ -22,6 +22,7 @@ import logging
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -63,21 +64,23 @@ def managed_process(
         sys.path.insert(1, common.PSUTIL_DIR)
     import psutil
 
-    get_debug_info = lambda p: (
+    get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
-        if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid,))
+        if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid))
 
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
-    python_utils.PRINT('Starting new %s: %s' % (human_readable_name, command))
+    human_readable_command = command if shell else ' '.join(command)
+    python_utils.PRINT(
+        'Starting new %s: %s' % (human_readable_name, human_readable_command))
     popen_proc = psutil.Popen(command, shell=shell, **popen_kwargs)
 
     try:
         yield popen_proc
     finally:
-        python_utils.PRINT('Stopping %s...' % get_debug_info(popen_proc))
+        python_utils.PRINT('Stopping %s...' % get_proc_info(popen_proc))
         procs_still_alive = [popen_proc]
         try:
             if popen_proc.is_running():
@@ -89,24 +92,24 @@ def managed_process(
             procs_to_kill = []
             for proc in procs_still_alive:
                 if proc.is_running():
-                    logging.info('Terminating %s...' % get_debug_info(proc))
+                    logging.info('Terminating %s...' % get_proc_info(proc))
                     proc.terminate()
                     procs_to_kill.append(proc)
                 else:
-                    logging.info('%s has already ended.' % get_debug_info(proc))
+                    logging.info('%s has already ended.' % get_proc_info(proc))
 
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_debug_info(proc))
+                logging.warn('Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
-                logging.info('%s has already ended.' % get_debug_info(proc))
+                logging.info('%s has already ended.' % get_proc_info(proc))
         except Exception:
             # NOTE: Raising an exception while exiting a context manager is bad
             # practice, so we log and suppress exceptions instead.
             logging.exception(
-                'Failed to stop %s gracefully!' % get_debug_info(popen_proc))
+                'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
 
 
 @contextlib.contextmanager
@@ -240,9 +243,6 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
     Yields:
         psutil.Process. The emulator process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     emulator_hostport = '%s:%d' % (
         feconf.CLOUD_DATASTORE_EMULATOR_HOST,
         feconf.CLOUD_DATASTORE_EMULATOR_PORT)
@@ -254,7 +254,7 @@ def managed_cloud_datastore_emulator(clear_datastore=False):
         '--no-store-on-disk', '--consistency=1.0', '--quiet',
     ]
 
-    with contextlib2.ExitStack() as stack:
+    with python_utils.ExitStack() as stack:
         data_dir_exists = os.path.exists(
             common.CLOUD_DATASTORE_EMULATOR_DATA_DIR)
         if clear_datastore and data_dir_exists:
@@ -364,9 +364,6 @@ def managed_webpack_compiler(
     Yields:
         psutil.Process. The Webpack compiler process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     if config_path is not None:
         pass
     elif use_prod_env:
@@ -388,7 +385,7 @@ def managed_webpack_compiler(
     if watch_mode:
         compiler_args.extend(['--color', '--watch', '--progress'])
 
-    with contextlib2.ExitStack() as exit_stack:
+    with python_utils.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
         proc = exit_stack.enter_context(managed_process(
@@ -443,16 +440,45 @@ def managed_portserver():
     Yields:
         psutil.Popen. The Popen subprocess object.
     """
+    # TODO(#11549): Move this to top of the file.
+    if common.PSUTIL_DIR not in sys.path:
+        # Our unit tests already configure sys.path correctly, but the
+        # standalone scripts do not. Because of this, the following line cannot
+        # be covered. This is fine since we want to cleanup this code anyway in
+        # #11549.
+        sys.path.insert(1, common.PSUTIL_DIR) # pragma: nocover
+    import psutil
+
     portserver_args = [
         'python', '-m', 'scripts.run_portserver',
         '--portserver_unix_socket_address', common.PORTSERVER_SOCKET_FILEPATH,
     ]
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
-    proc_context = managed_process(
-        portserver_args, human_readable_name='PortServer', shell=True)
+    proc_context = (
+        managed_process(portserver_args, human_readable_name='Portserver'))
     with proc_context as proc:
-        yield proc
+        try:
+            yield proc
+        finally:
+            # Before exiting the proc_context, try to end the process with
+            # SIGINT. The portserver is configured to shut down cleanly upon
+            # receiving this signal.
+            try:
+                proc.send_signal(signal.SIGINT)
+            except OSError:
+                # Raises when the process has already shutdown, in which case we
+                # can just return immediately.
+                pass
+            else:
+                # Otherwise, give the portserver 10 seconds to shut down after
+                # sending CTRL-C (SIGINT).
+                try:
+                    proc.wait(timeout=10)
+                except psutil.TimeoutExpired:
+                    # If the server fails to shut down, allow proc_context to
+                    # end it by calling terminate() and/or kill().
+                    pass
 
 
 @contextlib.contextmanager
@@ -469,9 +495,6 @@ def managed_webdriver_server(chrome_version=None):
     Yields:
         psutil.Process. The Webdriver process.
     """
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     if chrome_version is None:
         # Although there are spaces between Google and Chrome in the path, we
         # don't need to escape them for Popen (as opposed to on the terminal, in
@@ -510,7 +533,7 @@ def managed_webdriver_server(chrome_version=None):
         '--versions.chrome', chrome_version,
     ])
 
-    with contextlib2.ExitStack() as exit_stack:
+    with python_utils.ExitStack() as exit_stack:
         if common.is_windows_os():
             # NOTE: webdriver-manager (version 13.0.0) uses `os.arch()` to
             # determine the architecture of the operating system, however, this
@@ -539,10 +562,14 @@ def managed_webdriver_server(chrome_version=None):
 
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.
-        yield exit_stack.enter_context(managed_process([
+        proc = exit_stack.enter_context(managed_process([
             common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'start',
-            '--versions.chrome', chrome_version, '--detach', '--quiet',
+            '--versions.chrome', chrome_version, '--quiet', '--standalone',
         ], human_readable_name='Webdriver manager', shell=True))
+
+        common.wait_for_port_to_be_in_use(4444)
+
+        yield proc
 
 
 @contextlib.contextmanager
@@ -574,15 +601,19 @@ def managed_protractor_server(
         '--unhandled-rejections=strict',
         common.PROTRACTOR_BIN_PATH, common.PROTRACTOR_CONFIG_FILE_PATH,
         '--params.devMode=%s' % dev_mode,
-        '--suite=%s' % suite_name,
-        '--capabilities.shardTestFiles=True',
-        '--capabilities.maxInstances=%d' % sharding_instances,
+        '--suite', suite_name,
     ]
 
     if debug_mode:
         # NOTE: This is a flag for Node.js, not Protractor, so we insert it
         # immediately after NODE_BIN_PATH.
         protractor_args.insert(1, '--inspect-brk')
+
+    if sharding_instances > 1:
+        protractor_args.extend([
+            '--capabilities.shardTestFiles=True',
+            '--capabilities.maxInstances=%d' % sharding_instances,
+        ])
 
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.

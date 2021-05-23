@@ -527,7 +527,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
             self):
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
@@ -551,7 +551,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types):
             with self.swap(
                 suggestion_models,
@@ -1027,7 +1027,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         test_export_change_cmd = self.change_cmd
         test_export_score_category = 'category1'
         test_export_thread_id = 'exploration.exp1.thread_export'
-        test_export_language_code = None
+        test_export_language_code = 'en'
+        test_export_edited_by_reviewer = False
 
         suggestion_models.GeneralSuggestionModel.create(
             test_export_suggestion_type,
@@ -1054,8 +1055,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'target_id': test_export_target_id,
                 'target_version_at_submission': test_export_target_version,
                 'status': test_export_status,
-                'change_cmd': test_export_change_cmd
-            }
+                'change_cmd': test_export_change_cmd,
+                'language_code': test_export_language_code,
+                'edited_by_reviewer': test_export_edited_by_reviewer
+            },
+
         }
 
         self.assertEqual(user_data, test_data)

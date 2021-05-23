@@ -773,6 +773,174 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id, self.normal_user_id)
         self.assertEqual(can_resubmit, False)
 
+    def test_update_translation_suggestion_to_change_translation_html(self):
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        add_translation_change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'state 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exploration1', self.target_version_at_submission,
+            self.author_id, add_translation_change_dict, 'test description')
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, '<p>Updated translation</p>'
+        )
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+
+        self.assertEqual(
+            updated_suggestion.change.translation_html,
+            '<p>Updated translation</p>')
+
+    def test_update_question_suggestion_to_change_question_state(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        new_solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>This is the updated solution.</p>',
+            },
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+
+        question_state_data = suggestion_change['question_dict'][
+            'question_state_data']
+        question_state_data['content'][
+            'html'] = '<p>Updated question</p>'
+        question_state_data['interaction'][
+            'solution'] = new_solution_dict
+
+        suggestion_services.update_question_suggestion(
+            suggestion.suggestion_id,
+            suggestion.change.skill_difficulty,
+            question_state_data)
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+        new_question_state_data = updated_suggestion.change.question_dict[
+            'question_state_data']
+
+        self.assertEqual(
+            new_question_state_data['content'][
+                'html'],
+            '<p>Updated question</p>')
+        self.assertEqual(
+            new_question_state_data['interaction'][
+                'solution'],
+            new_solution_dict)
+
+    def test_update_question_suggestion_to_change_skill_difficulty(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+        question_state_data = suggestion.change.question_dict[
+            'question_state_data']
+
+        suggestion_services.update_question_suggestion(
+            suggestion.suggestion_id,
+            0.6,
+            question_state_data)
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion.suggestion_id)
+
+        self.assertEqual(
+            updated_suggestion.change.skill_difficulty,
+            0.6)
+
+    def test_accept_suggestion_commit_message_after_updating_a_suggestion(self):
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exploration1', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+        add_translation_change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'state 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': '<p>Translation for original content.</p>'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exploration1', self.target_version_at_submission,
+            self.author_id, add_translation_change_dict, 'test description')
+
+        suggestion_services.update_translation_suggestion(
+            suggestion.suggestion_id, '<p>Updated translation</p>'
+        )
+
+        suggestion_services.accept_suggestion(
+            suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
+        )
+        snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
+            'exploration1')
+
+        self.assertEqual(
+            snapshots_metadata[2]['commit_message'],
+            'Accepted suggestion by author: Accepted (with edits)')
+
 
 class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     score_category = (
@@ -1845,7 +2013,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             suggestion_services
             .SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS.keys())
         sorted_contributor_dashboard_suggestion_types = sorted(
-            suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
+            feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES)
 
         self.assertListEqual(
             sorted_text_getter_dict_suggestion_types,
@@ -3579,7 +3747,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types):
             with self.swap(
                 suggestion_models,
