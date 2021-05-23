@@ -323,6 +323,8 @@
 /extensions/domain*.py @brianrodri
 /extensions/interactions/ @iamprayush @vojtechjelinek
 /extensions/objects/ @iamprayush
+/extensions/objects/templates/filepath-editor.component*.ts @kevintab95
+/extensions/objects/templates/filepath-editor.component.html @kevintab95
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @iamprayush
 
@@ -620,7 +622,6 @@
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @vojtechjelinek
-/jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo
 /puppeteer-login-script.js @jimbyo @vojtechjelinek

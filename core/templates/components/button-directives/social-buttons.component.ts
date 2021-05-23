@@ -17,6 +17,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -24,7 +25,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 
 @Component({
-  selector: 'social-buttons',
+  selector: 'oppia-social-buttons',
   templateUrl: './social-buttons.component.html',
   styleUrls: []
 })
@@ -45,3 +46,8 @@ export class SocialButtonsComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
+
+angular.module('oppia').directive('oppiaSocialButtons',
+  downgradeComponent({
+    component: SocialButtonsComponent
+  }) as angular.IDirectiveFactory);
