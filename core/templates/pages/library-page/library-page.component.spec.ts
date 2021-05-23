@@ -32,7 +32,6 @@ import { UserService } from 'services/user.service';
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-
 describe('Library controller', function() {
   var ctrl = null;
   var $flushPendingTasks = null;

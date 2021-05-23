@@ -20,6 +20,7 @@ import { LibraryFooterComponent } from 'pages/library-page/library-footer/librar
 import { ComponentFixture, TestBed}
   from '@angular/core/testing';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SharedComponentsModule } from 'components/shared-component.module';
 class MockWindowRef {
   _window = {
     location: {
@@ -53,6 +54,9 @@ describe('Library Footer Component', () => {
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      imports: [
+        SharedComponentsModule
+      ],
       declarations: [LibraryFooterComponent],
       providers: [
         { provide: WindowRef, useValue: windowRef }

@@ -75,7 +75,7 @@ import { LibraryPageComponent } from 'pages/library-page/library-page.component'
     }
   ]
 })
-class LibraryPageModule {
+export class LibraryPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
