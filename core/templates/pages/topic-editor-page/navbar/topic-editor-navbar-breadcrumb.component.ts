@@ -54,33 +54,3 @@ angular.module('oppia').directive('oppiaTopicEditorNavbarBreadcrumb',
   downgradeComponent({
     component: TopicEditorNavbarBreadcrumbComponent
   }) as angular.IDirectiveFactory);
-
-// Angular.module('oppia').directive('topicEditorNavbarBreadcrumb', [
-//   'UrlInterpolationService', function(UrlInterpolationService) {
-//     return {
-//       restrict: 'E',
-//       scope: {},
-//       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//         '/pages/topic-editor-page/navbar/' +
-//         'topic-editor-navbar-breadcrumb.directive.html'),
-//       controller: [
-//         '$scope', 'TopicEditorRoutingService', 'TopicEditorStateService',
-//         function(
-//             $scope, TopicEditorRoutingService, TopicEditorStateService) {
-//           var ctrl = this;
-//           $scope.canNavigateToTopicEditorPage = function() {
-//             const activeTab = TopicEditorRoutingService.getActiveTabName();
-//             return (
-//               activeTab.startsWith('subtopic') ||
-//               TopicEditorRoutingService.getLastTabVisited() === 'subtopic');
-//           };
-//           $scope.navigateToMainTab = function() {
-//             TopicEditorRoutingService.navigateToMainTab();
-//           };
-//           ctrl.$onInit = function() {
-//             $scope.topic = TopicEditorStateService.getTopic();
-//           };
-//         }
-//       ]
-//     };
-//   }]);
