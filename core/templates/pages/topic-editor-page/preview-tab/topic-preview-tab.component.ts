@@ -13,53 +13,59 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the topic preview tab.
+ * @fileoverview Component for the topic preview tab.
  */
 
-require('components/summary-tile/subtopic-summary-tile.directive.ts');
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('pages/topic-viewer-page/subtopics-list/subtopics-list.component.ts');
-require(
-  'pages/topic-viewer-page/stories-list/' +
-    'topic-viewer-stories-list.component.ts');
-require('pages/topic-viewer-page/practice-tab/practice-tab.component.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-    'background-banner.component.ts');
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('topicPreviewTab', {
-  template: require('./topic-preview-tab.component.html'),
-  controllerAs: '$ctrl',
-  controller: ['TopicEditorStateService', 'UrlInterpolationService',
-    function(TopicEditorStateService, UrlInterpolationService) {
-      var ctrl = this;
-      var TAB_STORY = 'story';
-      var TAB_SUBTOPIC = 'subtopic';
-      var TAB_PRACTICE = 'practice';
-      ctrl.$onInit = function() {
-        ctrl.topic = TopicEditorStateService.getTopic();
-        ctrl.topicName = ctrl.topic.getName();
-        ctrl.subtopics = ctrl.topic.getSubtopics();
-        ctrl.activeTab = TAB_STORY;
-        ctrl.canonicalStorySummaries = (
-          TopicEditorStateService.getCanonicalStorySummaries());
-        ctrl.chapterCount = 0;
-        for (var idx in ctrl.canonicalStorySummaries) {
-          ctrl.chapterCount += (
-            ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
-        }
-      };
-      ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-      ctrl.changePreviewTab = function(tabName) {
-        switch (tabName) {
-          case TAB_STORY: ctrl.activeTab = TAB_STORY; break;
-          case TAB_SUBTOPIC: ctrl.activeTab = TAB_SUBTOPIC; break;
-          case TAB_PRACTICE: ctrl.activeTab = TAB_PRACTICE; break;
-        }
-      };
-    }
-  ]
-});
+@Component({
+  selector: 'oppia-topic-preview-tab',
+  templateUrl: './topic-preview-tab.component.html'
+})
+export class TopicPreviewTab {
+  constructor(
+    
+  ) {}
+}
+
+angular.module('oppia').directive('oppiaTopicPreviewTab',
+  downgradeComponent({
+    component: TopicPreviewTab
+  }) as angular.IDirectiveFactory);
+
+// angular.module('oppia').component('topicPreviewTab', {
+//   template: require('./topic-preview-tab.component.html'),
+//   controllerAs: '$ctrl',
+//   controller: ['TopicEditorStateService', 'UrlInterpolationService',
+//     function(TopicEditorStateService, UrlInterpolationService) {
+//       var ctrl = this;
+//       var TAB_STORY = 'story';
+//       var TAB_SUBTOPIC = 'subtopic';
+//       var TAB_PRACTICE = 'practice';
+//       ctrl.$onInit = function() {
+//         ctrl.topic = TopicEditorStateService.getTopic();
+//         ctrl.topicName = ctrl.topic.getName();
+//         ctrl.subtopics = ctrl.topic.getSubtopics();
+//         ctrl.activeTab = TAB_STORY;
+//         ctrl.canonicalStorySummaries = (
+//           TopicEditorStateService.getCanonicalStorySummaries());
+//         ctrl.chapterCount = 0;
+//         for (var idx in ctrl.canonicalStorySummaries) {
+//           ctrl.chapterCount += (
+//             ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
+//         }
+//       };
+//       ctrl.getStaticImageUrl = function(imagePath) {
+//         return UrlInterpolationService.getStaticImageUrl(imagePath);
+//       };
+//       ctrl.changePreviewTab = function(tabName) {
+//         switch (tabName) {
+//           case TAB_STORY: ctrl.activeTab = TAB_STORY; break;
+//           case TAB_SUBTOPIC: ctrl.activeTab = TAB_SUBTOPIC; break;
+//           case TAB_PRACTICE: ctrl.activeTab = TAB_PRACTICE; break;
+//         }
+//       };
+//     }
+//   ]
+// });
