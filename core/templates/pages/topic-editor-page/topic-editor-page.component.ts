@@ -194,9 +194,7 @@ angular.module('oppia').directive('topicEditorPage', [
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
             PageTitleService.setPageTitleForMobileView('Topic Editor');
             PreventPageUnloadEventService.addListener(
-              () => {
-                return UndoRedoService.getChangeCount();
-              });
+              () => UndoRedoService.getChangeCount());
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
             ctrl.warningsAreShown = false;

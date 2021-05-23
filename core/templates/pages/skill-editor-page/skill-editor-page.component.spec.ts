@@ -78,9 +78,7 @@ describe('Skill editor page', function() {
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     spyOn(PreventPageUnloadEventService, 'addListener').and
-      .callFake((callback) => {
-        callback();
-      });
+      .callFake((callback) => callback());
 
     ctrl.$onInit();
 

@@ -160,9 +160,7 @@ describe('Story editor page', function() {
     spyOn(PageTitleService, 'setPageTitle');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
     spyOn(PreventPageUnloadEventService, 'addListener').and
-      .callFake((callback) => {
-        callback();
-      });
+      .callFake((callback) => callback());
 
     ctrl.$onInit();
 

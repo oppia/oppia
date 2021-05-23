@@ -221,9 +221,7 @@ angular.module('oppia').component('storyEditorPage', {
         ctrl.warningsAreShown = false;
         BottomNavbarStatusService.markBottomNavbarStatus(true);
         PreventPageUnloadEventService.addListener(
-          () => {
-            return UndoRedoService.getChangeCount();
-          });
+          () => UndoRedoService.getChangeCount());
         StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
         ctrl.story = StoryEditorStateService.getStory();
 
