@@ -36,6 +36,7 @@ import { StoriesListComponent } from
 import { SubtopicsListComponent } from
   'pages/topic-viewer-page/subtopics-list/subtopics-list.component';
 import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navbar-breadcrumb.component';
+import { QuestionDifficultySelectorComponent } from 'components/question-difficulty-selector/question-difficulty-selector.component';
 
 @NgModule({
   imports: [
@@ -49,14 +50,16 @@ import { TopicEditorNavbarBreadcrumbComponent } from './navbar/topic-editor-navb
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
-    TopicEditorNavbarBreadcrumbComponent
+    TopicEditorNavbarBreadcrumbComponent,
+    QuestionDifficultySelectorComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
-    TopicEditorNavbarBreadcrumbComponent
+    TopicEditorNavbarBreadcrumbComponent,
+    QuestionDifficultySelectorComponent
   ],
   providers: [
     {
