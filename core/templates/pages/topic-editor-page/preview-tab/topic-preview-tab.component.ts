@@ -18,7 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
+import { StorySummary } from 'domain/story/story-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { Topic } from 'domain/topic/TopicObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -36,7 +36,7 @@ export class TopicPreviewTabComponent {
   topicName: string;
   subtopics: Subtopic[];
   activeTab: string = this._TAB_STORY;
-  cannonicalStorySummaries: StorySummaryBackendDict[];
+  cannonicalStorySummaries: StorySummary[];
   chapterCount: number = 0;
 
   constructor(
@@ -50,10 +50,9 @@ export class TopicPreviewTabComponent {
     this.subtopics = this.topic.getSubtopics();
     this.cannonicalStorySummaries = (
       this.topicEditorStateService.getCanonicalStorySummaries());
-    console.log(this.cannonicalStorySummaries);
     for (let idx in this.cannonicalStorySummaries) {
       this.chapterCount += (
-        this.cannonicalStorySummaries[idx].getNodeTitles().length());
+        this.cannonicalStorySummaries[idx].getNodeTitles().length);
     }
   }
 
@@ -80,39 +79,3 @@ angular.module('oppia').directive('oppiaTopicPreviewTab',
   downgradeComponent({
     component: TopicPreviewTabComponent
   }) as angular.IDirectiveFactory);
-
-// angular.module('oppia').component('topicPreviewTab', {
-//   template: require('./topic-preview-tab.component.html'),
-//   controllerAs: '$ctrl',
-//   controller: ['TopicEditorStateService', 'UrlInterpolationService',
-//     function(TopicEditorStateService, UrlInterpolationService) {
-//       var ctrl = this;
-//       var TAB_STORY = 'story';
-//       var TAB_SUBTOPIC = 'subtopic';
-//       var TAB_PRACTICE = 'practice';
-//       ctrl.$onInit = function() {
-//         ctrl.topic = TopicEditorStateService.getTopic();
-//         ctrl.topicName = ctrl.topic.getName();
-//         ctrl.subtopics = ctrl.topic.getSubtopics();
-//         ctrl.activeTab = TAB_STORY;
-//         ctrl.canonicalStorySummaries = (
-//           TopicEditorStateService.getCanonicalStorySummaries());
-//         ctrl.chapterCount = 0;
-//         for (var idx in ctrl.canonicalStorySummaries) {
-//           ctrl.chapterCount += (
-//             ctrl.canonicalStorySummaries[idx].getNodeTitles().length);
-//         }
-//       };
-//       ctrl.getStaticImageUrl = function(imagePath) {
-//         return UrlInterpolationService.getStaticImageUrl(imagePath);
-//       };
-//       ctrl.changePreviewTab = function(tabName) {
-//         switch (tabName) {
-//           case TAB_STORY: ctrl.activeTab = TAB_STORY; break;
-//           case TAB_SUBTOPIC: ctrl.activeTab = TAB_SUBTOPIC; break;
-//           case TAB_PRACTICE: ctrl.activeTab = TAB_PRACTICE; break;
-//         }
-//       };
-//     }
-//   ]
-// });

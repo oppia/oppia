@@ -54,7 +54,7 @@ export class TopicEditorStateService {
   private _topicIsBeingSaved: boolean = false;
   private _topicWithNameExists: boolean = false;
   private _topicWithUrlFragmentExists: boolean = false;
-  private _canonicalStorySummaries = [];
+  private _canonicalStorySummaries: StorySummary[] = [];
   private _skillIdToRubricsObject = {};
   private _skillQuestionCountDict = {};
   private _groupedSkillSummaries = {
@@ -341,7 +341,7 @@ export class TopicEditorStateService {
     return this._skillCreationIsAllowed;
   }
 
-  getCanonicalStorySummaries(): StorySummaryBackendDict[] {
+  getCanonicalStorySummaries(): StorySummary[] {
     return this._canonicalStorySummaries;
   }
 
