@@ -221,10 +221,12 @@
         "jobs.transforms.story_validation_test",
         "jobs.transforms.subtopic_validation_test",
         "jobs.transforms.topic_validation_test",
+        "jobs.transforms.feedback_validation_test",
         "jobs.types.base_validation_errors_test",
         "jobs.types.model_property_test",
         "jobs.types.topic_validation_errors_test",
-        "jobs.types.user_validation_errors_test"
+        "jobs.types.user_validation_errors_test",
+        "jobs.types.feedback_validation_errors_test"
     ],
     "10": [
         "core.domain.question_jobs_one_off_test",
