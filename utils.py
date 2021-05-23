@@ -423,7 +423,7 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    byte_value = b'[]' % python_utils.convert_to_bytes(value)
+    byte_value = b'[%s]' % python_utils.convert_to_bytes(value)
     return base64.b64encode(byte_value)
 
 

@@ -2979,7 +2979,7 @@ def can_update_suggestion(handler):
 
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException(
-                'Invalid format for suggestion_id.' +
+                'Invalid format for suggestion_id.'
                 ' It must contain 3 parts separated by \'.\'')
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)

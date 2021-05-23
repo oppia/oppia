@@ -97,7 +97,7 @@ def rename_yarn_folder(filename, path):
     if 'yarn' in filename:
         old_name = filename.split('.tar.gz')[0]
         new_name = ''.join(old_name.split('v'))
-        os.rename('%s/%s' % (path, old_name), '%s/%s' % (path, new_name))
+        os.rename(os.path.join(path, old_name), os.path.join(path, new_name))
 
 
 def download_and_install_node():

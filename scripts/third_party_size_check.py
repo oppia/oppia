@@ -56,7 +56,7 @@ def _get_skip_files_list():
                 sys.exit(1)
             skip_files_list = app_dev_yaml_dict.get('skip_files')
 
-            skip_files_list = ['%s/%s' % (os.getcwd(), skip_files_dir)
+            skip_files_list = [os.path.join(os.getcwd(), skip_files_dir)
                                for skip_files_dir in skip_files_list]
 
         return skip_files_list
