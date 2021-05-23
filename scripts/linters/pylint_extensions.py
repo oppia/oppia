@@ -2165,14 +2165,13 @@ class StringConcatenationChecker(checkers.BaseChecker):
 
     def is_node_string_constant(self, node):
         """Helper function for visit_binop. Called to check if any of the
-         operand is a string constant.
+        operand is a string constant.
 
         Args:
             node: astroid.node_classes.NodeNG. Node containing the operand.
 
         Returns:
-            bool: informs if it is a string constant or not. True if Operand
-                is a string constant, otherwise false.
+            bool. True if Operand is a string constant, otherwise false.
         """
         if (isinstance(node, astroid.nodes.Const) and
                 ('str' in node.pytype() or
@@ -2182,8 +2181,8 @@ class StringConcatenationChecker(checkers.BaseChecker):
 
     def visit_binop(self, node):
         """Called for every '+' operator to prohibit usage of string
-         concatenation. It covers only those cases where at least one of the
-         operands is astroid.nodes.Const.
+        concatenation. It covers only those cases where at least one of the
+        operands is astroid.nodes.Const.
 
         Args:
             node: astroid.node.BinOp. Node to access module content.
