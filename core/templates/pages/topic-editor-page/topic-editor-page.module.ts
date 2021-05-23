@@ -47,13 +47,15 @@ import { SubtopicsListComponent } from
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
-    SubtopicsListComponent
+    SubtopicsListComponent,
+    TopicPreviewTabComponent,
   ],
   entryComponents: [
     OppiaAngularRootComponent,
     PracticeTabComponent,
     StoriesListComponent,
     SubtopicsListComponent,
+    TopicPreviewTabComponent,
   ],
   providers: [
     {
@@ -76,6 +78,7 @@ class TopicEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { TopicPreviewTab, TopicPreviewTabComponent } from './preview-tab/topic-preview-tab.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

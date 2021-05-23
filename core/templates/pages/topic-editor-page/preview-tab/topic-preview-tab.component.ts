@@ -18,20 +18,67 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { Topic } from 'domain/topic/TopicObjectFactory';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicEditorStateService } from '../services/topic-editor-state.service';
 
 @Component({
   selector: 'oppia-topic-preview-tab',
   templateUrl: './topic-preview-tab.component.html'
 })
-export class TopicPreviewTab {
+export class TopicPreviewTabComponent {
+  private _TAB_STORY: string = 'story';
+  private _TAB_SUBTOPIC: string = 'subtopic';
+  private _TAB_PRACTICE: string = 'practice';
+  topic: Topic;
+  topicName: string;
+  subtopics: Subtopic[];
+  activeTab: string = this._TAB_STORY;
+  cannonicalStorySummaries: StorySummaryBackendDict[];
+  chapterCount: number = 0;
+
   constructor(
-    
+    private topicEditorStateService: TopicEditorStateService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  ngOnInit(): void {
+    this.topic = this.topicEditorStateService.getTopic();
+    this.topicName = this.topic.getName();
+    this.subtopics = this.topic.getSubtopics();
+    this.cannonicalStorySummaries = (
+      this.topicEditorStateService.getCanonicalStorySummaries());
+    console.log(this.cannonicalStorySummaries);
+    for (let idx in this.cannonicalStorySummaries) {
+      this.chapterCount += (
+        this.cannonicalStorySummaries[idx].getNodeTitles().length());
+    }
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  changePreviewTab(tabName: string): void {
+    switch (tabName) {
+      case this._TAB_STORY:
+        this.activeTab = this._TAB_STORY;
+        break;
+      case this._TAB_SUBTOPIC:
+        this.activeTab = this._TAB_SUBTOPIC;
+        break;
+      case this._TAB_PRACTICE:
+        this.activeTab = this._TAB_PRACTICE;
+        break;
+    }
+  }
 }
 
 angular.module('oppia').directive('oppiaTopicPreviewTab',
   downgradeComponent({
-    component: TopicPreviewTab
+    component: TopicPreviewTabComponent
   }) as angular.IDirectiveFactory);
 
 // angular.module('oppia').component('topicPreviewTab', {
