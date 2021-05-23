@@ -18,54 +18,39 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { TopicEditorStateService } from './topic-editor-state.service';
+import subtopicValidationConstants from 'assets/constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SubtopicValidationService {
+  private _VALID_URL_FRAGMENT_REGEX = new RegExp(
+    subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
+
   constructor(
-    // private topicEditorStateService: TopicEditorSa
+    private topicEditorStateService: TopicEditorStateService
   ) {}
+
+  checkValidSubtopicName(title: string): boolean {
+    let subtopicTitles = [];
+    let topic = this.topicEditorStateService.getTopic();
+    topic.getSubtopics().forEach((subtopic) => {
+      subtopicTitles.push(subtopic.getTitle());
+    });
+    return subtopicTitles.indexOf(title) === -1;
+  }
+
+  doesSubtopicWithUrlFragmentExist(urlFragment: string): boolean {
+    let topic = this.topicEditorStateService.getTopic();
+    return topic.getSubtopics().some(
+      subtopic => subtopic.getUrlFragment() === urlFragment);
+  }
+
+  isUrlFragmentValid(urlFragment: string): boolean {
+    return this._VALID_URL_FRAGMENT_REGEX.test(urlFragment);
+  }
 }
 
 angular.module('oppia').factory('SubtopicValidationService',
   downgradeInjectable(SubtopicValidationService));
-
-// require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-
-// // TODO(#9186): Change variable name to 'constants' once this file
-// // is migrated to Angular.
-// import subtopicValidationConstants from 'assets/constants';
-
-// angular.module('oppia').factory('SubtopicValidationService', [
-//   'TopicEditorStateService', function(
-//       TopicEditorStateService) {
-//     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-//       subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
-//     var checkValidSubtopicName = function(title) {
-//       var subtopicTitles = [];
-//       var topic = TopicEditorStateService.getTopic();
-//       topic.getSubtopics().forEach(
-//         function(subtopic) {
-//           subtopicTitles.push(subtopic.getTitle());
-//         });
-//       return subtopicTitles.indexOf(title) === -1;
-//     };
-
-//     var doesSubtopicWithUrlFragmentExist = function(urlFragment) {
-//       var topic = TopicEditorStateService.getTopic();
-//       return topic.getSubtopics().some(
-//         subtopic => subtopic.getUrlFragment() === urlFragment);
-//     };
-
-//     var isUrlFragmentValid = function(urlFragment) {
-//       return VALID_URL_FRAGMENT_REGEX.test(urlFragment);
-//     };
-
-//     return {
-//       checkValidSubtopicName: checkValidSubtopicName,
-//       doesSubtopicWithUrlFragmentExist: doesSubtopicWithUrlFragmentExist,
-//       isUrlFragmentValid: isUrlFragmentValid
-//     };
-//   }
-// ]);
