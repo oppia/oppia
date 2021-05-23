@@ -19,9 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import topic_domain
 from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
+from jobs.transforms import base_validation
 from jobs.types import topic_validation_errors
 
 import apache_beam as beam
@@ -48,3 +50,23 @@ class ValidateCanonicalNameMatchesNameInLowercase(beam.DoFn):
         name = model.name
         if name.lower() != model.canonical_name:
             yield topic_validation_errors.ModelCanonicalNameMismatchError(model)
+
+
+@validation_decorators.AuditsExisting(
+    topic_models.TopicSnapshotMetadataModel,
+    topic_models.TopicCommitLogEntryModel)
+class ValidateTopicCommitCmdsSchema(
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for topic models."""
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a Change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            change_domain.BaseChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        return topic_domain.TopicChange

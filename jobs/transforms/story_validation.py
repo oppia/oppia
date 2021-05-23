@@ -24,12 +24,12 @@ from core.platform import models
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(sill_models,) = models.Registry.import_models([models.NAMES.story])
+(story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
 @validation_decorators.AuditsExisting(
-    sill_models.StorySnapshotMetadataModel,
-    sill_models.StoryCommitLogEntryModel)
+    story_models.StorySnapshotMetadataModel,
+    story_models.StoryCommitLogEntryModel)
 class ValidateStoryCommitCmdsSchema(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for story models."""
