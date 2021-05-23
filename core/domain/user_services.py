@@ -267,7 +267,7 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     user_id = auth_services.get_user_id_from_auth_id(auth_id)
     user_settings_model = (
         None if user_id is None else
-        user_models.UserSettingsModel.get(user_id, strict=False))
+        user_models.UserSettingsModel.get(user_id, include_deleted=True))
     if user_settings_model is not None:
         return _get_user_settings_from_model(user_settings_model)
     elif strict:
