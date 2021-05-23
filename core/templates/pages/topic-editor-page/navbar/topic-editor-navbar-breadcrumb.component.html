@@ -9,7 +9,8 @@
     <i class="fa fa-arrow-left protractor-test-edit-topic-tab"
        ngbTooltip="Back to Topic"
        *ngIf="canNavigateToTopicEditorPage()"
-       (click)="navigateToMainTab()"></i>
+       (click)="navigateToMainTab()">
+    </i>
     {{ topic.getName() }} (v{{ topic.getVersion() }})
   </span>
 </div>
