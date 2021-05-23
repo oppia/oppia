@@ -119,13 +119,13 @@ describe ('Prevent page unload event service', function() {
 
   it('should test if Alert is not displayed when a condition is passed', () => {
     spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
-    var val = () => {
+    var validationCallback = () => {
       return false;
     };
-    preventPageUnloadEventService.addListener(val);
+    preventPageUnloadEventService.addListener(validationCallback);
     spyOn(reloadEvt, 'preventDefault');
 
-    windowRef.nativeWindow.location.reload(val());
+    windowRef.nativeWindow.location.reload(validationCallback());
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
