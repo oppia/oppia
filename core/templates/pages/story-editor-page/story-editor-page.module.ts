@@ -27,6 +27,10 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
+import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
+import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
+import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
 import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
 
 @NgModule({
@@ -37,10 +41,18 @@ import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.
   ],
   declarations: [
     OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
+    StoryEditorNavbarComponent,
     StoryPreviewTabComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
+    StoryEditorNavbarComponent,
     StoryPreviewTabComponent
   ],
   providers: [
