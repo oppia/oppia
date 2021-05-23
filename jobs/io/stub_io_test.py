@@ -23,28 +23,126 @@ from core.platform import models
 from jobs import job_test_utils
 from jobs.io import stub_io
 
+import apache_beam as beam
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-class ModelIoStubTests(job_test_utils.PipelinedTestBase):
+class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
 
-    def test_get_models_returns_nothing_when_stub_is_empty(self):
-        stub = stub_io.ModelIoStub()
+    def setUp(self):
+        super(DatastoreioStubTests, self).setUp()
+        self.stub = stub_io.DatastoreioStub()
 
-        self.assert_pcoll_empty(self.pipeline | stub.get_models_ptransform())
+    def test_stub_is_initially_empty(self):
+        self.assertItemsEqual(self.stub.get_everything(), [])
 
-    def test_get_models_ptransform(self):
-        stub = stub_io.ModelIoStub()
-        test_models = [
-            base_models.BaseModel(
-                id='a', created_on=self.NOW, last_updated=self.NOW),
-            base_models.BaseModel(
-                id='b', created_on=self.NOW, last_updated=self.NOW),
-            base_models.BaseModel(
-                id='c', created_on=self.NOW, last_updated=self.NOW),
+        with self.stub.context():
+            self.assert_pcoll_empty(
+                self.pipeline | self.stub.ReadFromDatastore())
+
+    def test_read_from_datastore(self):
+        model_list = [
+            self.create_model(base_models.BaseModel, id='a'),
+            self.create_model(base_models.BaseModel, id='b'),
+            self.create_model(base_models.BaseModel, id='c'),
+        ]
+        self.stub.put_multi(model_list)
+
+        with self.stub.context():
+            model_pcoll = self.pipeline | self.stub.ReadFromDatastore()
+
+            self.assert_pcoll_equal(model_pcoll, model_list)
+
+    def test_write_to_datastore(self):
+        model_list = [
+            self.create_model(base_models.BaseModel, id='a'),
+            self.create_model(base_models.BaseModel, id='b'),
+            self.create_model(base_models.BaseModel, id='c'),
         ]
 
-        stub.put_multi(test_models)
+        self.assertItemsEqual(self.stub.get_everything(), [])
 
-        self.assert_pcoll_equal(
-            self.pipeline | stub.get_models_ptransform(), test_models)
+        with self.stub.context():
+            model_pcoll = self.pipeline | beam.Create(model_list)
+
+            self.assert_pcoll_empty(model_pcoll | self.stub.WriteToDatastore())
+
+        self.assertItemsEqual(self.stub.get_everything(), model_list)
+
+    def test_delete_from_datastore(self):
+        model_list = [
+            self.create_model(base_models.BaseModel, id='a'),
+            self.create_model(base_models.BaseModel, id='b'),
+            self.create_model(base_models.BaseModel, id='c'),
+        ]
+        self.stub.put_multi(model_list)
+
+        self.assertItemsEqual(self.stub.get_everything(), model_list)
+
+        with self.stub.context():
+            model_pcoll = self.pipeline | beam.Create(model_list)
+
+            self.assert_pcoll_empty(
+                model_pcoll | self.stub.DeleteFromDatastore())
+
+        self.assertItemsEqual(self.stub.get_everything(), [])
+
+    def test_read_from_datastore_without_acquiring_context_raises_error(self):
+        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
+            self.stub.ReadFromDatastore()
+
+    def test_write_to_datastore_without_acquiring_context_raises_error(self):
+        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
+            self.stub.WriteToDatastore()
+
+    def test_delete_from_datastore_without_acquiring_context_raises_error(self):
+        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
+            self.stub.DeleteFromDatastore()
+
+    def test_read_after_write_raises_error(self):
+        with self.stub.context():
+            empty_pcoll = self.pipeline | beam.Create([])
+
+            self.assert_pcoll_empty(
+                empty_pcoll | self.stub.WriteToDatastore())
+
+            self.assertRaisesRegexp(
+                RuntimeError,
+                'Cannot read from datastore after a mutation',
+                lambda: self.pipeline | self.stub.ReadFromDatastore())
+
+    def test_read_after_delete_raises_error(self):
+        with self.stub.context():
+            empty_pcoll = self.pipeline | beam.Create([])
+
+            self.assert_pcoll_empty(
+                empty_pcoll | self.stub.DeleteFromDatastore())
+
+            self.assertRaisesRegexp(
+                RuntimeError,
+                'Cannot read from datastore after a mutation',
+                lambda: self.pipeline | self.stub.ReadFromDatastore())
+
+    def test_write_after_write_raises_error(self):
+        with self.stub.context():
+            empty_pcoll = self.pipeline | beam.Create([])
+
+            self.assert_pcoll_empty(empty_pcoll | self.stub.WriteToDatastore())
+
+            self.assertRaisesRegexp(
+                RuntimeError,
+                'At most one WriteToDatastore may be executed',
+                lambda: empty_pcoll | self.stub.WriteToDatastore())
+
+    def test_delete_after_delete_raises_error(self):
+        with self.stub.context():
+            empty_pcoll = self.pipeline | beam.Create([])
+
+            self.assert_pcoll_empty(
+                empty_pcoll | self.stub.DeleteFromDatastore())
+
+            self.assertRaisesRegexp(
+                RuntimeError,
+                'At most one DeleteFromDatastore may be executed',
+                lambda: empty_pcoll | self.stub.DeleteFromDatastore())

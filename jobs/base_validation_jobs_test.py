@@ -47,10 +47,10 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
     def test_run_with_empty_model_getter(self):
         pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
-            options=job_options.JobOptions(model_getter=None))
+            options=job_options.JobOptions(datastoreio=None))
 
         self.assertRaisesRegexp(
-            ValueError, 'JobOptions.model_getter must not be None',
+            ValueError, 'JobOptions.datastoreio must not be None',
             base_validation_jobs.AuditAllStorageModelsJob(pipeline).run)
 
     def test_base_validation(self):
@@ -67,7 +67,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         valid_base_model = self.create_model(
             base_models.BaseModel, id='127', deleted=False)
 
-        self.model_io_stub.put_multi([
+        self.put_multi([
             base_model_with_invalid_id,
             base_model_with_invalid_timestamps,
             base_model_with_inconsistent_timestamps,
@@ -94,7 +94,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
             user_models.UserSettingsModel,
             id=self.VALID_USER_ID, email='a@a.com')
 
-        self.model_io_stub.put_multi([
+        self.put_multi([
             user_settings_model_with_invalid_id,
             user_settings_model_with_valid_id,
         ])
@@ -105,7 +105,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_reports_error_when_id_property_target_does_not_exist(self):
-        self.model_io_stub.put_multi([
+        self.put_multi([
             # UserEmailPreferencesModel.id -> UserSettingsModel.id.
             self.create_model(
                 user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
@@ -121,7 +121,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_empty_when_id_property_target_exists(self):
-        self.model_io_stub.put_multi([
+        self.put_multi([
             self.create_model(
                 user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
             self.create_model(
@@ -132,7 +132,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_empty_when_web_of_id_property_targets_exist(self):
-        self.model_io_stub.put_multi([
+        self.put_multi([
             self.create_model(
                 auth_models.UserAuthDetailsModel,
                 id=self.VALID_USER_ID, firebase_auth_id='abc', gae_id='123'),
@@ -147,7 +147,7 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_reports_missing_id_property_target_even_if_sibling_property_is_valid(self): # pylint: disable=line-too-long
-        self.model_io_stub.put_multi([
+        self.put_multi([
             self.create_model(
                 auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,
                 # Value is not None, so UserIdentifiersModel must exist.
