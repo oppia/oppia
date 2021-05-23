@@ -152,7 +152,7 @@ var invisibilityOfInfoToast = async function(errorMessage) {
 
 var invisibilityOfLoadingMessage = async function(errorMessage) {
   await invisibilityOf(loadingMessage, errorMessage);
-}
+};
 
 var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
