@@ -42,7 +42,6 @@ import { FeedbackPopupComponent } from './layout-directives/feedback-popup.compo
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
-import { ProgressNavComponent } from './layout-directives/progress-nav.component';
 
 @NgModule({
   imports: [
@@ -65,7 +64,6 @@ import { ProgressNavComponent } from './layout-directives/progress-nav.component
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     RefresherExplorationConfirmationModal,
-    ProgressNavComponent,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -77,7 +75,6 @@ import { ProgressNavComponent } from './layout-directives/progress-nav.component
     FeedbackPopupComponent,
     LearnerAnswerInfoCard,
     RefresherExplorationConfirmationModal,
-    ProgressNavComponent,
   ],
   providers: [
     {

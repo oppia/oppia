@@ -73,6 +73,7 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { ProgressNavComponent } from 'pages/exploration-player-page/layout-directives/progress-nav.component';
 
 
 // Directives.
@@ -156,6 +157,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    ProgressNavComponent,
     PromoBarComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
@@ -208,6 +210,7 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
+    ProgressNavComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
@@ -253,6 +256,7 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    ProgressNavComponent,
     StateSkillEditorComponent,
     SharingLinksComponent,
     SelectSkillModalComponent,
