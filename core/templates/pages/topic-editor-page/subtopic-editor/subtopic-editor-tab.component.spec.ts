@@ -332,8 +332,9 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should redirect to topic editor if subtopic id is invalid', function() {
+    spyOn(TopicEditorRoutingService, 'getSubtopicIdFromUrl').and
+      .returnValue(99);
     var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
-    $location.path('/subtopic_editor/99');
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

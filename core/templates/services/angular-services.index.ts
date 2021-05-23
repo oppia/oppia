@@ -356,6 +356,7 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -693,6 +694,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicEditorStateService', TopicEditorStateService],
+  ['TopicEditorRoutingService', TopicEditorRoutingService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
