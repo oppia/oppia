@@ -16,41 +16,56 @@
  * @fileoverview Service to validate subtopic name.
  */
 
-require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-// TODO(#9186): Change variable name to 'constants' once this file
-// is migrated to Angular.
-import subtopicValidationConstants from 'assets/constants';
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicValidationService {
+  constructor(
+    // private topicEditorStateService: TopicEditorSa
+  ) {}
+}
 
-angular.module('oppia').factory('SubtopicValidationService', [
-  'TopicEditorStateService', function(
-      TopicEditorStateService) {
-    const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
-    var checkValidSubtopicName = function(title) {
-      var subtopicTitles = [];
-      var topic = TopicEditorStateService.getTopic();
-      topic.getSubtopics().forEach(
-        function(subtopic) {
-          subtopicTitles.push(subtopic.getTitle());
-        });
-      return subtopicTitles.indexOf(title) === -1;
-    };
+angular.module('oppia').factory('SubtopicValidationService',
+  downgradeInjectable(SubtopicValidationService));
 
-    var doesSubtopicWithUrlFragmentExist = function(urlFragment) {
-      var topic = TopicEditorStateService.getTopic();
-      return topic.getSubtopics().some(
-        subtopic => subtopic.getUrlFragment() === urlFragment);
-    };
+// require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 
-    var isUrlFragmentValid = function(urlFragment) {
-      return VALID_URL_FRAGMENT_REGEX.test(urlFragment);
-    };
+// // TODO(#9186): Change variable name to 'constants' once this file
+// // is migrated to Angular.
+// import subtopicValidationConstants from 'assets/constants';
 
-    return {
-      checkValidSubtopicName: checkValidSubtopicName,
-      doesSubtopicWithUrlFragmentExist: doesSubtopicWithUrlFragmentExist,
-      isUrlFragmentValid: isUrlFragmentValid
-    };
-  }
-]);
+// angular.module('oppia').factory('SubtopicValidationService', [
+//   'TopicEditorStateService', function(
+//       TopicEditorStateService) {
+//     const VALID_URL_FRAGMENT_REGEX = new RegExp(
+//       subtopicValidationConstants.VALID_URL_FRAGMENT_REGEX);
+//     var checkValidSubtopicName = function(title) {
+//       var subtopicTitles = [];
+//       var topic = TopicEditorStateService.getTopic();
+//       topic.getSubtopics().forEach(
+//         function(subtopic) {
+//           subtopicTitles.push(subtopic.getTitle());
+//         });
+//       return subtopicTitles.indexOf(title) === -1;
+//     };
+
+//     var doesSubtopicWithUrlFragmentExist = function(urlFragment) {
+//       var topic = TopicEditorStateService.getTopic();
+//       return topic.getSubtopics().some(
+//         subtopic => subtopic.getUrlFragment() === urlFragment);
+//     };
+
+//     var isUrlFragmentValid = function(urlFragment) {
+//       return VALID_URL_FRAGMENT_REGEX.test(urlFragment);
+//     };
+
+//     return {
+//       checkValidSubtopicName: checkValidSubtopicName,
+//       doesSubtopicWithUrlFragmentExist: doesSubtopicWithUrlFragmentExist,
+//       isUrlFragmentValid: isUrlFragmentValid
+//     };
+//   }
+// ]);
