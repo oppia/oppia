@@ -2,20 +2,9 @@ version: 2.1
 
 workflows:
   circleci_tests:
-    # The following jobs run in the following stages:
-    # - Setup runs first.
-    # - After setup passes, lint and frontend tests run.
-    #     - If frontend tests fail, stop and do not run the next step, but lint continues.
-    # - After frontend tests passes, backend and typescript tests run.
-    #     - If typescript tests fail, stop and do not run the next step, but backend continues.
-    # - After typescript tests passes, the flagship e2e tests (navigation and file upload) run. We run
-    #   these tests as sanity checks before running the entire test suite. Note that the navigation e2e
-    #   test also compiles all the prod files needed for other prod e2e tests.
-    #     - If either flagship e2e tests fail, then the rest of the e2e tests in the the corresponding
-    #       suite will not run.
-    # - After file upload e2e test passes, all other non-prod e2e tests run in parallel.
-    # - After navigation e2e test passes, all other prod e2e tests run in parallel.
-    # For an illustration of the stages, see https://github.com/oppia/oppia/wiki/images/circleCIWorkflow.png.
+    # The following job runs in the following stages:
+    # - Setup runs first. After setup passes, typescript tests run.
+    # Note: all end-to-end tests have now been moved off CircleCI.
 
     jobs:
       - setup_and_typescript_tests
@@ -116,15 +105,15 @@ jobs:
           name: Run typescript tests in strict mode
           command: |
             python -m scripts.typescript_checks --strict_checks
-      - persist_to_workspace:
-          root: /home/circleci/
-          paths:
-            - oppia/extensions/classifiers/proto
-            - oppia/proto_files/
-            - oppia/node_modules/
-            - oppia/third_party/
-            - oppia_tools/
-      - upload_screenshots
+      # Un-comment the following lines if e2e tests are added to CircleCI.
+      # - persist_to_workspace:
+          # root: /home/circleci/
+          # paths:
+            # - oppia/extensions/classifiers/proto
+            # - oppia/proto_files/
+            # - oppia/node_modules/
+            # - oppia/third_party/
+            # - oppia_tools/
 
 notify:
   webhooks:
