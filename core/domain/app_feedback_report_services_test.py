@@ -264,7 +264,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             self.android_report_model.android_report_info[
                 'build_fingerprint'])
         self.assertEqual(
-            device_system_context.network_type,
+            device_system_context.network_type.name,
             self.android_report_model.android_report_info[
                 'network_type'])
 
