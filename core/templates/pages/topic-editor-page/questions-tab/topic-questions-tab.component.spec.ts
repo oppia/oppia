@@ -17,28 +17,27 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { Subtopic } from 'domain/topic/subtopic.model';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { QuestionsListService } from 'services/questions-list.service';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { Subtopic } from 'domain/topic/subtopic.model';
 import { TestBed } from '@angular/core/testing';
+import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { TopicRights } from 'domain/topic/topic-rights.model';
 
 describe('Topic questions tab', function() {
-  var qls = null;
   var $rootScope = null;
   var $scope = null;
+  var $window = null;
   var TopicEditorStateService = null;
+  var TopicObjectFactory = null;
   var ctrl = null;
   var focusManagerService = null;
-  var TopicObjectFactory = null;
-  var topic = null;
-  var $window = null;
+  var qls = null;
   var subtopic1 = null;
-
+  var topic = null;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
 
@@ -107,11 +106,10 @@ describe('Topic questions tab', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
-    TopicEditorStateService = $injector.get('TopicEditorStateService');
-    focusManagerService = $injector.get('FocusManagerService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
     $window = $injector.get('$window');
-
+    TopicEditorStateService = $injector.get('TopicEditorStateService');
+    TopicObjectFactory = $injector.get('TopicObjectFactory');
+    focusManagerService = $injector.get('FocusManagerService');
     topicInitializedEventEmitter = new EventEmitter();
     topicReinitializedEventEmitter = new EventEmitter();
 

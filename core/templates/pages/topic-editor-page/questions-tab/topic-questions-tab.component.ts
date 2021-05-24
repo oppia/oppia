@@ -33,12 +33,10 @@ angular.module('oppia').component('questionsTab', {
   template: require('./topic-questions-tab.component.html'),
   controller: [
     '$scope', '$window', 'FocusManagerService', 'QuestionsListService',
-    'TopicEditorStateService',
-    'TopicsAndSkillsDashboardBackendApiService',
+    'TopicEditorStateService', 'TopicsAndSkillsDashboardBackendApiService',
     function(
         $scope, $window, FocusManagerService, QuestionsListService,
-        TopicEditorStateService,
-        TopicsAndSkillsDashboardBackendApiService,) {
+        TopicEditorStateService, TopicsAndSkillsDashboardBackendApiService,) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.getGroupedSkillSummaries =
