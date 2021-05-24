@@ -100,12 +100,12 @@ export class EditThumbnailModalComponent implements OnChanges {
     if (this.isUploadedImageSvg()) {
       let reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => {
+      reader.onload = ((e) => {
         this.imgSrc = reader.result as string;
         this.updateBackgroundColor(this.tempBgColor);
         let img = new Image();
 
-        img.onload = () => {
+        img.onload = ((e) => {
           //   Setting a default height of 300px and width of
           //   150px since most browsers use these dimensions
           //   for SVG files that do not have an explicit
@@ -113,7 +113,7 @@ export class EditThumbnailModalComponent implements OnChanges {
           this.setImageDimensions(
             img.naturalHeight || 150,
             img.naturalWidth || 300);
-        };
+        });
         img.src = this.imgSrc;
         this.uploadedImage = this.imgSrc;
         this.invalidTagsAndAttributes = (
@@ -124,7 +124,7 @@ export class EditThumbnailModalComponent implements OnChanges {
         if (this.tags.length > 0 || this.attrs.length > 0) {
           this.reset();
         }
-      };
+      });
     } else {
       this.reset();
       this.invalidImageWarningIsShown = true;

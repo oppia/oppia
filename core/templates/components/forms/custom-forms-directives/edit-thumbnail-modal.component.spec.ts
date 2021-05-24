@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NO_ERRORS_SCHEMA, Pipe, SimpleChanges } from '@angular/core';
@@ -36,35 +36,6 @@ class MockActiveModal {
 
   close(): void {
     return;
-  }
-}
-
-class MockImageObject {
-  source = null;
-  onload = null;
-
-  constructor() {
-    this.onload = () => {
-      return 'Fake onload executed';
-    };
-  }
-  set src(url) {
-    this.onload();
-  }
-}
-
-class MockReaderObject {
-  result = null;
-  onload = null;
-
-  constructor() {
-    this.onload = () => {
-      return 'Fake onload executed';
-    };
-  }
-  readAsDataURL(file) {
-    this.onload();
-    return 'The file is loaded';
   }
 }
 
@@ -101,19 +72,7 @@ describe('Edit Thumbnail Modal Component', () => {
   });
 
   it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', () => {
-    // This throws "Argument of type 'MockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'MockImageObject'.
-    // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(new MockImageObject());
-    // This throws "Argument of type 'MockReaderObject' is not assignable
-    // to parameter of type 'FileReader'.". This is because
-    // 'FileReader' has around 15 more properties. We have only defined
-    // the properties we need in 'MockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+    ' svg file', fakeAsync(() => {
     let fileContent = (
       'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
       'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
@@ -121,9 +80,31 @@ describe('Edit Thumbnail Modal Component', () => {
       'WVsbG93IiAvPjwvc3ZnPg==');
     let file = new File([fileContent], 'circle.svg', {type: 'image/svg'});
     component.invalidImageWarningIsShown = false;
+    component.uploadedImageMimeType = 'image/svg+xml';
+    component.imgSrc = 'source';
+    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
+    spyOn(component, 'updateBackgroundColor').and.callThrough();
+    spyOn(component, 'setImageDimensions').and.callThrough();
+    let mockFileReader = {
+      result: '',
+      readAsDataURL: (blobInput) => {},
+      onload: (e) => {}
+    };
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(mockFileReader);
+    let mockImageReader = {
+      result: '',
+      naturalHeight: 100,
+      naturalWidth: 100,
+      src: 'source',
+      onload: (e) => {}
+    };
+    // @ts-expect-error
+    spyOn(window, 'Image').and.returnValue(mockImageReader);
     component.onFileChanged(file);
+    flush();
     expect(component.invalidImageWarningIsShown).toBe(false);
-  });
+  }));
 
   it('should not load file if it is not a svg type', () => {
     expect(component.invalidImageWarningIsShown).toBe(false);
@@ -153,6 +134,15 @@ describe('Edit Thumbnail Modal Component', () => {
     };
     component.ngOnChanges(changes);
     expect(component.openInUploadMode).toBeFalse();
+  });
+
+  it('should set image dimensions', () => {
+    component.dimensions = {
+      height: 0,
+      width: 0
+    };
+    component.setImageDimensions(180, 180);
+    expect(component.dimensions).toEqual({ height: 180, width: 180 });
   });
 
   it('should reset the uploaded image on clicking reset button', () => {
