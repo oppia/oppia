@@ -26,8 +26,15 @@ import { TextInputCustomizationArgs } from 'interactions/customization-args-defs
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { Schema } from 'services/schema-default-value.service';
 import { TextInputRulesService } from './text-input-rules.service';
+
+type TextInputSchema = {
+  type: string;
+  'ui_config': {
+    placeholder?: string;
+    rows?: number;
+  };
+};
 
 @Component({
   selector: 'oppia-interactive-text-input',
@@ -40,13 +47,7 @@ export class InteractiveTextInputComponent implements OnInit {
   @Input() labelForFocusTarget: string;
   answer: string;
   placeholder: string;
-  schema: {
-    type: string;
-    'ui_config': {
-      placeholder?: string;
-      rows?: number;
-    };
-  };
+  schema: TextInputSchema;
   rows: number;
 
   constructor(
@@ -98,8 +99,8 @@ export class InteractiveTextInputComponent implements OnInit {
       () => this.submitAnswer(this.answer), () => this.validityCheckFn());
   }
 
-  getSchema(): Schema {
-    return this.schema as unknown as Schema;
+  getSchema(): TextInputSchema {
+    return this.schema;
   }
 
   getLabelForFocusTarget(): string {
