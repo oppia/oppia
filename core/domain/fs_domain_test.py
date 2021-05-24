@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
@@ -65,7 +67,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
         with self.assertRaisesRegexp(
-            IOError, r'File abc\.png not found'):
+            IOError, re.escape('File abc.png not found')
+        ):
             self.fs.get('abc.png')
 
         with self.assertRaisesRegexp(

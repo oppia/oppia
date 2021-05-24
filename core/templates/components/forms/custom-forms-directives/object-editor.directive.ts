@@ -71,7 +71,7 @@ angular.module('oppia').directive('objectEditor', [
           'set-of-unicode-string',
           'music-phrase',
           'number-with-units',
-          'non-negative-int',
+          'nonnegative-int',
           'normalized-string',
           'numeric-expression',
           'position-of-terms',

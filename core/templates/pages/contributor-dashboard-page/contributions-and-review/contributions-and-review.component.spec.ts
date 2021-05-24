@@ -391,7 +391,7 @@ describe('Contributions and review component', function() {
             details: null
           }
         }));
-      spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: 'skill1',
@@ -615,7 +615,7 @@ describe('Contributions and review component', function() {
             details: 'skill_1'
           }
         }));
-      spyOn(skillBackendApiService, 'fetchSkill').and.returnValue(
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
         $q.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: 'skill1',

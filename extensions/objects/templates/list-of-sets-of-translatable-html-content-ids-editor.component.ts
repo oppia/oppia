@@ -88,13 +88,15 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
       this.valueChanged.emit(this.value);
     }
     // Removing any empty arrays from the end.
-    for (let i = 1; i < this.value.length; i++) {
-      if (this.value[i].length === 0) {
-        // If empty array is found, all subsequent arrays must also be
-        // empty since rank skipping is not allowed.
-        this.value = this.value.slice(0, i);
-        this.valueChanged.emit(this.value);
-        break;
+    while (this.value.length > 0 && (
+      this.value[this.value.length - 1].length === 0)) {
+      this.value.pop();
+      this.valueChanged.emit(this.value);
+    }
+    // Inserting empty arrays for skipped slots in between.
+    for (let i = 0; i < this.value.length; i++) {
+      if (this.value[i] === undefined) {
+        this.value[i] = [];
       }
     }
     this.validateOrdering();
