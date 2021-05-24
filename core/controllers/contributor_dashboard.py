@@ -260,7 +260,9 @@ class TranslatableTextHandler(base.BaseHandler):
         """
         return any(
             s.change.state_name == state_name and
-            s.change.content_id == content_id for s in suggestions)
+            s.change.content_id == content_id and
+            s.language_code == self.request.get('language_code')
+            for s in suggestions)
 
 
 class MachineTranslationStateTextsHandler(base.BaseHandler):
