@@ -246,7 +246,7 @@ class RelationshipsOf(python_utils.OBJECT):
         model_cls = job_utils.get_model_class(model_kind)
         prop = model_property.ModelProperty(
             model_cls, getattr(model_cls, property_name))
-        return sorted(cls._ID_REFERENCING_PROPERTIES.get(prop, ()))
+        return cls._ID_REFERENCING_PROPERTIES.get(prop, set())
 
     def _get_model_kind(self, model_class):
         """Returns the kind of the model class.

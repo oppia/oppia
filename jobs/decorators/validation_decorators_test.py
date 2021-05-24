@@ -247,7 +247,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             })
         self.assertEqual(
             MockRelationshipsOf.get_model_kind_references('BarModel', 'foo_id'),
-            ['FooModel'])
+            {'FooModel'})
         self.assertEqual(
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
             {b'FooModel'})
@@ -267,7 +267,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             })
         self.assertEqual(
             MockRelationshipsOf.get_model_kind_references('BarModel', 'id'),
-            ['BazModel'])
+            {'BazModel'})
         self.assertEqual(
             MockRelationshipsOf.get_all_model_kinds_referenced_by_properties(),
             {b'BazModel'})

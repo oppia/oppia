@@ -37,33 +37,35 @@ class ModelProperty(python_utils.OBJECT):
         """Initializes a new ModelProperty instance.
 
         Args:
-            model_class: class. A subclass of base_models.BaseModel.
-            property_obj: datastore_services.Property|@property. An instance of
-                an NDB Property or Python @property.
+            model_class: type(base_model.BaseModel). The model's class.
+            property_obj: datastore_services.Property|@property. An NDB Property
+                or a Python @property.
 
         Raises:
-            TypeError. The model_class is not a class.
+            TypeError. The model_class is not a type.
             TypeError. The model_class is not a subclass of BaseModel.
-            TypeError. The property_class is not a type.
-            TypeError. The property_class is not a subclass of Property.
+            TypeError. The property_obj is not an NDB Property.
+            ValueError. The property_obj is not in the model_class.
         """
         if not isinstance(model_class, type):
             raise TypeError('%r is not a model class' % model_class)
         elif not issubclass(model_class, base_models.BaseModel):
             raise TypeError('%r is not a subclass of BaseModel' % model_class)
 
+        self._model_kind = job_utils.get_model_kind(model_class)
+
         if property_obj is model_class.id:
             # BaseModel.id is a Python @property, not an NDB Property.
             property_name = 'id'
         elif not isinstance(property_obj, datastore_services.Property):
-            raise TypeError('%r is not a property' % property_obj)
+            raise TypeError('%r is not an NDB Property' % property_obj)
         elif not any(
                 p is property_obj for p in model_class._properties.values()): # pylint: disable=protected-access
-            raise ValueError('%r is not in properties of model' % property_obj)
+            raise ValueError(
+                '%r is not a property of %s' % (property_obj, self._model_kind))
         else:
             property_name = property_obj._name # pylint: disable=protected-access
 
-        self._model_kind = job_utils.get_model_kind(model_class)
         self._property_name = property_name
 
     @property
@@ -71,7 +73,7 @@ class ModelProperty(python_utils.OBJECT):
         """Returns the kind of model this instance refers to.
 
         Returns:
-            bytes. The model's kind.
+            str. The model's kind.
         """
         return self._model_kind
 
@@ -80,7 +82,7 @@ class ModelProperty(python_utils.OBJECT):
         """Returns the name of the property this instance refers to.
 
         Returns:
-            bytes. The name of the property.
+            str. The name of the property.
         """
         return self._property_name
 
@@ -103,7 +105,7 @@ class ModelProperty(python_utils.OBJECT):
             raise TypeError(
                 '%r is not an instance of %s' % (model, self._model_kind))
         value = job_utils.get_model_property(model, self._property_name)
-        if self._is_repeated_property:
+        if self._is_repeated_property():
             for item in value:
                 yield item
         else:
@@ -125,7 +127,6 @@ class ModelProperty(python_utils.OBJECT):
         """
         return getattr(self._to_model_class(), self._property_name)
 
-    @property
     def _is_repeated_property(self):
         """Returns whether the property is repeated.
 
@@ -138,26 +139,23 @@ class ModelProperty(python_utils.OBJECT):
         """Called by pickle to get the value that uniquely defines self.
 
         Returns:
-            tuple(class, bytes). The model class and the name of the property.
-            We can't return the property object itself because it isn't
-            picklable.
+            tuple(str, str). The model's kind and the name of the property.
         """
-        return (self._model_kind, self.property_name)
+        return self._model_kind, self._property_name
 
     def __setstate__(self, state):
         """Called by pickle to build an instance from __getstate__'s value.
 
         Args:
-            state: tuple(class, bytes). The model class and the name of the
-                property.
+            state: tuple(str, str). The model's kind and the property's name.
         """
         self._model_kind, self._property_name = state
 
     def __str__(self):
-        return '%s.%s' % (self.model_kind, self.property_name)
+        return '%s.%s' % (self._model_kind, self._property_name)
 
     def __repr__(self):
-        return 'ModelProperty(%s, %s)' % (self.model_kind, self)
+        return 'ModelProperty(%s, %s)' % (self._model_kind, self)
 
     def __eq__(self, other):
         return (
