@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the GAE current user services."""
+"""Error classes for feedback model audits."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.platform.users import gae_current_user_services
-from core.tests import test_utils
+from jobs.types import base_validation_errors
 
 
-class GaeCurrentUserServicesTests(test_utils.GenericTestBase):
+class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
+    """Error class for models that have invalid entity type."""
 
-    def test_create_login_url(self):
-        self.assertEqual(
-            gae_current_user_services.create_login_url(''),
-            'https://www.google.com/accounts/Login'
-            '?continue=http%3A//localhost/signup%3Freturn_url%3D')
+    def __init__(self, model):
+        super(InvalidEntityTypeError, self).__init__(model)
+        self.message = (
+            'entity type %s is invalid.' % model.entity_type)
