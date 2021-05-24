@@ -128,10 +128,10 @@ export class TutorCardComponent {
 
           // Auto scroll to the new feedback on mobile device.
           if (this.deviceInfoService.isMobileDevice()) {
-            let latestFeedbackIndex = (
-              this.displayedCard.getInputResponsePairs().length - 1);
+            // Let latestFeedbackIndex = (
+            //   this.displayedCard.getInputResponsePairs().length - 1);
 
-            // some work left here.
+            // Some work left here.
           }
         }
       )
