@@ -512,11 +512,11 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   };
 
   return {
-    readPlainText: function(text, errorMessage) {
+    readPlainText: function(text) {
       // Plain text is in a text node so not recorded in either array.
       expect(
         fullText.substring(textPointer, textPointer + text.length)
-      ).toEqual(text, errorMessage);
+      ).toEqual(text);
       textPointer = textPointer + text.length;
       justPassedRteComponent = false;
     },
@@ -564,13 +564,13 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 // representation of a 'rich text object'. This is because we are more
 // interested in the process of interacting with the page than in the
 // information thereby conveyed.
-var toRichText = async function(text, errorMessage) {
+var toRichText = async function(text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker.
   return async function(handler) {
     if (handler.hasOwnProperty('setPlainText')) {
       await handler.setPlainText(text);
     } else {
-      await handler.readPlainText(text, errorMessage);
+      await handler.readPlainText(text);
     }
   };
 };
