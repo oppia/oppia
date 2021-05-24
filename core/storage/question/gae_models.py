@@ -368,7 +368,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             # Order by cls.key is needed alongside cls.last_updated so as to
             # resolve conflicts, if any.
             # Reference SO link: https://stackoverflow.com/q/12449197
-        ).order(-cls.last_updated, cls.key).fetch(
+        ).order(-cls.last_updated).fetch(
             question_skill_count, offset=offset)
 
         return (
