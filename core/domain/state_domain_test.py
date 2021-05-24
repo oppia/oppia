@@ -1446,24 +1446,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         written_translations_dict = {
             'translations_mapping': {
-                'content': {
-                    'hi': {
-                        'data_format': 'html',
-                        'translation': '<p>hello!</p>',
-                        'needs_update': False
-                    }
-                },
+                'content': {},
                 'hint_1': {},
                 'default_outcome': {},
                 'solution': {},
                 'feedback_1': {},
-                'ca_placeholder_0': {
-                    'hi': {
-                        'data_format': 'unicode',
-                        'translation': 'Placeholder translation',
-                        'needs_update': False
-                    }
-                },
+                'ca_placeholder_0': {},
                 'rule_input_4': {}
             }
         }
@@ -1477,7 +1465,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hint_1': '<p>hint one</p>',
                 'solution': '<p>hello_world is a string</p>',
                 'feedback_1': '<p>Feedback</p>',
-                'default_outcome': '<p>The default outcome.</p>'
+                'default_outcome': '<p>The default outcome.</p>',
+                'content': '<p>This is content</p>',
+                'ca_placeholder_0': 'Placeholder'
             })
 
     def test_add_translation_works_correctly(self):

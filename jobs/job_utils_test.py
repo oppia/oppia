@@ -21,9 +21,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
+import feconf
 from jobs import job_utils
 
-from google.cloud import datastore as cloud_datastore_types
+from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -99,8 +100,8 @@ class GetModelKindTests(test_utils.TestBase):
             job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
     def test_get_from_cloud_datastore_entity(self):
-        entity = cloud_datastore_types.Entity(
-            key=cloud_datastore_types.Key('BaseModel', '123', project='foo'))
+        entity = beam_datastore_types.Entity(
+            key=beam_datastore_types.Key(['BaseModel', '123'], project='foo'))
         self.assertEqual(job_utils.get_model_kind(entity), 'BaseModel')
 
     def test_get_from_bad_value(self):
@@ -124,19 +125,19 @@ class GetModelPropertyTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_property(model, 'prop'), None)
 
     def test_get_id_from_cloud_datastore_entity(self):
-        entity = cloud_datastore_types.Entity(
-            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        entity = beam_datastore_types.Entity(
+            key=beam_datastore_types.Key(['FooModel', '123'], project='foo'))
         self.assertEqual(job_utils.get_model_property(entity, 'id'), '123')
 
     def test_get_property_from_cloud_datastore_entity(self):
-        entity = cloud_datastore_types.Entity(
-            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
-        entity['prop'] = 'abc'
+        entity = beam_datastore_types.Entity(
+            key=beam_datastore_types.Key(['FooModel', '123'], project='foo'))
+        entity.set_properties({'prop': 'abc'})
         self.assertEqual(job_utils.get_model_property(entity, 'prop'), 'abc')
 
     def test_get_missing_property_from_cloud_datastore_entity(self):
-        entity = cloud_datastore_types.Entity(
-            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        entity = beam_datastore_types.Entity(
+            key=beam_datastore_types.Key(['FooModel', '123'], project='foo'))
         self.assertEqual(job_utils.get_model_property(entity, 'prop'), None)
 
     def test_get_property_from_bad_value(self):
@@ -151,10 +152,66 @@ class GetModelIdTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_model_id(model), '123')
 
     def test_get_id_from_cloud_datastore_entity(self):
-        entity = cloud_datastore_types.Entity(
-            key=cloud_datastore_types.Key('FooModel', '123', project='foo'))
+        entity = beam_datastore_types.Entity(
+            key=beam_datastore_types.Key(['FooModel', '123'], project='foo'))
         self.assertEqual(job_utils.get_model_id(entity), '123')
 
     def test_get_id_from_bad_value(self):
         with self.assertRaisesRegexp(TypeError, 'not a model instance'):
             job_utils.get_model_id(123)
+
+
+class BeamEntityToAndFromModelTests(test_utils.TestBase):
+
+    def test_get_beam_entity_from_model(self):
+        model = FooModel(id='abc', prop='123')
+
+        beam_entity = job_utils.get_beam_entity_from_model(model)
+
+        self.assertEqual(beam_entity.key.path_elements, ('FooModel', 'abc'))
+        self.assertEqual(beam_entity.key.project, feconf.OPPIA_PROJECT_ID)
+        self.assertEqual(beam_entity.properties, {
+            'prop': '123',
+            'last_updated': None,
+            'created_on': None,
+            'deleted': False,
+        })
+
+    def test_get_model_from_beam_entity(self):
+        beam_entity = beam_datastore_types.Entity(
+            beam_datastore_types.Key(
+                ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
+        beam_entity.set_properties({
+            'prop': '123',
+            'last_updated': None,
+            'created_on': None,
+            'deleted': False,
+        })
+
+        self.assertEqual(
+            FooModel(id='abc', prop='123'),
+            job_utils.get_model_from_beam_entity(beam_entity))
+
+    def test_from_and_then_to_model(self):
+        model = FooModel(id='abc', prop='123')
+
+        self.assertEqual(
+            model,
+            job_utils.get_model_from_beam_entity(
+                job_utils.get_beam_entity_from_model(model)))
+
+    def test_from_and_then_to_beam_entity(self):
+        beam_entity = beam_datastore_types.Entity(
+            beam_datastore_types.Key(
+                ('FooModel', 'abc'), project=feconf.OPPIA_PROJECT_ID))
+        beam_entity.set_properties({
+            'prop': '123',
+            'last_updated': None,
+            'created_on': None,
+            'deleted': False,
+        })
+
+        self.assertEqual(
+            beam_entity,
+            job_utils.get_beam_entity_from_model(
+                job_utils.get_model_from_beam_entity(beam_entity)))

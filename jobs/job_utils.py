@@ -20,8 +20,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+import feconf
 
-from google.cloud import datastore as cloud_datastore_types
+from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
+
+datastore_services = models.Registry.import_datastore_services()
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -65,7 +68,7 @@ def get_model_kind(model):
     convention and take special care to always return the correct value.
 
     Args:
-        model: base_models.Model|cloud_datastore_types.Entity. The model to
+        model: base_models.Model|beam_datastore_types.Entity. The model to
             inspect.
 
     Returns:
@@ -78,8 +81,8 @@ def get_model_kind(model):
             isinstance(model, type) and
             issubclass(model, base_models.BaseModel)):
         return model._get_kind() # pylint: disable=protected-access
-    elif isinstance(model, cloud_datastore_types.Entity):
-        return model.kind
+    elif isinstance(model, beam_datastore_types.Entity):
+        return model.key.to_client_key().kind
     else:
         raise TypeError('%r is not a model type or instance' % model)
 
@@ -88,7 +91,7 @@ def get_model_property(model, property_name):
     """Returns the given property from a model.
 
     Args:
-        model: base_models.Model|cloud_datastore_types.Entity. The model to
+        model: base_models.Model|beam_datastore_types.Entity. The model to
             inspect.
         property_name: str. The name of the property to extract.
 
@@ -102,8 +105,8 @@ def get_model_property(model, property_name):
         return get_model_id(model)
     elif isinstance(model, base_models.BaseModel):
         return getattr(model, property_name)
-    elif isinstance(model, cloud_datastore_types.Entity):
-        return model.get(property_name)
+    elif isinstance(model, beam_datastore_types.Entity):
+        return model.properties.get(property_name)
     else:
         raise TypeError('%r is not a model instance' % model)
 
@@ -112,7 +115,7 @@ def get_model_id(model):
     """Returns the given model's ID.
 
     Args:
-        model: base_models.Model|cloud_datastore_types.Entity. The model to
+        model: base_models.Model|beam_datastore_types.Entity. The model to
             inspect.
 
     Returns:
@@ -123,7 +126,39 @@ def get_model_id(model):
     """
     if isinstance(model, base_models.BaseModel):
         return model.id
-    elif isinstance(model, cloud_datastore_types.Entity):
-        return model.key.id_or_name
+    elif isinstance(model, beam_datastore_types.Entity):
+        return model.key.to_client_key().id_or_name
     else:
         raise TypeError('%r is not a model instance' % model)
+
+
+def get_beam_entity_from_model(model):
+    """Returns an Apache Beam representation of the given NDB model.
+
+    Args:
+        model: datastore_services.Model. The model to convert.
+
+    Returns:
+        beam_datastore_types.Entity. The Apache Beam representation of the
+        model.
+    """
+    beam_entity = beam_datastore_types.Entity(
+        beam_datastore_types.Key(
+            model.key.flat(), project=feconf.OPPIA_PROJECT_ID))
+    beam_entity.set_properties(model._to_dict()) # pylint: disable=protected-access
+    return beam_entity
+
+
+def get_model_from_beam_entity(beam_entity):
+    """Returns an NDB model representation of the given Apache Beam entity.
+
+    Args:
+        beam_entity: beam_datastore_types.Entity. The entity to convert.
+
+    Returns:
+        datastore_services.Model. The NDB model representation of the entity.
+    """
+    model_id = get_model_id(beam_entity)
+    model_class = (
+        datastore_services.Model._lookup_model(get_model_kind(beam_entity))) # pylint: disable=protected-access
+    return model_class(id=model_id, **beam_entity.properties)
