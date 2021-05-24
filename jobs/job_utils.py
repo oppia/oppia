@@ -88,6 +88,12 @@ def get_model_class(kind):
 def get_model_key(model):
     """Returns the given model's key.
 
+    TODO(#11475): Delete this function after we can use the real datastoreio
+    module. Until then, we need to maintain this code so we can test queries.
+    We need this because NDB queries that target every model can only be
+    performed when we sort models by key, and we use this function to acquire
+    the key for an NDB model.
+
     Args:
         model: datastore_services.Model. The model to inspect.
 
@@ -196,13 +202,20 @@ def get_model_from_beam_entity(beam_entity):
     Returns:
         datastore_services.Model. The NDB model representation of the entity.
     """
-    model_id = get_model_id(beam_entity)
-    model_class = get_model_class(get_model_kind(beam_entity))
+    beam_key = beam_entity.key.to_client_key()
+    model_id = beam_key.id_or_name
+    model_class = datastore_services.Model._lookup_model(beam_key.kind) # pylint: disable=protected-access
     return model_class(id=model_id, **beam_entity.properties)
 
 
 def get_beam_query_from_ndb_query(query):
     """Returns an equivalent Apache Beam query from the given NDB query.
+
+    This function helps developers avoid learning two types of query syntaxes.
+    Specifically, the datastoreio module offered by the Apache Beam SDK only
+    accepts Beam datastore queries, and are implemented very differently from
+    NDB queries. This function adapts the two patterns to make job code easier
+    to write.
 
     Args:
         query: datastore_services.Query. The NDB query to convert.
@@ -232,6 +245,10 @@ def get_beam_query_from_ndb_query(query):
 
 def apply_query_to_models(query, model_list):
     """Applies the query to the list of models by removing elements in-place.
+
+    TODO(#11475): Delete this function after we can use the real datastoreio
+    module, which implements authentic queries. Until then, we need to maintain
+    this code so we can mock the implementation of the datastoreio module.
 
     Args:
         query: beam_datastore_types.Query. The query object representing the
