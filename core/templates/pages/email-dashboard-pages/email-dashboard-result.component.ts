@@ -16,7 +16,7 @@
  * @fileoverview Component for oppia email dashboard page.
  */
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 angular.module('oppia').component('emailDashboardResultPage', {
   template: require('./email-dashboard-result.component.html'),

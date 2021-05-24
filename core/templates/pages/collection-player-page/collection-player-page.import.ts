@@ -36,7 +36,7 @@ require('pages/collection-player-page/collection-player-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'pages/collection-player-page/collection-footer/' +
   'collection-footer.component.ts');

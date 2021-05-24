@@ -29,7 +29,7 @@ import { ActivityIdTypeDict, CommitMessage,
   ExplorationDict, ModeratorPageBackendApiService }
   from './services/moderator-page-backend-api.service';
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 
 @Component({
   selector: 'oppia-moderator-page',

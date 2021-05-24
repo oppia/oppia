@@ -36,5 +36,5 @@ require('pages/story-viewer-page/story-viewer-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require('pages/story-viewer-page/story-viewer-page.component.ts');
