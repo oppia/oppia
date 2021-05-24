@@ -234,14 +234,14 @@ class RelationshipsOf(python_utils.OBJECT):
 
     @classmethod
     def get_model_kind_references(cls, model_kind, property_name):
-        """Returns all model kinds referenced by the given property.
+        """Returns the kinds of models referenced by the given property.
 
         Args:
             model_kind: str. The kind of model the property belongs to.
-            property_name: str. The property name to lookup.
+            property_name: str. The property's name.
 
         Returns:
-            list(str). All model kinds referenced by the given properties.
+            list(str). The kinds of models referenced by the given property.
         """
         model_cls = job_utils.get_model_class(model_kind)
         prop = model_property.ModelProperty(
