@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the LogicProof Interaction.
+ * @fileoverview Component for the LogicProof Interaction.
  */
 import { Component, Input, NgZone, OnInit, TemplateRef } from '@angular/core';
 import { Subscription } from 'rxjs';

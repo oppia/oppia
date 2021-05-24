@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the LogicProof response.
+ * @fileoverview Component for the LogicProof response.
  */
 
 import { Component, Input, OnInit } from '@angular/core';

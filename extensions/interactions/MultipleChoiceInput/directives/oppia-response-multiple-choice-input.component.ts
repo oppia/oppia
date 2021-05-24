@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the MultipleChoiceInput response.
+ * @fileoverview Component for the MultipleChoiceInput response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
+ * into the component is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 import { Component, Input, OnInit } from '@angular/core';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the interactive map interaction components.
+ * @fileoverview Module for the text input interaction components.
  */
 import 'core-js/es7/reflect';
 import 'zone.js';

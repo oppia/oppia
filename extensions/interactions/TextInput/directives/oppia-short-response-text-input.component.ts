@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the TextInput short response.
+ * @fileoverview Component for the TextInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
+ * into the component is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
 
