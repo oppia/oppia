@@ -58,6 +58,27 @@ def clone_model(model, **new_values):
     return cls(id=model_id, **props)
 
 
+def get_model_class(kind):
+    """Returns the model class corresponding to the given kind.
+
+    NOTE: A model's kind is usually, but not always, the same as a model's class
+    name. Specifically, the kind is different when a model overwrites the
+    _get_kind() class method. Although Oppia never does this, the Apache Beam
+    framework uses "kind" to refer to models extensively, so we follow the same
+    convention and take special care to always return the correct value.
+
+    Args:
+        kind: str. The model's kind.
+
+    Returns:
+        type(datastore_services.Model). The corresponding class.
+
+    Raises:
+        KindError. Internally raised by _lookup_model when the kind is invalid.
+    """
+    return datastore_services.Model._lookup_model(kind) # pylint: disable=protected-access
+
+
 def get_model_kind(model):
     """Returns the "kind" of the given model.
 
@@ -159,6 +180,5 @@ def get_model_from_beam_entity(beam_entity):
         datastore_services.Model. The NDB model representation of the entity.
     """
     model_id = get_model_id(beam_entity)
-    model_class = (
-        datastore_services.Model._lookup_model(get_model_kind(beam_entity))) # pylint: disable=protected-access
+    model_class = get_model_class(get_model_kind(beam_entity))
     return model_class(id=model_id, **beam_entity.properties)
