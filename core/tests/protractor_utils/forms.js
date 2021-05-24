@@ -514,6 +514,15 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
   return {
     readPlainText: function(text) {
       // Plain text is in a text node so not recorded in either array.
+      if (
+        fullText.substring(textPointer, textPointer + text.length) !== text
+      ) {
+        console.log(
+          'Expected' +
+            fullText.substring(textPointer, textPointer + text.length) +
+            ' to be ' + 'text'
+        );
+      }
       expect(
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
