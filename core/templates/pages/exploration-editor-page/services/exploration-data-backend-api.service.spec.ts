@@ -48,7 +48,7 @@ describe('Exploration data backend api service', () => {
 
   it('should send a put update exploration', fakeAsync(() => {
     edbas.saveChangeList(
-      '/createhandler/autosave_draft/0', [], '1').subscribe(
+      '/createhandler/autosave_draft/0', [], 1).subscribe(
       async(res) => expect(res).toBe(1)
     );
     const req = httpTestingController.expectOne(
