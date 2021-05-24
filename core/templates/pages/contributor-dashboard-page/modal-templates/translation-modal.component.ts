@@ -48,6 +48,11 @@ export interface HTMLSchema {
     'type': string;
     'ui_config': UiConfig;
 }
+export interface ImageDetails {
+  filePaths: string[];
+  alts: string[];
+  descriptions: string[];
+}
 export class TranslationError {
   constructor(
     private _hasUncopiedImgs: boolean,
@@ -94,6 +99,7 @@ export class TranslationModalComponent {
   triedToCopyText = false;
   hasImgTextError = false;
   incompleteTranslationError = false;
+  imageDetails: ImageDetails;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -216,7 +222,7 @@ export class TranslationModalComponent {
     this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
   }
 
-  getElementAttributeTexts(elements: [HTMLElement], type: string): string[] {
+  getElementAttributeTexts(elements: HTMLElement[], type: string): string[] {
     const textWrapperLength = 6;
     const attributes = Array.from(elements, function(element: HTMLElement) {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
@@ -233,19 +239,15 @@ export class TranslationModalComponent {
     return attributes.filter(attribute => attribute);
   }
 
-  getImageAttributeTexts(htmlElements: [HTMLElement]): {} {
-    const imageFilePaths = this.getElementAttributeTexts(
+  getImageAttributeTexts(htmlElements: HTMLElement[]): ImageDetails {
+    this.imageDetails.filePaths = this.getElementAttributeTexts(
       htmlElements, 'filepath-with-value');
-    const imageAlts = this.getElementAttributeTexts(
+    this.imageDetails.alts = this.getElementAttributeTexts(
       htmlElements, 'alt-with-value');
-    const imageDescriptions = this.getElementAttributeTexts(
+    this.imageDetails.descriptions = this.getElementAttributeTexts(
       htmlElements, 'caption-with-value');
 
-    return {
-      imageFilePaths: imageFilePaths,
-      imageAlts: imageAlts,
-      imageDescriptions: imageDescriptions
-    };
+    return this.imageDetails;
   }
 
   copiedAllElements(
@@ -256,18 +258,18 @@ export class TranslationModalComponent {
     return originalElements.every(hasMatchingTranslatedElement);
   }
 
-  hasSomeDuplicateElements = function(
-      originalElements: HTMLElement[],
-      translatedElements: HTMLElement[]): boolean {
+  hasSomeDuplicateElements (
+      originalElements: string[],
+      translatedElements: string[]): boolean {
     if (originalElements.length === 0) {
       return false;
     }
     const hasMatchingTranslatedElement = (element) => (
       translatedElements.includes(element) && originalElements.length > 0);
     return originalElements.some(hasMatchingTranslatedElement);
-  };
+  }
 
-  isTranslationCompleted = function(
+  isTranslationCompleted (
       originalElements: HTMLElement[],
       translatedElements: HTMLElement[]): boolean {
     originalElements.sort();
@@ -285,27 +287,27 @@ export class TranslationModalComponent {
     for (const [i, originalElement] of filteredOriginalElements.entries()) {
       if (originalElement.nodeName !== filteredTranslatedElements[
         i].nodeName) {
-          return false;
-        }
+        return false;
+      }
     }
     return true;
-  };
+  }
 
-  validateTranslation = function(
+  validateTranslation (
       textToTranslate: HTMLElement[],
       translatedText: HTMLElement[]): TranslationError {
-    const translatedElements = this.getImageAttributeTexts(translatedText);
-    const originalElements = this.getImageAttributeTexts(textToTranslate);
+    const translatedElements: ImageDetails = this.getImageAttributeTexts(translatedText);
+    const originalElements: ImageDetails = this.getImageAttributeTexts(textToTranslate);
 
     const hasUncopiedImgs = !this.copiedAllElements(
-      originalElements.imageFilePaths,
-      translatedElements.imageFilePaths);
+      originalElements.filePaths,
+      translatedElements.filePaths);
     const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
-      originalElements.imageAlts,
-      translatedElements.imageAlts);
+      originalElements.alts,
+      translatedElements.alts);
     const hasDuplicateDescriptions = this.hasSomeDuplicateElements(
-      originalElements.imageDescriptions,
-      translatedElements.imageDescriptions);
+      originalElements.descriptions,
+      translatedElements.descriptions);
     const hasUntranslatedElements = !(this.isTranslationCompleted(
       textToTranslate, translatedText));
 
