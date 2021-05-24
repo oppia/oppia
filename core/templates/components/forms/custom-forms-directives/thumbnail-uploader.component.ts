@@ -216,6 +216,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
           this.thumbnailIsLoading = false;
         }
       } else {
+        this.thumbnailIsLoading = false;
         this.imageLocalStorageService.saveImage(
           generatedImageFilename, data.newThumbnailDataUrl);
         this.localStorageBgcolor = data.newBgColor;
