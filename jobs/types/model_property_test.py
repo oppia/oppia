@@ -52,20 +52,22 @@ class RepeatedValueModel(base_models.BaseModel):
 class ModelPropertyTests(test_utils.TestBase):
 
     def setUp(self):
+        self.id_property = model_property.ModelProperty(
+            SubclassOfBaseModel, SubclassOfBaseModel.id)
         self.model_property = model_property.ModelProperty(
             SubclassOfBaseModel, SubclassOfBaseModel.value)
         self.repeated_model_property = model_property.ModelProperty(
             RepeatedValueModel, RepeatedValueModel.values)
 
-    def test_init_with_ndb_property(self):
-        # Does not raise.
-        model_property.ModelProperty(
-            SubclassOfBaseModel, SubclassOfBaseModel.value)
-
     def test_init_with_base_model_id(self):
         # Does not raise.
         model_property.ModelProperty(
             SubclassOfBaseModel, SubclassOfBaseModel.id)
+
+    def test_init_with_ndb_property(self):
+        # Does not raise.
+        model_property.ModelProperty(
+            SubclassOfBaseModel, SubclassOfBaseModel.value)
 
     def test_init_raises_type_error_when_model_is_not_a_type(self):
         foo_model = SubclassOfBaseModel()
@@ -118,6 +120,12 @@ class ModelPropertyTests(test_utils.TestBase):
         self.assertIn(self.model_property, model_property_set)
         self.assertNotIn(self.repeated_model_property, model_property_set)
 
+    def test_yield_value_from_model_with_id(self):
+        model = SubclassOfBaseModel(id='123')
+
+        self.assertEqual(
+            list(self.id_property.yield_value_from_model(model)), ['123'])
+
     def test_yield_value_from_model_with_property(self):
         model = SubclassOfBaseModel(value='abc')
 
@@ -144,21 +152,23 @@ class ModelPropertyTests(test_utils.TestBase):
             TypeError, 'not an instance of SubclassOfBaseModel',
             lambda: list(self.model_property.yield_value_from_model(model)))
 
-    def test_pickling(self):
-        pickled_model_property, pickled_repeated_model_property = (
-            pickle.dumps(self.model_property),
-            pickle.dumps(self.repeated_model_property))
-        unpickled_model_property, unpickled_repeated_model_property = (
-            pickle.loads(pickled_model_property),
-            pickle.loads(pickled_repeated_model_property))
+    def test_pickling_id_property(self):
+        pickled_value = pickle.dumps(self.id_property)
+        unpickled_value = pickle.loads(pickled_value)
 
-        self.assertEqual(self.model_property, unpickled_model_property)
-        self.assertIn(unpickled_model_property, {self.model_property})
+        self.assertEqual(self.id_property, unpickled_value)
+        self.assertIn(unpickled_value, {self.id_property})
 
-        self.assertEqual(
-            self.repeated_model_property, unpickled_repeated_model_property)
-        self.assertIn(
-            unpickled_repeated_model_property, {self.repeated_model_property})
+    def test_pickling_model_property(self):
+        pickled_value = pickle.dumps(self.model_property)
+        unpickled_value = pickle.loads(pickled_value)
 
-        self.assertNotEqual(
-            unpickled_model_property, unpickled_repeated_model_property)
+        self.assertEqual(self.model_property, unpickled_value)
+        self.assertIn(unpickled_value, {self.model_property})
+
+    def test_pickling_repeated_property(self):
+        pickled_value = pickle.dumps(self.repeated_model_property)
+        unpickled_value = pickle.loads(pickled_value)
+
+        self.assertEqual(self.repeated_model_property, unpickled_value)
+        self.assertIn(unpickled_value, {self.repeated_model_property})
