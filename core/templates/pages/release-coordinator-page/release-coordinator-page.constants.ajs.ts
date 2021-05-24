@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia admin page.
+ * @fileoverview Constants for the release coordinator page.
  */
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS

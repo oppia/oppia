@@ -30,16 +30,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the navigation bar in the admin panel.
+ * @fileoverview Component for the release coordinator page.
  */
 
 import { Component, OnInit, } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-
+import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
 
 @Component({

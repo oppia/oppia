@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service that manages admin data.
+ * @fileoverview Service that manages release coordinator's backend api calls.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -21,24 +21,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-import {
-  ComputationData,
-  ComputationDataBackendDict,
-} from 'domain/admin/computation-data.model';
-import {
-  Job,
-  JobDataBackendDict,
-} from 'domain/admin/job.model';
-import {
-  JobStatusSummary,
-  JobStatusSummaryBackendDict,
-} from 'domain/admin/job-status-summary.model';
+import { ComputationData, ComputationDataBackendDict } from 'domain/admin/computation-data.model';
+import { Job, JobDataBackendDict } from 'domain/admin/job.model';
+import { JobStatusSummary, JobStatusSummaryBackendDict } from 'domain/admin/job-status-summary.model';
 
 interface JobOutputBackendResponse {
   output: string[];
 }
-
 
 export interface JobsDataBackendDict {
   'one_off_job_status_summaries': JobStatusSummaryBackendDict[];

@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class ReleaseCoordinatorPage(base.BaseHandler):
 
 
 class JobsHandler(base.BaseHandler):
-    """Handler for the admin page."""
+    """Handler to presnt/run/cancel jobs through release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -137,7 +137,7 @@ class JobsHandler(base.BaseHandler):
 
 
 class JobOutputHandler(base.BaseHandler):
-    """Retrieves job output to show on the admin page."""
+    """Retrieves job output to show on the release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

@@ -70,7 +70,6 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   }
 
   async getUserInfoAsync(): Promise<void> {
-    this.activeTab = this.TAB_ID_JOBS;
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
@@ -85,6 +84,8 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   ngOnInit(): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
+
+    this.activeTab = this.TAB_ID_JOBS;
   }
 }
 

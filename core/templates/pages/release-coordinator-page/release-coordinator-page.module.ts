@@ -36,7 +36,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-
     SharedComponentsModule
   ],
   declarations: [
