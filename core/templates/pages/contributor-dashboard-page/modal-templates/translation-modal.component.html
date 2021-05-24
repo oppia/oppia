@@ -43,6 +43,20 @@
         </schema-based-editor>
       </div>
     </div>
+    <div class="oppia-translation-error-section">
+      <p *ngIf="hasImgCopyError">
+        All images should be copied.
+      </p>
+      <p *ngIf="hasImgTextError">
+        Image caption and/or description should be translated if they exist.
+      </p>
+      <p *ngIf="triedToCopyText">
+        Paragraphs are not allowed to be copied. Please make sure to translate the text.
+      </p>
+      <p *ngIf="incompleteTranslationError">
+        Translation is incomplete. Please make sure all elements in the original content are included in the translated content.
+      </p>
+    </div>
     <strong *ngIf="isSubmitted()">Submitted translation:</strong>
     <div *ngIf="isSubmitted()" class="oppia-text-to-translate-container">
       <angular-html-bind-wrapper [htmlData]="activeWrittenTranslation.html"
@@ -165,5 +179,8 @@
   }
   .oppia-rte-editor-focused *:hover {
     background-color: rgba(233, 241, 242);
+  }
+  .oppia-translation-error-section {
+    color: red;
   }
 </style>
