@@ -22,6 +22,9 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -31,9 +34,10 @@ describe('OppiaAngularRootComponent', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, RichTextComponentsModule],
       declarations: [OppiaAngularRootComponent],
       providers: [{provide: AngularFireAuth, useValue: null}],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(OppiaAngularRootComponent);
@@ -42,11 +46,11 @@ describe('OppiaAngularRootComponent', function() {
     emitSpy = spyOn(component.initialized, 'emit');
   }));
 
-  describe('.initialized', () => {
-    it('should emit once ngAfterViewInit is called', () => {
-      component.ngAfterViewInit();
+  it('should emit once ngAfterViewInit is called', () => {
+    spyOn(CkEditorInitializerService, 'ckEditorInitializer').and.callFake(
+      () => {});
+    component.ngAfterViewInit();
 
-      expect(emitSpy).toHaveBeenCalled();
-    });
+    expect(emitSpy).toHaveBeenCalled();
   });
 });

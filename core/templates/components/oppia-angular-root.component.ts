@@ -106,7 +106,7 @@ import { NoninteractiveSkillreview } from "rich_text_components/Skillreview/dire
 import { NoninteractiveSvgdiagram } from "rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component";
 import { NoninteractiveTabs } from "rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component";
 import { NoninteractiveVideo } from "rich_text_components/Video/directives/oppia-noninteractive-video.component";
-import { ckEditorInitializer } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
+import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { HtmlEscaperService } from 'services/html-escaper.service';
  
 const componentMap = {
@@ -183,7 +183,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
 
   public ngAfterViewInit(): void {
     this.ngZone.runOutsideAngular(() => {
-      ckEditorInitializer(
+      CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,
         this.htmlEscaperService,
         OppiaAngularRootComponent.contextService,
