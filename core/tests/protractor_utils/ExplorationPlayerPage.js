@@ -33,7 +33,7 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
-  var conversationFeedback = element.all(
+  var conversationFeedback = element(
     by.css('.protractor-test-conversation-feedback'));
   var explorationHeader = element(
     by.css('.protractor-test-exploration-header'));
@@ -239,8 +239,9 @@ var ExplorationPlayerPage = function() {
   // Note that the 'latest' feedback may be on either the current or a
   // previous card.
   this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(conversationFeedback);
     await forms.expectRichText(
-      await conversationFeedback.last()
+      conversationFeedback
     ).toMatch(richTextInstructions);
   };
 

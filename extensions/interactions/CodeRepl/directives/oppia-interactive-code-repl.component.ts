@@ -131,8 +131,8 @@ export class InteractiveCodeReplComponent implements
         this.preCode + this.placeholder + this.postCode);
       this.output = '';
     } else {
-      this.code = this.lastAnswer().code;
-      this.output = this.lastAnswer().output;
+      this.code = this.lastAnswer.code;
+      this.output = this.lastAnswer.output;
     }
 
     // Configure Skulpt.

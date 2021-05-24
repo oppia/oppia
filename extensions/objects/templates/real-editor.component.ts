@@ -1,4 +1,4 @@
-// Copyright 2012 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,62 +13,54 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for positive int editor.
+ * @fileoverview Directive for real editor.
  */
-
-// Every editor directive should implement an alwaysEditable option. There
-// may be additional customization options for the editor that should be passed
-// in via initArgs.
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-
-interface PositiveIntSchema {
+interface RealSchema {
   type: string;
-  validators: {
-    id: string;
-    'min_value'?: number;
-  }[];
 }
-
 @Component({
-  selector: 'positive-int-editor',
-  templateUrl: './positive-int-editor.component.html',
+  selector: 'real-editor',
+  templateUrl: './real-editor.component.html',
   styleUrls: []
 })
-export class PositiveIntEditorComponent implements OnInit {
-  @Input() modalId;
+export class RealEditorComponent implements OnInit {
   @Input() value;
   @Output() valueChanged = new EventEmitter();
-  SCHEMA: PositiveIntSchema = {
-    type: 'int',
-    validators: [{
-      id: 'is_at_least',
-      min_value: 1
-    }, {
-      id: 'is_integer'
-    }]
+  schema: RealSchema = {
+    type: 'float'
   };
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
-  ngOnInit(): void {
-    if (!this.value) {
-      this.value = 1;
+  getSchema(): RealSchema {
+    return this.schema;
+  }
+
+  updateValue(newValue: number | string): void {
+    if (
+      this.value === newValue ||
+      (newValue === '' || newValue === null) && this.value === 0.0) {
+      return;
     }
-  }
-
-  getSchema(): PositiveIntSchema {
-    return this.SCHEMA;
-  }
-
-  updateValue(newValue: number): void {
-    if (this.value === newValue) {
+    if (newValue === '' || newValue === null) {
+      // A new rule.
+      this.value = 0.0;
+      this.valueChanged.emit(this.value);
+      this.changeDetectorRef.detectChanges();
       return;
     }
     this.value = newValue;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }
+
+  ngOnInit(): void {
+    if (this.value === '' || this.value === undefined) {
+      this.value = 0.0;
+    }
+  }
 }
-angular.module('oppia').directive('positiveIntEditor', downgradeComponent({
-  component: PositiveIntEditorComponent
+angular.module('oppia').directive('realEditor', downgradeComponent({
+  component: RealEditorComponent
 }) as angular.IDirectiveFactory);

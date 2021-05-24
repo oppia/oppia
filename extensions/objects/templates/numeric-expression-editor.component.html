@@ -1,9 +1,7 @@
-<div class="guppy-div-creator protractor-test-guppy-div" ng-click="$ctrl.showOSK()"></div>
+<div class="guppy-div-creator protractor-test-guppy-div" (click)="showOSK()"></div>
 
-<span ng-model="$ctrl.currentValue" ui-validate="'$ctrl.isCurrentAnswerValid()'"></span>
-
-<div ng-show="$ctrl.warningText.length !== 0" class="alert alert-danger mt-2 mb-4">
-  <[$ctrl.warningText]>
+<div *ngIf="warningText.length !== 0" class="alert alert-danger mt-2 mb-4">
+  {{ warningText }}
 </div>
 
 <style>
