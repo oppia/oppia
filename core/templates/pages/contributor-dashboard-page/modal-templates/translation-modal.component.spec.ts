@@ -396,9 +396,9 @@ describe('Translation Modal Component', () => {
 
     describe('when all images are not copied', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
-          '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
-          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
+        component.textToTranslate = '<oppia-noninteractive-image alt-with-val' +
+          'ue="&amp;quot;Image description&amp;quot;" caption-with-value="&' +
+          'amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
           'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
           '</oppia-noninteractive-image>';
         component.activeWrittenTranslation.html = '';
@@ -413,16 +413,16 @@ describe('Translation Modal Component', () => {
 
     describe('when alt text is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
-          '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
-          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
-          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
-          '</oppia-noninteractive-image>';
-        component.activeWrittenTranslation.html = '<oppia-noninteractive-image alt-with-value=' +
-          '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
-          '"&amp;quot;New caption&amp;quot;" filepath-with-value="&amp;quot;' +
-          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
-          '</oppia-noninteractive-image>';
+        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+          'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
+          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
+          ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
+          '></oppia-noninteractive-image>';
+        component.activeWrittenTranslation.html = '<oppia-noninteractive-' +
+          'image alt-with-value="&amp;quot;Image description&amp;quot;' +
+          '" caption-with-value="&amp;quot;New caption&amp;quot;"' +
+          ' filepath-with-value="&amp;quot;img_20210129_210552_zbv0mdty94' +
+          '_height_54_width_490.png&amp;quot;"></oppia-noninteractive-image>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();
@@ -434,16 +434,16 @@ describe('Translation Modal Component', () => {
 
     describe('when caption is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-value=' +
-          '"&amp;quot;Image description&amp;quot;" caption-with-value=' +
-          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
-          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
-          '</oppia-noninteractive-image>';
-        component.activeWrittenTranslation.html = '<oppia-noninteractive-image alt-with-value=' +
-          '"&amp;quot;New description&amp;quot;" caption-with-value=' +
-          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;' +
-          'img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">' +
-          '</oppia-noninteractive-image>';
+        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+          'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
+          '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
+          ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
+          '></oppia-noninteractive-image>';
+        component.activeWrittenTranslation.html = '<oppia-noninteractive' +
+          '-image alt-with-value="&amp;quot;New description&amp;quot;"' +
+          ' caption-with-value="&amp;quot;Image caption&amp;quot;"' +
+          ' filepath-with-value="&amp;quot:img_20210129_210552_zbv0mdty9' +
+          '4_height_54_width_490.png&amp;quot;"></oppia-noninteractive-image>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();
@@ -466,11 +466,12 @@ describe('Translation Modal Component', () => {
       });
     });
 
-    describe('when translation elements are not matching with the elements '+
+    describe('when translation elements are not matching with the elements ' +
         'of the text to translate', () => {
       it('should not submit the translation', () => {
         component.textToTranslate = '<p>First para</p><p>Second para</p>';
-        component.activeWrittenTranslation.html = '<p>New First para</p><div></div>';
+        component.activeWrittenTranslation.html = '<p>New First para</p><div>' +
+          '</div>';
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
 
         component.suggestTranslatedText();

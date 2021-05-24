@@ -30,7 +30,6 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { typeOf } from 'mathjs';
 
 class UiConfig {
   'hide_complex_extensions': boolean;
@@ -154,7 +153,7 @@ export class TranslationModalComponent {
     return this.HTML_SCHEMA;
   }
 
-  onContentClick(event: MouseEvent) {
+  onContentClick(event: MouseEvent): boolean | void {
     const paragraphCopyValidation = this.validateParagraphCopy(event);
     if (paragraphCopyValidation) {
       return this.triedToCopyText = true;
@@ -166,18 +165,19 @@ export class TranslationModalComponent {
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
 
-  validateParagraphCopy($event) {
+  validateParagraphCopy($event: MouseEvent): boolean {
     // Mathematical equations are also wrapped by <p> elements.
     // Hence, math elements should be allowed to be copied.
     // See issue #11683.
-    const paragraphChildrenElements: HTMLElement[] = (
-      $event.target.localName === 'p') ? Array.from(
-        $event.target.children) : [];
-    const triedTextCopy = $event.target.localName === 'p' && !(
+    const target = $event.target as HTMLElement;
+    const paragraphChildrenElements: Element[] = (
+      target.localName === 'p') ? Array.from(
+        target.children) : [];
+    const triedTextCopy = target.localName === 'p' && !(
       paragraphChildrenElements.some(
         child => child.localName === 'oppia-noninteractive-math'));
     return triedTextCopy;
-  };
+  }
 
   isCopyModeActive(): boolean {
     return this.ckEditorCopyContentService.copyModeActive;
@@ -216,11 +216,11 @@ export class TranslationModalComponent {
     this.activeWrittenTranslation.html = textAndAvailability.translationHtml;
   }
 
-  getElementAttributeTexts(elements, type) {
+  getElementAttributeTexts(elements: [HTMLElement], type: string): string[] {
     const textWrapperLength = 6;
     const attributes = Array.from(elements, function(element: HTMLElement) {
-      // A sample element would be as <oppia-noninteractive-image alt-with-value=
-      // "&amp;quot;Image description&amp;quot;" caption-with-value=
+      // A sample element would be as <oppia-noninteractive-image alt-with-value
+      // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
       // img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">
       // </oppia-noninteractive-image>
@@ -233,7 +233,7 @@ export class TranslationModalComponent {
     return attributes.filter(attribute => attribute);
   }
 
-  getImageAttributeTexts(htmlElements: [HTMLElement]) {
+  getImageAttributeTexts(htmlElements: [HTMLElement]): {} {
     const imageFilePaths = this.getElementAttributeTexts(
       htmlElements, 'filepath-with-value');
     const imageAlts = this.getElementAttributeTexts(
@@ -242,31 +242,34 @@ export class TranslationModalComponent {
       htmlElements, 'caption-with-value');
 
     return {
-      foundImageFilePaths: imageFilePaths,
-      foundImageAlts: imageAlts,
-      foundImageDescriptions: imageDescriptions
+      imageFilePaths: imageFilePaths,
+      imageAlts: imageAlts,
+      imageDescriptions: imageDescriptions
     };
   }
 
   copiedAllElements(
-    originalElements, translatedElements) {
+      originalElements: string[],
+      translatedElements: string[]): boolean {
     const hasMatchingTranslatedElement = (element) => (
       translatedElements.includes(element));
     return originalElements.every(hasMatchingTranslatedElement);
   }
 
   hasSomeDuplicateElements = function(
-    originalElements: HTMLElement[], translatedElements: HTMLElement[]) {
+      originalElements: HTMLElement[],
+      translatedElements: HTMLElement[]): boolean {
     if (originalElements.length === 0) {
       return false;
     }
     const hasMatchingTranslatedElement = (element) => (
       translatedElements.includes(element) && originalElements.length > 0);
     return originalElements.some(hasMatchingTranslatedElement);
-  }
+  };
 
   isTranslationCompleted = function(
-    originalElements: HTMLElement[], translatedElements: HTMLElement[]) {
+      originalElements: HTMLElement[],
+      translatedElements: HTMLElement[]): boolean {
     originalElements.sort();
     translatedElements.sort();
 
@@ -275,37 +278,41 @@ export class TranslationModalComponent {
     const filteredTranslatedElements = translatedElements.filter(
       (element: HTMLElement) => element.nodeType === Node.ELEMENT_NODE);
 
-    if (filteredOriginalElements.length !== filteredTranslatedElements.length) return false;
+    if (filteredOriginalElements.length !== filteredTranslatedElements.length) {
+      return false;
+    }
 
     for (const [i, originalElement] of filteredOriginalElements.entries()) {
       if (originalElement.nodeName !== filteredTranslatedElements[
-        i].nodeName) return false;
+        i].nodeName) {
+          return false;
+        }
     }
     return true;
-  }
+  };
 
   validateTranslation = function(
-    textToTranslate: HTMLElement[],
-    translatedText: HTMLElement[]): TranslationError {
+      textToTranslate: HTMLElement[],
+      translatedText: HTMLElement[]): TranslationError {
     const translatedElements = this.getImageAttributeTexts(translatedText);
     const originalElements = this.getImageAttributeTexts(textToTranslate);
 
     const hasUncopiedImgs = !this.copiedAllElements(
-      originalElements.foundImageFilePaths,
-      translatedElements.foundImageFilePaths);
+      originalElements.imageFilePaths,
+      translatedElements.imageFilePaths);
     const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
-      originalElements.foundImageAlts,
-      translatedElements.foundImageAlts);
+      originalElements.imageAlts,
+      translatedElements.imageAlts);
     const hasDuplicateDescriptions = this.hasSomeDuplicateElements(
-      originalElements.foundImageDescriptions,
-      translatedElements.foundImageDescriptions);
+      originalElements.imageDescriptions,
+      translatedElements.imageDescriptions);
     const hasUntranslatedElements = !(this.isTranslationCompleted(
       textToTranslate, translatedText));
 
     return new TranslationError(
       hasUncopiedImgs, hasDuplicateAltTexts,
       hasDuplicateDescriptions, hasUntranslatedElements);
-  }
+  };
 
   suggestTranslatedText(): void {
     const originalElements = Array.from(angular.element(
