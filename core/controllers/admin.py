@@ -21,12 +21,9 @@ import logging
 import random
 
 from constants import constants
-from core import jobs
-from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import auth_services
-from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -80,63 +77,18 @@ class AdminHandler(base.BaseHandler):
         """Handles GET requests."""
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
-        recent_job_data = jobs.get_data_for_recent_jobs()
-        unfinished_job_data = jobs.get_data_for_unfinished_jobs()
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
-        for job in unfinished_job_data:
-            job['can_be_canceled'] = job['is_cancelable'] and any([
-                klass.__name__ == job['job_type']
-                for klass in (
-                    jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                        jobs_registry.AUDIT_JOB_MANAGERS))])
-
-        queued_or_running_job_types = set([
-            job['job_type'] for job in unfinished_job_data])
-        one_off_job_status_summaries = [{
-            'job_type': klass.__name__,
-            'is_queued_or_running': (
-                klass.__name__ in queued_or_running_job_types)
-        } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
-        audit_job_status_summaries = [{
-            'job_type': klass.__name__,
-            'is_queued_or_running': (
-                klass.__name__ in queued_or_running_job_types)
-        } for klass in jobs_registry.AUDIT_JOB_MANAGERS]
-
-        continuous_computations_data = jobs.get_continuous_computations_info(
-            jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS)
-        for computation in continuous_computations_data:
-            if computation['last_started_msec']:
-                computation['human_readable_last_started'] = (
-                    utils.get_human_readable_time_string(
-                        computation['last_started_msec']))
-            if computation['last_stopped_msec']:
-                computation['human_readable_last_stopped'] = (
-                    utils.get_human_readable_time_string(
-                        computation['last_stopped_msec']))
-            if computation['last_finished_msec']:
-                computation['human_readable_last_finished'] = (
-                    utils.get_human_readable_time_string(
-                        computation['last_finished_msec']))
 
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
         self.render_json({
             'config_properties': (
                 config_domain.Registry.get_config_property_schemas()),
-            'continuous_computations_data': continuous_computations_data,
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
-            'human_readable_current_time': (
-                utils.get_human_readable_time_string(
-                    utils.get_current_time_in_millisecs())),
-            'one_off_job_status_summaries': one_off_job_status_summaries,
-            'audit_job_status_summaries': audit_job_status_summaries,
-            'recent_job_data': recent_job_data,
-            'unfinished_job_data': unfinished_job_data,
             'updatable_roles': {
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.UPDATABLE_ROLES
@@ -204,34 +156,6 @@ class AdminHandler(base.BaseHandler):
                     (self.user_id, config_property_id))
                 config_services.revert_property(
                     self.user_id, config_property_id)
-            elif self.payload.get('action') == 'start_new_job':
-                for klass in (
-                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry.AUDIT_JOB_MANAGERS)):
-                    if klass.__name__ == self.payload.get('job_type'):
-                        klass.enqueue(klass.create_new())
-                        break
-            elif self.payload.get('action') == 'cancel_job':
-                job_id = self.payload.get('job_id')
-                job_type = self.payload.get('job_type')
-                for klass in (
-                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry.AUDIT_JOB_MANAGERS)):
-                    if klass.__name__ == job_type:
-                        klass.cancel(job_id, self.user_id)
-                        break
-            elif self.payload.get('action') == 'start_computation':
-                computation_type = self.payload.get('computation_type')
-                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                    if klass.__name__ == computation_type:
-                        klass.start_computation()
-                        break
-            elif self.payload.get('action') == 'stop_computation':
-                computation_type = self.payload.get('computation_type')
-                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                    if klass.__name__ == computation_type:
-                        klass.stop_computation(self.user_id)
-                        break
             elif self.payload.get('action') == 'upload_topic_similarities':
                 data = self.payload.get('data')
                 recommendations_services.update_topic_similarities(data)
@@ -776,20 +700,6 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class AdminJobOutputHandler(base.BaseHandler):
-    """Retrieves job output to show on the admin page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
-        job_id = self.request.get('job_id')
-        self.render_json({
-            'output': jobs.get_job_output(job_id)
-        })
-
-
 class AdminTopicsCsvFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
 
@@ -1048,26 +958,6 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             self.render_json({})
         else:
             raise self.InvalidInputException('This app cannot send emails.')
-
-
-class MemoryCacheAdminHandler(base.BaseHandler):
-    """Handler for memory cache functions used in the Misc Page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        cache_stats = caching_services.get_memory_cache_stats()
-        self.render_json({
-            'total_allocation': cache_stats.total_allocated_in_bytes,
-            'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
-            'total_keys_stored': cache_stats.total_number_of_keys_stored
-        })
-
-    @acl_decorators.can_access_admin_page
-    def post(self):
-        caching_services.flush_memory_cache()
-        self.render_json({})
 
 
 class UpdateUsernameHandler(base.BaseHandler):

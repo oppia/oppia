@@ -56,9 +56,6 @@ angular.module('oppia').directive('adminPage', [
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
           };
-          ctrl.isJobsTabOpen = function() {
-            return AdminRouterService.isJobsTabOpen();
-          };
           ctrl.isConfigTabOpen = function() {
             return AdminRouterService.isConfigTabOpen();
           };

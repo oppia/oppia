@@ -464,6 +464,45 @@ def can_access_moderator_page(handler):
     return test_can_access_moderator_page
 
 
+def can_access_release_coordinator_page(handler):
+    """Decorator to check whether user can access release coordinator page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the release coordinator page.
+    """
+
+    def test_can_access_release_coordinator_page(self, **kwargs):
+        """Checks if the user is logged in and can access release coordinator
+        page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the release coordinator page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_RUN_ANY_JOBS in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access release coordinator page.')
+    test_can_access_release_coordinator_page.__wrapped__ = True
+
+    return test_can_access_release_coordinator_page
+
+
 def can_send_moderator_emails(handler):
     """Decorator to check whether user can send moderator emails.
 

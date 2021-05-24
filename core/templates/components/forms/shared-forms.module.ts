@@ -20,7 +20,7 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
@@ -40,6 +40,7 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
+    ReactiveFormsModule,
     SharedPipesModule
   ],
   declarations: [

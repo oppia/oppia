@@ -25,8 +25,8 @@ import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 import { InterpolationValuesType, UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminPageConstants } from '../admin-page.constants';
-import { AdminJobsTabComponent } from './admin-jobs-tab.component';
+import { AdminPageConstants } from '../release-coordinator-page.constants';
+import { AdminJobsTabComponent } from './jobs-tab.component';
 
 
 interface FakeThen {

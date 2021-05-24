@@ -13,51 +13,43 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the admin page.
+ * @fileoverview Module for the release-coordinator page.
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
-import { AdminFeaturesTabComponent } from
-  'pages/admin-page/features-tab/admin-features-tab.component';
-import { AdminNavbarComponent } from './navbar/admin-navbar.component';
-import { AdminDevModeActivitiesTabComponent } from './activities-tab/admin-dev-mode-activities-tab.component';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { OppiaAdminProdModeActivitiesTabComponent } from
-  './activities-tab/admin-prod-mode-activities-tab.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
+import { ReleaseCoordinatorNavbarComponent } from 'pages/release-coordinator-page/navbar/release-coordinator-navbar.component';
+import { ReleaseCoordinatorPageComponent } from './release-coordinator-page.component';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { JobsTabComponent } from 'pages/release-coordinator-page/jobs-tab/jobs-tab.component';
+import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    ReactiveFormsModule,
+
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent,
-    AdminNavbarComponent,
-    AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    JobsTabComponent,
+    ReleaseCoordinatorNavbarComponent,
+    ReleaseCoordinatorPageComponent
   ],
   entryComponents: [
-    OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
-    AdminFeaturesTabComponent,
-    AdminNavbarComponent,
-    AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    JobsTabComponent,
+    ReleaseCoordinatorNavbarComponent,
+    ReleaseCoordinatorPageComponent
   ],
   providers: [
     {
@@ -73,7 +65,7 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     }
   ]
 })
-class AdminPageModule {
+class ReleaseCoordinatorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
@@ -83,7 +75,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(AdminPageModule);
+  return platformRef.bootstrapModule(ReleaseCoordinatorPageModule);
 };
 const downgradedModule = downgradeModule(bootstrapFnAsync);
 

@@ -23,6 +23,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import config_services
 from core.domain import fs_domain
 from core.domain import value_generators_domain
 import feconf
@@ -112,9 +113,7 @@ class AssetDevHandler(base.BaseHandler):
 
 
 class PromoBarHandler(base.BaseHandler):
-    """The handler for checking if Promobar is enabled and fetching
-    promobar message.
-    """
+    """Handler for the promo-bar."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     # This prevents partially logged in user from being logged out
@@ -127,3 +126,18 @@ class PromoBarHandler(base.BaseHandler):
             'promo_bar_enabled': config_domain.PROMO_BAR_ENABLED.value,
             'promo_bar_message': config_domain.PROMO_BAR_MESSAGE.value
         })
+
+    @acl_decorators.can_access_release_coordinator_page
+    def put(self):
+        promo_bar_enabled_value = self.payload.get('promo_bar_enabled')
+        promo_bar_message_value = self.payload.get('promo_bar_message')
+
+        logging.info(
+            '[RELEASE COORDINATOR] %s saved promo-bar config property values: '
+            '%s' % (self.user_id, promo_bar_message_value))
+        config_services.set_property(
+            self.user_id, 'promo_bar_enabled', promo_bar_enabled_value)
+        config_services.set_property(
+            self.user_id, 'promo_bar_message', promo_bar_message_value)
+
+        self.render_json({})

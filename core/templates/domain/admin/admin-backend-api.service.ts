@@ -27,18 +27,6 @@ import {
   TopicSummaryBackendDict
 } from 'domain/topic/topic-summary.model';
 import {
-  ComputationData,
-  ComputationDataBackendDict,
-} from 'domain/admin/computation-data.model';
-import {
-  Job,
-  JobDataBackendDict,
-} from 'domain/admin/job.model';
-import {
-  JobStatusSummary,
-  JobStatusSummaryBackendDict,
-} from 'domain/admin/job-status-summary.model';
-import {
   PlatformParameter,
   PlatformParameterBackendDict
 } from 'domain/platform_feature/platform-parameter.model';
@@ -58,10 +46,6 @@ interface ConfigPropertiesBackendResponse {
   [property: string]: Object;
 }
 
-interface JobOutputBackendResponse {
-  output: string[];
-}
-
 interface ViewContributionBackendResponse {
   usernames: string[];
 }
@@ -71,12 +55,6 @@ interface ContributionRightsBackendResponse {
   'can_review_translation_for_language_codes': string[],
   'can_review_voiceover_for_language_codes': string[],
   'can_submit_questions': boolean
-}
-
-interface MemoryCacheProfileBackendResponse {
-  'peak_allocation': string,
-  'total_allocation': string,
-  'total_keys_stored': string
 }
 
 interface PendingDeletionRequestBackendResponse {
@@ -140,15 +118,11 @@ export interface AdminPageDataBackendDict {
   'demo_explorations': string[][];
   'demo_collections': string[][];
   'demo_exploration_ids': string[];
-  'one_off_job_status_summaries': JobStatusSummaryBackendDict[];
   'human_readable_current_time': string;
-  'audit_job_status_summaries': JobStatusSummaryBackendDict[];
   'updatable_roles': UserRolesBackendResponse;
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
   'viewable_roles': UserRolesBackendResponse;
-  'unfinished_job_data': JobDataBackendDict[];
-  'recent_job_data': JobDataBackendDict[];
   'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
@@ -158,16 +132,10 @@ export interface AdminPageData {
   demoExplorations: string[][];
   demoCollections: string[][];
   demoExplorationIds: string[];
-  oneOffJobStatusSummaries: JobStatusSummary[];
-  humanReadableCurrentTime: string;
-  auditJobStatusSummaries: JobStatusSummary[];
   updatableRoles: UserRolesBackendResponse;
   roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
   viewableRoles: UserRolesBackendResponse;
-  unfinishedJobData: Job[];
-  recentJobData: Job[];
-  continuousComputationsData: ComputationData[];
   topicSummaries: TopicSummary[];
   featureFlags: PlatformParameter[];
 }
@@ -188,21 +156,10 @@ export class AdminBackendApiService {
           demoExplorations: response.demo_explorations,
           demoCollections: response.demo_collections,
           demoExplorationIds: response.demo_exploration_ids,
-          oneOffJobStatusSummaries: response.one_off_job_status_summaries.map(
-            JobStatusSummary.createFromBackendDict),
-          humanReadableCurrentTime: response.human_readable_current_time,
-          auditJobStatusSummaries: response.audit_job_status_summaries.map(
-            JobStatusSummary.createFromBackendDict),
           updatableRoles: response.updatable_roles,
           roleToActions: response.role_to_actions,
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
-          unfinishedJobData: response.unfinished_job_data.map(
-            Job.createFromBackendDict),
-          recentJobData: response.recent_job_data.map(
-            Job.createFromBackendDict),
-          continuousComputationsData: response.continuous_computations_data.map(
-            ComputationData.createFromBackendDict),
           topicSummaries: response.topic_summaries.map(
             TopicSummary.createFromBackendDict),
           featureFlags: response.feature_flags.map(
@@ -226,59 +183,6 @@ export class AdminBackendApiService {
         }, errorResponse => {
           reject(errorResponse.error.error);
         });
-    });
-  }
-
-  // Admin Jobs Tab Services.
-  async startNewJobAsync(jobType: string): Promise<void> {
-    let action = 'start_new_job';
-    let payload = {
-      job_type: jobType
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
-  async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
-    let action = 'cancel_job';
-    let payload = {
-      job_id: jobId,
-      job_type: jobType
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
-  async startComputationAsync(computationType: string): Promise<void> {
-    let action = 'start_computation';
-    let payload = {
-      computation_type: computationType
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
-  async stopComputationAsync(computationType: string): Promise<void> {
-    let action = 'stop_computation';
-    let payload = {
-      computation_type: computationType
-    };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
-  }
-
-  async fetchJobOutputAsync(jobId: string): Promise<string[]> {
-    let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
-      AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
-        jobId: jobId
-      });
-    return new Promise((resolve, reject) => {
-      this.http.get<JobOutputBackendResponse>(
-        adminJobOutputUrl).toPromise().then(response => {
-        resolve(Array.isArray(response.output) ? response.output.sort() : []);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
     });
   }
 
@@ -402,11 +306,6 @@ export class AdminBackendApiService {
   }
 
   // Admin Misc Tab Services.
-  async flushMemoryCacheAsync(): Promise<void> {
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL);
-  }
-
   async clearSearchIndexAsync(): Promise<void> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_HANDLER_URL);

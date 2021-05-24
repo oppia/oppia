@@ -1545,6 +1545,8 @@ class GenericTestBase(AppEngineTestBase):
     ADMIN_USERNAME = 'adm'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
+    RELEASE_COORDINATOR_EMAIL = 'releasecoordinator@example.com'
+    RELEASE_COORDINATOR_USERNAME = 'releasecoordinator'
     OWNER_EMAIL = 'owner@example.com'
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'

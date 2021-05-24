@@ -13,62 +13,41 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the navigation bar in the admin panel.
+ * @fileoverview Component for the navigation bar in the release-coordinator
+ * panel.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AdminRouterService } from 'pages/admin-page/services/admin-router.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
+import { ReleaseCoordinatorPageConstants } from 'pages/release-coordinator-page/release-coordinator-page.constants';
 import { AppConstants } from 'app.constants';
 
 @Component({
-  selector: 'oppia-admin-navbar',
-  templateUrl: './admin-navbar.component.html',
+  selector: 'oppia-release-coordinator-navbar',
+  templateUrl: './release-coordinator-navbar.component.html',
 })
-export class AdminNavbarComponent implements OnInit {
+export class ReleaseCoordinatorNavbarComponent implements OnInit {
+  @Input() activeTab;
+  @Output() activeTabChange = new EventEmitter();
+
+  TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
+  TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
   profilePictureDataUrl: string = '';
-  imagePath: string;
   username: string = '';
-  isModerator: boolean = null;
-  isSuperAdmin: boolean = null;
   profileUrl: string = '';
-  ADMIN_TAB_URLS = AdminPageConstants.ADMIN_TAB_URLS;
   logoutUrl = AppConstants.LOGOUT_URL;
   profileDropdownIsActive = false;
-  dropdownMenuIsActive = false;
 
   constructor(
-    private adminRouterService: AdminRouterService,
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isActivitiesTabOpen(): boolean {
-    return this.adminRouterService.isActivitiesTabOpen();
-  }
-
-  isConfigTabOpen(): boolean {
-    return this.adminRouterService.isConfigTabOpen();
-  }
-
-  isFeaturesTabOpen(): boolean {
-    return this.adminRouterService.isFeaturesTabOpen();
-  }
-
-  isRolesTabOpen(): boolean {
-    return this.adminRouterService.isRolesTabOpen();
-  }
-
-  isMiscTabOpen(): boolean {
-    return this.adminRouterService.isMiscTabOpen();
   }
 
   activateProfileDropdown(): boolean {
@@ -79,12 +58,10 @@ export class AdminNavbarComponent implements OnInit {
     return this.profileDropdownIsActive = false;
   }
 
-  activateDropdownMenu(): boolean {
-    return this.dropdownMenuIsActive = true;
-  }
-
-  deactivateDropdownMenu(): boolean {
-    return this.dropdownMenuIsActive = false;
+  switchTab(tabName: string): void {
+    if (tabName !== this.activeTab) {
+      this.activeTabChange.emit(tabName);
+    }
   }
 
   async getProfileImageDataAsync(): Promise<void> {
@@ -93,15 +70,13 @@ export class AdminNavbarComponent implements OnInit {
   }
 
   async getUserInfoAsync(): Promise<void> {
+    this.activeTab = this.TAB_ID_JOBS;
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
-    this.isModerator = userInfo.isModerator();
-    this.isSuperAdmin = userInfo.isSuperAdmin();
-
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
-        AdminPageConstants.PROFILE_URL_TEMPLATE, {
+        ReleaseCoordinatorPageConstants.PROFILE_URL_TEMPLATE, {
           username: this.username
         })
     );
@@ -114,5 +89,5 @@ export class AdminNavbarComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaAdminNavbar', downgradeComponent(
-    {component: AdminNavbarComponent}));
+  'oppiaReleaseCoordinatorNavbar', downgradeComponent(
+    {component: ReleaseCoordinatorNavbarComponent}));

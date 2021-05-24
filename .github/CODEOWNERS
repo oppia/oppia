@@ -544,7 +544,9 @@
 
 
 # Release team.
-/scripts/release_scripts/ @DubeySandeep
+/core/controllers/release_coordinator*.py @vojtechjelinek
+/core/templates/pages/release-coordinator-page/ @vojtechjelinek
+/scripts/release_scripts/ @vojtechjelinek
 
 
 # Rich text editor team.
