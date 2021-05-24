@@ -258,7 +258,7 @@ export class TranslationModalComponent {
     return originalElements.every(hasMatchingTranslatedElement);
   }
 
-  hasSomeDuplicateElements (
+  hasSomeDuplicateElements(
       originalElements: string[],
       translatedElements: string[]): boolean {
     if (originalElements.length === 0) {
@@ -269,7 +269,7 @@ export class TranslationModalComponent {
     return originalElements.some(hasMatchingTranslatedElement);
   }
 
-  isTranslationCompleted (
+  isTranslationCompleted(
       originalElements: HTMLElement[],
       translatedElements: HTMLElement[]): boolean {
     originalElements.sort();
@@ -293,11 +293,13 @@ export class TranslationModalComponent {
     return true;
   }
 
-  validateTranslation (
+  validateTranslation(
       textToTranslate: HTMLElement[],
       translatedText: HTMLElement[]): TranslationError {
-    const translatedElements: ImageDetails = this.getImageAttributeTexts(translatedText);
-    const originalElements: ImageDetails = this.getImageAttributeTexts(textToTranslate);
+    const translatedElements: ImageDetails = this.getImageAttributeTexts(
+      translatedText);
+    const originalElements: ImageDetails = this.getImageAttributeTexts(
+      textToTranslate);
 
     const hasUncopiedImgs = !this.copiedAllElements(
       originalElements.filePaths,
@@ -314,7 +316,7 @@ export class TranslationModalComponent {
     return new TranslationError(
       hasUncopiedImgs, hasDuplicateAltTexts,
       hasDuplicateDescriptions, hasUntranslatedElements);
-  };
+  }
 
   suggestTranslatedText(): void {
     const originalElements = Array.from(angular.element(
