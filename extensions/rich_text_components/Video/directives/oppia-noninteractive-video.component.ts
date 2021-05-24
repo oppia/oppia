@@ -27,6 +27,16 @@ import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ServicesConstants } from 'services/services.constants';
 
+/**
+ * The "apiLoaded" variable only changes once during the lifetime of
+ * the application. If it is inside the component we would end up fetching and
+ * loading the YouTube embed script every-time time this component was created.
+ * If this were a feature used in multiple places, keeping it in a service would
+ *  be a better place. But currently restricted to this component. This
+ * syntax/ code is taken from the example given in the angular repo.
+ * https://github.com/angular/components/tree/master/src/youtube-player#example
+ */
+
 let apiLoaded = false;
 @Component({
   selector: 'oppia-noninteractive-video',
@@ -70,8 +80,8 @@ export class NoninteractiveVideo implements OnInit {
       this.startWithValue) as string;
     const end = this.htmlEscaperService.escapedJsonToObj(
       this.endWithValue) as string;
-    this.start = +start;
-    this.end = +end;
+    this.start = Number(start);
+    this.end = Number(end);
     this.videoId = this.htmlEscaperService.escapedJsonToObj(
       this.videoIdWithValue) as string;
 

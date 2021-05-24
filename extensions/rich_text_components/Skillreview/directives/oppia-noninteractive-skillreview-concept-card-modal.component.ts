@@ -39,6 +39,8 @@ export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
     this.skillIds = [this.skillId];
   }
 
+  // The following three empty functions are required for template checks. If
+  // they are undefined, angular doesn't compile and give an error.
   isLastConceptCard(): true {
     return true;
   }
