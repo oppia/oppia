@@ -871,40 +871,6 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should get the data of memory cache profile when' +
-    'calling getMemoryCacheProfileAsync', fakeAsync(() => {
-    abas.getMemoryCacheProfileAsync()
-      .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/memorycacheadminhandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(200);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should fail to get the data of memory cache profile' +
-    'when calling getMemoryCacheProfileAsync', fakeAsync(() => {
-    abas.getMemoryCacheProfileAsync()
-      .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/memorycacheadminhandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Failed to get data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }
-  ));
-
   it('should update the username of oppia account given' +
     'the name when calling updateUserNameAsync', fakeAsync(() => {
     let oldUsername = 'old name';

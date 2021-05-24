@@ -123,7 +123,6 @@ export interface AdminPageDataBackendDict {
   'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
   'viewable_roles': UserRolesBackendResponse;
-  'continuous_computations_data': ComputationDataBackendDict[];
   'topic_summaries': TopicSummaryBackendDict[];
   'feature_flags': PlatformParameterBackendDict[];
 }
@@ -343,19 +342,6 @@ export class AdminBackendApiService {
   async sendDummyMailToAdminAsync(): Promise<void> {
     return this._postRequestAsync (
       AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL);
-  }
-
-  async getMemoryCacheProfileAsync(
-  ): Promise<MemoryCacheProfileBackendResponse> {
-    return new Promise((resolve, reject) => {
-      this.http.get<MemoryCacheProfileBackendResponse>(
-        AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
   }
 
   async updateUserNameAsync(

@@ -77,18 +77,6 @@ describe('Admin Data Service', () => {
         'welcome.yaml'
       ]
     ],
-    continuous_computations_data: [
-      {
-        is_startable: true,
-        status_code: 'never_started',
-        computation_type: 'FeedbackAnalyticsAggregator',
-        last_started_msec: null,
-        active_realtime_layer_index: null,
-        last_stopped_msec: null,
-        is_stoppable: false,
-        last_finished_msec: null
-      }
-    ],
     viewable_roles: {
       TOPIC_MANAGER: 'topic manager'
     },
