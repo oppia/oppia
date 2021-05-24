@@ -13,20 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AdminJobsTabComponent
+ * @fileoverview Unit tests for JobsTabComponent
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 
-import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { ReleaseCoordinatorBackendApiService, JobsData } from '../services/release-coordinator-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 import { InterpolationValuesType, UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminPageConstants } from '../release-coordinator-page.constants';
-import { AdminJobsTabComponent } from './jobs-tab.component';
+import { JobsTabComponent } from './jobs-tab.component';
 
 
 interface FakeThen {
@@ -48,9 +47,9 @@ interface RequestData {
   'job_id'?: string,
 }
 
-describe('Admin Jobs Tab Component', () => {
-  let componentInstance: AdminJobsTabComponent;
-  let fixture: ComponentFixture<AdminJobsTabComponent>;
+describe('Jobs Tab Component', () => {
+  let componentInstance: JobsTabComponent;
+  let fixture: ComponentFixture<JobsTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let mockJobId: string = 'testJobId';
   let mockComputationData: ComputationData = new ComputationData(
@@ -63,25 +62,16 @@ describe('Admin Jobs Tab Component', () => {
     'testTime', 24243, 'testJob', 'idle', 'none', false,
     true, '23', 3123, 'testTime',
   );
-  let mockAdminPageData: AdminPageData = {
-    demoExplorationIds: [],
+  let mockJobsData: JobsData = {
     humanReadableCurrentTime: 'testReadableTime',
     continuousComputationsData: [mockComputationData],
     oneOffJobStatusSummaries: [mockJobStatusSummary],
     unfinishedJobData: [mockJob],
     auditJobStatusSummaries: [mockJobStatusSummary],
     recentJobData: [mockJob],
-    demoExplorations: [],
-    demoCollections: [],
-    updatableRoles: null,
-    roleToActions: {},
-    configProperties: null,
-    viewableRoles: null,
-    topicSummaries: [],
-    featureFlags: [],
   };
 
-  class MockAdminBackendApiService {
+  class MockReleaseCoordinatorBackendApiService {
     private get(url: string): FakeThen {
       return {
         then: (
@@ -132,43 +122,43 @@ describe('Admin Jobs Tab Component', () => {
 
     fetchJobOutputAsync(jobId: string): FakeThen {
       let adminJobOutputUrl = urlInterpolationService.interpolateUrl(
-        AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
+        '/fetchJobOutputAsync/<job_id>', {
           jobId: jobId
         });
       return this.get(adminJobOutputUrl);
     }
 
-    getDataAsync(): FakeThen {
+    getJobsDataAsync(): FakeThen {
       return {
-        then: (callback: (adminDataObject: AdminPageData) => void) => {
-          callback(mockAdminPageData);
+        then: (callback: (adminDataObject: JobsData) => void) => {
+          callback(mockJobsData);
         }
       };
     }
 
     startNewJobAsync(jobType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+      return this.post('/startNewJobAsync', {
         action: 'start_new_job',
         job_type: jobType
       });
     }
 
     startComputationAsync(computationType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+      return this.post('/startComputationAsync', {
         action: 'start_computation',
         computation_type: computationType
       });
     }
 
     stopComputationAsync(computationType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+      return this.post('/stopComputationAsync', {
         action: 'stop_computation',
         computation_type: computationType
       });
     }
 
     cancelJobAsync(jobId: string, jobType: string): FakeThen {
-      return this.post(AdminPageConstants.ADMIN_HANDLER_URL, {
+      return this.post('/cancelJobAsync', {
         action: 'cancel_job',
         job_id: jobId,
         job_type: jobType
@@ -201,7 +191,7 @@ describe('Admin Jobs Tab Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AdminJobsTabComponent],
+      declarations: [JobsTabComponent],
       imports: [
         MatCardModule
       ],
@@ -211,8 +201,8 @@ describe('Admin Jobs Tab Component', () => {
           useClass: MockWindowRef
         },
         {
-          provide: AdminBackendApiService,
-          useClass: MockAdminBackendApiService
+          provide: ReleaseCoordinatorBackendApiService,
+          useClass: MockReleaseCoordinatorBackendApiService
         },
         {
           provide: UrlInterpolationService,
@@ -223,7 +213,7 @@ describe('Admin Jobs Tab Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AdminJobsTabComponent);
+    fixture = TestBed.createComponent(JobsTabComponent);
     componentInstance = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     fixture.detectChanges();
@@ -237,23 +227,23 @@ describe('Admin Jobs Tab Component', () => {
   it('should initialize', () => {
     componentInstance.ngOnInit();
     expect(componentInstance.HUMAN_READABLE_CURRENT_TIME)
-      .toEqual(mockAdminPageData.humanReadableCurrentTime);
+      .toEqual(mockJobsData.humanReadableCurrentTime);
     expect(componentInstance.CONTINUOUS_COMPUTATIONS_DATA)
-      .toEqual(mockAdminPageData.continuousComputationsData);
+      .toEqual(mockJobsData.continuousComputationsData);
     expect(componentInstance.ONE_OFF_JOB_SPECS)
-      .toEqual(mockAdminPageData.oneOffJobStatusSummaries);
+      .toEqual(mockJobsData.oneOffJobStatusSummaries);
     expect(componentInstance.UNFINISHED_JOB_DATA)
-      .toEqual(mockAdminPageData.unfinishedJobData);
+      .toEqual(mockJobsData.unfinishedJobData);
     expect(componentInstance.AUDIT_JOB_SPECS)
-      .toEqual(mockAdminPageData.auditJobStatusSummaries);
+      .toEqual(mockJobsData.auditJobStatusSummaries);
     expect(componentInstance.RECENT_JOB_DATA)
-      .toEqual(mockAdminPageData.recentJobData);
+      .toEqual(mockJobsData.recentJobData);
     expect(componentInstance.showingJobOutput).toBeFalse();
   });
 
   it('should work as expected when showJobOutput is called', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     let element: HTMLElement = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element);
     spyOn(element, 'scrollIntoView');
@@ -266,7 +256,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should expect error when showJobOuput is called', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.showJobOutput('error');
     expect(componentInstance.setStatusMessage.emit)
@@ -275,7 +265,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should work as expected when startNewJob is called', () =>{
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.startNewJob('testJob');
     expect(componentInstance.setStatusMessage.emit)
@@ -284,7 +274,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should expect error when startNewJob is called', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance.startNewJob('error');
     expect(componentInstance.setStatusMessage.emit)
@@ -293,7 +283,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should start computation', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .startComputation('testComputation');
@@ -303,7 +293,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should expect error when startCompuation is called', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .startComputation('error');
@@ -313,7 +303,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should stop computation', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
 
     componentInstance
@@ -324,7 +314,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should expect error when stopComputation is called', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .stopComputation('error');
@@ -334,7 +324,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should cancel job', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .cancelJob('jobId', 'jobType');
@@ -344,7 +334,7 @@ describe('Admin Jobs Tab Component', () => {
 
   it('should expect error when cancelJob is called', () => {
     componentInstance = (
-      componentInstance as unknown) as jasmine.SpyObj<AdminJobsTabComponent>;
+      componentInstance as unknown) as jasmine.SpyObj<JobsTabComponent>;
     spyOn(componentInstance.setStatusMessage, 'emit');
     componentInstance
       .cancelJob('error', 'error');

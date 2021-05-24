@@ -61,6 +61,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   switchTab(tabName: string): void {
     if (tabName !== this.activeTab) {
       this.activeTabChange.emit(tabName);
+      this.activeTab = tabName;
     }
   }
 

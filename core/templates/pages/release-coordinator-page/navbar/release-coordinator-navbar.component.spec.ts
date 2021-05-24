@@ -20,12 +20,14 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
-import { AdminRouterService } from '../services/admin-router.service';
 
-describe('Admin Navbar component', () => {
-  let component: AdminNavbarComponent;
+import { ReleaseCoordinatorNavbarComponent } from './release-coordinator-navbar.component';
+import { ReleaseCoordinatorPageConstants } from '../release-coordinator-page.constants';
+
+
+describe('Release coordinator navbar component', () => {
+  let component: ReleaseCoordinatorNavbarComponent;
   let userService = null;
-  let adminRouterService = null;
   let userProfileImage = 'profile-data-url';
   let userInfo = {
     isModerator: () => true,
@@ -34,25 +36,24 @@ describe('Admin Navbar component', () => {
   };
   let imagePath = '/path/to/image.png';
   let profileUrl = '/profile/username1';
-  let fixture: ComponentFixture<AdminNavbarComponent>;
+  let fixture: ComponentFixture<ReleaseCoordinatorNavbarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [AdminNavbarComponent]
+      declarations: [ReleaseCoordinatorNavbarComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminNavbarComponent);
+    fixture = TestBed.createComponent(ReleaseCoordinatorNavbarComponent);
     component = fixture.componentInstance;
     userService = TestBed.get(UserService);
-    adminRouterService = TestBed.get(AdminRouterService);
     fixture.detectChanges();
 
     spyOn(userService, 'getProfileImageDataUrlAsync')
       .and.resolveTo(userProfileImage);
     spyOn(userService, 'getUserInfoAsync')
       .and.resolveTo(userInfo);
-
+    spyOn(component.activeTabChange, 'emit');
     component.ngOnInit();
   }));
 
@@ -61,111 +62,26 @@ describe('Admin Navbar component', () => {
     expect(component.getStaticImageUrl(imagePath)).toBe(
       '/assets/images/path/to/image.png');
     expect(component.username).toBe('username1');
-    expect(component.isModerator).toBe(true);
-    expect(component.isSuperAdmin).toBe(true);
     expect(component.profileUrl).toEqual(profileUrl);
     expect(component.logoutUrl).toEqual('/logout');
     expect(component.profileDropdownIsActive).toBe(false);
-    expect(component.dropdownMenuIsActive).toBe(false);
+    expect(component.activeTab).toBe(
+      ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
   });
 
-  it('should be routed to the activities tab by default', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-  });
+  it('should allow switching tabs correctly', () => {
+    expect(component.activeTab).toBe(
+      ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
 
-  it('should be routed to the config tab', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
+    component.switchTab(ReleaseCoordinatorPageConstants.TAB_ID_MISC);
+    component.activeTabChange.subscribe(
+      (tabName: string) => expect(tabName).toBe(
+        ReleaseCoordinatorPageConstants.TAB_ID_MISC));
 
-    adminRouterService.showTab('#config');
-
-    expect(component.isActivitiesTabOpen()).toBe(false);
-    expect(component.isConfigTabOpen()).toBe(true);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-  });
-
-  it('should be routed to the features tab', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-
-    adminRouterService.showTab('#features');
-
-    expect(component.isActivitiesTabOpen()).toBe(false);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(true);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-  });
-
-  it('should be routed to the roles tab', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-
-    adminRouterService.showTab('#roles');
-
-    expect(component.isActivitiesTabOpen()).toBe(false);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(true);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-  });
-
-  it('should be routed to the jobs tab', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-
-    adminRouterService.showTab('#jobs');
-
-    expect(component.isActivitiesTabOpen()).toBe(false);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(true);
-    expect(component.isMiscTabOpen()).toBe(false);
-  });
-
-  it('should be routed to the misc tab', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-
-    adminRouterService.showTab('#misc');
-
-    expect(component.isActivitiesTabOpen()).toBe(false);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(true);
+    expect(component.activeTab).toBe(
+      ReleaseCoordinatorPageConstants.TAB_ID_MISC);
+    expect(component.activeTabChange.emit).toHaveBeenCalledWith(
+      ReleaseCoordinatorPageConstants.TAB_ID_MISC);
   });
 
   it('should set profileDropdownIsActive to true', () => {
@@ -184,23 +100,5 @@ describe('Admin Navbar component', () => {
     component.deactivateProfileDropdown();
 
     expect(component.profileDropdownIsActive).toBe(false);
-  });
-
-  it('should set dropdownMenuIsActive to true', () => {
-    expect(component.dropdownMenuIsActive).toBe(false);
-
-    component.activateDropdownMenu();
-
-    expect(component.dropdownMenuIsActive).toBe(true);
-  });
-
-  it('should set dropdownMenuIsActive to false', () => {
-    component.dropdownMenuIsActive = true;
-
-    expect(component.dropdownMenuIsActive).toBe(true);
-
-    component.deactivateDropdownMenu();
-
-    expect(component.dropdownMenuIsActive).toBe(false);
   });
 });

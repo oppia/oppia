@@ -35,7 +35,6 @@ class ReleaseCoordinatorPage(base.BaseHandler):
     @acl_decorators.can_access_release_coordinator_page
     def get(self):
         """Handles GET requests."""
-
         self.render_template('release-coordinator-page.mainpage.html')
 
 

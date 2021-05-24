@@ -30,16 +30,10 @@ describe('Promo Bar Component', () => {
   class MockPromoBarBackendApiService {
     async getPromoBarDataAsync() {
       return new Promise((resolve) => {
-        resolve(
-          {
-            isPromoBarEnabled() {
-              return true;
-            },
-            getPromoBarMessage() {
-              return 'Promo bar message.';
-            }
-          }
-        );
+        resolve({
+          promoBarEnabled: true,
+          promoBarMessage: 'Promo bar message.'
+        });
       });
     }
   }

@@ -93,6 +93,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.get_html_response('/admin')
         self.logout()
 
+    def test_promo_bar_configuration_not_present_to_admin(self):
+        """Test that promo bar configuration is not presentd in admin page."""
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+
+        self.assertNotIn('promo_bar_enabled', response_config_properties)
+        self.assertNotIn('promo_bar_message', response_config_properties)
+
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 

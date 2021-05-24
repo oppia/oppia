@@ -51,7 +51,6 @@ class JobsHandlerTest(test_utils.GenericTestBase):
     """Test for the JobsHandler."""
 
     def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
         super(JobsHandlerTest, self).setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -64,8 +63,6 @@ class JobsHandlerTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
     def test_only_release_coordinator_allowed_to_use_jobs_handler(self):
-        """Test access rights to the admin page."""
-
         # Guest user.
         self.get_json('/jobshandler', expected_status_int=401)
 

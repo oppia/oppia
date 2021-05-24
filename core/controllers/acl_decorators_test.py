@@ -982,6 +982,78 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_release_coordinator_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessReleaseCoordinatorPageDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/release-coordinator', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access release coordinator page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access release coordinator page.')
+        self.logout()
+
+    def test_release_coordinator_can_access_release_coordinator_page(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/release-coordinator')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
 class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     username = 'user'

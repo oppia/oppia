@@ -87,4 +87,53 @@ describe('Promo bar backend api service', () => {
       expect(failHandler).toHaveBeenCalled();
     })
   );
+
+  it('should make request to update promo bar config data',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      promoBarBackendApiService.updatePromoBarDataAsync(true, 'New message')
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/promo_bar_handler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual({
+        promo_bar_enabled: true,
+        promo_bar_message: 'New message'
+      });
+      req.flush({ status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should make request to update promo bar config data',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      promoBarBackendApiService.updatePromoBarDataAsync(true, 'New message')
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/promo_bar_handler');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual({
+        promo_bar_enabled: true,
+        promo_bar_message: 'New message'
+      });
+      req.flush({
+        error: 'You don\'t have rights to updated promo bar config data.',
+      }, {
+        status: 401, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });
