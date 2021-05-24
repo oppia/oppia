@@ -21,9 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from jobs import job_test_utils
+from jobs import job_utils
 from jobs.io import stub_io
 
 import apache_beam as beam
+
+datastore_services = models.Registry.import_datastore_services()
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -35,13 +38,18 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
         self.stub = stub_io.DatastoreioStub()
 
     def test_stub_is_initially_empty(self):
-        self.assertItemsEqual(self.stub.get_everything(), [])
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
+
+        self.assertItemsEqual(self.stub.get(query), [])
 
         with self.stub.context():
             self.assert_pcoll_empty(
-                self.pipeline | self.stub.ReadFromDatastore())
+                self.pipeline | self.stub.ReadFromDatastore(query))
 
     def test_read_from_datastore(self):
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
@@ -50,27 +58,13 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
         self.stub.put_multi(model_list)
 
         with self.stub.context():
-            model_pcoll = self.pipeline | self.stub.ReadFromDatastore()
+            model_pcoll = self.pipeline | self.stub.ReadFromDatastore(query)
 
             self.assert_pcoll_equal(model_pcoll, model_list)
 
     def test_write_to_datastore(self):
-        model_list = [
-            self.create_model(base_models.BaseModel, id='a'),
-            self.create_model(base_models.BaseModel, id='b'),
-            self.create_model(base_models.BaseModel, id='c'),
-        ]
-
-        self.assertItemsEqual(self.stub.get_everything(), [])
-
-        with self.stub.context():
-            model_pcoll = self.pipeline | beam.Create(model_list)
-
-            self.assert_pcoll_empty(model_pcoll | self.stub.WriteToDatastore())
-
-        self.assertItemsEqual(self.stub.get_everything(), model_list)
-
-    def test_delete_from_datastore(self):
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
@@ -78,7 +72,7 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
         ]
         self.stub.put_multi(model_list)
 
-        self.assertItemsEqual(self.stub.get_everything(), model_list)
+        self.assertItemsEqual(self.stub.get(query), model_list)
 
         with self.stub.context():
             model_pcoll = self.pipeline | beam.Create(model_list)
@@ -86,11 +80,33 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             self.assert_pcoll_empty(
                 model_pcoll | self.stub.DeleteFromDatastore())
 
-        self.assertItemsEqual(self.stub.get_everything(), [])
+        self.assertItemsEqual(self.stub.get(query), [])
+
+    def test_delete_from_datastore(self):
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
+        model_list = [
+            self.create_model(base_models.BaseModel, id='a'),
+            self.create_model(base_models.BaseModel, id='b'),
+            self.create_model(base_models.BaseModel, id='c'),
+        ]
+        self.stub.put_multi(model_list)
+
+        self.assertItemsEqual(self.stub.get(query), model_list)
+
+        with self.stub.context():
+            model_pcoll = self.pipeline | beam.Create(model_list)
+
+            self.assert_pcoll_empty(
+                model_pcoll | self.stub.DeleteFromDatastore())
+
+        self.assertItemsEqual(self.stub.get(query), [])
 
     def test_read_from_datastore_without_acquiring_context_raises_error(self):
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
         with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
-            self.stub.ReadFromDatastore()
+            self.stub.ReadFromDatastore(query)
 
     def test_write_to_datastore_without_acquiring_context_raises_error(self):
         with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
@@ -101,6 +117,9 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             self.stub.DeleteFromDatastore()
 
     def test_read_after_write_raises_error(self):
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
+
         with self.stub.context():
             empty_pcoll = self.pipeline | beam.Create([])
 
@@ -110,9 +129,12 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             self.assertRaisesRegexp(
                 RuntimeError,
                 'Cannot read from datastore after a mutation',
-                lambda: self.pipeline | self.stub.ReadFromDatastore())
+                lambda: self.pipeline | self.stub.ReadFromDatastore(query))
 
     def test_read_after_delete_raises_error(self):
+        query = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
+
         with self.stub.context():
             empty_pcoll = self.pipeline | beam.Create([])
 
@@ -122,7 +144,7 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             self.assertRaisesRegexp(
                 RuntimeError,
                 'Cannot read from datastore after a mutation',
-                lambda: self.pipeline | self.stub.ReadFromDatastore())
+                lambda: self.pipeline | self.stub.ReadFromDatastore(query))
 
     def test_write_after_write_raises_error(self):
         with self.stub.context():
