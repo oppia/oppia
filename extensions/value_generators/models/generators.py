@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 
 from core.domain import value_generators_domain
-import jinja_utils
 import utils
 
 
@@ -31,23 +30,22 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value = ''
 
-    def generate_value(self, context_params, value, parse_with_jinja=False):
+    def generate_value(
+            self, unused_context_params, value, parse_with_jinja=False):  # pylint: disable=unused-argument
         """Returns a copy of the input value.
 
-        If parse_with_jinja is True, strings within the input value are treated
-        as templates and parsed against context_params. The output will be a
-        unicode string.
+        Args:
+            unused_context_params: dict. Context params parsed with input
+                value which is treated as a template. Not used.
+            value: str. Value whose copy should be returned.
+            parse_with_jinja: bool. It is a part of ParamChange object.
+                The parsing of input value against context_params
+                based on parse_with_jinja is done in the FE. Not used.
 
-        If parse_with_jinja is False, the input value is copied and returned
-        without changing its type.
+        Returns:
+            str. Copy of the input value.
         """
-        if context_params is None:
-            context_params = {}
-
-        if parse_with_jinja:
-            return jinja_utils.evaluate_object(value, context_params)
-        else:
-            return copy.deepcopy(value)
+        return copy.deepcopy(value)
 
 
 class RandomSelector(value_generators_domain.BaseValueGenerator):

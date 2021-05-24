@@ -146,7 +146,7 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_graph_data': role_services.get_role_graph_data(),
+            'role_to_actions': role_services.get_role_actions(),
             'feature_flags': feature_flag_dicts,
         })
 
@@ -343,6 +343,7 @@ class AdminHandler(base.BaseHandler):
         })
 
         state.update_next_content_id_index(1)
+        state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})

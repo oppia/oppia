@@ -51,9 +51,6 @@ AUTH_HANDLER_PATHS = (
     '/csrfhandler',
     '/session_begin',
     '/session_end',
-    # TODO(#11462): Delete this handler once the Firebase migration logic is
-    # rollback-safe and all backup data is using post-migration data.
-    '/seed_firebase',
 )
 
 
@@ -87,23 +84,6 @@ class SessionEndHandler(webapp2.RequestHandler):
     def get(self):
         """Destroys an existing auth session."""
         auth_services.destroy_auth_session(self.response)
-
-
-class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob.
-
-    TODO(#11462): Delete this handler once the Firebase migration logic is
-    rollback-safe and all backup data is using post-migration data.
-    """
-
-    def get(self):
-        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
-        try:
-            auth_services.seed_firebase()
-        except Exception:
-            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
-        finally:
-            self.redirect('/')
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -398,7 +378,10 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        self.response.cache_control.no_cache = True
+
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
             b'max-age=31536000; includeSubDomains')
