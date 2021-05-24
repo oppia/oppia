@@ -19,142 +19,142 @@
 import { EventEmitter } from '@angular/core';
 
 var MockWindow = function() {
-    this.location = {
-      hostname: 'oppiaserver.appspot.com',
-      pathname: '/path',
-      href: '',
-      search: '/search',
-      hash: '/hash'
-    };
+  this.location = {
+    hostname: 'oppiaserver.appspot.com',
+    pathname: '/path',
+    href: '',
+    search: '/search',
+    hash: '/hash'
+  };
 };
 
 describe('Base Content Component', function() {
-    var ctrl = null;
-    var $rootScope = null;
-    var $scope = null;
-    var BackgroundMaskService = null;
-    var BottomNavbarStatusService = null;
-    var PageTitleService = null;
-    var SidebarStatusService = null;
-    var mockWindow = null;
-    var loadingMessageChangeEventEmitter = new EventEmitter();
+  var ctrl = null;
+  var $rootScope = null;
+  var $scope = null;
+  var BackgroundMaskService = null;
+  var BottomNavbarStatusService = null;
+  var PageTitleService = null;
+  var SidebarStatusService = null;
+  var mockWindow = null;
+  var loadingMessageChangeEventEmitter = new EventEmitter();
 
-    beforeEach(angular.mock.module('oppia', function($provide) {
-        mockWindow = new MockWindow();
-        $provide.value('LoaderService', {
-          onLoadingMessageChange: loadingMessageChangeEventEmitter
-        });
-        $provide.value('UrlService', {
-            isIframed: () =>  true
-        });
-        $provide.value('$window', mockWindow);
-    }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    mockWindow = new MockWindow();
+    $provide.value('LoaderService', {
+      onLoadingMessageChange: loadingMessageChangeEventEmitter
+    });
+    $provide.value('UrlService', {
+      isIframed: () => true
+    });
+    $provide.value('$window', mockWindow);
+  }));
 
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-        $rootScope = $injector.get('$rootScope');
-        BackgroundMaskService = $injector.get('BackgroundMaskService');
-        BottomNavbarStatusService = $injector.get('BottomNavbarStatusService');
-        PageTitleService = $injector.get('PageTitleService');
-        SidebarStatusService = $injector.get('SidebarStatusService');
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $rootScope = $injector.get('$rootScope');
+    BackgroundMaskService = $injector.get('BackgroundMaskService');
+    BottomNavbarStatusService = $injector.get('BottomNavbarStatusService');
+    PageTitleService = $injector.get('PageTitleService');
+    SidebarStatusService = $injector.get('SidebarStatusService');
 
-        $scope = $rootScope.$new();
-        ctrl = $componentController('baseContent', {
-            $scope: $scope
-        });
-        ctrl.$onInit();
-    }));
+    $scope = $rootScope.$new();
+    ctrl = $componentController('baseContent', {
+      $scope: $scope
+    });
+    ctrl.$onInit();
+  }));
 
-    it('should initialize', function() {
-        spyOn(BottomNavbarStatusService, 'isBottomNavbarEnabled')
-            .and.returnValue(true);
-        expect(ctrl.isBottomNavbarShown()).toBe(true);
+  it('should initialize', function() {
+    spyOn(BottomNavbarStatusService, 'isBottomNavbarEnabled')
+      .and.returnValue(true);
+    expect(ctrl.isBottomNavbarShown()).toBe(true);
 
-        loadingMessageChangeEventEmitter.emit('Loading...');
+    loadingMessageChangeEventEmitter.emit('Loading...');
 
-        expect(ctrl.iframed).toBe(true);
-        expect(ctrl.DEV_MODE).toBe($rootScope.DEV_MODE);
-        expect(ctrl.loadingMessage).toBe('Loading...');
+    expect(ctrl.iframed).toBe(true);
+    expect(ctrl.DEV_MODE).toBe($rootScope.DEV_MODE);
+    expect(ctrl.loadingMessage).toBe('Loading...');
+  });
+
+  it('should get header text', function() {
+    spyOn(PageTitleService, 'getPageTitleForMobileView').and.returnValue(
+      'Header');
+    expect($scope.getHeaderText()).toEqual('Header');
+  });
+
+  it('should get sub header text', function() {
+    spyOn(PageTitleService, 'getPageSubtitleForMobileView').and.returnValue(
+      'Sub header');
+    expect($scope.getSubheaderText()).toEqual('Sub header');
+  });
+
+  it('should return if sidebar is shown', function() {
+    spyOn(SidebarStatusService, 'isSidebarShown').and.returnValue(false);
+    expect(ctrl.isSidebarShown()).toBe(false);
+  });
+
+  it('should close sidebar', function() {
+    var isSidebarShown = true;
+    spyOn(SidebarStatusService, 'closeSidebar').and.callFake(() => {
+      isSidebarShown = false;
     });
 
-    it('should get header text', function() {
-        spyOn(PageTitleService, 'getPageTitleForMobileView').and.returnValue(
-            'Header');
-        expect($scope.getHeaderText()).toEqual('Header');
+    ctrl.closeSidebarOnSwipe();
+
+    expect(isSidebarShown).toBe(false);
+  });
+
+  it('should toggle mobile nav options', function() {
+    ctrl.mobileNavOptionsAreShown = true;
+    ctrl.toggleMobileNavOptions();
+    expect(ctrl.mobileNavOptionsAreShown).toBe(false);
+  });
+
+  it('should return if background mask is active', function() {
+    spyOn(BackgroundMaskService, 'isMaskActive').and.returnValue(true);
+    expect(ctrl.isBackgroundMaskActive()).toBe(true);
+  });
+
+  it('should redirect when on testing server', function() {
+    expect(mockWindow.location.href)
+      .toBe('https://oppiatestserver.appspot.com/path/search/hash');
+  });
+
+  it('should skip to main content', function() {
+    var mainContentElement = {
+      tabIndex: 0,
+      scrollIntoView: () => {},
+      focus: () => {}
+    };
+
+    // This throws "Argument of type '() => { tabIndex: number;
+    // scrollIntoView: () => void; focus: () => void; }' is not assignable
+    // to parameter of type '(elementId: string) => HTMLElement'.". This is
+    // because the actual 'getElementById' returns more properties than
+    // required. We need to suppress this error because we need only
+    // "tabIndex" property and "focus", "scrollIntoView" functions
+    // for testing.
+    // @ts-expect-error
+    spyOn(document, 'getElementById').and.callFake(() => {
+      return mainContentElement;
+    });
+    var scrollIntoViewSpy = spyOn(mainContentElement, 'scrollIntoView');
+    var focusSpy = spyOn(mainContentElement, 'focus');
+
+    ctrl.skipToMainContent();
+
+    expect(mainContentElement.tabIndex).toBe(-1);
+    expect(focusSpy).toHaveBeenCalled();
+    expect(scrollIntoViewSpy).toHaveBeenCalled();
+  });
+
+  it('should throw error when mainContentElement is undefined', function() {
+    var mainContentElement = undefined;
+    spyOn(document, 'getElementById').and.callFake(() => {
+      return mainContentElement;
     });
 
-    it('should get sub header text', function() {
-        spyOn(PageTitleService, 'getPageSubtitleForMobileView').and.returnValue(
-            'Sub header');
-        expect($scope.getSubheaderText()).toEqual('Sub header');
-    });
-
-    it('should return if sidebar is shown', function() {
-        spyOn(SidebarStatusService, 'isSidebarShown').and.returnValue(false);
-        expect(ctrl.isSidebarShown()).toBe(false);
-    });
-
-    it('should close sidebar', function() {
-        var isSidebarShown = true;
-        spyOn(SidebarStatusService, 'closeSidebar').and.callFake(() => {
-            isSidebarShown = false;
-        });
-
-        ctrl.closeSidebarOnSwipe();
-
-        expect(isSidebarShown).toBe(false);
-    });
-
-    it('should toggle mobile nav options', function() {
-        ctrl.mobileNavOptionsAreShown = true;
-        ctrl.toggleMobileNavOptions();
-        expect(ctrl.mobileNavOptionsAreShown).toBe(false);
-    });
-
-    it('should return if background mask is active', function() {
-        spyOn(BackgroundMaskService, 'isMaskActive').and.returnValue(true);
-        expect(ctrl.isBackgroundMaskActive()).toBe(true);
-    });
-
-    it('should redirect when on testing server', function() {
-        expect(mockWindow.location.href)
-            .toBe('https://oppiatestserver.appspot.com/path/search/hash');
-    });
-
-    it('should skip to main content', function() {
-        var mainContentElement = {
-            tabIndex: 0,
-            scrollIntoView: () => {},
-            focus: () => {}
-        };
-
-        // This throws "Argument of type '() => { tabIndex: number;
-        // scrollIntoView: () => void; focus: () => void; }' is not assignable
-        // to parameter of type '(elementId: string) => HTMLElement'.". This is
-        // because the actual 'getElementById' returns more properties than
-        // required. We need to suppress this error because we need only
-        // "tabIndex" property and "focus", "scrollIntoView" functions
-        // for testing.
-        // @ts-expect-error
-        spyOn(document, 'getElementById').and.callFake(() => {
-            return mainContentElement;
-        });
-        var scrollIntoViewSpy = spyOn(mainContentElement, 'scrollIntoView');
-        var focusSpy = spyOn(mainContentElement, 'focus');
-
-        ctrl.skipToMainContent();
-
-        expect(mainContentElement.tabIndex).toBe(-1);
-        expect(focusSpy).toHaveBeenCalled();
-        expect(scrollIntoViewSpy).toHaveBeenCalled();
-    });
-
-    it('should throw error when mainContentElement is undefined', function() {
-        var mainContentElement = undefined;
-        spyOn(document, 'getElementById').and.callFake(() => {
-            return mainContentElement;
-        });
-
-        expect(() => ctrl.skipToMainContent())
-            .toThrow(new Error('Variable mainContentElement is undefined.'));
-    });
+    expect(() => ctrl.skipToMainContent())
+      .toThrowError('Variable mainContentElement is undefined.');
+  });
 });

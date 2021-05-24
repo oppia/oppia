@@ -27,19 +27,19 @@ require('services/page-title.service.ts');
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').component('baseContent', {
-    template: require('./base-content.component.html'),
-    bindings: {
-        backButtonShown: '<'
-      },
-      transclude: {
-        breadcrumb: '?navbarBreadcrumb',
-        preLogoAction: '?navbarPreLogoAction',
-        content: 'content',
-        footer: '?pageFooter',
-        navOptions: '?navOptions',
-        mobileNavOptions: '?mobileNavOptions',
-      },
-    controller: [
+  template: require('./base-content.component.html'),
+  bindings: {
+    backButtonShown: '<'
+  },
+  transclude: {
+    breadcrumb: '?navbarBreadcrumb',
+    preLogoAction: '?navbarPreLogoAction',
+    content: 'content',
+    footer: '?pageFooter',
+    navOptions: '?navOptions',
+    mobileNavOptions: '?mobileNavOptions',
+  },
+  controller: [
     '$rootScope', '$scope', '$window', 'BackgroundMaskService',
     'BottomNavbarStatusService', 'KeyboardShortcutService',
     'LoaderService', 'PageTitleService', 'SidebarStatusService',
