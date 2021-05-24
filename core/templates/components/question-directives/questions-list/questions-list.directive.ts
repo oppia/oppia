@@ -305,6 +305,11 @@ angular.module('oppia').directive('questionsList', [
             ctrl.initiateQuestionCreation();
           };
 
+          ctrl.updateSkillWithDifficulty = function($event, $index) {
+            this.linkedSkillsWithDifficulty[$index] = $event;
+            ctrl.changeLinkedSkillDifficulty();
+          };
+
           ctrl.changeLinkedSkillDifficulty = function() {
             ctrl.isSkillDifficultyChanged = true;
             if (ctrl.newQuestionSkillIds.length === 1) {

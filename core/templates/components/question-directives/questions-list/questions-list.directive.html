@@ -15,10 +15,11 @@
       <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.difficultyCardIsShown">
         <div class="list-group">
           <h4>Select Difficulty</h4>
-          <div ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index" ng-click="$ctrl.changeLinkedSkillDifficulty()">
+          <div ng-repeat="skillWithDifficulty in $ctrl.linkedSkillsWithDifficulty track by $index">
             <label class="list-group-item-heading"><[skillWithDifficulty.getDescription()]></label>
             <oppia-question-difficulty-selector [skill-id-to-rubrics-object]="$ctrl.skillIdToRubricsObject"
-                                                [(skill-with-difficulty)]="skillWithDifficulty">
+                                                [skill-with-difficulty]="skillWithDifficulty"
+                                                (skill-with-difficulty-change)="$ctrl.updateSkillWithDifficulty($event, $index)">
             </oppia-question-difficulty-selector>
           </div>
         </div>
