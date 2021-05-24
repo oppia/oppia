@@ -16,7 +16,7 @@
  * @fileoverview Directive for CK Editor.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
@@ -48,8 +48,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private contextService: ContextService,
-    private elementRef: ElementRef,
-    private ngZone: NgZone
+    private elementRef: ElementRef
   ) {
     this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
   }
@@ -153,6 +152,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
 
     var editable = document.querySelectorAll('.oppia-rte-resizer');
     var resize = () => {
+      // TODO(#12882): Remove the use of jQuery.
       $('.oppia-rte-resizer').css({
         width: '100%'
       });
@@ -259,6 +259,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       // Set the css and icons for each toolbar button.
       names.forEach((name, index) => {
         var icon = icons[index];
+        // TODO(#12882): Remove the use of jQuery.
         $('.cke_button__oppia' + name)
           .css('background-image', 'url("/extensions' + icon + '")')
           .css('background-position', 'center')
@@ -268,9 +269,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
           .css('padding', '0px 0px');
       });
 
+      // TODO(#12882): Remove the use of jQuery.
       $('.cke_toolbar_separator')
         .css('height', '22px');
 
+      // TODO(#12882): Remove the use of jQuery.
       $('.cke_button_icon')
         .css('height', '24px')
         .css('width', '24px');
@@ -292,6 +295,8 @@ export class CkEditor4RteComponent implements AfterViewInit, OnDestroy {
       if (ck.getData() === this.value) {
         return;
       }
+
+      // TODO(#12882): Remove the use of jQuery.
       var elt = $('<div>' + ck.getData() + '</div>');
       var textElt = elt[0].childNodes;
       for (var i = textElt.length; i > 0; i--) {
