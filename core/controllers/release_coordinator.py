@@ -39,7 +39,7 @@ class ReleaseCoordinatorPage(base.BaseHandler):
 
 
 class JobsHandler(base.BaseHandler):
-    """Handler to presnt/run/cancel jobs through release coordinator page."""
+    """Handler to present/start/stop jobs through release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

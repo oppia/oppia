@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for admin navbar component.
+ * @fileoverview Unit tests for release-coordinator navbar component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

@@ -35,11 +35,11 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
 
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
-  profilePictureDataUrl: string = '';
-  username: string = '';
-  profileUrl: string = '';
-  logoutUrl = AppConstants.LOGOUT_URL;
-  profileDropdownIsActive = false;
+  profilePictureDataUrl: string;
+  username: string;
+  profileUrl: string;
+  logoutUrl: string = AppConstants.LOGOUT_URL;
+  profileDropdownIsActive: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
