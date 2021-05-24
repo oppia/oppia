@@ -71,8 +71,6 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-
-current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
@@ -285,6 +283,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/gettranslatabletexthandler',
         contributor_dashboard.TranslatableTextHandler),
+    get_redirect_route(
+        r'%s' % feconf.MACHINE_TRANSLATION_DATA_URL,
+        contributor_dashboard.MachineTranslationStateTextsHandler),
     get_redirect_route(
         r'/usercontributionrightsdatahandler',
         contributor_dashboard.UserContributionRightsDataHandler),
@@ -657,6 +658,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateTranslationSuggestionHandler),
+    get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateQuestionSuggestionHandler),
+    get_redirect_route(
         r'%s' % feconf.QUESTIONS_URL_PREFIX,
         reader.QuestionPlayerHandler),
     get_redirect_route(
@@ -808,7 +815,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
     get_redirect_route(r'/session_end', base.SessionEndHandler),
-    get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (

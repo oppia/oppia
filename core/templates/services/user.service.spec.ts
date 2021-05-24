@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -60,7 +60,7 @@ describe('User Api Service', () => {
     csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
-      () =>{
+      async() => {
         return new Promise((resolve, reject) => {
           resolve('sample-csrf-token');
         });
@@ -122,16 +122,6 @@ describe('User Api Service', () => {
   it('should return new userInfo data when url path is logout',
     fakeAsync(() => {
       spyOn(urlService, 'getPathname').and.returnValue('/logout');
-      const sampleUserInfo = UserInfo.createDefault();
-
-      userService.getUserInfoAsync().then((userInfo) => {
-        expect(userInfo).toEqual(sampleUserInfo);
-      });
-    }));
-
-  it('should return new userInfo data when url path is login',
-    fakeAsync(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/login');
       const sampleUserInfo = UserInfo.createDefault();
 
       userService.getUserInfoAsync().then((userInfo) => {

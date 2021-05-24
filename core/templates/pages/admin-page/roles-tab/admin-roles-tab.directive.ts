@@ -16,8 +16,6 @@
  * @fileoverview Directive for the Roles tab in the admin panel.
  */
 
-require('pages/admin-page/roles-tab/role-graph.directive.ts');
-
 require('domain/admin/admin-backend-api.service');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -55,7 +53,7 @@ angular.module('oppia').directive('adminRolesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin-page/roles-tab/role-graph.directive.html'),
+        '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
@@ -92,13 +90,13 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Processing query...');
 
           AdminTaskManagerService.startTask();
-          ctrl.result = {};
+          ctrl.userRolesResult = {};
           AdminBackendApiService.viewUsersRoleAsync(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username
           ).then((userRoles) => {
-            ctrl.result = userRoles;
-            if (Object.keys(ctrl.result).length === 0) {
+            ctrl.userRolesResult = userRoles;
+            if (Object.keys(ctrl.userRolesResult).length === 0) {
               ctrl.resultRolesVisible = false;
               ctrl.setStatusMessage('No results.');
             } else {
@@ -161,11 +159,13 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
+          ctrl.contributionReviewersResult = {};
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
             AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then((usersObject) => {
-              ctrl.result.usernames = usersObject.usernames;
+              ctrl.contributionReviewersResult.usernames = (
+                usersObject.usernames);
               ctrl.contributionReviewersDataFetched = true;
               ctrl.setStatusMessage('Success.');
               refreshFormData();
@@ -183,7 +183,7 @@ angular.module('oppia').directive('adminRolesTab', [
                 contributionRights.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
                 contributionRights.can_review_voiceover_for_language_codes);
-              ctrl.result = {
+              ctrl.contributionReviewersResult = {
                 translationLanguages: translationLanguages,
                 voiceoverLanguages: voiceoverLanguages,
                 questions: contributionRights.can_review_questions,
@@ -194,6 +194,7 @@ angular.module('oppia').directive('adminRolesTab', [
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the directive is migrated to angular.
               $rootScope.$apply();
+              refreshFormData();
             }, handleErrorResponse);
           }
           AdminTaskManagerService.finishTask();
@@ -328,7 +329,8 @@ angular.module('oppia').directive('adminRolesTab', [
           refreshFormData();
           ctrl.resultRolesVisible = false;
           ctrl.contributionReviewersDataFetched = false;
-          ctrl.result = {};
+          ctrl.userRolesResult = {};
+          ctrl.contributionReviewersResult = {};
           ctrl.setStatusMessage('');
 
           ctrl.languageCodesAndDescriptions = (
@@ -342,46 +344,24 @@ angular.module('oppia').directive('adminRolesTab', [
                 };
               }));
           ctrl.topicSummaries = {};
-          ctrl.graphData = {};
-          ctrl.graphDataLoaded = false;
+          ctrl.roleToActions = null;
           AdminDataService.getDataAsync().then(function(adminDataObject) {
             ctrl.UPDATABLE_ROLES = adminDataObject.updatableRoles;
             ctrl.VIEWABLE_ROLES = adminDataObject.viewableRoles;
             ctrl.topicSummaries = adminDataObject.topicSummaries;
-            ctrl.graphData = adminDataObject.roleGraphData;
+            ctrl.roleToActions = adminDataObject.roleToActions;
 
-            ctrl.graphDataLoaded = false;
-            // Calculating initStateId and finalStateIds for graphData
-            // Since role graph is acyclic, node with no incoming edge
-            // is initState and nodes with no outgoing edge are finalStates.
-            var hasIncomingEdge = [];
-            var hasOutgoingEdge = [];
-            for (var i = 0; i < ctrl.graphData.links.length; i++) {
-              hasIncomingEdge.push(ctrl.graphData.links[i].target);
-              hasOutgoingEdge.push(ctrl.graphData.links[i].source);
-            }
-            var finalStateIds = [];
-            for (var role in ctrl.graphData.nodes) {
-              if (ctrl.graphData.nodes.hasOwnProperty(role)) {
-                if (hasIncomingEdge.indexOf(role) === -1) {
-                  ctrl.graphData.initStateId = role;
-                }
-                if (hasOutgoingEdge.indexOf(role) === -1) {
-                  finalStateIds.push(role);
-                }
-              }
-            }
-            ctrl.graphData.finalStateIds = finalStateIds;
-            ctrl.graphDataLoaded = true;
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular.
             $rootScope.$apply();
           });
         };
 
-        ctrl.clearReviewersData = function() {
+        ctrl.clearResults = function() {
           ctrl.contributionReviewersDataFetched = false;
-          ctrl.result = {};
+          ctrl.resultRolesVisible = false;
+          ctrl.userRolesResult = {};
+          ctrl.contributionReviewersResult = {};
         };
       }]
     };

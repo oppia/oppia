@@ -16,119 +16,117 @@
  * @fileoverview Component for the translation opportunities.
  */
 
-require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
-require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
-require('directives/angular-html-bind.directive.ts');
-require('directives/mathjax-bind.directive.ts');
-require(
-  'pages/contributor-dashboard-page/login-required-message/' +
-  'login-required-message.component.ts');
-require(
-  'pages/contributor-dashboard-page/modal-templates/' +
-  'translation-modal.controller.ts');
-require(
-  'pages/contributor-dashboard-page/opportunities-list/' +
-  'opportunities-list.component.ts');
+import { Component, Injector } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { ContextService } from 'services/context.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
+import { TranslationModalComponent, TranslationOpportunity } from '../modal-templates/translation-modal.component';
+import { ContributionOpportunitiesService, ExplorationOpportunitiesDict } from '../services/contribution-opportunities.service';
 
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities.service.ts');
-require('pages/contributor-dashboard-page/services/translate-text.service.ts');
-require('services/site-analytics.service.ts');
+@Component({
+  selector: 'oppia-translation-opportunities',
+  templateUrl: './translation-opportunities.component.html',
+})
+export class TranslationOpportunitiesComponent {
+  allOpportunities: {[id: string]: TranslationOpportunity} = {};
+  userIsLoggedIn = false;
+  constructor(
+    private readonly contextService: ContextService,
+    private readonly contributionOpportunitiesService:
+      ContributionOpportunitiesService,
+    private readonly modalService: NgbModal,
+    private readonly siteAnalyticsService: SiteAnalyticsService,
+    private readonly translationLanguageService: TranslationLanguageService,
+    private readonly urlInterpolationService: UrlInterpolationService,
+    private readonly userService: UserService,
+    private readonly injector: Injector
+  ) {}
 
-angular.module('oppia').component('translationOpportunities', {
-  template: require('./translation-opportunities.component.html'),
-  controller: [
-    '$rootScope', '$uibModal', 'ContributionOpportunitiesService',
-    'SiteAnalyticsService', 'TranslationLanguageService',
-    'UrlInterpolationService', 'UserService',
-    function(
-        $rootScope, $uibModal, ContributionOpportunitiesService,
-        SiteAnalyticsService, TranslationLanguageService,
-        UrlInterpolationService, UserService) {
-      var ctrl = this;
-      var allOpportunities = {};
-      var userIsLoggedIn = false;
+  getOpportunitySummary(expId: string): TranslationOpportunity {
+    return this.allOpportunities[expId];
+  }
 
-      var getOpportunitySummary = function(expId) {
-        return allOpportunities[expId];
+  getPresentableOpportunitiesData(
+      {opportunities, more}: ExplorationOpportunitiesDict): {
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  } {
+    const opportunitiesDicts: TranslationOpportunity[] = [];
+    for (const index in opportunities) {
+      const opportunity = opportunities[index];
+      const subheading = opportunity.getOpportunitySubheading();
+      const heading = opportunity.getOpportunityHeading();
+      const languageCode = (
+        this.translationLanguageService.getActiveLanguageCode());
+      const progressPercentage = (
+        opportunity.getTranslationProgressPercentage(languageCode));
+      const opportunityDict: TranslationOpportunity = {
+        id: opportunity.getExplorationId(),
+        heading: heading,
+        subheading: subheading,
+        progressPercentage: progressPercentage.toFixed(2),
+        actionButtonTitle: 'Translate'
       };
-
-      var getPresentableOpportunitiesData = function({opportunities, more}) {
-        let opportunitiesDicts = [];
-        for (var index in opportunities) {
-          var opportunity = opportunities[index];
-          var subheading = opportunity.getOpportunitySubheading();
-          var heading = opportunity.getOpportunityHeading();
-          var languageCode = (
-            TranslationLanguageService.getActiveLanguageCode());
-          var progressPercentage = (
-            opportunity.getTranslationProgressPercentage(languageCode));
-          var opportunityDict = {
-            id: opportunity.getExplorationId(),
-            heading: heading,
-            subheading: subheading,
-            progressPercentage: progressPercentage.toFixed(2),
-            actionButtonTitle: 'Translate'
-          };
-          allOpportunities[opportunityDict.id] = opportunityDict;
-          opportunitiesDicts.push(opportunityDict);
-        }
-        return {opportunitiesDicts, more};
-      };
-
-      ctrl.onClickButton = function(expId) {
-        if (!userIsLoggedIn) {
-          ContributionOpportunitiesService.showRequiresLoginModal();
-          return;
-        }
-        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
-          'Translation');
-        var opportunity = getOpportunitySummary(expId);
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/contributor-dashboard-page/modal-templates/' +
-            'translation-modal.directive.html'),
-          backdrop: 'static',
-          size: 'lg',
-          resolve: {
-            opportunity: function() {
-              return opportunity;
-            }
-          },
-          controller: 'TranslationModalController'
-        }).result.then(function() {
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
-      };
-
-      ctrl.$onInit = function() {
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          userIsLoggedIn = userInfo.isLoggedIn();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-      };
-
-      ctrl.loadMoreOpportunities = function() {
-        return ContributionOpportunitiesService
-          .getMoreTranslationOpportunitiesAsync(
-            TranslationLanguageService.getActiveLanguageCode()).then(
-            getPresentableOpportunitiesData);
-      };
-
-      ctrl.loadOpportunities = function() {
-        return ContributionOpportunitiesService
-          .getTranslationOpportunitiesAsync(
-            TranslationLanguageService.getActiveLanguageCode()).then(
-            getPresentableOpportunitiesData);
-      };
+      this.allOpportunities[opportunityDict.id] = opportunityDict;
+      opportunitiesDicts.push(opportunityDict);
     }
-  ]
-});
+    return {opportunitiesDicts, more};
+  }
+
+  onClickButton(expId: string): void {
+    if (!this.userIsLoggedIn) {
+      this.contributionOpportunitiesService.showRequiresLoginModal();
+      return;
+    }
+    this.siteAnalyticsService.registerContributorDashboardSuggestEvent(
+      'Translation');
+    const opportunity = this.getOpportunitySummary(expId);
+    const modalRef = this.modalService.open(
+      TranslationModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        injector: this.injector,
+        // TODO(#12768): Remove the backdropClass & windowClass once the
+        // rte-component-modal is migrated to Angular. Currently, the custom
+        // class is used for correctly stacking AngularJS modal on top of
+        // Angular modal.
+        backdropClass: 'forced-modal-stack',
+        windowClass: 'forced-modal-stack'
+      });
+    modalRef.componentInstance.opportunity = opportunity;
+  }
+
+  ngOnInit(): void {
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });
+  }
+
+  async loadMoreOpportunitiesAsync(): Promise<{
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  }> {
+    return this.contributionOpportunitiesService
+      .getMoreTranslationOpportunitiesAsync(
+        this.translationLanguageService.getActiveLanguageCode())
+      .then(this.getPresentableOpportunitiesData.bind(this));
+  }
+
+  async loadOpportunitiesAsync(): Promise<{
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  }> {
+    return this.contributionOpportunitiesService
+      .getTranslationOpportunitiesAsync(
+        this.translationLanguageService.getActiveLanguageCode())
+      .then(this.getPresentableOpportunitiesData.bind(this));
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaTranslationOpportunities', downgradeComponent(
+    {component: TranslationOpportunitiesComponent}));

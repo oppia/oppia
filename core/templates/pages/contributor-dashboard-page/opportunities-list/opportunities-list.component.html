@@ -1,40 +1,40 @@
 <div class="oppia-opportunities-list">
-  <div ng-repeat="opportunity in $ctrl.visibleOpportunities track by $index">
-    <opportunities-list-item opportunity="opportunity"
-                             on-click-action-button="$ctrl.onClickActionButton"
-                             progress-bar-required="$ctrl.progressBarRequired"
-                             label-required="$ctrl.labelRequired"
-                             opportunity-heading-truncation-length="$ctrl.opportunityHeadingTruncationLength">
-    </opportunities-list-item>
+  <div *ngFor="let opportunity of visibleOpportunities">
+    <oppia-opportunities-list-item [opportunity]="opportunity"
+                             (clickActionButton)="clickActionButton.emit($event)"
+                             [progressBarRequired]="progressBarRequired"
+                             [labelRequired]="labelRequired"
+                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength">
+    </oppia-opportunities-list-item>
   </div>
-  <div ng-show="$ctrl.loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
-    <opportunities-list-item></opportunities-list-item>
-    <opportunities-list-item></opportunities-list-item>
+  <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
+    <oppia-opportunities-list-item></oppia-opportunities-list-item>
+    <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
-  <div class="oppia-opportunity-pagination-contaniner" ng-if="$ctrl.visibleOpportunities.length > 0">
+  <div class="oppia-opportunity-pagination-contaniner" *ngIf="visibleOpportunities.length > 0">
     <button type="button"
             class="oppia-pagination-button"
-            ng-click="$ctrl.gotoPage($ctrl.activePageNumber - 1)"
-            ng-disabled="$ctrl.activePageNumber == 1">
-            ng-disabled="$ctrl.activePageNumber == 1">
+            (click)="gotoPage(activePageNumber - 1)"
+            [disabled]="activePageNumber == 1">
       <span class="material-icons">navigate_before</span>Previous
     </button>
     <button type="button"
             class="oppia-pagination-button"
-            ng-click="$ctrl.gotoPage($ctrl.activePageNumber + 1)"
-            ng-disabled="$ctrl.loadingOpportunityData || $ctrl.activePageNumber >= $ctrl.lastPageNumber">
+            (click)="gotoPage(activePageNumber + 1)"
+            [disabled]="loadingOpportunityData || activePageNumber >= lastPageNumber">
       Next<span class="material-icons">navigate_next</span>
     </button>
   </div>
-  <div class="oppia-end-availability" ng-show="$ctrl.visibleOpportunities.length === 0 && !$ctrl.loadingOpportunityData">
+  <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
     <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
+
 <style>
   .oppia-opportunity-availablity-message {
-    color: #ababab;
+    color: #555;
     font-style: italic;
     overflow: hidden;
     padding: 0 2%;
@@ -83,100 +83,5 @@
   }
   .oppia-pagination-button[disabled]:hover {
     border: none;
-  }
-
-  /* All of the css for opportunities-list-item is added here to avoid having duplicate css properties.*/
-  .oppia-opportunities-button {
-    background-color: #fff;
-    border: 2px solid #009688;
-    border-radius: 5px;
-    color: #009688;
-    font-size: 18px;
-    font-weight: bold;
-    min-width: 64%;
-    text-align: center;
-  }
-  .oppia-opportunities-button:hover {
-    background-color: #009688;
-    color: #fff;
-    -webkit-transition: background-color 200ms ease-out;
-    -ms-transition: background-color 200ms ease-out;
-    transition: background-color 200ms ease-out;
-  }
-  .oppia-opportunities-progress-bar {
-    border-radius: 10px;
-    height: 20px;
-    width: 60%;
-  }
-  .oppia-opportunities-progress-bar .progress {
-    height: 12px;
-  }
-  .oppia-opportunities-progress-label {
-    font-size: 12px;
-    margin-left: 5px;
-    margin-top: -6px;
-  }
-  .oppia-opportunities-subheading {
-    color: #009688;
-    font-size: 14px;
-    height: 40%;
-  }
-  .oppia-opportunities-heading {
-    color: #4a4a4a;
-    font-size: 20px;
-    font-weight: bold;
-    height: 50%;
-  }
-  .oppia-opportunities-button-container {
-    align-items: center;
-    display: flex;
-    justify-content: flex-end;
-    margin: 1% 0;
-    width: 20%;
-  }
-  .oppia-opportunities-label-container {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    margin: 1% 0;
-    width: 25%;
-  }
-  .oppia-opportunities-label {
-    background-color: #fff;
-    border-radius: 8px;
-    font-size: 0.9em;
-    min-width: 150px;
-    opacity: 0.8;
-    text-align: center;
-  }
-  .oppia-opportunities-progress {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    margin: 1% 0;
-    min-width: 200px;
-    width: 25%;
-  }
-  .oppia-opportunities-details {
-    display: flex;
-    flex-direction: column;
-    margin: 1.8% 0;
-    width: 60%;
-  }
-  .oppia-opportunities-list-item {
-    background-color: #fff;
-    border: 1px solid #e8e7e2;
-    display: flex;
-    height: 90px;
-    justify-content: space-between;
-    margin-top: 24px;
-    padding: 0% 3%;
-  }
-  .oppia-animate-fadein {
-    -webkit-animation: fadein 0.5s linear 1 normal forwards; /* Safari, Chrome and Opera > 12.1 */
-    -moz-animation: fadein 0.5s linear 1 normal forwards; /* Firefox < 16 */
-    -ms-animation: fadein 0.5s linear 1 normal forwards; /* Internet Explorer */
-    -o-animation: fadein 0.5s linear 1 normal forwards; /* Opera < 12.1 */
-    animation: fadein 0.5s linear 1 normal forwards;
   }
 </style>

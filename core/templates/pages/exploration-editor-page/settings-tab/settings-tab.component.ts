@@ -86,6 +86,7 @@ require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-features.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/context.service');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 require(
@@ -99,7 +100,8 @@ angular.module('oppia').component('settingsTab', {
   template: require('./settings-tab.component.html'),
   controller: [
     '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
-    'EditabilityService', 'EditableExplorationBackendApiService',
+    'ContextService', 'EditabilityService',
+    'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesService',
@@ -114,7 +116,8 @@ angular.module('oppia').component('settingsTab', {
     'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
         $http, $rootScope, $uibModal, AlertsService, ChangeListService,
-        EditabilityService, EditableExplorationBackendApiService,
+        ContextService, EditabilityService,
+        EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
         ExplorationDataService, ExplorationFeaturesService,
@@ -132,6 +135,7 @@ angular.module('oppia').component('settingsTab', {
       var EXPLORE_PAGE_PREFIX = '/explore/';
 
       ctrl.directiveSubscriptions = new Subscription();
+      ctrl.explorationIsLinkedToStory = false;
 
       ctrl.getExplorePageUrl = function() {
         return (
@@ -172,7 +176,7 @@ angular.module('oppia').component('settingsTab', {
         // /settings) results in a console error.
 
         ctrl.hasPageLoaded = false;
-        ExplorationDataService.getData().then(function() {
+        ExplorationDataService.getDataAsync().then(function() {
           if (ExplorationStatesService.isInitialized()) {
             var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
               function(categoryItem) {
@@ -192,6 +196,8 @@ angular.module('oppia').component('settingsTab', {
             }
 
             ctrl.stateNames = ExplorationStatesService.getStateNames();
+            ctrl.explorationIsLinkedToStory = (
+              ContextService.isExplorationLinkedToStory());
           }
           ctrl.hasPageLoaded = true;
           // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -406,7 +412,7 @@ angular.module('oppia').component('settingsTab', {
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function() {
-          EditableExplorationBackendApiService.deleteExploration(
+          EditableExplorationBackendApiService.deleteExplorationAsync(
             ctrl.explorationId).then(function() {
             WindowRef.nativeWindow.location = CREATOR_DASHBOARD_PAGE_URL;
           });

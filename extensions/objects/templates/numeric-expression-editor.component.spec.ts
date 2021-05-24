@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for the numeric expression editor.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
-import { GuppyConfigurationService } from
-  'services/guppy-configuration.service.ts';
-import { GuppyInitializationService } from
-  'services/guppy-initialization.service.ts';
-import { MathInteractionsService } from 'services/math-interactions.service.ts';
-import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { GuppyConfigurationService } from 'services/guppy-configuration.service';
+import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import { MathInteractionsService } from 'services/math-interactions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('NumericExpressionEditor', function() {
   var ctrl = null, $window = null;
@@ -56,8 +54,7 @@ describe('NumericExpressionEditor', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    guppyConfigurationService = new GuppyConfigurationService(
-      new DeviceInfoService(new WindowRef()));
+    guppyConfigurationService = new GuppyConfigurationService();
     mathInteractionsService = new MathInteractionsService();
     guppyInitializationService = new GuppyInitializationService();
     deviceInfoService = new DeviceInfoService(new WindowRef());

@@ -191,15 +191,12 @@ var LibraryPage = function() {
   };
 
   this.clickCreateActivity = async function() {
-    await createActivityButton.click();
+    await action.click('create Activity Button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickExplorationObjective = async function() {
-    await waitFor.elementToBeClickable(
-      explorationObjective,
-      'Exploration Objective takes too long to be clickable');
-    await explorationObjective.click();
+    await action.click('Exploration objective', explorationObjective);
   };
 
   this.findExploration = async function(explorationTitle) {

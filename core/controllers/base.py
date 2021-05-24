@@ -27,6 +27,7 @@ import sys
 import time
 import traceback
 
+from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -44,6 +45,15 @@ DEFAULT_CSRF_SECRET = 'oppia csrf secret'
 CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
+
+# NOTE: These handlers manage user sessions. Thus, we should never reject or
+# replace them when running in maintenance mode; otherwise admins will be unable
+# to access the site.
+AUTH_HANDLER_PATHS = (
+    '/csrfhandler',
+    '/session_begin',
+    '/session_end',
+)
 
 
 @backports.functools_lru_cache.lru_cache(maxsize=128)
@@ -76,23 +86,6 @@ class SessionEndHandler(webapp2.RequestHandler):
     def get(self):
         """Destroys an existing auth session."""
         auth_services.destroy_auth_session(self.response)
-
-
-class SeedFirebaseHandler(webapp2.RequestHandler):
-    """Handler for preparing Firebase and Oppia to run SeedFirebaseOneOffJob.
-
-    TODO(#11462): Delete this handler once the Firebase migration logic is
-    rollback-safe and all backup data is using post-migration data.
-    """
-
-    def get(self):
-        """Prepares Firebase and Oppia to run SeedFirebaseOneOffJob."""
-        try:
-            auth_services.seed_firebase()
-        except Exception:
-            logging.exception('Failed to prepare for SeedFirebaseOneOffJob')
-        finally:
-            self.redirect('/')
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -128,7 +121,12 @@ class UserFacingExceptions(python_utils.OBJECT):
         maintenance (error code 503).
         """
 
-        pass
+        def __init__(self):
+            super(
+                UserFacingExceptions.TemporaryMaintenanceException, self
+            ).__init__(
+                'Oppia is currently being upgraded, and the site should be up '
+                'and running again in a few hours. Thanks for your patience!')
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -164,19 +162,33 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        auth_claims = auth_services.get_auth_claims_from_request(request)
-        self.current_user_is_super_admin = (
-            auth_claims is not None and auth_claims.role_is_super_admin)
-
-        if (feconf.ENABLE_MAINTENANCE_MODE and
-                not self.current_user_is_super_admin):
-            return
-
         self.user_id = None
         self.username = None
         self.email = None
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
+        self.current_user_is_super_admin = False
+
+        try:
+            auth_claims = auth_services.get_auth_claims_from_request(request)
+        except auth_domain.StaleAuthSessionError:
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        except auth_domain.InvalidAuthSessionError:
+            logging.exception('User session is invalid!')
+            auth_services.destroy_auth_session(self.response)
+            self.redirect(user_services.create_login_url(self.request.uri))
+            return
+        else:
+            self.current_user_is_super_admin = (
+                auth_claims is not None and auth_claims.role_is_super_admin)
+
+        if (feconf.ENABLE_MAINTENANCE_MODE
+                and not self.current_user_is_super_admin
+                and self.request.path not in AUTH_HANDLER_PATHS):
+            auth_services.destroy_auth_session(self.response)
+            return
 
         if auth_claims:
             auth_id = auth_claims.auth_id
@@ -187,8 +199,6 @@ class BaseHandler(webapp2.RequestHandler):
                 # the not-fully registered user.
                 email = auth_claims.email
                 if 'signup?' in self.request.uri:
-                    if not feconf.ENABLE_USER_CREATION:
-                        raise Exception('New sign-ups are temporarily disabled')
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
@@ -245,14 +255,11 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE and
-                not self.current_user_is_super_admin):
+        if (feconf.ENABLE_MAINTENANCE_MODE
+                and not self.current_user_is_super_admin
+                and self.request.path not in AUTH_HANDLER_PATHS):
             self.handle_exception(
-                self.TemporaryMaintenanceException(
-                    'Oppia is currently being upgraded, and the site should '
-                    'be up and running again in a few hours. '
-                    'Thanks for your patience!'),
-                self.app.debug)
+                self.TemporaryMaintenanceException(), self.app.debug)
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -373,7 +380,10 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        self.response.cache_control.no_cache = True
+
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
             b'max-age=31536000; includeSubDomains')

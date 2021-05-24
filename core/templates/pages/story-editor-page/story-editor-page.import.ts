@@ -26,7 +26,7 @@ import 'third-party-imports/dnd-lists.import';
 angular.module('oppia', [
   require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable',
+  'toastr', 'ui.bootstrap', 'ui.sortable',
   uiValidate
 ]);
 
@@ -44,6 +44,6 @@ require(
 require(
   'pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts');
 require(
-  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
-require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
+  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.ts');
+require('pages/story-editor-page/navbar/story-editor-navbar.component.ts');
 require('pages/story-editor-page/story-editor-page.component.ts');

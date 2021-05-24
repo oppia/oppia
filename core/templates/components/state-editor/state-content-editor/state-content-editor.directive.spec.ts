@@ -22,9 +22,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
-require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -36,7 +35,7 @@ require(
 require('services/editability.service.ts');
 
 describe('State content editor directive', function() {
-  var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;
+  var outerScope, ctrlScope, shof, cls, scs, es, ess, srvos;
   var mockExplorationData;
 
   var _getContent = function(contentId, contentString) {
@@ -52,7 +51,7 @@ describe('State content editor directive', function() {
 
     mockExplorationData = {
       explorationId: 0,
-      autosaveChangeList: function() {}
+      autosaveChangeListAsync: function() {}
     };
     angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', [mockExplorationData][0]);
@@ -67,9 +66,7 @@ describe('State content editor directive', function() {
 
   beforeEach(angular.mock.inject(
     function($compile, $injector, $rootScope, $templateCache) {
-      shof = $injector.get('SubtitledHtmlObjectFactory');
       cls = $injector.get('ChangeListService');
-      rvo = $injector.get('RecordedVoiceoversObjectFactory');
       srvos = $injector.get('StateRecordedVoiceoversService');
       scs = $injector.get('StateContentService');
       es = $injector.get('EditabilityService');
@@ -84,7 +81,8 @@ describe('State content editor directive', function() {
       };
 
       scs.init('Third State', _getContent('content', 'This is some content.'));
-      srvos.init('Third State', rvo.createFromBackendDict(rvoDict));
+      srvos.init(
+        'Third State', RecordedVoiceovers.createFromBackendDict(rvoDict));
       es.markEditable();
       ess.init({
         'First State': {

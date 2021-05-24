@@ -61,6 +61,7 @@ describe('Context service', () => {
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
       spyOn(urlService, 'getHash').and.returnValue('');
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to exploration editor', () => {
@@ -108,6 +109,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/embed/exploration/123');
       spyOn(urlService, 'getHash').and.returnValue('');
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to exploration editor', () => {
@@ -142,6 +144,7 @@ describe('Context service', () => {
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/create/123');
       spyOn(urlService, 'getHash').and.returnValue('#/gui');
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the exploration id', () => {
@@ -150,6 +153,12 @@ describe('Context service', () => {
 
     it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('editor');
+    });
+
+    it('should correctly retrieve the story context', () => {
+      expect(ecs.isExplorationLinkedToStory()).toBe(false);
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.isExplorationLinkedToStory()).toBe(true);
     });
 
     it('should correctly retrieve exploration editor mode', () => {
@@ -170,6 +179,7 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to topic editor', () => {
@@ -214,6 +224,7 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the values in topic editor', () => {
@@ -251,6 +262,7 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to story editor', () => {
@@ -288,6 +300,7 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to skill editor', () => {
@@ -325,6 +338,7 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the page context as question editor', () => {
@@ -369,6 +383,7 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
+      ecs.removeCustomEntityContext();
     });
 
     it('should throw an error when trying to retrieve the exploration id',
@@ -410,6 +425,7 @@ describe('Context service', () => {
       });
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
+      ecs.removeCustomEntityContext();
     });
 
     it('should retrieve the exploration id cached before', () => {

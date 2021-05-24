@@ -95,7 +95,7 @@
         "excludedForTesting.js"
       ],
       "rules": {
-        "oppia/e2e-action": "error",
+        "oppia/e2e-action": "error"
       }
     },
     {
@@ -106,15 +106,24 @@
         "core/tests/protractor_desktop/*.js"
       ],
       "rules": {
-        "oppia/protractor-practices": "error",
+        "oppia/protractor-practices": "error"
+      }
+    },
+    {
+      // We exclude spec files to the no-testonly check
+      "files": ["*spec.js", "*spec.ts"],
+      "rules": {
+        "oppia/no-testonly": "off"
       }
     }
   ],
   "rules": {
     "oppia/break-after-parens": "error",
     "oppia/no-multiline-disable": "error",
+    "oppia/no-testonly": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
+    "oppia/no-test-blockers": "error",
     "angular/di": [
       "error",
       "array"

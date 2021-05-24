@@ -32,6 +32,7 @@ import types
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
@@ -51,7 +52,6 @@ from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
 
-current_user_services = models.Registry.import_current_user_services()
 auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -218,49 +218,14 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         self.delete_json('/community-library/data', expected_status_int=404)
 
-    def test_maintenance_mode_when_enabled_html(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        with swap_maintenance_mode:
-            response = (
-                self.get_html_response(
-                    '/community-library', expected_status_int=503))
-            self.assertIn(
-                '<maintenance-page>', response.body)
-            self.assertNotIn('<library-page>', response.body)
-
-    def test_maintenance_mode_when_enabled_and_super_admin_html(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        login_super_admin = self.login_context(
-            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        with swap_maintenance_mode, login_super_admin:
-            response = self.get_html_response('/community-library')
-            self.assertIn('<library-page>', response.body)
-            self.assertNotIn(
-                'The Oppia site is temporarily unavailable', response.body)
-
-    def test_maintenance_mode_when_enabled_json(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        with swap_maintenance_mode:
-            response = (
-                self.get_json('/url_handler', expected_status_int=503))
-            self.assertIn('error', response)
-            self.assertEqual(
-                response['error'],
-                'Oppia is currently being upgraded, and the site should be up '
-                'and running again in a few hours. Thanks for your patience!')
-
-    def test_maintenance_mode_when_enabled_and_super_admin_json(self):
-        swap_maintenance_mode = self.swap(
-            feconf, 'ENABLE_MAINTENANCE_MODE', True)
-        login_super_admin = self.login_context(
-            self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        with swap_maintenance_mode, login_super_admin:
-            response = self.get_json('/url_handler')
-            self.assertIn('login_url', response)
-            self.assertIsNone(response['login_url'])
+    def test_html_requests_have_no_store_cache_policy(self):
+        response = self.get_html_response('/community-library')
+        # We set 'no-store' and 'must-revalidate', but webapp
+        # adds 'no-cache' since it is basically a subset of 'no-store'.
+        self.assertEqual(
+            response.headers['Cache-Control'],
+            'must-revalidate, no-cache, no-store'
+        )
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -597,6 +562,175 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         response = self.get_html_response('/splash', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
 
+    def test_unauthorized_user_exception_raised_when_session_is_stale(self):
+        with python_utils.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                auth_services, 'get_auth_claims_from_request',
+                error=auth_domain.StaleAuthSessionError('uh-oh')))
+
+            response = self.get_html_response('/', expected_status_int=302)
+
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(
+            response.location,
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
+
+    def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
+        with python_utils.ExitStack() as exit_stack:
+            call_counter = exit_stack.enter_context(self.swap_with_call_counter(
+                auth_services, 'destroy_auth_session'))
+            logs = exit_stack.enter_context(
+                self.capture_logging(min_level=logging.ERROR))
+            exit_stack.enter_context(self.swap_to_always_raise(
+                auth_services, 'get_auth_claims_from_request',
+                error=auth_domain.InvalidAuthSessionError('uh-oh')))
+
+            response = self.get_html_response('/', expected_status_int=302)
+
+        self.assert_matches_regexps(logs, ['User session is invalid!'])
+        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(
+            response.location,
+            'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
+
+
+class MaintenanceModeTests(test_utils.GenericTestBase):
+    """Tests BaseHandler behavior when maintenance mode is enabled.
+
+    Each test case runs within a context where ENABLE_MAINTENANCE_MODE is True.
+    """
+
+    def setUp(self):
+        super(MaintenanceModeTests, self).setUp()
+        with python_utils.ExitStack() as context_stack:
+            context_stack.enter_context(
+                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
+            self.context_stack = context_stack.pop_all()
+
+    def tearDown(self):
+        self.context_stack.close()
+        super(MaintenanceModeTests, self).tearDown()
+
+    def test_html_response_is_rejected(self):
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response(
+            '/community-library', expected_status_int=503)
+
+        self.assertIn('<maintenance-page>', response.body)
+        self.assertNotIn('<library-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_html_response_is_not_rejected_when_user_is_super_admin(self):
+        self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response('/community-library')
+
+        self.assertIn('<library-page>', response.body)
+        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_json_response_is_rejected(self):
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_json('/url_handler', expected_status_int=503)
+
+        self.assertIn('error', response)
+        self.assertEqual(
+            response['error'],
+            'Oppia is currently being upgraded, and the site should be up '
+            'and running again in a few hours. Thanks for your patience!')
+        self.assertNotIn('login_url', response)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
+    def test_json_response_is_not_rejected_when_user_is_super_admin(self):
+        self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_json('/url_handler')
+
+        self.assertIn('login_url', response)
+        self.assertIsNone(response['login_url'])
+        self.assertNotIn('error', response)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_csrfhandler_handler_is_not_rejected(self):
+        response = self.get_json('/csrfhandler')
+
+        self.assertTrue(
+            base.CsrfTokenManager.is_csrf_token_valid(None, response['token']))
+
+    def test_session_begin_handler_is_not_rejected(self):
+        call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(
+                auth_services, 'establish_auth_session'))
+
+        self.get_html_response('/session_begin', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_session_end_handler_is_not_rejected(self):
+        call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        self.get_html_response('/session_end', expected_status_int=200)
+
+        self.assertEqual(call_counter.times_called, 1)
+
+    def test_signup_fails(self):
+        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_signup_succeeds_when_maintenance_mode_is_disabled(self):
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+    def test_signup_succeeds_when_user_is_super_admin(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME, is_super_admin=True)
+
+    def test_admin_auth_session_is_preserved_when_in_maintenance_mode(self):
+        # TODO(#12692): Use stateful login sessions to assert the behavior of
+        # logging out, rather than asserting that destroy_auth_session() gets
+        # called.
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+        self.context_stack.enter_context(self.super_admin_context())
+
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+        self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(self):
+        # TODO(#12692): Use stateful login sessions to assert the behavior of
+        # logging out, rather than asserting that destroy_auth_session() gets
+        # called.
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+        with self.assertRaisesRegexp(Exception, 'Bad response: 503'):
+            self.get_json('/url_handler?current_url=/')
+
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
@@ -733,37 +867,6 @@ class SessionEndHandlerTests(test_utils.GenericTestBase):
             self.get_html_response('/session_end', expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
-
-
-class SeedFirebaseHandlerTests(test_utils.GenericTestBase):
-    """Tests for /seed_firebase handler."""
-
-    def test_get(self):
-        swap = self.swap_with_call_counter(
-            firebase_auth_services, 'seed_firebase')
-
-        with swap as call_counter:
-            response = self.get_html_response(
-                '/seed_firebase', expected_status_int=302)
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-
-    def test_get_with_error(self):
-        swap = self.swap_with_call_counter(
-            firebase_auth_services, 'seed_firebase', raises=Exception())
-
-        captured_logging_context = self.capture_logging(min_level=logging.ERROR)
-
-        with swap as call_counter, captured_logging_context as logs:
-            response = self.get_html_response(
-                '/seed_firebase', expected_status_int=302)
-
-        self.assertEqual(call_counter.times_called, 1)
-        self.assertEqual(response.location, 'http://localhost/')
-        self.assert_matches_regexps(logs, [
-            'Failed to prepare for SeedFirebaseOneOffJob'
-        ])
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -1219,13 +1322,6 @@ class SignUpTests(test_utils.GenericTestBase):
 
         self.get_html_response('/community-library')
 
-    def test_500_error_is_raised_when_enable_user_creation_is_false(self):
-        self.login('abc@example.com')
-
-        with self.swap(feconf, 'ENABLE_USER_CREATION', False):
-            response = self.get_response_without_checking_for_errors(
-                '%s?return_url=/' % feconf.SIGNUP_URL, [500])
-
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
@@ -1290,7 +1386,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -1303,7 +1400,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)

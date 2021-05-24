@@ -30,7 +30,7 @@ import { Rule, RuleObjectFactory } from
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
 import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
+  'domain/exploration/SubtitledUnicodeObjectFactory';
 
 import { AppConstants } from 'app.constants';
 
@@ -71,6 +71,7 @@ describe('NumericExpressionInputValidationService', () => {
     });
 
     customizationArgs = {
+      useFractionForDivision: false,
       placeholder: {
         value: new SubtitledUnicode(
           'Type an expression here, using only numbers.', 'ca_placeholder_0')

@@ -19,10 +19,8 @@
  */
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/skill/RubricObjectFactory.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('domain/topic/editable-topic-backend-api.service.ts');
-require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-rights-backend-api.service.ts');
 require('services/alerts.service.ts');
@@ -31,19 +29,20 @@ require('services/questions-list.service.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
+import { Rubric } from 'domain/skill/rubric.model';
 
 import { StorySummary } from 'domain/story/story-summary.model';
+import { SubtopicPage } from 'domain/topic/subtopic-page.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'RubricObjectFactory', 'SubtopicPageObjectFactory',
   'TopicObjectFactory', 'TopicRightsBackendApiService', 'UndoRedoService',
   function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      RubricObjectFactory, SubtopicPageObjectFactory, TopicObjectFactory,
+      TopicObjectFactory,
       TopicRightsBackendApiService, UndoRedoService) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRights.createInterstitialRights();
@@ -54,7 +53,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
     // subtopics (and not loaded from the backend).
     var _newSubtopicPageIds = [];
     var _subtopicPage =
-      SubtopicPageObjectFactory.createInterstitialSubtopicPage();
+      SubtopicPage.createInterstitialSubtopicPage();
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
@@ -137,7 +136,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           continue;
         }
         var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
-          return RubricObjectFactory.createFromBackendDict(rubric);
+          return Rubric.createFromBackendDict(rubric);
         });
         _skillIdToRubricsObject[skillId] = rubrics;
       }
@@ -148,7 +147,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
       _subtopicPageLoadedEventEmitter.emit();
     };
     var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
-      _setSubtopicPage(SubtopicPageObjectFactory.createFromBackendDict(
+      _setSubtopicPage(SubtopicPage.createFromBackendDict(
         newBackendSubtopicPageObject));
     };
     var _setTopicRights = function(topicRights) {
@@ -183,12 +182,12 @@ angular.module('oppia').factory('TopicEditorStateService', [
        */
       loadTopic: function(topicId) {
         _topicIsLoading = true;
-        let topicDataPromise = EditableTopicBackendApiService.fetchTopic(
+        let topicDataPromise = EditableTopicBackendApiService.fetchTopicAsync(
           topicId);
-        let storyDataPromise = EditableTopicBackendApiService.fetchStories(
+        let storyDataPromise = EditableTopicBackendApiService.fetchStoriesAsync(
           topicId);
-        let topicRightsPromise = TopicRightsBackendApiService.fetchTopicRights(
-          topicId);
+        let topicRightsPromise = TopicRightsBackendApiService
+          .fetchTopicRightsAsync(topicId);
         Promise.all([
           topicDataPromise,
           storyDataPromise,
@@ -259,7 +258,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           _subtopicPageLoadedEventEmitter.emit();
           return;
         }
-        EditableTopicBackendApiService.fetchSubtopicPage(
+        EditableTopicBackendApiService.fetchSubtopicPageAsync(
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
             _updateSubtopicPage(newBackendSubtopicPageObject);
@@ -441,7 +440,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           return false;
         }
         _topicIsBeingSaved = true;
-        EditableTopicBackendApiService.updateTopic(
+        EditableTopicBackendApiService.updateTopicAsync(
           _topic.getId(), _topic.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
@@ -455,7 +454,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
-                EditableStoryBackendApiService.deleteStory(
+                EditableStoryBackendApiService.deleteStoryAsync(
                   changeList[i].story_id);
               }
             }

@@ -4742,6 +4742,15 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
+  "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "link", "math", "skillreview"],
+
+  // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
+  "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
+    "code": "en",
+    "description": "English"
+  }],
+
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
@@ -4866,6 +4875,10 @@ export default {
     "description": "polszczyzna (Polish)",
     "direction": "ltr"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)",
+    "direction": "rtl"
+  }, {
     "code": "pt",
     "description": "português (Portuguese)",
     "direction": "ltr"
@@ -4910,6 +4923,10 @@ export default {
     "description": "yкраїнська (Ukrainian)",
     "direction": "ltr"
   }, {
+    "code": "ur",
+    "description": "اُردُو (Urdu)",
+    "direction": "rtl"
+  }, {
     "code": "vi",
     "description": "Tiếng Việt (Vietnamese)",
     "direction": "ltr"
@@ -4920,43 +4937,56 @@ export default {
   // List of supported site languages in which the platform is offered.
   "SUPPORTED_SITE_LANGUAGES": [{
     "id": "id",
-    "text": "Bahasa Indonesia"
+    "text": "Bahasa Indonesia",
+    "direction": "ltr"
   }, {
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "direction": "ltr"
   }, {
     "id": "es",
-    "text": "Español"
+    "text": "Español",
+    "direction": "ltr"
   }, {
     "id": "fr",
-    "text": "français (French)"
+    "text": "français (French)",
+    "direction": "ltr"
   }, {
     "id": "pt-br",
-    "text": "Português (Brasil)"
+    "text": "Português (Brasil)",
+    "direction": "ltr"
   }, {
     "id": "ar",
-    "text": "العربية"
+    "text": "العربية",
+    "direction": "rtl"
   }, {
     "id": "kab",
-    "text": "Taqbaylit (Kabyle)"
+    "text": "Taqbaylit (Kabyle)",
+    "direction": "ltr"
   }, {
     "id": "vi",
-    "text": "Tiếng Việt"
+    "text": "Tiếng Việt",
+    "direction": "ltr"
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)"
+    "text": "Türkçe (Turkish)",
+    "direction": "ltr"
   }, {
     "id": "hi",
-    "text": "हिन्दी"
+    "text": "हिन्दी",
+    "direction": "ltr"
   }, {
     "id": "bn",
-    "text": "বাংলা"
+    "text": "বাংলা",
+    "direction": "ltr"
   }, {
     "id": "zh-hans",
-    "text": "中文(简体)"
+    "text": "中文(简体)",
+    "direction": "ltr"
   }, {
     "id": "zh-hant",
-    "text": "中文(繁體)"
+    "text": "中文(繁體)",
+    "direction": "ltr"
   }],
 
   // List of supported audio languages in which we have audio and translations
@@ -5027,7 +5057,7 @@ export default {
     "id": "prs",
     "description": "Dari",
     "relatedLanguages": ["prs"],
-    "direction": "ltr"
+    "direction": "rtl"
   }, {
     "id": "nl",
     "description": "Dutch",
@@ -5204,6 +5234,11 @@ export default {
     "relatedLanguages": ["uk"],
     "direction": "ltr"
   }, {
+    "id": "ur",
+    "description": "Urdu",
+    "relatedLanguages": ["ur"],
+    "direction": "rtl"
+  }, {
     "id": "vi",
     "description": "Vietnamese",
     "relatedLanguages": ["vi"],
@@ -5292,6 +5327,32 @@ export default {
       "FractionInput",
       "NumberWithUnits",
       "NumericInput"
+    ]
+  }],
+
+  // These are linked to the VALID_INTERACTION_IDS constant in
+  // android_validation_constants.py.
+  "ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES": [{
+    "name": "General",
+    "interaction_ids": [
+      "Continue",
+      "EndExploration",
+      "ImageClickInput",
+      "ItemSelectionInput",
+      "MultipleChoiceInput",
+      "TextInput",
+      "DragAndDropSortInput"
+    ]
+  }, {
+    "name": "Math",
+    "interaction_ids": [
+      "FractionInput",
+      "NumericInput",
+      "NumericExpressionInput",
+      "AlgebraicExpressionInput",
+      "MathEquationInput",
+      "NumberWithUnits",
+      "RatioExpressionInput"
     ]
   }],
 
@@ -5453,6 +5514,7 @@ export default {
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
+    "linked_skill_id": null,
     "content": {
       "html": "",
       "content_id": "content"
@@ -5485,6 +5547,7 @@ export default {
       }
     },
     "solicit_answer_details": false,
+    "card_is_checkpoint": false,
     "written_translations": {
       "translations_mapping": {
         "content": {},
@@ -5496,11 +5559,6 @@ export default {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
-
-  "FIREBASE_AUTH_ENABLED": true,
-
-  // TODO(#11462): Delete this after Firebase authentication has been deployed.
-  "ENABLE_LOGIN_PAGE": true,
 
   // Data required for Firebase authentication.
   //
@@ -5639,9 +5697,10 @@ export default {
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
   "OPPORTUNITY_TYPE_VOICEOVER": "voiceover",
 
-  // The bucket name is set to None-resources to enable it to be used
-  // in prod mode when the resource bucket name is not allowed to be null.
-  "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+  // The bucket name is set to app_default_bucket which is used to store files
+  // in GCS when local development server is running. This should be changed
+  // in prod appropriately.
+  "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
 
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
@@ -5756,6 +5815,30 @@ export default {
         }]
       },
       "default_value": null
+    },
+    {
+      "backend_id": "created_collection",
+      "backend_attr": "created_collection",
+      "description": "Has created collection",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
+    },
+    {
+      "backend_id": "used_logic_proof_interaction",
+      "backend_attr": "used_logic_proof_interaction",
+      "description": "Has used LogicProof interaction in any exploration",
+      "schema": {
+        "type": "bool",
+        "validators": [{
+          "id": "is_nonempty"
+        }]
+      },
+      "default_value": false
     }
   ],
 

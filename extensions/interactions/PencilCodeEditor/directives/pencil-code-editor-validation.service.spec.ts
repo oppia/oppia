@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import { AnswerGroupObjectFactory } from
+import { AnswerGroup, AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AppConstants } from 'app.constants';
 import { OutcomeObjectFactory } from
@@ -29,11 +29,11 @@ import { RuleObjectFactory, RuleInputs } from
 import { TestBed } from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
-  let pcevs: PencilCodeEditorValidationService = null;
-  let oof: OutcomeObjectFactory = null;
-  let rof: RuleObjectFactory = null;
-  let inputBackend: RuleInputs = null;
-  let agof: AnswerGroupObjectFactory = null;
+  let pcevs: PencilCodeEditorValidationService;
+  let oof: OutcomeObjectFactory;
+  let rof: RuleObjectFactory;
+  let inputBackend: RuleInputs;
+  let agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     oof = TestBed.get(OutcomeObjectFactory);
@@ -64,7 +64,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-      var answergroup1 = [];
+      var answergroup1: AnswerGroup[] = [];
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -130,7 +130,7 @@ describe('Pencil Code Editor Validation Service', () => {
       };
       const testOutcome1 = oof.createNew(
         'Introduction', 'default_outcome', '', []);
-      var answergroup1 = [];
+      var answergroup1: AnswerGroup[] = [];
 
       spyOn(pcevs, 'getCustomizationArgsWarnings')
         .withArgs(customizationArgs).and.returnValue([]);

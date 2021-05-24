@@ -37,9 +37,9 @@ import { ConceptCardObjectFactory, ConceptCard, ConceptCardBackendDict } from
   'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory, Misconception, MisconceptionBackendDict }
   from 'domain/skill/MisconceptionObjectFactory';
-import { RubricObjectFactory, Rubric, RubricBackendDict } from
-  'domain/skill/RubricObjectFactory';
-import { ValidatorsService } from 'services/validators.service.ts';
+import { Rubric, RubricBackendDict } from
+  'domain/skill/rubric.model';
+import { ValidatorsService } from 'services/validators.service';
 import constants from 'assets/constants';
 
 export class Skill {
@@ -123,7 +123,7 @@ export class Skill {
   }
 
   getRubrics(): Rubric[] {
-    return this._rubrics.slice();
+    return this._rubrics;
   }
 
   appendMisconception(newMisconception: Misconception): void {
@@ -200,8 +200,7 @@ export class Skill {
         return;
       }
     }
-    const rubricObjectFactory = new RubricObjectFactory();
-    this._rubrics.push(rubricObjectFactory.create(difficulty, explanations));
+    this._rubrics.push(Rubric.create(difficulty, explanations));
   }
 
   toBackendDict(): SkillBackendDict {
@@ -246,7 +245,6 @@ export class SkillObjectFactory {
   constructor(
     private conceptCardObjectFactory: ConceptCardObjectFactory,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
-    private rubricObjectFactory: RubricObjectFactory,
     private validatorService: ValidatorsService) {
   }
   createInterstitialSkill(): Skill {
@@ -290,7 +288,7 @@ export class SkillObjectFactory {
   generateRubricsFromBackendDict(
       rubricBackendDicts: RubricBackendDict[]): Rubric[] {
     return rubricBackendDicts.map((rubricBackendDict) => {
-      return this.rubricObjectFactory.createFromBackendDict(rubricBackendDict);
+      return Rubric.createFromBackendDict(rubricBackendDict);
     });
   }
 }

@@ -8,7 +8,7 @@
     </div>
     <div class="navbar-icons">
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'main', 'uib-dropdown': $ctrl.countWarnings()}" ng-click="$ctrl.selectMainTab()"
-          class = "nav-item icon nav-list-item position-relative">
+          class="nav-item icon nav-list-item position-relative">
         <a href="#" class="nav-link navbar-tab protractor-test-main-tab" uib-tooltip="Editor" tooltip-placement="<[$ctrl.countWarnings() ? 'left' : 'bottom']>">
           <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
         </a>
@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'">
+    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'" exploration-is-linked-to-story="$ctrl.explorationIsLinkedToStory">
     </exploration-editor-tab>
 
     <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">

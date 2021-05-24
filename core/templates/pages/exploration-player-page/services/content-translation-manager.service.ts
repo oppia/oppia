@@ -19,6 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
+import isObject from 'lodash/isObject';
 
 import { BaseTranslatableObject, InteractionRuleInputs } from
   'interactions/rule-input-defs';
@@ -29,7 +30,7 @@ import { StateCard } from
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { SubtitledHtml } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+  'domain/exploration/subtitled-html.model';
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
   'components/forms/schema-based-editors/schema-constants';
@@ -144,7 +145,8 @@ export class ContentTranslationManagerService {
 
     const contentTranslation = writtenTranslations.translationsMapping[
       card.contentId][languageCode];
-    const contentTranslationText = contentTranslation.getTranslation();
+    const contentTranslationText = (
+      contentTranslation && contentTranslation.getTranslation());
 
     // The isString() check is needed for the TypeScript compiler to narrow the
     // type down from string|string[] to string. See "Using type predicates" at
@@ -269,7 +271,7 @@ export class ContentTranslationManagerService {
   _isTranslatableObject(
       ruleInputValue: InteractionRuleInputs):
       ruleInputValue is BaseTranslatableObject {
-    return 'contentId' in ruleInputValue;
+    return isObject(ruleInputValue) && 'contentId' in ruleInputValue;
   }
 
   _isString(translation: string|string[]): translation is string {

@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('Editor state service', () => {
   let ecs: StateEditorService = null;
@@ -63,6 +63,14 @@ describe('Editor state service', () => {
     expect(ecs.getMisconceptionsBySkill()).toEqual({});
     ecs.setMisconceptionsBySkill(misconceptionsBySkill);
     expect(ecs.getMisconceptionsBySkill()).toEqual(misconceptionsBySkill);
+  });
+
+  it('should correctly set and get linkedSkillId', () => {
+    const linkedSkillId = 'skill_id1';
+
+    expect(ecs.getLinkedSkillId()).toEqual(null);
+    ecs.setLinkedSkillId(linkedSkillId);
+    expect(ecs.getLinkedSkillId()).toEqual(linkedSkillId);
   });
 
   it('should correctly return answer choices for interaction', () => {
