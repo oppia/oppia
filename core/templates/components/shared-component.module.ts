@@ -73,6 +73,7 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
 
 
 // Directives.
@@ -157,6 +158,7 @@ const toastrConfig = {
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
+    QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
     SharingLinksComponent,
@@ -209,6 +211,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     PromoBarComponent,
+    QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
     SummaryListHeaderComponent,
@@ -253,6 +256,7 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    QuestionDifficultySelectorComponent,
     StateSkillEditorComponent,
     SharingLinksComponent,
     SelectSkillModalComponent,
