@@ -5,7 +5,7 @@
          class="filepath-editor-img-toolbar"
          [attr.style]="getToolbarDynamicStyles()">
       <div class="filepath-editor-img-toolbar-resize">
-        Resize to:
+        <span class="filepath-editor-fit-to-scale">Fit to scale</span>
         <span class="filepath-editor-button filepath-editor-decrease-size"
               (click)="decreaseResizePercent(10)">-
         </span>
@@ -17,7 +17,6 @@
         </span>
       </div>
       <div class="filepath-editor-img-toolbar-size">
-        Image Size:
         <span>{{ calculateTargetImageDimensions().width }}</span>
         &times;
         <span> {{ calculateTargetImageDimensions().height }} </span>
@@ -31,9 +30,16 @@
     <div class="filepath-editor-image-container"
          [attr.style]="getImageContainerDynamicStyles()">
       <div *ngIf="isNoImageUploaded()">
-        <oppia-image-uploader (fileChanged)="onFileChanged($event)"
-                              [allowedImageFormats]="allowedImageFormats">
-        </oppia-image-uploader>
+        <div class="filepath-editor-image-uploader">
+          <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+                                [allowedImageFormats]="allowedImageFormats">
+          </oppia-image-uploader>
+        </div>
+        <div class="filepath-editor-verticalLine"></div>
+        <div class="filepath-editor-image-creator">
+          <div class="filepath-editor-image-creator-text" ></div>
+          <button class="filepath-editor-image-create-button" (click)="svgEditorModal = true">Create</button>
+        </div>
       </div>
       <div *ngIf="isImageUploaded()"
            class="filepath-editor-image-crop-container"
@@ -64,13 +70,17 @@
       </div>
       <div *ngIf="isImageSaved()">
         <div class="filepath-editor-saved-image-container">
-          <i class="material-icons filepath-editor-trash"
-             (click)="resetFilePathEditor()"
-             title="Delete this image">
-            &#xE872;
-          </i>
           <img [src]="data.metadata.savedImageUrl" [ngStyle]="imageContainerStyle">
         </div>
+        <i class="material-icons filepath-editor-edit"
+           title="Edit this image">
+           &#xE254;
+        </i>
+        <i class="material-icons filepath-editor-trash"
+           (click)="resetFilePathEditor()"
+           title="Delete this image">
+           &#xE872;
+        </i>
       </div>
     </div>
     <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
@@ -99,6 +109,99 @@
   </div>
 </div>
 <style>
+  .filepath-editor .filepath-editor-image-container oppia-image-uploader span.image-uploader-license-warning {
+    display: none;
+  }
+
+  .image-uploader-text {
+     visibility: hidden;
+  }
+
+  .image-uploader-text:before {
+    position: relative;
+    bottom: 30px;
+    visibility: visible;
+    content: "Browse from Your Desktop";
+    font-size: 11px;
+    display: block;
+  }
+
+  .filepath-editor .filepath-editor-image-uploader {
+    border: 1px solid #707070;
+    border-right: none;
+    height: 152px;
+    margin-bottom: 25px;
+    box-shadow: 0px 3px 6px #00000029;
+    width: 50%;
+    float: left;
+  }
+
+  .filepath-editor .filepath-editor-image-creator {
+    background: #eee;
+    border: 1px solid #707070;
+    border-left: none;
+    margin-bottom: 25px;
+    height: 152px;
+    box-shadow: 0px 3px 6px #00000029;
+    width: 50%;
+    float: right;
+  }
+
+  .filepath-editor .filepath-editor-image-creator-text {
+    font-size: 11px;
+    position: relative;
+    top: 50px;
+  }
+
+  .filepath-editor .filepath-editor-image-create-button {
+    background-color: #00645C;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    padding: 4px 21px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 4px 2px;
+    position: relative;
+    top: 57px;
+  }
+
+  .filepath-editor .filepath-editor-image-uploader label.image-uploader-upload-label-button {
+    position: relative;
+    color: white;
+    bottom: 65px;
+    border: 1px solid #707070;
+    background: #00609C;
+    border-radius: 3px;
+    text-transform: uppercase;
+    opacity: 1;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 10px;
+  }
+
+  .filepath-editor .filepath-editor-verticalLine {
+    border-left: 1px solid black;
+    height: 110px;
+    position: absolute;
+    top: 23px;
+    left: 50%;
+  }
+
+  .filepath-editor .filepath-editor-fit-to-scale {
+    color: #333333;
+    text-transform: uppercase;
+    position: relative;
+    font-size: 10px;
+    bottom: 2px;
+    font-weight: 400;
+    opacity: 0.4;
+  }
+
   .filepath-editor .filepath-editor-saved-image-container img {
     background-color: white;
   }
