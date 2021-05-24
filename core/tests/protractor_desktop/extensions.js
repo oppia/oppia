@@ -178,7 +178,7 @@ describe('Interactions', function() {
           await explorationPlayerPage.submitAnswer(
             interactionId, test.wrongAnswers[j]);
           await explorationPlayerPage.expectLatestFeedbackToMatch(
-            await forms.toRichText('no'));
+            await forms.toRichText('no', interactionId));
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
@@ -196,7 +196,7 @@ describe('Interactions', function() {
           await explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);
           await explorationPlayerPage.expectLatestFeedbackToMatch(
-            await forms.toRichText('yes'));
+            await forms.toRichText('yes', interactionId));
         }
         await explorationEditorPage.navigateToMainTab();
         await explorationEditorMainTab.deleteInteraction();
