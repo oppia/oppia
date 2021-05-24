@@ -36,8 +36,8 @@ import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.componen
 import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
 export interface SkillsCategorizedByTopics {
-  [key: string]: {
-    [key: string]: ShortSkillSummary[]
+  [topicName: string]: {
+    [subtopicName: string]: ShortSkillSummary[]
   }
 }
 
@@ -77,7 +77,7 @@ export class SkillsListComponent {
   ) {}
 
   getSkillEditorUrl(skillId: string): string {
-    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
+    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       SKILL_EDITOR_URL_TEMPLATE, {
         skill_id: skillId
