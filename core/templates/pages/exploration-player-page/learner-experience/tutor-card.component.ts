@@ -185,7 +185,7 @@ export class TutorCardComponent {
     return this.displayedCard.isInteractionInline();
   }
 
-  getContentAudioHighlightClass(): string {
+  getContentAudioHighlightClass(): Object {
     if (this.audioTranslationManagerService
       .getCurrentComponentName() ===
       AppConstants.COMPONENT_NAME_CONTENT &&

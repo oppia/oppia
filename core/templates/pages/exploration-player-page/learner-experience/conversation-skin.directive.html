@@ -37,11 +37,11 @@
                       !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
-      <tutor-card displayed-card="displayedCard"
-                  is-learn-again-button="isLearnAgainButton()"
-                  avatar-image-is-shown="true"
-                  start-card-change-animation="startCardChangeAnimation">
-      </tutor-card>
+      <oppia-tutor-card [displayed-card]="displayedCard"
+                        [is-learn-again-button]="isLearnAgainButton()"
+                        [avatar-image-is-shown]="true"
+                        [start-card-change-animation]="startCardChangeAnimation">
+      </oppia-tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            displayed-card="displayedCard"

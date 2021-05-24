@@ -5,14 +5,14 @@
   <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        [ngClass]="{'animate-card-change': startCardChangeAnimation}">
     <div class="oppia-learner-view-card-top-section">
-      <content-language-selector></content-language-selector>
+      <oppia-content-language-selector></oppia-content-language-selector>
       <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
          [href]="OPPIA_AVATAR_LINK_URL"
          target="_blank"
          rel="noopener">
         <img class="conversation-skin-oppia-avatar"
              [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
-             *ngIf="isAvatarImageShown()">
+             *ngIf="avatarImageIsShown">
       </a>
       <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
            [ngClass]="getContentAudioHighlightClass()"
@@ -45,7 +45,7 @@
     <div *ngIf="arePreviousResponsesShown && !conceptCardIsBeingShown"
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
       <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
-        <div *ngIf="(!$last || !isInteractionInline())">
+        <div *ngIf="(!(index === (displayedCard.getInputResponsePairs().length - 1)) || !isInteractionInline())">
           <oppia-input-response-pair [data]="responsePair"
                                      [profilePicture]="profilePicture"
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
