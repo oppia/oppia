@@ -210,6 +210,7 @@ import { AdminRouterService } from 'pages/admin-page/services/admin-router.servi
 import { AdminTaskManagerService } from 'pages/admin-page/services/admin-task-manager.service';
 import { CollectionEditorStateService } from 'pages/collection-editor-page/services/collection-editor-state.service';
 import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { ContributorDashboardAdminBackendApiService } from 'pages/contributor-dashboard-admin-page/services/contributor-dashboard-admin-backend-api.service';
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { TranslateTextBackendApiService } from 'pages/contributor-dashboard-page/services/translate-text-backend-api.service';
 import { TranslateTextService } from 'pages/contributor-dashboard-page/services/translate-text.service';
@@ -410,6 +411,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ContributionOpportunitiesService', ContributionOpportunitiesService],
   ['ContributionOpportunitiesBackendApiService',
     ContributionOpportunitiesBackendApiService],
+  ['ContributorDashboardAdminBackendApiService',
+    ContributorDashboardAdminBackendApiService],
   ['ConvertToPlainTextPipe', ConvertToPlainTextPipe],
   ['CountVectorizerService', CountVectorizerService],
   ['CreateNewSkillModalService', CreateNewSkillModalService],

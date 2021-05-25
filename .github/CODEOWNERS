@@ -118,6 +118,7 @@
 /core/storage/translation/ @vojtechjelinek
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
+/core/templates/pages/contributor-dashboard-admin-page/ @sagangwee
 
 
 # Core documentation

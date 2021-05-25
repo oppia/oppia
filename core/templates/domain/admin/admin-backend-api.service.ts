@@ -62,17 +62,6 @@ interface JobOutputBackendResponse {
   output: string[];
 }
 
-interface ViewContributionBackendResponse {
-  usernames: string[];
-}
-
-interface ContributionRightsBackendResponse {
-  'can_review_questions': boolean,
-  'can_review_translation_for_language_codes': string[],
-  'can_review_voiceover_for_language_codes': string[],
-  'can_submit_questions': boolean
-}
-
 interface MemoryCacheProfileBackendResponse {
   'peak_allocation': string,
   'total_allocation': string,
@@ -312,86 +301,6 @@ export class AdminBackendApiService {
           role: newRole,
           username: username,
           topic_id: topicId
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async addContributionReviewerAsync(
-      category: string, username: string, languageCode: string
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        AdminPageConstants.ADMIN_ADD_CONTRIBUTION_RIGHTS_HANDLER, {
-          category: category,
-          username: username,
-          language_code: languageCode
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async viewContributionReviewersAsync(
-      category: string, languageCode: string
-  ): Promise<ViewContributionBackendResponse> {
-    let params = {};
-    if (languageCode === null) {
-      params = { category: category };
-    } else {
-      params = {
-        category: category,
-        language_code: languageCode
-      };
-    }
-    return new Promise((resolve, reject) => {
-      this.http.get<ViewContributionBackendResponse>(
-        AdminPageConstants.ADMIN_GET_CONTRIBUTOR_USERS_HANDLER, {
-          params
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async contributionReviewerRightsAsync(
-      username: string): Promise<ContributionRightsBackendResponse> {
-    return new Promise((resolve, reject) => {
-      this.http.get<ContributionRightsBackendResponse>(
-        AdminPageConstants.ADMIN_CONTRIBUTION_RIGHTS_HANDLER, {
-          params: {
-            username: username
-          }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
-    });
-  }
-
-  async removeContributionReviewerAsync(
-      username: string, method: string,
-      category: string, languageCode: string
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.ADMIN_REMOVE_CONTRIBUTION_RIGHTS_HANDLER, {
-          username: username,
-          removal_type: method,
-          category: category,
-          language_code: languageCode
         }
       ).toPromise().then(response => {
         resolve(response);

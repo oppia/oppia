@@ -26,25 +26,11 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
   '$rootScope', 'AdminBackendApiService',
-  'AdminDataService', 'AdminTaskManagerService',
-  'LanguageUtilService', 'UrlInterpolationService',
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
-  'ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS',
-  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION',
-  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION',
-  'CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER',
-  'CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION',
+  'AdminDataService', 'AdminTaskManagerService', 'UrlInterpolationService',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
       $rootScope, AdminBackendApiService,
-      AdminDataService, AdminTaskManagerService,
-      LanguageUtilService, UrlInterpolationService,
-      ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-      ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-      CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-      CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION,
+      AdminDataService, AdminTaskManagerService, UrlInterpolationService,
       USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
@@ -64,22 +50,6 @@ angular.module('oppia').directive('adminRolesTab', [
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the directive is migrated to angular.
           $rootScope.$apply();
-        };
-
-        var getLanguageDescriptions = function(languageCodes) {
-          var languageDescriptions = [];
-          languageCodes.forEach(function(languageCode) {
-            languageDescriptions.push(
-              LanguageUtilService.getAudioLanguageDescription(
-                languageCode));
-          });
-          return languageDescriptions;
-        };
-
-        ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
-          return (
-            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION ||
-            reviewCategory === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER);
         };
 
         ctrl.submitRoleViewForm = function(formResponse) {
@@ -132,93 +102,6 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.finishTask();
         };
 
-        ctrl.submitAddContributionRightsForm = function(formResponse) {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          ctrl.setStatusMessage('Adding new reviewer...');
-          AdminTaskManagerService.startTask();
-          AdminBackendApiService.addContributionReviewerAsync(
-            formResponse.category, formResponse.username,
-            formResponse.languageCode
-          ).then(() => {
-            ctrl.setStatusMessage(
-              'Successfully added "' + formResponse.username + '" as ' +
-              formResponse.category + ' reviewer.');
-            refreshFormData();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular.
-            $rootScope.$apply();
-          }, handleErrorResponse);
-          AdminTaskManagerService.finishTask();
-        };
-
-        ctrl.submitViewContributorUsersForm = function(formResponse) {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          ctrl.setStatusMessage('Processing query...');
-          AdminTaskManagerService.startTask();
-          ctrl.contributionReviewersResult = {};
-          if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-            AdminBackendApiService.viewContributionReviewersAsync(
-              formResponse.category, formResponse.languageCode
-            ).then((usersObject) => {
-              ctrl.contributionReviewersResult.usernames = (
-                usersObject.usernames);
-              ctrl.contributionReviewersDataFetched = true;
-              ctrl.setStatusMessage('Success.');
-              refreshFormData();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            }, handleErrorResponse);
-          } else {
-            var translationLanguages = [];
-            var voiceoverLanguages = [];
-            AdminBackendApiService.contributionReviewerRightsAsync(
-              formResponse.username
-            ).then((contributionRights) => {
-              translationLanguages = getLanguageDescriptions(
-                contributionRights.can_review_translation_for_language_codes);
-              voiceoverLanguages = getLanguageDescriptions(
-                contributionRights.can_review_voiceover_for_language_codes);
-              ctrl.contributionReviewersResult = {
-                translationLanguages: translationLanguages,
-                voiceoverLanguages: voiceoverLanguages,
-                questions: contributionRights.can_review_questions,
-                can_submit_questions: contributionRights.can_submit_questions
-              };
-              ctrl.contributionReviewersDataFetched = true;
-              ctrl.setStatusMessage('Success.');
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-              refreshFormData();
-            }, handleErrorResponse);
-          }
-          AdminTaskManagerService.finishTask();
-        };
-
-        ctrl.submitRemoveContributionRightsForm = function(formResponse) {
-          if (AdminTaskManagerService.isTaskRunning()) {
-            return;
-          }
-          ctrl.setStatusMessage('Processing query...');
-          AdminTaskManagerService.startTask();
-          AdminBackendApiService.removeContributionReviewerAsync(
-            formResponse.username, formResponse.method,
-            formResponse.category, formResponse.languageCode
-          ).then(() => {
-            ctrl.setStatusMessage('Success.');
-            refreshFormData();
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the directive is migrated to angular.
-            $rootScope.$apply();
-          }, handleErrorResponse);
-          AdminTaskManagerService.finishTask();
-        };
-
         var refreshFormData = function() {
           ctrl.formData = {
             viewUserRoles: {
@@ -247,102 +130,20 @@ angular.module('oppia').directive('adminRolesTab', [
                 }
                 return false;
               }
-            },
-            viewContributionReviewers: {
-              filterCriterion: USER_FILTER_CRITERION_ROLE,
-              username: '',
-              category: null,
-              languageCode: null,
-              isValid: function() {
-                if (this.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-                  if (this.category === null) {
-                    return false;
-                  }
-                  if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                    return Boolean(this.languageCode);
-                  }
-                  return true;
-                }
-
-                if (this.filterCriterion === USER_FILTER_CRITERION_USERNAME) {
-                  return Boolean(this.username);
-                }
-              }
-            },
-            addContributionReviewer: {
-              username: '',
-              category: null,
-              languageCode: null,
-              isValid: function() {
-                if (this.username === '') {
-                  return false;
-                }
-                if (this.category === null) {
-                  return false;
-                }
-                if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                  return Boolean(this.languageCode);
-                }
-                return true;
-              }
-            },
-            removeContributionReviewer: {
-              username: '',
-              method: ACTION_REMOVE_ALL_REVIEW_RIGHTS,
-              category: null,
-              languageCode: null,
-              isValid: function() {
-                if (this.username === '') {
-                  return false;
-                }
-                if (this.method === ACTION_REMOVE_ALL_REVIEW_RIGHTS) {
-                  return Boolean(this.username);
-                } else {
-                  if (this.category === null) {
-                    return false;
-                  }
-                  if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                    return Boolean(this.languageCode);
-                  }
-                  return true;
-                }
-              }
             }
           };
         };
 
         ctrl.$onInit = function() {
-          ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS = (
-            ACTION_REMOVE_ALL_REVIEW_RIGHTS);
-          ctrl.ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS = (
-            ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS);
           ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
           ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
           ctrl.UPDATABLE_ROLES = {};
           ctrl.VIEWABLE_ROLES = {};
-          ctrl.CONTRIBUTION_RIGHT_CATEGORIES = {
-            REVIEW_TRANSLATION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION,
-            REVIEW_VOICEOVER: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER,
-            REVIEW_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION,
-            SUBMIT_QUESTION: CONTRIBUTION_RIGHT_CATEGORY_SUBMIT_QUESTION
-          };
           refreshFormData();
           ctrl.resultRolesVisible = false;
-          ctrl.contributionReviewersDataFetched = false;
           ctrl.userRolesResult = {};
-          ctrl.contributionReviewersResult = {};
           ctrl.setStatusMessage('');
 
-          ctrl.languageCodesAndDescriptions = (
-            LanguageUtilService.getAllVoiceoverLanguageCodes().map(
-              function(languageCode) {
-                return {
-                  id: languageCode,
-                  description: (
-                    LanguageUtilService.getAudioLanguageDescription(
-                      languageCode))
-                };
-              }));
           ctrl.topicSummaries = {};
           ctrl.roleToActions = null;
           AdminDataService.getDataAsync().then(function(adminDataObject) {
@@ -358,10 +159,8 @@ angular.module('oppia').directive('adminRolesTab', [
         };
 
         ctrl.clearResults = function() {
-          ctrl.contributionReviewersDataFetched = false;
           ctrl.resultRolesVisible = false;
           ctrl.userRolesResult = {};
-          ctrl.contributionReviewersResult = {};
         };
       }]
     };

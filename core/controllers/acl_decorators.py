@@ -577,6 +577,46 @@ def can_access_admin_page(handler):
     return test_super_admin
 
 
+def can_access_contributor_dashboard_admin_page(handler):
+    """Decorator that checks if the current user is a contributor dashboard
+    admin.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks if the user
+        is a super admin.
+    """
+
+    def test_contributor_dashboard_admin(self, **kwargs):
+        """Checks if the user is logged in and is a contributor dashboard admin.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user is not a contributor dashboard
+                admin of the application.
+        """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_CONTRIBUTORS in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'User is not a contributor dashboard admin of this application')
+
+    test_contributor_dashboard_admin.__wrapped__ = True
+
+    return test_contributor_dashboard_admin
+
+
 def can_delete_any_user(handler):
     """Decorator that checks if the current user can delete any user.
 

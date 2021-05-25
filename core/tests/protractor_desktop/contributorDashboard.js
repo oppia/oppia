@@ -24,6 +24,8 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ContributorDashboardPage = require(
   '../protractor_utils/ContributorDashboardPage.js');
+var ContributorDashboardAdminPage = require(
+  '../protractor_utils/ContributorDashboardAdminPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var SkillEditorPage = require(
@@ -41,6 +43,8 @@ describe('Contributor dashboard page', function() {
     'Review Material 1'];
   const ADMIN_EMAIL = 'management@contributor.com';
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
+  const CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL = 'user@contributor.com';
+  const CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME = 'user4321';
   const HINDI_LANGUAGE = 'Hindi';
   let contributorDashboardPage = null;
   let contributorDashboardTranslateTextTab = null;
@@ -49,6 +53,7 @@ describe('Contributor dashboard page', function() {
   let explorationEditorPage = null;
   let explorationEditorMainTab = null;
   let adminPage = null;
+  let contributorDashboardAdminPage = null;
 
   beforeAll(async function() {
     contributorDashboardPage = (
@@ -62,16 +67,21 @@ describe('Contributor dashboard page', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     adminPage = new AdminPage.AdminPage();
+    contributorDashboardAdminPage = (
+      ContributorDashboardAdminPage.ContributorDashboardAdminPage());
+
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
+    await users.createUser(
+      CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL, CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME);
+
     await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
-    await adminPage.assignQuestionContributor('user0');
-    await adminPage.assignQuestionContributor('user1');
+
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
@@ -82,9 +92,16 @@ describe('Contributor dashboard page', function() {
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
 
-    // Allow user1 to review question suggestions.
     await adminPage.get();
-    await adminPage.assignQuestionReviewer('user1');
+    await adminPage.updateRole(
+      CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME, 'contributor dashboard admin');
+    await users.logout();
+
+    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionContributor('user0');
+    await contributorDashboardAdminPage.assignQuestionContributor('user1');
+    await contributorDashboardAdminPage.assignQuestionReviewer('user1');
     await users.logout();
   });
 
@@ -227,10 +244,14 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Admin page contribution rights form', function() {
-  var HINDI_LANGUAGE = 'Hindi';
+describe('Contributor dashbaord admin page contribution rights form', () => {
+  const HINDI_LANGUAGE = 'Hindi';
+  const CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL = 'user@contributor.com';
+  const CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME = 'user1234';
+
   var adminPage = null;
   var contributorDashboardPage = null;
+  var contributorDashboardAdminPage = null;
   var translationReviewerUsername = 'translator';
   var translationReviewerEmail = 'translator@contributor.com';
   var voiceoverReviewerUsername = 'voiceartist';
@@ -242,10 +263,14 @@ describe('Admin page contribution rights form', function() {
     adminPage = new AdminPage.AdminPage();
     contributorDashboardPage = (
       new ContributorDashboardPage.ContributorDashboardPage());
+    contributorDashboardAdminPage = (
+      new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
     await users.createUser(
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
+    await users.createUser(
+      CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL, CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME);
     await users.createAndLoginAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
     await adminPage.editConfigProperty(
@@ -253,16 +278,18 @@ describe('Admin page contribution rights form', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
+
+    await adminPage.updateRole(
+      CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME, 'contributor dashboard admin');
     await users.logout();
   });
 
   it('should allow admin to add translation reviewer', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAssignTranslationReviewer@adminTab.com',
-      'assignTranslationReviewer');
-    await adminPage.assignTranslationReviewer(
+    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
-    await adminPage.expectUserToBeTranslationReviewer(
+    await contributorDashboardAdminPage.expectUserToBeTranslationReviewer(
       translationReviewerUsername, HINDI_LANGUAGE);
     await users.logout();
 
@@ -274,11 +301,11 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add voiceover reviewer', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAssignVoiceoverReviewer@adminTab.com', 'assignVoiceoverReviewer');
-    await adminPage.assignVoiceoverReviewer(
+    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
-    await adminPage.expectUserToBeVoiceoverReviewer(
+    await contributorDashboardAdminPage.expectUserToBeVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
     await users.logout();
 
@@ -290,10 +317,12 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question reviewer', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAssignQuestionReviewer@adminTab.com', 'assignQuestionReviewer');
-    await adminPage.assignQuestionReviewer(questionReviewerUsername);
-    await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
+    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionReviewer(
+      questionReviewerUsername);
+    await contributorDashboardAdminPage.expectUserToBeQuestionReviewer(
+      questionReviewerUsername);
     await users.logout();
 
     await users.login(questionReviewerEmail);
@@ -303,14 +332,17 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question contributor', async function() {
-    await users.createAndLoginAdminUser(
-      'adminToAddQuestionContributor@adminTab.com', 'addQuestionContributor');
-    await adminPage.assignQuestionContributor(questionReviewerUsername);
-    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+    await users.login(CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL);
+    await contributorDashboardAdminPage.get();
+    await contributorDashboardAdminPage.assignQuestionContributor(
+      questionReviewerUsername);
+    await contributorDashboardAdminPage.expectUserToBeQuestionContributor(
+      questionReviewerUsername);
 
     // Confirm rights persist on page reload.
     await browser.refresh();
-    await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
+    await contributorDashboardAdminPage.expectUserToBeQuestionContributor(
+      questionReviewerUsername);
     await users.logout();
   });
 
