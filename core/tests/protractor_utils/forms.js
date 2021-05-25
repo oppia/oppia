@@ -444,6 +444,7 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(elem, 'RTE taking too long to become visible');
     // TODO(#9821): Find a better way to parse through the tags rather than
     // using xpath.
     // We select all top-level non-paragraph elements, as well as all children
