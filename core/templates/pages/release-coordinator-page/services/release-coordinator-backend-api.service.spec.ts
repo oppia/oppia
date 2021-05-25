@@ -122,7 +122,6 @@ describe('Release coordinator backend api service', () => {
     })
   );
 
-  // Test cases for Admin Jobs Tab.
   it('should request to start a new job when calling startNewJobAsync',
     fakeAsync(() => {
       let jobType = 'ActivityContributorsSummaryOneOffJob';
@@ -140,8 +139,7 @@ describe('Release coordinator backend api service', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    }));
 
   it('should request to cancel the job given its id' +
    'and type when calling cancelJobAsync', fakeAsync(() => {
