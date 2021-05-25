@@ -207,7 +207,8 @@ class TranslatableTextHandler(base.BaseHandler):
             self._get_state_names_to_not_in_review_content_id_mapping(
                 state_names_to_content_id_mapping,
                 suggestion_services
-                .get_translation_suggestions_in_review_by_exploration(exp_id)
+                .get_translation_suggestions_in_review_by_exploration(
+                    exp_id, language_code)
             )
         )
 
@@ -260,9 +261,7 @@ class TranslatableTextHandler(base.BaseHandler):
         """
         return any(
             s.change.state_name == state_name and
-            s.change.content_id == content_id and
-            s.language_code == self.request.get('language_code')
-            for s in suggestions)
+            s.change.content_id == content_id for s in suggestions)
 
 
 class MachineTranslationStateTextsHandler(base.BaseHandler):
