@@ -42,6 +42,11 @@ import contextlib2
 
 
 CHROME_DRIVER_VERSION = '77.0.3865.40'
+MOCK_RERUN_POLICIES = {
+    'always': run_e2e_tests.RERUN_POLICY_ALWAYS,
+    'known_flakes': run_e2e_tests.RERUN_POLICY_KNOWN_FLAKES,
+    'never': run_e2e_tests.RERUN_POLICY_NEVER,
+}
 
 
 class MockProcessClass(python_utils.OBJECT):
@@ -1150,11 +1155,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         policy_swap = self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', {
-                'never': 'never',
-                'known_flakes': 'known flakes',
-                'always': 'always',
-            })
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
@@ -1213,11 +1214,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         policy_swap = self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', {
-                'never': 'never',
-                'known_flakes': 'known flakes',
-                'always': 'always',
-            })
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
@@ -1276,11 +1273,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         policy_swap = self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', {
-                'never': 'never',
-                'known_flakes': 'known flakes',
-                'always': 'always',
-            })
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
@@ -1342,11 +1335,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         policy_swap = self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', {
-                'never': 'never',
-                'known_flakes': 'known flakes',
-                'always': 'always',
-            })
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
@@ -1408,11 +1397,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         policy_swap = self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', {
-                'never': 'never',
-                'known_flakes': 'known flakes',
-                'always': 'always',
-            })
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
@@ -1471,11 +1456,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
         policy_swap = self.swap(
-            run_e2e_tests, 'RERUN_POLICIES', {
-                'never': 'never',
-                'known_flakes': 'known flakes',
-                'always': 'always',
-            })
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES)
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap, policy_swap:

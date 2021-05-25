@@ -163,42 +163,46 @@ _PARSER.add_argument(
 # the oppia web server.
 SUBPROCESSES = []
 
+RERUN_POLICY_NEVER = 'never'
+RERUN_POLICY_KNOWN_FLAKES = 'known flakes'
+RERUN_POLICY_ALWAYS = 'always'
+
 RERUN_POLICIES = {
-    'accessibility': 'never',
-    'additionaleditorfeatures': 'known flakes',
-    'additionalplayerfeatures': 'always',
-    'adminpage': 'never',
-    'classroompage': 'never',
-    'classroompagefileuploadfeatures': 'never',
-    'collections': 'never',
-    'contributordashboard': 'always',
-    'coreeditorandplayerfeatures': 'known flakes',
-    'creatordashboard': 'always',
-    'embedding': 'known flakes',
-    'explorationfeedbacktab': 'never',
-    'explorationhistorytab': 'always',
-    'explorationstatisticstab': 'never',
-    'explorationtranslationtab': 'never',
-    'extensions': 'known flakes',
-    'fileuploadextensions': 'never',
-    'fileuploadfeatures': 'known flakes',
-    'learner': 'known flakes',
-    'learnerdashboard': 'known flakes',
-    'library': 'known flakes',
-    'navigation': 'never',
-    'playvoiceovers': 'never',
-    'preferences': 'known flakes',
-    'profilefeatures': 'never',
-    'profilemenu': 'never',
-    'publication': 'never',
-    'skilleditor': 'known flakes',
-    'subscriptions': 'never',
-    'topicandstoryeditor': 'always',
-    'topicandstoryeditorfileuploadfeatures': 'never',
-    'topicandstoryviewer': 'known flakes',
-    'topicsandskillsdashboard': 'always',
-    'users': 'known flakes',
-    'wipeout': 'known flakes',
+    'accessibility': RERUN_POLICY_NEVER,
+    'additionaleditorfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
+    'adminpage': RERUN_POLICY_NEVER,
+    'classroompage': RERUN_POLICY_NEVER,
+    'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
+    'collections': RERUN_POLICY_NEVER,
+    'contributordashboard': RERUN_POLICY_ALWAYS,
+    'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'creatordashboard': RERUN_POLICY_ALWAYS,
+    'embedding': RERUN_POLICY_KNOWN_FLAKES,
+    'explorationfeedbacktab': RERUN_POLICY_NEVER,
+    'explorationhistorytab': RERUN_POLICY_ALWAYS,
+    'explorationstatisticstab': RERUN_POLICY_NEVER,
+    'explorationtranslationtab': RERUN_POLICY_NEVER,
+    'extensions': RERUN_POLICY_KNOWN_FLAKES,
+    'fileuploadextensions': RERUN_POLICY_NEVER,
+    'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'learner': RERUN_POLICY_KNOWN_FLAKES,
+    'learnerdashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'library': RERUN_POLICY_KNOWN_FLAKES,
+    'navigation': RERUN_POLICY_NEVER,
+    'playvoiceovers': RERUN_POLICY_NEVER,
+    'preferences': RERUN_POLICY_KNOWN_FLAKES,
+    'profilefeatures': RERUN_POLICY_NEVER,
+    'profilemenu': RERUN_POLICY_NEVER,
+    'publication': RERUN_POLICY_NEVER,
+    'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
+    'subscriptions': RERUN_POLICY_NEVER,
+    'topicandstoryeditor': RERUN_POLICY_ALWAYS,
+    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_NEVER,
+    'topicandstoryviewer': RERUN_POLICY_KNOWN_FLAKES,
+    'topicsandskillsdashboard': RERUN_POLICY_ALWAYS,
+    'users': RERUN_POLICY_KNOWN_FLAKES,
+    'wipeout': RERUN_POLICY_KNOWN_FLAKES,
 }
 
 
@@ -645,10 +649,10 @@ def main(args=None):
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)
         # Check whether we should rerun based on this suite's policy.
-        policy = RERUN_POLICIES.get(parsed_args.suite, 'always')
-        if policy == 'never':
+        policy = RERUN_POLICIES.get(parsed_args.suite, RERUN_POLICY_ALWAYS)
+        if policy == RERUN_POLICY_NEVER:
             break
-        if policy == 'known flakes' and not flaky:
+        if policy == RERUN_POLICY_KNOWN_FLAKES and not flaky:
             break
         # Prepare for rerun.
         cleanup()
