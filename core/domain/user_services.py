@@ -43,7 +43,6 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
-current_user_services = models.Registry.import_current_user_services()
 bulk_email_services = models.Registry.import_bulk_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -2211,11 +2210,6 @@ def create_login_url(return_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-    # TODO(#11462): Delete this function. Pre-#11462, we needed this because we
-    # didn't control the page or URL responsible for user authentication.
-    # This is no longer the case. We've implemented our own user authentication
-    # flow on top of the Firebase SDK in "core/templates/pages/login-page", and
-    # this function will always redirect to its static location ("/login").
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})
 
 
