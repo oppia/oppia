@@ -17,40 +17,41 @@
  * domain objects.
  */
 
- import { downgradeInjectable } from '@angular/upgrade/static';
- import { Injectable } from '@angular/core';
- import { DragAndDropAnswer } from 'interactions/answer-defs';
- import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
- 
- @Injectable({
-   providedIn: 'root'
- })
- export class DragAndDropSortObjectFactory {
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { DragAndDropAnswer } from 'interactions/answer-defs';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
-    answerContentIdToHTML(answer: DragAndDropAnswer, choices: SubtitledHtml): string[][] {
-        var answerResponse = [];
-        function* yieldAllValuesOf(choices) {
-            yield* choices;
+@Injectable({
+  providedIn: 'root'
+})
+export class DragAndDropSortObjectFactory {
+  answerContentIdToHTML(
+      answer: DragAndDropAnswer,
+      choices: SubtitledHtml): string[][] {
+    var answerResponse = [];
+    var yieldAllValuesOf = function*(choices) {
+      yield* choices;
+    };
+    for (let ans of answer) {
+      for (let value of ans) {
+        for (let elem of yieldAllValuesOf(choices)) {
+          if (value === elem._contentId) {
+            answerResponse.push(elem._html);
+          }
         }
-        for (let ans of answer) {
-            for (let value of ans) {
-                for(let elem of yieldAllValuesOf(choices)) {
-                    if (value === elem._contentId) {
-                        answerResponse.push(elem._html);
-                    }
-                }
-            }
-        }
-        var answerArray = [];
-        for (let elem of answerResponse) {
-            let transformedArray = [];
-            transformedArray.push(elem);
-            answerArray.push(transformedArray);
-        }
-        return answerArray;
+      }
     }
- }
- 
- angular.module('oppia').factory(
-   'DragAndDropSortObjectFactory', downgradeInjectable(DragAndDropSortObjectFactory));
+    var answerArray = [];
+    for (let elem of answerResponse) {
+      let transformedArray = [];
+      transformedArray.push(elem);
+      answerArray.push(transformedArray);
+    }
+    return answerArray;
+  }
+}
 
+angular.module('oppia').factory(
+  'DragAndDropSortObjectFactory', downgradeInjectable(
+    DragAndDropSortObjectFactory));

@@ -11,32 +11,33 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
- 
+
 /**
-* @fileoverview unit tests for the dragAndDropSort object type factory service.
-*/
- 
+ * @fileoverview unit tests for the DragAndDropSort object type factory service.
+ */
+
 import { DragAndDropSortObjectFactory } from
-'domain/objects/DragAndDropSortObjectFactory';
+  'domain/objects/DragAndDropSortObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
- 
+
 describe('DragAndDropSort Object Factory', () => {
-let dragAndDrop: DragAndDropSortObjectFactory;
- 
-beforeEach(() => {
-  dragAndDrop = new DragAndDropSortObjectFactory();
-});
- 
-it('should get the answer of DragAndDropSort interaction', () => {
+  let dragAndDrop: DragAndDropSortObjectFactory;
+
+  beforeEach(() => {
+    dragAndDrop = new DragAndDropSortObjectFactory();
+  });
+
+  it('should get the answer of DragAndDropSort interaction', () => {
     var answer = [['ca_choices01'], ['ca_choices1']];
     var choices = SubtitledHtml.createDefault('Choice 1', 'ca_choices_0');
     var value = ['ca_choices01'];
     var elem = ['ca_choices01'];
     var answerArray = [['aa'], ['bb']];
     spyOn(dragAndDrop, 'answerContentIdToHTML').and.returnValue(answerArray);
+    dragAndDrop.answerContentIdToHTML(answer, choices);
     expect(value).toEqual(elem);
     expect(dragAndDrop.answerContentIdToHTML(
-        answer, choices)
+      answer, choices)
     ).toBe(answerArray);
-})
+  });
 });
