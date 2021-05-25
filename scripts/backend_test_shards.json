@@ -42,6 +42,7 @@
         "core.controllers.topics_and_skills_dashboard_test",
         "extensions.value_generators.models.generators_test",
         "core.controllers.admin_test",
+        "core.controllers.contributor_dashboard_admin_test",
         "core.controllers.classifier_test",
         "core.controllers.suggestion_test",
         "core.controllers.voice_artist_test",
