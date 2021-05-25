@@ -153,8 +153,8 @@ describe('Exploration Html Formatter Service', () => {
     };
     var expectedHtmlTag = '<oppia-short-response-sample-id answer="&amp;' +
     'quot;sampleAnswer&amp;quot;" choices="[{&amp;quot;_html&amp;quot;:&amp;' +
-    'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;&amp;' +
-    'quot;}]" interactionchoices="[{&amp;quot;_html&amp;quot;:&amp;quot;' +
+    'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;' +
+    '&amp;quot;}]" interactionchoices="[{&amp;quot;_html&amp;quot;:&amp;quot;' +
     'sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;&amp;' +
     'quot;}]"></oppia-short-response-sample-id>';
     expect(ehfs.getShortAnswerHtml(
