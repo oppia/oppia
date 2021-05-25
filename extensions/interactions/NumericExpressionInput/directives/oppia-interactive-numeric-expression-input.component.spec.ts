@@ -45,7 +45,7 @@ describe('NumericExpressionInputInteractive', function() {
     getValuesFromAttributes: function(interactionId, attrs) {
       return {
         placeholder: {
-          unicode: null
+          unicode: '2^2'
         }
       };
     }

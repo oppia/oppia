@@ -1029,6 +1029,32 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
         return cls(ca_value, ca_schema)
 
+    def get_subtitled_unicode(self):
+        """Get all SubtitledUnicode(s) in the customization argument.
+
+        Returns:
+            list(str). A list of SubtitledUnicode.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+            lambda x: x
+        )
+
+    def get_subtitled_html(self):
+        """Get all SubtitledHtml(s) in the customization argument.
+
+        Returns:
+            list(str). A list of SubtitledHtml.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x
+        )
+
     def get_content_ids(self):
         """Get all content_ids from SubtitledHtml and SubtitledUnicode in the
         customization argument.
@@ -2303,7 +2329,8 @@ class State(python_utils.OBJECT):
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
             written_translations, solicit_answer_details, card_is_checkpoint,
-            next_content_id_index, classifier_model_id=None):
+            next_content_id_index, linked_skill_id=None,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -2324,6 +2351,8 @@ class State(python_utils.OBJECT):
                 the creator or not.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
+            linked_skill_id: str or None. The linked skill ID associated with
+                this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -2342,6 +2371,7 @@ class State(python_utils.OBJECT):
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
+        self.linked_skill_id = linked_skill_id
         self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
         self.card_is_checkpoint = card_is_checkpoint
@@ -2467,6 +2497,14 @@ class State(python_utils.OBJECT):
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
+
+        if self.linked_skill_id is not None:
+            if not isinstance(
+                    self.linked_skill_id,
+                    python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected linked_skill_id to be a str, '
+                    'received %s.' % self.linked_skill_id)
 
     def get_content_html(self, content_id):
         """Returns the content belongs to a given content id of the object.
@@ -2729,6 +2767,14 @@ class State(python_utils.OBJECT):
             next_content_id_index: int. The new next content id index to set.
         """
         self.next_content_id_index = next_content_id_index
+
+    def update_linked_skill_id(self, linked_skill_id):
+        """Update the state linked skill id attribute.
+
+        Args:
+            linked_skill_id: str. The linked skill id to state.
+        """
+        self.linked_skill_id = linked_skill_id
 
     def update_interaction_customization_args(self, customization_args_dict):
         """Update the customization_args of InteractionInstance domain object.
@@ -2997,35 +3043,49 @@ class State(python_utils.OBJECT):
 
         Returns:
             dict(str, str). Returns a dict with key as content id and content
-            html as the value.
+            html/unicode as the value.
         """
-        content_id_to_html = {}
+        content_id_to_string = {}
 
-        content_id_to_html[self.content.content_id] = self.content.html
+        content_id_to_string[self.content.content_id] = self.content.html
 
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
         if default_outcome is not None and default_outcome.feedback.html != '':
-            content_id_to_html[default_outcome.feedback.content_id] = (
+            content_id_to_string[default_outcome.feedback.content_id] = (
                 default_outcome.feedback.html)
 
         for answer_group in self.interaction.answer_groups:
             if answer_group.outcome.feedback.html != '':
-                content_id_to_html[answer_group.outcome.feedback.content_id] = (
-                    answer_group.outcome.feedback.html)
+                content_id_to_string[
+                    answer_group.outcome.feedback.content_id
+                ] = (answer_group.outcome.feedback.html)
 
         for hint in self.interaction.hints:
             if hint.hint_content.html != '':
-                content_id_to_html[hint.hint_content.content_id] = (
+                content_id_to_string[hint.hint_content.content_id] = (
                     hint.hint_content.html)
 
         solution = self.interaction.solution
         if solution is not None and solution.explanation.html != '':
-            content_id_to_html[solution.explanation.content_id] = (
+            content_id_to_string[solution.explanation.content_id] = (
                 solution.explanation.html)
 
-        return content_id_to_html
+        for ca_dict in self.interaction.customization_args.values():
+            subtitled_htmls = ca_dict.get_subtitled_html()
+            for subtitled_html in subtitled_htmls:
+                if subtitled_html.html != '':
+                    content_id_to_string[subtitled_html.content_id] = (
+                        subtitled_html.html)
+
+            subtitled_unicodes = ca_dict.get_subtitled_unicode()
+            for subtitled_unicode in subtitled_unicodes:
+                if subtitled_unicode.unicode_str != '':
+                    content_id_to_string[subtitled_unicode.content_id] = (
+                        subtitled_unicode.unicode_str)
+
+        return content_id_to_string
 
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
@@ -3041,13 +3101,7 @@ class State(python_utils.OBJECT):
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
-
         for content_id in available_translation_content_ids:
-            # Interactions can be translated through editor pages but
-            # _get_all_translatable_content returns contents which are only
-            # translatable through the contributor dashboard page, we are
-            # ignoring the content ids related to interaction translation below
-            # if it doesn't exist in content_id_to_html.
             content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
@@ -3067,6 +3121,7 @@ class State(python_utils.OBJECT):
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
+            'linked_skill_id': self.linked_skill_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
@@ -3096,6 +3151,7 @@ class State(python_utils.OBJECT):
             state_dict['solicit_answer_details'],
             state_dict['card_is_checkpoint'],
             state_dict['next_content_id_index'],
+            state_dict['linked_skill_id'],
             state_dict['classifier_model_id'])
 
     @classmethod
