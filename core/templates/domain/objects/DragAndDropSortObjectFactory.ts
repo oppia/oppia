@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating instances of Drag And Drop Sort
- * domain objects..
+ * domain objects.
  */
 
  import { downgradeInjectable } from '@angular/upgrade/static';
