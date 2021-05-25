@@ -75,11 +75,10 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
 
     this.username = userInfo.getUsername();
     this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl
-      ('/profile/<username>', {
+      this.urlInterpolationService.interpolateUrl(
+        '/profile/<username>', {
           username: this.username
-        })
-    );
+        }));
   }
 
   ngOnInit(): void {
