@@ -34,13 +34,13 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfNormalizedStringEditorComponent
     ).componentInstance;
+    component.value = {};
     component.updateValue('random val');
   }));
 
   it('should initialize the schema', () => {
     component.updateValue('random val');
     component.getSchema();
-    component.value = {};
     component.updateValue('abc');
     expect(component.value.normalizedStrSet).toBe('abc');
   });

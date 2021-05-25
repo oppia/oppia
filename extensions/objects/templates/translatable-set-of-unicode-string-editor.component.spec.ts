@@ -36,13 +36,13 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfUnicodeStringEditorComponent
     ).componentInstance;
+    component.value = {};
     component.updateValue('random val');
   }));
 
   it('should initialize the schema', () => {
     component.updateValue('random val');
     component.getSchema();
-    component.value = {};
     component.updateValue('abc');
     expect(component.value.unicodeStrSet).toBe('abc');
   });
