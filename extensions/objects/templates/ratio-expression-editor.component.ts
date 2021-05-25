@@ -17,35 +17,57 @@
  */
 
 import { Ratio } from 'domain/objects/ratio.model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('ratioExpressionEditor', {
-  bindings: {
-    value: '='
-  },
-  template: require('./ratio-expression-editor.component.html'),
-  controller: [function() {
-    const ctrl = this;
-    ctrl.warningText = '';
+@Component({
+  selector: 'ratio-expression-editor',
+  templateUrl: './ratio-expression-editor.component.html'
+})
 
-    ctrl.isValidRatio = function(value) {
-      try {
-        ctrl.value = Ratio.fromRawInputString(value).components;
-        ctrl.warningText = '';
-        return true;
-      } catch (parsingError) {
-        ctrl.warningText = parsingError.message;
-        return false;
-      }
-    };
+export class RatioExpressionEditorComponent implements OnInit {
+  @Input() modalId: symbol;
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  warningText: string = '';
+  localValue: { label: string; };
+  eventBusGroup: EventBusGroup;
+  constructor(private eventBusService: EventBusService) {
+    this.eventBusGroup = new EventBusGroup(this.eventBusService);
+  }
 
-    ctrl.$onInit = function() {
-      if (ctrl.value === null) {
-        ctrl.value = [1, 1];
-      }
-      ctrl.localValue = {
-        label: Ratio.fromList(ctrl.value).toAnswerString()
-      };
+  ngOnInit(): void {
+    if (this.value === null) {
+      this.value = [1, 1];
+      this.valueChanged.emit(this.value);
+    }
+    this.localValue = {
+      label: Ratio.fromList(this.value).toAnswerString()
     };
   }
-  ]
-});
+
+  isValidRatio(value: string): boolean {
+    try {
+      this.value = Ratio.fromRawInputString(value).components;
+      this.valueChanged.emit(this.value);
+      this.warningText = '';
+      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+        modalId: this.modalId,
+        value: false
+      }));
+      return true;
+    } catch (parsingError) {
+      this.warningText = parsingError.message;
+      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
+        modalId: this.modalId,
+        value: true
+      }));
+      return false;
+    }
+  }
+}
+angular.module('oppia').directive('ratioExpressionEditor', downgradeComponent({
+  component: RatioExpressionEditorComponent
+}) as angular.IDirectiveFactory);
