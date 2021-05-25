@@ -85,7 +85,7 @@ describe('Solution object factory', () => {
       expect(solutionFromScratch.toBackendDict()).toEqual(expectedSolution);
     });
 
-    it('should create summary correctly', () => {
+    fit('should create summary correctly', () => {
       expect(solution.getSummary('GraphInput')).toEqual(
         'One solution is "[Graph]". This is the explanation to the answer.');
       expect(solution.getSummary('MusicNotesInput')).toEqual(
@@ -129,7 +129,7 @@ describe('Solution object factory', () => {
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
-        ['Choice 1'], ['Choice 2']
+        ['<p>Choice 1</p>'], ['<p>Choice 2</p>']
       ]);
       solution.setCorrectAnswer(
         '"[{&amp;quot;_html&amp;quot;' +

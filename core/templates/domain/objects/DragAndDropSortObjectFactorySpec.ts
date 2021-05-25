@@ -18,14 +18,10 @@
  
 import { DragAndDropSortObjectFactory } from
 'domain/objects/DragAndDropSortObjectFactory';
-/*import { DragAndDropAnswer } from
-'interactions/answer-defs';*/
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
  
 describe('DragAndDropSort Object Factory', () => {
 let dragAndDrop: DragAndDropSortObjectFactory;
-/*let dragAndDropAnswer: DragAndDropAnswer;
-let subtitledHtml: SubtitledHtml;*/
  
 beforeEach(() => {
   dragAndDrop = new DragAndDropSortObjectFactory();

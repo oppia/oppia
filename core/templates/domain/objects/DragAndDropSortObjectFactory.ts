@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of Units domain objects.
+ * @fileoverview Factory for creating instances of Drag And Drop Sort
+ * domain objects..
  */
 
  import { downgradeInjectable } from '@angular/upgrade/static';
  import { Injectable } from '@angular/core';
- import { DragAndDropAnswer } from
-   'interactions/answer-defs';
+ import { DragAndDropAnswer } from 'interactions/answer-defs';
  import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
  
  @Injectable({
@@ -53,4 +53,4 @@
  
  angular.module('oppia').factory(
    'DragAndDropSortObjectFactory', downgradeInjectable(DragAndDropSortObjectFactory));
- 
+
