@@ -2,8 +2,6 @@ version: 2.1
 
 workflows:
   circleci_tests:
-    # The following job runs in the following stages:
-    # - Setup runs first. After setup passes, typescript tests run.
     # Note: all end-to-end tests have now been moved off CircleCI.
 
     jobs:
@@ -17,14 +15,6 @@ anchor_for_job_defaults: &job_defaults
     - image: *docker_image
 
 commands:
-  install_chrome:
-    # Chrome version installed should be consistent with that installed on Github Actions.
-    description: "Install Chrome"
-    steps:
-      - run:
-          name: Install chrome
-          command: python -m scripts.install_chrome_for_ci
-
   merge_target_branch:
     description: "Merge to target branch"
     steps:
@@ -57,30 +47,6 @@ commands:
                 git pull origin $target_branch --no-edit
               fi
             fi
-  
-  check_memory_usage:
-    description: "Checking max memory usage to debug out-of-memory issues"
-    steps:
-      - run:
-          name: Checking Memory Usage
-          command: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
-
-  skip_for_low_risk_prs:
-    description: "Skip job for low-risk PRs"
-    steps:
-      - run:
-          name: Skip build for low-risk PRs
-          command: |
-            if python -m scripts.check_if_pr_is_low_risk ${CIRCLE_PULL_REQUEST}; then
-              circleci-agent step halt
-            fi
-
-  upload_screenshots:
-    description: "Upload protractor screenshots folder as an artifact"
-    steps:
-      - store_artifacts:
-          path: /home/circleci/protractor-screenshots/
-          destination: protractor-screenshots
 
 jobs:
   setup_and_typescript_tests:
@@ -105,15 +71,6 @@ jobs:
           name: Run typescript tests in strict mode
           command: |
             python -m scripts.typescript_checks --strict_checks
-      # Un-comment the following lines if e2e tests are added to CircleCI.
-      # - persist_to_workspace:
-          # root: /home/circleci/
-          # paths:
-            # - oppia/extensions/classifiers/proto
-            # - oppia/proto_files/
-            # - oppia/node_modules/
-            # - oppia/third_party/
-            # - oppia_tools/
 
 notify:
   webhooks:
