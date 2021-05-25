@@ -16,7 +16,7 @@
  * @fileoverview Directive for Subtitled Unicode editor.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -29,12 +29,15 @@ export class SubtitledUnicodeEditorComponent {
   schema: { type: string } ={
     type: 'unicode',
   };
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {
+    if (this.value._unicode === val) {
+      return;
+    }
     this.value._unicode = val;
-    this.value = {...this.value};
     this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 
   getSchema(): { type: string } {

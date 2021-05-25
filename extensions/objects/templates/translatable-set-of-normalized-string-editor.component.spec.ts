@@ -34,9 +34,11 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfNormalizedStringEditorComponent
     ).componentInstance;
+    component.updateValue('random val');
   }));
 
   it('should initialize the schema', () => {
+    component.updateValue('random val');
     component.getSchema();
     component.value = {};
     component.updateValue('abc');

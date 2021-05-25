@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for translatable set of normalized string editor.
  */
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -39,12 +39,15 @@ export class TranslatableSetOfNormalizedStringEditorComponent {
     }]
   };
 
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {
+    if (this.value.normalizedStrSet === val) {
+      return;
+    }
     this.value.normalizedStrSet = val;
-    this.value = {...this.value};
     this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
   }
 
   getSchema(): {

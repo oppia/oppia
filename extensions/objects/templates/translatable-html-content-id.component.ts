@@ -17,7 +17,7 @@
  * @fileoverview Component for translatable html content id editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -31,7 +31,7 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   choices = [];
   @Output() valueChanged = new EventEmitter();
   name: string;
-  constructor() { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.name = Math.random().toString(36).substring(7);
@@ -43,8 +43,12 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   }
 
   updateLocalValue(value: unknown): void {
-    this.value(value);
+    if (this.value === value) {
+      return;
+    }
+    this.value = value;
     this.valueChanged.emit(value);
+    this.changeDetectorRef.detectChanges();
   }
 }
 angular.module('oppia').directive(
