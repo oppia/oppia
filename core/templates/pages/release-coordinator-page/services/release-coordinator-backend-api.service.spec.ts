@@ -162,8 +162,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should request to start computation given the job' +
    'name when calling startComputationAsync', fakeAsync(() => {
@@ -183,8 +182,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should request to stop computation given the job' +
    'name when calling stopComputationAsync', fakeAsync(() => {
@@ -204,8 +202,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should fail to stop computation given the job' +
    'name when calling stopComputationAsync', fakeAsync(() => {
@@ -229,8 +226,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-  }
-  ));
+  }));
 
   it('should request to show the output of valid' +
    'jobs when calling showJobOutputAsync', fakeAsync(() => {
@@ -247,8 +243,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should request to show the sorted output of valid' +
    'jobs when calling showJobOutputAsync', fakeAsync(() => {
@@ -266,8 +261,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should fail to show the output of invalid' +
    'jobs when calling showJobOutputAsync', fakeAsync(() => {
@@ -286,8 +280,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Internal Server Error');
-  }
-  ));
+  }));
 
   it('should flush the memory cache when calling' +
    'flushMemoryCacheAsync', fakeAsync(() => {
@@ -302,8 +295,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should fail to flush the memory cache when calling' +
    'flushMemoryCacheAsync', fakeAsync(() => {
@@ -322,8 +314,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Failed to flush memory cache.');
-  }
-  ));
+  }));
 
   it('should get the data of memory cache profile when' +
    'calling getMemoryCacheProfileAsync', fakeAsync(() => {
@@ -337,8 +328,7 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
   it('should fail to get the data of memory cache profile' +
    'when calling getMemoryCacheProfileAsync', fakeAsync(() => {
@@ -356,6 +346,5 @@ describe('Release coordinator backend api service', () => {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }
-  ));
+  }));
 });

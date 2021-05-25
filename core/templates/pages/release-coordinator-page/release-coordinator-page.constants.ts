@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia release-coordinator page.
+ * @fileoverview Constants for the Oppia release coordinator page.
  */
 
 export const ReleaseCoordinatorPageConstants = {
   TAB_ID_JOBS: 'jobs',
   TAB_ID_MISC: ' misc',
 
-  PROFILE_URL_TEMPLATE: '/profile/<username>'
+  PROFILE_URL: '/profile/<username>'
 } as const;

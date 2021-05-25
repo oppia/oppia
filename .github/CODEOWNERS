@@ -544,6 +544,7 @@
 
 
 # Release team.
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
 /core/controllers/release_coordinator*.py @vojtechjelinek
 /core/templates/pages/release-coordinator-page/ @vojtechjelinek
 /scripts/release_scripts/ @vojtechjelinek

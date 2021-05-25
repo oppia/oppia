@@ -493,7 +493,8 @@ def can_access_release_coordinator_page(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_RUN_ANY_JOBS in self.user.actions:
+        if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (
+                self.user.actions):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
@@ -501,6 +502,82 @@ def can_access_release_coordinator_page(handler):
     test_can_access_release_coordinator_page.__wrapped__ = True
 
     return test_can_access_release_coordinator_page
+
+
+def can_manage_memcache(handler):
+    """Decorator to check whether user can can manage memcache.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to manage memcache.
+    """
+
+    def test_can_manage_memcache(self, **kwargs):
+        """Checks if the user is logged in and can manage memcache.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials manage
+                memcache.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_MEMCACHE in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage memcache.')
+    test_can_manage_memcache.__wrapped__ = True
+
+    return test_can_manage_memcache
+
+
+def can_run_any_job(handler):
+    """Decorator to check whether user can can run any job.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to run any job.
+    """
+
+    def test_can_run_any_job(self, **kwargs):
+        """Checks if the user is logged in and can run any job.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials run
+                any job.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to run any job.')
+    test_can_run_any_job.__wrapped__ = True
+
+    return test_can_run_any_job
 
 
 def can_send_moderator_emails(handler):

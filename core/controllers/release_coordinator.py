@@ -43,7 +43,7 @@ class JobsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_run_any_job
     def get(self):
         """Handles GET requests."""
         recent_job_data = jobs.get_data_for_recent_jobs()
@@ -96,7 +96,7 @@ class JobsHandler(base.BaseHandler):
             'unfinished_job_data': unfinished_job_data,
         })
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_run_any_job
     def post(self):
         """Handles POST requests."""
         try:
@@ -140,7 +140,7 @@ class JobOutputHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_run_any_job
     def get(self):
         """Handles GET requests."""
         job_id = self.request.get('job_id')
@@ -154,7 +154,7 @@ class MemoryCacheHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_manage_memcache
     def get(self):
         cache_stats = caching_services.get_memory_cache_stats()
         self.render_json({
@@ -163,7 +163,7 @@ class MemoryCacheHandler(base.BaseHandler):
             'total_keys_stored': cache_stats.total_number_of_keys_stored
         })
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_manage_memcache
     def delete(self):
         caching_services.flush_memory_cache()
         self.render_json({})
