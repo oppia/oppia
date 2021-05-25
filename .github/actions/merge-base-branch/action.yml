@@ -18,9 +18,9 @@ runs:
         git config --global user.email "admin@oppia.org"
         git config --global user.name "Oppia Merge Base Branch GitHub Action"
         git remote add source "https://github.com/${{ github.event.pull_request.head.repo.full_name }}.git"
-        git fetch source $GITHUB_HEAD_REF
-        git checkout source/$GITHUB_HEAD_REF
         git remote add base "https://github.com/${{ github.repository }}.git"
+        git fetch source $GITHUB_HEAD_REF
         git fetch base ${{ github.base_ref }}
-        git merge base/${{ github.base_ref }}
+        git checkout base/${{ github.base_ref }}
+        git merge source/$GITHUB_HEAD_REF
       shell: bash
