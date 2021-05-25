@@ -354,8 +354,7 @@ class UserSettingsModel(base_models.BaseModel):
 
         Returns:
             UserSettingsModel | None. The UserSettingsModel instance which
-            contains the same email. If multiple users are present, log an error
-            and return the first one.
+            contains the same email.
         """
         filtered_users = cls.query(cls.email == email).fetch()
         return None if not filtered_users else filtered_users[0]

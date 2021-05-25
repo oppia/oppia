@@ -76,6 +76,40 @@ def _get_mailchimp_class():
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
+def _create_user_in_mailchimp_db(user_email):
+    """Creates a new user in the mailchimp database and handles the case where
+    the user was permanently deleted from the database.
+
+    Args:
+        user_email: str. Email ID of the user. Email is used to uniquely
+            identify the user in the mailchimp DB.
+
+    Raises:
+        Exception. Any error (other than the one mentioned below) raised by the
+            mailchimp API.
+
+    Returns:
+        bool. False if the user was permanently deleted earlier and therefore
+        cannot be added back.
+    """
+    post_data = {
+        'email_address': user_email,
+        'status': 'subscribed'
+    }
+    client = _get_mailchimp_class()
+
+    try:
+        client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
+    except mailchimpclient.MailChimpError as error:
+        error_message = ast.literal_eval(python_utils.UNICODE(error))
+        # This is the specific error message returned for the error mentioned in
+        # the docstring.
+        if error_message['title'] == 'Forgotten Email Not Subscribed':
+            return False
+        raise Exception(error_message['detail'])
+    return True
+
+
 def permanently_delete_user_from_list(user_email):
     """Permanently deletes the user with the given email from the Mailchimp
     list.
@@ -88,6 +122,9 @@ def permanently_delete_user_from_list(user_email):
     Args:
         user_email: str. Email ID of the user. Email is used to uniquely
             identify the user in the mailchimp DB.
+
+    Raises:
+        Exception. Any error raised by the mailchimp API.
     """
     client = _get_mailchimp_class()
     subscriber_hash = _get_subscriber_hash(user_email)
@@ -123,6 +160,14 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
             identify the user in the mailchimp DB.
         can_receive_email_updates: bool. Whether they want to be subscribed to
             the bulk email list or not.
+
+    Raises:
+        Exception. Any error (other than the one mentioned below) raised by the
+            mailchimp API.
+
+    Returns:
+        bool. False if the user was permanently deleted earlier and therefore
+        cannot be added back.
     """
     client = _get_mailchimp_class()
     subscriber_hash = _get_subscriber_hash(user_email)
@@ -169,7 +214,10 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
         # Error 404 corresponds to "User does not exist".
         if error_message['status'] == 404:
             if can_receive_email_updates:
-                client.lists.members.create(
-                    feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
+                user_creation_successful = _create_user_in_mailchimp_db(
+                    user_email)
+                if not user_creation_successful:
+                    return False
         else:
             raise Exception(error_message['detail'])
+    return True

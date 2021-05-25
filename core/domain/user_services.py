@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import datetime
 import hashlib
 import imghdr
@@ -1401,7 +1400,7 @@ def record_user_created_an_exploration(user_id):
 def update_email_preferences(
         user_id, can_receive_email_updates, can_receive_editor_role_email,
         can_receive_feedback_email, can_receive_subscription_email,
-        update_bulk_email_db=True):
+        bulk_email_db_already_updated=False):
     """Updates whether the user has chosen to receive email updates.
 
     If no UserEmailPreferencesModel exists for this user, a new one will
@@ -1417,12 +1416,13 @@ def update_email_preferences(
             emails when users submit feedback to their explorations.
         can_receive_subscription_email: bool. Whether the given user can receive
             emails related to his/her creator subscriptions.
-        update_bulk_email_db: bool. Whether to update the bulk email provider's
-            db as well. This is set to false only when called from the webhook
-            controller in which case the bulk email DB is already updated.
+        bulk_email_db_already_updated: bool. Whether the bulk email provider's
+            db is already updated. This is set to true only when calling from
+            the webhook controller since in that case, the external update to
+            bulk email db initiated the update here.
 
     Returns:
-        bool. Whether to send a mail to the user to complete bulk email serviec
+        bool. Whether to send a mail to the user to complete bulk email service
         signup.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
@@ -1437,21 +1437,17 @@ def update_email_preferences(
         can_receive_feedback_email)
     email_preferences_model.subscription_notifications = (
         can_receive_subscription_email)
-    email_preferences_model.site_updates = can_receive_email_updates
     email = get_email_from_user_id(user_id)
-    if update_bulk_email_db:
-        try:
+    if not bulk_email_db_already_updated:
+        user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
-                email, can_receive_email_updates)
-        except Exception as error_message:
-            error_message = ast.literal_eval(
-                python_utils.UNICODE(error_message))
-            if error_message['title'] == 'Forgotten Email Not Subscribed':
-                email_preferences_model.site_updates = False
-                email_preferences_model.update_timestamps()
-                email_preferences_model.put()
-                return True
-            raise Exception(error_message)
+                email, can_receive_email_updates))
+        if not user_creation_successful:
+            email_preferences_model.site_updates = False
+            email_preferences_model.update_timestamps()
+            email_preferences_model.put()
+            return True
+    email_preferences_model.site_updates = can_receive_email_updates
     email_preferences_model.update_timestamps()
     email_preferences_model.put()
     return False

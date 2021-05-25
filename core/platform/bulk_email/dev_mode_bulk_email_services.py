@@ -41,8 +41,12 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
         user_email: str. Email id of the user.
         can_receive_email_updates: bool. Whether they want to be subscribed to
             list or not.
+
+    Returns:
+        bool. True to mock user creation successful.
     """
     logging.info(
         'Updated status of email ID %s\'s bulk email preference in the service '
         'provider\'s db to %s. Cannot access API, since this is a dev '
         'environment.' % (user_email, can_receive_email_updates))
+    return True

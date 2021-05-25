@@ -73,7 +73,7 @@ angular.module('oppia').component('preferencesPage', {
           data: data
         }).then((returnData) => {
           PreventPageUnloadEventService.removeListener();
-          if (returnData.data.show_bulk_email_signup_message) {
+          if (returnData.data.bulk_email_signup_message_should_be_shown) {
             ctrl.canReceiveEmailUpdates = false;
             ctrl.showEmailSignupLink = true;
           } else {

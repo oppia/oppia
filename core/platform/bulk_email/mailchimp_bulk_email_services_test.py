@@ -104,11 +104,20 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                         _list_id: str. List Id of mailchimp list.
                         data: dict. Payload received.
                     """
-                    self.users_data.append({
-                        # Email: test3@example.com.
-                        'email': 'fedd8b80a7a813966263853b9af72151',
-                        'status': data['status']
-                    })
+                    if data['email_address'] == 'test3@example.com':
+                        self.users_data.append({
+                            # Email: test3@example.com.
+                            'email': 'fedd8b80a7a813966263853b9af72151',
+                            'status': data['status']
+                        })
+                    elif data['email_address'] == 'test4@example.com':
+                        raise mailchimpclient.MailChimpError({
+                            'status': 400,
+                            'title': 'Forgotten Email Not Subscribed'})
+                    else:
+                        raise mailchimpclient.MailChimpError({
+                            'status': 404, 'title': 'Invalid email',
+                            'detail': 'Server Issue'})
 
                 def delete_permanent(self, _list_id, subscriber_hash):
                     """Mocks the delete function of the mailchimp api. This
@@ -185,8 +194,10 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
 
             # Creates a mailchimp entry for a new user.
             self.assertEqual(len(mailchimp.lists.members.users_data), 2)
-            mailchimp_bulk_email_services.add_or_update_user_status(
-                self.user_email_3, True)
+            return_status = (
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    self.user_email_3, True))
+            self.assertTrue(return_status)
             self.assertEqual(
                 mailchimp.lists.members.users_data[2]['status'], 'subscribed')
 
@@ -195,6 +206,30 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                 Exception, 'Server Error'):
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     self.user_email_1, True)
+
+    def test_catch_or_raise_errors_when_creating_new_invalid_user(self):
+        mailchimp = self.MockMailchimpClass()
+        swapped_mailchimp = lambda: mailchimp
+        swap_mailchimp_context = self.swap(
+            mailchimp_bulk_email_services, '_get_mailchimp_class',
+            swapped_mailchimp)
+        swap_api = self.swap(feconf, 'MAILCHIMP_API_KEY', 'key')
+        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
+
+        with swap_mailchimp_context, swap_api, swap_username:
+            # Creates a mailchimp entry for a deleted user.
+            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
+            return_status = (
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'test4@example.com', True))
+            self.assertFalse(return_status)
+            self.assertEqual(len(mailchimp.lists.members.users_data), 2)
+
+            # Create user raises exception for other errors.
+            with self.assertRaisesRegexp(
+                Exception, 'Server Issue'):
+                mailchimp_bulk_email_services.add_or_update_user_status(
+                    'test5@example.com', True)
 
     def test_permanently_delete_user(self):
         mailchimp = self.MockMailchimpClass()

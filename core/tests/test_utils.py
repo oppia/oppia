@@ -2265,6 +2265,9 @@ title: Title
 
         return self._parse_json_response(json_response, expect_errors)
 
+    # This function is requried to test the webhook for the bulk email provider,
+    # since post_json creates a 'payload' object  with input data,
+    # but the webhook does not follow that format.
     def post_json_with_custom_body(
             self, url, data, expected_status_int=200):
         """Post an object to the server by JSON; return the received object."""
