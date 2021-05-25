@@ -114,9 +114,10 @@ class TextMessageLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         if model_instance.text:
-            yield ('SUCCESS', 1)
             if len(model_instance.text) > 10000:
                 yield (model_instance.thread_id, model_instance.message_id)
+
+        yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):
