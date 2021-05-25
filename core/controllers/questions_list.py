@@ -76,8 +76,7 @@ class QuestionsListHandler(base.BaseHandler):
 
         _, _, temp_next_offset = (
             question_services.get_displayable_question_skill_link_details(
-                constants.NUM_QUESTIONS_PER_PAGE, skill_ids,
-                offset=next_offset)
+                1, skill_ids, offset=next_offset)
         )
 
         # Set next_offset to None if there are no more questions so that
