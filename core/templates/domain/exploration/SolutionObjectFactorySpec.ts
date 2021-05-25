@@ -85,7 +85,7 @@ describe('Solution object factory', () => {
       expect(solutionFromScratch.toBackendDict()).toEqual(expectedSolution);
     });
 
-    fit('should create summary correctly', () => {
+    it('should create summary correctly', () => {
       expect(solution.getSummary('GraphInput')).toEqual(
         'One solution is "[Graph]". This is the explanation to the answer.');
       expect(solution.getSummary('MusicNotesInput')).toEqual(
