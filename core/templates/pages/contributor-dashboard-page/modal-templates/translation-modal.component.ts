@@ -99,7 +99,6 @@ export class TranslationModalComponent {
   triedToCopyText = false;
   hasImgTextError = false;
   incompleteTranslationError = false;
-  imageDetails: ImageDetails;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -240,14 +239,16 @@ export class TranslationModalComponent {
   }
 
   getImageAttributeTexts(htmlElements: HTMLElement[]): ImageDetails {
-    this.imageDetails.filePaths = this.getElementAttributeTexts(
-      htmlElements, 'filepath-with-value');
-    this.imageDetails.alts = this.getElementAttributeTexts(
-      htmlElements, 'alt-with-value');
-    this.imageDetails.descriptions = this.getElementAttributeTexts(
-      htmlElements, 'caption-with-value');
+    const imageDetails: ImageDetails = {
+      filePaths: this.getElementAttributeTexts(
+        htmlElements, 'filepath-with-value'),
+      alts: this.getElementAttributeTexts(
+        htmlElements, 'alt-with-value'),
+      descriptions: this.getElementAttributeTexts(
+        htmlElements, 'caption-with-value')
+    }
 
-    return this.imageDetails;
+    return imageDetails;
   }
 
   copiedAllElements(
