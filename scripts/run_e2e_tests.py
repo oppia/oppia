@@ -199,10 +199,6 @@ RERUN_POLICIES = {
     'topicsandskillsdashboard': 'always',
     'users': 'known flakes',
     'wipeout': 'known flakes',
-    # The following are not real suites; they're only for testing.
-    'never': 'never',
-    'known_flakes': 'known flakes',
-    'always': 'always',
 }
 
 

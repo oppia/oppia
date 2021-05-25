@@ -1149,9 +1149,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 tuple(), tuple(), tuple()])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
+        policy_swap = self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', {
+                'never': 'never',
+                'known_flakes': 'known flakes',
+                'always': 'always',
+            })
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
-                with on_ci_swap, cleanup_swap, exit_swap:
+                with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
                     run_e2e_tests.main(args=['--suite', 'always'])
 
     def test_do_not_rerun_when_tests_fail_with_known_flakes_policy(self):
@@ -1206,9 +1212,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'cleanup', mock_cleanup)
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
+        policy_swap = self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', {
+                'never': 'never',
+                'known_flakes': 'known flakes',
+                'always': 'always',
+            })
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
-                with on_ci_swap, cleanup_swap, exit_swap:
+                with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
                     run_e2e_tests.main(args=['--suite', 'known_flakes'])
 
     def test_do_not_rerun_when_tests_fail_with_never_policy(self):
@@ -1263,9 +1275,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'cleanup', mock_cleanup)
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
+        policy_swap = self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', {
+                'never': 'never',
+                'known_flakes': 'known flakes',
+                'always': 'always',
+            })
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
-                with on_ci_swap, cleanup_swap, exit_swap:
+                with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
                     run_e2e_tests.main(args=['--suite', 'never'])
 
     def test_rerun_when_tests_flake_with_always_policy(self):
@@ -1323,9 +1341,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 tuple(), tuple(), tuple()])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
+        policy_swap = self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', {
+                'never': 'never',
+                'known_flakes': 'known flakes',
+                'always': 'always',
+            })
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
-                with on_ci_swap, cleanup_swap, exit_swap:
+                with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
                     run_e2e_tests.main(args=['--suite', 'always'])
 
     def test_rerun_when_tests_flake_with_known_flakes_policy(self):
@@ -1383,9 +1407,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 tuple(), tuple(), tuple()])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
+        policy_swap = self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', {
+                'never': 'never',
+                'known_flakes': 'known flakes',
+                'always': 'always',
+            })
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
-                with on_ci_swap, cleanup_swap, exit_swap:
+                with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
                     run_e2e_tests.main(args=['--suite', 'known_flakes'])
 
     def test_do_not_rerun_when_tests_flake_with_never_policy(self):
@@ -1440,9 +1470,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'cleanup', mock_cleanup)
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(1,)])
+        policy_swap = self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', {
+                'never': 'never',
+                'known_flakes': 'known flakes',
+                'always': 'always',
+            })
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
-                with on_ci_swap, cleanup_swap, exit_swap:
+                with on_ci_swap, cleanup_swap, exit_swap, policy_swap:
                     run_e2e_tests.main(args=['--suite', 'never'])
 
     def test_no_reruns_off_ci_fail(self):
