@@ -270,7 +270,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_translation_suggestions_in_review_with_exp_id(
-        cls, exp_id, language_code):
+            cls, exp_id, language_code):
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
