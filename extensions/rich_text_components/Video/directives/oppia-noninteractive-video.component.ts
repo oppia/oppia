@@ -32,7 +32,7 @@ import { ServicesConstants } from 'services/services.constants';
  * the application. If it is inside the component we would end up fetching and
  * loading the YouTube embed script every-time time this component was created.
  * If this were a feature used in multiple places, keeping it in a service would
- *  be a better place. But currently restricted to this component. This
+ * be a better place. But currently restricted to this component. This
  * syntax/ code is taken from the example given in the angular repo.
  * https://github.com/angular/components/tree/master/src/youtube-player#example
  */
