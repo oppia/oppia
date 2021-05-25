@@ -353,6 +353,7 @@ import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { DragAndDropSortObjectFactory } from 'domain/objects/DragAndDropSortObjectFactory';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -421,6 +422,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['DragAndDropSortInputRulesService', DragAndDropSortInputRulesService],
   ['DragAndDropSortInputValidationService',
     DragAndDropSortInputValidationService],
+  ['DragAndDropSortObjectFactory', DragAndDropSortObjectFactory],
   ['EditabilityService', EditabilityService],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',

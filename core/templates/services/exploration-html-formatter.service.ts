@@ -149,9 +149,9 @@ export class ExplorationHtmlFormatterService {
       interactionChoices = interactionCustomizationArgs.choices.value.map(
         choice => choice.html);
     }
-    var interactionChoicesD = null;
+    var interactionChoices = null;
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoicesD = interactionCustomizationArgs.choices.value.map(
+      interactionChoices = interactionCustomizationArgs.choices.value.map(
         choice => choice);
     }
     var el = $(
@@ -162,9 +162,9 @@ export class ExplorationHtmlFormatterService {
       el.attr('choices', this.htmlEscaper.objToEscapedJson(
         interactionChoices));
     }
-    if (interactionChoicesD) {
-      el.attr('interactionChoicesD', this.htmlEscaper.objToEscapedJson(
-        interactionChoicesD));
+    if (interactionChoices) {
+      el.attr('interactionChoices', this.htmlEscaper.objToEscapedJson(
+        interactionChoices));
     }
     return ($('<span>').append(el)).html();
   }

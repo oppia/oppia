@@ -17,9 +17,11 @@
  */
 
 require('services/html-escaper.service.ts');
+require('domain/objects/DragAndDropSortObjectFactory.ts');
 
 angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'DragAndDropSortObjectFactory', 'HtmlEscaperService',
+  function(DragAndDropSortObjectFactory, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -39,24 +41,10 @@ angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
         };
         ctrl.$onInit = function() {
           const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          const interactionchoicesd = HtmlEscaperService.escapedJsonToObj(
-            $attrs.interactionchoicesd);
-          var answerResponse = [];
-          for (let ans of answer) {
-            for (let value of ans) {
-              for (let elem of interactionchoicesd) {
-                if (value === elem._contentId) {
-                  answerResponse.push(elem._html);
-                }
-              }
-            }
-          }
-          var answerArray = [];
-          for (let elem of answerResponse) {
-            let transformedArray = [];
-            transformedArray.push(elem);
-            answerArray.push(transformedArray);
-          }
+          const interactionchoices = HtmlEscaperService.escapedJsonToObj(
+            $attrs.interactionchoices);
+          var answerArray = DragAndDropSortObjectFactory.answerContentIdToHTML(
+            answer, interactionchoices);
           ctrl.answer = answerArray;
           ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
         };

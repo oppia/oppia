@@ -509,6 +509,7 @@ import { SolutionVerificationService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { QuestionValidationService } from './question-validation.service';
+import { DragAndDropSortObjectFactory } from 'domain/objects/DragAndDropSortObjectFactory';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -558,6 +559,8 @@ export class UpgradedServices {
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DragAndDropSortInputRulesService'] =
       new DragAndDropSortInputRulesService();
+    upgradedServices['DragAndDropSortObjectFactory'] =
+      new DragAndDropSortObjectFactory();
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['EndExplorationRulesService'] =
       new EndExplorationRulesService();

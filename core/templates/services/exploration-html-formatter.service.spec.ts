@@ -147,16 +147,16 @@ describe('Exploration Html Formatter Service', () => {
       choices: {
         value: [new SubtitledHtml('sampleChoice', '')]
       },
-      interactionchoicesd: {
+      interactionchoices: {
         value: [new SubtitledHtml('Choice 1', 'ca_choices_0')]
       }
     };
-    var expectedHtmlTag = '<oppia-short-response-sample-id answer="' +
-      '&amp;quot;sampleAnswer&amp;quot;" ' +
-      'choices="[&amp;quot;sampleChoice&amp;quot;]" ' +
-      'interactionchoicesd="[{&amp;quot;_html&amp;quot;:&amp;quot;' +
-      'sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;' +
-      '&amp;quot;}]"></oppia-short-response-sample-id>';
+    var expectedHtmlTag = '<oppia-short-response-sample-id answer="&amp;' +
+    'quot;sampleAnswer&amp;quot;" choices="[{&amp;quot;_html&amp;quot;:&amp;' +
+    'quot;sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;&amp;' +
+    'quot;}]" interactionchoices="[{&amp;quot;_html&amp;quot;:&amp;quot;' +
+    'sampleChoice&amp;quot;,&amp;quot;_contentId&amp;quot;:&amp;quot;&amp;' +
+    'quot;}]"></oppia-short-response-sample-id>';
     expect(ehfs.getShortAnswerHtml(
       answer, interactionId, interactionCustomizationArgs)
     ).toBe(expectedHtmlTag);

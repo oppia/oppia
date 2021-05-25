@@ -17,9 +17,11 @@
  */
 
 require('services/html-escaper.service.ts');
+require('domain/objects/DragAndDropSortObjectFactory.ts');
 
 angular.module('oppia').directive('oppiaResponseDragAndDropSortInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'DragAndDropSortObjectFactory', 'HtmlEscaperService',
+  function(DragAndDropSortObjectFactory, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -40,22 +42,8 @@ angular.module('oppia').directive('oppiaResponseDragAndDropSortInput', [
           const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           const choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choices).map(choice => choice);
-          var answerResponse = [];
-          for (let ans of answer) {
-            for (let value of ans) {
-              for (let elem of choices) {
-                if (value === elem._contentId) {
-                  answerResponse.push(elem._html);
-                }
-              }
-            }
-          }
-          var answerArray = [];
-          for (let elem of answerResponse) {
-            let transformedArray = [];
-            transformedArray.push(elem);
-            answerArray.push(transformedArray);
-          }
+          var answerArray = DragAndDropSortObjectFactory.answerContentIdToHTML(
+            answer, choices);
           ctrl.answer = answerArray;
           ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
         };
