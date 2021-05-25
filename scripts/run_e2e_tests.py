@@ -106,8 +106,11 @@ _PARSER.add_argument(
     action='store_true')
 
 
+# Never rerun failing tests, even when they match a known flake.
 RERUN_POLICY_NEVER = 'never'
+# Only rerun failing tests when they match a known flake.
 RERUN_POLICY_KNOWN_FLAKES = 'known flakes'
+# Always rerun failing tests, even when they don't match a known flake.
 RERUN_POLICY_ALWAYS = 'always'
 
 RERUN_POLICIES = {
