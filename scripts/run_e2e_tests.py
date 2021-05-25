@@ -649,7 +649,7 @@ def main(args=None):
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)
         # Check whether we should rerun based on this suite's policy.
-        policy = RERUN_POLICIES.get(parsed_args.suite, RERUN_POLICY_ALWAYS)
+        policy = RERUN_POLICIES[parsed_args.suite]
         if policy == RERUN_POLICY_NEVER:
             break
         if policy == RERUN_POLICY_KNOWN_FLAKES and not flaky:
