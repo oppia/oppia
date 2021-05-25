@@ -226,7 +226,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         user_supplied_feedback = self.android_report_obj.user_supplied_feedback
 
         self.assertEqual(
-            user_supplied_feedback.report_type,
+            user_supplied_feedback.report_type.name,
             self.android_report_model.report_type)
         self.assertEqual(
             user_supplied_feedback.category, self.android_report_model.category)
@@ -283,7 +283,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_context.audio_language_code,
             self.android_report_model.audio_language_code)
         self.assertEqual(
-            app_context.text_size,
+            app_context.text_size.name,
             self.android_report_model.android_report_info['text_size'])
         self.assertEqual(
             app_context.only_allows_wifi_download_and_update,

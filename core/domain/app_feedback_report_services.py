@@ -81,7 +81,8 @@ def create_android_report_from_json(report_json):
             device_context_json['android_device_model'],
             device_context_json['android_sdk_version'],
             device_context_json['build_fingerprint'],
-            _get_network_type_from_string(device_context_json['network_type'])))
+            _get_android_network_type_from_string(
+                device_context_json['network_type'])))
 
     app_context_json = report_json['app_context']
     entry_point_obj = _get_entry_point_from_json(
@@ -226,14 +227,14 @@ def _get_entry_point_from_json(entry_point_json):
             'The given entry point %s is invalid.' % entry_point_name)
 
 
-def _get_network_type_from_string(network_type_name):
+def _get_android_network_type_from_string(network_type_name):
     """Determines the network type based on the JSON value.
 
     Args:
         network_type_name: str. The name of the network type.
 
     Returns:
-        ANDROID_NETWORK_TYPES. The enum representing the network type.
+        ANDROID_NETWORK_TYPE. The enum representing the network type.
     """
     if network_type_name == constants.ANDROID_NETWORK_TYPES.wifi.name:
         return constants.ANDROID_NETWORK_TYPES.wifi
@@ -244,6 +245,7 @@ def _get_network_type_from_string(network_type_name):
     else:
         raise utils.InvalidInputException(
             'The given Android network type %s is invalid.' % network_type_name)
+
 
 def store_incoming_report_stats(report_obj):
     """Adds a new report's stats to the aggregate stats model.
@@ -282,7 +284,7 @@ def _update_report_stats_model_in_transaction(
             report is added or removed from the model.
     """
     # The stats we want to aggregate on.
-    report_type = report_obj.user_supplied_feedback.report_type
+    report_type = report_obj.user_supplied_feedback.report_type.name
     country_locale_code = (
         report_obj.device_system_context.device_country_locale_code)
     entry_point_name = report_obj.app_context.entry_point.entry_point_name
@@ -501,7 +503,7 @@ def _create_app_daily_stats_from_model_json(daily_param_stats):
 
 def _get_android_report_from_model(android_report_model):
     """Creates a domain object that represents an android feedback report from
-    the model given.
+    the given model.
 
     Args:
         android_report_model: AppFeedbackReportModel. The model to convert to a
@@ -517,7 +519,8 @@ def _get_android_report_from_model(android_report_model):
             'report schemas implemented.')
     report_info_dict = android_report_model.android_report_info
     user_supplied_feedback = app_feedback_report_domain.UserSuppliedFeedback(
-        android_report_model.report_type, android_report_model.category,
+        _get_report_type_from_string(android_report_model.report_type),
+        android_report_model.category,
         report_info_dict['user_feedback_selected_items'],
         report_info_dict['user_feedback_other_text_input'])
     device_system_context = (
@@ -529,8 +532,9 @@ def _get_android_report_from_model(android_report_model):
             android_report_model.android_device_model,
             android_report_model.android_sdk_version,
             report_info_dict['build_fingerprint'],
-            _get_network_type_from_string(report_info_dict['network_type'])))
-    entry_point = _get_entry_point(
+            _get_android_network_type_from_string(
+                report_info_dict['network_type'])))
+    entry_point = _get_entry_point_from_model(
         android_report_model.entry_point,
         android_report_model.entry_point_topic_id,
         android_report_model.entry_point_story_id,
@@ -538,7 +542,8 @@ def _get_android_report_from_model(android_report_model):
         android_report_model.entry_point_subtopic_id)
     app_context = app_feedback_report_domain.AndroidAppContext(
         entry_point, android_report_model.text_language_code,
-        android_report_model.audio_language_code, report_info_dict['text_size'],
+        android_report_model.audio_language_code,
+        _get_android_text_size_from_string(report_info_dict['text_size']),
         report_info_dict['only_allows_wifi_download_and_update'],
         report_info_dict['automatically_update_topics'],
         report_info_dict['account_is_profile_admin'],
@@ -552,7 +557,7 @@ def _get_android_report_from_model(android_report_model):
         user_supplied_feedback, device_system_context, app_context)
 
 
-def _get_entry_point(
+def _get_entry_point_from_model(
         entry_point_name, topic_id, story_id, exploration_id, subtopic_id):
     """Creates a domain object that represents an entry point to the feedback
     reporting feature.
@@ -635,7 +640,7 @@ def scrub_single_app_feedback_report(report, scrubbed_by):
 
 
 def save_feedback_report_to_storage(report, new_incoming_report=False):
-    """Saves the AppFeedbackReport domain object in persistent storage.
+    """Saves the AppFeedbackReport domain object to persistent storage.
 
     Args:
         report: AppFeedbackReport. The domain object of the report to save.
@@ -732,9 +737,8 @@ def reassign_ticket(report, new_ticket):
             'Assigning web reports to tickets has not been implemented yet.')
 
     old_ticket_id = report.ticket_id
-
-    # Update the old ticket model to remove the report from the ticket's list of
-    # reports.
+    # Update the old ticket model to remove the report from the old ticket's
+    # list of reports.
     if old_ticket_id is not None:
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(

@@ -883,8 +883,7 @@ class AndroidAppContext(AppContext):
         if text_size not in constants.ALLOWED_ANDROID_TEXT_SIZES:
             raise utils.ValidationError(
                 'App text size should be one of %s, received: %s' % (
-                    [item.name for item in
-                    constants.ALLOWED_ANDROID_TEXT_SIZES],
+                    constants.ALLOWED_ANDROID_TEXT_SIZES,
                     text_size))
 
 
