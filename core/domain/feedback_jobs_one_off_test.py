@@ -421,7 +421,10 @@ class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertEqual(
-            [u'[u\'Thread Id: ' + thread_id + '\', u"Message Id: [\'0\']"]'],
+            [
+                u'[u\'SUCCESS\', 1]',
+                u'[u\'Thread Id: ' + thread_id + '\', u"Message Id: [\'0\']"]'
+            ],
             output)
 
 
