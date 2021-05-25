@@ -34,6 +34,8 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 })
 export class QuestionsListService {
   private _questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
+  // Here, _nextOffsetForQuestions is null when there are no more
+  // questions to be fetched.
   private _nextOffsetForQuestions: number | null = 0;
   private _currentPage: number = 0;
   private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
