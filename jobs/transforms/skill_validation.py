@@ -24,12 +24,12 @@ from core.platform import models
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
-(sill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
 @validation_decorators.AuditsExisting(
-    sill_models.SkillSnapshotMetadataModel,
-    sill_models.SkillCommitLogEntryModel)
+    skill_models.SkillSnapshotMetadataModel,
+    skill_models.SkillCommitLogEntryModel)
 class ValidateSkillCommitCmdsSchema(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for skill models."""
