@@ -19,6 +19,4 @@
 export const ReleaseCoordinatorPageConstants = {
   TAB_ID_JOBS: 'jobs',
   TAB_ID_MISC: ' misc',
-
-  PROFILE_URL: '/profile/<username>'
 } as const;

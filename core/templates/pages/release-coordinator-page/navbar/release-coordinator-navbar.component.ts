@@ -75,8 +75,8 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
 
     this.username = userInfo.getUsername();
     this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        ReleaseCoordinatorPageConstants.PROFILE_URL, {
+      this.urlInterpolationService.interpolateUrl
+      ('/profile/<username>', {
           username: this.username
         })
     );
