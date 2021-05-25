@@ -232,6 +232,22 @@ class RelationshipsOf(python_utils.OBJECT):
         return set(itertools.chain.from_iterable(
             cls._ID_REFERENCING_PROPERTIES.values()))
 
+    @classmethod
+    def get_model_kind_references(cls, model_kind, property_name):
+        """Returns the kinds of models referenced by the given property.
+
+        Args:
+            model_kind: str. The kind of model the property belongs to.
+            property_name: str. The property's name.
+
+        Returns:
+            list(str). The kinds of models referenced by the given property.
+        """
+        model_cls = job_utils.get_model_class(model_kind)
+        prop = model_property.ModelProperty(
+            model_cls, getattr(model_cls, property_name))
+        return cls._ID_REFERENCING_PROPERTIES.get(prop, set())
+
     def _get_model_kind(self, model_class):
         """Returns the kind of the model class.
 

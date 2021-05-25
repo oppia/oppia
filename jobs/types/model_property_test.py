@@ -32,13 +32,13 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class SubclassOfBaseModel(base_models.BaseModel):
-    """Subclass of BaseModel with a StringProperty named 'x'."""
+    """Subclass of BaseModel with a StringProperty named 'value'."""
 
     value = datastore_services.StringProperty()
 
 
 class SubclassOfNdbModel(datastore_services.Model):
-    """Subclass of NDB Model with a StringProperty named 'x'."""
+    """Subclass of NDB Model with a StringProperty named 'value'."""
 
     value = datastore_services.StringProperty()
 
@@ -52,113 +52,186 @@ class RepeatedValueModel(base_models.BaseModel):
 class ModelPropertyTests(test_utils.TestBase):
 
     def setUp(self):
-        self.model_property = model_property.ModelProperty(
+        self.id_property = model_property.ModelProperty(
+            SubclassOfBaseModel, SubclassOfBaseModel.id)
+        self.ndb_property = model_property.ModelProperty(
             SubclassOfBaseModel, SubclassOfBaseModel.value)
-        self.repeated_model_property = model_property.ModelProperty(
+        self.ndb_repeated_property = model_property.ModelProperty(
             RepeatedValueModel, RepeatedValueModel.values)
+
+    def test_init_with_id_property(self):
+        # Does not raise.
+        model_property.ModelProperty(
+            SubclassOfBaseModel, SubclassOfBaseModel.id)
 
     def test_init_with_ndb_property(self):
         # Does not raise.
         model_property.ModelProperty(
             SubclassOfBaseModel, SubclassOfBaseModel.value)
 
-    def test_init_with_base_model_id(self):
+    def test_init_with_ndb_repeated_property(self):
         # Does not raise.
         model_property.ModelProperty(
-            SubclassOfBaseModel, SubclassOfBaseModel.id)
+            RepeatedValueModel, RepeatedValueModel.values)
 
-    def test_init_raises_type_error_when_model_is_not_a_type(self):
-        foo_model = SubclassOfBaseModel()
+    def test_init_raises_type_error_when_model_is_not_a_class(self):
+        model = SubclassOfBaseModel()
+
         with self.assertRaisesRegexp(TypeError, 'not a model class'):
-            model_property.ModelProperty(foo_model, foo_model.value)
+            model_property.ModelProperty(model, SubclassOfBaseModel.value)
 
-    def test_init_raises_type_error_when_model_not_subclass_of_base_model(self):
+    def test_init_raises_type_error_when_model_is_unrelated_to_base_model(self):
         with self.assertRaisesRegexp(TypeError, 'not a subclass of BaseModel'):
             model_property.ModelProperty(
                 SubclassOfNdbModel, SubclassOfNdbModel.value)
 
-    def test_init_raises_type_error_when_property_is_not_ndb_property(self):
-        with self.assertRaisesRegexp(TypeError, 'not a property'):
-            model_property.ModelProperty(SubclassOfBaseModel, 'value')
+    def test_init_raises_type_error_when_property_is_not_an_ndb_property(self):
+        model = SubclassOfBaseModel(value='123')
+
+        with self.assertRaisesRegexp(TypeError, 'not an NDB Property'):
+            model_property.ModelProperty(SubclassOfBaseModel, model.value)
 
     def test_init_raises_value_error_when_property_is_not_in_model(self):
-        with self.assertRaisesRegexp(ValueError, 'not in properties of model'):
+        with self.assertRaisesRegexp(ValueError, 'not a property of'):
             model_property.ModelProperty(
                 SubclassOfBaseModel, SubclassOfNdbModel.value)
 
-    def test_kind(self):
-        self.assertEqual(self.model_property.model_kind, 'SubclassOfBaseModel')
+    def test_model_kind_of_id_property(self):
+        self.assertEqual(self.id_property.model_kind, 'SubclassOfBaseModel')
 
-    def test_property_name(self):
-        self.assertEqual(self.model_property.property_name, 'value')
+    def test_model_kind_of_ndb_property(self):
+        self.assertEqual(self.ndb_property.model_kind, 'SubclassOfBaseModel')
 
-    def test_str(self):
+    def test_model_kind_of_ndb_repeated_property(self):
         self.assertEqual(
-            python_utils.UNICODE(self.model_property),
+            self.ndb_repeated_property.model_kind, 'RepeatedValueModel')
+
+    def test_property_name_of_id_property(self):
+        self.assertEqual(self.id_property.property_name, 'id')
+
+    def test_property_name_of_ndb_property(self):
+        self.assertEqual(self.ndb_property.property_name, 'value')
+
+    def test_property_name_of_ndb_repeated_property(self):
+        self.assertEqual(self.ndb_repeated_property.property_name, 'values')
+
+    def test_str_of_id_property(self):
+        self.assertEqual(
+            python_utils.UNICODE(self.id_property), 'SubclassOfBaseModel.id')
+
+    def test_str_of_ndb_property(self):
+        self.assertEqual(
+            python_utils.UNICODE(self.ndb_property),
             'SubclassOfBaseModel.value')
 
-    def test_repr(self):
+    def test_str_of_ndb_repeated_property(self):
         self.assertEqual(
-            repr(self.model_property),
+            python_utils.UNICODE(self.ndb_repeated_property),
+            'RepeatedValueModel.values')
+
+    def test_repr_of_id_property(self):
+        self.assertEqual(
+            repr(self.id_property),
+            'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.id)')
+
+    def test_repr_of_ndb_property(self):
+        self.assertEqual(
+            repr(self.ndb_property),
             'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.value)')
 
-    def test_equality(self):
-        self.assertNotEqual(self.model_property, self.repeated_model_property)
+    def test_repr_of_ndb_repeated_property(self):
         self.assertEqual(
-            self.model_property,
+            repr(self.ndb_repeated_property),
+            'ModelProperty(RepeatedValueModel, RepeatedValueModel.values)')
+
+    def test_equality(self):
+        self.assertNotEqual(self.id_property, self.ndb_property)
+        self.assertNotEqual(self.ndb_property, self.ndb_repeated_property)
+        self.assertNotEqual(self.ndb_repeated_property, self.id_property)
+
+        self.assertEqual(
+            self.id_property,
+            model_property.ModelProperty(
+                SubclassOfBaseModel, SubclassOfBaseModel.id))
+        self.assertEqual(
+            self.ndb_property,
             model_property.ModelProperty(
                 SubclassOfBaseModel, SubclassOfBaseModel.value))
+        self.assertEqual(
+            self.ndb_repeated_property,
+            model_property.ModelProperty(
+                RepeatedValueModel, RepeatedValueModel.values))
 
-    def test_hash(self):
-        model_property_set = {
+    def test_hash_of_id_property(self):
+        id_property_set = {
+            model_property.ModelProperty(
+                SubclassOfBaseModel, SubclassOfBaseModel.id),
+        }
+
+        self.assertIn(self.id_property, id_property_set)
+        self.assertNotIn(self.ndb_property, id_property_set)
+        self.assertNotIn(self.ndb_repeated_property, id_property_set)
+
+    def test_hash_of_ndb_property(self):
+        ndb_property_set = {
             model_property.ModelProperty(
                 SubclassOfBaseModel, SubclassOfBaseModel.value),
         }
 
-        self.assertIn(self.model_property, model_property_set)
-        self.assertNotIn(self.repeated_model_property, model_property_set)
+        self.assertIn(self.ndb_property, ndb_property_set)
+        self.assertNotIn(self.id_property, ndb_property_set)
+        self.assertNotIn(self.ndb_repeated_property, ndb_property_set)
 
-    def test_yield_value_from_model_with_property(self):
+    def test_hash_of_ndb_repeated_property(self):
+        ndb_repeated_property_set = {
+            model_property.ModelProperty(
+                RepeatedValueModel, RepeatedValueModel.values),
+        }
+
+        self.assertIn(self.ndb_repeated_property, ndb_repeated_property_set)
+        self.assertNotIn(self.id_property, ndb_repeated_property_set)
+        self.assertNotIn(self.ndb_property, ndb_repeated_property_set)
+
+    def test_yield_value_from_id_property(self):
+        model = SubclassOfBaseModel(id='123')
+
+        self.assertEqual(
+            list(self.id_property.yield_value_from_model(model)), ['123'])
+
+    def test_yield_value_from_ndb_property(self):
         model = SubclassOfBaseModel(value='abc')
 
         self.assertEqual(
-            list(self.model_property.yield_value_from_model(model)), ['abc'])
+            list(self.ndb_property.yield_value_from_model(model)), ['abc'])
 
-    def test_yield_value_from_model_with_repeated_property(self):
+    def test_yield_value_from_ndb_repeated_property(self):
         model = RepeatedValueModel(values=['123', '456', '789'])
 
         self.assertEqual(
-            list(self.repeated_model_property.yield_value_from_model(model)),
+            list(self.ndb_repeated_property.yield_value_from_model(model)),
             ['123', '456', '789'])
 
-    def test_yield_value_from_model_raises_type_error_if_not_a_model(self):
-        class FakeModel(python_utils.OBJECT):
-            """Class that pretends to be a model."""
-
-            def __init__(self, value):
-                self.value = value
-
-        model = FakeModel('abc')
+    def test_yield_value_from_model_raises_type_error_if_not_right_kind(self):
+        model = RepeatedValueModel(values=['123', '456', '789'])
 
         self.assertRaisesRegexp(
             TypeError, 'not an instance of SubclassOfBaseModel',
-            lambda: list(self.model_property.yield_value_from_model(model)))
+            lambda: list(self.ndb_property.yield_value_from_model(model)))
 
-    def test_pickling(self):
-        pickled_model_property, pickled_repeated_model_property = (
-            pickle.dumps(self.model_property),
-            pickle.dumps(self.repeated_model_property))
-        unpickled_model_property, unpickled_repeated_model_property = (
-            pickle.loads(pickled_model_property),
-            pickle.loads(pickled_repeated_model_property))
+    def test_pickle_id_property(self):
+        pickle_value = pickle.loads(pickle.dumps(self.id_property))
 
-        self.assertEqual(self.model_property, unpickled_model_property)
-        self.assertIn(unpickled_model_property, {self.model_property})
+        self.assertEqual(self.id_property, pickle_value)
+        self.assertIn(pickle_value, {self.id_property})
 
-        self.assertEqual(
-            self.repeated_model_property, unpickled_repeated_model_property)
-        self.assertIn(
-            unpickled_repeated_model_property, {self.repeated_model_property})
+    def test_pickle_ndb_property(self):
+        pickle_value = pickle.loads(pickle.dumps(self.ndb_property))
 
-        self.assertNotEqual(
-            unpickled_model_property, unpickled_repeated_model_property)
+        self.assertEqual(self.ndb_property, pickle_value)
+        self.assertIn(pickle_value, {self.ndb_property})
+
+    def test_pickle_ndb_repeated_property(self):
+        pickle_value = pickle.loads(pickle.dumps(self.ndb_repeated_property))
+
+        self.assertEqual(self.ndb_repeated_property, pickle_value)
+        self.assertIn(pickle_value, {self.ndb_repeated_property})

@@ -102,6 +102,17 @@ class CloneTests(test_utils.TestBase):
         self.assertEqual(clone.prop, 'updated')
 
 
+class GetModelClassTests(test_utils.TestBase):
+
+    def test_get_from_existing_model(self):
+        self.assertIs(
+            job_utils.get_model_class('BaseModel'), base_models.BaseModel)
+
+    def test_get_from_non_existing_model(self):
+        with self.assertRaisesRegexp(Exception, 'No model class found'):
+            job_utils.get_model_class('InvalidModel')
+
+
 class GetModelKindTests(test_utils.TestBase):
 
     def test_get_from_datastore_model(self):
