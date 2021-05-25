@@ -142,7 +142,7 @@ export class TranslationModalComponent {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: true,
+        hide_complex_extensions: false,
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection: (
           this.translationLanguageService.getActiveLanguageDirection())
