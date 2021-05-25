@@ -80,7 +80,8 @@ class QuestionsListHandler(base.BaseHandler):
                 offset=next_offset)
         )
 
-        # To set next_offset to None if there are no more questions.
+        # Set next_offset to None if there are no more questions so that
+        # in the frontend we know when we reached the end of the list.
         if next_offset == temp_next_offset:
             next_offset = None
 
