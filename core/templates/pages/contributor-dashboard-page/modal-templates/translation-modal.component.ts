@@ -246,7 +246,7 @@ export class TranslationModalComponent {
         htmlElements, 'alt-with-value'),
       descriptions: this.getElementAttributeTexts(
         htmlElements, 'caption-with-value')
-    }
+    };
 
     return imageDetails;
   }
