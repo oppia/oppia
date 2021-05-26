@@ -446,7 +446,7 @@ def replace_skill_id_for_all_questions(
 
 
 def get_displayable_question_skill_link_details(
-        question_count, skill_ids, offset=0):
+        question_count, skill_ids, offset):
     """Returns the list of question summaries and corresponding skill
     descriptions linked to all the skills given by skill_ids.
 

@@ -31,7 +31,7 @@ import feconf
 
 
 def get_questions_and_skill_descriptions_by_skill_ids(
-        question_count, skill_ids, offset=0):
+        question_count, skill_ids, offset):
     """Returns the questions linked to the given skill ids.
 
     Args:
