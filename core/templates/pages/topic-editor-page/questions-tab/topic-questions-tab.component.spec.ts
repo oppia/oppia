@@ -175,9 +175,9 @@ describe('Topic questions tab', function() {
   });
 
   it('should call initTab when topic is initialized', function() {
-    expect($scope.question).toBeNull();
-    expect($scope.skillId).toBeNull();
-    expect($scope.topic).toBe(topic);
+    $scope.question = 'question1';
+    $scope.skillId = '1';
+    $scope.topic = null;
 
     topicInitializedEventEmitter.emit();
 
@@ -187,14 +187,17 @@ describe('Topic questions tab', function() {
   });
 
   it('should call initTab when topic is reinitialized', function() {
-    expect($scope.question).toBeNull();
-    expect($scope.skillId).toBeNull();
-    expect($scope.topic).toBe(topic);
+    $scope.question = 'question1';
+    $scope.skillId = '1';
+    $scope.topic = null;
 
     topicInitializedEventEmitter.emit();
     expect($scope.question).toBeNull();
     expect($scope.skillId).toBeNull();
     expect($scope.topic).toBe(topic);
+    $scope.question = 'question1';
+    $scope.skillId = '1';
+    $scope.topic = null;
     topicReinitializedEventEmitter.emit();
 
     expect($scope.question).toBeNull();
@@ -202,7 +205,7 @@ describe('Topic questions tab', function() {
     expect($scope.topic).toBe(topic);
   });
 
-  it('should unsubscribe ondestroy', function() {
+  it('should unsubscribe when onDestroy runs', function() {
     spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
 
     ctrl.$onDestroy();
