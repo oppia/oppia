@@ -64,8 +64,35 @@ def clone_model(model, **new_values):
     return cls(id=model_id, **props)
 
 
+def get_model_class(kind):
+    """Returns the model class corresponding to the given kind.
+
+    NOTE: A model's kind is usually, but not always, the same as a model's class
+    name. Specifically, the kind is different when a model overwrites the
+    _get_kind() class method. Although Oppia never does this, the Apache Beam
+    framework uses "kind" to refer to models extensively, so we follow the same
+    convention and take special care to always return the correct value.
+
+    Args:
+        kind: str. The model's kind.
+
+    Returns:
+        type(datastore_services.Model). The corresponding class.
+
+    Raises:
+        KindError. Internally raised by _lookup_model when the kind is invalid.
+    """
+    return datastore_services.Model._lookup_model(kind) # pylint: disable=protected-access
+
+
 def get_model_key(model):
     """Returns the given model's key.
+
+    TODO(#11475): Delete this function after we can use the real datastoreio
+    module. Until then, we need to maintain this code so we can test queries.
+    We need this because NDB queries that target every model can only be
+    performed when we sort models by key, and we use this function to acquire
+    the key for an NDB model.
 
     Args:
         model: datastore_services.Model. The model to inspect.
@@ -184,6 +211,12 @@ def get_model_from_beam_entity(beam_entity):
 def get_beam_query_from_ndb_query(query):
     """Returns an equivalent Apache Beam query from the given NDB query.
 
+    This function helps developers avoid learning two types of query syntaxes.
+    Specifically, the datastoreio module offered by the Apache Beam SDK only
+    accepts Beam datastore queries, and are implemented very differently from
+    NDB queries. This function adapts the two patterns to make job code easier
+    to write.
+
     Args:
         query: datastore_services.Query. The NDB query to convert.
 
@@ -212,6 +245,10 @@ def get_beam_query_from_ndb_query(query):
 
 def apply_query_to_models(query, model_list):
     """Applies the query to the list of models by removing elements in-place.
+
+    TODO(#11475): Delete this function after we can use the real datastoreio
+    module, which implements authentic queries. Until then, we need to maintain
+    this code so we can mock the implementation of the datastoreio module.
 
     Args:
         query: beam_datastore_types.Query. The query object representing the
