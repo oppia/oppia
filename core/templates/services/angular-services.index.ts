@@ -352,6 +352,7 @@ import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-pag
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { SiteLanguageBackendApiService } from './site-language-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -620,6 +621,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SetInputValidationService', SetInputValidationService],
   ['SidebarStatusService', SidebarStatusService],
   ['SiteAnalyticsService', SiteAnalyticsService],
+  ['SiteLanguageBackendApiService', SiteLanguageBackendApiService],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
