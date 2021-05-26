@@ -549,7 +549,8 @@ describe('Core exploration functionality', function() {
     await explorationEditorSettingsTab.setCategory('New');
     await explorationEditorPage.navigateToMainTab();
     await browser.refresh();
-    await waitFor.pageToFullyLoad();
+    await waitFor.invisibilityOfLoadingMessage(
+      'Loading Message takes long to disappear');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.expectCategoryToBe('New');
   });
