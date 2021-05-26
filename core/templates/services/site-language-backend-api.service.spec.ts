@@ -20,7 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { fakeAsync, flushMicrotasks, TestBed, waitForAsync } from '@angular/core/testing';
 import { SiteLanguageBackendApiService } from './site-language-backend-api.service';
 
-describe('Speech Synthesis Chunker Service', () => {
+describe('Site Language Backend Api Service', () => {
   let siteLanguageBackendApiService: SiteLanguageBackendApiService;
   let httpTestingController: HttpTestingController;
   let siteLanguageUrl = '/save_site_language';
