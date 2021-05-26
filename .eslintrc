@@ -397,6 +397,9 @@
     "wrap-iife": [
       "error",
       "any"
-    ]
+    ],
+    // note you must disable the base rule as it can report incorrect errors
+    "dot-notation": "off",
+    "@typescript-eslint/dot-notation": ["error"]
   }
 }
