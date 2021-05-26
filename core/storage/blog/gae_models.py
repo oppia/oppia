@@ -36,7 +36,7 @@ class BlogPostModel(base_models.BaseModel):
     The id of instances of this class has the form
         [author_id].[generated_string]
     """
-    # All string properties are indexed. P
+
     # The ID of the user the blog is authored by.
     author_id = datastore_services.StringProperty(required=True)
     # Title of the blog.
