@@ -528,7 +528,9 @@ var ExplorationEditorMainTab = function() {
     var hintTextButton = element(
       by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
     await action.click('Hint Text Button', hintTextButton);
-    var browserActiveElement = browser.switchTo().activeElement();
+    var browserActiveElement = element(
+      by.css('.protractor-test-ck-editor')).all(by.className(
+      'oppia-rte-resizer')).first();
     await action.sendKeys('Browser Active Element', browserActiveElement, hint);
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
@@ -551,7 +553,9 @@ var ExplorationEditorMainTab = function() {
       by.css('.protractor-test-explanation-textarea')).all(
       by.tagName('p')).first();
     await action.click('Explanation Text Area', explanationTextArea);
-    var browserActiveElement = browser.switchTo().activeElement();
+    var browserActiveElement = element(
+      by.css('.protractor-test-ck-editor')).all(by.className(
+      'oppia-rte-resizer')).first();
     await action.sendKeys(
       'Browser Active Element', browserActiveElement, solution.explanation);
     var submitSolutionButton = element(
