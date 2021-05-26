@@ -40,8 +40,8 @@ export class TranslateCustomParser extends TranslateParser {
   interpolate(
       expr: string | Function,
       params?: { [key: string]: number | string | boolean }): string {
-    let interpolatedValue = this.translateDefaultParser
-      .interpolate(expr, params);
+    let interpolatedValue = this.translateDefaultParser.interpolate(
+      expr, params);
 
     if (!(params &&
          interpolatedValue !== undefined)) {
