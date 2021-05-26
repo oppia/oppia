@@ -99,9 +99,10 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  await browser.wait(
-    await until.visibilityOf(element),
-    DEFAULT_WAIT_TIME_MSECS, errorMessage);
+  await browser.wait(function () {
+    return element.getCssValue('opacity') === 1;
+  },
+  DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
