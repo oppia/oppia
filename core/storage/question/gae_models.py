@@ -344,7 +344,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_by_skill_ids(
-            cls, question_count, skill_ids, offset=0):
+            cls, question_count, skill_ids, offset):
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
 
