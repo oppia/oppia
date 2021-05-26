@@ -12,12 +12,14 @@
       <oppia-thumbnail-display ng-show="!thumbnailIsLoading"
                                [img-src]="editableThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                               [background]="getBgColor()">
+                               [background]="getBgColor()"
+                               [aspectRatio]="4:3">
       </oppia-thumbnail-display>
       <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
                                [img-src]="newThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                               [background]="localStorageBgcolor">
+                               [background]="localStorageBgcolor"
+                               [aspectRatio]="4:3">
       </oppia-thumbnail-display>
     </div>
   </div>
@@ -25,13 +27,13 @@
 
 <style>
   thumbnail-uploader .thumbnail-editor {
-    height: 100px;
+    height: 200px;
   }
 
   thumbnail-uploader .oppia-editable-section {
     border-radius: 0.25rem;
     display: table-cell;
-    height: 100px;
+    height: 190px;
     text-align: center;
     vertical-align: middle;
     width: 180px;
