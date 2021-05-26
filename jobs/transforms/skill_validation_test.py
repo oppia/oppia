@@ -146,12 +146,7 @@ class ValidateSkillCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='private',
             commit_cmds=[{
                 'cmd': 'add_skill_misconception',
-                'new_misconception_dict': {
-                    'id': 0,
-                    'name': 'name',
-                    'notes': '<p>notes</p>',
-                    'feedback': '<p>default_feedback</p>'
-                },
+                'new_misconception_dict': {},
                 'invalid': 'invalid'
             }])
 
@@ -162,15 +157,14 @@ class ValidateSkillCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 skill_validation.ValidateSkillCommitCmdsSchema())
         )
 
-        # Why can't I use dict here.
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd\': u\'add_skill_misconception\', '
-                'u\'new_misconception_dict\': {u\'id\': 0, u\'notes\': '
-                'u\'<p>notes</p>\', u\'feedback\': '
-                'u\'<p>default_feedback</p>\', u\'name\': u\'name\'}, '
-                'u\'invalid\': u\'invalid\'}',
+                {
+                    'cmd': 'add_skill_misconception',
+                    'new_misconception_dict': {},
+                    'invalid': 'invalid'
+                },
                 'The following extra attributes are present: invalid')
         ])
 

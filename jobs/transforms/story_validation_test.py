@@ -136,7 +136,6 @@ class ValidateStoryCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 'new_value, old_value')
         ])
 
-    # Why can't I use dict here.
     def test_story_change_object_with_extra_attribute_in_cmd(self):
         invalid_commit_cmd_model = story_models.StoryCommitLogEntryModel(
             id='123',
@@ -148,8 +147,8 @@ class ValidateStoryCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='private',
             commit_cmds=[{
                 'cmd': 'add_story_node',
-                'node_id': 'node_id',
-                'invalid': 'invalid'
+                'invalid': 'invalid',
+                'node_id': 'node_id'
             }])
 
         output = (
@@ -162,8 +161,11 @@ class ValidateStoryCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd\': u\'add_story_node\', u\'node_id\': u\'node_id\', '
-                'u\'invalid\': u\'invalid\'}',
+                {
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_id',
+                    'invalid': 'invalid'
+                },
                 'The following required attributes are missing: title, '
                 'The following extra attributes are present: invalid')
         ])
@@ -205,7 +207,6 @@ class ValidateStoryCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 'invalid is not allowed')
         ])
 
-    # Why can't I use dict here.
     def test_story_change_object_with_invalid_story_node_property(self):
         invalid_commit_cmd_model = story_models.StoryCommitLogEntryModel(
             id='123',
@@ -216,11 +217,11 @@ class ValidateStoryCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             story_id='123',
             post_commit_status='private',
             commit_cmds=[{
-                'cmd': 'update_story_node_property',
-                'node_id': 'node_id',
-                'property_name': 'invalid',
-                'old_value': 'old_value',
                 'new_value': 'new_value',
+                'cmd': 'update_story_node_property',
+                'old_value': 'old_value',
+                'property_name': 'invalid',
+                'node_id': 'node_id',
             }])
 
         output = (
@@ -233,9 +234,13 @@ class ValidateStoryCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [
             base_validation_errors.CommitCmdsValidateError(
                 invalid_commit_cmd_model,
-                '{u\'cmd\': u\'update_story_node_property\', u\'new_value\': '
-                'u\'new_value\', u\'node_id\': u\'node_id\', u\'old_value\': '
-                'u\'old_value\', u\'property_name\': u\'invalid\'}',
+                {
+                    'cmd': 'update_story_node_property',
+                    'node_id': 'node_id',
+                    'property_name': 'invalid',
+                    'old_value': 'old_value',
+                    'new_value': 'new_value',
+                },
                 'Value for property_name in cmd update_story_node_property: '
                 'invalid is not allowed')
         ])
