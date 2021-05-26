@@ -76,7 +76,9 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
       $scope.getChangeListLength = function() {
         var countChanges = ChangeListService.getChangeList().length;
 
-        if (countChanges >= 50 && !isModalDisplayed &&
+        const minChangesDisplayPrompt = 50;
+
+        if (countChanges >= minChangesDisplayPrompt && !isModalDisplayed &&
           !$scope.saveIsInProcess) {
           isModalDisplayed = true;
           $uibModal.open({
