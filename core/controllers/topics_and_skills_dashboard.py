@@ -359,7 +359,7 @@ class NewSkillHandler(base.BaseHandler):
         for filename in image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging_services.error(
+                logging_services.exception(
                     'Image not provided for file with name %s when the skill '
                     'with id %s was created.' % (filename, skill.id))
                 raise self.InvalidInputException(

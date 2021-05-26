@@ -221,8 +221,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             """Mocks logging_services.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(
-            logging_services, 'error', _mock_logging_function)
+        logging_swap = self.swap(logging_services, 'exception', _mock_logging_function)
         default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1)
         # Load the search results with an empty query.
         with default_query_limit_swap, logging_swap:

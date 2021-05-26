@@ -121,7 +121,7 @@ class SuggestionHandler(base.BaseHandler):
         for filename in new_image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging_services.error(
+                logging_services.exception(
                     'Image not provided for file with name %s when the '
                     ' suggestion with target id %s was created.' % (
                         filename, suggestion.target_id))

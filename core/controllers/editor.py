@@ -547,8 +547,8 @@ class StateInteractionStatsHandler(EditorHandler):
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
-            logging_services.error('Could not find state: %s' % state_name)
-            logging_services.error('Available states: %s' % (
+            logging_services.exception('Could not find state: %s' % state_name)
+            logging_services.exception('Available states: %s' % (
                 list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 

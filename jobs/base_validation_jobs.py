@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
+from core.platform import models
 from jobs import base_jobs
 from jobs import job_utils
 from jobs.transforms import base_validation
@@ -30,9 +31,10 @@ import python_utils
 
 import apache_beam as beam
 
+datastore_services = models.Registry.import_datastore_services()
+
 AUDIT_DO_FN_TYPES_BY_KIND = (
-    base_validation_registry.
-    get_audit_do_fn_types_by_kind())
+    base_validation_registry.get_audit_do_fn_types_by_kind())
 KIND_BY_INDEX = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 
 # Type is: dict(str, tuple(tuple(ModelProperty, tuple(str)))). Tuples of type
@@ -76,16 +78,20 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             audit.
 
         Raises:
-            ValueError. When the `model_getter` option, which should be the type
-                of PTransform we will use to fetch models from the datastore, is
-                None.
+            ValueError. When the `datastoreio` option, which provides the
+                PTransforms for performing datastore IO operations, is None.
         """
-        if self.job_options.model_getter is None:
-            raise ValueError('JobOptions.model_getter must not be None')
+        datastoreio = self.job_options.datastoreio
+        if datastoreio is None:
+            raise ValueError('JobOptions.datastoreio must not be None')
+
+        query_everything = job_utils.get_beam_query_from_ndb_query(
+            datastore_services.query_everything())
 
         existing_models, deleted_models = (
             self.pipeline
-            | 'Get all models' >> self.job_options.model_getter()
+            | 'Get all models' >> (
+                datastoreio.ReadFromDatastore(query_everything))
             | 'Partition by model.deleted' >> (
                 beam.Partition(lambda model, _: int(model.deleted), 2))
         )

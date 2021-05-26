@@ -1939,8 +1939,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 0)
 
-        with self.swap(
-            logging_services, 'error', _mock_logging_function):
+        with self.swap(logging_services, 'exception', _mock_logging_function):
             self.post_json(
                 '/explorehandler/state_hit_event/%s' % exp_id,
                 {

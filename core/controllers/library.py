@@ -83,7 +83,7 @@ def get_matching_activity_dicts(
             exp_ids))
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
-        logging_services.error(
+        logging_services.exception(
             '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)

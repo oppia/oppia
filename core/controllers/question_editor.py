@@ -122,7 +122,7 @@ class QuestionCreationHandler(base.BaseHandler):
         for filename in filenames:
             image = self.request.get(filename)
             if not image:
-                logging_services.error(
+                logging_services.exception(
                     'Image not provided for file with name %s when the question'
                     ' with id %s was created.' % (filename, question.id))
                 raise self.InvalidInputException(
