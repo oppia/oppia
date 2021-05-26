@@ -2180,7 +2180,9 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-interaction-button,
 .oppia-add-response-button,
 .oppia-add-fallback-button,
-.oppia-add-hint-button {
+.oppia-add-hint-button,
+.oppia-add-skill-button,
+.oppia-change-skill-button {
   background-color: #008098;
   border: 0;
   border-radius: 2px;
@@ -2200,7 +2202,13 @@ pre.oppia-pre-wrapped-text {
 .oppia-add-fallback-button:hover,
 .oppia-add-hint-button:active,
 .oppia-add-hint-button:focus,
-.oppia-add-hint-button:hover {
+.oppia-add-hint-button:hover,
+.oppia-add-skill-button:hover,
+.oppia-add-skill-button:active,
+.oppia-add-skill-button:focus,
+.oppia-change-skill-button:hover,
+.oppia-change-skill-button:active,
+.oppia-change-skill-button:focus {
   background-color: rgba(5,140,166,1);
   color: white;
   opacity: 1;
@@ -2548,7 +2556,7 @@ oppia-parameter {
 @media(min-width: 768px) {
   .modal-dialog {
     margin: 30px auto;
-    width: 600px;
+    width: 1000px;
   }
   .modal-content {
     -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
@@ -4399,4 +4407,29 @@ div.oppia-issues-learner-action {
 
 .practice-tab-mat-checkbox .mat-checkbox-label {
   font-weight: normal;
+}
+
+/*
+  The following style is required so as to prevent multi-word texts from being
+  split into multiple lines in the link text in the editor and shouldn't be
+  removed.
+*/
+.cke_widget_inline.cke_widget_oppialink {
+  display: inline;
+}
+/*
+  When a modal is opened on top of another modal, after closing the second one,
+  the first becomes unscrollable. This is required to fix that issue.
+*/
+.modal {
+  overflow: auto !important;
+}
+
+/*
+  TODO(#12768): Remove the .forced-modal-stack style once the
+  rte-component-modal is migrated to Angular. Currently, this style is used for
+  correctly stacking AngularJS modal on top of Angular modal.
+*/
+.forced-modal-stack {
+  z-index: 1035 !important;
 }

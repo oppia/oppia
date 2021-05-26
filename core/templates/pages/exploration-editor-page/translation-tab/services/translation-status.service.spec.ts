@@ -76,13 +76,13 @@ describe('Translation status service', function() {
     beforeEach(function() {
       mockExplorationData = {
         explorationId: 0,
-        autosaveChangeList: function() {},
-        discardDraft: function() {}
+        autosaveChangeListAsync: function() {},
+        discardDraftAsync: function() {}
       };
       angular.mock.module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
-      spyOn(mockExplorationData, 'autosaveChangeList');
+      spyOn(mockExplorationData, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -197,6 +197,7 @@ describe('Translation status service', function() {
             },
             confirmed_unclassified_answers: []
           },
+          linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
@@ -262,6 +263,7 @@ describe('Translation status service', function() {
             },
             confirmed_unclassified_answers: []
           },
+          linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
@@ -301,6 +303,7 @@ describe('Translation status service', function() {
             default_outcome: null,
             confirmed_unclassified_answers: []
           },
+          linked_skill_id: null,
           solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
@@ -408,7 +411,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationNotAvailableCount = (
         tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(explorationTranslationNotAvailableCount).toBe(6);
 
       ess.addState('Fourth');
       ess.saveInteractionId('Third', 'MultipleChoiceInput');

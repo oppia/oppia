@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
+import re
 import time
 
 from core.platform.search import gae_search_services
@@ -160,9 +161,10 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         doc = {'abc': set('xyz')}
         with self.assertRaisesRegexp(
             ValueError,
-            r'Value for document field abc should be a \(unicode\) string, '
-            r'numeric type, datetime.date, datetime.datetime or list of such '
-            r'types, got <type \'set\'>'):
+            re.escape(
+                'Value for document field abc should be a (unicode) string, '
+                'numeric type, datetime.date, datetime.datetime or list of '
+                'such types, got <type \'set\'>')):
             gae_search_services.add_documents_to_index([doc], 'my_index')
 
 

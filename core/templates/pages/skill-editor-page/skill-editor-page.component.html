@@ -12,12 +12,13 @@
             <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
           </a>
           <div ng-show="$ctrl.getWarningsCount()"
-               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
+               class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+               ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
             <span class="oppia-editor-warnings-count">
               <[$ctrl.getWarningsCount()]>
             </span>
           </div>
-          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+          <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box skill-editor-warning-box" ng-if="$ctrl.warningsAreShown">
             <span class="oppia-editor-warnings-header">Warnings</span>
             <li class="oppia-editor-warnings-text"
                 ng-repeat="issue in $ctrl.skill.getValidationIssues() track by $index">
@@ -104,7 +105,7 @@
   }
 
   .skill-editor-main .navbar-tab span {
-    color: #FFF;
+    color: #333;
     font-size: 12px;
   }
   .skill-editor-main .navbar-tab-active {
@@ -113,12 +114,17 @@
   }
   .skill-editor-main .nav-list-item {
     align-items: center;
+    cursor: pointer;
     display: flex;
     justify-content: center;
     width: 90px;
   }
   .skill-editor-main .navbar-icons .nav-list-item:hover {
     background-color: #4eb0c0;
+  }
+  .skill-editor-warning-box {
+    display: block;
+    width: 250px;
   }
   .skill-editor-main .navbar-tab-active-icon {
     color: #00609C;

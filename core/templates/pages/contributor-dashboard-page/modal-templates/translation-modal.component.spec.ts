@@ -145,13 +145,15 @@ describe('Translation Modal Component', () => {
     });
 
     it('should set context correctly', fakeAsync(() => {
+      contextService.removeCustomEntityContext();
+      contextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
         (expId, languageCode, successCallback) => successCallback());
       component.ngOnInit();
       expect(contextService.getEntityType()).toBe(
         AppConstants.ENTITY_TYPE.EXPLORATION);
       expect(contextService.getEntityId()).toBe('1');
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     }));
 
@@ -187,7 +189,11 @@ describe('Translation Modal Component', () => {
       expect(translateTextService.getPreviousTextToTranslate)
         .toHaveBeenCalled();
       expect(component.textToTranslate).toBe('text1');
-      expect(component.moreAvailable).toBeFalse();
+      // The value of moreAvailable will be set to true when the operation
+      // is viewing a previous translation. If the value is false, the
+      // 'save and close' button is shown. This should happen only on the
+      // last translation.
+      expect(component.moreAvailable).toBeTrue();
     }));
 
     it('should set the schema constant based on the active language', fakeAsync(
@@ -320,6 +326,23 @@ describe('Translation Modal Component', () => {
       flushMicrotasks();
     }));
 
+    it('should correctly submit a translation suggestion', fakeAsync(() => {
+      spyOn(
+        translateTextService,
+        'getPreviousTextToTranslate'
+      ).and.returnValue({
+        text: 'abc',
+        more: true,
+        status: 'submitted',
+        translationHtml: 'cba'
+      });
+      expect(component.isSubmitted()).toBeFalse();
+
+      component.returnToPreviousTranslation();
+
+      expect(component.isSubmitted()).toBeTrue();
+    }));
+
     describe('when already uploading a translation', () => {
       it('should not submit the translation', fakeAsync(() => {
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
@@ -432,10 +455,10 @@ describe('Translation Modal Component', () => {
 
     it('should not reset the image save destination', () => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
       component.suggestTranslatedText();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
     });
 
@@ -453,7 +476,7 @@ describe('Translation Modal Component', () => {
       });
       flushMicrotasks();
       component.suggestTranslatedText();
-      expect(contextService.imageSaveDestination).toBe(
+      expect(contextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
     }));
   });

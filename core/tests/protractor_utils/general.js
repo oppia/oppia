@@ -135,14 +135,14 @@ var moveToEditor = async function(welcomeModalIsShown) {
   await openEditor(explorationId, welcomeModalIsShown);
 };
 
-var expect404Error = async function() {
+var expectErrorPage = async function(errorNum) {
   var errorContainer = element(
     by.css('.protractor-test-error-container'));
   await waitFor.visibilityOf(
     errorContainer,
     'Protractor test error container taking too long to appear');
   expect(await errorContainer.getText()).
-    toMatch('Error 404');
+    toMatch(`Error ${errorNum}`);
 };
 
 // Checks no untranslated values are shown in the page.
@@ -264,7 +264,7 @@ exports.openEditor = openEditor;
 exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
-exports.expect404Error = expect404Error;
+exports.expectErrorPage = expectErrorPage;
 exports.closeCurrentTabAndSwitchTo = closeCurrentTabAndSwitchTo;
 exports.dragAndDrop = dragAndDrop;
 

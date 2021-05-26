@@ -77,6 +77,16 @@ describe('ImageLocalStorageService', () => {
       imageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
 
+  it('should get raw image data correctly', () => {
+    imageLocalStorageService.saveImage(imageFilename, sampleImageData);
+    expect(
+      imageLocalStorageService.getRawImageData(imageFilename)).toEqual(
+      sampleImageData);
+    expect(
+      imageLocalStorageService.getRawImageData('invalidFilename')).toEqual(
+      null);
+  });
+
   it('should return correctly check whether file exist in storage', () => {
     expect(imageLocalStorageService.isInStorage(imageFilename)).toBeFalse();
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
@@ -86,7 +96,7 @@ describe('ImageLocalStorageService', () => {
   it(
     'should show error message if number of stored images crosses ' +
     'limit', () => {
-      for (var i = 0; i <= 50; i++) {
+      for (let i = 0; i <= 50; i++) {
         imageLocalStorageService.saveImage('filename' + i, sampleImageData);
       }
       expect(alertsService.messages.length).toEqual(0);

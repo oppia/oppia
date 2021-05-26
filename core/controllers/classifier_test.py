@@ -34,8 +34,8 @@ from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-from proto import text_classifier_pb2
-from proto import training_job_response_payload_pb2
+from proto_files import text_classifier_pb2
+from proto_files import training_job_response_payload_pb2
 import python_utils
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
@@ -121,7 +121,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.secret = feconf.DEFAULT_VM_SHARED_SECRET
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
-            self.payload_proto.job_result.SerializeToString(),
+            python_utils.convert_to_bytes(
+                self.payload_proto.job_result.SerializeToString()),
             self.payload_proto.vm_id)
 
         self.payload_for_fetching_next_job_request = {
@@ -132,7 +133,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_for_fetching_next_job_request['signature'] = (
             classifier_services.generate_signature(
                 python_utils.convert_to_bytes(self.secret),
-                self.payload_for_fetching_next_job_request['message'],
+                python_utils.convert_to_bytes(
+                    self.payload_for_fetching_next_job_request['message']),
                 self.payload_for_fetching_next_job_request['vm_id']))
 
     def test_trained_classifier_handler(self):
@@ -235,7 +237,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         self.payload_proto.job_result.ClearField('classifier_frozen_model')
         self.payload_proto.signature = classifier_services.generate_signature(
             python_utils.convert_to_bytes(self.secret),
-            self.payload_proto.job_result.SerializeToString(),
+            python_utils.convert_to_bytes(
+                self.payload_proto.job_result.SerializeToString()),
             self.payload_proto.vm_id)
         self.post_blob(
             '/ml/trainedclassifierhandler',
@@ -545,7 +548,8 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.payload['message'] = json.dumps({})
         self.payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            self.payload['message'], self.payload['vm_id'])
+            python_utils.convert_to_bytes(self.payload['message']),
+            self.payload['vm_id'])
 
     def test_next_job_handler(self):
         json_response = self.post_json(

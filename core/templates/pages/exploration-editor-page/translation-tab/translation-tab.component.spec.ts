@@ -48,7 +48,7 @@ import { ContextService } from 'services/context.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
@@ -191,6 +191,7 @@ describe('Translation tab component', function() {
           },
           hints: []
         },
+        linked_skill_id: null,
         next_content_id_index: 0,
         param_changes: [],
         solicit_answer_details: false,
