@@ -53,6 +53,16 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
 import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
 import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
 import { NumberWithUnitsEditorComponent } from './templates/number-with-units-editor.component';
+import { NumericExpressionEditorComponent } from './templates/numeric-expression-editor.component';
+import { PositionOfTermsEditorComponent } from './templates/position-of-terms-editor.component';
+import { PositiveIntEditorComponent } from './templates/positive-int-editor.component';
+import { RatioExpressionEditorComponent } from './templates/ratio-expression-editor.component';
+import { RealEditorComponent } from './templates/real-editor.component';
+import { SanitizedUrlEditorComponent } from './templates/sanitized-url-editor.component';
+import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-algebraic-identifier-editor.component';
+import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
 
 
 @NgModule({
@@ -65,6 +75,7 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     GraphInputInteractionModule,
     DynamicContentModule,
     DirectivesModule,
+    MatCheckboxModule,
     NgbModalModule,
     NgxTrimDirectiveModule
   ],
@@ -92,7 +103,16 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SubtitledHtmlEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -118,7 +138,16 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SubtitledHtmlEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -144,7 +173,16 @@ import { NumberWithUnitsEditorComponent } from './templates/number-with-units-ed
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
     NumberWithUnitsEditorComponent,
-    SetOfUnicodeStringEditorComponent
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
+    SetOfUnicodeStringEditorComponent,
+    SubtitledHtmlEditorComponent
   ],
 })
 
