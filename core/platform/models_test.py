@@ -66,6 +66,14 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_base_models,
             self.registry_instance.import_models([models.NAMES.base_model]))
 
+    def test_import_models_blog_model(self):
+        """Tests import_models function with blog post model option."""
+        from core.storage.blog import gae_models as blog_models
+        expected_blog_models = (blog_models,)
+        self.assertEqual(
+            expected_blog_models,
+            self.registry_instance.import_models([models.NAMES.blog]))
+
     def test_import_models_classifier(self):
         """Tests import_models function with classifier option."""
         from core.storage.classifier import gae_models as classifier_data_models

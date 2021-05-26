@@ -27,7 +27,7 @@ import python_utils
 
 # Valid model names.
 NAMES = python_utils.create_enum(
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'blog', 'classifier',
     'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
     'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
     'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
@@ -97,6 +97,9 @@ class _Gae(Platform):
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
+            elif name == NAMES.blog:
+                from core.storage.blog import gae_models as blog_models
+                returned_models.append(blog_models)
             elif name == NAMES.classifier:
                 from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
                 returned_models.append(classifier_data_models)

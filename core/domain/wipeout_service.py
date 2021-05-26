@@ -1253,3 +1253,55 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
             voiceover_application_models[
                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION]
         )
+
+# blog_post_models = [
+# model for model in blog_posts_related_models
+# if isinstance(model, blog_post_model_class)]
+# for blog_post_model in blog_post_models:
+# if blog_post_model.author_id == user_id:
+# blog_post_model.author_id = pseudonymized_id
+# blog_post_model.update_timestamps()
+
+# blog_post_summary_models = [
+# model for model in blog_posts_related_models
+# if isinstance(model, blog_post_summary_model_class)]
+# for blog_post_summary in blog_post_summary_models:
+# blog_post_summary.author_id = pseudonymized_id
+# blog_post_summary.update_timestamps()
+
+# blog_post_rights_models = [
+# model for model in blog_posts_related_models
+# if isinstance(model, blog_post_rights_model_class)]
+# for blog_post_rights_model in blog_post_rights_models:
+# if blog_post_rights_model.editor_ids == user_id:
+# blog_post_rights_model.editor_ids = pseudonymized_id
+# blog_post_rights_model.update_timestamps()
+
+# datastore_services.put_multi(
+# blog_post_models +
+# blog_post_summary_models +
+# blog_post_rights_models)
+
+# blog_posts_ids_to_pids = (
+# pending_deletion_request.pseudonymizable_entity_mappings[
+# models.NAMES.blog_posts.value])
+# for blogpost_id, pseudonymized_id in blog_posts_ids_to_pids.items():
+# blog_posts_related_models = [
+# model for model in blog_post_models
+# if model.id == blogpost_id
+# ] + [
+# model for model in blog_post_summary_models
+# if model.id == blogpost_id
+# ] + [
+# model for model in blog_post_rights_models
+# if model.id == blogpost_id
+# ]
+# for i in python_utils.RANGE(
+# 0,
+# len(blog_posts_related_models),
+# feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+# _pseudonymize_models_transactional(
+# blog_posts_related_models[
+# i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+# pseudonymized_id)
+
