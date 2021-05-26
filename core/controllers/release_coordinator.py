@@ -17,15 +17,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
 import feconf
-import python_utils
 import utils
 
 
@@ -99,40 +96,38 @@ class JobsHandler(base.BaseHandler):
     @acl_decorators.can_run_any_job
     def post(self):
         """Handles POST requests."""
-        try:
-            if self.payload.get('action') == 'start_new_job':
-                for klass in (
-                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry.AUDIT_JOB_MANAGERS)):
-                    if klass.__name__ == self.payload.get('job_type'):
-                        klass.enqueue(klass.create_new())
-                        break
-            elif self.payload.get('action') == 'cancel_job':
-                job_id = self.payload.get('job_id')
-                job_type = self.payload.get('job_type')
-                for klass in (
-                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry.AUDIT_JOB_MANAGERS)):
-                    if klass.__name__ == job_type:
-                        klass.cancel(job_id, self.user_id)
-                        break
-            elif self.payload.get('action') == 'start_computation':
-                computation_type = self.payload.get('computation_type')
-                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                    if klass.__name__ == computation_type:
-                        klass.start_computation()
-                        break
-            elif self.payload.get('action') == 'stop_computation':
-                computation_type = self.payload.get('computation_type')
-                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                    if klass.__name__ == computation_type:
-                        klass.stop_computation(self.user_id)
-                        break
-            self.render_json({})
-        except Exception as e:
-            logging.error('[RELEASE COORDINATOR] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+        action = self.payload.get('action')
+        if action == 'start_new_job':
+            for klass in (
+                    jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                        jobs_registry.AUDIT_JOB_MANAGERS)):
+                if klass.__name__ == self.payload.get('job_type'):
+                    klass.enqueue(klass.create_new())
+                    break
+        elif action == 'cancel_job':
+            job_id = self.payload.get('job_id')
+            job_type = self.payload.get('job_type')
+            for klass in (
+                    jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                        jobs_registry.AUDIT_JOB_MANAGERS)):
+                if klass.__name__ == job_type:
+                    klass.cancel(job_id, self.user_id)
+                    break
+        elif action == 'start_computation':
+            computation_type = self.payload.get('computation_type')
+            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                if klass.__name__ == computation_type:
+                    klass.start_computation()
+                    break
+        elif action == 'stop_computation':
+            computation_type = self.payload.get('computation_type')
+            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                if klass.__name__ == computation_type:
+                    klass.stop_computation(self.user_id)
+                    break
+        else:
+            raise self.InvalidInputException('Invalid action: %s' % action)
+        self.render_json({})
 
 
 class JobOutputHandler(base.BaseHandler):
