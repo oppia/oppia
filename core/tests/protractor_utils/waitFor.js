@@ -158,6 +158,12 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
+var visibilityOfStateEditButton = async function(element, errorMessage) {
+  await browser.driver.wait(async function () {
+    return await element.getCssValue('opacity') === 0.2;
+  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+}
+
 var modalPopupToAppear = async function() {
   await visibilityOf(
     element(by.css('.modal-body')), 'Modal taking too long to appear.');
