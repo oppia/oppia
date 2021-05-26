@@ -1293,28 +1293,33 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         degrees_of_masteries = skill_services.get_multi_user_skill_mastery(
             self.USER_ID, self.SKILL_IDS)
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 2):
-            sorted_skill_ids = skill_services.get_sorted_skill_ids(degrees_of_masteries)
+            sorted_skill_ids = skill_services.get_sorted_skill_ids(
+                degrees_of_masteries)
         expected_sorted_skill_ids = [self.SKILL_ID_3, self.SKILL_ID_1]
         self.assertEqual(len(sorted_skill_ids), 2)
         self.assertEqual(sorted_skill_ids, expected_sorted_skill_ids)
 
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 3):
-            sorted_skill_ids = skill_services.get_sorted_skill_ids(degrees_of_masteries)
-        expected_sorted_skill_ids = [self.SKILL_ID_3, self.SKILL_ID_1, self.SKILL_ID_2]
+            sorted_skill_ids = skill_services.get_sorted_skill_ids(
+                degrees_of_masteries)
+        expected_sorted_skill_ids = [
+            self.SKILL_ID_3, self.SKILL_ID_1, self.SKILL_ID_2]
         self.assertEqual(sorted_skill_ids, expected_sorted_skill_ids)
 
     def test_filter_skills_by_mastery(self):
 
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', 2):
-            arranged_filtered_skill_ids = skill_services.filter_skills_by_mastery(
-                self.USER_ID, self.SKILL_IDS)
+            arranged_filtered_skill_ids = (
+                skill_services.filter_skills_by_mastery(
+                    self.USER_ID, self.SKILL_IDS))
         self.assertEqual(len(arranged_filtered_skill_ids), 2)
         expected_skill_ids = [self.SKILL_ID_1, self.SKILL_ID_3]
         self.assertEqual(arranged_filtered_skill_ids, expected_skill_ids)
 
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', len(self.SKILL_IDS)):
-            arranged_filtered_skill_ids = skill_services.filter_skills_by_mastery(
-                self.USER_ID, self.SKILL_IDS)
+            arranged_filtered_skill_ids = (
+                skill_services.filter_skills_by_mastery(
+                self.USER_ID, self.SKILL_IDS))
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
 
 
