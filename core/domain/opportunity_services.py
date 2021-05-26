@@ -664,7 +664,7 @@ def create_skill_opportunity(skill_id, skill_description):
 
     questions, _, _ = (
         question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-            constants.MAX_QUESTIONS_PER_SKILL, [skill_id], offset=0))
+            constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0))
     skill_opportunity = opportunity_domain.SkillOpportunity(
         skill_id=skill_id,
         skill_description=skill_description,
