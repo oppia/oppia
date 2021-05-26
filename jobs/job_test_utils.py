@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
+import contextlib
 import datetime
 import re
 
@@ -32,7 +33,6 @@ import python_utils
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
-import contextlib2
 
 
 class PipelinedTestBase(test_utils.TestBase):
@@ -48,18 +48,18 @@ class PipelinedTestBase(test_utils.TestBase):
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
             options=test_pipeline.PipelineOptions(runtime_type_check=True))
-        self._close_stack = None
+        self._pipeline_context_stack = None
 
     def setUp(self):
         super(PipelinedTestBase, self).setUp()
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.enter_context(decorate_beam_errors())
             stack.enter_context(self.pipeline)
-            self._close_stack = stack.pop_all().close
+            self._pipeline_context_stack = stack.pop_all()
 
     def tearDown(self):
         try:
-            self._flush_pipeline()
+            self._exit_pipeline_context()
         finally:
             super(PipelinedTestBase, self).tearDown()
 
@@ -79,10 +79,10 @@ class PipelinedTestBase(test_utils.TestBase):
         Raises:
             RuntimeError. A PCollection assertion has already been called.
         """
-        if self._close_stack:
+        if self._is_in_pipeline_context():
             beam_testing_util.assert_that(
                 actual, beam_testing_util.equal_to(expected))
-            self._flush_pipeline()
+            self._exit_pipeline_context()
         else:
             raise RuntimeError('assert_pcoll_* may be called at most once')
 
@@ -101,10 +101,10 @@ class PipelinedTestBase(test_utils.TestBase):
         Raises:
             RuntimeError. A PCollection assertion has already been called.
         """
-        if self._close_stack:
+        if self._is_in_pipeline_context():
             beam_testing_util.assert_that(
                 actual, beam_testing_util.is_empty())
-            self._flush_pipeline()
+            self._exit_pipeline_context()
         else:
             raise RuntimeError('assert_pcoll_* may be called at most once')
 
@@ -132,11 +132,15 @@ class PipelinedTestBase(test_utils.TestBase):
         property_values.update(properties)
         return model_class(**property_values)
 
-    def _flush_pipeline(self):
+    def _is_in_pipeline_context(self):
+        """Returns whether the test is currently within the pipeline context."""
+        return self._pipeline_context_stack is not None
+
+    def _exit_pipeline_context(self):
         """Flushes the pipeline and waits for it to finish running."""
-        if self._close_stack:
-            self._close_stack()
-            self._close_stack = None
+        if self._is_in_pipeline_context():
+            self._pipeline_context_stack.close()
+            self._pipeline_context_stack = None
 
 
 class JobTestBase(PipelinedTestBase):
@@ -149,13 +153,15 @@ class JobTestBase(PipelinedTestBase):
 
     def __init__(self, *args, **kwargs):
         super(JobTestBase, self).__init__(*args, **kwargs)
-        self.model_io_stub = stub_io.ModelIoStub()
-        self.pipeline.options.view_as(job_options.JobOptions).model_getter = (
-            self.model_io_stub.get_models_ptransform)
+        self.datastoreio_stub = stub_io.DatastoreioStub()
+        self.pipeline.options.view_as(job_options.JobOptions).datastoreio = (
+            self.datastoreio_stub)
 
-    def tearDown(self):
-        self.model_io_stub.clear()
-        super(JobTestBase, self).tearDown()
+    def setUp(self):
+        super(JobTestBase, self).setUp()
+        with self._pipeline_context_stack as stack:
+            stack.enter_context(self.datastoreio_stub.context())
+            self._pipeline_context_stack = stack.pop_all()
 
     def run_job(self):
         """Runs a new instance of self.JOB_CLASS and returns its output.
@@ -174,6 +180,17 @@ class JobTestBase(PipelinedTestBase):
         """
         return self.JOB_CLASS(self.pipeline).run()
 
+    def put_multi(self, models):
+        """Puts the input models into the datastore.
+
+        Since the datastore is stubbed during unit tests, no actual models are
+        created.
+
+        Args:
+            models: list(Model). The NDB models to put into the stub.
+        """
+        self.datastoreio_stub.put_multi(models)
+
     def assert_job_output_is(self, expected):
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
 
@@ -187,18 +204,18 @@ class JobTestBase(PipelinedTestBase):
         self.assert_pcoll_empty(self.run_job())
 
 
-@contextlib2.contextmanager
+@contextlib.contextmanager
 def decorate_beam_errors():
     """Context manager to improve the readability of beam_testing_util errors.
 
     The beam_testing_util module raises exceptions with a single string of
     repr()'d lists as the message. The items end up appearing on one long line,
     making it difficult to read when the elements of the lists are very long
-    (which they tend to be especially for Oppia's audit errors).
+    (which they tend to be, especially for Oppia's audit errors).
 
-    This context manager tries to split the list elements into lines, so that
-    it's easier to read which errors occurred and why. If it cannot parse the
-    message successfully, it will raise the same message.
+    This context manager tries to split the list elements into lines so that
+    it's easier to understand which errors occurred and why. If it cannot parse
+    the message successfully, it will raise the error unchanged.
 
     Yields:
         None. Nothing.
