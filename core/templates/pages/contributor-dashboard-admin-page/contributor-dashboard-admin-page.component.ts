@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the contributor dashbaoard admin page.
+ * @fileoverview Directive for the contributor dashboard admin page.
  */
 
 require('domain/utilities/language-util.service.ts');

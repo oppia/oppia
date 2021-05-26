@@ -32,6 +32,3 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL',
   PageConstants.REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL);
-
-angular.module('oppia').constant(
-  'PROFILE_URL_TEMPLATE', PageConstants.PROFILE_URL_TEMPLATE);

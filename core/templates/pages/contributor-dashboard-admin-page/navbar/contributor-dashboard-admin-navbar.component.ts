@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UserService } from 'services/user.service';
-import { ContributorDashboardAdminPageConstants } from 'pages/contributor-dashboard-admin-page/contributor-dashboard-admin-page.constants';
 import { AppConstants } from 'app.constants';
 
 @Component({
@@ -63,10 +62,9 @@ export class ContributorDashboardAdminNavbarComponent implements OnInit {
 
     this.username = userInfo.getUsername();
     this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        ContributorDashboardAdminPageConstants.PROFILE_URL_TEMPLATE, {
-          username: this.username
-        })
+      this.urlInterpolationService.interpolateUrl('/profile/<username>', {
+        username: this.username
+      })
     );
   }
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for contributor-dashboard-admin navbar component.
+ * @fileoverview Unit tests for contributor dashboard admin navbar component.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia contributor-dashboard-admin page.
+ * @fileoverview Constants for the Oppia contributor dashboard admin page.
  */
 
 export const ContributorDashboardAdminPageConstants = {
@@ -21,6 +21,4 @@ export const ContributorDashboardAdminPageConstants = {
   CONTRIBUTION_RIGHTS_HANDLER_URL: '/contributionrightsdatahandler',
   GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler',
   REMOVE_CONTRIBUTION_RIGHTS_HANDLER_URL: '/removecontributionrightshandler',
-
-  PROFILE_URL_TEMPLATE: '/profile/<username>'
 } as const;

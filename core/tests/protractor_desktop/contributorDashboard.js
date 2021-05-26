@@ -244,7 +244,7 @@ describe('Contributor dashboard page', function() {
   });
 });
 
-describe('Contributor dashbaord admin page contribution rights form', () => {
+describe('Contributor dashboard admin page contribution rights form', () => {
   const HINDI_LANGUAGE = 'Hindi';
   const CONTRIBUTOR_DASHBOARD_ADMIN_EMAIL = 'user@contributor.com';
   const CONTRIBUTOR_DASHBOARD_ADMIN_USERNAME = 'user1234';
