@@ -317,6 +317,7 @@ var AdminPage = function() {
   };
 
   this.expectNumberOfRunningOneOffJobs = async function(count) {
+    await waitFor.visibilityOf(element(by.css('.protractor-test-unfinished-one-off-jobs-id')));
     var len = await element.all(by.css(
       '.protractor-test-unfinished-one-off-jobs-id')).count();
     expect(len).toEqual(count);
@@ -373,6 +374,10 @@ var AdminPage = function() {
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
+    if(expectedUsernamesArray.length != 0){
+      await waitFor.visibilityOf(element(
+        by.css('.protractor-test-roles-result-rows')));
+    }
     var usernames = await element.all(
       by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {
