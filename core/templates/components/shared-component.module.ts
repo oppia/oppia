@@ -19,17 +19,17 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 // Modules.
-import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { AngularFireModule } from '@angular/fire';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from './material.module';
-import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
@@ -96,6 +96,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 
 import { HammerGestureConfig } from '@angular/platform-browser';
@@ -141,8 +142,10 @@ const toastrConfig = {
     DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
+    NgbNavModule,
     NgbModalModule,
     FormsModule,
+    RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
@@ -265,6 +268,8 @@ const toastrConfig = {
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    NgbNavModule,
+    RichTextComponentsModule,
     NgbModalModule,
     ObjectComponentsModule,
     SharedFormsModule,
