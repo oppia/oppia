@@ -574,7 +574,7 @@ def can_run_any_job(handler):
             return handler(self, **kwargs)
 
         raise self.UnauthorizedUserException(
-            'You do not have credentials to run any job.')
+            'You do not have credentials to run jobs.')
     test_can_run_any_job.__wrapped__ = True
 
     return test_can_run_any_job

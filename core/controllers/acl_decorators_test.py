@@ -1090,7 +1090,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'You do not have credentials to run any job.')
+            'You do not have credentials to run jobs.')
         self.logout()
 
     def test_guest_user_cannot_access_release_coordinator_page(self):
@@ -1110,7 +1110,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'You do not have credentials to run any job.')
+            'You do not have credentials to run jobs.')
         self.logout()
 
     def test_release_coordinator_can_run_any_job(self):
