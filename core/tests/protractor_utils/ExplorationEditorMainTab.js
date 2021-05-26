@@ -486,8 +486,7 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     await waitFor.visibilityOfStateEditButton(
-      stateEditButton, 'State Edit Button taking too long to fade In'
-    );
+      stateEditButton, 'State Edit Button taking too long to fade In');
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(

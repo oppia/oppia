@@ -194,5 +194,6 @@ exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
+exports.visibilityOfStateEditButton = visibilityOfStateEditButton;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
