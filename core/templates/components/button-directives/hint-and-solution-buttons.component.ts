@@ -16,7 +16,7 @@
  * @fileoverview Component for hint and solution buttons.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateCard } from 'domain/state_card/StateCardObjectFactory';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
@@ -43,6 +43,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   isVisible: boolean = true;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
@@ -75,6 +76,17 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
           this.resetLocalHintsArray();
         }
       }));
+    this.directiveSubscriptions.add(
+      this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
+        this.changeDetectorRef.detectChanges();
+      })
+    );
+    this.directiveSubscriptions.add(
+      this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter
+        .subscribe(() => {
+          this.changeDetectorRef.detectChanges();
+        })
+    );
   }
 
   ngOnDestroy(): void {

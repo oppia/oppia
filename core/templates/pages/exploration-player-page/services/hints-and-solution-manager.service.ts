@@ -113,8 +113,8 @@ export class HintsAndSolutionManagerService {
       clearTimeout(this.tooltipTimeout);
       this.tooltipTimeout = null;
     }
-    this._hintConsumedEventEmitter.emit();
     this.numHintsConsumed++;
+    this._hintConsumedEventEmitter.emit();
     this.wrongAnswersSinceLastHintConsumed = 0;
 
     let funcToEnqueue = null;
