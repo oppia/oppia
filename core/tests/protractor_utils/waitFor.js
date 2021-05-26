@@ -101,8 +101,7 @@ var presenceOf = async function(element, errorMessage) {
 var visibilityOf = async function(element, errorMessage) {
   await browser.wait(function () {
     return element.getCssValue('opacity') === 1;
-  },
-  DEFAULT_WAIT_TIME_MSECS, errorMessage);
+  },DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
