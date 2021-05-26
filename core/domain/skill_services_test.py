@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-import random
 
 from constants import constants
 from core.domain import config_services
@@ -1319,7 +1318,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'MAX_NUMBER_OF_SKILL_IDS', len(self.SKILL_IDS)):
             arranged_filtered_skill_ids = (
                 skill_services.filter_skills_by_mastery(
-                self.USER_ID, self.SKILL_IDS))
+                    self.USER_ID, self.SKILL_IDS))
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
 
 
