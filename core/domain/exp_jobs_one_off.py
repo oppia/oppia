@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import logging
 import re
 
 from constants import constants
@@ -55,6 +54,7 @@ import utils
     models.NAMES.statistics,
     models.NAMES.story,
 ])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class RemoveDeprecatedExplorationModelFieldsOneOffJob(
@@ -294,7 +294,7 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 error_message = (
                     'Exploration %s failed migration to states v%s: %s' %
                     (item.id, states_schema_version + 1, e))
-                logging.exception(error_message)
+                logging_services.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
 
@@ -337,7 +337,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         try:
             old_exploration.validate()
         except Exception as e:
-            logging.error(
+            logging_services.error(
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
             return
@@ -879,7 +879,7 @@ class ExpSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                     'Exploration snapshot %s failed migration to states '
                     'v%s: %s' % (
                         item.id, current_state_schema_version + 1, e))
-                logging.exception(error_message)
+                logging_services.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
 

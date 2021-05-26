@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import importlib
 import inspect
-import logging
 import os
 import re
 
@@ -35,6 +34,7 @@ import feconf
     models.NAMES.statistics, models.NAMES.feedback])
 
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class MockNumbersModel(datastore_services.Model):
@@ -235,10 +235,11 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
         with logging_swap:
             event_services.StatsEventsHandler.record(
                 'eid1', 1, {

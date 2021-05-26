@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
-import logging
 import os
 import re
 import shutil
@@ -27,9 +26,12 @@ import subprocess
 import sys
 import threading
 
+from core.platform import models
 import feconf
 import python_utils
 from scripts import common
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 @contextlib.contextmanager
@@ -92,23 +94,27 @@ def managed_process(
             procs_to_kill = []
             for proc in procs_still_alive:
                 if proc.is_running():
-                    logging.info('Terminating %s...' % get_proc_info(proc))
+                    logging_services.info(
+                        'Terminating %s...' % get_proc_info(proc))
                     proc.terminate()
                     procs_to_kill.append(proc)
                 else:
-                    logging.info('%s has already ended.' % get_proc_info(proc))
+                    logging_services.info(
+                        '%s has already ended.' % get_proc_info(proc))
 
             procs_gone, procs_still_alive = (
                 psutil.wait_procs(procs_to_kill, timeout=timeout_secs))
             for proc in procs_still_alive:
-                logging.warn('Forced to kill %s!' % get_proc_info(proc))
+                logging_services.warn(
+                    'Forced to kill %s!' % get_proc_info(proc))
                 proc.kill()
             for proc in procs_gone:
-                logging.info('%s has already ended.' % get_proc_info(proc))
+                logging_services.info(
+                    '%s has already ended.' % get_proc_info(proc))
         except Exception:
             # NOTE: Raising an exception while exiting a context manager is bad
             # practice, so we log and suppress exceptions instead.
-            logging.exception(
+            logging_services.exception(
                 'Failed to stop %s gracefully!' % get_proc_info(popen_proc))
 
 

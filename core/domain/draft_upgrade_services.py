@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from core.domain import exp_domain
 from core.domain import html_validation_service
@@ -32,6 +31,7 @@ import utils
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class InvalidDraftConversionException(Exception):
@@ -89,7 +89,8 @@ def try_upgrading_draft_to_exp_version(
             commit.commit_cmds[0]['from_version'],
             commit.commit_cmds[0]['to_version'])
         if not hasattr(DraftUpgradeUtil, conversion_fn_name):
-            logging.warning('%s is not implemented' % conversion_fn_name)
+            logging_services.warning(
+                '%s is not implemented' % conversion_fn_name)
             return None
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:

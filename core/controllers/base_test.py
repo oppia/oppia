@@ -23,7 +23,6 @@ import datetime
 import importlib
 import inspect
 import json
-import logging
 import os
 import re
 import sys
@@ -54,6 +53,7 @@ import webtest
 
 auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+logging_services = models.Registry.import_cloud_logging_services()
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
@@ -322,7 +322,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_logging_function(msg, *_):
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'warning', mock_logging_function):
+        with self.swap(logging_services, 'warning', mock_logging_function):
             self.get_json('/mock', expected_status_int=500)
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
@@ -341,7 +341,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_logging_function(msg, *_):
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'warning', mock_logging_function):
+        with self.swap(logging_services, 'warning', mock_logging_function):
             self.testapp.head('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 2)
             self.assertEqual(
@@ -542,10 +542,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging_services, 'error', _mock_logging_function):
             self.post_json('/frontend_errors', {'error': 'errors'})
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
@@ -567,7 +567,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
+                self.capture_logging(min_level=logging_services.ERROR))
             exit_stack.enter_context(self.swap_to_always_raise(
                 auth_services, 'get_auth_claims_from_request',
                 error=auth_domain.StaleAuthSessionError('uh-oh')))
@@ -584,7 +584,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
+                self.capture_logging(min_level=logging_services.ERROR))
             exit_stack.enter_context(self.swap_to_always_raise(
                 auth_services, 'get_auth_claims_from_request',
                 error=auth_domain.InvalidAuthSessionError('uh-oh')))

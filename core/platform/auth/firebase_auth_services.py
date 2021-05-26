@@ -54,8 +54,6 @@ Terminology:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from constants import constants
 from core.domain import auth_domain
 from core.platform import models
@@ -69,6 +67,7 @@ from firebase_admin import exceptions as firebase_exceptions
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -191,18 +190,19 @@ def mark_user_for_deletion(user_id):
         assoc_by_auth_id_model.update_timestamps()
         assoc_by_auth_id_model.put()
     else:
-        logging.error(
+        logging_services.error(
             '[WIPEOUT] User with user_id=%s has no Firebase account' % user_id)
         return
 
     try:
         firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
     except (firebase_exceptions.FirebaseError, ValueError):
-        # NOTE: logging.exception appends the stack trace automatically. The
-        # errors are not re-raised because wipeout_services, the user of this
-        # function, does not use exceptions to keep track of failures. It uses
-        # the verify_external_auth_associations_are_deleted() function instead.
-        logging.exception(
+        # NOTE: logging_services.exception appends the stack trace
+        # automatically. The errors are not re-raised because wipeout_services,
+        # the user of this function, does not use exceptions to keep track of
+        # failures. It uses the verify_external_auth_associations_are_deleted()
+        # function instead.
+        logging_services.exception(
             '[WIPEOUT] Failed to disable Firebase account! Stack trace:')
 
 
@@ -219,13 +219,15 @@ def delete_external_auth_associations(user_id):
     try:
         firebase_auth.delete_user(auth_id)
     except firebase_auth.UserNotFoundError:
-        logging.exception('[WIPEOUT] Firebase account already deleted')
+        logging_services.exception('[WIPEOUT] Firebase account already deleted')
     except (firebase_exceptions.FirebaseError, ValueError):
-        # NOTE: logging.exception appends the stack trace automatically. The
-        # errors are not re-raised because wipeout_services, the user of this
-        # function, does not use exceptions to keep track of failures. It uses
-        # the verify_external_auth_associations_are_deleted() function instead.
-        logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
+        # NOTE: logging_services.exception appends the stack trace
+        # automatically. The errors are not re-raised because wipeout_services,
+        # the user of this function, does not use exceptions to keep track of
+        # failures. It uses the verify_external_auth_associations_are_deleted()
+        # function instead.
+        logging_services.exception(
+            '[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
 
 
 def verify_external_auth_associations_are_deleted(user_id):
@@ -253,11 +255,12 @@ def verify_external_auth_associations_are_deleted(user_id):
     except firebase_auth.UserNotFoundError:
         return True
     except (firebase_exceptions.FirebaseError, ValueError):
-        # NOTE: logging.exception appends the stack trace automatically. The
-        # errors are not re-raised because wipeout_services, the user of this
-        # function, will keep retrying the other "delete" family of functions
-        # until this returns True (in 12h intervals).
-        logging.exception('[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
+        # NOTE: logging_services.exception appends the stack trace
+        # automatically. The errors are not re-raised because wipeout_services,
+        # the user of this function, will keep retrying the other "delete"
+        # family of functions until this returns True (in 12h intervals).
+        logging_services.exception(
+            '[WIPEOUT] Firebase Admin SDK failed! Stack trace:')
     return False
 
 

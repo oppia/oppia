@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import os
 import re
 import zipfile
@@ -55,6 +54,7 @@ import utils
     models.NAMES.recommendations, models.NAMES.statistics, models.NAMES.user
 ])
 search_services = models.Registry.import_search_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # TODO(msl): Test ExpSummaryModel changes if explorations are updated,
@@ -502,10 +502,11 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
         search_results_page_size_swap = self.swap(
             feconf, 'SEARCH_RESULTS_PAGE_SIZE', 6)
         max_iterations_swap = self.swap(exp_services, 'MAX_ITERATIONS', 1)

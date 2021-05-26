@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import logging
 import random
 
 from constants import constants
@@ -43,8 +42,11 @@ from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -300,7 +302,7 @@ class StatsEventsHandler(base.BaseHandler):
         try:
             self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
-            logging.exception(e)
+            logging_services.exception(e)
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})
@@ -386,7 +388,8 @@ class StateHitEventHandler(base.BaseHandler):
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
         else:
-            logging.error('Unexpected StateHit event for the END state.')
+            logging_services.error(
+                'Unexpected StateHit event for the END state.')
         self.render_json({})
 
 

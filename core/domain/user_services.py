@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import hashlib
 import imghdr
-import logging
 import re
 
 from constants import constants
@@ -42,6 +41,7 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Size (in px) of the gravatar being retrieved.
@@ -210,13 +210,14 @@ def fetch_gravatar(email):
             gravatar_url, headers={b'Content-Type': b'image/png'},
             allow_redirects=False)
     except Exception:
-        logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
+        logging_services.exception(
+            'Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
             if imghdr.what(None, h=response.content) == 'png':
                 return utils.convert_png_binary_to_data_url(response.content)
         else:
-            logging.error(
+            logging_services.error(
                 '[Status %s] Failed to fetch Gravatar from %s' %
                 (response.status_code, gravatar_url))
 
@@ -242,7 +243,7 @@ def get_user_settings(user_id, strict=False):
 
     user_settings = get_users_settings([user_id])[0]
     if strict and user_settings is None:
-        logging.error('Could not find user with id %s' % user_id)
+        logging_services.error('Could not find user with id %s' % user_id)
         raise Exception('User not found.')
     return user_settings
 
@@ -270,7 +271,7 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
     if user_settings_model is not None:
         return _get_user_settings_from_model(user_settings_model)
     elif strict:
-        logging.error('Could not find user with id %s' % auth_id)
+        logging_services.error('Could not find user with id %s' % auth_id)
         raise Exception('User not found.')
     else:
         return None
@@ -953,7 +954,7 @@ def get_auth_details_by_user_id(user_id, strict=False):
         return auth_services.get_user_auth_details_from_model(
             user_auth_details_model)
     elif strict:
-        logging.error('Could not find user with id %s' % user_id)
+        logging_services.error('Could not find user with id %s' % user_id)
         raise Exception('User not found.')
     else:
         return None
@@ -1286,8 +1287,9 @@ def get_human_readable_user_ids(user_ids, strict=True):
     for ind, user_settings in enumerate(users_settings):
         if user_settings is None:
             if strict:
-                logging.error('User id %s not known in list of user_ids %s' % (
-                    user_ids[ind], user_ids))
+                logging_services.error(
+                    'User id %s not known in list of user_ids %s' % (
+                        user_ids[ind], user_ids))
                 raise Exception('User not found.')
         elif user_settings.deleted:
             usernames.append(LABEL_FOR_USER_BEING_DELETED)

@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import logging
 
 from constants import constants
 from core.domain import caching_services
@@ -44,6 +43,7 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 # Repository GET methods.
@@ -721,7 +721,7 @@ def apply_change_list(skill_id, change_list, committer_id):
         return skill
 
     except Exception as e:
-        logging.error(
+        logging_services.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, skill_id, change_list)
         )

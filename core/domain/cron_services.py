@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import logging
 
 from core import jobs
 from core.platform import models
@@ -32,6 +31,7 @@ from mapreduce import model as mapreduce_model
 (base_models, job_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 # Only non-versioned models should be included in this list. Activities that
 # use versioned models should have their own delete functions.
@@ -167,10 +167,10 @@ class MapReduceStateModelsCleanupManager(jobs.BaseMapReduceOneOffJobManager):
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         if key.endswith('_deleted'):
-            logging.warning(
+            logging_services.warning(
                 'Delete count: %s entities (%s)' % (sum(values), key))
         else:
-            logging.warning(
+            logging_services.warning(
                 'Entities remaining count: %s entities (%s)' %
                 (sum(values), key))
 

@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.domain import activity_domain
@@ -27,6 +26,7 @@ from core.platform import models
 import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def get_featured_activity_references():
@@ -108,7 +108,7 @@ def remove_featured_activities(activity_type, activity_ids):
         # It is quite unusual for a featured activity to be unpublished or
         # deleted, so we log a message.
         for activity_id in activity_references_ids_found:
-            logging.info(
+            logging_services.info(
                 'The %s with id %s was removed from the featured list.' % (
                     activity_type, activity_id))
         update_featured_activity_references(new_activity_references)

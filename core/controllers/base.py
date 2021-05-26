@@ -21,7 +21,6 @@ import base64
 import datetime
 import hmac
 import json
-import logging
 import os
 import sys
 import time
@@ -32,12 +31,15 @@ from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import python_utils
 import utils
 
 import backports.functools_lru_cache
 import webapp2
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
@@ -176,7 +178,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect(user_services.create_login_url(self.request.uri))
             return
         except auth_domain.InvalidAuthSessionError:
-            logging.exception('User session is invalid!')
+            logging_services.exception('User session is invalid!')
             auth_services.destroy_auth_session(self.response)
             self.redirect(user_services.create_login_url(self.request.uri))
             return
@@ -202,7 +204,7 @@ class BaseHandler(webapp2.RequestHandler):
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
-                    logging.error(
+                    logging_services.error(
                         'Cannot find user %s with email %s on page %s' % (
                             auth_id, email, self.request.uri))
                     auth_services.destroy_auth_session(self.response)
@@ -296,7 +298,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+                logging_services.error('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
@@ -305,7 +307,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
-        logging.warning('Invalid URL requested: %s', self.request.uri)
+        logging_services.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
         self._render_exception(
             404, {
@@ -427,7 +429,7 @@ class BaseHandler(webapp2.RequestHandler):
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
-                logging.warning(
+                logging_services.warning(
                     'Not a recognized return type: defaulting to render JSON.')
             self.render_json(values)
 
@@ -458,7 +460,7 @@ class BaseHandler(webapp2.RequestHandler):
             self._render_exception_json_or_html(
                 self.DELETE_HANDLER_ERROR_RETURN_TYPE, values)
         else:
-            logging.warning('Not a recognized request method.')
+            logging_services.warning('Not a recognized request method.')
             self._render_exception_json_or_html(None, values)
 
     def handle_exception(self, exception, unused_debug_mode):
@@ -486,17 +488,19 @@ class BaseHandler(webapp2.RequestHandler):
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.error(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging_services.error(
+            b''.join(traceback.format_exception(*sys.exc_info())))
 
         if isinstance(exception, self.PageNotFoundException):
-            logging.warning('Invalid URL requested: %s', self.request.uri)
+            logging_services.warning(
+                'Invalid URL requested: %s', self.request.uri)
             self.error(404)
             self._render_exception(
                 404, {
                     'error': 'Could not find the page %s.' % self.request.uri})
             return
 
-        logging.error('Exception raised: %s', exception)
+        logging_services.error('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)

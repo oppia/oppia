@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import skill_domain
@@ -30,6 +29,7 @@ from core.platform import models
 import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -60,7 +60,7 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             skill.validate()
         except Exception as e:
-            logging.exception(
+            logging_services.exception(
                 'Skill %s failed validation: %s' % (item.id, e))
             yield (
                 SkillMigrationOneOffJob._ERROR_KEY,

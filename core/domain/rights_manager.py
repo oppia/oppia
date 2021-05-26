@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from constants import constants
 from core.domain import activity_services
 from core.domain import rights_domain
@@ -36,6 +34,7 @@ datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def get_activity_rights_from_model(activity_rights_model, activity_type):
@@ -754,7 +753,7 @@ def _assign_role(
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_modify_activity_roles(committer, activity_rights):
-        logging.error(
+        logging_services.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
                 committer_id, assignee_id, new_role, activity_id))
@@ -874,7 +873,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_modify_activity_roles(committer, activity_rights):
-        logging.error(
+        logging_services.error(
             'User %s tried to remove user %s from an activity %s '
             'but was refused permission.' % (
                 committer_id, removed_user_id, activity_id))
@@ -936,7 +935,7 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_release_ownership(committer, activity_rights):
-        logging.error(
+        logging_services.error(
             'User %s tried to release ownership of %s %s but was '
             'refused permission.' % (committer_id, activity_type, activity_id))
         raise Exception(
@@ -1012,7 +1011,7 @@ def _publish_activity(committer, activity_id, activity_type):
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_publish_activity(committer, activity_rights):
-        logging.error(
+        logging_services.error(
             'User %s tried to publish %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
         raise Exception('This %s cannot be published.' % activity_type)
@@ -1044,7 +1043,7 @@ def _unpublish_activity(committer, activity_id, activity_type):
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_unpublish_activity(committer, activity_rights):
-        logging.error(
+        logging_services.error(
             'User %s tried to unpublish %s %s but was refused '
             'permission.' % (committer_id, activity_type, activity_id))
         raise Exception('This %s cannot be unpublished.' % activity_type)
@@ -1159,7 +1158,7 @@ def set_private_viewability_of_exploration(
 
     # The user who can publish activity can change its private viewability.
     if not check_can_publish_activity(committer, exploration_rights):
-        logging.error(
+        logging_services.error(
             'User %s tried to change private viewability of exploration %s '
             'but was refused permission.' % (committer_id, exploration_id))
         raise Exception(

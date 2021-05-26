@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -31,9 +30,12 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
+from core.platform import models
 import feconf
 import python_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
@@ -119,7 +121,7 @@ class SuggestionHandler(base.BaseHandler):
         for filename in new_image_filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging_services.error(
                     'Image not provided for file with name %s when the '
                     ' suggestion with target id %s was created.' % (
                         filename, suggestion.target_id))

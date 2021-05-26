@@ -20,15 +20,17 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import re
 import time
 
+from core.platform import models
 from core.platform.search import gae_search_services
 from core.tests import test_utils
 import python_utils
 
 from google.appengine.api import search
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
@@ -296,7 +298,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         def mock_logging_function(msg, *_):
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'exception', mock_logging_function):
+        with self.swap(logging_services, 'exception', mock_logging_function):
             doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
             gae_search_services.add_documents_to_index([doc], 'index')
             result = gae_search_services.search('NOT:abc', 'my_index', [], [])

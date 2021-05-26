@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from constants import constants
 from core.domain import exp_domain
@@ -39,6 +38,7 @@ from core.tests import test_utils
 import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
@@ -192,7 +192,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+        with self.capture_logging(
+            min_level=logging_services.ERROR) as captured_logs:
             self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(len(captured_logs), 1)
@@ -457,7 +458,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_topic'
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -467,7 +468,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
         get_topic_by_id_swap = self.swap(
             topic_fetchers, 'get_topic_by_id', _mock_get_topic_by_id)
         logging_exception_swap = self.swap(
-            logging, 'exception', _mock_logging_function)
+            logging_services, 'exception', _mock_logging_function)
 
         with get_topic_by_id_swap, logging_exception_swap:
             job_id = (

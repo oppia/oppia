@@ -1037,7 +1037,7 @@ def partition(iterable, predicate=bool, enumerated=False):
         for i, error in errors:
             raise Exception('Log index=%d failed for reason: %s' % (i, error))
         for i, message in others:
-            logging.info('Log index=%d: %s' % (i, message))
+            logging_services.info('Log index=%d: %s' % (i, message))
 
     Args:
         iterable: iterable. Any kind of iterable object.

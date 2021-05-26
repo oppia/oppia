@@ -20,13 +20,15 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import numbers
 
+from core.platform import models
 import feconf
 import python_utils
 
 from google.appengine.api import search as gae_search
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def _dict_to_search_document(d):
@@ -174,11 +176,11 @@ def add_documents_to_index(documents, index_name):
     gae_docs = [_dict_to_search_document(d) for d in documents]
 
     try:
-        logging.debug(
+        logging_services.debug(
             'adding the following docs to index %s: %s', index.name, documents)
         index.put(gae_docs, deadline=5)
     except gae_search.PutError as e:
-        logging.exception('PutError raised.')
+        logging_services.exception('PutError raised.')
 
         # At this point, either we don't have any tries left, or none of the
         # results has a transient error code.
@@ -203,12 +205,12 @@ def delete_documents_from_index(doc_ids, index_name):
 
     index = gae_search.Index(index_name)
     try:
-        logging.debug(
+        logging_services.debug(
             'Attempting to delete documents from index %s, ids: %s' %
             (index.name, ', '.join(doc_ids)))
         index.delete(doc_ids, deadline=5)
     except gae_search.DeleteError as e:
-        logging.exception('Something went wrong during deletion.')
+        logging_services.exception('Something went wrong during deletion.')
         raise SearchFailureError(e)
 
 
@@ -289,16 +291,17 @@ def search(
     except gae_search.QueryError as e:
         # This can happen for query strings like "NOT" or a string that
         # contains backslashes.
-        logging.exception('Could not parse query string %s' % gae_query_string)
+        logging_services.exception(
+            'Could not parse query string %s' % gae_query_string)
         return [], None
 
     index = gae_search.Index(index_name)
 
     try:
-        logging.debug('attempting a search with query %s' % query)
+        logging_services.debug('attempting a search with query %s' % query)
         results = index.search(query)
     except Exception as e:
-        logging.exception('something went wrong while searching.')
+        logging_services.exception('something went wrong while searching.')
         raise SearchFailureError(e)
 
     result_offset = (

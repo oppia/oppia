@@ -24,7 +24,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
-import logging
 
 from constants import constants
 from core.domain import caching_services
@@ -43,6 +42,7 @@ import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -217,7 +217,7 @@ def apply_change_list(story_id, change_list):
         return story, exp_ids_removed_from_story, exp_ids_added_to_story
 
     except Exception as e:
-        logging.error(
+        logging_services.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, story_id, change_list)
         )
@@ -390,7 +390,7 @@ def validate_explorations_for_story(exp_ids, strict):
                 validation_error_messages.extend(
                     exp_services.validate_exploration_for_story(exp, strict))
             except Exception as e:
-                logging.exception(
+                logging_services.exception(
                     'Exploration validation failed for exploration with ID: '
                     '%s. Error: %s' % (exp_id, e))
                 raise Exception(e)

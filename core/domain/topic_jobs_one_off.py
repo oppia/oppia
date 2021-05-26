@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -34,6 +33,7 @@ import python_utils
 
 (skill_models, topic_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.topic])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -64,7 +64,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             topic.validate()
         except Exception as e:
-            logging.exception(
+            logging_services.exception(
                 'Topic %s failed validation: %s' % (item.id, e))
             yield (
                 TopicMigrationOneOffJob._ERROR_KEY,
@@ -222,7 +222,7 @@ class RegenerateTopicSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         except Exception as e:
             error_message = (
                 'Failed to create topic summary %s: %s' % (item.id, e))
-            logging.exception(error_message)
+            logging_services.exception(error_message)
             yield (
                 RegenerateTopicSummaryOneOffJob._ERROR_KEY,
                 error_message.encode('utf-8'))

@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import itertools
 import json
-import logging
 
 from core.domain import auth_domain
 from core.domain import user_services
@@ -40,6 +39,7 @@ import webapp2
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class FirebaseAdminSdkStub(python_utils.OBJECT):
@@ -811,7 +811,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         self.firebase_sdk_stub.uninstall()
         super(FirebaseAuthServicesTestBase, self).tearDown()
 
-    def capture_logging(self, min_level=logging.INFO):
+    def capture_logging(self, min_level=logging_services.INFO):
         """Context manager that captures logs into a list.
 
         Overridden to set the minimum logging level as INFO.

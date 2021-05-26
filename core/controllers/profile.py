@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import logging
 import re
 import zipfile
 
@@ -33,9 +32,12 @@ from core.domain import takeout_service
 from core.domain import user_domain
 from core.domain import user_services
 from core.domain import wipeout_service
+from core.platform import models
 import feconf
 import python_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -380,7 +382,7 @@ class ExportAccountHandler(base.BaseHandler):
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
-            logging.error(
+            logging_services.error(
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
                 % self.user_id)
             user_data_json_string = (

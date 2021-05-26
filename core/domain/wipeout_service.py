@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import re
 
 from core.domain import auth_services
@@ -50,6 +49,7 @@ import python_utils
 ])
 
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'
@@ -375,7 +375,7 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
                 model_class.get_deletion_policy() not in policies_not_to_verify
                 and model_class.has_reference_to_user_id(user_id)
         ):
-            logging.error(
+            logging_services.error(
                 '%s %s is not deleted for user with ID %s' % (
                     WIPEOUT_LOGS_PREFIX, model_class.__name__, user_id))
             user_is_verified = False
@@ -619,7 +619,7 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
             getattr(model, commit_log_model_field_name)
             for model in commit_log_models)
         if snapshot_metadata_ids != commit_log_ids:
-            logging.error(
+            logging_services.error(
                 '%s The commit log model \'%s\' and snapshot models %s IDs '
                 'differ. Snapshots without commit logs: %s, '
                 'commit logs without snapshots: %s.' % (

@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import logging
 import os
 
 from core.domain import caching_services
@@ -49,6 +48,7 @@ import utils
 ])
 
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 search_services = models.Registry.import_search_services()
 
 
@@ -1293,7 +1293,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -1310,7 +1310,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
         exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging_services, 'error', _mock_logging_function):
             self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(

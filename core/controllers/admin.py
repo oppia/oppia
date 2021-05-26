@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import random
 
 from constants import constants
@@ -55,9 +54,12 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
+from core.platform import models
 import feconf
 import python_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class AdminPage(base.BaseHandler):
@@ -192,14 +194,14 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')
-                logging.info(
+                logging_services.info(
                     '[ADMIN] %s saved config property values: %s' %
                     (self.user_id, new_config_property_values))
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif self.payload.get('action') == 'revert_config_property':
                 config_property_id = self.payload.get('config_property_id')
-                logging.info(
+                logging_services.info(
                     '[ADMIN] %s reverted config property: %s' %
                     (self.user_id, config_property_id))
                 config_services.revert_property(
@@ -285,12 +287,12 @@ class AdminHandler(base.BaseHandler):
                         utils.ValidationError,
                         feature_services.FeatureFlagNotFoundException) as e:
                     raise self.InvalidInputException(e)
-                logging.info(
+                logging_services.info(
                     '[ADMIN] %s updated feature %s with new rules: '
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
-            logging.error('[ADMIN] %s', e)
+            logging_services.error('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
             python_utils.reraise_exception()
 
@@ -305,7 +307,7 @@ class AdminHandler(base.BaseHandler):
             Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
-            logging.info(
+            logging_services.info(
                 '[ADMIN] %s reloaded exploration %s' %
                 (self.user_id, exploration_id))
             exp_services.load_demo(python_utils.convert_to_bytes(
@@ -613,7 +615,7 @@ class AdminHandler(base.BaseHandler):
             Exception. Cannot reload a collection in production.
         """
         if constants.DEV_MODE:
-            logging.info(
+            logging_services.info(
                 '[ADMIN] %s reloaded collection %s' %
                 (self.user_id, collection_id))
             collection_services.load_demo(
@@ -639,7 +641,7 @@ class AdminHandler(base.BaseHandler):
         """
 
         if constants.DEV_MODE:
-            logging.info(
+            logging_services.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %
                 (self.user_id, num_dummy_exps_to_generate))
             possible_titles = ['Hulk Neuroscience', 'Quantum Starks',

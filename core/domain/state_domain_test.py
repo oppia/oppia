@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
-import logging
 import os
 import re
 
@@ -32,11 +31,14 @@ from core.domain import interaction_registry
 from core.domain import rules_registry
 from core.domain import state_domain
 from core.domain import translatable_object_registry
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
 import schema_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class StateDomainUnitTests(test_utils.GenericTestBase):
@@ -3843,7 +3845,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
+                self.capture_logging(min_level=logging_services.ERROR))
             stack.enter_context(
                 self.assertRaisesRegexp(
                     Exception, 'string indices must be integers')
@@ -4237,10 +4239,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'warning', _mock_logging_function)
 
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_groups = [{

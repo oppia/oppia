@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import logging
 
 from core.domain import caching_services
 from core.domain import feedback_services
@@ -43,6 +42,7 @@ import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def _create_topic(committer_id, topic, commit_message, commit_cmds):
@@ -340,7 +340,7 @@ def apply_change_list(topic_id, change_list):
             newly_created_subtopic_ids, modified_subtopic_change_cmds)
 
     except Exception as e:
-        logging.error(
+        logging_services.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, topic_id, change_list)
         )
@@ -1076,7 +1076,7 @@ def assign_role(committer, assignee, new_role, topic_id):
     topic_rights = topic_fetchers.get_topic_rights(topic_id)
     if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
-        logging.error(
+        logging_services.error(
             'User %s tried to allow user %s to be a %s of topic %s '
             'but was refused permission.' % (
                 committer_id, assignee.user_id, new_role, topic_id))

@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import itertools
-import logging
 import re
 
 import android_validation_constants
@@ -33,11 +32,14 @@ from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rules_registry
 from core.domain import translatable_object_registry
+from core.platform import models
 from extensions.objects.models import objects
 import feconf
 import python_utils
 import schema_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class AnswerGroup(python_utils.OBJECT):
@@ -2023,7 +2025,7 @@ class RuleSpec(python_utils.OBJECT):
 
         # Check if there are input keys which are not rule parameters.
         if leftover_input_keys:
-            logging.warning(
+            logging_services.warning(
                 'RuleSpec \'%s\' has inputs which are not recognized '
                 'parameter names: %s' % (self.rule_type, leftover_input_keys))
 
@@ -2587,7 +2589,7 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.exception(
+            logging_services.exception(
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
             python_utils.reraise_exception()
 

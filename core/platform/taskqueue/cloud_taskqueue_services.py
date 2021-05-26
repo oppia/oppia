@@ -20,13 +20,14 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import logging
-
+from core.platform import models
 import feconf
 
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 CLIENT = tasks_v2.CloudTasksClient()
 
@@ -94,5 +95,5 @@ def create_http_task(
     # Taskqueue API are not repeated.
     response = CLIENT.create_task(parent, task, retry=retry.Retry())
 
-    logging.info('Created task %s' % response.name)
+    logging_services.info('Created task %s' % response.name)
     return response

@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.domain import collection_domain
@@ -46,6 +45,7 @@ import python_utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -1752,7 +1752,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             self):
         self.aggregated_stats.pop('num_starts')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+        with self.capture_logging(
+            min_level=logging_services.ERROR) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
@@ -1767,7 +1768,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.aggregated_stats['state_stats_mapping']['Home'].pop(
             'total_hit_count')
 
-        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+        with self.capture_logging(
+            min_level=logging_services.ERROR) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
@@ -1924,7 +1926,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg)
 
         # Load demo exploration.
@@ -1937,7 +1939,8 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
             stats_models.StateHitEventLogEntryModel.get_all())
         self.assertEqual(all_models.count(), 0)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(
+            logging_services, 'error', _mock_logging_function):
             self.post_json(
                 '/explorehandler/state_hit_event/%s' % exp_id,
                 {

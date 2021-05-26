@@ -18,7 +18,6 @@ from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import exp_fetchers
@@ -35,6 +34,7 @@ import utils
         models.NAMES.feedback, models.NAMES.user]))
 
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -167,7 +167,7 @@ class RecentUpdatesMRJobManager(
 
         for ind, activity_model in enumerate(activity_models):
             if activity_model is None:
-                logging.error(
+                logging_services.error(
                     'Could not find %s %s' % (
                         activity_type, activity_ids_list[ind]))
                 continue

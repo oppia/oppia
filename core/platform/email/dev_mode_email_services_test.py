@@ -19,12 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import textwrap
 
+from core.platform import models
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 import feconf
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class EmailTests(test_utils.GenericTestBase):
@@ -37,7 +39,7 @@ class EmailTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.info()."""
+            """Mocks logging_services.info()."""
             observed_log_messages.append(msg % args)
 
         msg_body = (
@@ -68,7 +70,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+            self.swap(logging_services, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
                 'subject', 'body', 'html')
@@ -84,7 +86,7 @@ class EmailTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.info()."""
+            """Mocks logging_services.info()."""
             observed_log_messages.append(msg % args)
 
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
@@ -125,7 +127,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         allow_emailing = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         with allow_emailing, (
-            self.swap(logging, 'info', _mock_logging_function)):
+            self.swap(logging_services, 'info', _mock_logging_function)):
             dev_mode_email_services.send_email_to_recipients(
                 feconf.SYSTEM_EMAIL_ADDRESS,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

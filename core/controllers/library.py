@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import logging
 import string
 
 from constants import constants
@@ -28,9 +27,12 @@ from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import python_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def get_matching_activity_dicts(
@@ -81,7 +83,7 @@ def get_matching_activity_dicts(
             exp_ids))
 
     if len(activity_list) == feconf.DEFAULT_QUERY_LIMIT:
-        logging.error(
+        logging_services.error(
             '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)

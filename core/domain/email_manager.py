@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 
 from constants import constants
 from core.domain import config_domain
@@ -38,14 +37,15 @@ import utils
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
 app_identity_services = models.Registry.import_app_identity_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
 def log_new_error(*args, **kwargs):
-    """Logs an error message (This is a stub for logging.error(), so that the
-    latter can be swapped out in tests).
+    """Logs an error message (This is a stub for logging_services.error(),
+    so that the latter can be swapped out in tests).
     """
-    logging.error(*args, **kwargs)
+    logging_services.error(*args, **kwargs)
 
 
 NEW_REVIEWER_EMAIL_DATA = {
@@ -390,7 +390,7 @@ def require_sender_id_is_valid(intent, sender_id):
         raise Exception('Invalid email intent string: %s' % intent)
     else:
         if not SENDER_VALIDATORS[intent](sender_id):
-            logging.error(
+            logging_services.error(
                 'Invalid sender_id %s for email with intent \'%s\'' %
                 (sender_id, intent))
             raise Exception(
@@ -1361,7 +1361,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
         return
 
     if not reviewable_suggestion_email_infos:
-        logging.info(
+        logging_services.info(
             'There were no Contributor Dashboard suggestions that were waiting '
             'too long for a review.')
         return
@@ -1448,7 +1448,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         return
 
     if not suggestion_types_needing_reviewers:
-        logging.info(
+        logging_services.info(
             'There were no suggestion types that needed more reviewers on the '
             'Contributor Dashboard.')
         return
@@ -1575,7 +1575,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
 
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
-            logging.info(
+            logging_services.info(
                 'There were no suggestions to recommend to the reviewer with '
                 'user id: %s.' % reviewer_id)
             continue

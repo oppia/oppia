@@ -52,13 +52,15 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import collections
-import logging
 import os
 import socket
 import sys
 import threading
 
+from core.platform import models
 import python_utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 _PROTOCOLS = [(socket.SOCK_STREAM, socket.IPPROTO_TCP),
               (socket.SOCK_DGRAM, socket.IPPROTO_UDP)]
@@ -159,17 +161,17 @@ def _should_allocate_port(pid):
         bool. Whether or not to allocate a port to the process.
     """
     if pid <= 0:
-        logging.info('Not allocating a port to invalid pid')
+        logging_services.info('Not allocating a port to invalid pid')
         return False
     if pid == 1:
         # The client probably meant to send us its parent pid but
         # had been reparented to init.
-        logging.info('Not allocating a port to init.')
+        logging_services.info('Not allocating a port to init.')
         return False
     try:
         os.kill(pid, 0)
     except OSError:
-        logging.info('Not allocating a port to a non-existent process')
+        logging_services.info('Not allocating a port to a non-existent process')
         return False
     return True
 
@@ -249,15 +251,16 @@ class _PortPool(python_utils.OBJECT):
                     candidate.pid = pid
                     candidate.start_time = _get_process_start_time(pid)
                     if not candidate.start_time:
-                        logging.info('Can\'t read start time for pid %d.', pid)
+                        logging_services.info(
+                            'Can\'t read start time for pid %d.', pid)
                     self.ports_checked_for_last_request = check_count
                     return candidate.port
                 else:
-                    logging.info(
+                    logging_services.info(
                         'Port %d unexpectedly in use, last owning pid %d.',
                         candidate.port, candidate.pid)
 
-        logging.info('All ports in use.')
+        logging_services.info('All ports in use.')
         self.ports_checked_for_last_request = check_count
         return 0
 
@@ -309,11 +312,11 @@ class _PortServerRequestHandler(python_utils.OBJECT):
             pid = int(client_data)
         except ValueError as error:
             self._client_request_errors += 1
-            logging.warning('Could not parse request: %s', error)
+            logging_services.warning('Could not parse request: %s', error)
             return
 
-        logging.info('Request on behalf of pid %d.', pid)
-        logging.info('cmdline: %s', _get_process_command_line(pid))
+        logging_services.info('Request on behalf of pid %d.', pid)
+        logging_services.info('cmdline: %s', _get_process_command_line(pid))
 
         if not _should_allocate_port(pid):
             self._denied_allocations += 1
@@ -322,16 +325,16 @@ class _PortServerRequestHandler(python_utils.OBJECT):
         port = self._port_pool.get_port_for_process(pid)
         if port > 0:
             self._total_allocations += 1
-            logging.debug('Allocated port %d to pid %d', port, pid)
+            logging_services.debug('Allocated port %d to pid %d', port, pid)
             return '{:d}\n'.format(port).encode(encoding='utf-8')
         else:
             self._denied_allocations += 1
-            logging.info('Denied allocation to pid %d', pid)
+            logging_services.info('Denied allocation to pid %d', pid)
             return ''
 
     def dump_stats(self):
         """Logs statistics of our operation."""
-        logging.info('Dumping statistics:')
+        logging_services.info('Dumping statistics:')
         stats = []
         stats.append(
             'client-request-errors {}'.format(self._client_request_errors))
@@ -341,7 +344,7 @@ class _PortServerRequestHandler(python_utils.OBJECT):
             self._port_pool.ports_checked_for_last_request))
         stats.append('total-allocations {}'.format(self._total_allocations))
         for stat in stats:
-            logging.info(stat)
+            logging_services.info(stat)
 
 
 def _parse_command_line():
@@ -379,10 +382,12 @@ def _parse_port_ranges(pool_str):
             a, b = range_str.split('-', 1)
             start, end = int(a), int(b)
         except ValueError:
-            logging.error('Ignoring unparsable port range %r.', range_str)
+            logging_services.error(
+                'Ignoring unparsable port range %r.', range_str)
             continue
         if start < 1 or end > 65535:
-            logging.error('Ignoring out of bounds port range %r.', range_str)
+            logging_services.error(
+                'Ignoring out of bounds port range %r.', range_str)
             continue
         ports.update(set(python_utils.RANGE(start, end + 1)))
     return ports
@@ -504,7 +509,7 @@ def main():
     config = _parse_command_line()
     ports_to_serve = _parse_port_ranges(config.portserver_static_pool)
     if not ports_to_serve:
-        logging.error(
+        logging_services.error(
             'No ports. Invalid port ranges in --portserver_static_pool?'
         )
         sys.exit(1)
@@ -515,18 +520,18 @@ def main():
         request_handler.handle_port_request,
         config.portserver_unix_socket_address.replace('@', '\0', 1),
     )
-    logging.info(
+    logging_services.info(
         'Serving portserver on %s',
         config.portserver_unix_socket_address
     )
     try:
         server.run()
     except KeyboardInterrupt:
-        logging.info('Stopping portserver due to ^C.')
+        logging_services.info('Stopping portserver due to ^C.')
     finally:
         server.close()
         request_handler.dump_stats()
-        logging.info('Shutting down portserver.')
+        logging_services.info('Shutting down portserver.')
 
 
 if __name__ == '__main__':

@@ -27,7 +27,6 @@ import functools
 import inspect
 import itertools
 import json
-import logging
 import os
 import re
 import unittest
@@ -85,6 +84,7 @@ import webtest
 
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
+logging_services = models.Registry.import_cloud_logging_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_auth_services = models.Registry.import_auth_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
@@ -999,7 +999,7 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
-    def capture_logging(self, min_level=logging.NOTSET):
+    def capture_logging(self, min_level=logging_services.NOTSET):
         """Context manager that captures logs into a list.
 
         Strips whitespace from messages for convenience.
@@ -1028,9 +1028,10 @@ class TestBase(unittest.TestCase):
                 """Does nothing."""
                 pass
 
-        list_stream_handler = logging.StreamHandler(stream=ListStream())
+        list_stream_handler = logging_services.StreamHandler(
+            stream=ListStream())
 
-        logger = logging.getLogger()
+        logger = logging_services.getLogger()
         old_level = logger.level
         logger.addHandler(list_stream_handler)
         logger.setLevel(min_level)

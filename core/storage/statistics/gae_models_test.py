@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import types
 
 from core.domain import exp_domain
@@ -29,6 +28,7 @@ import feconf
 
 (base_models, stats_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.statistics])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):
@@ -658,10 +658,11 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.exception."""
+            """Mocks logging_services.exception."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'exception', _mock_logging_function)
 
         large_calculation_output = {'key': 'a' * 1200000}
 

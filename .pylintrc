@@ -62,8 +62,10 @@ max-line-length=80
 indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
+# TODO(#): Add import a subset of platform i.e the models to forbidden imports
+# of core.controllers.
 forbidden-imports=
-    core.controllers:core.platform|core.storage,
+    core.controllers:core.storage,
     core.domain:core.controllers,
     core.storage:core.domain
 

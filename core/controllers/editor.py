@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -39,8 +38,11 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -167,7 +169,7 @@ class ExplorationHandler(EditorHandler):
 
         log_debug_string = '(%s) %s tried to delete exploration %s' % (
             self.role, self.user_id, exploration_id)
-        logging.debug(log_debug_string)
+        logging_services.debug(log_debug_string)
 
         is_exploration_cloned = rights_manager.is_exploration_cloned(
             exploration_id)
@@ -176,7 +178,7 @@ class ExplorationHandler(EditorHandler):
 
         log_info_string = '(%s) %s deleted exploration %s' % (
             self.role, self.user_id, exploration_id)
-        logging.info(log_info_string)
+        logging_services.info(log_info_string)
         self.render_json(self.values)
 
 
@@ -545,8 +547,8 @@ class StateInteractionStatsHandler(EditorHandler):
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % (
+            logging_services.error('Could not find state: %s' % state_name)
+            logging_services.error('Available states: %s' % (
                 list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 

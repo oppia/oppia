@@ -19,12 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from core.domain import translation_fetchers
 from core.platform import models
 
 cloud_translate_services = models.Registry.import_cloud_translate_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 (translation_models,) = models.Registry.import_models([
     models.NAMES.translation])
@@ -64,7 +63,7 @@ def get_and_cache_machine_translation(
     # instead of raised to provide an uninterrupted end user experience while
     # still providing error context on the back-end.
     except ValueError as e:
-        logging.error(e)
+        logging_services.error(e)
 
     if translated_text is not None:
         translation_models.MachineTranslationModel.create(

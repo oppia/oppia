@@ -19,10 +19,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import textwrap
 
+from core.platform import models
 import python_utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def send_email_to_recipients(
@@ -108,9 +110,9 @@ def send_email_to_recipients(
             bcc_email_list_str if bcc else 'None',
             reply_to if reply_to else 'None',
             len(recipient_variables) if recipient_variables else 0))
-    logging.info(
+    logging_services.info(
         textwrap.dedent(msg) + textwrap.dedent(optional_msg_description))
-    logging.info(
+    logging_services.info(
         'You are not currently sending out real emails since this is a' +
         ' dev environment. Emails are sent out in the production' +
         ' environment.')

@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import collection_domain
@@ -31,6 +30,7 @@ import python_utils
 
 (base_models, collection_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -61,7 +61,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             collection.validate(strict=False)
         except Exception as e:
-            logging.exception(
+            logging_services.exception(
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (
                 CollectionMigrationOneOffJob._ERROR_KEY,

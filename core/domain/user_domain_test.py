@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from constants import constants
 from core.domain import auth_services
 from core.domain import user_domain
@@ -31,6 +29,7 @@ import feconf
 import utils
 
 user_models, = models.Registry.import_models([models.NAMES.user])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 # This mock class will not be needed once the schema version is >=2 for the
@@ -276,10 +275,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
         assert_raises_user_not_found = self.assertRaisesRegexp(
             Exception, 'User not found.')
 

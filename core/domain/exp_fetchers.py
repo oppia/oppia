@@ -26,7 +26,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
-import logging
 
 from core.domain import caching_services
 from core.domain import exp_domain
@@ -37,6 +36,7 @@ import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def _migrate_states_schema(versioned_exploration_states, init_state_name):
@@ -366,7 +366,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             exploration = get_exploration_from_model(model)
             db_results_dict[eid] = exploration
         else:
-            logging.info(
+            logging_services.info(
                 'Tried to fetch exploration with id %s, but no such '
                 'exploration exists in the datastore' % eid)
             not_found.append(eid)

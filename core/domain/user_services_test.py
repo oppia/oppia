@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import os
 
 from constants import constants
@@ -44,6 +43,7 @@ import requests_mock
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class MockUserStatsAggregator(
@@ -380,7 +380,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        logging_mocker = self.swap(logging, 'error', error_messages.append)
+        logging_mocker = self.swap(
+            logging_services, 'error', error_messages.append)
 
         with logging_mocker, requests_mock.Mocker() as requests_mocker:
             requests_mocker.get(gravatar_url, status_code=404)
@@ -396,7 +397,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages = []
-        logging_mocker = self.swap(logging, 'exception', error_messages.append)
+        logging_mocker = self.swap(
+            logging_services, 'exception', error_messages.append)
 
         with logging_mocker, requests_mock.Mocker() as requests_mocker:
             requests_mocker.get(gravatar_url, exc=Exception)

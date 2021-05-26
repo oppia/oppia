@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import contextlib
-import logging
 import os
 import re
 import shutil
@@ -29,6 +28,7 @@ import sys
 import threading
 import time
 
+from core.platform import models
 from core.tests import test_utils
 import python_utils
 from scripts import common
@@ -37,6 +37,8 @@ from scripts import servers
 
 import mock
 import psutil
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class ManagedProcessTests(test_utils.TestBase):
@@ -309,7 +311,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(self.swap_to_always_raise(
             psutil, 'wait_procs', error=Exception('uh-oh')))
         logs = self.exit_stack.enter_context(self.capture_logging(
-            min_level=logging.ERROR))
+            min_level=logging_services.ERROR))
 
         self.exit_stack.enter_context(servers.managed_process(['a', 'bc']))
         # Should not raise.

@@ -23,7 +23,6 @@ import collections
 import copy
 import datetime
 import json
-import logging
 import traceback
 
 from core.domain import taskqueue_services
@@ -44,6 +43,7 @@ from pipeline import pipeline
 
 app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
@@ -633,7 +633,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                     results_list.append(json.loads(item))
             job_class.register_completion(job_id, results_list)
         except Exception as e:
-            logging.exception(
+            logging_services.exception(
                 'Job %s failed at %s' % (
                     job_id, utils.get_current_time_in_millisecs()
                 )
@@ -1568,10 +1568,10 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         """Marks the batch job as cancelled and verifies that the continuous
         computation is now idle.
         """
-        logging.info('Job %s canceled.' % cls.__name__)
+        logging_services.info('Job %s canceled.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status != job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE:
-            logging.error(
+            logging_services.error(
                 'Batch job for computation %s canceled but status code not set '
                 'to idle.' % cls.__name__)
 
@@ -1579,7 +1579,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
     def on_batch_job_failure(cls):
         """Gives up on the existing batch job and kicks off a new one."""
         # TODO(sll): Alert the site admin via email.
-        logging.error('Job %s failed.' % cls.__name__)
+        logging_services.error('Job %s failed.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job_after_previous_one_ends()
@@ -1746,7 +1746,7 @@ def cleanup_old_jobs_pipelines():
                 p.cleanup()
                 num_cleaned += 1
 
-    logging.warning('%s MR jobs cleaned up.' % num_cleaned)
+    logging_services.warning('%s MR jobs cleaned up.' % num_cleaned)
 
 
 def do_unfinished_jobs_exist(job_type):

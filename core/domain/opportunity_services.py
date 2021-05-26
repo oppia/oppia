@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.domain import exp_fetchers
@@ -32,6 +31,7 @@ import utils
 
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def is_exploration_available_for_contribution(exp_id):
@@ -73,7 +73,7 @@ def get_exploration_opportunity_summary_from_model(model):
     missing_language_codes = list(
         supported_language_codes - set_of_all_languages)
     if missing_language_codes:
-        logging.info(
+        logging_services.info(
             'Missing language codes %s in exploration opportunity model with '
             'id %s' % (missing_language_codes, model.id))
 

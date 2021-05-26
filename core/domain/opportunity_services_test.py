@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.domain import exp_domain
@@ -47,6 +46,7 @@ import python_utils
 ) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.suggestion
 ])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
@@ -839,7 +839,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.info()."""
+            """Mocks logging_services.info()."""
             observed_log_messages.append(msg % args)
 
         opportunities = (
@@ -860,8 +860,10 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(len(observed_log_messages), 0)
 
-        with self.swap(logging, 'info', _mock_logging_function), self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages):
+        with self.swap(
+            logging_services, 'info', _mock_logging_function), self.swap(
+                constants, 'SUPPORTED_AUDIO_LANGUAGES',
+                mock_supported_languages):
             opportunities = (
                 opportunity_services
                 .get_exploration_opportunity_summaries_by_ids(['0']))

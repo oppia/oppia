@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import logging
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -33,6 +32,7 @@ import python_utils
 
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class BaseEventHandler(python_utils.OBJECT):
@@ -88,7 +88,7 @@ class StatsEventsHandler(BaseEventHandler):
     @classmethod
     def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
         if 'undefined' in aggregated_stats['state_stats_mapping']:
-            logging.error(
+            logging_services.error(
                 'Aggregated stats contains an undefined state name: %s'
                 % aggregated_stats['state_stats_mapping'].keys())
             return

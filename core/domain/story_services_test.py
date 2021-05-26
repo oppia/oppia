@@ -17,8 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -37,6 +35,7 @@ import utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class StoryServicesUnitTests(test_utils.GenericTestBase):
@@ -514,10 +513,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'Expected change to be of type StoryChange')
 
@@ -1019,14 +1019,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg):
-            """Mocks logging.exception()."""
+            """Mocks logging_services.exception()."""
             observed_log_messages.append(msg)
 
         def _mock_validate_function(_exploration, _strict):
-            """Mocks logging.exception()."""
+            """Mocks logging_services.exception()."""
             raise Exception('Error in exploration')
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'exception', _mock_logging_function)
         validate_fn_swap = self.swap(
             exp_services, 'validate_exploration_for_story',
             _mock_validate_function)

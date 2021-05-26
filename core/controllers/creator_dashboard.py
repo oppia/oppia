@@ -19,7 +19,6 @@ activities.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -37,9 +36,12 @@ from core.domain import summary_services
 from core.domain import topic_fetchers
 from core.domain import user_jobs_continuous
 from core.domain import user_services
+from core.platform import models
 import feconf
 import python_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 EXPLORATION_ID_KEY = 'exploration_id'
 COLLECTION_ID_KEY = 'collection_id'
@@ -232,7 +234,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             user_services.get_last_week_dashboard_stats(self.user_id))
 
         if last_week_stats and len(list(last_week_stats.keys())) != 1:
-            logging.error(
+            logging_services.error(
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
                 ' datetime string.')

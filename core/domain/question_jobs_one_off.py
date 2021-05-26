@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import question_domain
@@ -29,6 +28,7 @@ from core.platform import models
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -59,7 +59,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             question.validate()
         except Exception as e:
-            logging.exception(
+            logging_services.exception(
                 'Question %s failed validation: %s' % (item.id, e))
             yield (
                 QuestionMigrationOneOffJob._ERROR_KEY,
@@ -183,7 +183,7 @@ class QuestionSnapshotsMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
                     'Question snapshot %s failed migration to state '
                     'v%s: %s' % (
                         item.id, current_state_schema_version + 1, e))
-                logging.exception(error_message)
+                logging_services.exception(error_message)
                 yield ('MIGRATION_ERROR', error_message.encode('utf-8'))
                 break
 

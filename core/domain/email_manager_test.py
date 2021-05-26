@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import types
 
 from constants import constants
@@ -39,6 +38,7 @@ import python_utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class FailedMLTest(test_utils.EmailTestBase):
@@ -2186,8 +2186,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.logged_errors.append(error_message)
 
     def _mock_logging_info(self, msg, *args):
-        """Mocks logging.info() by appending the log message to the logged info
-        list.
+        """Mocks logging_services.info() by appending the log message to the
+        logged info list.
         """
         self.logged_info.append(msg % args)
 
@@ -2214,7 +2214,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             email_manager, 'log_new_error', self.log_new_error_counter)
         self.logged_info = []
         self.log_new_info_ctx = self.swap(
-            logging, 'info', self._mock_logging_info)
+            logging_services, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
@@ -3769,8 +3769,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.logged_errors.append(error_message)
 
     def _mock_logging_info(self, msg, *args):
-        """Mocks logging.info() by appending the log message to the logged info
-        list.
+        """Mocks logging_services.info() by appending the log message to the
+        logged info list.
         """
         self.logged_info.append(msg % args)
 
@@ -3795,7 +3795,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             email_manager, 'log_new_error', self.log_new_error_counter)
         self.logged_info = []
         self.log_new_info_ctx = self.swap(
-            logging, 'info', self._mock_logging_info)
+            logging_services, 'info', self._mock_logging_info)
 
         self.save_new_valid_exploration(self.target_id, self.author_id)
         self.save_new_skill(self.skill_id, self.author_id)
@@ -4501,8 +4501,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.logged_errors.append(error_message)
 
     def _mock_logging_info(self, msg, *args):
-        """Mocks logging.info() by appending the log message to the logged info
-        list.
+        """Mocks logging_services.info() by appending the log message to the
+        logged info list.
         """
         self.logged_info.append(msg % args)
 
@@ -4530,7 +4530,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             email_manager, 'log_new_error', self.log_new_error_counter)
         self.logged_info = []
         self.log_new_info_ctx = self.swap(
-            logging, 'info', self._mock_logging_info)
+            logging_services, 'info', self._mock_logging_info)
 
         self.suggestion_types_needing_reviewers = {
             feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
@@ -5405,10 +5405,10 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging_services, 'error', _mock_logging_function):
             email_manager.send_rejected_voiceover_application_email(
                 self.applicant_id, 'Lesson to voiceover', 'en',
                 'A rejection message!')

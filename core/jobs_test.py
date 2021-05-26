@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 import re
 
 from core import jobs
@@ -42,6 +41,7 @@ from mapreduce import input_readers
         models.NAMES.statistics, models.NAMES.job]))
 
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'
@@ -233,7 +233,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
-                self.capture_logging(min_level=logging.ERROR))
+                self.capture_logging(min_level=logging_services.ERROR))
             stack.enter_context(input_reader_swap)
             stack.enter_context(
                 self.assertRaisesRegexp(
@@ -957,7 +957,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
         StartExplorationEventCounter.start_computation()
@@ -966,7 +966,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         self.assertEqual(
             status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.swap(logging_services, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
         self.run_but_do_not_flush_pending_mapreduce_tasks()
@@ -979,7 +979,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
         StartExplorationEventCounter.start_computation()
@@ -988,7 +988,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         self.assertEqual(
             status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with self.swap(logging_services, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
         self.run_but_do_not_flush_pending_mapreduce_tasks()

@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from core import jobs
 from core.domain import story_domain
@@ -30,6 +29,7 @@ from core.platform import models
 import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class DescriptionLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -79,7 +79,7 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             story_services.validate_prerequisite_skills_in_story_contents(
                 story.corresponding_topic_id, story.story_contents)
         except Exception as e:
-            logging.error(
+            logging_services.error(
                 'Story %s failed validation: %s' % (item.id, e))
             yield (
                 StoryMigrationOneOffJob._ERROR_KEY,

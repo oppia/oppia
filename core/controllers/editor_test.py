@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import os
 import zipfile
 
@@ -44,6 +43,7 @@ import python_utils
 
 (exp_models, user_models, stats_models) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
@@ -965,10 +965,11 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
 
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
@@ -1137,8 +1138,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             if msg != log_from_google_app_engine:
                 observed_log_messages.append(msg)
 
-        with self.swap(logging, 'info', mock_logging_function), self.swap(
-            logging, 'debug', mock_logging_function):
+        with self.swap(
+            logging_services, 'info', mock_logging_function), self.swap(
+                logging_services, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
             exp_id = 'unpublished_eid'
             exploration = exp_domain.Exploration.create_default_exploration(

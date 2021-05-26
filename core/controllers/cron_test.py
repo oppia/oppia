@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import logging
 
 from constants import constants
 from core import jobs
@@ -48,6 +47,7 @@ import webtest
     models.NAMES.exploration, models.NAMES.job,
     models.NAMES.suggestion, models.NAMES.user
 ])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
@@ -224,10 +224,11 @@ class CronJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
+            """Mocks logging_services.warning()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'warning', _mock_logging_function)
         recency_msec_swap = self.swap(
             jobs, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
 
@@ -270,10 +271,11 @@ class CronJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
+            """Mocks logging_services.warning()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'warning', _mock_logging_function)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -303,10 +305,11 @@ class CronJobTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
+            """Mocks logging_services.warning()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'warning', _mock_logging_function)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 

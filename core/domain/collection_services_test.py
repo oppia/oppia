@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import logging
 import os
 
 from constants import constants
@@ -38,6 +37,7 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 gae_search_services = models.Registry.import_search_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -402,10 +402,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *_):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
 
         self.save_new_valid_collection('collection_id', self.owner_id)
 

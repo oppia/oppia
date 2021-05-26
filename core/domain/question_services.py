@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
-import logging
 
 from constants import constants
 from core.domain import opportunity_services
@@ -33,6 +32,7 @@ import utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -568,7 +568,7 @@ def apply_change_list(question_id, change_list):
         return question
 
     except Exception as e:
-        logging.error(
+        logging_services.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, question_id, change_list)
         )

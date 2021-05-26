@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core import jobs
@@ -62,6 +61,8 @@ import utils
     models.NAMES.audit, models.NAMES.exploration, models.NAMES.job,
     models.NAMES.opportunity, models.NAMES.user
 ])
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -233,7 +234,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.info()."""
+            """Mocks logging_services.info()."""
             observed_log_messages.append(msg % args)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -244,7 +245,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertFalse(collection_rights.community_owned)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with self.swap(logging_services, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'reload_collection',
@@ -468,7 +469,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.info()."""
+            """Mocks logging_services.info()."""
             observed_log_messages.append(msg % args)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -477,7 +478,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         config_services.set_property(self.admin_id, 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with self.swap(logging_services, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler', {
                     'action': 'revert_config_property',

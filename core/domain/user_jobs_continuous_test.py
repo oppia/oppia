@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import logging
 
 from core.domain import collection_services
 from core.domain import event_services
@@ -45,6 +44,7 @@ import utils
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
+logging_services = models.Registry.import_cloud_logging_services()
 
 COLLECTION_ID = 'cid'
 COLLECTION_TITLE = 'Title'
@@ -567,10 +567,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
         self.save_new_default_collection(
             COLLECTION_ID, USER_ID, title=COLLECTION_TITLE)
         collection_services.delete_collection(

@@ -27,7 +27,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import datetime
-import logging
 import math
 import os
 import pprint
@@ -66,6 +65,7 @@ datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
+logging_services = models.Registry.import_cloud_logging_services()
 
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
@@ -117,7 +117,7 @@ def get_exploration_titles_and_categories(exp_ids):
     result = {}
     for exploration in explorations:
         if exploration is None:
-            logging.error(
+            logging_services.error(
                 'Could not find exploration corresponding to id')
         else:
             result[exploration.id] = {
@@ -177,13 +177,13 @@ def get_exploration_ids_matching_query(
                 or search_offset is None):
             break
         else:
-            logging.error(
+            logging_services.error(
                 'Search index contains stale exploration ids: %s' %
                 ', '.join(invalid_exp_ids))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_offset is not None):
-        logging.error(
+        logging_services.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
@@ -536,7 +536,7 @@ def apply_change_list(exploration_id, change_list):
         return exploration
 
     except Exception as e:
-        logging.error(
+        logging_services.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
@@ -1485,7 +1485,7 @@ def delete_demo(exploration_id):
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if not exploration:
-        logging.info(
+        logging_services.info(
             'Exploration with id %s was not deleted, because it '
             'does not exist.' % exploration_id)
     else:
@@ -1522,7 +1522,7 @@ def load_demo(exploration_id):
 
     index_explorations_given_ids([exploration_id])
 
-    logging.info('Exploration with id %s was loaded.' % exploration_id)
+    logging_services.info('Exploration with id %s was loaded.' % exploration_id)
 
 
 def get_next_page_of_all_non_private_commits(
@@ -1843,7 +1843,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                 for change in exp_user_data.draft_change_list]
             if (exploration.version >
                     exp_user_data.draft_change_list_exp_version):
-                logging.info(
+                logging_services.info(
                     'Exploration and draft versions out of sync, trying '
                     'to upgrade draft version to match exploration\'s.')
                 new_draft_change_list = (

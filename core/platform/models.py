@@ -311,6 +311,23 @@ class _Gae(Platform):
             from core.platform.cloud_translate import cloud_translate_services
             return cloud_translate_services
 
+    @classmethod
+    def import_cloud_logging_services(cls):
+        """Enables the cloud logging services and returns the logging module.
+
+        Returns:
+            module. The logging module.
+        """
+        if constants.EMULATOR_MODE:
+            import logging
+            return logging
+
+        else:
+            from core.platform.cloud_logging import cloud_logging_service
+            cloud_logging_service.enable_cloud_logging()
+            import logging
+            return logging
+
     NAME = 'gae'
 
 
@@ -441,6 +458,15 @@ class Registry(python_utils.OBJECT):
             module. The cloud_translate_services module.
         """
         return cls._get().import_cloud_translate_services()
+
+    @classmethod
+    def import_cloud_logging_services(cls):
+        """Enables the cloud logging services and returns the logging module.
+
+        Returns:
+            module. The logging module.
+        """
+        return cls._get().import_cloud_logging_services()
 
     @classmethod
     def import_search_services(cls):

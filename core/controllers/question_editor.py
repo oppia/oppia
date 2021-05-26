@@ -19,7 +19,6 @@ and are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -31,8 +30,11 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
+from core.platform import models
 import feconf
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class QuestionCreationHandler(base.BaseHandler):
@@ -120,7 +122,7 @@ class QuestionCreationHandler(base.BaseHandler):
         for filename in filenames:
             image = self.request.get(filename)
             if not image:
-                logging.error(
+                logging_services.error(
                     'Image not provided for file with name %s when the question'
                     ' with id %s was created.' % (filename, question.id))
                 raise self.InvalidInputException(

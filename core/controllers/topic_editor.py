@@ -19,7 +19,6 @@ are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -40,8 +39,11 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class TopicEditorStoryHandler(base.BaseHandler):
@@ -237,7 +239,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 
             if deleted_skill_ids:
                 deleted_skills_string = ', '.join(deleted_skill_ids)
-                logging.exception(
+                logging_services.exception(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
@@ -327,7 +329,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         if deleted_skill_ids:
             deleted_skills_string = ', '.join(deleted_skill_ids)
-            logging.exception(
+            logging_services.exception(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )

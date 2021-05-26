@@ -19,13 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class ActivityRightsTests(test_utils.GenericTestBase):
@@ -161,10 +162,11 @@ class ActivityRightsTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'The ownership of this exploration cannot be released.')

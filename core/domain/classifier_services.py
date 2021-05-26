@@ -21,7 +21,6 @@ import base64
 import datetime
 import hashlib
 import hmac
-import logging
 
 from core.domain import classifier_domain
 from core.domain import config_domain
@@ -33,6 +32,7 @@ import python_utils
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -194,7 +194,7 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     for index, classifier_training_job_map in enumerate(
             classifier_training_job_maps):
         if classifier_training_job_map is None:
-            logging.error(
+            logging_services.error(
                 'The ClassifierTrainingJobModel for the %s state of Exploration'
                 ' with exp_id %s and exp_version %s does not exist.' % (
                     state_names_to_retrieve[index], exp_id, old_exp_version))

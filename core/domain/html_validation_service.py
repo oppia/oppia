@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import logging
 import re
 import xml
 
@@ -29,11 +28,14 @@ from constants import constants
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
+from core.platform import models
 from extensions.objects.models import objects
 from extensions.rich_text_components import components
 import feconf
 import python_utils
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def escape_html(unescaped_html_data):
@@ -594,7 +596,7 @@ def add_math_content_to_math_rte_components(html_string):
                 normalized_raw_latex = (
                     objects.UnicodeString.normalize(raw_latex))
             except Exception as e:
-                logging.exception(
+                logging_services.exception(
                     'Invalid raw_latex string found in the math tag : %s' % (
                         python_utils.UNICODE(e)
                     )

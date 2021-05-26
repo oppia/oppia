@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
-import logging
 import sys
 
 from core.platform import models
@@ -32,6 +31,7 @@ import utils
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 CURRENT_ACTION_SCHEMA_VERSION = 1
@@ -2203,7 +2203,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             instance.update_timestamps()
             instance.put()
         except Exception:
-            logging.exception(
+            logging_services.exception(
                 'Failed to add calculation output for exploration ID %s, '
                 'version %s, state name %s, and calculation ID %s' % (
                     exploration_id, exploration_version,

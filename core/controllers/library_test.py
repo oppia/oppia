@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import logging
 import os
 
 from constants import constants
@@ -33,9 +32,12 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 CAN_EDIT_STR = 'can_edit'
 
@@ -216,10 +218,11 @@ class LibraryPageTests(test_utils.GenericTestBase):
         observed_log_messages = []
 
         def _mock_logging_function(msg, *_):
-            """Mocks logging.error()."""
+            """Mocks logging_services.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(
+            logging_services, 'error', _mock_logging_function)
         default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1)
         # Load the search results with an empty query.
         with default_query_limit_swap, logging_swap:

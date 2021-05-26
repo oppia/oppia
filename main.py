@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 from constants import constants
 
 from core.controllers import acl_decorators
@@ -72,11 +71,13 @@ import webapp2
 from webapp2_extras import routes
 
 transaction_services = models.Registry.import_transaction_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,
 # which makes it tiresome to identify the actual error.
-logging.getLogger(name='chardet.charsetprober').setLevel(logging.INFO)
+logging_services.getLogger(
+    name='chardet.charsetprober').setLevel(logging_services.INFO)
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -87,7 +88,7 @@ class FrontendErrorHandler(base.BaseHandler):
     @acl_decorators.open_access
     def post(self):
         """Records errors reported by the frontend."""
-        logging.error('Frontend error: %s' % self.payload.get('error'))
+        logging_services.error('Frontend error: %s' % self.payload.get('error'))
         self.render_json(self.values)
 
 

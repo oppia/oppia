@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 import os
 import re
 
@@ -37,6 +36,7 @@ import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -424,26 +424,26 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 'random_url', [200], params='invalid_params')
 
     def test_capture_logging(self):
-        logging.info('0')
+        logging_services.info('0')
         with self.capture_logging() as logs:
-            logging.info('1')
-            logging.debug('2')
-            logging.warn('3')
-            logging.error('4')
+            logging_services.info('1')
+            logging_services.debug('2')
+            logging_services.warn('3')
+            logging_services.error('4')
             python_utils.PRINT('5')
-        logging.info('6')
+        logging_services.info('6')
 
         self.assertEqual(logs, ['1', '2', '3', '4'])
 
     def test_capture_logging_with_min_level(self):
-        logging.info('0')
-        with self.capture_logging(min_level=logging.WARN) as logs:
-            logging.info('1')
-            logging.debug('2')
-            logging.warn('3')
-            logging.error('4')
+        logging_services.info('0')
+        with self.capture_logging(min_level=logging_services.WARN) as logs:
+            logging_services.info('1')
+            logging_services.debug('2')
+            logging_services.warn('3')
+            logging_services.error('4')
             python_utils.PRINT('5')
-        logging.error('6')
+        logging_services.error('6')
 
         self.assertEqual(logs, ['3', '4'])
 

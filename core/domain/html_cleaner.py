@@ -21,12 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import html.parser
 import json
-import logging
 
 import bleach
 import bs4
 from core.domain import rte_component_registry
+from core.platform import models
 import python_utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 def filter_a(tag, name, value):
@@ -49,7 +51,7 @@ def filter_a(tag, name, value):
         url_components = python_utils.url_split(value)
         if url_components[0] in ['http', 'https']:
             return True
-        logging.error('Found invalid URL href: %s' % value)
+        logging_services.error('Found invalid URL href: %s' % value)
 
     return False
 

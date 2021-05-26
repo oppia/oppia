@@ -27,7 +27,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import copy
-import logging
 import os
 
 from constants import constants
@@ -49,6 +48,7 @@ import utils
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
+logging_services = models.Registry.import_cloud_logging_services()
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -267,7 +267,7 @@ def get_multiple_collections_by_id(collection_ids, strict=True):
             collection = get_collection_from_model(model)
             db_results_dict[cid] = collection
         else:
-            logging.info(
+            logging_services.info(
                 'Tried to fetch collection with id %s, but no such '
                 'collection exists in the datastore' % cid)
             not_found.append(cid)
@@ -354,7 +354,8 @@ def get_collection_titles_and_categories(collection_ids):
     result = {}
     for collection in collection_list:
         if collection is None:
-            logging.error('Could not find collection corresponding to id')
+            logging_services.error(
+                'Could not find collection corresponding to id')
         else:
             result[collection.id] = {
                 'title': collection.title,
@@ -676,7 +677,7 @@ def apply_change_list(collection_id, change_list):
         return collection
 
     except Exception as e:
-        logging.error(
+        logging_services.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
@@ -1180,7 +1181,7 @@ def delete_demo(collection_id):
 
     collection = get_collection_by_id(collection_id, strict=False)
     if not collection:
-        logging.info(
+        logging_services.info(
             'Collection with id %s was not deleted, because it '
             'does not exist.' % collection_id)
     else:
@@ -1220,7 +1221,7 @@ def load_demo(collection_id):
         if exp_fetchers.get_exploration_by_id(exp_id, strict=False) is None:
             exp_services.load_demo(exp_id)
 
-    logging.info('Collection with id %s was loaded.' % collection_id)
+    logging_services.info('Collection with id %s was loaded.' % collection_id)
 
 
 def index_collections_given_ids(collection_ids):

@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -25,8 +24,11 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import fs_domain
 from core.domain import value_generators_domain
+from core.platform import models
 import feconf
 import python_utils
+
+logging_services = models.Registry.import_cloud_logging_services()
 
 
 class ValueGeneratorHandler(base.BaseHandler):
@@ -42,7 +44,7 @@ class ValueGeneratorHandler(base.BaseHandler):
                 value_generators_domain.Registry.get_generator_class_by_id(
                     generator_id).get_html_template())
         except KeyError as e:
-            logging.exception(
+            logging_services.exception(
                 'Value generator not found: %s. %s' % (generator_id, e))
             raise self.PageNotFoundException
 
@@ -106,7 +108,7 @@ class AssetDevHandler(base.BaseHandler):
             self.response.cache_control.max_age = 600
             self.response.write(raw)
         except Exception as e:
-            logging.exception(
+            logging_services.exception(
                 'File not found: %s. %s' % (encoded_filename, e))
             raise self.PageNotFoundException
 
