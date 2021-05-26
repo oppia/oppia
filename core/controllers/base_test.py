@@ -598,6 +598,11 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MaintenanceModeTests, self).setUp()
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
         with contextlib2.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
@@ -620,6 +625,19 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
         self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response('/community-library')
+
+        self.assertIn('<library-page>', response.body)
+        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_html_response_is_not_rejected_when_user_is_release_coordinator(
+            self):
+        self.context_stack.enter_context(
+            self.login_context(self.RELEASE_COORDINATOR_EMAIL))
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 

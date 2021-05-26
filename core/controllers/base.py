@@ -228,11 +228,9 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.user = user_services.get_user_actions_info(self.user_id)
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not (
-                    self.current_user_is_super_admin or
-                    self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
-                and self.request.path not in AUTH_HANDLER_PATHS):
+        if feconf.ENABLE_MAINTENANCE_MODE and (
+                self.request.path not in AUTH_HANDLER_PATHS
+                and not self.current_user_is_site_maintainer):
             auth_services.destroy_auth_session(self.response)
             return
 
@@ -257,11 +255,9 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not (
-                    self.current_user_is_super_admin or
-                    self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
-                and self.request.path not in AUTH_HANDLER_PATHS):
+        if feconf.ENABLE_MAINTENANCE_MODE and (
+                self.request.path not in AUTH_HANDLER_PATHS
+                and not self.current_user_is_site_maintainer):
             self.handle_exception(
                 self.TemporaryMaintenanceException(), self.app.debug)
             return
@@ -306,6 +302,19 @@ class BaseHandler(webapp2.RequestHandler):
                 return
 
         super(BaseHandler, self).dispatch()
+
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
+
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
+        """
+        return (
+            self.current_user_is_super_admin or
+            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
