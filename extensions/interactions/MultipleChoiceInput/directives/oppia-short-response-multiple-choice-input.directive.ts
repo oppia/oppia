@@ -40,6 +40,7 @@ angular.module('oppia').directive('oppiaShortResponseMultipleChoiceInput', [
           ctrl.$onInit = function() {
             var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
             var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
+            _choices = _choices.value.map(choice => choice.html);
             var response = $filter('convertToPlainText')(_choices[_answer]);
             ctrl.response = $filter('truncateAtFirstLine')(response);
           };

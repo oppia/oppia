@@ -34,7 +34,6 @@ describe('DragAndDropSort Object Factory', () => {
     var elem = ['ca_choices01'];
     var answerArray = [['aa'], ['bb']];
     spyOn(dragAndDrop, 'answerContentIdToHTML').and.returnValue(answerArray);
-    dragAndDrop.answerContentIdToHTML(answer, choices);
     expect(value).toEqual(elem);
     expect(dragAndDrop.answerContentIdToHTML(
       answer, choices)

@@ -143,13 +143,6 @@ export class ExplorationHtmlFormatterService {
       answer: InteractionAnswer, interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
-
-    // TODO(sll): Get rid of this special case for multiple choice.
-    if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.html);
-    }
-    var interactionChoices = null;
     if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value.map(
         choice => choice);
@@ -160,10 +153,6 @@ export class ExplorationHtmlFormatterService {
     el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
     if (interactionChoices) {
       el.attr('choices', this.htmlEscaper.objToEscapedJson(
-        interactionChoices));
-    }
-    if (interactionChoices) {
-      el.attr('interactionChoices', this.htmlEscaper.objToEscapedJson(
         interactionChoices));
     }
     return ($('<span>').append(el)).html();

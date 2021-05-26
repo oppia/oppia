@@ -42,7 +42,7 @@ angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
         ctrl.$onInit = function() {
           const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           const interactionchoices = HtmlEscaperService.escapedJsonToObj(
-            $attrs.interactionchoices);
+            $attrs.choices);
           var answerArray = DragAndDropSortObjectFactory.answerContentIdToHTML(
             answer, interactionchoices);
           ctrl.answer = answerArray;
