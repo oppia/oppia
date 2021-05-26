@@ -26,6 +26,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
+import feconf
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
@@ -43,6 +44,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('f@example.com', 'F')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -53,9 +55,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
+        self.user_id_voiceover_admin = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_c = user_services.get_user_actions_info(self.user_id_c)
@@ -66,8 +71,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_admin)
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
+        self.user_voiceover_admin = user_services.get_user_actions_info(
+            self.user_id_voiceover_admin)
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
+        user_services.update_user_role(
+            self.user_id_voiceover_admin, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -120,6 +129,18 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
+        self.assertTrue(
+            rights_manager.check_can_modify_voice_artist_in_activity(
+                self.user_voiceover_admin, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_modify_voice_artist_in_activity(
+                self.user_a, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_modify_voice_artist_in_activity(
+                self.user_admin, exp_rights))
+        self.assertFalse(
+            rights_manager.check_can_modify_voice_artist_in_activity(
+                self.user_a, None))
 
     def test_non_splash_page_demo_exploration(self):
         # Note: there is no difference between permissions for demo
@@ -919,7 +940,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.is_owner(self.user_id_b))
         self.assertFalse(collection_rights.is_editor(self.user_id_b))
 
-    def test_voiceartist_can_be_reassigned_as_owner(self):
+    def test_voice_artist_can_be_reassigned_as_owner(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)
@@ -979,7 +1000,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.is_editor(self.user_id_b))
         self.assertFalse(collection_rights.is_viewer(self.user_id_b))
 
-    def test_voiceartist_can_be_reassigned_as_editor(self):
+    def test_voice_artist_can_be_reassigned_as_editor(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)
@@ -999,7 +1020,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertTrue(collection_rights.is_editor(self.user_id_b))
         self.assertFalse(collection_rights.is_voice_artist(self.user_id_b))
 
-    def test_viewer_can_be_reassigned_as_voiceartist(self):
+    def test_viewer_can_be_reassigned_as_voice_artist(self):
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
         collection_services.save_new_collection(self.user_id_a, collection)

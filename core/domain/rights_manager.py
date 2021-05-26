@@ -566,6 +566,27 @@ def check_can_voiceover_activity(user, activity_rights):
     return False
 
 
+def check_can_modify_voice_artist_in_activity(user, activity_rights):
+    """Check whether the user can assign voice artist to activity.
+
+    Args:
+        user: UserActionInfo. Object having user_id, role, and actions for
+            given user.
+        activity_rights: AcitivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the user can assign voice artist.
+    """
+    if activity_rights is None:
+        return False
+    elif (role_services.ACTION_CAN_ASSIGN_VOICE_ARTIST in user.actions and (
+            activity_rights.community_owned or activity_rights.is_published())):
+        return True
+    else:
+        return False
+
+
 def check_can_save_activity(user, activity_rights):
     """Checks whether the user can save given activity.
 
@@ -753,7 +774,15 @@ def _assign_role(
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    role_is_voice_artist = new_role == constants.ROLE_VOICE_ARTIST
+    user_can_assigning_voice_artist = check_can_modify_voice_artist_in_activity(
+        committer, activity_rights)
+
+    user_can_assigning_role = (
+        check_can_modify_activity_roles(committer, activity_rights)) or (
+            role_is_voice_artist and user_can_assigning_voice_artist)
+
+    if not user_can_assigning_role:
         logging.error(
             'User %s tried to allow user %s to be a(n) %s of activity %s '
             'but was refused permission.' % (
@@ -873,7 +902,15 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
-    if not check_can_modify_activity_roles(committer, activity_rights):
+    user_can_modify_activity_roles = (
+        check_can_modify_activity_roles(committer, activity_rights) or (
+            check_can_modify_voice_artist_in_activity(
+                committer, activity_rights) and (
+                    activity_rights.is_voice_artist(removed_user_id)
+                )
+            )
+        )
+    if not user_can_modify_activity_roles:
         logging.error(
             'User %s tried to remove user %s from an activity %s '
             'but was refused permission.' % (

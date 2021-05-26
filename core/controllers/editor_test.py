@@ -2999,5 +2999,6 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.assertFalse(response['can_release_ownership'])
         self.assertTrue(response['can_voiceover'])
         self.assertFalse(response['can_unpublish'])
+        self.assertFalse(response['can_assign_voice_artist'])
 
         self.logout()

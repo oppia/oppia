@@ -23,6 +23,8 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_domain
 from core.domain import fs_services
+from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import user_services
 import feconf
 import python_utils
@@ -129,3 +131,50 @@ class StartedTranslationTutorialEventHandler(base.BaseHandler):
         user_services.record_user_started_state_translation_tutorial(
             self.user_id)
         self.render_json({})
+
+
+class VoiceArtistManagementHandler(base.BaseHandler):
+    """Handles assignment of voice artists."""
+
+    @acl_decorators.can_assign_voice_artist
+    def post(self, entity_type, entity_id):
+        """Handles Post requests."""
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            raise self.InvalidInputException(
+                'Invalid entity type.')
+
+        voice_artist = self.payload.get('username')
+        voice_artist_id = user_services.get_user_id_from_username(
+            voice_artist)
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        rights_manager.assign_role_for_exploration(
+            self.user, entity_id, voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                entity_id).to_dict()
+        })
+
+    @acl_decorators.can_assign_voice_artist
+    def delete(self, entity_type, entity_id):
+        """Handles Delete requests."""
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            raise self.InvalidInputException(
+                'Invalid entity type.')
+        voice_artist = self.request.get('voice_artist')
+        voice_artist_id = user_services.get_user_id_from_username(
+            voice_artist)
+
+        if voice_artist_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        rights_manager.deassign_role_for_exploration(
+            self.user, entity_id, voice_artist_id)
+
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                entity_id).to_dict()
+        })

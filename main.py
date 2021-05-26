@@ -859,6 +859,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/learn/<classroom_url_fragment>', classroom.ClassroomPage),
+
+    get_redirect_route(
+        r'/voice_artist_management_handler/<entity_type>/<entity_id>',
+        voice_artist.VoiceArtistManagementHandler),
 ]
 
 # Adding redirects for topic landing pages.
