@@ -158,9 +158,10 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
-var visibilityOfStateEditButton = async function(element, errorMessage) {
+var fadeInToComplete = async function(element, errorMessage) {
+  await visibilityOf(element, errorMessage);
   await browser.driver.wait(async function () {
-    return await element.getCssValue('opacity') === 0.2;
+    return await element.getCssValue('opacity') === 1;
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
 }
 
@@ -194,6 +195,6 @@ exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
-exports.visibilityOfStateEditButton = visibilityOfStateEditButton;
+exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
