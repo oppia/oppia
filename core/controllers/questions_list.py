@@ -72,8 +72,7 @@ class QuestionsListHandler(base.BaseHandler):
             question_services.get_displayable_question_skill_link_details(
                 constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset=offset)
         )
-        next_offset -= len(skill_ids)
-
+        next_offset -= min(len(skill_ids), constants.MAX_SKILLS_PER_QUESTION)
         # Set next_offset to None if there are no more questions so that
         # in the frontend we know when we reached the end of the list.
         if len(question_summaries) <= constants.NUM_QUESTIONS_PER_PAGE:
