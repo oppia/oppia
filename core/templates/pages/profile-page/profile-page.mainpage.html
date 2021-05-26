@@ -163,10 +163,11 @@
         width: calc(100% - 280px);
       }
 
-      md-card.oppia-profile-content-card {
+      .mat-card.oppia-profile-content-card {
         background-color: transparent;
         margin-top: 0;
         padding-top: 0;
+        box-shadow: none;
       }
 
       /* For issue #1867 (https://github.com/oppia/oppia/issues/1867)
@@ -181,7 +182,7 @@
         width: 100%;
       }
 
-      md-content.oppia-profile-portfolio-container {
+      .mat-card-content.oppia-profile-portfolio-container {
         background-color: transparent;
       }
 
@@ -297,7 +298,7 @@
             <profile-page-navbar></profile-page-navbar>
           </navbar-breadcrumb>
           <content>
-            <profile-page></profile-page>
+            <oppia-profile-page></oppia-profile-page>
           </content>
           <page-footer>
             <oppia-footer></oppia-footer>

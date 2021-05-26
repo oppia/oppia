@@ -16,97 +16,118 @@
  * @fileoverview Unit tests for profile page component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-
-// TODO(#7222): Remove the following block of unnecessary imports once
-// thread-data-backend-api.service.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-import { ProfilePageBackendApiService } from
-  './profile-page-backend-api.service';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { RatingComputationService } from
-  'components/ratings/rating-computation/rating-computation.service';
+import { ProfilePageComponent } from './profile-page.component';
+import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { UserService } from 'services/user.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { LoggerService } from 'services/contextual/logger.service';
 import { UserProfile, UserProfileBackendDict } from 'domain/user/user-profile.model';
+import { MatCardModule } from '@angular/material/card';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 
-require('pages/profile-page/profile-page.component.ts');
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
 
-describe('Profile page', function() {
-  var $scope = null;
-  var ctrl = null;
-  var $q = null;
-  var UserService = null;
-  var CsrfTokenService = null;
-  var DateTimeFormatService = null;
-  var $log = null;
-  var windowRefMock = {
-    nativeWindow: {
+
+fdescribe('Profile page', () => {
+  let fixture: ComponentFixture<ProfilePageComponent>;
+  let componentInstance: ProfilePageComponent;
+  let userService: UserService;
+  let csrfTokenService: CsrfTokenService;
+  let dateTimeFormatService: DateTimeFormatService;
+  let loggerService: LoggerService;
+  let mockWindowRef: MockWindowRef;
+  let profilePageBackendApiService: ProfilePageBackendApiService;
+
+  class MockWindowRef {
+    nativeWindow = {
       location: {
         href: '',
-        reload: function() {}
+        reload: () => {}
       }
-    }
-  };
+    };
+  }
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+  class MockUrlService {
+    getUserFromProfileUrl(): string {
+      return 'username1';
     }
-  }));
+  }
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UrlService', {
-      getUsernameFromProfileUrl: () => 'username1'
-    });
-    $provide.value('WindowRef', windowRefMock);
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        MatCardModule
+      ],
+      declarations: [
+        MockTranslatePipe,
+        ProfilePageComponent,
+        TruncatePipe
+      ],
+      providers: [
+        ProfilePageBackendApiService,
+        {
+          provide: UrlService,
+          useClass: MockUrlService
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ProfilePageBackendApiService]
-    });
-    OppiaAngularRootComponent.profilePageBackendApiService = (
-      TestBed.get(ProfilePageBackendApiService)
-    );
-    OppiaAngularRootComponent.ratingComputationService = (
-      TestBed.get(RatingComputationService));
+    fixture = TestBed.createComponent(ProfilePageComponent);
+    componentInstance = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+    userService = (TestBed.inject(UserService) as unknown) as
+      jasmine.SpyObj<UserService>;
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    csrfTokenService = (csrfTokenService as unknown) as
+      jasmine.SpyObj<CsrfTokenService>;
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    dateTimeFormatService = (dateTimeFormatService as unknown) as
+      jasmine.SpyObj<DateTimeFormatService>;
+    loggerService = TestBed.inject(LoggerService);
+    loggerService = (loggerService as unknown) as LoggerService;
+    mockWindowRef = (TestBed.inject(WindowRef) as unknown) as MockWindowRef;
+    profilePageBackendApiService = (
+      TestBed.inject(ProfilePageBackendApiService) as unknown) as
+        jasmine.SpyObj<ProfilePageBackendApiService>;
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.resolve('sample-csrf-token'));
   });
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $q = $injector.get('$q');
-    UserService = $injector.get('UserService');
-    CsrfTokenService = $injector.get('CsrfTokenService');
-    DateTimeFormatService = $injector.get('DateTimeFormatService');
-    $log = $injector.get('$log');
-
-    spyOn(CsrfTokenService, 'getTokenAsync')
-      .and.returnValue($q.resolve('sample-csrf-token'));
-
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ctrl = $componentController('profilePage', {
-      $scope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    windowRefMock.nativeWindow.location.href = '';
+  afterEach(() => {
+    mockWindowRef.nativeWindow.location.href = '';
   });
 
   it('should get formatted date string from the timestamp in milliseconds',
-    function() {
+    () => {
       // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-      var NOW_MILLIS = 1416563100000;
-      spyOn(DateTimeFormatService, 'getLocaleDateString').withArgs(NOW_MILLIS)
+      let NOW_MILLIS = 1416563100000;
+      spyOn(dateTimeFormatService, 'getLocaleDateString').withArgs(NOW_MILLIS)
         .and.returnValue('11/21/2014');
-      expect(ctrl.getLocaleDateString(NOW_MILLIS)).toBe('11/21/2014');
+      expect(componentInstance.getLocaleDateString(NOW_MILLIS))
+        .toBe('11/21/2014');
     });
 
-  describe('when user has edited explorations', function() {
-    var profileData = {
+  describe('when user has edited explorations', () => {
+    let profileData = {
       username: '',
       username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
@@ -167,26 +188,24 @@ describe('Profile page', function() {
       profile_picture_data_url: 'image',
     };
 
-    beforeEach(function() {
-      spyOn(
-        OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfile.createFromBackendDict(profileData)));
-      ctrl.$onInit();
-      $scope.$apply();
+    beforeEach(() => {
+      spyOn(profilePageBackendApiService, 'fetchProfileDataAsync').and
+        .returnValue(Promise.resolve(
+          UserProfile.createFromBackendDict(profileData)));
+      componentInstance.ngOnInit();
     });
 
     it('should get explorations to display when edited explorations are empty',
-      function() {
-        var userProfile = UserProfile.createFromBackendDict(
+      () => {
+        let userProfile = UserProfile.createFromBackendDict(
           profileData);
-        expect(ctrl.getExplorationsToDisplay()).toEqual(
+        expect(componentInstance.getExplorationsToDisplay()).toEqual(
           userProfile.editedExpSummaries);
       });
   });
 
-  describe('when changing pages', function() {
-    var profileData = {
+  describe('when changing pages', () => {
+    let profileData = {
       username: '',
       username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
@@ -218,7 +237,7 @@ describe('Profile page', function() {
       edited_exp_summary_dicts: []
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       for (let i = 0; i < 11; i++) {
         profileData.edited_exp_summary_dicts.push({
           last_updated_msec: 1591296737470.528,
@@ -264,42 +283,43 @@ describe('Profile page', function() {
       profileData.edited_exp_summary_dicts[10].num_views = 15;
 
       spyOn(
-        OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileDataAsync').and.returnValue($q.resolve(
+        profilePageBackendApiService,
+        'fetchProfileDataAsync').and.returnValue(Promise.resolve(
         UserProfile.createFromBackendDict(
           profileData as UserProfileBackendDict)));
-      ctrl.$onInit();
-      $scope.$apply();
+      componentInstance.ngOnInit();
     });
 
-    it('should go back and forth between pages', function() {
-      expect(ctrl.currentPageNumber).toBe(0);
-      ctrl.goToNextPage();
+    it('should go back and forth between pages', () => {
+      expect(componentInstance.currentPageNumber).toBe(0);
+      componentInstance.goToNextPage();
 
-      expect(ctrl.currentPageNumber).toBe(1);
-      expect(ctrl.startingExplorationNumber).toBe(7);
-      expect(ctrl.endingExplorationNumber).toBe(11);
+      expect(componentInstance.currentPageNumber).toBe(1);
+      expect(componentInstance.startingExplorationNumber).toBe(7);
+      expect(componentInstance.endingExplorationNumber).toBe(11);
 
-      spyOn($log, 'error').and.callThrough();
-      ctrl.goToNextPage();
+      spyOn(loggerService, 'error');
+      componentInstance.goToNextPage();
 
-      expect($log.error).toHaveBeenCalledWith('Error: Cannot increment page');
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Error: Cannot increment page');
 
-      ctrl.goToPreviousPage();
+      componentInstance.goToPreviousPage();
 
-      expect(ctrl.currentPageNumber).toBe(0);
-      expect(ctrl.startingExplorationNumber).toBe(1);
-      expect(ctrl.endingExplorationNumber).toBe(6);
+      expect(componentInstance.currentPageNumber).toBe(0);
+      expect(componentInstance.startingExplorationNumber).toBe(1);
+      expect(componentInstance.endingExplorationNumber).toBe(6);
 
-      ctrl.goToPreviousPage();
+      componentInstance.goToPreviousPage();
 
-      expect(ctrl.currentPageNumber).toBe(0);
-      expect($log.error).toHaveBeenCalledWith('Error: cannot decrement page');
+      expect(componentInstance.currentPageNumber).toBe(0);
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Error: cannot decrement page');
     });
   });
 
-  describe('when user is not logged in', function() {
-    var profileData = {
+  describe('when user is not logged in', () => {
+    let profileData = {
       username: '',
       username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
@@ -308,55 +328,51 @@ describe('Profile page', function() {
       edited_exp_summary_dicts: []
     };
 
-    beforeEach(function() {
-      spyOn(
-        OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfile.createFromBackendDict(
+    beforeEach(() => {
+      spyOn(profilePageBackendApiService, 'fetchProfileDataAsync').and
+        .returnValue(Promise.resolve(
+          UserProfile.createFromBackendDict(
           profileData as UserProfileBackendDict)));
-      ctrl.$onInit();
-      $scope.$apply();
+      componentInstance.ngOnInit();
     });
 
     it('should not change subscription status and change to login page',
-      function() {
-        var loginUrl = 'login-url';
-        spyOn(UserService, 'getLoginUrlAsync').and.returnValue(
-          $q.resolve(loginUrl));
+      () => {
+        let loginUrl = 'login-url';
+        spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+          Promise.resolve(loginUrl));
 
-        ctrl.changeSubscriptionStatus();
-        $scope.$apply();
+        componentInstance.changeSubscriptionStatus();
 
-        expect(windowRefMock.nativeWindow.location.href).toBe(loginUrl);
+        expect(mockWindowRef.nativeWindow.location.href).toBe(loginUrl);
       });
 
     it('should not change subscription status and reload the page when login' +
-      ' page is not provided', function() {
-      spyOn(windowRefMock.nativeWindow.location, 'reload').and.callThrough();
-      spyOn(UserService, 'getLoginUrlAsync').and.returnValue(
-        $q.resolve(null));
+      ' page is not provided', () => {
+      spyOn(mockWindowRef.nativeWindow.location, 'reload');
+      spyOn(userService, 'getLoginUrlAsync').and.returnValue(
+        Promise.resolve(null));
 
-      ctrl.changeSubscriptionStatus();
-      $scope.$apply();
+      componentInstance.changeSubscriptionStatus();
 
-      expect(windowRefMock.nativeWindow.location.reload).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     });
 
     it('should update subscription button text to warn user to log in',
-      function() {
-        ctrl.updateSubscriptionButtonPopoverText();
-        expect(ctrl.subscriptionButtonPopoverText).toBe(
+      () => {
+        componentInstance.updateSubscriptionButtonPopoverText();
+        expect(componentInstance.subscriptionButtonPopoverText).toBe(
           'Log in or sign up to subscribe to your favorite creators.');
       });
 
     it('should get explorations to display when edited explorations are empty',
-      function() {
-        expect(ctrl.getExplorationsToDisplay()).toEqual([]);
+      () => {
+        expect(componentInstance.getExplorationsToDisplay()).toEqual([]);
       });
   });
 
-  describe('when user is logged in', function() {
-    var profileData = {
+  describe('when user is logged in', () => {
+    let profileData = {
       username: 'username1',
       username_of_viewed_profile: 'username1',
       user_bio: 'User bio',
@@ -366,38 +382,32 @@ describe('Profile page', function() {
       is_already_subscribed: false
     };
 
-    beforeEach(function() {
-      spyOn(
-        OppiaAngularRootComponent.profilePageBackendApiService,
-        'fetchProfileDataAsync').and.returnValue($q.resolve(
-        UserProfile.createFromBackendDict(
-          profileData as UserProfileBackendDict)));
-      ctrl.$onInit();
-      $scope.$apply();
+    beforeEach(() => {
+      spyOn(profilePageBackendApiService, 'fetchProfileDataAsync').and
+        .returnValue(Promise.resolve(
+          UserProfile.createFromBackendDict(
+            profileData as UserProfileBackendDict)));
+      componentInstance.ngOnInit();
     });
 
-    it('should subscribe and unsubscribe from a profile', function() {
-      expect(ctrl.isAlreadySubscribed).toBe(false);
-      spyOn(
-        OppiaAngularRootComponent.profilePageBackendApiService,
-        'subscribeAsync').and.returnValue($q.resolve());
-      ctrl.changeSubscriptionStatus();
-      $scope.$apply();
+    it('should subscribe and unsubscribe from a profile', () => {
+      expect(componentInstance.isAlreadySubscribed).toBe(false);
+      spyOn(profilePageBackendApiService, 'subscribeAsync').and
+        .returnValue(Promise.resolve());
+      componentInstance.changeSubscriptionStatus();
 
-      expect(ctrl.isAlreadySubscribed).toBe(true);
-      expect(ctrl.subscriptionButtonPopoverText).toBe(
+      expect(componentInstance.isAlreadySubscribed).toBe(true);
+      expect(componentInstance.subscriptionButtonPopoverText).toBe(
         'Unsubscribe to stop receiving email notifications regarding new' +
         ' explorations published by ' + profileData.username_of_viewed_profile +
         '.');
 
-      spyOn(
-        OppiaAngularRootComponent.profilePageBackendApiService,
-        'unsubscribeAsync').and.returnValue($q.resolve());
-      ctrl.changeSubscriptionStatus();
-      $scope.$apply();
+      spyOn(profilePageBackendApiService, 'unsubscribeAsync').and
+        .returnValue(Promise.resolve());
+      componentInstance.changeSubscriptionStatus();
 
-      expect(ctrl.isAlreadySubscribed).toBe(false);
-      expect(ctrl.subscriptionButtonPopoverText).toBe(
+      expect(componentInstance.isAlreadySubscribed).toBe(false);
+      expect(componentInstance.subscriptionButtonPopoverText).toBe(
         'Receive email notifications, whenever ' +
         profileData.username_of_viewed_profile +
         ' publishes a new exploration.');
