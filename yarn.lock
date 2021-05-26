@@ -39,6 +39,13 @@
   dependencies:
     tslib "^2.0.0"
 
+"@angular/elements@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@angular/elements/-/elements-10.2.2.tgz#1a4a24089049b36eb5cacf74d760b74869fc47a5"
+  integrity sha512-hRoajhy9qNI+Rw4fxpVr6WKOoDQUJKzFPckcA+fnkQ4WJL7EH51Oip2b/JQive5vUCd1qort8wwXITnS4CX5Tw==
+  dependencies:
+    tslib "^2.0.0"
+
 "@angular/fire@^6.1.0":
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/@angular/fire/-/fire-6.1.4.tgz#d3923a68336d7177abbb2676731d0aef566b9739"
@@ -86,6 +93,14 @@
   resolved "https://registry.yarnpkg.com/@angular/upgrade/-/upgrade-10.2.5.tgz#187204eced5b56b3489f46ee88e3efa1426fe789"
   integrity sha512-mQXH7NryXrQ0M7oojoBMl4ORIgxKxGCUHebHG1AN+To2uhXJgAvW0jtk4Tm4tgCXgKQUMS9fXSdXQwWSDI/SKQ==
   dependencies:
+    tslib "^2.0.0"
+
+"@angular/youtube-player@^10.2.2":
+  version "10.2.7"
+  resolved "https://registry.yarnpkg.com/@angular/youtube-player/-/youtube-player-10.2.7.tgz#9f8c5178bdbc656ede82ea62d26537c6dc3cb615"
+  integrity sha512-4NVX/tmwNWFW4G8Y+bZaehKO3GTCniy+HYijctNY8+jsxI5h9RsfHWkRAfX8oPp2KmBJ906//BCTIRqrT+CgUQ==
+  dependencies:
+    "@types/youtube" "^0.0.38"
     tslib "^2.0.0"
 
 "@apidevtools/json-schema-ref-parser@^9.0.3":
@@ -1536,6 +1551,11 @@
   integrity sha512-A1b8SU4D10uoPjwb0lnHmmu8wZhR9d+9o2PKBQT2jU5YPTKsxac6M2qGAdY7VcL+dHHhARVUDmeg0rOrcd9EjA==
   dependencies:
     "@types/node" "*"
+
+"@types/youtube@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/youtube/-/youtube-0.0.38.tgz#04aa5efa61f4d52e9cf682575a9dfed58f31e8c1"
+  integrity sha512-rS0nLlnnZIvOfBNT4957rkKRMHjHxutoVhSEzowocYgNiTMVBmN+Hbkf/L3TeGMMtts9uKZ9gw7O2JLHREVnIw==
 
 "@typescript-eslint/eslint-plugin@^4.0.0":
   version "4.22.0"
