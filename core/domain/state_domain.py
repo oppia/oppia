@@ -1029,6 +1029,32 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
         return cls(ca_value, ca_schema)
 
+    def get_subtitled_unicode(self):
+        """Get all SubtitledUnicode(s) in the customization argument.
+
+        Returns:
+            list(str). A list of SubtitledUnicode.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+            lambda x: x
+        )
+
+    def get_subtitled_html(self):
+        """Get all SubtitledHtml(s) in the customization argument.
+
+        Returns:
+            list(str). A list of SubtitledHtml.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x
+        )
+
     def get_content_ids(self):
         """Get all content_ids from SubtitledHtml and SubtitledUnicode in the
         customization argument.
@@ -3017,35 +3043,49 @@ class State(python_utils.OBJECT):
 
         Returns:
             dict(str, str). Returns a dict with key as content id and content
-            html as the value.
+            html/unicode as the value.
         """
-        content_id_to_html = {}
+        content_id_to_string = {}
 
-        content_id_to_html[self.content.content_id] = self.content.html
+        content_id_to_string[self.content.content_id] = self.content.html
 
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
         if default_outcome is not None and default_outcome.feedback.html != '':
-            content_id_to_html[default_outcome.feedback.content_id] = (
+            content_id_to_string[default_outcome.feedback.content_id] = (
                 default_outcome.feedback.html)
 
         for answer_group in self.interaction.answer_groups:
             if answer_group.outcome.feedback.html != '':
-                content_id_to_html[answer_group.outcome.feedback.content_id] = (
-                    answer_group.outcome.feedback.html)
+                content_id_to_string[
+                    answer_group.outcome.feedback.content_id
+                ] = (answer_group.outcome.feedback.html)
 
         for hint in self.interaction.hints:
             if hint.hint_content.html != '':
-                content_id_to_html[hint.hint_content.content_id] = (
+                content_id_to_string[hint.hint_content.content_id] = (
                     hint.hint_content.html)
 
         solution = self.interaction.solution
         if solution is not None and solution.explanation.html != '':
-            content_id_to_html[solution.explanation.content_id] = (
+            content_id_to_string[solution.explanation.content_id] = (
                 solution.explanation.html)
 
-        return content_id_to_html
+        for ca_dict in self.interaction.customization_args.values():
+            subtitled_htmls = ca_dict.get_subtitled_html()
+            for subtitled_html in subtitled_htmls:
+                if subtitled_html.html != '':
+                    content_id_to_string[subtitled_html.content_id] = (
+                        subtitled_html.html)
+
+            subtitled_unicodes = ca_dict.get_subtitled_unicode()
+            for subtitled_unicode in subtitled_unicodes:
+                if subtitled_unicode.unicode_str != '':
+                    content_id_to_string[subtitled_unicode.content_id] = (
+                        subtitled_unicode.unicode_str)
+
+        return content_id_to_string
 
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
@@ -3061,13 +3101,7 @@ class State(python_utils.OBJECT):
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
-
         for content_id in available_translation_content_ids:
-            # Interactions can be translated through editor pages but
-            # _get_all_translatable_content returns contents which are only
-            # translatable through the contributor dashboard page, we are
-            # ignoring the content ids related to interaction translation below
-            # if it doesn't exist in content_id_to_html.
             content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
