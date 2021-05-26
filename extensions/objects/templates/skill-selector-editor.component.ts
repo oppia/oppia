@@ -45,15 +45,15 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  private filterSkills(skillSelector): void {
+  private filterSkills(skillSelector: string): void {
     if (skillSelector === '') {
       this.skillsToShow = this.skills;
     }
 
+    skillSelector = skillSelector.toLowerCase();
+
     this.skillsToShow = this.skills.filter(
-      option => (
-        option.description.toLowerCase().indexOf(skillSelector) >= 0 ||
-        option.id.toLowerCase().indexOf(skillSelector) >= 0)
+      option => (option.description.toLowerCase().indexOf(skillSelector) >= 0)
     );
   }
 
