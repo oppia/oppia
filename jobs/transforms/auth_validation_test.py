@@ -20,8 +20,10 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+from core.tests import test_utils
 import feconf
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import auth_validation
 from jobs.types import base_validation_errors
 
@@ -92,3 +94,28 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
         )
 
         self.assert_pcoll_equal(output, [])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_user_auth_details_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserAuthDetailsModel', 'firebase_auth_id'),
+            ['UserIdByFirebaseAuthIdModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserAuthDetailsModel', 'gae_id'),
+            ['UserIdentifiersModel'])
+
+    def test_user_id_by_firebase_auth_id_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserIdByFirebaseAuthIdModel', 'user_id'),
+            ['UserAuthDetailsModel'])
+
+    def test_user_identifiers_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserIdentifiersModel', 'user_id'),
+            ['UserAuthDetailsModel'])

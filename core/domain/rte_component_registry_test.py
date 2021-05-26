@@ -166,20 +166,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(protractor_file))
 
             main_ts_file = os.path.join(
-                directives_dir, 'oppia-noninteractive-%s.directive.ts'
+                directives_dir, 'oppia-noninteractive-%s.component.ts'
                 % hyphenated_component_id)
             main_html_file = os.path.join(
-                directives_dir, '%s.directive.html' % hyphenated_component_id)
-            # TODO(#9762): Remove this if condition once all the files in the
-            # rich_text_components directory is migrated from directives
-            # to component files.
-            if hyphenated_component_id == 'svgdiagram':
-                main_ts_file = os.path.join(
-                    directives_dir, 'oppia-noninteractive-%s.component.ts'
-                    % hyphenated_component_id)
-                main_html_file = os.path.join(
-                    directives_dir, '%s.component.html'
-                    % hyphenated_component_id)
+                directives_dir, '%s.component.html'
+                % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
