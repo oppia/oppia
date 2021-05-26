@@ -72,13 +72,15 @@ class QuestionsListHandler(base.BaseHandler):
             question_services.get_displayable_question_skill_link_details(
                 constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset=offset)
         )
-        next_offset -= 1
-        
+        next_offset -= len(skill_ids)
+
         # Set next_offset to None if there are no more questions so that
         # in the frontend we know when we reached the end of the list.
         if len(question_summaries) <= constants.NUM_QUESTIONS_PER_PAGE:
         	next_offset = None
-            
+        else:
+            question_summaries.pop()
+            merged_question_skill_links.pop()
 
         return_dicts = []
         for index, summary in enumerate(question_summaries):
