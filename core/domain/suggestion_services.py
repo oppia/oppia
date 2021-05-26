@@ -651,11 +651,12 @@ def get_translation_suggestions_waiting_longest_for_review(language_code):
     ]
 
 
-def get_translation_suggestions_in_review_by_exploration(exp_id):
+def get_translation_suggestions_in_review_by_exploration(exp_id, language_code):
     """Returns translation suggestions in review by exploration ID.
 
     Args:
         exp_id: str. Exploration ID.
+        language_code: str. Language code.
 
     Returns:
         list(Suggestion). A list of translation suggestions in review with
@@ -663,7 +664,8 @@ def get_translation_suggestions_in_review_by_exploration(exp_id):
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
-        .get_translation_suggestions_in_review_with_exp_id(exp_id)
+        .get_translation_suggestions_in_review_with_exp_id(
+            exp_id, language_code)
     )
     return [
         get_suggestion_from_model(model) if model else None
