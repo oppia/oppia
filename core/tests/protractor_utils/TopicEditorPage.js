@@ -517,13 +517,7 @@ var TopicEditorPage = function() {
   };
 
   this.saveTopic = async function(commitMessage) {
-    await waitFor.visibilityOf(
-      saveTopicButton,
-      'Save topic button takes too long to appear');
-    await waitFor.elementToBeClickable(
-      saveTopicButton,
-      'Save topic button takes too long to be clickable');
-    await saveTopicButton.click();
+    await action.click('Save Topic Button', saveTopicButton);
     await commitMessageField.sendKeys(commitMessage);
 
     await waitFor.elementToBeClickable(

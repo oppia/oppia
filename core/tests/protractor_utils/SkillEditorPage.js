@@ -237,10 +237,6 @@ var SkillEditorPage = function() {
   };
 
   this.saveOrPublishSkill = async function(commitMessage) {
-    await waitFor.visibilityOf(
-      saveOrPublishSkillButton, 'Save or Publish Skill Button takes too' +
-      'to appear'
-    );
     await action.click(
       'Save or Publish Skill button', saveOrPublishSkillButton);
     await action.sendKeys('Commit message', commitMessageField, commitMessage);
@@ -263,10 +259,9 @@ var SkillEditorPage = function() {
 
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
-    await waitFor.visibilityOf(
-      saveConceptCardExplanationButton,
-      'Save Concept Card Explanation button takes too long to be appear');
-    await saveConceptCardExplanationButton.click();
+    await action.click(
+      'Save Concept Card Explanation Button',
+      saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
       editor, 'Explanation Editor takes too long to close');
   };

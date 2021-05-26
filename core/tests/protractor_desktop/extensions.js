@@ -150,9 +150,6 @@ describe('Interactions', function() {
           '.protractor-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
           await action.click('Delete Response button', deleteResponseButton);
-          await waitFor.visibilityOf(
-            confirmDeleteInteractionButton,
-            'Confirm Delete Interaction Button takes too long to appear');
           await action.click(
             'Confirm Delete Response button', confirmDeleteResponseButton);
         }
