@@ -20,49 +20,65 @@
  * followed by the name of the arg.
  */
 
-require('pages/exploration-player-page/services/image-preloader.service.ts');
-require('services/assets-backend-api.service.ts');
-require('services/context.service.ts');
-require('services/html-escaper.service.ts');
-require('services/image-local-storage.service.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
-angular.module('oppia').component('oppiaNoninteractiveSvgdiagram', {
-  template: require('./svgdiagram.component.html'),
-  controller: [
-    '$attrs', 'AssetsBackendApiService', 'ContextService',
-    'HtmlEscaperService', 'ImageLocalStorageService',
-    'ImagePreloaderService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
-    function(
-        $attrs, AssetsBackendApiService, ContextService,
-        HtmlEscaperService, ImageLocalStorageService,
-        ImagePreloaderService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        ctrl.filename = HtmlEscaperService.escapedJsonToObj(
-          $attrs.svgFilenameWithValue);
-        ctrl.dimensions = (
-          ImagePreloaderService.getDimensionsOfImage(ctrl.filename));
-        ctrl.svgContainerStyle = {
-          height: ctrl.dimensions.height + 'px',
-          width: ctrl.dimensions.width + 'px'
-        };
-        if (
-          ContextService.getImageSaveDestination() ===
-          IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          ctrl.svgUrl = ImageLocalStorageService.getObjectUrlForImage(
-            ctrl.filename);
-        } else {
-          ctrl.svgUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ContextService.getEntityType(), ContextService.getEntityId(),
-            ctrl.filename);
-        }
+@Component({
+  selector: 'oppia-noninteractive-svgdiagram',
+  templateUrl: './svgdiagram.component.html',
+  styleUrls: []
+})
+export class NoninteractiveSvgdiagram implements OnInit {
+  @Input() svgFilenameWithValue: string;
+  @Input() altWithValue: string;
 
-        ctrl.svgAltText = '';
-        if ($attrs.altWithValue) {
-          ctrl.svgAltText = HtmlEscaperService.escapedJsonToObj(
-            $attrs.altWithValue);
-        }
-      };
+  dimensions: ImageDimensions;
+  filename: string;
+  svgAltText: string = '';
+  svgContainerStyle: { height: string, width: string };
+  svgUrl: string;
+
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private contextService: ContextService,
+    private htmlEscaperService: HtmlEscaperService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private imagePreloaderService: ImagePreloaderService
+  ) {}
+
+  ngOnInit(): void {
+    this.filename = this.htmlEscaperService.escapedJsonToObj(
+      this.svgFilenameWithValue) as string;
+    this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
+      this.filename);
+    this.svgContainerStyle = {
+      height: this.dimensions.height + 'px',
+      width: this.dimensions.width + 'px'
+    };
+    if (this.contextService.getImageSaveDestination() === (
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE)) {
+      this.svgUrl = this.imageLocalStorageService.getObjectUrlForImage(
+        this.filename);
+    } else {
+      this.svgUrl = this.assetsBackendApiService.getImageUrlForPreview(
+        this.contextService.getEntityType(), this.contextService.getEntityId(),
+        this.filename);
     }
-  ]
-});
+
+    if (this.altWithValue) {
+      this.svgAltText = this.htmlEscaperService.escapedJsonToObj(
+        this.altWithValue) as string;
+    }
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaNoninteractiveSvgdiagram', downgradeComponent({
+    component: NoninteractiveSvgdiagram
+  }) as angular.IDirectiveFactory);

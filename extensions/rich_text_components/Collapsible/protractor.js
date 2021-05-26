@@ -36,10 +36,9 @@ var expectComponentDetailsToMatch = async function(
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   await headerElement.click();
-  await forms.expectRichText(
-    elem.element(by.css('.panel-body')).element(by.css(
-      '.protractor-test-collapsible-content'))
-  ).toMatch(contentInstructions);
+  const collapsibleElem = elem.element(by.css(
+    '.protractor-test-collapsible-content'));
+  await forms.expectRichText(collapsibleElem).toMatch(contentInstructions);
 };
 
 exports.customizeComponent = customizeComponent;

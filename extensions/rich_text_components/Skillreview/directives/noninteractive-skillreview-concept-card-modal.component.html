@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h3> {{ modalHeader }} </h3>
+</div>
+
+<div class="modal-body">
+  <concept-card [skillIds]="skillIds" [index]="index"> </concept-card>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          (click)="cancel()">
+    Close
+  </button>
+  <button class="btn btn-success"
+          *ngIf="isInTestMode && !isLastConceptCard()"
+          (click)="goToNextConceptCard()">
+    Next
+  </button>
+  <button class="btn btn-success"
+          *ngIf="isInTestMode && isLastConceptCard()"
+          (click)="retryTest()">
+    Retry Test
+  </button>
+</div>

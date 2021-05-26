@@ -20,26 +20,33 @@
  * followed by the name of the arg.
  */
 
-require('directives/angular-html-bind.directive.ts');
+import { Component, Input, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
-require('services/html-escaper.service.ts');
+export interface TabContent {
+  title: string,
+  content: string;
+}
 
-angular.module('oppia').directive('oppiaNoninteractiveTabs', [
-  'HtmlEscaperService',
-  function(HtmlEscaperService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      template: require('./tabs.directive.html'),
-      controllerAs: '$ctrl',
-      controller: ['$attrs', function($attrs) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.tabContents = HtmlEscaperService.escapedJsonToObj(
-            $attrs.tabContentsWithValue);
-        };
-      }]
-    };
+@Component({
+  selector: 'oppia-noninteractive-tabs',
+  templateUrl: './tabs.component.html',
+  styleUrls: []
+})
+export class NoninteractiveTabs implements OnInit {
+  @Input() tabContentsWithValue: string;
+  tabContents: TabContent[] = [];
+
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
+
+  ngOnInit(): void {
+    this.tabContents = this.htmlEscaperService.escapedJsonToObj(
+      this.tabContentsWithValue) as TabContent[];
   }
-]);
+}
+
+angular.module('oppia').directive(
+  'oppiaNoninteractiveTabs', downgradeComponent({
+    component: NoninteractiveTabs
+  }) as angular.IDirectiveFactory);

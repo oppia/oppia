@@ -18,6 +18,8 @@
  */
 
 var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
+var waitFor = require(
+  process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
 // The 'tabArray' arg should be an array of dictionaries with keys:
 //   'title': a string
@@ -37,18 +39,29 @@ var customizeComponent = async function(modal, tabArray) {
 };
 
 var expectComponentDetailsToMatch = async function(elem, tabArray) {
-  var titleElems = elem.element(by.tagName('ul')).all(by.tagName('li'));
+  var titleElems = elem.all(
+    by.css('.protractor-test-non-interactive-tabs-headers'));
   expect(await titleElems.count()).toEqual(tabArray.length);
-  var contentElems = elem.element(by.css('.tab-content')).all(by.xpath('./*'));
 
   for (var i = 0; i < tabArray.length; i++) {
     // Click on each tab in turn to check its contents.
+    await waitFor.visibilityOf(
+      elem.element(by.css('.protractor-test-non-interactive-tabs-headers')),
+      'Non-interactive-tabs-headers is taking too long to appear'
+    );
     expect(await (await titleElems.get(i)).getText()).toMatch(
       tabArray[i].title);
     await (await titleElems.get(i)).click();
-    await forms.expectRichText((await contentElems.get(i)).element(
-      by.css('.protractor-test-tab-content'))
-    ).toMatch(tabArray[i].content);
+
+    const tabContentEl = elem.element(
+      by.css('.protractor-test-tab-content-' + i));
+
+    await waitFor.visibilityOf(
+      tabContentEl,
+      '.protractor-test-tab-content-' + i + 'is taking too long to appear'
+    );
+    await forms.expectRichText(tabContentEl).toMatch(
+      tabArray[i].content);
   }
 };
 

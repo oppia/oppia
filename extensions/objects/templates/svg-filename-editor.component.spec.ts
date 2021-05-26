@@ -606,6 +606,7 @@ describe('SvgFilenameEditor', function() {
 
 describe('SvgFilenameEditor initialized with value attribute',
   function() {
+    importAllAngularServices();
     var svgFilenameCtrl = null;
     var $httpBackend = null;
     var contextService = null;

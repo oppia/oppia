@@ -1,0 +1,24 @@
+<figure>
+  <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
+    <img [src]="imageUrl"
+         alt="{{imageAltText}}"
+         class="center-element-horizontally"
+         [ngStyle]="imageContainerStyle">
+    <figcaption class="text-center">{{imageCaption}}</figcaption>
+  </div>
+  <div *ngIf="isLoadingIndicatorShown"
+       class="oppia-image-container"
+       [ngStyle]="imageContainerStyle">
+    <img [src]="loadingIndicatorUrl"
+         class="center-element-horizontally"
+         [ngStyle]="loadingIndicatorStyle"
+         alt="Loading...">
+  </div>
+  <div *ngIf="isTryAgainShown" class="oppia-image-container" [ngStyle]="imageContainerStyle">
+    <button matButton
+            (click)="loadImage()"
+            class="oppia-learner-reload-image-button center-element-horizontally">
+      <span>Reload image<i class="material-icons oppia-reload-image-symbol">&#10227;</i></span>
+    </button>
+  </div>
+</figure>
