@@ -136,7 +136,6 @@ describe('Interactions', function() {
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
-
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
