@@ -31,13 +31,13 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
         '<angular-html-bind html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope',
-        function($rootScope) {
+        '$rootScope', '$scope',
+        function($rootScope, $scope) {
           var ctrl = this;
           ctrl.$onInit = function() {
             if (ctrl.parentScope) {
               for (let key of Object.keys(ctrl.parentScope)) {
-                ctrl[key] = ctrl.parentScope[key];
+                $scope.$parent[key] = ctrl.parentScope[key];
               }
             }
             $rootScope.$applyAsync();
