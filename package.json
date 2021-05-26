@@ -166,6 +166,7 @@
     "ng-infinite-scroll": "^1.3.0",
     "ngx-toastr": "^13.2.1",
     "ngx-trim-directive": "^1.1.0",
+    "proxy-polyfill": "^0.3.2",
     "requireindex": "^1.2.0",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^4.0.1"

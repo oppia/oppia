@@ -6408,9 +6408,9 @@ google-p12-pem@^3.0.3:
     node-forge "^0.10.0"
 
 google-protobuf@^3.13.0:
-  version "3.17.1"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.17.1.tgz#d5224fe7dc931f1a69cbdc5cb6e3d69ae74da651"
-  integrity sha512-CHisE5cwd66w6y/K4K7x2N+SSZ0HgPBQwky7lKsj2vr4nXPuXQ2uUZgMF/ctXnd4xHL747Lh8LUgby2nA8gViA==
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.16.0.tgz#87c61829a8aec7d9244dcbed9464e1d0fcbed8ae"
+  integrity sha512-gBY66yYL1wbQMU2r1POkXSXkm035Ni0wFv3vx0K9IEUsJLP9G5rAcFVn0xUXfZneRu6MmDjaw93pt/DE56VOyw==
 
 got@^9.6.0:
   version "9.6.0"
@@ -10614,6 +10614,11 @@ proxy-from-env@^1.0.0, proxy-from-env@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
+
+proxy-polyfill@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/proxy-polyfill/-/proxy-polyfill-0.3.2.tgz#55f190054a3044e105d9de16e23719e1e9be0898"
+  integrity sha512-ENKSXOMCewnQTOyqrQXxEjIhzT6dy572mtehiItbDoIUF5Sv5UkmRUc8kowg2MFvr232Uo8rwRpNg3V5kgTKbA==
 
 prr@~1.0.1:
   version "1.0.1"
