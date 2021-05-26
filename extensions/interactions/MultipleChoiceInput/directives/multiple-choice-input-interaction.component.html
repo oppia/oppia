@@ -1,0 +1,20 @@
+<form>
+  <div *ngFor="let choice of choices"
+       class="multiple-choice-option-container protractor-test-multiple-choice-option-container">
+    <button class="multiple-choice-option"
+            (click)="selectAnswer($event, choice.originalIndex)">
+      <div class="multiple-choice-radio-button-container">
+        <span class="multiple-choice-outer-radio-button">
+          <span class="multiple-choice-inner-radio-button"></span>
+        </span>
+      </div>
+      <div class="multiple-choice-content-container">
+        <span>
+          <angular-html-bind-wrapper class="protractor-test-multiple-choice-option"
+                                     [htmlData]="choice.value">
+          </angular-html-bind-wrapper>
+        </span>
+      </div>
+    </button>
+  </div>
+</form>

@@ -37,7 +37,12 @@ export class InteractionAttributesExtractorService {
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
-    'CodeRepl'
+    'CodeRepl',
+    'InteractiveMap',
+    'LogicProof',
+    'MultipleChoiceInput',
+    'SetInput',
+    'TextInput',
   ];
 
   constructor(

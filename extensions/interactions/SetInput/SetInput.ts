@@ -19,10 +19,10 @@
 require('interactions/SetInput/directives/set-input-rules.service.ts');
 require('interactions/SetInput/directives/set-input-validation.service.ts');
 require(
-  'interactions/SetInput/directives/oppia-interactive-set-input.directive.ts');
+  'interactions/SetInput/directives/oppia-interactive-set-input.component.ts');
 require(
   'interactions/SetInput/directives/' +
-  'oppia-response-set-input.directive.ts');
+  'oppia-response-set-input.component.ts');
 require(
   'interactions/SetInput/directives/' +
-  'oppia-short-response-set-input.directive.ts');
+  'oppia-short-response-set-input.component.ts');

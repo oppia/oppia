@@ -53,9 +53,14 @@ INTERACTIONS_THAT_USE_COMPONENTS = [
     'FractionInput',
     'GraphInput',
     'ImageClickInput',
+    'InteractiveMap',
+    'LogicProof',
     'MathEquationInput',
+    'MultipleChoiceInput',
     'NumericExpressionInput',
-    'RatioExpressionInput'
+    'RatioExpressionInput',
+    'SetInput',
+    'TextInput'
 ]
 
 _INTERACTION_CONFIG_SCHEMA = [

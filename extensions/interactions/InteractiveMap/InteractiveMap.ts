@@ -24,10 +24,10 @@ require(
   'interactive-map-validation.service.ts');
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-interactive-interactive-map.directive.ts');
+  'oppia-interactive-interactive-map.component.ts');
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-response-interactive-map.directive.ts');
+  'oppia-response-interactive-map.component.ts');
 require(
   'interactions/InteractiveMap/directives/' +
-  'oppia-short-response-interactive-map.directive.ts');
+  'oppia-short-response-interactive-map.component.ts');
