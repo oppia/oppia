@@ -40,7 +40,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
     THUMBNAIL = 'xyzabc'
 
     def setUp(self):
-        """Set up user models in datastore for use in testing."""
+        """Set up blog post models in datastore for use in testing."""
         super(BlogPostModelTest, self).setUp()
 
         self.blog_post_model = blog_post_models.BlogPostModel(
@@ -85,7 +85,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                 blog_post_model_cls.create(
                     'author_id.blog_id')
 
-        # Test generate_new_thread_id method.
+        # Test generate_new_blog_id method.
         with self.assertRaisesRegexp(
             Exception,
             'New blog id generator is producing too many collisions.'):
