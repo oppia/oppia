@@ -8,7 +8,7 @@
       <mat-list>
         <mat-list-item class="pl-0" *ngFor="let explanation of rubric.getExplanations()">
           <div class="oppia-skill-description-label">Skill description:</div>
-          <angular-html-bind-wrapper class="oppia-skill-description-text"
+          <angular-html-bind-wrapper classStr="oppia-skill-description-text"
                                     [htmlData]="explanation">
           </angular-html-bind-wrapper>
           <div *ngIf="explanation === '' || explanation === '<p></p>'">
