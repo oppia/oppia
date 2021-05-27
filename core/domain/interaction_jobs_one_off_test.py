@@ -1356,3 +1356,112 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
                 interaction_jobs_one_off
                 .RuleInputToCustomizationArgsMappingOneOffJob)
         )
+
+
+class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(LogicProofInteractionOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
+        """Checks output pairs are produced only for
+        desired interactions.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1', 'State2'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('LogicProof')
+
+        customization_args_dict1 = {
+            'question': {'value': {
+                'assumptions': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'results': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'default_proof_string': ''
+            }},
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start LogicProofInteractionOneOffJob job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.create_new())
+        interaction_jobs_one_off.LogicProofInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.get_output(job_id))
+        expected_output = [(
+            u'[u\'exp_id0\', [u\'user email is: albert@example.com\']]'
+        )]
+        self.assertEqual(actual_output, expected_output)
+
+        # Update state1 and add state2.
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Test that no action is performed on deleted explorations."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+
+        state1 = exploration.states['State1']
+
+        state1.update_interaction_id('LogicProof')
+
+        customization_args_dict = {
+            'question': {'value': {
+                'assumptions': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'results': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'default_proof_string': ''
+            }},
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+
+        run_job_for_deleted_exp(
+            self, interaction_jobs_one_off.LogicProofInteractionOneOffJob)

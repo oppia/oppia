@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import interaction_registry
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 
 import python_utils
@@ -388,6 +389,36 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                                                 invalid_values)
                                         ).encode('utf-8')
                                     )
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that produces a list of (exploaration, state) pairs that use the
+    logicProof interaction. This will be used to send manual emails.
+    This job can be deleted after logicProof is removed from the codebase.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+        exploration = exp_fetchers.get_exploration_from_model(item)
+        for _, state in exploration.states.items():
+            if state.interaction.id == 'LogicProof':
+                owner_ids = rights_manager.get_exploration_rights(
+                    item.id).owner_ids
+                # Always yield for all case ?
+                if owner_ids:
+                    for user_id in owner_ids:
+                        user_mail = user_services.get_email_from_user_id(user_id)
+                        yield(item.id, 'user email is: %s' % (user_mail))
 
     @staticmethod
     def reduce(key, values):
