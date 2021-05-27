@@ -77,6 +77,7 @@ import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-e
 import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
 import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 
 
 // Directives.
@@ -187,6 +188,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SideNavigationBarWrapperComponent,
@@ -247,6 +249,7 @@ const toastrConfig = {
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
@@ -292,6 +295,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
