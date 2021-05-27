@@ -72,6 +72,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   userIsLoggedIn: boolean;
   isRefresherExploration: boolean;
   contributors: object;
+  lastUpdatedDateTime: string = '';
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -117,6 +118,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         this.isWindowLarge = (
           this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
       });
+    this.lastUpdatedDateTime = this.getLastUpdatedDatetime();
   }
 
   ngOnDestroy(): void {
