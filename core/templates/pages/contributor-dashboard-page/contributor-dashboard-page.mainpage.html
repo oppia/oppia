@@ -5,18 +5,20 @@
   </head>
   <body>
     <oppia-root>
-      <oppia-base-content>
-        <navbar-breadcrumb>
-        </navbar-breadcrumb>
+      <div ng-controller="Base">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+          </navbar-breadcrumb>
 
-        <nav-options>
-        </nav-options>
+          <nav-options>
+          </nav-options>
 
-        <content>
-          <contributor-dashboard-page></contributor-dashboard-page>
-        </content>
-        <page-footer></page-footer>
-      </oppia-base-content>
+          <content>
+            <contributor-dashboard-page></contributor-dashboard-page>
+          </content>
+          <page-footer></page-footer>
+        </oppia-base-content>
+      </div>
     </oppia-root>
     @load('pages/footer_js_libs.html')
     <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=default"></script>
