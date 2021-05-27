@@ -1,5 +1,5 @@
-name: 'Merge from Base Branch if Action Running on a PR'
-description: 'Merge from the base branch the PR is being merged into.'
+name: 'Merge Source Branch into Base Branch'
+description: 'Merge the PR source branch into its base branch, leaving the merge commit checked-out'
 runs:
   using: 'composite'
   steps:
