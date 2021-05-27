@@ -1287,8 +1287,8 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.blog, blogpost_ids)
-    #TODO(sll):Add wipeout for BlogPostsRightsModel after adding
-    #service layer.
+    # TODO(sll):Add wipeout for BlogPostsRightsModel after adding
+    # service layer.
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
             blog_posts_related_models, pseudonymized_id):

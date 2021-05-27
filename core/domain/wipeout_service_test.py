@@ -4752,7 +4752,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
                     id='blogmodel-%s' % i,
                     author_id=self.user_1_id,
                     summary=self.SUMMARY,
-                    title=self.TITLE
+                    title=self.TITLE,
                     last_updated=datetime.datetime.utcnow(),
                     published_on=datetime.datetime.utcnow(),
                     url_fragment='sample-url-fragment',

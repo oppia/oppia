@@ -32,7 +32,7 @@ NAMES = python_utils.create_enum(
     'improvements', 'job', 'opportunity', 'question', 'recommendations',
     'skill', 'statistics', 'activity', 'audit', 'auth', 'base_model',
     'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
-    'improvements', 'job', 'opportunity', 'question', 'recommendations', 
+    'improvements', 'job', 'opportunity', 'question', 'recommendations',
     'skill', 'statistics', 'story', 'subtopic', 'suggestion', 'topic',
     'translation', 'user')
 
