@@ -211,7 +211,7 @@ describe('Base Content Component', () => {
     expect(dummyElement.tabIndex).toEqual(-1);
   });
 
-  it('should throw error when there no main content', () => {
+  it('should throw error when there is no main content', () => {
     let document = TestBed.inject(DOCUMENT);
     spyOn(document, 'getElementById').and.returnValue(null);
     expect(componentInstance.skipToMainContent).toThrowError(
