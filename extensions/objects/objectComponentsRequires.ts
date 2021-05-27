@@ -46,8 +46,8 @@ require('objects/templates/parameter-name-editor.directive.ts');
 require('objects/templates/position-of-terms-editor.component.ts');
 require('objects/templates/positive-int-editor.component.ts');
 require('objects/templates/ratio-expression-editor.component.ts');
-require('objects/templates/real-editor.directive.ts');
-require('objects/templates/sanitized-url-editor.directive.ts');
+require('objects/templates/real-editor.component.ts');
+require('objects/templates/sanitized-url-editor.component.ts');
 require('objects/templates/set-of-algebraic-identifier-editor.component.ts');
 require('objects/templates/translatable-html-content-id.component.ts');
 require(
@@ -59,7 +59,7 @@ require(
   'objects/templates/translatable-set-of-unicode-string-editor.component.ts');
 require('objects/templates/set-of-unicode-string-editor.component.ts');
 require('objects/templates/skill-selector-editor.directive.ts');
-require('objects/templates/subtitled-html-editor.directive.ts');
+require('objects/templates/subtitled-html-editor.component.ts');
 require('objects/templates/subtitled-unicode-editor.directive.ts');
 require('objects/templates/svg-filename-editor.component.ts');
 require('objects/templates/unicode-string-editor.directive.ts');

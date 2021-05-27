@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
@@ -74,6 +74,7 @@ import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { I18nFooterComponent } from '../base-components/i18n-footer.component';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 
 
 // Directives.
@@ -93,20 +94,8 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
-
-// TODO(#11462): Delete these conditional values once firebase auth is launched.
-const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireModule.initializeApp(AuthService.firebaseConfig),
-  AngularFireAuthModule,
-] : [];
-
-const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireAuth,
-  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
-] : [
-  {provide: AngularFireAuth, useValue: null},
-];
 
 const toastrConfig = {
   allowHtml: false,
@@ -132,17 +121,21 @@ const toastrConfig = {
     DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
+    NgbNavModule,
     NgbModalModule,
     FormsModule,
+    RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
-    ...firebaseAuthModules,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
   ],
 
   providers: [
-    ...firebaseAuthProviders,
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
   ],
 
   declarations: [
@@ -167,6 +160,7 @@ const toastrConfig = {
     LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -222,6 +216,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
     I18nFooterComponent,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
@@ -242,6 +237,8 @@ const toastrConfig = {
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    NgbNavModule,
+    RichTextComponentsModule,
     NgbModalModule,
     ObjectComponentsModule,
     SharedFormsModule,
@@ -263,6 +260,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,

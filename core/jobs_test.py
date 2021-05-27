@@ -34,7 +34,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-import contextlib2
 from mapreduce import input_readers
 
 (base_models, exp_models, stats_models, job_models) = (
@@ -232,7 +231,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             captured_logs = stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR))
             stack.enter_context(input_reader_swap)
