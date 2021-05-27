@@ -74,6 +74,8 @@ import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { OppiaFooterComponent } from 'pages/OppiaFooter.component';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
+
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -159,6 +161,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     OppiaFooterComponent,
+    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -214,6 +217,7 @@ const toastrConfig = {
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
     KeyboardShortcutHelpModalComponent,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
@@ -257,6 +261,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
