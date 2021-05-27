@@ -125,12 +125,12 @@
             </button>
           </div>
           <div ng-if="$ctrl.subtopicPreviewCardIsShown">
-            <preview-thumbnail name="$ctrl.editableTitle"
-                               aspect-ratio="'4:3'"
-                               filename="$ctrl.editableThumbnailFilename"
-                               thumbnail-bg-color="$ctrl.editableThumbnailBgColor"
-                               bg-color="'#2F6687'">
-            </preview-thumbnail>
+            <oppia-preview-thumbnail [name]="$ctrl.editableTitle"
+                                     [aspect-ratio]="'4:3'"
+                                     [filename]="$ctrl.editableThumbnailFilename"
+                                     [thumbnail-bg-color]="$ctrl.editableThumbnailBgColor"
+                                     [bg-color]="'#2F6687'">
+            </oppia-preview-thumbnail>
           </div>
         </div>
       </md-card>
