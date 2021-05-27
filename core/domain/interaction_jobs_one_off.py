@@ -417,8 +417,9 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 # Always yield for all case ?
                 if owner_ids:
                     for user_id in owner_ids:
-                        user_mail = user_services.get_email_from_user_id(user_id)
-                        yield(item.id, 'user email is: %s' % (user_mail))
+                        user_mail = user_services.get_email_from_user_id(
+                            user_id)
+                        yield (item.id, 'user email is: %s' % (user_mail))
 
     @staticmethod
     def reduce(key, values):
