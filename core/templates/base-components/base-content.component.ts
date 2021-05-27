@@ -53,9 +53,11 @@ export class BaseContentComponent {
   ) {}
 
   ngOnInit(): void {
-    // Mimic redirection behaviour in the backend (see issue #7867 for
-    // details).
-    if (this.isOppiaAppspotServer()) {
+    /**
+     * Redirect occasional developer using the old appsport url to
+     * the test server. (see issue #7867 for details)
+     */
+    if (this.isMainProdServer()) {
       this.windowRef.nativeWindow.location.href = (
         'https://oppiatestserver.appspot.com' +
         this.windowRef.nativeWindow.location.pathname +
@@ -82,7 +84,7 @@ export class BaseContentComponent {
     };
   }
 
-  isOppiaAppspotServer(): boolean {
+  isMainProdServer(): boolean {
     return this.windowRef.nativeWindow.location.hostname ===
       'oppiaserver.appspot.com';
   }
