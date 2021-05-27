@@ -1298,10 +1298,11 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
         blog_posts_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            blog_posts_related_models: list(BaseModel). Models whose user IDs
-                should be pseudonymized.
-            pseudonymized_id: str. New pseudonymized user ID to be used for
-                the models.
+            blog_posts_related_models:
+                list(BaseModel). Models whose user IDs should be
+                pseudonymized.
+            pseudonymized_id:
+                str. New pseudonymized user ID to be used for the models.
         """
         blog_post_models = [
             model for model in blog_posts_related_models
