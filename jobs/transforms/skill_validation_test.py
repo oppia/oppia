@@ -147,8 +147,9 @@ class ValidateSkillCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             commit_cmds=[{
                 'cmd': 'add_skill_misconception',
                 'new_misconception_dict': '{u\'id\': 0, u\'notes\': '
-                        'u\'<p>notes</p>\', u\'feedback\': '
-                        'u\'<p>default_feedback</p>\', u\'name\': u\'name\'}',
+                                          'u\'<p>notes</p>\', u\'feedback\': '
+                                          'u\'<p>default_feedback</p>\', '
+                                          'u\'name\': u\'name\'}',
                 'invalid': 'invalid'
             }])
 
@@ -165,8 +166,10 @@ class ValidateSkillCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 {
                     'cmd': 'add_skill_misconception',
                     'new_misconception_dict': '{u\'id\': 0, u\'notes\': '
-                        'u\'<p>notes</p>\', u\'feedback\': '
-                        'u\'<p>default_feedback</p>\', u\'name\': u\'name\'}',
+                                              'u\'<p>notes</p>\', '
+                                              'u\'feedback\': '
+                                              'u\'<p>default_feedback</p>\', '
+                                              'u\'name\': u\'name\'}',
                     'invalid': 'invalid'
                 },
                 'The following extra attributes are present: invalid')
