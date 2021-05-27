@@ -28,6 +28,7 @@ var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 
 var toastInfoElement = element(by.css('.toast-info'));
 var toastSuccessElement = element(by.css('.toast-success'));
+var loadingMessage = element(by.css('.protractor-test-loading-message'));
 
 var alertToBePresent = async function() {
   await browser.wait(
@@ -149,6 +150,10 @@ var invisibilityOfInfoToast = async function(errorMessage) {
   await invisibilityOf(toastInfoElement, errorMessage);
 };
 
+var invisibilityOfLoadingMessage = async function(errorMessage) {
+  await invisibilityOf(loadingMessage, errorMessage);
+};
+
 var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
@@ -180,6 +185,7 @@ exports.elementAttributeToBe = elementAttributeToBe;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
+exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.modalPopupToAppear = modalPopupToAppear;
