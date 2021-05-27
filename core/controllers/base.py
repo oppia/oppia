@@ -226,9 +226,7 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.user = user_services.get_user_actions_info(self.user_id)
 
-        if feconf.ENABLE_MAINTENANCE_MODE and (
-                self.request.path not in AUTH_HANDLER_PATHS
-                and not self.current_user_is_site_maintainer):
+        if not self._is_requested_path_currently_accessible_to_user():
             auth_services.destroy_auth_session(self.response)
             return
 
@@ -253,9 +251,7 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if feconf.ENABLE_MAINTENANCE_MODE and (
-                self.request.path not in AUTH_HANDLER_PATHS
-                and not self.current_user_is_site_maintainer):
+        if not self._is_requested_path_currently_accessible_to_user():
             self.handle_exception(
                 self.TemporaryMaintenanceException(), self.app.debug)
             return
@@ -313,6 +309,17 @@ class BaseHandler(webapp2.RequestHandler):
         return (
             self.current_user_is_super_admin or
             self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
