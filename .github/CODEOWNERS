@@ -185,7 +185,6 @@
 /scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
 /scripts/linters/python_linter*.py @sajalasati @DubeySandeep
-/scripts/linters/ts_ignore_exceptions.json @vojtechjelinek
 /ubuntu_dockerfile @DubeySandeep
 
 

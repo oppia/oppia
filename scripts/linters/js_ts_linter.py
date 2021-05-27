@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
-import json
 import os
 import re
 import shutil
@@ -43,12 +42,6 @@ sys.path.insert(1, ESPRIMA_PATH)
 import esprima  # isort:skip pylint: disable=wrong-import-order, wrong-import-position
 
 COMPILED_TYPESCRIPT_TMP_PATH = 'tmpcompiledjs/'
-
-TS_IGNORE_EXCEPTIONS_FILEPATH = os.path.join(
-    CURR_DIR, 'scripts', 'linters', 'ts_ignore_exceptions.json')
-
-TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
-    TS_IGNORE_EXCEPTIONS_FILEPATH, 'r'))
 
 # The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
 # to be included in angular-services.index.ts. These services are not required
@@ -253,135 +246,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             COMPILED_TYPESCRIPT_TMP_PATH,
             os.path.relpath(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
-
-    def _check_ts_ignore(self):
-        """Checks if ts ignore is used.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Ts ignore'
-        error_messages = []
-
-        ts_ignore_pattern = r'@ts-ignore'
-        comment_pattern = r'^ *// '
-        comment_with_ts_error_pattern = r'^ *// This throws'
-        failed = False
-
-        for file_path in self.all_filepaths:
-            file_content = self.file_cache.read(file_path)
-            previous_line_has_ts_ignore = False
-            previous_line_has_comment = False
-            previous_line_has_comment_with_ts_error = False
-
-            for line_number, line in enumerate(file_content.split('\n')):
-                if previous_line_has_ts_ignore:
-                    if file_path in TS_IGNORE_EXCEPTIONS:
-                        line_contents = TS_IGNORE_EXCEPTIONS[file_path]
-                        this_line_is_exception = False
-
-                        for line_content in line_contents:
-                            if line.find(line_content) != -1:
-                                this_line_is_exception = True
-                                break
-
-                        if this_line_is_exception:
-                            previous_line_has_ts_ignore = False
-                            continue
-
-                    failed = True
-                    previous_line_has_ts_ignore = False
-                    error_message = (
-                        '%s --> @ts-ignore found at line %s. '
-                        'Please add this exception in %s.' % (
-                            file_path, line_number,
-                            TS_IGNORE_EXCEPTIONS_FILEPATH))
-                    error_messages.append(error_message)
-
-                previous_line_has_ts_ignore = bool(
-                    re.findall(ts_ignore_pattern, line))
-
-                if (
-                        previous_line_has_ts_ignore and
-                        not previous_line_has_comment_with_ts_error):
-                    failed = True
-                    error_message = (
-                        '%s --> Please add a comment above the @ts-ignore '
-                        'explaining the @ts-ignore at line %s. The format '
-                        'of comment should be -> This throws "...". This '
-                        'needs to be suppressed because ...' % (
-                            file_path, line_number + 1))
-                    error_messages.append(error_message)
-
-                previous_line_has_comment = bool(
-                    re.findall(comment_pattern, line))
-
-                previous_line_has_comment_with_ts_error = (
-                    bool(
-                        re.findall(
-                            comment_with_ts_error_pattern, line))
-                    or (
-                        previous_line_has_comment_with_ts_error and
-                        previous_line_has_comment))
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
-    def _check_ts_expect_error(self):
-        """Checks if ts expect error is used in non spec file.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Ts expect error'
-        error_messages = []
-
-        ts_expect_error_pattern = r'@ts-expect-error'
-        comment_pattern = r'^ *// '
-        comment_with_ts_error_pattern = r'^ *// This throws'
-
-        failed = False
-        previous_line_has_comment = False
-        previous_line_has_comment_with_ts_error = False
-
-        for file_path in self.all_filepaths:
-            file_content = self.file_cache.read(file_path)
-            for line_number, line in enumerate(file_content.split('\n')):
-                if re.findall(ts_expect_error_pattern, line):
-                    if not (
-                            file_path.endswith('.spec.ts') or
-                            file_path.endswith('Spec.ts')):
-                        failed = True
-                        error_message = (
-                            '%s --> @ts-expect-error found at line %s. '
-                            'It can be used only in spec files.' % (
-                                file_path, line_number + 1))
-                        error_messages.append(error_message)
-
-                    if not previous_line_has_comment_with_ts_error:
-                        failed = True
-                        error_message = (
-                            '%s --> Please add a comment above the '
-                            '@ts-expect-error explaining the '
-                            '@ts-expect-error at line %s. The format '
-                            'of comment should be -> This throws "...". '
-                            'This needs to be suppressed because ...' % (
-                                file_path, line_number + 1))
-                        error_messages.append(error_message)
-
-                previous_line_has_comment = bool(
-                    re.findall(comment_pattern, line))
-
-                previous_line_has_comment_with_ts_error = (
-                    bool(
-                        re.findall(
-                            comment_with_ts_error_pattern, line))
-                    or (
-                        previous_line_has_comment_with_ts_error and
-                        previous_line_has_comment))
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
 
     def _check_js_and_ts_component_name_and_count(self):
         """This function ensures that all JS/TS files have exactly
@@ -855,96 +719,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_comments(self):
-        """This function ensures that comments follow correct style. Below are
-        some formats of correct comment style:
-        1. A comment can end with the following symbols: ('.', '?', ';', ',',
-        '{', '^', ')', '}', '>'). Example: // Is this is comment?
-        2. If a line contain any of the following words or phrases('@ts-ignore',
-        '--params', 'eslint-disable', 'eslint-enable', 'http://', 'https://')
-        in the comment.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Comments'
-        error_messages = []
-        files_to_check = self.all_filepaths
-        allowed_terminating_punctuations = [
-            '.', '?', ';', ',', '{', '^', ')', '}', '>']
-
-        # We allow comments to not have a terminating punctuation if any of the
-        # below phrases appears at the beginning of the comment.
-        # Example: // eslint-disable max-len
-        # This comment will be excluded from this check.
-        allowed_start_phrases = [
-            '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
-            'eslint-enable']
-
-        # We allow comments to not have a terminating punctuation if any of the
-        # below phrases appears in the last word of a comment.
-        # Example: // Ref: https://some.link.com
-        # This comment will be excluded from this check.
-        allowed_end_phrases = ['http://', 'https://']
-
-        failed = False
-        for filepath in files_to_check:
-            file_content = self.file_cache.readlines(filepath)
-            file_length = len(file_content)
-            for line_num in python_utils.RANGE(file_length):
-                line = file_content[line_num].strip()
-                next_line = ''
-                previous_line = ''
-                if line_num + 1 < file_length:
-                    next_line = file_content[line_num + 1].strip()
-
-                # Exclude comment line containing heading.
-                # Example: // ---- Heading ----
-                # These types of comments will be excluded from this check.
-                if (
-                        line.startswith('//') and line.endswith('-')
-                        and not (
-                            next_line.startswith('//') and
-                            previous_line.startswith('//'))):
-                    continue
-
-                if line.startswith('//') and not next_line.startswith('//'):
-                    # Check if any of the allowed starting phrase is present
-                    # in comment and exclude that line from check.
-                    allowed_start_phrase_present = any(
-                        line.split()[1].startswith(word) for word in
-                        allowed_start_phrases)
-
-                    if allowed_start_phrase_present:
-                        continue
-
-                    # Check if any of the allowed ending phrase is present
-                    # in comment and exclude that line from check. Used 'in'
-                    # instead of 'startswith' because we have some comments
-                    # with urls inside the quotes.
-                    # Example: 'https://oppia.org'
-                    allowed_end_phrase_present = any(
-                        word in line.split()[-1] for word in
-                        allowed_end_phrases)
-
-                    if allowed_end_phrase_present:
-                        continue
-
-                    # Check that the comment ends with the proper
-                    # punctuation.
-                    last_char_is_invalid = line[-1] not in (
-                        allowed_terminating_punctuations)
-                    if last_char_is_invalid:
-                        failed = True
-                        error_message = (
-                            '%s --> Line %s: Invalid punctuation used at '
-                            'the end of the comment.' % (
-                                filepath, line_num + 1))
-                        error_messages.append(error_message)
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_angular_services_index(self):
         """Finds all @Injectable classes and makes sure that they are added to
             Oppia root and Angular Services Index.
@@ -1027,9 +801,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(
             self._match_line_breaks_in_controller_dependencies())
         linter_stdout.append(self._check_constants_declaration())
-        linter_stdout.append(self._check_comments())
-        linter_stdout.append(self._check_ts_ignore())
-        linter_stdout.append(self._check_ts_expect_error())
         linter_stdout.append(self._check_angular_services_index())
 
         # Clear temp compiled typescipt files.
