@@ -13,13 +13,13 @@
                                [img-src]="editableThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                [background]="getBgColor()"
-                               [aspectRatio]="4:3">
+                               [aspect-ratio]="'4:3'">
       </oppia-thumbnail-display>
       <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
                                [img-src]="newThumbnailDataUrl"
                                [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                [background]="localStorageBgcolor"
-                               [aspectRatio]="4:3">
+                               [aspect-ratio]="'4:3'">
       </oppia-thumbnail-display>
     </div>
   </div>
