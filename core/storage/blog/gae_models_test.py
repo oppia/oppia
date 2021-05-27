@@ -62,6 +62,14 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             blog_post_models.BlogPostModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            blog_post_models.BlogPostModel
+            .has_reference_to_user_id(self.USER_ID))
+        self.assertFalse(
+            blog_post_models.BlogPostModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
+
     def test_raise_exception_by_mocking_collision(self):
         blog_post_model_cls = blog_post_models.BlogPostModel
 

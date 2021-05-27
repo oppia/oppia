@@ -27,19 +27,20 @@ import python_utils
 
 # Valid model names.
 NAMES = python_utils.create_enum(
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'blog', 'classifier',
-    'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
-    'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
-    'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
-    'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'story', 'subtopic', 'suggestion', 'topic', 'translation', 'user')
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'blog',
+    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
+    'improvements', 'job', 'opportunity', 'question', 'recommendations',
+    'skill', 'statistics', 'activity', 'audit', 'auth', 'base_model',
+    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
+    'improvements', 'job', 'opportunity', 'question', 'recommendations', 
+    'skill', 'statistics', 'story', 'subtopic', 'suggestion', 'topic',
+    'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
 MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
-    NAMES.app_feedback_report, NAMES.collection, NAMES.config,
+    NAMES.app_feedback_report, NAMES.blog, NAMES.collection, NAMES.config,
     NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
     NAMES.subtopic, NAMES.suggestion, NAMES.topic)
 

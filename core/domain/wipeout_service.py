@@ -37,16 +37,16 @@ import feconf
 import python_utils
 
 (
-    app_feedback_report_models, base_models, collection_models, config_models,
-    exp_models, feedback_models, question_models,
-    skill_models, story_models, subtopic_models,
+    app_feedback_report_models, base_models, blog_models,
+    collection_models, config_models, exp_models, feedback_models,
+    question_models, skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.base_model,
-    models.NAMES.collection, models.NAMES.config, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user,
+    models.NAMES.blog, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -343,6 +343,7 @@ def delete_user(pending_deletion_request):
             'topic_id',
             feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
             ('manager_ids',))
+        _pseudonymize_blog_posts_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.email)
 
 
@@ -1255,106 +1256,88 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         )
 
 
-# def _pseudonymize_blog_posts_models(pending_deletion_request):
-#     """Pseudonymize the blog post models for the user with user_id.
+def _pseudonymize_blog_posts_models(pending_deletion_request):
+    """Pseudonymize the blog post models for the user with user_id.
 
-#     Args:
-#         pending_deletion_request: PendingDeletionRequest. The pending deletion
-#         request object to be saved in the datastore.
-#     """
-#     user_id = pending_deletion_request.user_id
+    Args:
+        pending_deletion_request:
+            PendingDeletionRequest. The pending deletion
+            request object to be saved in the datastore.
+    """
+    user_id = pending_deletion_request.user_id
 
-#     # We want to preserve the same pseudonymous user ID on all the models
-#     # related to one blog post. So we collect all the users' blog
-#     # post models, blog post summary models, and rights models; then
-#     # we generate a pseudonymous user ID and replace the user ID
-#     # with that pseudonymous user ID in all the models.
-#     blog_post_model_class = blog_posts.BlogPostModel
-#     blog_post_models = blog_post_model_class.query(
-#         datastore_services.any_of(
-#             blog_post_model_class.author_id == user_id)
-#         ).fetch()
-#     blogpost_ids = set([model.id for model in blog_post_models])
+    # We want to preserve the same pseudonymous user ID on all the models
+    # related to one blog post. So we collect all the users' blog
+    # post models and blog post summary models then
+    # we generate a pseudonymous user ID and replace the user ID
+    # with that pseudonymous user ID in all the models.
+    blog_post_model_class = blog_models.BlogPostModel
+    blog_post_models = blog_post_model_class.query(
+        datastore_services.any_of(
+            blog_post_model_class.author_id == user_id)
+        ).fetch()
+    blogpost_ids = set([model.id for model in blog_post_models])
 
-#     blog_post_summary_model_class = blog_posts.BlogPostSummaryModel
-#     blog_post_summary_models = blog_post_summary_model_class.query(
-#         datastore_services.any_of(
-#             blog_post_summary_model_class.author_id == user_id)
-#         ).fetch()
-#     blogpost_ids |= set([model.id for model in blog_post_summary_models])
+    blog_post_summary_model_class = blog_models.BlogPostSummaryModel
+    blog_post_summary_models = blog_post_summary_model_class.query(
+        datastore_services.any_of(
+            blog_post_summary_model_class.author_id == user_id)
+        ).fetch()
+    blogpost_ids |= set([model.id for model in blog_post_summary_models])
 
-#     blog_post_rights_model_class = blog_posts.BlogPostRightsModel
-#     blog_post_rights_models = blog_post_rights_model_class.query(
-#         datastore_services.any_of(
-#             blog_post_rights_model_class.editor_ids == user_id,
-#         )).fetch()
-#     blogpost_ids |= set([model.id for model in blog_post_rights_models])
+    _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
+        pending_deletion_request, models.NAMES.blog, blogpost_ids)
+    #TODO(sll):Add wipeout for BlogPostsRightsModel after adding
+    #service layer.
+    @transaction_services.run_in_transaction_wrapper
+    def _pseudonymize_models_transactional(
+            blog_posts_related_models, pseudonymized_id):
+        """Pseudonymize user ID fields in the models.
 
-#     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-#         pending_deletion_request, models.NAMES.blog_posts, blogpost_ids)
+        This function is run in a transaction, with the maximum number of
+        blog_posts_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
-    # @transaction_services.run_in_transaction_wrapper
-    # def _pseudonymize_models_transactional(
-    #         blog_posts_related_models, pseudonymized_id):
-    #     """Pseudonymize user ID fields in the models.
+        Args:
+            blog_posts_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
+        """
+        blog_post_models = [
+            model for model in blog_posts_related_models
+            if isinstance(model, blog_post_model_class)]
+        for blog_post_model in blog_post_models:
+            if blog_post_model.author_id == user_id:
+                blog_post_model.author_id = pseudonymized_id
+            blog_post_model.update_timestamps()
 
-    #     This function is run in a transaction, with the maximum number of
-    #     blog_posts_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
+        blog_post_summary_models = [
+            model for model in blog_posts_related_models
+            if isinstance(model, blog_post_summary_model_class)]
+        for blog_post_summary in blog_post_summary_models:
+            blog_post_summary.author_id = pseudonymized_id
+            blog_post_summary.update_timestamps()
 
-    #     Args:
-    #         blog_posts_related_models: list(BaseModel). Models whose user IDs
-    #             should be pseudonymized.
-    #         pseudonymized_id: str. New pseudonymized user ID to be used for
-    #             the models.
-    #     """
-    #     blog_post_models = [
-    #         model for model in blog_posts_related_models
-    #         if isinstance(model, blog_post_model_class)]
-    #     for blog_post_model in blog_post_models:
-    #         if blog_post_model.author_id == user_id:
-    #             blog_post_model.author_id = pseudonymized_id
-    #         blog_post_model.update_timestamps()
+        datastore_services.put_multi(
+            blog_post_models +
+            blog_post_summary_models)
 
-    #     blog_post_summary_models = [
-    #         model for model in blog_posts_related_models
-    #         if isinstance(model, blog_post_summary_model_class)]
-    #     for blog_post_summary in blog_post_summary_models:
-    #         blog_post_summary.author_id = pseudonymized_id
-    #         blog_post_summary.update_timestamps()
-
-    #     blog_post_rights_models = [
-    #         model for model in blog_posts_related_models
-    #         if isinstance(model, blog_post_rights_model_class)]
-    #     for blog_post_rights_model in blog_post_rights_models:
-    #         if blog_post_rights_model.editor_ids == user_id:
-    #             blog_post_rights_model.editor_ids = pseudonymized_id
-    #         blog_post_rights_model.update_timestamps()
-
-    #     datastore_services.put_multi(
-    #         blog_post_models +
-    #         blog_post_summary_models +
-    #         blog_post_rights_models)
-
-    # blog_posts_ids_to_pids = (
-    #     pending_deletion_request.pseudonymizable_entity_mappings[
-    #         models.NAMES.blog_posts.value])
-    # for blogpost_id, pseudonymized_id in blog_posts_ids_to_pids.items():
-    #     blog_posts_related_models = [
-    #         model for model in blog_post_models
-    #         if model.id == blogpost_id
-    #     ] + [
-    #         model for model in blog_post_summary_models
-    #         if model.id == blogpost_id
-    #     ] + [
-    #         model for model in blog_post_rights_models
-    #         if model.id == blogpost_id
-    #     ]
-    #     for i in python_utils.RANGE(
-    #             0,
-    #             len(blog_posts_related_models),
-    #             feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
-    #         _pseudonymize_models_transactional(
-    #             blog_posts_related_models[
-    #                 i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
-    #             pseudonymized_id)
-
+    blog_posts_ids_to_pids = (
+        pending_deletion_request.pseudonymizable_entity_mappings[
+            models.NAMES.blog.value])
+    for blogpost_id, pseudonymized_id in blog_posts_ids_to_pids.items():
+        blog_posts_related_models = [
+            model for model in blog_post_models
+            if model.id == blogpost_id
+        ] + [
+            model for model in blog_post_summary_models
+            if model.id == blogpost_id
+        ]
+        for i in python_utils.RANGE(
+                0,
+                len(blog_posts_related_models),
+                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+            _pseudonymize_models_transactional(
+                blog_posts_related_models[
+                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                pseudonymized_id)

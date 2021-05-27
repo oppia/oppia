@@ -47,13 +47,13 @@ import feconf
 import python_utils
 
 (
-    app_feedback_report_models, auth_models, collection_models, config_models,
-    email_models, exp_models, feedback_models, improvements_models,
-    question_models, skill_models, story_models,
+    app_feedback_report_models, auth_models, blog_models, collection_models,
+    config_models, email_models, exp_models, feedback_models,
+    improvements_models, question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.auth,
+    models.NAMES.app_feedback_report, models.NAMES.auth, models.NAMES.blog,
     models.NAMES.collection, models.NAMES.config, models.NAMES.email,
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
     models.NAMES.question, models.NAMES.skill, models.NAMES.story,
@@ -4614,212 +4614,184 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
-# class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
-#     """Provides testing of the deletion part of wipeout service."""
 
-#     BLOG_1_ID = 'blog_1_id'
-#     USER_1_EMAIL = 'some@email.com'
-#     USER_1_USERNAME = 'username1'
-#     USER_2_EMAIL = 'some-other@email.com'
-#     USER_2_USERNAME = 'username2'
-#     NUMBER_OF_MODELS = 150
-#     NONEXISTENT_USER_ID = 'id_x'
-#     CONTENT = 'Dummy Content'
-#     SUMMARY = 'Dummy Content'
-#     TITLE = 'Dummy Title'
-#     TAGS = 'tag1 tag2 tag3'
-#     THUMBNAIL = 'xyzabc'
+class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
+    """Provides testing of the deletion part of wipeout service."""
 
-#     def setUp(self):
-#         super(WipeoutServiceDeleteBlogPostsModelsTests, self).setUp()
-#         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
-#         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
-#         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-#         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-#         self.blog_post_model = blog_models.BlogPostModel(
-#             id=self.BLOG_1_ID,
-#             author_id=self.user_1_id,
-#             content=self.CONTENT,
-#             title=self.TITLE,
-#             last_updated=datetime.datetime.utcnow(),
-#             published_on=datetime.datetime.utcnow(),
-#             url_fragment='sample-url-fragment',
-#             tags=self.TAGS,
-#             thumbnail_filename=self.THUMBNAIL
-#         )
-#         self.blog_post_model.update_timestamps()
-#         self.blog_post_model.put()
-#         self.blog_post_summary_model = blog_models.BlogPostSummaryModel(
-#             id=self.BLOG_1_ID,
-#             author_id=self.user_1_id,
-#             summary=self.SUMMARY,
-#             title=self.TITLE,
-#             last_updated=datetime.datetime.utcnow(),
-#             published_on=datetime.datetime.utcnow(),
-#             url_fragment='sample-url-fragment',
-#             tags=self.TAGS,
-#             thumbnail_filename=self.THUMBNAIL
-#         )
-#         self.blog_post_summary_model.update_timestamps()
-#         self.blog_post_summary_model.put()
-#         self.blog_post_rights_model = blog_models.BlogPostRightsModel(
-#             id=self.BLOG_1_ID,
-#             editor_ids=[self.user_1_id, self.user_2_id],
-#             blog_is_published=True,
-#         )
-#         self.blog_post_rights_model.update_timestamps()
-#         self.blog_post_rights_model.put()
-#         wipeout_service.pre_delete_user(self.user_1_id)
-#         wipeout_service.pre_delete_user(self.user_2_id)
-#         self.process_and_flush_pending_tasks()
+    BLOG_1_ID = 'blog_1_id'
+    USER_1_EMAIL = 'some@email.com'
+    USER_1_USERNAME = 'username1'
+    USER_2_EMAIL = 'some-other@email.com'
+    USER_2_USERNAME = 'username2'
+    NUMBER_OF_MODELS = 150
+    NONEXISTENT_USER_ID = 'id_x'
+    CONTENT = 'Dummy Content'
+    SUMMARY = 'Dummy Content'
+    TITLE = 'Dummy Title'
+    TAGS = 'tag1 tag2 tag3'
+    THUMBNAIL = 'xyzabc'
 
-#     def test_one_blog_model_is_pseudonymized(self):
-#         wipeout_service.delete_user(
-#             wipeout_service.get_pending_deletion_request(self.user_1_id))
+    def setUp(self):
+        super(WipeoutServiceDeleteBlogPostsModelsTests, self).setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
+        self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
+        self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.blog_post_model = blog_models.BlogPostModel(
+            id=self.BLOG_1_ID,
+            author_id=self.user_1_id,
+            content=self.CONTENT,
+            title=self.TITLE,
+            last_updated=datetime.datetime.utcnow(),
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=self.TAGS,
+            thumbnail_filename=self.THUMBNAIL
+        )
+        self.blog_post_model.update_timestamps()
+        self.blog_post_model.put()
+        self.blog_post_summary_model = blog_models.BlogPostSummaryModel(
+            id=self.BLOG_1_ID,
+            author_id=self.user_1_id,
+            summary=self.SUMMARY,
+            title=self.TITLE,
+            last_updated=datetime.datetime.utcnow(),
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=self.TAGS,
+            thumbnail_filename=self.THUMBNAIL
+        )
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
+        wipeout_service.pre_delete_user(self.user_1_id)
+        wipeout_service.pre_delete_user(self.user_2_id)
+        self.process_and_flush_pending_tasks()
 
-#         # Verify user is pseudonymized.
-#         blog_mappings = (
-#             user_models.PendingDeletionRequestModel.get_by_id(
-#                 self.user_1_id
-#             ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
-#         )
-#         blog_post_model = (
-#             blog_models.BlogPostModel.get_by_id(
-#                 self.BLOG_1_ID)
-#         )
-#         self.assertEqual(
-#             blog_post_model.author_id,
-#             blog_mappings[self.BLOG_1_ID]
-#         )
-#         blog_post_summary_model = (
-#             blog_models.BlogPostRightsModel.get_by_id(
-#                 self.BLOG_1_ID)
-#         )
-#         self.assertEqual(
-#             blog_post_summary_model.author_id,
-#             blog_mappings[self.BLOG_1_ID]
-#         )
+    def test_one_blog_model_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-#     def test_one_blog_model_when_the_deletion_is_repeated_is_pseudonymized(self):
-#         wipeout_service.delete_user(
-#             wipeout_service.get_pending_deletion_request(self.user_1_id))
+        # Verify user is pseudonymized.
+        blog_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
+        )
+        blog_post_model = (
+            blog_models.BlogPostModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        self.assertEqual(
+            blog_post_model.author_id,
+            blog_mappings[self.BLOG_1_ID]
+        )
+        blog_post_summary_model = (
+            blog_models.BlogPostSummaryModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        self.assertEqual(
+            blog_post_summary_model.author_id,
+            blog_mappings[self.BLOG_1_ID]
+        )
 
-#         # Return blog post model to the original user ID.
-#         blog_post_model = (
-#             blog_models.BlogPostModel.get_by_id(
-#                 self.BLOG_1_ID)
-#         )
-#         blog_post_model.author_id = self.user_1_id
-#         blog_post_model.update_timestamps()
-#         blog_post_model.put()
+    def test_one_blog_when_the_deletion_is_repeated_is_pseudonymized(self):
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-#         # Run the user deletion again.
-#         wipeout_service.delete_user(
-#             wipeout_service.get_pending_deletion_request(self.user_1_id))
+        # Return blog post model to the original user ID.
+        blog_post_model = (
+            blog_models.BlogPostModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        blog_post_model.author_id = self.user_1_id
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
 
-#         # Verify that both the blog post summary and the rights have the same
-#         # pseudonymous user ID.
-#         blog_mappings = (
-#             user_models.PendingDeletionRequestModel.get_by_id(
-#                 self.user_1_id
-#             ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
-#         )
-#         new_blog_post_model = (
-#             blog_models.BlogPostModel.get_by_id(
-#                 self.BLOG_1_ID)
-#         )
-#         self.assertEqual(
-#             new_blog_post_model.author_id,
-#             blog_mappings[self.BLOG_1_ID]
-#         )
+        # Run the user deletion again.
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-#     def test_multiple_blog_models_are_pseudonymized(self):
-#         blog_post_models = []
-#         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
-#             blog_post_models.append(
-#                 blog_models.BlogPostModel(
-#                     id='blogmodel-%s' % i,
-#                     author_id=self.user_1_id,
-#                     content=self.CONTENT,
-#                     title=self.TITLE % i,
-#                     last_updated=datetime.datetime.utcnow(),
-#                     published_on=datetime.datetime.utcnow(),
-#                     url_fragment='sample-url-fragment' % i,
-#                     tags=self.TAGS,
-#                     thumbnail_filename=self.THUMBNAIL
-#                 )
-#             )
-#             blog_models.BlogPostModel.update_timestamps_multi(
-#                 blog_post_models)
-#         blog_post_summary_models = []
-#         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
-#             blog_post_summary_models.append(
-#                 blog_models.BlogPostSummaryModel(
-#                     id='blogmodel-%s' % i,
-#                     author_id=self.user_1_id,
-#                     summary=self.SUMMARY,
-#                     title=self.TITLE % i,
-#                     last_updated=datetime.datetime.utcnow(),
-#                     published_on=datetime.datetime.utcnow(),
-#                     url_fragment='sample-url-fragment',
-#                     tags=self.TAGS,
-#                     thumbnail_filename=self.THUMBNAIL
-#                 )
-#             )
-#             blog_models.BlogPostSummaryModel.update_timestamps_multi(
-#                 blog_post_summary_models)
-#         blog_post_summary_models = []
-#         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
-#             blog_post_rights_models.append(
-#                 blog_models.BlogPostRightsModel(
-#                     id='blogmodel-%s' % i,
-#                     editor_ids=[self.user_1_id, self.user_2_id],
-#                     blog_is_published=True,
-#                 )
-#             )
-#             blog_models.BlogPostRightsModel.update_timestamps_multi(
-#                 blog_post_rights_models)
-#         datastore_services.put_multi(
-#             blog_post_models + blog_post_summary_models+ blog_post_rights_models)
+        # Verify that both the blog post summary and the rights have the same
+        # pseudonymous user ID.
+        blog_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
+        )
+        new_blog_post_model = (
+            blog_models.BlogPostModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+        self.assertEqual(
+            new_blog_post_model.author_id,
+            blog_mappings[self.BLOG_1_ID]
+        )
 
-#         wipeout_service.delete_user(
-#             wipeout_service.get_pending_deletion_request(self.user_1_id))
+    def test_multiple_blog_models_are_pseudonymized(self):
+        blog_post_models = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            blog_post_models.append(
+                blog_models.BlogPostModel(
+                    id='blogmodel-%s' % i,
+                    author_id=self.user_1_id,
+                    content=self.CONTENT,
+                    title=self.TITLE,
+                    last_updated=datetime.datetime.utcnow(),
+                    published_on=datetime.datetime.utcnow(),
+                    url_fragment='sample-url-fragment',
+                    tags=self.TAGS,
+                    thumbnail_filename=self.THUMBNAIL
+                )
+            )
+            blog_models.BlogPostModel.update_timestamps_multi(
+                blog_post_models)
+        blog_post_summary_models = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            blog_post_summary_models.append(
+                blog_models.BlogPostSummaryModel(
+                    id='blogmodel-%s' % i,
+                    author_id=self.user_1_id,
+                    summary=self.SUMMARY,
+                    title=self.TITLE
+                    last_updated=datetime.datetime.utcnow(),
+                    published_on=datetime.datetime.utcnow(),
+                    url_fragment='sample-url-fragment',
+                    tags=self.TAGS,
+                    thumbnail_filename=self.THUMBNAIL
+                )
+            )
+            blog_models.BlogPostSummaryModel.update_timestamps_multi(
+                blog_post_summary_models)
+        datastore_services.put_multi(
+            blog_post_models + blog_post_summary_models)
 
-#         blog_mappings = (
-#             user_models.PendingDeletionRequestModel.get_by_id(
-#                 self.user_1_id
-#             ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
-#         )
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-#         pseudonymized_blog_post_models = (
-#             blog_models.BlogPostModel.get_multi(
-#                 [model.id for model in blog_post_models]
-#             )
-#         )
-#         for blog_post_model in pseudonymized_blog_post_models:
-#             self.assertEqual(
-#                 blog_post_model.author_id,
-#                 blog_mappings[blog_post_model.id]
-#             )
+        blog_mappings = (
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.user_1_id
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
+        )
 
-#         pseudonymized_blog_post_summary_models = (
-#             blog_models.BlogPostSummaryModel.get_multi(
-#                 [model.id for model in blog_post_summary_models]
-#             )
-#         )
-#         for blog_post_summary_model in pseudonymized_blog_post_summary_models:
-#             self.assertEqual(
-#                 blog_post_summary_model.author_id,
-#                 blog_mappings[blog_post_summary_model.id]
-#             )
-        
-#         pseudonymized_blog_post_rights_models = (
-#             blog_models.BlogPostRightsModel.get_multi(
-#                 [model.id for model in blog_post_rights_models]
-#             )
-#         )
-#         for blog_post_rights_model in pseudonymized_blog_post_rights_models:
-#             self.assertEqual(
-#                 blog_post_rights_model.editor_ids,
-#                 blog_mappings[blog_post_right_model.id]
-#             )
+        pseudonymized_blog_post_models = (
+            blog_models.BlogPostModel.get_multi(
+                [model.id for model in blog_post_models]
+            )
+        )
+        for blog_post_model in pseudonymized_blog_post_models:
+            self.assertEqual(
+                blog_post_model.author_id,
+                blog_mappings[blog_post_model.id]
+            )
+
+        pseudonymized_blog_post_summary_models = (
+            blog_models.BlogPostSummaryModel.get_multi(
+                [model.id for model in blog_post_summary_models]
+            )
+        )
+        for blog_post_summary_model in pseudonymized_blog_post_summary_models:
+            self.assertEqual(
+                blog_post_summary_model.author_id,
+                blog_mappings[blog_post_summary_model.id]
+            )
