@@ -63,7 +63,8 @@
             <div class="navbar-mobile-container" *ngIf="isBottomNavbarShown()">
               <i class="fa fa-book show-mobile-navbar-icon"
                  (click)="toggleMobileNavOptions()"
-                 aria-label="Mobile navbar options"></i>
+                 aria-label="Mobile navbar options">
+              </i>
               <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
                 <div>
                   <ng-content select="mobile-nav-options"></ng-content>
