@@ -60,6 +60,7 @@ export class I18nFooterComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaI18nFooter', downgradeComponent({
-  component: I18nFooterComponent
-}));
+angular.module('oppia').directive('oppiaI18nFooter',
+  downgradeComponent({
+    component: I18nFooterComponent
+  }) as angular.IDirectiveFactory);
