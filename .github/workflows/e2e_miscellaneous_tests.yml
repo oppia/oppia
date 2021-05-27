@@ -50,7 +50,7 @@ jobs:
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard" --prod_env
       - name: Run e2e Publication Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="publication"  --skip-install --skip-build --server_log_level="info" --prod_env
       - name: Run e2e Feature Gating Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
