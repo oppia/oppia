@@ -148,10 +148,10 @@ export class ExplorationHtmlFormatterService {
       answer: InteractionAnswer, interactionId: string,
       interactionCustomizationArgs: InteractionCustomizationArgs): string {
     var interactionChoices = null;
-    if ('choices' in interactionCustomizationArgs) {
+    /*if ('choices' in interactionCustomizationArgs) {
       interactionChoices = interactionCustomizationArgs.choices.value.map(
         choice => choice);
-    }
+    }*/
     var el = $(
       '<oppia-short-response-' + this.camelCaseToHyphens.transform(
         interactionId) + '>');
