@@ -1739,7 +1739,7 @@ class GenericTestBase(AppEngineTestBase):
 auto_tts_enabled: true
 blurb: ''
 category: Category
-correctness_feedback_enabled: false
+correctness_feedback_enabled: true
 init_state_name: %s
 language_code: en
 objective: ''

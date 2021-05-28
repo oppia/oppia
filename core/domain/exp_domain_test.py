@@ -4207,7 +4207,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
-            'correctness_feedback_enabled': False,
+            'correctness_feedback_enabled': True,
         })
 
 
