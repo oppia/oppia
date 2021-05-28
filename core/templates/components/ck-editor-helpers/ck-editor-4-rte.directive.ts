@@ -66,6 +66,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         title: false,
         floatSpaceDockedOffsetY: 15,
         extraAllowedContent: extraAllowedContentRules,
+        forcePasteAsPlainText: true,
         sharedSpaces: sharedSpaces,
         skin: (
           'bootstrapck,' +
