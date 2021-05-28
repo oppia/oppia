@@ -143,6 +143,9 @@ describe('CreateActivityButtonComponent', () => {
     });
     spyOn(component, 'initCreationProcess');
 
+    expect(component.canCreateCollections).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
+
     component.ngOnInit();
     tick();
     fixture.detectChanges();
@@ -172,6 +175,9 @@ describe('CreateActivityButtonComponent', () => {
     });
     const explorationCreationServiceSpy = spyOn(
       explorationCreationService, 'createNewExploration');
+
+    expect(component.canCreateCollections).toBe(false);
+    expect(component.userIsLoggedIn).toBe(false);
 
     component.ngOnInit();
     tick();
