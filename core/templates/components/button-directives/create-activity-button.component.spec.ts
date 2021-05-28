@@ -26,7 +26,7 @@ import { CreateActivityButtonComponent } from './create-activity-button.componen
  * @fileoverview Unit tests for CreateActivityButtonComponent.
  */
 
- class MockWindowRef {
+class MockWindowRef {
   _window = {
     location: {
       _hash: '',
@@ -126,13 +126,13 @@ describe('CreateActivityButtonComponent', () => {
   });
 
   it('should initialize and call initCreationProcess()', fakeAsync(() => {
-    // This throws "Argument of type 'Promise<{ isLoggedIn: () => boolean;
-    // canCreateCollections: () => boolean; }>' is not assignable to parameter
-    // of type 'Promise<UserInfo>'.". This is because the actual
-    // 'getUserInfoAsync' returns more properties than required. We need to
-    // suppress this error because we need only "isLoggedIn" and
-    // "canCreateCollections" functions for testing.
     const userServiceSpy = spyOn(userService, 'getUserInfoAsync')
+      // This throws "Argument of type 'Promise<{ isLoggedIn: () => boolean;
+      // canCreateCollections: () => boolean; }>' is not assignable to parameter
+      // of type 'Promise<UserInfo>'.". This is because the actual
+      // 'getUserInfoAsync' returns more properties than required. We need to
+      // suppress this error because we need only "isLoggedIn" and
+      // "canCreateCollections" functions for testing.
       // @ts-expect-error
       .and.returnValue(Promise.resolve({
         isLoggedIn: () => true,
@@ -155,13 +155,13 @@ describe('CreateActivityButtonComponent', () => {
   }));
 
   it('should initialize and call createNewExploration()', fakeAsync(() => {
-    // This throws "Argument of type 'Promise<{ isLoggedIn: () => boolean;
-    // canCreateCollections: () => boolean; }>' is not assignable to parameter
-    // of type 'Promise<UserInfo>'.". This is because the actual
-    // 'getUserInfoAsync' returns more properties than required. We need to
-    // suppress this error because we need only "isLoggedIn" and
-    // "canCreateCollections" functions for testing.
     const userServiceSpy = spyOn(userService, 'getUserInfoAsync')
+      // This throws "Argument of type 'Promise<{ isLoggedIn: () => boolean;
+      // canCreateCollections: () => boolean; }>' is not assignable to parameter
+      // of type 'Promise<UserInfo>'.". This is because the actual
+      // 'getUserInfoAsync' returns more properties than required. We need to
+      // suppress this error because we need only "isLoggedIn" and
+      // "canCreateCollections" functions for testing.
       // @ts-expect-error
       .and.returnValue(Promise.resolve({
         isLoggedIn: () => true,
@@ -186,8 +186,8 @@ describe('CreateActivityButtonComponent', () => {
 
   it('should return from initCreateProcess() when' +
     ' creation is in progress', () => {
-      component.creationInProgress = true;
-      expect(component.initCreationProcess()).toBe();
+    component.creationInProgress = true;
+    expect(component.initCreationProcess()).toBe();
   });
 
   it('should create new exploration if user cannot create collections', () => {
