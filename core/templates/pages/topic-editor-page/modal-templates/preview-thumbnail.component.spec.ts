@@ -12,63 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the preview thumbnail component.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ThumbnailDisplayComponent } from 'components/forms/custom-forms-directives/thumbnail-display.component';
 import { ContextService } from 'services/context.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { PreviewThumbnailComponent } from './preview-thumbnail.component';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value): string {
-    return value;
-  }
-}
-
-describe('Preview Thumbnail Component', () => {
-  let contextService: ContextService;
-  let component: PreviewThumbnailComponent;
+describe('Preview Thumbnail Component', function() {
+  let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
+  let imageUploadHelperService: ImageUploadHelperService;
+  let testUrl = 'test_url';
 
-  class MockImageUploadHelperService {
-    getTrustedResourceUrlForThumbnailFilename(
-        filename: string, entityType: string, entityId: string) {
-      return (entityType + '/' + entityId + '/' + filename);
-    }
-  }
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [PreviewThumbnailComponent, MockTranslatePipe],
-      providers: [
-        {
-          provide: ImageUploadHelperService,
-          useClass: MockImageUploadHelperService
-        }
+      declarations: [
+        PreviewThumbnailComponent,
+        ThumbnailDisplayComponent
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [
+        ImageUploadHelperService,
+        ContextService
+      ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    contextService = TestBed.inject(ContextService);
-  });
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    componentInstance = fixture.componentInstance;
+    imageUploadHelperService = (
+       TestBed.inject(ImageUploadHelperService) as unknown) as
+         jasmine.SpyObj<ImageUploadHelperService>;
+    spyOn(
+      imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
+      .and.returnValue(testUrl);
   });
 
-  it('should init the component', fakeAsync(() => {
-    component.filename = 'img.svg';
-    spyOn(contextService, 'getEntityId').and.returnValue('1');
-    spyOn(contextService, 'getEntityType').and.returnValue('topic');
-    component.ngOnInit();
-    expect(component.editableThumbnailDataUrl).toEqual('topic/1/img.svg');
-  }));
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', () => {
+    componentInstance.ngOnInit();
+    expect(componentInstance.editableThumbnailDataUrl).toEqual(testUrl);
+  });
 });
