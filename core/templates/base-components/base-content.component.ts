@@ -54,8 +54,8 @@ export class BaseContentComponent {
 
   ngOnInit(): void {
     /**
-     * Redirect occasional developer using the old appsport url to
-     * the test server. (see issue #7867 for details)
+     * Redirect any developers using the old appspot URL to the
+     * test server (see issue #7867 for details).
      */
     if (this.isMainProdServer()) {
       this.windowRef.nativeWindow.location.href = (
