@@ -604,7 +604,7 @@ class Exploration(python_utils.OBJECT):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, True)
 
     @classmethod
     def from_dict(
