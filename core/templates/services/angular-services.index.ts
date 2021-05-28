@@ -355,7 +355,6 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { DragAndDropSortObjectFactory } from 'domain/objects/DragAndDropSortObjectFactory';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -425,7 +424,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['DragAndDropSortInputRulesService', DragAndDropSortInputRulesService],
   ['DragAndDropSortInputValidationService',
     DragAndDropSortInputValidationService],
-  ['DragAndDropSortObjectFactory', DragAndDropSortObjectFactory],
   ['EditabilityService', EditabilityService],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',

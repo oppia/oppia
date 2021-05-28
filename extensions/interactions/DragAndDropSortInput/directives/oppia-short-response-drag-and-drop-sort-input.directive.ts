@@ -17,11 +17,10 @@
  */
 
 require('services/html-escaper.service.ts');
-require('domain/objects/DragAndDropSortObjectFactory.ts');
+import cloneDeep from 'lodash/cloneDeep';
 
 angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
-  'DragAndDropSortObjectFactory', 'HtmlEscaperService',
-  function(DragAndDropSortObjectFactory, HtmlEscaperService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -41,10 +40,17 @@ angular.module('oppia').directive('oppiaShortResponseDragAndDropSortInput', [
         };
         ctrl.$onInit = function() {
           const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          const interactionchoices = HtmlEscaperService.escapedJsonToObj(
-            $attrs.choices);
-          var answerArray = DragAndDropSortObjectFactory.answerContentIdToHTML(
-            answer, interactionchoices);
+          const dragAndDropSortInputChoices =
+          HtmlEscaperService.escapedJsonToObj($attrs.choices);
+          var answerArray = cloneDeep(answer);
+          var mappingOfContentIds = {};
+          // Creating a mapping of contentIds which shall be used to
+          // get the html content.
+          dragAndDropSortInputChoices.map(choiceIterator => mappingOfContentIds[
+            choiceIterator._contentId] = choiceIterator._html);
+          // Mapping the contenId of answerArray with it's html.
+          answerArray = answerArray.map(ans => ans.map(
+            contentId => mappingOfContentIds[contentId]));
           ctrl.answer = answerArray;
           ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
         };

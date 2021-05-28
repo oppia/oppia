@@ -35,7 +35,6 @@ angular.module('oppia').directive('oppiaShortResponseItemSelectionInput', [
         ctrl.$onInit = function() {
           var choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
           const answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          choices = choices.value.map(choice => choice.html);
           const choicesContentIds = choices.map(choice => choice._contentId);
           ctrl.answer = answer.map(
             contentId => choices[choicesContentIds.indexOf(contentId)]._html);

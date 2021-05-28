@@ -133,7 +133,7 @@ export class Solution {
   getDragAndDropAnswer(
       interactionId: 'DragAndDropSortInput',
       customizationArgs: InteractionCustomizationArgs): string {
-    var correctAnswer = null;
+    let correctAnswer = null;
     correctAnswer = [];
     customizationArgs = (
       <DragAndDropSortInputCustomizationArgs> customizationArgs
