@@ -82,14 +82,15 @@ export class CreateActivityButtonComponent implements OnInit {
    showUploadExplorationModal(): void {
      this.explorationCreationService.showUploadExplorationModal();
    }
-   ngOnInit(): void {
+
+   async ngOnInit(): Promise<void> {
      this.creationInProgress = false;
      this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
+     const userInfo = await this.userService.getUserInfoAsync();
 
-     this.userService.getUserInfoAsync().then((userInfo) => {
-       this.canCreateCollections = userInfo.canCreateCollections();
-       this.userIsLoggedIn = userInfo.isLoggedIn();
-     });
+     this.canCreateCollections = userInfo.canCreateCollections();
+     this.userIsLoggedIn = userInfo.isLoggedIn();
+
      // If the user clicked on a 'create' button to get to the dashboard,
      // open the create modal immediately (or redirect to the exploration
      // editor if the create modal does not need to be shown).
