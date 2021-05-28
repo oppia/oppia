@@ -113,7 +113,7 @@ export class EditThumbnailModalComponent implements OnChanges {
           this.setImageDimensions(
             img.naturalHeight || 150,
             img.naturalWidth || 300);
-        });
+        }
         img.src = this.imgSrc;
         this.uploadedImage = this.imgSrc;
         this.invalidTagsAndAttributes = (
@@ -124,7 +124,7 @@ export class EditThumbnailModalComponent implements OnChanges {
         if (this.tags.length > 0 || this.attrs.length > 0) {
           this.reset();
         }
-      });
+      }
     } else {
       this.reset();
       this.invalidImageWarningIsShown = true;
