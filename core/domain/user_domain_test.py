@@ -29,7 +29,7 @@ import feconf
 import utils
 
 user_models, = models.Registry.import_models([models.NAMES.user])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 # This mock class will not be needed once the schema version is >=2 for the

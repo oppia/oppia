@@ -32,7 +32,6 @@ requests==2.24.0
 requests-mock==1.5.2
 requests-toolbelt==0.9.1
 google-cloud-logging==1.14.0
-googleapis_common_protos
 google-cloud-tasks==1.5.0
 google-cloud-translate==2.0.1
 googleapis_common_protos==1.52.0

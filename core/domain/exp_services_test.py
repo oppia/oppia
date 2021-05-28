@@ -54,7 +54,7 @@ import utils
     models.NAMES.recommendations, models.NAMES.statistics, models.NAMES.user
 ])
 search_services = models.Registry.import_search_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # TODO(msl): Test ExpSummaryModel changes if explorations are updated,

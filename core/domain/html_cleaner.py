@@ -28,7 +28,7 @@ from core.domain import rte_component_registry
 from core.platform import models
 import python_utils
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def filter_a(tag, name, value):

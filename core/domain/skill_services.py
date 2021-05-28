@@ -43,7 +43,7 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 # Repository GET methods.

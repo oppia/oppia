@@ -24,7 +24,7 @@ import textwrap
 from core.platform import models
 import python_utils
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def send_email_to_recipients(

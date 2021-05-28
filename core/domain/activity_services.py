@@ -26,7 +26,7 @@ from core.platform import models
 import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def get_featured_activity_references():

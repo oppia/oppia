@@ -43,7 +43,7 @@ import python_utils
 
 (exp_models, user_models, stats_models) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):

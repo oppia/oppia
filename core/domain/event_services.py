@@ -32,7 +32,7 @@ import python_utils
 
 (stats_models, feedback_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class BaseEventHandler(python_utils.OBJECT):

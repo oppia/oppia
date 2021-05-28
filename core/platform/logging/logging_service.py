@@ -16,18 +16,22 @@
 
 """Provides logging functionality from Google Cloud Logging."""
 
-import google.cloud.logging
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+from google.cloud import logging
 
 
-def enable_cloud_logging():
+def enable_logging():
     """Enables google cloud logging."""
 
-    # Instantiates a client
-    client = google.cloud.logging.Client()
+    # Instantiates a client.
+    client = logging.Client()
 
     # Retrieves a Cloud Logging handler based on the environment
     # you're running in and integrates the handler with the
     # Python logging module. By default this captures all logs
-    # at INFO level and higher
+    # at INFO level and higher.
     client.get_default_handler()
-    client.setup_logging()
+    # Setting the log level to 10 to capture debug logs.
+    client.setup_logging(log_level=10)

@@ -44,7 +44,7 @@ import utils
 
 (exp_models, stats_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics, models.NAMES.user])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 COLLECTION_ID = 'cid'
 COLLECTION_TITLE = 'Title'

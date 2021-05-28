@@ -31,7 +31,7 @@ import utils
 
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def is_exploration_available_for_contribution(exp_id):

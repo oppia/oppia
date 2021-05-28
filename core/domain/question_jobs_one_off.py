@@ -28,7 +28,7 @@ from core.platform import models
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

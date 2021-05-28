@@ -37,7 +37,7 @@ import utils
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.email, models.NAMES.suggestion])
 app_identity_services = models.Registry.import_app_identity_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 

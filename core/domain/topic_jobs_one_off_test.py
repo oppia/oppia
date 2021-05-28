@@ -38,7 +38,7 @@ from core.tests import test_utils
 import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):

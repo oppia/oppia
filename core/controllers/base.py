@@ -37,7 +37,7 @@ import utils
 import backports.functools_lru_cache
 import webapp2
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60

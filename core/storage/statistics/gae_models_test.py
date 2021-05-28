@@ -28,7 +28,7 @@ import feconf
 
 (base_models, stats_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.statistics])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class StateCounterModelTests(test_utils.GenericTestBase):

@@ -26,7 +26,7 @@ from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
 import feconf
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class EmailTests(test_utils.GenericTestBase):

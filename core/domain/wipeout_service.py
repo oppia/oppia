@@ -49,7 +49,7 @@ import python_utils
 ])
 
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 WIPEOUT_LOGS_PREFIX = '[WIPEOUT]'

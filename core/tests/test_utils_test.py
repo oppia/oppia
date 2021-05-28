@@ -36,7 +36,7 @@ import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):

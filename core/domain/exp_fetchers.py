@@ -36,7 +36,7 @@ import python_utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def _migrate_states_schema(versioned_exploration_states, init_state_name):

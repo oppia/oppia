@@ -34,7 +34,7 @@ import feconf
     models.NAMES.statistics, models.NAMES.feedback])
 
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class MockNumbersModel(datastore_services.Model):

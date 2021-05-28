@@ -41,7 +41,7 @@ from mapreduce import input_readers
         models.NAMES.statistics, models.NAMES.job]))
 
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 JOB_FAILED_MESSAGE = 'failed (as expected)'

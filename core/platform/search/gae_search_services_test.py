@@ -30,7 +30,7 @@ import python_utils
 
 from google.appengine.api import search
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):

@@ -71,7 +71,7 @@ import webapp2
 from webapp2_extras import routes
 
 transaction_services = models.Registry.import_transaction_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
 # Without this, a lot of unnecessary debug logs are printed in error logs,

@@ -29,7 +29,7 @@ from core.platform import models
 import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):

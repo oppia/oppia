@@ -42,7 +42,7 @@ import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def _create_topic(committer_id, topic, commit_message, commit_cmds):

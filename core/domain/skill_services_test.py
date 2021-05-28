@@ -37,7 +37,7 @@ import python_utils
 
 (skill_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.suggestion])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):

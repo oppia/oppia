@@ -42,7 +42,7 @@ from core.platform import models
 import feconf
 import utils
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def _require_valid_version(version_from_payload, exploration_version):

@@ -28,7 +28,7 @@ from core.platform import models
 import feconf
 import utils
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class TopicViewerPage(base.BaseHandler):

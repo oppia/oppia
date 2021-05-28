@@ -34,7 +34,7 @@ datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def get_activity_rights_from_model(activity_rights_model, activity_type):

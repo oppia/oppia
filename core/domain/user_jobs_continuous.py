@@ -34,7 +34,7 @@ import utils
         models.NAMES.feedback, models.NAMES.user]))
 
 datastore_services = models.Registry.import_datastore_services()
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 transaction_services = models.Registry.import_transaction_services()
 
 

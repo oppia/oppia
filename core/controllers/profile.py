@@ -37,7 +37,7 @@ import feconf
 import python_utils
 import utils
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class ProfilePage(base.BaseHandler):

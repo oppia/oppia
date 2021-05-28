@@ -47,7 +47,7 @@ import webtest
     models.NAMES.exploration, models.NAMES.job,
     models.NAMES.suggestion, models.NAMES.user
 ])
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):

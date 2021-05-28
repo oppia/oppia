@@ -27,7 +27,7 @@ from core.tests import test_utils
 import feconf
 
 
-class RegistryUnitTest(test_utils.TestBase):
+class RegistryUnitTest(test_utils.AppEngineTestBase):
     """Tests the Registry class interface."""
 
     def setUp(self):
@@ -309,6 +309,18 @@ class RegistryUnitTest(test_utils.TestBase):
         self.assertEqual(
             self.registry_instance.import_cloud_translate_services(),
             dev_mode_cloud_translate_services)
+
+    def test_import_logging_services(self):
+        """Tests import logging services function."""
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            import logging
+            self.assertEqual(
+                self.registry_instance.import_logging_services(),
+                logging)
+        import logging
+        self.assertEqual(
+            self.registry_instance.import_logging_services(),
+            logging)
 
     def test_import_search_services(self):
         """Tests import search services function."""

@@ -65,9 +65,9 @@ allowed-comment-prefixes=int,str,float,bool,v
 # TODO(#12920): Add import a subset of platform i.e the models to forbidden imports
 # of core.controllers.
 forbidden-imports=
-    core.controllers:core.storage,
-    core.domain:core.controllers,
-    core.storage:core.domain
+    core.controllers:core.storage|logging,
+    core.domain:core.controllers|logging,
+    core.storage:core.domain|logging
 
 disallowed-functions-and-replacements-str=
   assertEquals=>self.assertEqual,

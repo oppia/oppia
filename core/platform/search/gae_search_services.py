@@ -28,7 +28,7 @@ import python_utils
 
 from google.appengine.api import search as gae_search
 
-logging_services = models.Registry.import_cloud_logging_services()
+logging_services = models.Registry.import_logging_services()
 
 
 def _dict_to_search_document(d):
