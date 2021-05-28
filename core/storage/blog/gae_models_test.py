@@ -24,6 +24,7 @@ import types
 
 from core.platform import models
 from core.tests import test_utils
+import utils
 
 (base_models, blog_post_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.blog, models.NAMES.user])
@@ -105,6 +106,34 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             self.blog_post_model
         )
 
+    def test_export_data_trivial(self):
+        user_data = blog_post_models.BlogPostModel.export_data(
+            self.NONEXISTENT_USER_ID
+        )
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        user_data = blog_post_models.BlogPostModel.export_data(
+            self.USER_ID),
+        blog_post_id = '%s.%s' % (self.USER_ID, 'random')
+        test_data = (
+            {
+                blog_post_id: {
+                    'content': self.CONTENT,
+                    'title': self.TITLE,
+                    'last_updated': utils.get_time_in_millisecs(
+                        self.blog_post_model.last_updated),
+                    'published_on': utils.get_time_in_millisecs(
+                        self.blog_post_model.published_on),
+                    'url_fragment': 'sample-url-fragment',
+                    'tags': self.TAGS,
+                    'thumbnail_filename': self.THUMBNAIL
+                }
+            },
+        )
+        self.assertEqual(user_data, test_data)
+
 
 class BlogPostSummaryModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostSummaryModel class."""
@@ -162,6 +191,26 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                 blog_post_summary_model_cls.create(
                     'author_id.blog_id')
 
+    def test_export_data_nontrivial(self):
+        user_data = blog_post_models.BlogPostSummaryModel.export_data(
+            self.USER_ID),
+        blog_post_summary_id = '%s.%s' % (self.USER_ID, 'random')
+        test_data = (
+            {
+                blog_post_summary_id: {
+                    'summary': self.SUMMARY,
+                }
+            },
+        )
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_trivial(self):
+        user_data = blog_post_models.BlogPostSummaryModel.export_data(
+            self.NONEXISTENT_USER_ID
+        )
+        test_data = {}
+        self.assertEqual(user_data, test_data)
+
 
 class BlogPostRightsModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostRightsModel class."""
@@ -214,3 +263,25 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_models.BlogPostRightsModel.get_by_user(self.USER_ID),
             [self.blog_post_rights_model_new])
+
+    def test_export_data_on_editor(self):
+        """Test export data on user who is editor of the blog post."""
+        blog_post_ids = (
+            blog_post_models.BlogPostRightsModel.export_data(
+                self.USER_ID_NEW))
+        expected_blog_post_ids = {
+            'editable_blog_post_ids': [self.BLOG_ID_NEW, self.BLOG_ID_OLD, ],
+        }
+        self.assertEqual(expected_blog_post_ids, blog_post_ids)
+
+    def test_export_data_on_uninvolved_user(self):
+        """Test for empty lists when user has no editor rights on
+        existing blog posts."""
+
+        blog_post_ids = (
+            blog_post_models.BlogPostRightsModel.export_data(
+                self.NONEXISTENT_USER_ID))
+        expected_blog_post_ids = {
+            'editable_blog_post_ids': [],
+        }
+        self.assertEqual(expected_blog_post_ids, blog_post_ids)

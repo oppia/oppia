@@ -4672,7 +4672,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         # Verify user is pseudonymized.
-        blog_mappings = (
+        pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
             ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
@@ -4683,7 +4683,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             blog_post_model.author_id,
-            blog_mappings[self.BLOG_1_ID]
+            pseudonymizable_user_id_mapping[self.BLOG_1_ID]
         )
         blog_post_summary_model = (
             blog_models.BlogPostSummaryModel.get_by_id(
@@ -4691,7 +4691,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             blog_post_summary_model.author_id,
-            blog_mappings[self.BLOG_1_ID]
+            pseudonymizable_user_id_mapping[self.BLOG_1_ID]
         )
 
     def test_one_blog_when_the_deletion_is_repeated_is_pseudonymized(self):
@@ -4713,7 +4713,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
 
         # Verify that both the blog post summary and the rights have the same
         # pseudonymous user ID.
-        blog_mappings = (
+        pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
             ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
@@ -4724,7 +4724,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             new_blog_post_model.author_id,
-            blog_mappings[self.BLOG_1_ID]
+            pseudonymizable_user_id_mapping[self.BLOG_1_ID]
         )
 
     def test_multiple_blog_models_are_pseudonymized(self):
@@ -4768,7 +4768,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        blog_mappings = (
+        pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
             ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
@@ -4782,7 +4782,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         for blog_post_model in pseudonymized_blog_post_models:
             self.assertEqual(
                 blog_post_model.author_id,
-                blog_mappings[blog_post_model.id]
+                pseudonymizable_user_id_mapping[blog_post_model.id]
             )
 
         pseudonymized_blog_post_summary_models = (
@@ -4793,5 +4793,5 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         for blog_post_summary_model in pseudonymized_blog_post_summary_models:
             self.assertEqual(
                 blog_post_summary_model.author_id,
-                blog_mappings[blog_post_summary_model.id]
+                pseudonymizable_user_id_mapping[blog_post_summary_model.id]
             )

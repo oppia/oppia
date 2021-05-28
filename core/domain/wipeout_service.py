@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
+import utils
 import re
 
 from core.domain import auth_services
@@ -1260,9 +1261,8 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
     """Pseudonymize the blog post models for the user with user_id.
 
     Args:
-        pending_deletion_request:
-            PendingDeletionRequest. The pending deletion
-            request object to be saved in the datastore.
+        pending_deletion_request: PendingDeletionRequest. The pending
+            deletion request object to be saved in the datastore.
     """
     user_id = pending_deletion_request.user_id
 
@@ -1298,11 +1298,10 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
         blog_posts_related_models being MAX_NUMBER_OF_OPS_IN_TRANSACTION.
 
         Args:
-            blog_posts_related_models:
-                list(BaseModel). Models whose user IDs should be
-                pseudonymized.
-            pseudonymized_id:
-                str. New pseudonymized user ID to be used for the models.
+            blog_posts_related_models: list(BaseModel). Models whose user IDs
+                should be pseudonymized.
+            pseudonymized_id: str. New pseudonymized user ID to be used for
+                the models.
         """
         blog_post_models = [
             model for model in blog_posts_related_models
@@ -1334,11 +1333,10 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
             model for model in blog_post_summary_models
             if model.id == blogpost_id
         ]
-        for i in python_utils.RANGE(
-                0,
-                len(blog_posts_related_models),
-                feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION):
+        transaction_slices = utils.grouper(
+            blog_posts_related_models,
+            feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION)
+        for transaction_slice in transaction_slices:
             _pseudonymize_models_transactional(
-                blog_posts_related_models[
-                    i:i + feconf.MAX_NUMBER_OF_OPS_IN_TRANSACTION],
+                [m for m in transaction_slice if m is not None],
                 pseudonymized_id)
