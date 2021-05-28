@@ -288,7 +288,7 @@ describe('Translation Modal Component', () => {
         target_id: '1',
         target_version_at_submission: 1,
         change: {
-          cmd: 'add_translation',
+          cmd: 'update_translation',
           content_id: 'contentId1',
           state_name: 'stateName1',
           language_code: 'es',
@@ -386,7 +386,7 @@ describe('Translation Modal Component', () => {
           target_id: '1',
           target_version_at_submission: 1,
           change: {
-            cmd: 'add_translation',
+            cmd: 'update_translation',
             content_id: 'contentId2',
             state_name: 'stateName2',
             language_code: 'es',

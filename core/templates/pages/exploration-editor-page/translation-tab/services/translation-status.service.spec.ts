@@ -348,7 +348,6 @@ describe('Translation status service', function() {
       swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
       ess.markWrittenTranslationAsNeedingUpdate('feedback_1', 'First');
       ess.markWrittenTranslationAsNeedingUpdate('feedback_2', 'First');
-      tss.setStateNeedsUpdate('First');
       tss.refresh();
 
       statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
@@ -456,7 +455,6 @@ describe('Translation status service', function() {
       swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
       ess.saveWrittenTranslation(
         'content', 'html', 'hi', 'Second', 'content', false);
-      tss.setStateNeedsUpdate('Second');
 
       tss.refresh();
       stateWiseStatusColor = tss.getAllStateStatusColors();

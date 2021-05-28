@@ -338,10 +338,6 @@ angular.module('oppia').factory('TranslationStatusService', [
       },
       getActiveStateContentIdNeedsUpdateStatus: function(contentId) {
         return _getActiveStateContentIdNeedsUpdateStatus(contentId);
-      },
-      setStateNeedsUpdate: function(stateName) {
-        stateNeedsUpdateWarnings[stateName] = (
-          TRANSLATION_NEEDS_UPDATE_MESSAGE);
       }
     };
   }]);

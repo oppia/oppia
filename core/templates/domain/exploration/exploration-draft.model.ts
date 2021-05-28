@@ -95,7 +95,7 @@ export interface MigrateStatesVersionChangeList {
 }
 
 export interface ExplorationChangeAddTranslation {
-  'cmd': 'add_translation';
+  'cmd': 'update_translation';
   'content_id': string;
   'data_format': string;
   'language_code': string;

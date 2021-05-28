@@ -51,7 +51,7 @@ angular.module('oppia').factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-    var CMD_ADD_TRANSLATION = 'add_translation';
+    var CMD_UPDATE_TRANSLATION = 'update_translation';
     var CMD_MARK_TRANSLATION_AS_NEEDING_UPDATE = (
       'mark_translation_as_needing_update');
     var autosaveInProgressEventEmitter: EventEmitter<boolean> = (
@@ -264,7 +264,7 @@ angular.module('oppia').factory('ChangeListService', [
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate) {
         addChange({
-          cmd: CMD_ADD_TRANSLATION,
+          cmd: CMD_UPDATE_TRANSLATION,
           content_id: contentId,
           data_format: dataFormat,
           language_code: languageCode,

@@ -84,6 +84,10 @@ CMD_DELETE_STATE = 'delete_state'
 # This takes additional 'state_name', 'content_id', 'language_code' and
 # 'content_html' and 'translation_html' parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
+# This takes additional 'state_name', 'content_id', 'language_code',
+# 'needs_update', 'date_format', 'content_html' and 'translation_html'
+# parameters.
+CMD_UPDATE_TRANSLATION = 'update_translation'
 # This takes additional 'content_id' and 'state_name' parameters.
 CMD_MARK_TRANSLATION_AS_NEEDING_UPDATE = 'mark_translation_as_needing_update'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -277,6 +281,13 @@ class ExplorationChange(change_domain.BaseChange):
         'user_id_attribute_names': []
     }, {
         'name': CMD_ADD_TRANSLATION,
+        'required_attribute_names': [
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, {
+        'name': CMD_UPDATE_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code',
             'needs_update', 'translation_html', 'data_format'],
