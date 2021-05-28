@@ -217,10 +217,12 @@
         "jobs.transforms.config_validation_test",
         "jobs.transforms.collection_validation_test",
         "jobs.transforms.question_validation_test",
+        "jobs.transforms.feedback_validation_test",
         "jobs.types.base_validation_errors_test",
         "jobs.types.model_property_test",
         "jobs.types.topic_validation_errors_test",
-        "jobs.types.user_validation_errors_test"
+        "jobs.types.user_validation_errors_test",
+        "jobs.types.feedback_validation_errors_test"
     ],
     "10": [
         "core.domain.question_jobs_one_off_test",
@@ -261,7 +263,6 @@
         "scripts.docstrings_checker_test",
         "core.platform.search.elastic_search_services_test",
         "scripts.typescript_checks_test",
-        "core.platform.auth.gae_auth_services_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
         "core.platform.cloud_translate.cloud_translate_emulator_test",
@@ -308,7 +309,6 @@
         "scripts.linters.js_ts_linter_test",
         "core.domain.question_validators_test",
         "scripts.pre_push_hook_test",
-        "core.platform.users.gae_current_user_services_test",
         "core.platform.search.gae_search_services_test",
         "scripts.release_scripts.update_configs_test",
         "core.storage.improvements.gae_models_test",

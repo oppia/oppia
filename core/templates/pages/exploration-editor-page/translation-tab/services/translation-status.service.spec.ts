@@ -413,7 +413,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationNotAvailableCount = (
         tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(explorationTranslationNotAvailableCount).toBe(6);
 
       ess.addState('Fourth');
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
