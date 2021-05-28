@@ -103,7 +103,7 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should skip to the main content element', async function() {
     await libraryPage.get();
-    await browser.actions().sendKeys(protractor.Key.TAB).perform();
+    await browser.actions().sendKeys('s').perform();
     await action.click('Skip link', skipLink);
     expect(await mainContent.getAttribute('class')).toEqual(
       await (await browser.driver.switchTo().activeElement())
