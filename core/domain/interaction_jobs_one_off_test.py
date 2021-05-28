@@ -1389,21 +1389,23 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('LogicProof')
 
         customization_args_dict1 = {
-            'question': {'value': {
-                'assumptions': [{
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p',
-                    'arguments': [],
-                    'dummies': []
-                }],
-                'results': [{
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p',
-                    'arguments': [],
-                    'dummies': []
-                }],
-                'default_proof_string': ''
-            }},
+            'question': {
+                'value': {
+                    'assumptions': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'results': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'default_proof_string': ''
+                }
+            },
         }
 
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -1440,21 +1442,23 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_id('LogicProof')
 
         customization_args_dict = {
-            'question': {'value': {
-                'assumptions': [{
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p',
-                    'arguments': [],
-                    'dummies': []
-                }],
-                'results': [{
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p',
-                    'arguments': [],
-                    'dummies': []
-                }],
-                'default_proof_string': ''
-            }},
+            'question': {
+                'value': {
+                    'assumptions': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'results': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'default_proof_string': ''
+                }
+            },
         }
 
         state1.update_interaction_customization_args(customization_args_dict)
