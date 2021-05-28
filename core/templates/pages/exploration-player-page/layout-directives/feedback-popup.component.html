@@ -21,7 +21,7 @@
     <button mat-button class="float-right oppia-exploration-feedback-submit-btn protractor-test-exploration-feedback-submit-btn"
             [ngClass]="{'oppia-feedback-popover-submit-btn-enabled': feedbackText}"
             (click)="saveFeedback()"
-            [disabled]="!feedbackText">
+            [disabled]="!feedbackText || feedbackText.length > MAX_REVIEW_MESSAGE_LENGTH">
       {{ 'I18N_PLAYER_SUBMIT_BUTTON' | translate }}
     </button>
     <div class="checkbox oppia-checkbox" *ngIf="isLoggedIn">

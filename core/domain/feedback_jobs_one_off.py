@@ -127,6 +127,32 @@ class TextMessageLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('Thread Id: %s' % key, 'Message Id: %s' % values)
 
 
+class TrimTextMessageLengthOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that trims the text length"""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackMessageModel]
+
+    @staticmethod
+    def map(model_instance):
+        if model_instance.text:
+            if len(model_instance.text) > 10000:
+                model_instance.text = model_instance.text[:10000]
+                model_instance.update_timestamps(update_last_updated_time=False)
+                model_instance.put()
+                yield (model_instance.thread_id, model_instance.message_id)
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield ('SUCCESS', len(values))
+        else:
+            yield ('Thread Id: %s' % key, 'Message Id: %s' % values)
+
+
 class CleanUpFeedbackAnalyticsModelModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to remove feedback analytics models for

@@ -81,6 +81,7 @@ ONE_OFF_JOB_MANAGERS = [
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
     feedback_jobs_one_off.TextMessageLengthAuditOneOffJob,
+    feedback_jobs_one_off.TrimTextMessageLengthOneOffJob,
     feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     (
         interaction_jobs_one_off
