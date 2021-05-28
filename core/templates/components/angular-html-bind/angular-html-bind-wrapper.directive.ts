@@ -25,11 +25,11 @@ angular.module('oppia').directive('angularHtmlBindWrapper', [
       scope: {},
       bindToController: {
         htmlData: '<',
-        spaceSeparatedCssClassesString: '<'
+        classStr: '<'
       },
       template:
-        '<angular-html-bind class="<[$ctrl.spaceSeparatedCssClassesString]>"' +
-        ' html-data="$ctrl.htmlData"></angular-html-bind>',
+        '<angular-html-bind class="<[$ctrl.classStr]>" ' +
+        'html-data="$ctrl.htmlData"></angular-html-bind>',
       controllerAs: '$ctrl',
       controller: [
         '$rootScope',
@@ -58,7 +58,7 @@ export const ScopeProvider = {
 })
 export class AngularHtmlBindWrapperDirective extends UpgradeComponent {
   @Input() htmlData: string;
-  @Input() spaceSeparatedCssClassesString: string = '';
+  @Input() classStr = '';
   constructor(elementRef: ElementRef, injector: Injector) {
     super('angularHtmlBindWrapper', elementRef, injector);
   }

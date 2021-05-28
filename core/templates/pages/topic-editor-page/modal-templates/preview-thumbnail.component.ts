@@ -16,31 +16,41 @@
  * @fileoverview Component for previewing thumbnails.
  */
 
-require('services/image-upload-helper.service.ts');
-require('services/context.service.ts');
+import { Component, Input } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { ContextService } from 'services/context.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 
-angular.module('oppia').component('previewThumbnail', {
-  bindings: {
-    getBgColor: '&bgColor',
-    getFilename: '&filename',
-    getName: '&name',
-    getAspectRatio: '&aspectRatio',
-    getDescription: '&description',
-    getPreviewFooter: '&previewFooter',
-    getThumbnailBgColor: '&thumbnailBgColor',
-    getPreviewTitle: '&previewTitle',
-  },
-  template: require('./preview-thumbnail.component.html'),
-  controller: [
-    'ContextService', 'ImageUploadHelperService',
-    function(ContextService, ImageUploadHelperService) {
-      var ctrl = this;
-      ctrl.$onInit = function() {
-        ctrl.editableThumbnailDataUrl = (
-          ImageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
-            ctrl.getFilename(),
-            ContextService.getEntityType(),
-            ContextService.getEntityId()));
-      };
-    }]
-});
+@Component({
+  selector: 'oppia-preview-thumbnail',
+  templateUrl: './preview-thumbnail.component.html'
+})
+export class PreviewThumbnailComponent {
+  @Input() bgColor: string;
+  @Input() filename: string;
+  @Input() name: string;
+  @Input() aspectRatio: string;
+  @Input() description: string;
+  @Input() previewFooter: string;
+  @Input() thumbnailBgColor: string;
+  @Input() previewTitle: string;
+  editableThumbnailDataUrl: string;
+
+  constructor(
+    private contextService: ContextService,
+    private imageUploadHelperService: ImageUploadHelperService
+  ) {}
+
+  ngOnInit(): void {
+    this.editableThumbnailDataUrl = (
+      this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
+        this.filename,
+        this.contextService.getEntityType(),
+        this.contextService.getEntityId()));
+  }
+}
+
+angular.module('oppia').directive('oppiaPreviewThumbnail',
+  downgradeComponent({
+    component: PreviewThumbnailComponent
+  }) as angular.IDirectiveFactory);
