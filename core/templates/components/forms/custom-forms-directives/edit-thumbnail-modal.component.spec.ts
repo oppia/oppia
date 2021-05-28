@@ -88,8 +88,12 @@ describe('Edit Thumbnail Modal Component', () => {
     let mockFileReader = {
       result: '',
       readAsDataURL: (blobInput) => {},
-      onload: (e) => {}
+      onload: () => {}
     };
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(mockFileReader);
     let mockImageReader = {
@@ -97,8 +101,12 @@ describe('Edit Thumbnail Modal Component', () => {
       naturalHeight: 100,
       naturalWidth: 100,
       src: 'source',
-      onload: (e) => {}
+      onload: () => {}
     };
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
     // @ts-expect-error
     spyOn(window, 'Image').and.returnValue(mockImageReader);
     component.onFileChanged(file);

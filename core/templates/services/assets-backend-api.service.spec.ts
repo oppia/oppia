@@ -22,9 +22,6 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
 import { AudioFile } from 'domain/utilities/audio-file.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
-import { of } from 'rxjs';
-import { Observable } from 'rxjs';
-import { HttpClient } from 'selenium-webdriver/http';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
@@ -42,24 +39,9 @@ describe('Assets Backend API Service', () => {
     const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
     const imageBlob = new Blob(['image data'], {type: 'imagetype'});
 
-    class MockHttpClient {
-      get<T>(url: string, options): Observable<T | string> {
-        return of('<svg></svg>');
-      }
-      post<T>(url: string, body: unknown): Observable<T> {
-        return of({filename: 'file.name'} as unknown as T);
-      }
-    }
-
     beforeEach(() => {
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [
-          {
-            provide: HttpClient,
-            useClass: MockHttpClient
-          }
-        ]
+        imports: [HttpClientTestingModule]
       });
       assetsBackendApiService = TestBed.get(AssetsBackendApiService);
       csrfTokenService = TestBed.get(CsrfTokenService);
@@ -196,17 +178,24 @@ describe('Assets Backend API Service', () => {
     }));
 
     it('should successfully post a thumbnail to server', fakeAsync(() => {
+      const successMessage = 'Thumbnail SVG was successfully saved.';
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
       assetsBackendApiService.postThumbnailFile(
         new Blob(['abc']),
         'filename.svg',
         'entity_type',
         'entity_id'
-      ).subscribe(
-        res => expect(res.filename).toBe('file.name')
-      );
+      ).subscribe(onSuccess, onFailure);
+      flushMicrotasks();
+
       httpTestingController.expectOne(
         '/createhandler/imageupload/entity_type/entity_id'
-      );
+      ).flush(successMessage);
+
+      expect(onSuccess).toHaveBeenCalledWith(successMessage);
+      expect(onFailure).not.toHaveBeenCalled();
     }));
 
     it('should handle rejection when saving a math SVG fails', fakeAsync(() => {
@@ -220,6 +209,27 @@ describe('Assets Backend API Service', () => {
 
       httpTestingController.expectOne(
         '/createhandler/imageupload/exploration/expid12345'
+      ).flush(null, {status: 400, statusText: 'Failure'});
+      flushMicrotasks();
+
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalled();
+    }));
+
+    it('should handle rejection when saving a thumbnail fails', fakeAsync(() => {
+      const onSuccess = jasmine.createSpy('onSuccess');
+      const onFailure = jasmine.createSpy('onFailure');
+
+      assetsBackendApiService.postThumbnailFile(
+        new Blob(['abc']),
+        'filename.svg',
+        'entity_type',
+        'entity_id'
+      ).subscribe(onSuccess, onFailure);
+      flushMicrotasks();
+
+      httpTestingController.expectOne(
+        '/createhandler/imageupload/entity_type/entity_id'
       ).flush(null, {status: 400, statusText: 'Failure'});
       flushMicrotasks();
 

@@ -26,7 +26,7 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 interface SaveAudioResponse {
@@ -134,13 +134,17 @@ export class AssetsBackendApiService {
     }));
     let imageUploadUrlTemplate = '/createhandler/imageupload/' +
     '<entity_type>/<entity_id>';
-    return this.http.post<{filename: string}>(
-      this.urlInterpolationService.interpolateUrl(
-        imageUploadUrlTemplate, {
-          entity_type: entityType,
-          entity_id: entityId
-        }
-      ), form);
+    try {
+      return this.http.post<{filename: string}>(
+        this.urlInterpolationService.interpolateUrl(
+          imageUploadUrlTemplate, {
+            entity_type: entityType,
+            entity_id: entityId
+          }
+        ), form);
+    } catch(reason) {
+      return throwError(reason.error);
+    }
   }
 
   isCached(filename: string): boolean {

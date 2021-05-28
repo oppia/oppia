@@ -100,12 +100,12 @@ export class EditThumbnailModalComponent implements OnChanges {
     if (this.isUploadedImageSvg()) {
       let reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = ((e) => {
+      reader.onload = () => {
         this.imgSrc = reader.result as string;
         this.updateBackgroundColor(this.tempBgColor);
         let img = new Image();
 
-        img.onload = ((e) => {
+        img.onload = () => {
           //   Setting a default height of 300px and width of
           //   150px since most browsers use these dimensions
           //   for SVG files that do not have an explicit
