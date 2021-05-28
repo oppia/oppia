@@ -65,17 +65,22 @@ describe('Admin Page', function() {
     await adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
     await adminPage.expectJobToBeRunning('FeedbackThreadCacheOneOffJob');
     await adminPage.expectNumberOfRunningOneOffJobs(1);
+    console.log('Started and asserted FeedbackThread job.');
 
     await adminPage.startOneOffJob('ExplorationValidityJobManager');
     await adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
     await adminPage.expectNumberOfRunningOneOffJobs(2);
+    console.log('Started and asserted ExplorationValidity job.');
 
     await adminPage.stopOneOffJob('FeedbackThreadCacheOneOffJob');
     await adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
     await adminPage.expectNumberOfRunningOneOffJobs(1);
+    console.log('Stopped and asserted FeedbackThread job.');
 
     await adminPage.stopOneOffJob('ExplorationValidityJobManager');
     await adminPage.expectNumberOfRunningOneOffJobs(0);
+    console.log('Stopped and asserted ExplorationValidity job.');
+
     await users.logout();
   });
 
