@@ -40,7 +40,6 @@ import { ExplorationEmbedButtonModalComponent } from './button-directives/explor
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
-import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { StateSkillEditorComponent } from 'components/state-editor/state-skill-editor/state-skill-editor.component';
 import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
@@ -73,6 +72,8 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
+import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 
 
 // Directives.
@@ -94,7 +95,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
-import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 const toastrConfig = {
   allowHtml: false,
@@ -115,6 +116,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CommonElementsModule,
     CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
@@ -157,9 +159,9 @@ const toastrConfig = {
     LazyLoadingComponent,
     LimitToPipe,
     LoadingMessageComponent,
-    LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -203,7 +205,7 @@ const toastrConfig = {
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingMessageComponent,
-    LoadingDotsComponent, SocialButtonsComponent,
+    SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -215,6 +217,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
@@ -229,6 +232,7 @@ const toastrConfig = {
 
   exports: [
     // Modules.
+    CommonElementsModule,
     CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
@@ -258,6 +262,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
@@ -283,7 +288,6 @@ const toastrConfig = {
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
-    LoadingDotsComponent,
     LearnerDashboardIconsComponent
   ],
 })
