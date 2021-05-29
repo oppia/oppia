@@ -13,12 +13,12 @@
     <div *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
          class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
-      <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-learner-answer-content"
+      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getShortAnswerHtml()">
       </angular-html-bind-wrapper>
     </div>
     <div *ngIf="!getShortAnswerHtml()">
-      <angular-html-bind-wrapper class="oppia-rte-viewer conversation-skin-learner-answer-content"
+      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getAnswerHtml()">
       </angular-html-bind-wrapper>
     </div>
@@ -48,7 +48,7 @@
   <div>
     <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
                                [htmlData]="data.oppiaResponse"
-                               class="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                               classStr="oppia-rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
                                [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
                                [ngClass]="getFeedbackAudioHighlightClass()">
     </angular-html-bind-wrapper>
