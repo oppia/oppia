@@ -25,7 +25,6 @@ import { TranslateCustomParser } from './translate-custom-parser';
 describe('Translate Custom Parser', () => {
   let translateCustomParser: TranslateCustomParser;
   let translateDefaultParser: TranslateDefaultParser;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,9 +46,8 @@ describe('Translate Custom Parser', () => {
 
   beforeEach(() => {
     translateDefaultParser = TestBed.inject(TranslateDefaultParser);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     translateCustomParser = new TranslateCustomParser(
-      translateDefaultParser, i18nLanguageCodeService);
+      translateDefaultParser);
   });
 
   it('should interpolate with preferred language', () => {
@@ -75,8 +73,6 @@ describe('Translate Custom Parser', () => {
           return 'Please select one or more choices.';
         };
       });
-    spyOn(i18nLanguageCodeService, 'getCurrentI18nLanguageCode')
-      .and.returnValue('es');
     expect(translateCustomParser.interpolate(
       '{minChoiceNumber, plural, one{Please select one or more choices.}' +
       'other{Please select # or more choices.}}', {

@@ -178,7 +178,7 @@ const toastrConfig = {
       },
       cacheName: 'NG_TRANSLATE_LANG_KEY',
       cacheMechanism: 'Cookie',
-      cookieExpiry: 1
+      cookieExpiry: 30
     }),
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
