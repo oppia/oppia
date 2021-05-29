@@ -37,6 +37,9 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
         ctrl.updateValue = function(value: string) {
           ctrl.localValue = value;
           $scope.$applyAsync();
+          setTimeout(() => {
+            $scope.$applyAsync();
+          });
         };
       }]
     };
