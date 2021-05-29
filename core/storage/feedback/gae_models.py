@@ -503,7 +503,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             GeneralFeedbackMessageModel. Last message in the thread.
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
-        return cls.get(thread_id, thread.message_count - 1)
+        return cls.get_feedback_message_model(thread_id, thread.message_count - 1)
 
     @classmethod
     def get_message_count(cls, thread_id):
