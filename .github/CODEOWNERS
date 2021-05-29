@@ -161,7 +161,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @U8NWXD @kevintab95
+/.circleci/ @U8NWXD @kevintab95 @krishnarao22
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -306,8 +306,7 @@
 
 
 # Interaction project.
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/core/domain/customization_args_util*.py @vojtechjelinek
+/core/domain/customization_args_util*.py @brianrodri
 /core/domain/expression_parser*.py @iamprayush
 /core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
@@ -316,56 +315,55 @@
 /core/domain/translatable_object_registry*.py @iamprayush
 /core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/core/templates/expressions/ @kevintab95
+/core/templates/expressions/ @brianrodri
 /core/templates/services/code-normalizer.service*.ts @iamprayush
 /core/templates/services/guppy-configuration.service.ts @iamprayush
 /core/templates/services/guppy-initialization.service.ts @iamprayush
 /core/templates/services/math-interactions.service.ts @iamprayush
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/extensions/domain*.py @kevintab95
+/extensions/domain*.py @brianrodri
 /extensions/interactions/ @iamprayush @vojtechjelinek
 /extensions/objects/ @iamprayush
+/extensions/objects/templates/filepath-editor.component*.ts @kevintab95
+/extensions/objects/templates/filepath-editor.component.html @kevintab95
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @iamprayush
 
 
 # Lesson Analytics team.
-# TODO(#12656): Revert block of ownership to @brianrodri after 2021-05-18.
-/core/controllers/features*.py @vojtechjelinek
-/core/controllers/improvements*.py @vojtechjelinek
-/core/domain/action_registry*.py @vojtechjelinek
-/core/domain/calculation_registry*.py @vojtechjelinek
-/core/domain/event_services*.py @vojtechjelinek
-/core/domain/improvements_domain*.py @vojtechjelinek
-/core/domain/improvements_services*.py @vojtechjelinek
-/core/domain/improvements_validators*.py @vojtechjelinek
-/core/domain/playthrough_issue_registry*.py @vojtechjelinek
-/core/domain/stats*.py @vojtechjelinek
-/core/domain/statistics_validators*.py @vojtechjelinek
-/core/domain/visualization_registry*.py @vojtechjelinek
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @kevintab95
-/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @kevintab95
-/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @kevintab95
-/core/templates/components/statistics-directives/ @kevintab95
-/core/templates/domain/statistics/ @kevintab95
-/core/templates/domain/improvements/ @kevintab95
-/core/templates/pages/exploration-editor-page/improvements-tab/ @kevintab95
-/core/templates/pages/exploration-editor-page/statistics-tab/ @kevintab95
-/core/templates/services/exploration-improvements.service*.ts @kevintab95
-/core/templates/services/exploration-improvements-backend-api.service*.ts @kevintab95
-/core/templates/services/exploration-improvements-task-registry.service*.ts @kevintab95
-/core/templates/services/exploration-stats.service*.ts @kevintab95
-/core/templates/services/exploration-stats-backend-api.service*.ts @kevintab95
-/core/templates/services/improvements.service*.ts @kevintab95
-/core/templates/services/messenger.service.ts @kevintab95
-/core/templates/services/playthrough*.ts @kevintab95
-/core/templates/services/state-interaction-stats.service*.ts @kevintab95
-/core/templates/services/state-top-answers-stats*.ts @kevintab95
-/extensions/actions/ @kevintab95
-/extensions/answer_summarizers/ @kevintab95
-/extensions/issues/ @kevintab95
-/extensions/visualizations/ @kevintab95
+/core/controllers/features*.py @brianrodri
+/core/controllers/improvements*.py @brianrodri
+/core/domain/action_registry*.py @brianrodri
+/core/domain/calculation_registry*.py @brianrodri
+/core/domain/event_services*.py @brianrodri
+/core/domain/improvements_domain*.py @brianrodri
+/core/domain/improvements_services*.py @brianrodri
+/core/domain/improvements_validators*.py @brianrodri
+/core/domain/playthrough_issue_registry*.py @brianrodri
+/core/domain/stats*.py @brianrodri
+/core/domain/statistics_validators*.py @brianrodri
+/core/domain/visualization_registry*.py @brianrodri
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
+/core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
+/core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
+/core/templates/components/statistics-directives/ @brianrodri
+/core/templates/domain/statistics/ @brianrodri
+/core/templates/domain/improvements/ @brianrodri
+/core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
+/core/templates/pages/exploration-editor-page/statistics-tab/ @brianrodri
+/core/templates/services/exploration-improvements.service*.ts @brianrodri
+/core/templates/services/exploration-improvements-backend-api.service*.ts @brianrodri
+/core/templates/services/exploration-improvements-task-registry.service*.ts @brianrodri
+/core/templates/services/exploration-stats.service*.ts @brianrodri
+/core/templates/services/exploration-stats-backend-api.service*.ts @brianrodri
+/core/templates/services/improvements.service*.ts @brianrodri
+/core/templates/services/messenger.service.ts @brianrodri
+/core/templates/services/playthrough*.ts @brianrodri
+/core/templates/services/state-interaction-stats.service*.ts @brianrodri
+/core/templates/services/state-top-answers-stats*.ts @brianrodri
+/extensions/actions/ @brianrodri
+/extensions/answer_summarizers/ @brianrodri
+/extensions/issues/ @brianrodri
+/extensions/visualizations/ @brianrodri
 
 
 # Library page.
@@ -462,8 +460,7 @@
 
 
 # Infrastructure.
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/jobs/ @vojtechjelinek
+/jobs/ @brianrodri
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/controllers/cron*.py @vojtechjelinek
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
@@ -486,10 +483,8 @@
 /core/domain/job_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/core/jobs*.py @vojtechjelinek
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/core/platform/ @vojtechjelinek
+/core/jobs*.py @brianrodri
+/core/platform/ @brianrodri
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
@@ -497,10 +492,8 @@
 /core/templates/pages/interaction-specs.constants.ajs.ts @jameesjohn @vojtechjelinek
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/pages/interaction-specs.constants.ts @kevintab95
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/core/templates/pages/login-page/ @vojtechjelinek
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/core/templates/pages/logout-page/ @vojtechjelinek
+/core/templates/pages/login-page/ @brianrodri
+/core/templates/pages/logout-page/ @brianrodri
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /core/templates/I18nFooter.ts @kevintab95
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
@@ -517,8 +510,7 @@
 /redis.conf @seanlip
 # TODO(#12694): Add @nithusha21 as owner after 2021-05-08
 /release_constants.json @DubeySandeep
-# TODO(#12656): Revert ownership to @brianrodri after 2021-05-18.
-/.firebase.json @vojtechjelinek
+/.firebase.json @brianrodri
 
 
 # Miscellaneous.
@@ -630,7 +622,6 @@
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
 /core/templates/third-party-imports/ @vojtechjelinek
-/jinja_utils*.py @jameesjohn @vojtechjelinek
 /.lighthouserc.js @jimbyo @jameesjohn @vojtechjelinek
 /.lighthouserc-accessibility.js @jimbyo
 /puppeteer-login-script.js @jimbyo @vojtechjelinek
@@ -692,26 +683,25 @@
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
 /data/ @kevintab95
 /core/templates/karma.module.ts @vojtechjelinek
-/core/tests/protractor_utils/ @U8NWXD @kevintab95
-/core/tests/protractor_desktop/ @U8NWXD @kevintab95
-/core/tests/protractor/ @U8NWXD @kevintab95
-/core/tests/protractor.conf.js @U8NWXD @kevintab95
-/extensions/interactions/*/protractor.js @U8NWXD @kevintab95
-/extensions/interactions/protractor.js @U8NWXD @kevintab95
-/extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95
-/extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
-/extensions/objects/protractor.js @U8NWXD @kevintab95
-/scripts/backend_test_shards.json @U8NWXD
-/.github/actions @U8NWXD
+/core/tests/protractor_utils/ @U8NWXD @kevintab95 @krishnarao22
+/core/tests/protractor_desktop/ @U8NWXD @kevintab95 @krishnarao22
+/core/tests/protractor/ @U8NWXD @kevintab95 @krishnarao22
+/core/tests/protractor.conf.js @U8NWXD @kevintab95 @krishnarao22
+/extensions/interactions/*/protractor.js @U8NWXD @kevintab95 @krishnarao22
+/extensions/interactions/protractor.js @U8NWXD @kevintab95 @krishnarao22
+/extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95 @krishnarao22
+/extensions/rich_text_components/protractor.js @U8NWXD @kevintab95 @krishnarao22
+/extensions/objects/protractor.js @U8NWXD @kevintab95 @krishnarao22
+/scripts/backend_test_shards.json @U8NWXD @krishnarao22
+/.github/actions @U8NWXD @krishnarao22
 
 
 # Python 3 Migration project.
-# TODO(#12656): Revert block of ownership to @brianrodri after 2021-05-18.
-/core/domain/auth*.py @vojtechjelinek
-/core/domain/caching*.py @vojtechjelinek
-/core/domain/taskqueue*.py @vojtechjelinek
-/core/templates/services/auth.service*.ts @kevintab95
-/core/templates/services/auth-backend-api.service*.ts @kevintab95
+/core/domain/auth*.py @brianrodri
+/core/domain/caching*.py @brianrodri
+/core/domain/taskqueue*.py @brianrodri
+/core/templates/services/auth.service*.ts @brianrodri
+/core/templates/services/auth-backend-api.service*.ts @brianrodri
 
 
 # Critical files.
@@ -743,4 +733,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @DubeySandeep @U8NWXD
+/.github/workflows/ @DubeySandeep @U8NWXD @krishnarao22
