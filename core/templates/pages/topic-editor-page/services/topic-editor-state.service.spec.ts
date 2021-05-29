@@ -259,7 +259,6 @@ describe('Topic editor state service', () => {
   });
 
   it('should delete subtopic page', fakeAsync(() => {
-    // Load Subtopic
     topicEditorStateService.loadSubtopicPage(1, 2);
     tick();
     topicEditorStateService.deleteSubtopicPage(1, 2);
