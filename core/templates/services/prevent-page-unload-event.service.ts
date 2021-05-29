@@ -53,7 +53,7 @@ export class PreventPageUnloadEventService {
   }
 
   private _preventPageUnloadEventHandler(
-      validationCallback: Function, e: BeforeUnloadEvent): void {
+      validationCallback: () => boolean, e: BeforeUnloadEvent): void {
     if (validationCallback()) {
       // The preventDefault call is used to trigger a confirmation
       // before leaving.

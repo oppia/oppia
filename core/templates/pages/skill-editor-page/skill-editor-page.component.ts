@@ -94,7 +94,7 @@ angular.module('oppia').component('skillEditorPage', {
       ctrl.$onInit = function() {
         BottomNavbarStatusService.markBottomNavbarStatus(true);
         PreventPageUnloadEventService.addListener(
-          () => UndoRedoService.getChangeCount());
+          UndoRedoService.getChangeCount.bind(UndoRedoService));
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
         ctrl.directiveSubscriptions.add(
