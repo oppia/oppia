@@ -86,12 +86,13 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
             self.assertEqual(len(question_summary_dicts), 2)
-            next_offset = json_response['next_offset']
+            more = json_response['more']
+            self.assertEqual(more, True)
             json_response = self.get_json(
                 '%s/%s,%s?offset=%s' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
                     self.skill_id, self.skill_id_2,
-                    next_offset
+                    4
                 ))
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
@@ -141,9 +142,9 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 ))
             question_summary_dicts_4 = (
                 json_response['question_summary_dicts'])
-            next_offset_4 = json_response['next_offset']
+            more = json_response['more']
             self.assertEqual(len(question_summary_dicts_4), 1)
-            self.assertEqual(next_offset_4, None)
+            self.assertEqual(more, False)
         self.logout()
 
     def test_get_fails_when_skill_id_not_valid(self):
