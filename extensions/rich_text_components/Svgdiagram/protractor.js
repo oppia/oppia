@@ -89,10 +89,10 @@ const SVGTAGS = {
     '-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-mi' +
     'terlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-sp' +
     'ace: pre;"><tspan x="-100" y="-6.14" style="stroke: rgb(0,0,0); stroke-' +
-    'width: 2; fill: rgb(255,0,0); ">▇</tspan><tspan x="-86.16" y="-6.14" st' +
+    'width: 2; fill: rgb(255,0,0); ">▇</tspan><tspan x="-82" y="-6.14" st' +
     'yle="white-space: pre; "> - Data name 1 - 10</tspan><tspan x="-100" y="' +
     '17.45" style="stroke: rgb(0,0,0); stroke-width: 2; fill: rgb(0,255,0); ' +
-    '">▇</tspan><tspan x="-86.16" y="17.45" style="white-space: pre; "> - Da' +
+    '">▇</tspan><tspan x="-82" y="17.45" style="white-space: pre; "> - Da' +
     'ta name 2 - 10</tspan></text></g><g transform="matrix(1 0 0 1 50 50)"><' +
     'g style=""><g transform="matrix(0 1 -1 0 0 0)"><g style=""><g transform' +
     '="matrix(1 0 0 1 0 0)" id="group0"><path d="M 0 -30 A 30 30 0 0 1 0 30"' +

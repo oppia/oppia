@@ -58,6 +58,9 @@ export class NoninteractiveSvgdiagram implements OnInit, OnChanges {
     }
     this.filename = this.htmlEscaperService.escapedJsonToObj(
       this.svgFilenameWithValue) as string;
+    if (!this.filename) {
+      return;
+    }
     this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
       this.filename);
     this.svgContainerStyle = {

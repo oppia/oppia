@@ -105,6 +105,9 @@ describe('oppiaNoninteractiveSvgdiagram', () => {
     expect(component.filename).toBe('svgFilename.svg');
     expect(component.svgAltText).toBe('altText');
     expect(component.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+    component.svgFilenameWithValue = '&quot;&quot;';
+    component.ngOnInit();
+    expect(component.filename).toBe('');
   });
 });
 
