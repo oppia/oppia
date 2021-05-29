@@ -25,12 +25,14 @@ import { InteractiveInteractiveMapComponent } from './directives/oppia-interacti
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { ResponseInteractiveMapComponent } from './directives/oppia-response-interactive-map.component';
 import { ShortResponseInteractiveMapComponent } from './directives/oppia-short-response-interactive-map.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    LeafletModule
+    LeafletModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveInteractiveMapComponent,

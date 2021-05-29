@@ -26,13 +26,15 @@ import { InteractiveSetInputComponent } from './directives/oppia-interactive-set
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ResponseSetInputComponent } from './directives/oppia-response-set-input.component';
 import { ShortResponseSetInputComponent } from './directives/oppia-short-response-set-input.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     SharedFormsModule,
-    SharedPipesModule
+    SharedPipesModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveSetInputComponent,
