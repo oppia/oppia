@@ -13,54 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for translatable set of normalized string editor.
+ * @fileoverview Directive for Subtitled Unicode editor.
  */
+
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'translatable-set-of-normalized-string-editor',
-  templateUrl: './translatable-set-of-normalized-string-editor.component.html'
+  selector: 'subtitled-unicode-editor',
+  templateUrl: './subtitled-unicode-editor.component.html'
 })
-export class TranslatableSetOfNormalizedStringEditorComponent {
+export class SubtitledUnicodeEditorComponent {
   @Input() value;
   @Output() valueChanged = new EventEmitter();
-  schema: {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-  } = {
-    type: 'list',
-    items: {
-      type: 'unicode'
-    },
-    validators: [{
-      id: 'is_uniquified'
-    }]
+  schema: { type: string } ={
+    type: 'unicode',
   };
-
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
   updateValue(val: string): void {
-    if (this.value.normalizedStrSet === val) {
+    if (this.value._unicode === val) {
       return;
     }
-    this.value.normalizedStrSet = val;
+    this.value._unicode = val;
     this.valueChanged.emit(this.value);
     this.changeDetectorRef.detectChanges();
   }
 
-  getSchema(): {
-    type: string;
-    items: { type: string; };
-    validators: { id: string; }[];
-    } {
+  getSchema(): { type: string } {
     return this.schema;
   }
 }
 
-angular.module('oppia').directive(
-  'translatableSetOfNormalizedStringEditor',
-  downgradeComponent({
-    component: TranslatableSetOfNormalizedStringEditorComponent
-  }) as angular.IDirectiveFactory);
+angular.module('oppia').directive('subtitledUnicodeEditor', downgradeComponent({
+  component: SubtitledUnicodeEditorComponent
+}) as angular.IDirectiveFactory);
