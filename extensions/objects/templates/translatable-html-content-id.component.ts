@@ -16,25 +16,42 @@
 /**
  * @fileoverview Component for translatable html content id editor.
  */
-angular.module('oppia').component('translatableHtmlContentIdEditor', {
-  bindings: {
-    getInitArgs: '&',
-    value: '='
-  },
-  template: require('./translatable-html-content-id.component.html'),
-  controller: [
-    function() {
-      const ctrl = this;
 
-      ctrl.$onInit = function() {
-        ctrl.name = Math.random().toString(36).substring(7);
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-        if (!ctrl.value || ctrl.value === '') {
-          ctrl.value = ctrl.choices[0].val;
-        }
-      };
+@Component({
+  selector: 'translatable-html-content-id-editor',
+  templateUrl: './translatable-html-content-id.component.html'
+})
+
+export class TranslatableHtmlContentIdEditorComponent implements OnInit {
+  @Input() value;
+  @Input() initArgs;
+  choices = [];
+  @Output() valueChanged = new EventEmitter();
+  name: string;
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    this.name = Math.random().toString(36).substring(7);
+    this.choices = this.initArgs.choices;
+
+    if (!this.value || this.value === '') {
+      this.value = this.choices[0].val;
     }
-  ]
-});
+  }
+
+  updateLocalValue(value: unknown): void {
+    if (this.value === value) {
+      return;
+    }
+    this.value = value;
+    this.valueChanged.emit(value);
+    this.changeDetectorRef.detectChanges();
+  }
+}
+angular.module('oppia').directive(
+  'translatableHtmlContentIdEditor', downgradeComponent({
+    component: TranslatableHtmlContentIdEditorComponent
+  }) as angular.IDirectiveFactory);

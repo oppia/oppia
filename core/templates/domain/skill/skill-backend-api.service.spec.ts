@@ -97,6 +97,21 @@ describe('Skill backend API service', () => {
     httpTestingController.verify();
   });
 
+  it('should fetch all skills', fakeAsync(() => {
+    const skills: SkillBackendDict[] = [];
+    skills.push(skillObjectFactory.createInterstitialSkill().toBackendDict());
+    skillBackendApiService.fetchAllSkills().toPromise().then(
+      res => {
+        expect(res).toEqual(skills);
+      }
+    );
+    let req = httpTestingController.expectOne('/fetch_skills');
+    expect(req.request.method).toEqual('GET');
+    req.flush(skills);
+
+    flushMicrotasks();
+  }));
+
   it(
     'should succesfully fetch an existing skill from the backend.',
     fakeAsync(() => {
