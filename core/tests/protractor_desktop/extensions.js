@@ -131,11 +131,14 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
+    await explorationEditorPage.saveChanges();
 
+    var isChangesPresent = false;
     var defaultOutcomeSet = false;
 
     for (var interactionId in interactions.INTERACTIONS) {
       var interaction = interactions.INTERACTIONS[interactionId];
+      isChangesPresent = false;
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
@@ -200,9 +203,13 @@ describe('Interactions', function() {
         }
         await explorationEditorPage.navigateToMainTab();
         await explorationEditorMainTab.deleteInteraction();
+        isChangesPresent = true;
+      }
+      if (isChangesPresent) {
+        await explorationEditorPage.discardChanges();
+        defaultOutcomeSet = false;
       }
     }
-    await explorationEditorPage.discardChanges();
     await users.logout();
   });
 
