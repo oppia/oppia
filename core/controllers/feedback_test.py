@@ -403,7 +403,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         to the given user id.
         """
         feedback_thread_user_model = (
-            feedback_models.GeneralFeedbackThreadUserModel.get(
+            feedback_models.GeneralFeedbackThreadUserModel
+            .get_feedback_thread_model(
                 user_id, thread_id))
 
         return (
