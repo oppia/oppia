@@ -40,12 +40,12 @@ interface QuestionsBackendResponse {
 
 interface QuestionSummariesBackendResponse {
   'question_summary_dicts': QuestionSummaryForOneSkillBackendDict[];
-  'next_offset': number;
+  'more': boolean;
 }
 
 interface QuestionSummariesResponse {
   questionSummaries: QuestionSummaryForOneSkillBackendDict[];
-  nextOffset: number;
+  more: boolean;
 }
 
 @Injectable({
@@ -124,7 +124,7 @@ export class QuestionBackendApiService {
       if (successCallback) {
         successCallback({
           questionSummaries: questionSummaries,
-          nextOffset: response.next_offset
+          more: response.more
         });
       }
     }, (errorResponse) => {

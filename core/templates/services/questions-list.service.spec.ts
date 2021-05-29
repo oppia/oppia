@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
 
 import { QuestionsListService } from 'services/questions-list.service';
 
-describe('Questions List Service', () => {
+fdescribe('Questions List Service', () => {
   let qls: QuestionsListService;
   let httpTestingController: HttpTestingController;
   let quesionSummariesInitializedSpy: jasmine.Spy;
@@ -39,7 +39,7 @@ describe('Questions List Service', () => {
         question_content: ''
       }
     }],
-    next_offset: null
+    more: false
   };
 
   beforeEach(() => {
