@@ -1624,19 +1624,16 @@ class WrittenTranslations(python_utils.OBJECT):
 
         return correctly_translated_content_ids
 
-    def add_translation(
-            self, content_id, language_code, html, data_format, needs_update):
+    def add_translation(self, content_id, language_code, html):
         """Adds a translation for the given content id in a given language.
 
         Args:
             content_id: str. The id of the content.
             language_code: str. The language code of the translated html.
             html: str. The translated html.
-            data_format: str. The data format of the translated content.
-            needs_update: bool. Whether the translation needs to be updated.
         """
         written_translation = WrittenTranslation(
-            data_format, html, needs_update)
+            WrittenTranslation.DATA_FORMAT_HTML, html, False)
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
