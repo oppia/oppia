@@ -1238,7 +1238,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         suggestions = (
             suggestion_services
             .get_translation_suggestions_in_review_by_exploration(
-                self.target_id_1))
+                self.target_id_1, 'hi'))
 
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(suggestions[0].target_id, self.target_id_1)
@@ -1255,6 +1255,18 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
+
+    def test_get_translation_suggestions_in_review_by_exploration_returns_only_suggestions_with_supplied_language_code(self): # pylint: disable=line-too-long
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review_by_exploration(
+                self.target_id_1, 'pt'))
+
+        self.assertEqual(len(suggestions), 1)
 
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
             self):
