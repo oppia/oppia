@@ -65,7 +65,6 @@ class QuestionsListHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-
         question_summaries, merged_question_skill_links, _ = (
             question_services.get_displayable_question_skill_link_details(
                 constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset)
