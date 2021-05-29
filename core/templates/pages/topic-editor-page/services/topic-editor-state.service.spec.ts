@@ -29,18 +29,26 @@ import { TopicBackendDict, TopicObjectFactory } from 'domain/topic/TopicObjectFa
 import { AlertsService } from 'services/alerts.service';
 import { TopicEditorStateService } from './topic-editor-state.service';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Topic editor state service', () => {
+describe('Topic editor state service', () => {
   let topicEditorStateService: TopicEditorStateService;
   let mockEditableTopicBackendApiService: MockEditableTopicBackendApiService;
   let alertsService: AlertsService;
   let topicObjectFactory: TopicObjectFactory;
-  let editableStoryBackendApiService: EditableStoryBackendApiService;
-  let undoRedoService: UndoRedoService;
 
   let skillCreationIsAllowed: boolean = true;
   let skillQuestionCountDict = {};
-  let groupedSkillSummaries = {};
+  let groupedSkillSummaries = {
+    topic1: {
+      id: 'topic_id',
+      description: 'desc',
+      language_code: 'en',
+      version: 2,
+      misconception_count: 0,
+      worked_examples_count: 0,
+      skill_model_created_on: 123,
+      skill_model_last_updated: 213
+    }
+  };
   let topicDict: TopicBackendDict = {
     id: 'topic_id',
     name: 'topic_name',
@@ -168,11 +176,6 @@ fdescribe('Topic editor state service', () => {
     alertsService = (TestBed.inject(AlertsService) as unknown) as
       jasmine.SpyObj<AlertsService>;
     topicObjectFactory = TestBed.inject(TopicObjectFactory);
-    editableStoryBackendApiService = (
-      TestBed.inject(EditableStoryBackendApiService) as unknown) as
-      jasmine.SpyObj<EditableStoryBackendApiService>;
-    undoRedoService = (TestBed.inject(UndoRedoService) as unknown) as
-      jasmine.SpyObj<UndoRedoService>;
   });
 
   it('should create', () => {
@@ -185,6 +188,10 @@ fdescribe('Topic editor state service', () => {
     expect(topicEditorStateService.isSkillCreationAllowed())
       .toEqual(skillCreationIsAllowed);
     expect(topicEditorStateService.isLoadingTopic()).toEqual(false);
+    expect(topicEditorStateService.hasLoadedTopic()).toBeTrue();
+    expect(topicEditorStateService.getGroupedSkillSummaries()).toBeDefined();
+    expect(topicEditorStateService.getSkillQuestionCountDict()).toBeDefined();
+    expect(topicEditorStateService.getTopicRights()).toBeDefined();
   }));
 
   it('should display error message when topic fails to load', fakeAsync(() => {
@@ -221,6 +228,16 @@ fdescribe('Topic editor state service', () => {
       SubtopicPage.createFromBackendDict(subtopicPage));
   }));
 
+  it('should show error when loading subtopic page fails', fakeAsync(() => {
+    spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
+      .and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
+    topicEditorStateService.loadSubtopicPage(1, 2);
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when loading the topic.');
+  }));
+
   it('should set subtopic page', fakeAsync(() => {
     topicEditorStateService.setSubtopicPage(
       SubtopicPage.createFromBackendDict(subtopicPage));
@@ -248,17 +265,16 @@ fdescribe('Topic editor state service', () => {
     topicEditorStateService.deleteSubtopicPage(1, 2);
   }));
 
-  // it('should save topic', fakeAsync(() => {
-  //   spyOn(editableStoryBackendApiService, 'deleteStoryAsync');
-  //   spyOn(undoRedoService, 'hasChanges').and.returnValue(true);
-  //   topicEditorStateService.loadTopic('test_id');
-  //   tick();
-  //   topicEditorStateService.saveTopic('test commit', () => {
-  //     expect(editableStoryBackendApiService.deleteStoryAsync)
-  //       .toHaveBeenCalled();
-  //   });
-  //   tick();
-  // }));
+  it('should test getters', () => {
+    expect(topicEditorStateService.getSkillIdToRubricsObject()).toBeDefined();
+    expect(topicEditorStateService.getCanonicalStorySummaries()).toBeDefined();
+    expect(topicEditorStateService.onStorySummariesInitialized).toBeDefined();
+    expect(topicEditorStateService.onSubtopicPageLoaded).toBeDefined();
+    expect(topicEditorStateService.isSavingTopic()).toBeDefined();
+    expect(topicEditorStateService.onTopicInitialized).toBeDefined();
+    expect(topicEditorStateService.onTopicReinitialized).toBeDefined();
+    expect(topicEditorStateService.getClassroomUrlFragment()).toBeDefined();
+  });
 
   it('should update existence of topic name', fakeAsync(() => {
     topicEditorStateService.updateExistenceOfTopicName('test_topic', () => {});
