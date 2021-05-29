@@ -59,7 +59,6 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
-import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
@@ -185,8 +184,6 @@ const toastrConfig = {
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
-    LoadingMessageComponent,
-    LoadingDotsComponent,
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
