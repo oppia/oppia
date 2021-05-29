@@ -552,6 +552,7 @@
 
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @aks681
+/core/templates/components/ck-editor-helpers/ckeditor4.module.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
 /core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
