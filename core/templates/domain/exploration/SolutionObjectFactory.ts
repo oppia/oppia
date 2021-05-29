@@ -125,7 +125,7 @@ export class Solution {
       for (let arr of <DragAndDropAnswer> this.correctAnswer) {
         let transformedArray = [];
         for (let elem of arr) {
-          let val = (contentIdToHtmlMapping[elem]).toString();
+          let val = contentIdToHtmlMapping[elem];
           transformedArray.push(formatRtePreview.transform(val));
         }
         correctAnswer.push(transformedArray);
