@@ -20,8 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import {
+  CapitalizePipe
+} from 'filters/string-utility-filters/capitalize.pipe';
 import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -33,6 +37,7 @@ import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import {
+  DragAndDropAnswer,
   FractionAnswer,
   InteractionAnswer,
   LogicProofAnswer,
@@ -110,11 +115,21 @@ export class Solution {
         <NumberWithUnitsAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       correctAnswer = [];
+      let contentIdToHtmlMapping = {};
       customizationArgs = (
         <DragAndDropSortInputCustomizationArgs>
-        customizationArgs);
-      correctAnswer = this.getDragAndDropAnswer(
-        interactionId, customizationArgs);
+      customizationArgs).choices.value.map(
+        choiceIterator => contentIdToHtmlMapping[choiceIterator._contentId] =
+        choiceIterator._html);
+      let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
+      for (let arr of <DragAndDropAnswer> this.correctAnswer) {
+        let transformedArray = [];
+        for (let elem of arr) {
+          let val = (contentIdToHtmlMapping[elem]).toString();
+          transformedArray.push(formatRtePreview.transform(val));
+        }
+        correctAnswer.push(transformedArray);
+      }
       correctAnswer = JSON.stringify(correctAnswer);
       correctAnswer = correctAnswer.replace(/"/g, '');
     } else {
@@ -129,25 +144,6 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
-  // Function to get the answer of Drag and Drop Sort Input interaction.
-  getDragAndDropAnswer(
-      interactionId: 'DragAndDropSortInput',
-      customizationArgs: InteractionCustomizationArgs): string {
-    let correctAnswer = null;
-    correctAnswer = [];
-    customizationArgs = (
-      <DragAndDropSortInputCustomizationArgs> customizationArgs
-    ).choices.value.map(
-      choice => choice.html);
-    let transformedArrayone = [];
-    var transformedArraytwo = transformedArrayone.concat(customizationArgs);
-    for (let elem of transformedArraytwo) {
-      let transformedArray = [];
-      transformedArray.push(elem);
-      correctAnswer.push(transformedArray);
-    }
-    return correctAnswer;
-  }
   setCorrectAnswer(correctAnswer: InteractionAnswer): void {
     this.correctAnswer = correctAnswer;
   }

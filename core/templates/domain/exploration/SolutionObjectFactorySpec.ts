@@ -129,13 +129,10 @@ describe('Solution object factory', () => {
         'One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
-        ['<p>Choice 1</p>'], ['<p>Choice 2</p>']
+        ['<p>1</p>', '<b>3</b>'],
+        ['<p>c</p>', '<oppia-noninteractive-math></oppia-noninteractive-math>']
       ]);
-      solution.setCorrectAnswer(
-        '"[{&amp;quot;_html&amp;quot;' +
-        ':&amp;quot;This is a choice&amp;quot;,&amp;quot;_contentId&amp;quot;' +
-        ':&amp;quot;&amp;quot;}]"');
-      const customizationArgsForItemSelectionAndDragAndDropInput = {
+      const customizationArgsForDragAndDropInput = {
         choices: {
           value: [
             new SubtitledHtml('Choice 1', 'ca_choices_0'),
@@ -144,14 +141,9 @@ describe('Solution object factory', () => {
         }
       };
       expect(solution.getSummary(
-        'DragAndDropSortInput',
-        customizationArgsForItemSelectionAndDragAndDropInput)).toEqual(
-        'One solution is "[[Choice 1],[Choice 2]]".' +
-        ' This is the explanation to the answer.');
-      expect(solution.getDragAndDropAnswer(
-        'DragAndDropSortInput',
-        customizationArgsForItemSelectionAndDragAndDropInput
-      )).toEqual([['Choice 1'], ['Choice 2']]);
+        'DragAndDropSortInput', customizationArgsForDragAndDropInput)).toEqual(
+        'One solution is "[[1,3],[c,[Math]]]". This is the explanation to ' +
+        'the answer.');
     });
 
     it('should get oppia short answer', () => {
@@ -165,11 +157,8 @@ describe('Solution object factory', () => {
       };
       const expectedShortAnswerHtml = {
         prefix: 'One',
-        answer: '<oppia-short-response-0 answer="&amp;quot;This is a' +
-        ' correct answer!&amp;quot;" choices="[{&amp;quot;_html&amp;' +
-        'quot;:&amp;quot;This is a choice&amp;quot;,&amp;quot;' +
-        '_contentId&amp;quot;:&amp;quot;&amp;quot;}]">' +
-        '</oppia-short-response-0>'
+        answer: '<oppia-short-response-0 answer="&amp;quot;This is' +
+        ' a correct answer!&amp;quot;"></oppia-short-response-0>'
       };
 
       expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
