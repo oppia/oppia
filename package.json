@@ -170,6 +170,7 @@
     "ngx-toastr": "^13.2.1",
     "ngx-translate-cache": "^9.0.2",
     "ngx-trim-directive": "^1.1.0",
+    "proxy-polyfill": "^0.3.2",
     "requireindex": "^1.2.0",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^4.0.1"

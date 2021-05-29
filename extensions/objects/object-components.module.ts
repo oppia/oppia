@@ -63,18 +63,28 @@ import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-alge
 import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
+import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
+import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
+import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
+import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
+import { MatCardModule } from '@angular/material/card';
+import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-editor.component';
+import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
+import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
 
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
+    CommonElementsModule,
     FormsModule,
     LeafletModule,
     SharedFormsModule,
     GraphInputInteractionModule,
     DynamicContentModule,
     DirectivesModule,
+    MatCardModule,
     MatCheckboxModule,
     NgbModalModule,
     NgxTrimDirectiveModule
@@ -102,6 +112,7 @@ import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
     NumericExpressionEditorComponent,
     PositionOfTermsEditorComponent,
@@ -112,7 +123,12 @@ import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.
     SetOfAlgebraicIdentifierEditorComponent,
     SetOfTranslatableHtmlContentIdsEditorComponent,
     SetOfUnicodeStringEditorComponent,
-    SubtitledHtmlEditorComponent
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -137,6 +153,7 @@ import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
     NumericExpressionEditorComponent,
     PositionOfTermsEditorComponent,
@@ -147,7 +164,12 @@ import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.
     SetOfAlgebraicIdentifierEditorComponent,
     SetOfTranslatableHtmlContentIdsEditorComponent,
     SetOfUnicodeStringEditorComponent,
-    SubtitledHtmlEditorComponent
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -172,6 +194,7 @@ import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
     NumericExpressionEditorComponent,
     PositionOfTermsEditorComponent,
@@ -182,7 +205,12 @@ import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.
     SetOfAlgebraicIdentifierEditorComponent,
     SetOfTranslatableHtmlContentIdsEditorComponent,
     SetOfUnicodeStringEditorComponent,
-    SubtitledHtmlEditorComponent
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
 })
 
