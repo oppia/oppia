@@ -42,7 +42,7 @@ export class ShortResponseMathEquationInput implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseMathEquationInput', downgradeComponent({
+  'oppiaShortResponseMathEquationInput', downgradeComponent({
     component: ShortResponseMathEquationInput
   }) as angular.IDirectiveFactory
 );
