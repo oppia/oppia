@@ -83,25 +83,26 @@ export class CreateActivityButtonComponent implements OnInit {
      this.explorationCreationService.showUploadExplorationModal();
    }
 
-   async ngOnInit(): Promise<void> {
-     this.creationInProgress = false;
-     this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
-     const userInfo = await this.userService.getUserInfoAsync();
+   ngOnInit(): void {
+    this.creationInProgress = false;
+    this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
 
-     this.canCreateCollections = userInfo.canCreateCollections();
-     this.userIsLoggedIn = userInfo.isLoggedIn();
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.canCreateCollections = userInfo.canCreateCollections();
+      this.userIsLoggedIn = userInfo.isLoggedIn();
 
-     // If the user clicked on a 'create' button to get to the dashboard,
-     // open the create modal immediately (or redirect to the exploration
-     // editor if the create modal does not need to be shown).
-     if (this.urlService.getUrlParams().mode === 'create') {
-       if (!this.canCreateCollections) {
-         this.explorationCreationService.createNewExploration();
-       } else {
-         this.initCreationProcess();
-       }
-     }
-   }
+      // If the user clicked on a 'create' button to get to the dashboard,
+      // open the create modal immediately (or redirect to the exploration
+      // editor if the create modal does not need to be shown).
+      if (this.urlService.getUrlParams().mode === 'create') {
+        if (!this.canCreateCollections) {
+          this.explorationCreationService.createNewExploration();
+        } else {
+          this.initCreationProcess();
+        }
+      }
+    });
+  }
 }
 angular.module('oppia').directive(
   'oppiaCreateActivityButton', downgradeComponent(
