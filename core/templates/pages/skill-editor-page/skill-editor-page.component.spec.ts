@@ -73,7 +73,8 @@ describe('Skill editor page', function() {
     expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
     spyOn(SkillEditorStateService, 'loadSkill').and.stub();
     spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
