@@ -155,7 +155,8 @@ describe('Story editor page', function() {
     ctrl.$onDestroy();
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
     spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
     spyOn(PageTitleService, 'setPageTitle');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);

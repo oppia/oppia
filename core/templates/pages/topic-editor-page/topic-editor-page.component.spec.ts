@@ -117,7 +117,8 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toBe('Question Editor');
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
     spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
     spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
