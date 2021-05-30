@@ -91,7 +91,7 @@ class BeamJobRunResultModelValidatorTests(BeamJobValidatorTestBase):
         self.RUN_MODEL_CLASS(
             id='123', job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
-        self.RESULT_MODEL_CLASS(id='123', stdout=[], stderr=[]).put()
+        self.RESULT_MODEL_CLASS(id='123', stdout='', stderr='').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
             ['fully-validated BeamJobRunResultModel', 1],
@@ -101,7 +101,7 @@ class BeamJobRunResultModelValidatorTests(BeamJobValidatorTestBase):
         self.RUN_MODEL_CLASS(
             id='123', job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
-        self.RESULT_MODEL_CLASS(id='456', stdout=[], stderr=[]).put()
+        self.RESULT_MODEL_CLASS(id='456', stdout='', stderr='').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
             ['failed validation check for beam_job_ids field check of '
