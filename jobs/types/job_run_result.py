@@ -27,8 +27,6 @@ class JobRunResult(python_utils.OBJECT):
 
     The stdout and stderr are string values analogous to a program's stdout and
     stderr pipes (reserved for standard output and errors, respectively).
-
-    The class inherits from tuple() to optimize space.
     """
 
     __slots__ = ('_stdout', '_stderr')
