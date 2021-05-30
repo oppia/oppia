@@ -110,7 +110,8 @@ export class UserBackendApiService {
       this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
   }
 
-  async submitSiteLanguageAsync(currentLanguageCode: string): Promise<Object> {
+  async updatePreferredSiteLanguageAsync(currentLanguageCode: string):
+  Promise<Object> {
     return this.httpClient.put(this.SITE_LANGUAGE_URL, {
       site_language_code: currentLanguageCode
     }).toPromise();

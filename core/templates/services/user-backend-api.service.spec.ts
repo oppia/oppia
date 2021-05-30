@@ -180,12 +180,12 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should submit site langauge', fakeAsync(() => {
+  it('should update preferred site langauge', fakeAsync(() => {
     let siteLanguageUrl = '/save_site_language';
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    userBackendApiService.submitSiteLanguageAsync('en')
+    userBackendApiService.updatePreferredSiteLanguageAsync('en')
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(siteLanguageUrl);

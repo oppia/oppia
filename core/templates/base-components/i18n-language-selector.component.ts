@@ -53,7 +53,7 @@ export class I18nLanguageSelectorComponent {
     this.i18nLanguageCodeService.setI18nLanguageCode(this.currentLanguageCode);
     this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.isLoggedIn()) {
-        this.userBackendApiService.submitSiteLanguageAsync(
+        this.userBackendApiService.updatePreferredSiteLanguageAsync(
           this.currentLanguageCode);
       }
     });
