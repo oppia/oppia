@@ -19,7 +19,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TranslatePipe } from 'filters/translate.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
 
@@ -46,11 +46,11 @@ describe('Side Navigation Bar Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientModule
+        HttpClientModule,
+        TranslateModule.forRoot()
       ],
       declarations: [
         SideNavigationBarComponent,
-        TranslatePipe
       ],
       providers: [
         {
