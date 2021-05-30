@@ -57,16 +57,17 @@ export interface UserContributionRightsDataBackendDict {
   providedIn: 'root'
 })
 export class UserBackendApiService {
-  constructor(private http: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
+  private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {
-    return this.http.get<UserInfoBackendDict>(
+    return this.httpClient.get<UserInfoBackendDict>(
       this.USER_INFO_URL).toPromise().then(
       (backendDict) => {
         return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
@@ -75,7 +76,7 @@ export class UserBackendApiService {
   }
 
   async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
-    return this.http.get<PreferencesBackendDict>(
+    return this.httpClient.get<PreferencesBackendDict>(
       this.PROFILE_PICTURE_URL).toPromise().then(
       (backendDict) => {
         return backendDict.profile_picture_data_url || defaultUrl;
@@ -88,7 +89,7 @@ export class UserBackendApiService {
       update_type: 'profile_picture_data_url',
       data: newProfileImageDataUrl
     };
-    return this.http.put<PreferencesBackendDict>(
+    return this.httpClient.put<PreferencesBackendDict>(
       this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
   }
 
@@ -96,7 +97,7 @@ export class UserBackendApiService {
     const urlParameters = {
       current_url: currentUrl
     };
-    return this.http.get<LoginUrlResponseDict>(
+    return this.httpClient.get<LoginUrlResponseDict>(
       '/url_handler', { params: urlParameters }).toPromise().then(
       (backendDict) => {
         return backendDict.login_url;
@@ -105,8 +106,14 @@ export class UserBackendApiService {
 
   async getUserContributionRightsDataAsync():
     Promise<UserContributionRightsDataBackendDict> {
-    return this.http.get<UserContributionRightsDataBackendDict>(
+    return this.httpClient.get<UserContributionRightsDataBackendDict>(
       this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
+  }
+
+  async submitSiteLanguageAsync(currentLanguageCode: string): Promise<Object> {
+    return this.httpClient.put(this.SITE_LANGUAGE_URL, {
+      site_language_code: currentLanguageCode
+    }).toPromise();
   }
 }
 

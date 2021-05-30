@@ -75,7 +75,7 @@ require('google-analytics.initializer.ts');
 
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded *after* app.constants.ts.
-require('base-components/i18n-footer.component.ts');
+require('base-components/i18n-language-selector.component.ts');
 
 // Default to passive event listeners.
 require('default-passive-events');

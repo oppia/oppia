@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SiteLanguageBackendApiService } from 'services/site-language-backend-api.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 
 interface SiteLanguage {
@@ -30,17 +30,17 @@ interface SiteLanguage {
 }
 
 @Component({
-  selector: 'oppia-i18n-footer',
-  templateUrl: './i18n-footer.component.html'
+  selector: 'oppia-i18n-language-selector',
+  templateUrl: './i18n-language-selector.component.html'
 })
-export class I18nFooterComponent {
+export class I18nLanguageSelectorComponent {
   currentLanguageCode: string;
   supportedSiteLanguages: readonly SiteLanguage[];
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userService: UserService,
-    private siteLanguageBackendApiService: SiteLanguageBackendApiService
+    private userBackendApiService: UserBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -53,14 +53,14 @@ export class I18nFooterComponent {
     this.i18nLanguageCodeService.setI18nLanguageCode(this.currentLanguageCode);
     this.userService.getUserInfoAsync().then((userInfo) => {
       if (userInfo.isLoggedIn()) {
-        this.siteLanguageBackendApiService.submitSiteLanguageAsync(
+        this.userBackendApiService.submitSiteLanguageAsync(
           this.currentLanguageCode);
       }
     });
   }
 }
 
-angular.module('oppia').directive('oppiaI18nFooter',
+angular.module('oppia').directive('oppiaI18nLanguageSelector',
   downgradeComponent({
-    component: I18nFooterComponent
+    component: I18nLanguageSelectorComponent
   }) as angular.IDirectiveFactory);

@@ -496,9 +496,9 @@
 /core/templates/pages/login-page/ @brianrodri
 /core/templates/pages/logout-page/ @brianrodri
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
-/core/templates/base-components/i18n-footer.component.ts @kevintab95
+/core/templates/base-components/i18n-language-selector.component.ts @kevintab95
 # TODO(#12694): Replace @nithusha21 as owner after 2021-05-08
-/core/templates/base-components/i18n-footer.component.html @kevintab95
+/core/templates/base-components/i18n-language-selector.component.html @kevintab95
 /core/templates/app-events/ @srijanreddy98
 /core/templates/services/app.service*.ts @srijanreddy98
 /core/templates/services/contextual/document-attribute-customization.service*.ts @srijanreddy98
