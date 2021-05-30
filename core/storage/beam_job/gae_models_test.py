@@ -1,4 +1,4 @@
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,6 +89,9 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
         export_policy = beam_job_models.BeamJobRunModel.get_export_policy()
         self.assertEqual(
             export_policy['job_name'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
+            export_policy['job_arguments'],
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
         self.assertEqual(
             export_policy['latest_job_state'],

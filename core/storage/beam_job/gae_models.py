@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,6 +57,8 @@ class BeamJobRunModel(base_models.BaseModel):
 
     # The name of the job class that implements the job's logic.
     job_name = datastore_services.StringProperty(required=True)
+    # The arguments provided to the job run.
+    job_arguments = datastore_services.StringProperty(repeated=True)
     # The state of the job at the time the model was last updated.
     latest_job_state = datastore_services.StringProperty(choices=[
         BEAM_JOB_STATE_DONE, BEAM_JOB_STATE_FAILED,
@@ -95,6 +97,7 @@ class BeamJobRunModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(BeamJobRunModel, cls).get_export_policy(), **{
             'job_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'job_arguments': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
