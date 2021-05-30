@@ -40,7 +40,6 @@ import { ExplorationEmbedButtonModalComponent } from './button-directives/explor
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
-import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { StateSkillEditorComponent } from 'components/state-editor/state-skill-editor/state-skill-editor.component';
 import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
@@ -95,6 +94,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 const toastrConfig = {
   allowHtml: false,
@@ -115,6 +115,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CommonElementsModule,
     CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
@@ -155,7 +156,6 @@ const toastrConfig = {
     LazyLoadingComponent,
     LimitToPipe,
     LoadingMessageComponent,
-    LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     PreviewThumbnailComponent,
@@ -202,7 +202,7 @@ const toastrConfig = {
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingMessageComponent,
-    LoadingDotsComponent, SocialButtonsComponent,
+    SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -228,6 +228,7 @@ const toastrConfig = {
 
   exports: [
     // Modules.
+    CommonElementsModule,
     CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
@@ -282,7 +283,6 @@ const toastrConfig = {
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
-    LoadingDotsComponent,
     LearnerDashboardIconsComponent
   ],
 })
