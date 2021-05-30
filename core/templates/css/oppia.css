@@ -920,6 +920,14 @@ textarea {
   border-top: 0;
   content: "";
 }
+
+.oppia-navbar-nav .dropdown-menu {
+  left: auto;
+  right: 0;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
 .dropup .dropdown-menu,
 .navbar-fixed-bottom .dropdown .dropdown-menu {
   bottom: 100%;

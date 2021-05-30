@@ -32,7 +32,6 @@ describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
   let contextService: ContextService;
-  let changeDetectorRef: ChangeDetectorRef;
   let skillObjectFactory: SkillObjectFactory;
   let testObj: SubtitledHtml = SubtitledHtml
     .createDefault('test_html', 'test_id');
@@ -51,7 +50,6 @@ describe('Create new skill modal', () => {
       ],
       providers: [
         NgbActiveModal,
-        ChangeDetectorRef,
       ]
     }).compileComponents();
   }));
@@ -62,9 +60,6 @@ describe('Create new skill modal', () => {
     contextService = TestBed.inject(ContextService);
     contextService = (contextService as unknown) as
       jasmine.SpyObj<ContextService>;
-    changeDetectorRef = TestBed.inject(ChangeDetectorRef);
-    changeDetectorRef = (changeDetectorRef as unknown) as
-      jasmine.SpyObj<ChangeDetectorRef>;
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     skillObjectFactory = (skillObjectFactory as unknown) as
       jasmine.SpyObj<SkillObjectFactory>;
@@ -98,8 +93,16 @@ describe('Create new skill modal', () => {
   });
 
   it('should open concept card explanation editor', () => {
+    const changeDetectorRef =
+     fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy =
+     spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    componentInstance.isEditorShown.conceptCardExplanationEditorIsShown = false;
     componentInstance.openConceptCardExplanationEditor();
-    expect(componentInstance.conceptCardExplanationEditorIsShown).toBeTrue();
+    expect(
+      componentInstance.isEditorShown
+        .conceptCardExplanationEditorIsShown).toBe(true);
+    expect(detectChangesSpy).toHaveBeenCalled();
   });
 
   it('should get html schema', () => {

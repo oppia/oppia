@@ -74,6 +74,7 @@ import { LoadingMessageComponent } from '../base-components/loading-message.comp
 import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
@@ -87,7 +88,6 @@ import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templat
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 
-
 // Pipes.
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/truncate-and-capitalize.pipe';
@@ -96,7 +96,6 @@ import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-
 
 // Services.
 import { AuthService } from 'services/auth.service';
@@ -258,6 +257,7 @@ const toastrConfig = {
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
+    TopNavigationBarComponent,
     WrapTextWithEllipsisPipe,
     WarningsAndAlertsComponent,
     ThumbnailDisplayComponent,
@@ -311,6 +311,7 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
+    TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
@@ -370,6 +371,7 @@ const toastrConfig = {
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
+    TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,

@@ -25,21 +25,25 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+import { Title } from '@angular/platform-browser';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService = null;
   let urlInterpolationService: UrlInterpolationService = null;
   let httpTestingController: HttpTestingController = null;
   let csrfService: CsrfTokenService = null;
+  let titleService: Title;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    userBackendApiService = TestBed.get(UserBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
-    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    userBackendApiService = TestBed.inject(UserBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    csrfService = TestBed.inject(CsrfTokenService);
+    titleService = TestBed.inject(Title);
+
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       async() => {
@@ -178,5 +182,23 @@ describe('User Backend Api Service', () => {
     req.flush(sampleUserContributionRightsDict);
 
     flushMicrotasks();
+  }));
+
+  it('should show number of Unseen Notifications', fakeAsync(() => {
+    let response = {
+      num_unseen_notifications: 10
+    };
+    userBackendApiService.showUnseenNotifications();
+    titleService.setTitle('home');
+    expect(titleService.getTitle()).toEqual('home');
+    userBackendApiService.numUnseenNotifications = 10;
+    expect(userBackendApiService.numUnseenNotifications).toEqual(10);
+    let req = httpTestingController.expectOne(
+      '/notificationshandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(response);
+    flushMicrotasks();
+
+    expect(titleService.getTitle()).toBe('(10) home');
   }));
 });
