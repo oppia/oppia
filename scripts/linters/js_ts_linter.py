@@ -422,123 +422,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_directive_scope(self):
-        """This function checks that all directives have an explicit
-        scope: {} and it should not be scope: true.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        # Select JS and TS files which need to be checked.
-        name = 'Directive scope'
-        files_to_check = self.all_filepaths
-        failed = False
-        error_messages = []
-        components_to_check = ['directive']
-
-        for filepath in files_to_check:
-            parsed_expressions = self.parsed_expressions_in_files[filepath]
-            # Parse the body of the content as nodes.
-            for component in components_to_check:
-                for expression in parsed_expressions[component]:
-                    if not expression:
-                        continue
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the directive.
-                    if arguments[0].type == 'Literal':
-                        directive_name = python_utils.UNICODE(
-                            arguments[0].value)
-                    arguments = arguments[1:]
-                    for argument in arguments:
-                        # Check the type of an argument.
-                        if argument.type != 'ArrayExpression':
-                            continue
-                        # Separate out the elements for the argument.
-                        elements = argument.elements
-                        for element in elements:
-                            # Check the type of an element.
-                            if element.type != 'FunctionExpression':
-                                continue
-                            # Separate out the body of the element.
-                            body = element.body
-                            # Further separate the body elements from the
-                            # body.
-                            body_elements = body.body
-                            for body_element in body_elements:
-                                # Check if the body element is a return
-                                # statement.
-                                body_element_type_is_not_return = (
-                                    body_element.type != 'ReturnStatement')
-                                if body_element_type_is_not_return:
-                                    continue
-                                arg_type = (
-                                    body_element.argument and
-                                    body_element.argument.type)
-                                body_element_arg_type_is_not_object = (
-                                    arg_type != 'ObjectExpression')
-                                if body_element_arg_type_is_not_object:
-                                    continue
-                                # Separate the properties of the return
-                                # node.
-                                return_node_properties = (
-                                    body_element.argument.properties)
-                                # Loop over all the properties of the return
-                                # node to find out the scope key.
-                                for return_node_property in (
-                                        return_node_properties):
-                                    # Check whether the property is scope.
-                                    property_key_is_an_identifier = (
-                                        return_node_property.key.type == (
-                                            'Identifier'))
-                                    property_key_name_is_scope = (
-                                        return_node_property.key.name == (
-                                            'scope'))
-                                    if (
-                                            property_key_is_an_identifier
-                                            and (
-                                                property_key_name_is_scope
-                                                )):
-                                        # Separate the scope value and
-                                        # check if it is an Object
-                                        # Expression. If it is not, then
-                                        # check for scope: true and report
-                                        # the error message.
-                                        scope_value = (
-                                            return_node_property.value)
-                                        if (
-                                                scope_value.type == (
-                                                    'Literal')
-                                                and (
-                                                    scope_value.value)):
-                                            failed = True
-                                            error_message = (
-                                                'Please ensure that %s '
-                                                'directive in %s file '
-                                                'does not have scope set '
-                                                'to true.' %
-                                                (directive_name, filepath))
-                                            error_messages.append(
-                                                error_message)
-                                        elif scope_value.type != (
-                                                'ObjectExpression'):
-                                            # Check whether the directive
-                                            # has scope: {} else report
-                                            # the error message.
-                                            failed = True
-                                            error_message = (
-                                                'Please ensure that %s '
-                                                'directive in %s file has '
-                                                'a scope: {}.' % (
-                                                    directive_name, filepath
-                                                    ))
-                                            error_messages.append(
-                                                error_message)
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
         imported in the controllers/directives/factories in JS
@@ -1022,7 +905,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout = []
 
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
-        linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
         linter_stdout.append(
             self._match_line_breaks_in_controller_dependencies())
