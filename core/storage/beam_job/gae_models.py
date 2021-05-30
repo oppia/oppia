@@ -25,27 +25,45 @@ from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
 
-# The job is running.
+# The job is currently running.
 BEAM_JOB_STATE_RUNNING = 'RUNNING'
-# The job is created, but the system needs time to prepare before launching it.
+# The job has been created but is not yet running. Jobs that are pending may
+# only transition to RUNNING, or FAILED.
 BEAM_JOB_STATE_PENDING = 'PENDING'
-# The job has been paused or has not yet started running.
+# The job has not yet started to run.
 BEAM_JOB_STATE_STOPPED = 'STOPPED'
-# The job has been explicitly cancelled and is in the process of stopping.
+# The job has has been explicitly cancelled and is in the process of stopping.
+# Jobs that are cancelling may only transition to CANCELLED or FAILED.
 BEAM_JOB_STATE_CANCELLING = 'CANCELLING'
-# The job has been explicitly cancelled (terminal state).
+# The job has has been explicitly cancelled. This is a terminal job state. This
+# state may only be set via a Cloud Dataflow jobs.update call, and only if the
+# job has not yet reached another terminal state.
 BEAM_JOB_STATE_CANCELLED = 'CANCELLED'
-# The job is still processing, but no longer reading data.
+# The job is in the process of draining. A draining job has stopped pulling from
+# its input sources and is processing any data that remains in-flight. This
+# state may be set via a Cloud Dataflow jobs.update call, but only as a
+# transition from RUNNING. Jobs that are draining may only transition
+# to DRAINED, CANCELLED, or FAILED.
 BEAM_JOB_STATE_DRAINING = 'DRAINING'
-# The job is finished draining (terminal state).
+# The job has been drained. A drained job terminated by stopping pulling from
+# its input sources and processing any data that remained in-flight when
+# draining was requested. This state is a terminal state, may only be set by the
+# Cloud Dataflow service, and only as a transition from DRAINING.
 BEAM_JOB_STATE_DRAINED = 'DRAINED'
-# The job has been replaced by a newer version of the code (terminal state).
+# The job was successfully updated, meaning that this job was stopped and
+# another job was started, inheriting state from this one. This is a terminal
+# job state. This state may only be set by the Cloud Dataflow service, and only
+# as a transition from RUNNING.
 BEAM_JOB_STATE_UPDATED = 'UPDATED'
-# The job has successfully completed (terminal state).
+# The job has successfully completed. This is a terminal job state. This state
+# may be set by the Cloud Dataflow service, as a transition from
+# RUNNING. It may also be set via a Cloud Dataflow jobs.update call,
+# if the job has not yet reached a terminal state.
 BEAM_JOB_STATE_DONE = 'DONE'
-# The job has failed to complete (terminal state).
+# The job has has failed. This is a terminal job state. This state may only be
+# set by the Cloud Dataflow service, and only as a transition from RUNNING.
 BEAM_JOB_STATE_FAILED = 'FAILED'
-# The job did not report a state recognized by Google Cloud Dataflow.
+# The job's run state isn't specified.
 BEAM_JOB_STATE_UNKNOWN = 'UNKNOWN'
 
 
@@ -70,7 +88,7 @@ class BeamJobRunModel(base_models.BaseModel):
     ], required=True)
 
     @property
-    def is_in_terminal_state(self):
+    def in_terminal_state(self):
         """Returns whether the job run has reached a terminal state and will no
         longer run.
 

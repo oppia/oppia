@@ -27,7 +27,7 @@ from core.tests import test_utils
 class BeamJobRunModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunModel."""
 
-    def test_is_in_terminal_state(self):
+    def test_in_terminal_state(self):
         cancelled_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
             latest_job_state=beam_job_models.BEAM_JOB_STATE_CANCELLED)
@@ -62,17 +62,17 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
             job_name='FooJob',
             latest_job_state=beam_job_models.BEAM_JOB_STATE_UNKNOWN)
 
-        self.assertTrue(cancelled_job_run.is_in_terminal_state)
-        self.assertTrue(drained_job_run.is_in_terminal_state)
-        self.assertTrue(updated_job_run.is_in_terminal_state)
-        self.assertTrue(done_job_run.is_in_terminal_state)
-        self.assertTrue(failed_job_run.is_in_terminal_state)
-        self.assertFalse(cancelling_job_run.is_in_terminal_state)
-        self.assertFalse(draining_job_run.is_in_terminal_state)
-        self.assertFalse(pending_job_run.is_in_terminal_state)
-        self.assertFalse(running_job_run.is_in_terminal_state)
-        self.assertFalse(stopped_job_run.is_in_terminal_state)
-        self.assertFalse(unknown_job_run.is_in_terminal_state)
+        self.assertTrue(cancelled_job_run.in_terminal_state)
+        self.assertTrue(drained_job_run.in_terminal_state)
+        self.assertTrue(updated_job_run.in_terminal_state)
+        self.assertTrue(done_job_run.in_terminal_state)
+        self.assertTrue(failed_job_run.in_terminal_state)
+        self.assertFalse(cancelling_job_run.in_terminal_state)
+        self.assertFalse(draining_job_run.in_terminal_state)
+        self.assertFalse(pending_job_run.in_terminal_state)
+        self.assertFalse(running_job_run.in_terminal_state)
+        self.assertFalse(stopped_job_run.in_terminal_state)
+        self.assertFalse(unknown_job_run.in_terminal_state)
 
     def test_get_deletion_policy(self):
         """Model doesn't contain any data directly corresponding to a user."""
