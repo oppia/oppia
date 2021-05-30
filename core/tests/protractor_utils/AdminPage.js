@@ -288,9 +288,7 @@ var AdminPage = function() {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
         by.css('.protractor-test-one-off-jobs-start-btn'));
       await action.click('One Off Job Rows Button', oneOffJobRowsButton);
-      await waitFor.textToBePresentInElement(
-        statusMessage, 'Job started successfully.',
-        'Status message not indicating that job was started.');
+      await waitFor.pageToFullyLoad();
     } else {
       await this._startOneOffJob(jobName, ++i);
     }
