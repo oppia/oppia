@@ -115,7 +115,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
     // escaped.
     const escapeCharacters = [
       '&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
-    for (var i = 0; i < placeholder.value.unicode.length; i++) {
+    for (let i = 0; i < placeholder.value.unicode.length; i++) {
       if (escapeCharacters.includes(placeholder.value.unicode[i])) {
         let newPlaceholder = `\\verb|${placeholder.value.unicode}|`;
         placeholder.value.unicode = newPlaceholder;

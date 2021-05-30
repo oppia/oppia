@@ -23,6 +23,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from './oppia-interactive-numeric-expression-input.component';
+import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 
 describe('NumericExpressionInputInteractive', () => {
   let component: InteractiveNumericExpressionInput;
@@ -62,6 +63,21 @@ describe('NumericExpressionInputInteractive', () => {
     }
   }
 
+  class MockInteractionAttributesExtractorService {
+    getValuesFromAttributes(inputType: string, attributes: Object) {
+      return {
+        useFractionForDivision: {
+          value: {}
+        },
+        placeholder: {
+          value: {
+            unicode: '2^2'
+          }
+        }
+      };
+    }
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule(
       {
@@ -70,6 +86,10 @@ describe('NumericExpressionInputInteractive', () => {
           {
             provide: CurrentInteractionService,
             useClass: MockCurrentInteractionService
+          },
+          {
+            provide: InteractionAttributesExtractorService,
+            useClass: MockInteractionAttributesExtractorService
           }
         ]
       }).compileComponents();
