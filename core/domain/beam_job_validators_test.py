@@ -25,7 +25,6 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (beam_job_models,) = models.Registry.import_models([models.NAMES.beam_job])
 datastore_services = models.Registry.import_datastore_services()
@@ -36,13 +35,8 @@ class BeamJobValidatorTestBase(test_utils.AppEngineTestBase):
 
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = False
 
-    def run_job_and_get_output(self, entity_id_order=None):
+    def run_job_and_get_output(self):
         """Runs the validation jobs and returns its output.
-
-        Args:
-            entity_id_order: list(str)|None. The ordering of IDs to be returned
-                from the validation outputs. If None, then the output is not
-                changed.
 
         Returns:
             list(*). The validation job output.
@@ -56,22 +50,7 @@ class BeamJobValidatorTestBase(test_utils.AppEngineTestBase):
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
-        output = [
-            ast.literal_eval(o) for o in self.JOB_CLASS.get_output(job_id)
-        ]
-
-        if entity_id_order is not None:
-            by_entity_id_order = lambda output_str: python_utils.NEXT(
-                (
-                    i for i, entity_id in enumerate(entity_id_order)
-                    if output_str.startswith('Entity id %s' % entity_id)),
-                len(entity_id_order))
-
-            for _, sub_output in output:
-                if isinstance(sub_output, list):
-                    sub_output.sort(key=by_entity_id_order)
-
-        return output
+        return [ast.literal_eval(o) for o in self.JOB_CLASS.get_output(job_id)]
 
 
 class BeamJobRunModelValidatorTests(BeamJobValidatorTestBase):

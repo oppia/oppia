@@ -118,6 +118,19 @@ class _JobMetaclass(type):
         """
         return list(mcs._JOB_REGISTRY.values())
 
+    @classmethod
+    def get_all_job_names(mcs):
+        """Returns the names of all jobs that have inherited from the JobBase
+        class.
+
+        Args:
+            mcs: _JobMetaclass. The metaclass.
+
+        Returns:
+            list(str). The names of all classes that hae inherited from JobBase.
+        """
+        return list(mcs._JOB_REGISTRY.keys())
+
 
 class JobBase(python_utils.with_metaclass(_JobMetaclass)):
     """The base class for all of Oppia's Apache Beam jobs.

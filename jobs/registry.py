@@ -37,3 +37,12 @@ def get_all_jobs():
         list(class). The classes that have inherited from JobBase.
     """
     return base_jobs._JobMetaclass.get_all_jobs() # pylint: disable=protected-access
+
+
+def get_all_job_names():
+    """Returns the names of all jobs that have inherited from the JobBase class.
+
+    Returns:
+        list(str). The names of all classes that hae inherited from JobBase.
+    """
+    return base_jobs._JobMetaclass.get_all_job_names() # pylint: disable=protected-access

@@ -36,10 +36,7 @@ class BeamJobRunModelValidator(base_model_validators.BaseModelValidator):
         Args:
             item: beam_job_models.BeamJobRunModel. The item to validate.
         """
-        registered_job_names = [
-            j.__name__ for j in jobs_registry.get_all_jobs()
-        ]
-        if item.job_name not in registered_job_names:
+        if item.job_name not in jobs_registry.get_all_job_names():
             cls._add_error(
                 'beam_job_name_error',
                 'Entity id %s: The job_name field has a value %s which is '
