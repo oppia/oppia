@@ -487,6 +487,31 @@ var ExplorationEditorMainTab = function() {
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
+    await action.click('stateEditButton', stateEditButton);
+    var stateEditorTag = element(by.tagName('state-content-editor'));
+    await waitFor.visibilityOf(
+      stateEditorTag, 'State editor tag not showing up');
+    var stateContentEditor = stateEditorTag.element(
+      by.css('.protractor-test-state-content-editor'));
+    await waitFor.visibilityOf(
+      stateContentEditor,
+      'stateContentEditor taking too long to appear to set content');
+    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    await richTextEditor.clear();
+    await richTextInstructions(richTextEditor);
+    expect(await saveStateContentButton.isDisplayed()).toBe(true);
+    await waitFor.elementToBeClickable(saveStateContentButton);
+    await saveStateContentButton.click();
+    await waitFor.invisibilityOf(
+      saveStateContentButton,
+      'State content editor takes too long to disappear');
+  };
+
+  this.setContent1 = async function(richTextInstructions) {
+    // Wait for browser to time out the popover, which is 4000 ms.
+    await waitFor.invisibilityOf(
+      postTutorialPopover, 'Post-tutorial popover does not disappear.');
+    await action.waitForAutosave();
     await waitFor.fadeInToComplete(
       fadeIn, 'Editor taking long to fade in');
     await action.click('stateEditButton', stateEditButton);
