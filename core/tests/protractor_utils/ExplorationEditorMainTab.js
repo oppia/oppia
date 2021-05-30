@@ -24,6 +24,7 @@ var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../protractor_utils/waitFor.js');
 var action = require('./action.js');
+const { element } = require('protractor');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -59,6 +60,7 @@ var ExplorationEditorMainTab = function() {
   };
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
+  var fadeIn = element(by.css('.protractor-test-fade-in'));
   var interaction = element(by.css('.protractor-test-interaction'));
   var interactionEditor = element(
     by.css('.protractor-test-interaction-editor'));
@@ -485,6 +487,8 @@ var ExplorationEditorMainTab = function() {
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
+    await waitFor.fadeInToComplete(
+      fadeIn, 'Editor taking long to fade in');
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(

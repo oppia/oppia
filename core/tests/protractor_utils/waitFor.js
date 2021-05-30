@@ -158,6 +158,13 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
+var fadeInToComplete = async function(element, errorMessage) {
+  await visibilityOf(element, "Editor taking too long to appear");
+  await browser.driver.wait(async function() {
+    return await element.getCssValue('opacity') === '1';
+  }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
+};
+
 var modalPopupToAppear = async function() {
   await visibilityOf(
     element(by.css('.modal-body')), 'Modal taking too long to appear.');
@@ -188,5 +195,6 @@ exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
+exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
