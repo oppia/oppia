@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for changing translation language.
+ * @fileoverview Component for changing site language.
  */
 
 import { Component } from '@angular/core';
