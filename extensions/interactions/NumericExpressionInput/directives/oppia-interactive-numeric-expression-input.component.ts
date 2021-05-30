@@ -109,6 +109,19 @@ export class InteractiveNumericExpressionInput implements OnInit {
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'NumericExpressionInput', this._getAttributes()
       )) as NumericExpressionInputCustomizationArgs;
+
+    // This represents a list of special characters in LaTeX. These
+    // characters have a special meaning in LaTeX and thus need to be
+    // escaped.
+    const escapeCharacters = [
+      '&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
+    for (var i = 0; i < placeholder.value.unicode.length; i++) {
+      if (escapeCharacters.includes(placeholder.value.unicode[i])) {
+        let newPlaceholder = `\\verb|${placeholder.value.unicode}|`;
+        placeholder.value.unicode = newPlaceholder;
+        break;
+      }
+    }
     this.guppyConfigurationService.changeDivSymbol(
       (useFractionForDivision as unknown as { value: boolean }).value);
     this.guppyInitializationService.init(

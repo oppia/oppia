@@ -49,7 +49,7 @@
             ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
             type="button" class="btn btn-secondary btn-sm ml-0 protractor-test-add-list-entry" ng-click="addElement()"
             ng-disabled="isDisabled()">
-      <[addElementText]>
+      <[addElementText | translate]>
     </button>
   </div>
 </ng-form>

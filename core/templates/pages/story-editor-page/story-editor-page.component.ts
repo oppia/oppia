@@ -26,8 +26,8 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
-  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
-require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
+  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.component.ts');
+require('pages/story-editor-page/navbar/story-editor-navbar.component.ts');
 require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 require(
   'pages/story-editor-page/story-preview-tab/story-preview-tab.component.ts');
@@ -167,7 +167,7 @@ angular.module('oppia').component('storyEditorPage', {
           }
           ctrl.forceValidateExplorations = false;
           if (explorationIds.length > 0) {
-            EditableStoryBackendApiService.validateExplorations(
+            EditableStoryBackendApiService.validateExplorationsAsync(
               ctrl.story.getId(), explorationIds
             ).then(function(validationIssues) {
               ctrl.explorationValidationIssues =

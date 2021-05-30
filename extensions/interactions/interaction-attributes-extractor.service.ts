@@ -39,7 +39,13 @@ export class InteractionAttributesExtractorService {
     'ImageClickInput',
     'CodeRepl',
     'NumericExpressionInput',
-    'NumericInput'
+    'NumericInput',
+    'InteractiveMap',
+    'LogicProof',
+    'MultipleChoiceInput',
+    'SetInput',
+    'TextInput',
+    'MathEquationInput'
   ];
 
   constructor(
