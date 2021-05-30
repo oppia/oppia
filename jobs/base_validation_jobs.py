@@ -82,16 +82,10 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             ValueError. When the `datastoreio` option, which provides the
                 PTransforms for performing datastore IO operations, is None.
         """
-        # TODO(#11475): Stop depending on stubs when we have access to Cloud NDB
-        # and Python 3.
-        datastoreio_stub = self.job_options.datastoreio_stub
-        if datastoreio_stub is None:
-            raise ValueError('JobOptions.datastoreio_stub must not be None')
-
         existing_models, deleted_models = (
             self.pipeline
             | 'Get all models' >> ndb_io.GetModels(
-                datastore_services.query_everything(), datastoreio_stub)
+                datastore_services.query_everything(), self.datastoreio_stub)
             | 'Partition by model.deleted' >> (
                 beam.Partition(lambda model, _: int(model.deleted), 2))
         )

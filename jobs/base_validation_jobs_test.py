@@ -22,14 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 from jobs import base_validation_jobs
-from jobs import job_options
 from jobs import job_test_utils
 from jobs.transforms import base_validation
 from jobs.types import base_validation_errors
 from jobs.types import model_property
-
-from apache_beam import runners
-from apache_beam.testing import test_pipeline
 
 (auth_models, base_models, user_models) = models.Registry.import_models(
     [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])
@@ -43,15 +39,6 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
 
     def test_empty_storage(self):
         self.assert_job_output_is_empty()
-
-    def test_run_with_empty_model_getter(self):
-        pipeline = test_pipeline.TestPipeline(
-            runner=runners.DirectRunner(),
-            options=job_options.JobOptions(datastoreio_stub=None))
-
-        self.assertRaisesRegexp(
-            ValueError, 'JobOptions.datastoreio_stub must not be None',
-            base_validation_jobs.AuditAllStorageModelsJob(pipeline).run)
 
     def test_base_validation(self):
         base_model_with_invalid_id = self.create_model(

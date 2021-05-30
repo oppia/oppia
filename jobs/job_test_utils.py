@@ -26,8 +26,6 @@ import re
 
 from core.tests import test_utils
 from jobs import base_jobs
-from jobs import job_options
-from jobs.io import stub_io
 import python_utils
 
 from apache_beam import runners
@@ -153,14 +151,12 @@ class JobTestBase(PipelinedTestBase):
 
     def __init__(self, *args, **kwargs):
         super(JobTestBase, self).__init__(*args, **kwargs)
-        self.datastoreio_stub = stub_io.DatastoreioStub()
-        self.pipeline.options.view_as(
-            job_options.JobOptions).datastoreio_stub = self.datastoreio_stub
+        self.job = self.JOB_CLASS(self.pipeline)
 
     def setUp(self):
         super(JobTestBase, self).setUp()
         with self._pipeline_context_stack as stack:
-            stack.enter_context(self.datastoreio_stub.context())
+            stack.enter_context(self.job.datastoreio_stub.context())
             self._pipeline_context_stack = stack.pop_all()
 
     def run_job(self):
@@ -178,7 +174,7 @@ class JobTestBase(PipelinedTestBase):
         Returns:
             PCollection. The output of the job.
         """
-        return self.JOB_CLASS(self.pipeline).run()
+        return self.job.run()
 
     def put_multi(self, models):
         """Puts the input models into the datastore.
@@ -189,7 +185,7 @@ class JobTestBase(PipelinedTestBase):
         Args:
             models: list(Model). The NDB models to put into the stub.
         """
-        self.datastoreio_stub.put_multi(models)
+        self.job.datastoreio_stub.put_multi(models)
 
     def assert_job_output_is(self, expected):
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
