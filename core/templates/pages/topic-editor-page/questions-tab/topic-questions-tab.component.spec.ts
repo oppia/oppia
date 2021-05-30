@@ -23,9 +23,7 @@ import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summar
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TestBed } from '@angular/core/testing';
 import { TopicRights } from 'domain/topic/topic-rights.model';
-import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from
-  // eslint-disable-next-line max-len
-  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 describe('Topic questions tab', function() {
   var $rootScope = null;
