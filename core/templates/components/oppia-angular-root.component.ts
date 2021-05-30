@@ -465,7 +465,7 @@ import { TranslateCacheService } from 'ngx-translate-cache';
 
 @Component({
   selector: 'oppia-angular-root',
-  template: ''
+  template: '<ng-content></ng-content>'
 })
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
@@ -1486,6 +1486,13 @@ private injector: Injector
       this.writtenTranslationsObjectFactory);
 
     OppiaAngularRootComponent.injector = this.injector;
+    this.translateService.use(
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+      (code) => this.translateService.use(code)
+    );
+    this.translateCacheService.init();
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();

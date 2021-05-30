@@ -319,7 +319,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'teacher.ts',
     'teacher2.ts',
     'thumbnail-uploader.directive.ts',
-    'top-navigation-bar-wrapper.component.ts',
     'top-navigation-bar.component.ts',
     'topic-creation.service.ts',
     'topic-editor-navbar-breadcrumb.directive.ts',

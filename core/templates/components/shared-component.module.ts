@@ -77,7 +77,6 @@ import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { TopNavigationBarComponent } from './common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
 import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
 import { I18nFooterComponent } from '../base-components/i18n-footer.component';
@@ -113,6 +112,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import { HammerGestureConfig } from '@angular/platform-browser';
 import * as hammer from 'hammerjs';
+import { OppiaFooterComponent } from 'pages/OppiaFooterDirective';
 
 
 export class MyHammerConfig extends HammerGestureConfig {
@@ -239,6 +239,7 @@ const toastrConfig = {
     LimitToPipe,
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     PreviewThumbnailComponent,
     ProfileLinkImageComponent,
@@ -263,7 +264,6 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TopNavigationBarWrapperComponent,
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
@@ -303,6 +303,7 @@ const toastrConfig = {
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
     I18nFooterComponent,
+    OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -313,7 +314,6 @@ const toastrConfig = {
     ThreadTableComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     LearnerDashboardIconsComponent
   ],
@@ -353,6 +353,7 @@ const toastrConfig = {
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
+    OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -373,7 +374,6 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     TopNavigationBarComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,

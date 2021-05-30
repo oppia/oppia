@@ -46,15 +46,14 @@
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>
                 </div>
-                <top-navigation-bar [headerText]="getHeaderText"
-                                    [subheaderText]="getSubheaderText"
-                                    [toggle]="toggleSidebar.bind(this)">
-                </top-navigation-bar>
+                <oppia-top-navigation-bar [headerText]="getHeaderText"
+                                          [subheaderText]="getSubheaderText">
+                </oppia-top-navigation-bar>
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak">
                   <div class="mr-auto">
-                    <ng-content select="navbar-breadcrumb"></ng-content>
+                    <ng-content select=".navbar-breadcrumb"></ng-content>
                   </div>
-                  <ng-content select="nav-options"></ng-content>
+                  <ng-content select=".nav-options"></ng-content>
                 </div>
               </div>
             </nav>

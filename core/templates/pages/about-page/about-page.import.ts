@@ -19,18 +19,12 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
-
 require('Polyfills.ts');
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/about-page/about-page.module.ts');
-require('App.ts');
-require('base-components/oppia-root.directive.ts');
+// require('App.ts');
+// require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.component.ts');
+// require('base-components/base-content.component.ts');

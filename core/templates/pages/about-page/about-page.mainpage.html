@@ -1,26 +1,96 @@
 <!DOCTYPE html>
-<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+<html itemscope itemtype="http://schema.org/Organization">
   <head>
-    @load('base-components/header.template.html', {"title": "About | Oppia"})
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">
+    <meta name="description" content="Learn any subject through free and interactive lessons in easy-to-follow language. Oppia provides a step-by-step learning process to master any skills you want.">
+    <meta itemprop="name" content="<%= htmlWebpackPlugin.options.meta.name %>">
+    <meta itemprop="description" content="<%= htmlWebpackPlugin.options.meta.description %>">
+    <!-- The og tags are for Facebook sharing. -->
+    <meta property="og:title" content="<%= htmlWebpackPlugin.options.meta.name %>">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Oppia">
+    <meta property="og:description" content="<%= htmlWebpackPlugin.options.meta.description %>">
+
+    <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
+    <link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/third_party/generated/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap">
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap">
+    <% if (webpackConfig.mode == 'production') { %>
+      <link rel="stylesheet" type="text/css" media="screen"
+            href="/third_party/generated/css/third_party.min.css">
+    <% } else { %>
+      <link rel="stylesheet" type="text/css" media="screen"
+            href="/third_party/generated/css/third_party.css">
+    <% } %>
+
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="/templates/css/oppia.css">
+    <link rel="stylesheet" type="text/css" media="screen"
+          href="/templates/css/oppia-material.css">
+    <script src="/third_party/static/jquery-3.5.1/jquery.min.js"></script>
+    <script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js"></script>
+    <script async src="https://www.googleoptimize.com/optimize.js?id=OPT-57KK7PG"></script>
+    <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
+
+    <script>
+      window.angular = {
+        $$minErr() { },
+        module(str) {
+          return {
+            directive(name, object) {
+              return this;
+            },
+            info() {
+              return this;
+            },
+            factory(name, object) {
+              return this;
+            },
+            provider(name) {
+              return this;
+            },
+            filter(name, object) {
+              return this;
+            },
+            run(str) {
+              return this;
+            },
+            constant() {
+              return this;
+            },
+            controller(name, constructor) {
+              return this;
+            },
+            service(name, constructor) {
+              return this;
+            },
+            config(configFn) {
+              return this;
+            }
+          };
+        }
+      };
+    </script>
   </head>
   <body>
-    <oppia-root>
-      <div ng-controller="Base" dir="<[direction]>">
-        <oppia-base-content>
-          <navbar-breadcrumb>
-            <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-              <li>
-                <span class="oppia-navbar-breadcrumb-separator"></span>
-                <span translate="I18N_ABOUT_PAGE_BREADCRUMB"></span>
-              </li>
-            </ul>
-          </navbar-breadcrumb>
-          <content>
-            <about-page></about-page>
-          </content>
-        </oppia-base-content>
-      </div>
-    </oppia-root>
-    @load('pages/footer_js_libs.html')
+
+    <about-page-root></about-page-root>
+
+    @load('base-components/no-script.template.html')
+    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+      <% if (webpackConfig.mode == 'production') { %>
+        <script src="build<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } else { %>
+        <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } %>
+    <% } %>
+    <!-- <script src="/third_party/ngx_generated/js/third_party.js"></script> -->
   </body>
 </html>
