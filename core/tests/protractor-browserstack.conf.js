@@ -133,6 +133,8 @@ exports.config = {
   },
 
   // Code to start browserstack local before start of test.
+  // We disable the lint check because we cannot change the
+  // function names required by browserstack.
   /* eslint-disable-next-line @typescript-eslint/promise-function-async */
   beforeLaunch: function() {
     var checkSuites = function() {
@@ -178,6 +180,8 @@ exports.config = {
   },
 
   // Code to stop browserstack local after end of test.
+  // We disable the lint check because we cannot change the
+  // function names required by browserstack.
   /* eslint-disable-next-line @typescript-eslint/promise-function-async */
   afterLaunch: function() {
     return new Promise(function(resolve, reject) {
