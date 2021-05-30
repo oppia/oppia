@@ -146,6 +146,8 @@ class ValidateSkillCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
             post_commit_status='private',
             commit_cmds=[{
                 'cmd': 'add_skill_misconception',
+                # Key new_misconception_dict stores a string because dict
+                # keeps on rearranging themselves so tests are not passing.
                 'new_misconception_dict': '{u\'id\': 0, u\'notes\': '
                                           'u\'<p>notes</p>\', u\'feedback\': '
                                           'u\'<p>default_feedback</p>\', '
@@ -165,6 +167,8 @@ class ValidateSkillCommitCmdsSchemaTests(job_test_utils.PipelinedTestBase):
                 invalid_commit_cmd_model,
                 {
                     'cmd': 'add_skill_misconception',
+                    # Key new_misconception_dict stores a string because dict
+                    # keeps on rearranging themselves so tests are not passing.
                     'new_misconception_dict': '{u\'id\': 0, u\'notes\': '
                                               'u\'<p>notes</p>\', '
                                               'u\'feedback\': '
