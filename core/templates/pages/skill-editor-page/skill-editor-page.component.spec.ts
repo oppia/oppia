@@ -27,6 +27,7 @@ require('pages/skill-editor-page/skill-editor-page.component.ts');
 
 describe('Skill editor page', function() {
   var ctrl = null;
+  var PreventPageUnloadEventService = null;
   var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var SkillObjectFactory = null;
@@ -39,6 +40,8 @@ describe('Skill editor page', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
     $uibModal = $injector.get('$uibModal');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
@@ -70,13 +73,18 @@ describe('Skill editor page', function() {
     expect($rootScope.$applyAsync).toHaveBeenCalled();
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(SkillEditorStateService, 'loadSkill').and.stub();
+    spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should get active tab name from skill editor routing service',

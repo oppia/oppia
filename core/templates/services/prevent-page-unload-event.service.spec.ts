@@ -46,8 +46,10 @@ describe ('Prevent page unload event service', function() {
       document.addEventListener('mock' + eventname, callback);
     },
     location: {
-      reload: () => {
-        document.dispatchEvent(reloadEvt);
+      reload: (val = true) => {
+        if (val) {
+          document.dispatchEvent(reloadEvt);
+        }
       }
     }
   };
@@ -100,5 +102,32 @@ describe ('Prevent page unload event service', function() {
     preventPageUnloadEventService.ngOnDestroy();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+  });
+
+  it('should test if Alert is displayed when a condition is passed', () => {
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    preventPageUnloadEventService.addListener(() => {
+      return true;
+    });
+    spyOn(reloadEvt, 'preventDefault');
+
+    windowRef.nativeWindow.location.reload();
+
+    expect(reloadEvt.preventDefault).toHaveBeenCalled();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+  });
+
+  it('should test if Alert is not displayed when a condition is passed', () => {
+    spyOnProperty(windowRef, 'nativeWindow', 'get').and.returnValue(mockWindow);
+    var validationCallback = () => {
+      return false;
+    };
+    preventPageUnloadEventService.addListener(validationCallback);
+    spyOn(reloadEvt, 'preventDefault');
+
+    windowRef.nativeWindow.location.reload(validationCallback());
+
+    expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 });
