@@ -154,8 +154,8 @@ class JobTestBase(PipelinedTestBase):
     def __init__(self, *args, **kwargs):
         super(JobTestBase, self).__init__(*args, **kwargs)
         self.datastoreio_stub = stub_io.DatastoreioStub()
-        self.pipeline.options.view_as(job_options.JobOptions).datastoreio = (
-            self.datastoreio_stub)
+        self.pipeline.options.view_as(
+            job_options.JobOptions).datastoreio_stub = self.datastoreio_stub
 
     def setUp(self):
         super(JobTestBase, self).setUp()

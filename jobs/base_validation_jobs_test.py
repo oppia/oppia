@@ -47,10 +47,10 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
     def test_run_with_empty_model_getter(self):
         pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
-            options=job_options.JobOptions(datastoreio=None))
+            options=job_options.JobOptions(datastoreio_stub=None))
 
         self.assertRaisesRegexp(
-            ValueError, 'JobOptions.datastoreio must not be None',
+            ValueError, 'JobOptions.datastoreio_stub must not be None',
             base_validation_jobs.AuditAllStorageModelsJob(pipeline).run)
 
     def test_base_validation(self):

@@ -272,7 +272,7 @@ class _ReadFromDatastore(_DatastoreioTransform):
 
         Args:
             pcoll: PCollection. The source PCollection to attach the fetched
-                models onto.
+                models to.
 
         Returns:
             PCollection. The PCollection of models.
@@ -284,8 +284,6 @@ class _ReadFromDatastore(_DatastoreioTransform):
             pcoll
             | 'Get models from the ReadFromDatastore endpoint' >> (
                 beam.Create(model_list))
-            | 'Convert the Apache Beam entities into NDB models' >> (
-                beam.Map(job_utils.get_model_from_beam_entity))
         )
 
 
@@ -304,8 +302,6 @@ class _WriteToDatastore(_DatastoreioTransform):
         """
         return (
             model_pcoll
-            | 'Create Apache Beam entities for put operation' >> (
-                beam.Map(job_utils.get_beam_entity_from_model))
             | 'Gather entities to put in a list' >> beam.combiners.ToList()
             | 'Encode the list of entities to put using pickle' >> (
                 beam.Map(pickle.dumps))
@@ -335,8 +331,6 @@ class _DeleteFromDatastore(_DatastoreioTransform):
         """
         return (
             model_pcoll
-            | 'Create Apache Beam entities for delete operation' >> (
-                beam.Map(job_utils.get_beam_entity_from_model))
             | 'Gather entities to delete in a list' >> beam.combiners.ToList()
             | 'Encode the list of entities to delete using pickle' >> (
                 beam.Map(pickle.dumps))
