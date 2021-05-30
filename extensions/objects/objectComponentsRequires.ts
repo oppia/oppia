@@ -39,7 +39,7 @@ require('objects/templates/math-equation-editor.component.ts');
 require('objects/templates/math-expression-content-editor.component.ts');
 require('objects/templates/music-phrase-editor.component.ts');
 require('objects/templates/nonnegative-int-editor.component.ts');
-require('objects/templates/normalized-string-editor.directive.ts');
+require('objects/templates/normalized-string-editor.component.ts');
 require('objects/templates/number-with-units-editor.component.ts');
 require('objects/templates/numeric-expression-editor.component.ts');
 require('objects/templates/parameter-name-editor.directive.ts');
@@ -58,8 +58,8 @@ require(
 require(
   'objects/templates/translatable-set-of-unicode-string-editor.component.ts');
 require('objects/templates/set-of-unicode-string-editor.component.ts');
-require('objects/templates/skill-selector-editor.directive.ts');
+require('objects/templates/skill-selector-editor.component.ts');
 require('objects/templates/subtitled-html-editor.component.ts');
-require('objects/templates/subtitled-unicode-editor.directive.ts');
+require('objects/templates/subtitled-unicode-editor.component.ts');
 require('objects/templates/svg-filename-editor.component.ts');
-require('objects/templates/unicode-string-editor.directive.ts');
+require('objects/templates/unicode-string-editor.component.ts');
