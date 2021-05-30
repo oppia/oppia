@@ -159,7 +159,7 @@ var visibilityOfSuccessToast = async function(errorMessage) {
 };
 
 var fadeInToComplete = async function(element, errorMessage) {
-  await visibilityOf(element, "Editor taking too long to appear");
+  await visibilityOf(element, 'Editor taking too long to appear');
   await browser.driver.wait(async function() {
     return await element.getCssValue('opacity') === '1';
   }, DEFAULT_WAIT_TIME_MSECS, errorMessage);
