@@ -79,6 +79,7 @@ import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-e
 import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
 import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
 import { BaseContentComponent } from '../base-components/base-content.component';
+import { I18nFooterComponent } from '../base-components/i18n-footer.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 
 
@@ -233,6 +234,7 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nFooterComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
@@ -300,6 +302,7 @@ const toastrConfig = {
     KeyboardShortcutHelpModalComponent,
     SideNavigationBarComponent,
     SideNavigationBarWrapperComponent,
+    I18nFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -344,6 +347,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nFooterComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
