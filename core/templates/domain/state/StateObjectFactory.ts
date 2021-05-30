@@ -133,14 +133,12 @@ export class State {
       INTERACTION_SPECS[interactionId].is_terminal) {
       allContentIds.forEach(contentId => {
         if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
-          // eslint-disable-next-line dot-notation
           allContentIds.delete(contentId);
         }
       });
       // Excluding default_outcome content status as default outcome's
       // content is left empty so the translation or voiceover is not
       // required.
-      // eslint-disable-next-line dot-notation
       allContentIds.delete('default_outcome');
     }
 

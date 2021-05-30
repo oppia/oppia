@@ -266,7 +266,6 @@ export class LearnerDashboardPageComponent implements OnInit {
         // So that focus is applied after the loading screen has dissapeared.
         this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);
-    // eslint-disable-next-line dot-notation
     }).catch(errorResponse => {
       // This is placed here in order to satisfy Unit tests.
     });

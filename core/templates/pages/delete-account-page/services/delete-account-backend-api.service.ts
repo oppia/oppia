@@ -33,7 +33,6 @@ export class DeleteAccountBackendApiService {
   ) {}
 
   deleteAccount(): void {
-    // eslint-disable-next-line dot-notation
     this.http.delete('/delete-account-handler').subscribe(() => {
       this.siteAnalyticsService.registerAccountDeletion();
       setTimeout(() => {

@@ -104,7 +104,7 @@ export class SkillsListComponent {
             this.alertsService.addSuccessMessage(successToast, 1000);
           }, 100);
         }
-      )['catch']((errorMessage: string) => {
+      ).catch((errorMessage: string) => {
         let errorToast: string = null;
         // This error is thrown as part of a final validation check in
         // the backend, hence the message does not include instructions
