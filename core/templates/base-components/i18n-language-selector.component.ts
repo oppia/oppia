@@ -24,9 +24,9 @@ import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 
 interface SiteLanguage {
-  readonly id: string,
-  readonly text: string,
-  readonly direction: string
+  readonly id: string;
+  readonly text: string;
+  readonly direction: string;
 }
 
 @Component({
