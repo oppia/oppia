@@ -39,14 +39,14 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   providedIn: 'root'
 })
 export class QuestionPlayerEngineService {
-  private explorationId: string = null;
-  private questionPlayerMode: boolean = null;
-  private version: number = null;
+  explorationId: string = null;
+  questionPlayerMode: boolean = null;
+  version: number = null;
 
-  private answerIsBeingProcessed: boolean = false;
-  private questions: Question[] = [];
-  private currentIndex: number = null;
-  private nextIndex: number = null;
+  answerIsBeingProcessed: boolean = false;
+  questions: Question[] = [];
+  currentIndex: number = null;
+  nextIndex: number = null;
 
   constructor(
       private alertsService: AlertsService,
@@ -161,7 +161,7 @@ export class QuestionPlayerEngineService {
     if (!this.questionPlayerMode) {
       this.readOnlyExplorationBackendApiService
         .loadExplorationAsync(this.explorationId, this.version)
-        .then(function(exploration) {
+        .then((exploration) => {
           this.version = exploration.version;
         });
     }
