@@ -549,7 +549,7 @@ describe('Question player engine service ', () => {
       multipleQuestionBackendDict, successHandler, failHandler);
     let explorationId = questionPlayerEngineService.getExplorationId();
 
-    expect(explorationId).toBe('id1')
+    expect(explorationId).toBe('id1');
   });
 
   it('should return the version of exploration', () =>{
