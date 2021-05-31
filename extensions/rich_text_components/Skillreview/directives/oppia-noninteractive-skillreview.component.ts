@@ -100,10 +100,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.skillIdWithValue ||
-      changes.textWithValue
-    ) {
+    if (changes.skillIdWithValue || changes.textWithValue) {
       this._updateViewOnNewSkillSelected();
     }
   }

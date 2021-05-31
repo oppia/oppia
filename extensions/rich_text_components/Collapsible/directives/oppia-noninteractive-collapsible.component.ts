@@ -51,10 +51,7 @@ export class NoninteractiveCollapsible implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.headingWithValue ||
-      changes.contentWithValue
-    ) {
+    if (changes.headingWithValue || changes.contentWithValue) {
       this._updateViewOnInputChange();
     }
   }

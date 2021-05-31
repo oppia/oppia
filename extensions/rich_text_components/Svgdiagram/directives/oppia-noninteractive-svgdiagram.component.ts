@@ -88,10 +88,7 @@ export class NoninteractiveSvgdiagram implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.svgFilenameWithValue ||
-      changes.altWithValue
-    ) {
+    if (changes.svgFilenameWithValue || changes.altWithValue) {
       this._updateViewOnSvgFileChange();
     }
   }

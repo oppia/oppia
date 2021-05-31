@@ -61,7 +61,7 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
   entryComponents: [
     NoninteractiveCollapsible,
@@ -72,7 +72,7 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
   exports: [
     ConceptCardComponent,
@@ -84,7 +84,7 @@ import { PortalModule } from '@angular/cdk/portal';
     NoninteractiveSvgdiagram,
     NoninteractiveTabs,
     NoninteractiveVideo,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+    OppiaNoninteractiveSkillreviewConceptCardModalComponent
   ],
 })
 

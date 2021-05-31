@@ -82,10 +82,7 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (
-      changes.urlWithValue ||
-      changes.textWithValue
-    ) {
+    if (changes.urlWithValue || changes.textWithValue) {
       this._updateViewOnLinkChange();
     }
   }

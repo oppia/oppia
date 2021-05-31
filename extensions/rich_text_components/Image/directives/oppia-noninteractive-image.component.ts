@@ -64,9 +64,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
 
   private _updateViewOnNewImage(): void {
     if (
-      !this.filepathWithValue ||
-      !this.altWithValue ||
-      !this.captionWithValue
+      !this.filepathWithValue || !this.altWithValue || !this.captionWithValue
     ) {
       return;
     }
