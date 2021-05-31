@@ -103,7 +103,7 @@ class MultipleChoiceInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                             yield (
                                 item.id,
                                 'State name: %s, AnswerGroup: %s, Rule: %s is '
-                                'invalid.(Indices here are 0-indexed.)' % (
+                                'invalid. (Indices here are 0-indexed.)' % (
                                     state_name.encode('utf-8'),
                                     answer_group_index, rule_index))
 
