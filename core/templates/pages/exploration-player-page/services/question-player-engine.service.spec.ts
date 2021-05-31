@@ -820,7 +820,8 @@ describe('Question player engine service ', () => {
     let answerClassificationServiceSpy =
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.callFake(() => {
-          expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(true);
+          expect(questionPlayerEngineService.isAnswerBeingProcessed())
+            .toBe(true);
           return answerClassificationResult;
         });
 
@@ -1243,7 +1244,7 @@ describe('Question player engine service ', () => {
         multipleQuestionBackendDict, successHandler, failHandler);
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
- 
+
       expect(questionPlayerEngineService.currentIndex).toBe(0);
 
       questionPlayerEngineService.recordNewCardAdded();
