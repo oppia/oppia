@@ -3487,7 +3487,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -3501,7 +3502,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             with self.swap(constants, 'DEV_MODE', False):
                 self.post_json(
@@ -3514,7 +3516,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            'message', payload['vm_id'])
+            python_utils.convert_to_bytes('message'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -3527,7 +3529,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             json_response = self.post_json('/ml/nextjobhandler', payload)
