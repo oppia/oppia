@@ -1360,8 +1360,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
 
 class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
 
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
+    USER_EMAIL = 'albert@example.com'
+    USER_NAME = 'albert'
 
     VALID_EXP_ID = 'exp_id0'
     NEW_EXP_ID = 'exp_id1'
@@ -1371,8 +1371,8 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         super(LogicProofInteractionOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.USER_EMAIL, self.USER_NAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
@@ -1409,7 +1409,7 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         }
 
         state1.update_interaction_customization_args(customization_args_dict1)
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(self.user_id, exploration)
 
         # Start LogicProofInteractionOneOffJob job on sample exploration.
         job_id = (
@@ -1422,9 +1422,7 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .LogicProofInteractionOneOffJob.get_output(job_id))
-        expected_output = [(
-            u'[u\'exp_id0\', [u\'user email is: albert@example.com\']]'
-        )]
+        expected_output = [(u'[u\'SUCCESS\', 1]')]
         self.assertEqual(actual_output, expected_output)
 
         # Update state1 and add state2.
@@ -1463,9 +1461,9 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_customization_args(customization_args_dict)
 
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        exp_services.save_new_exploration(self.user_id, exploration)
 
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
+        exp_services.delete_exploration(self.user_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(
             self, interaction_jobs_one_off.LogicProofInteractionOneOffJob)

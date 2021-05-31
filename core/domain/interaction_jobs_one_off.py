@@ -414,11 +414,17 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if state.interaction.id == 'LogicProof':
                 owner_ids = rights_manager.get_exploration_rights(
                     item.id).owner_ids
+                # Handle for empty owner_ids.
+                if not owner_ids:
+                    yield('EMPTY', item.id)
                 for user_id in owner_ids:
                     user_mail = user_services.get_email_from_user_id(
                         user_id)
-                    yield (item.id, 'user email is: %s' % (user_mail))
+                    yield ('SUCCESS', (user_mail, item.id))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        if (key == 'SUCCESS'):
+            yield(key, len(values))
+        else:
+            yield (key, values)
