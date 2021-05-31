@@ -202,7 +202,7 @@ class DatastoreioStub(python_utils.OBJECT):
             entities.
         """
         return pickle.dumps([
-            job_utils.get_beam_entity_from_model(m)
+            job_utils.get_beam_entity_from_ndb_model(m)
             for m in self.get(pickle.loads(pickled_query))
         ])
 
@@ -216,7 +216,7 @@ class DatastoreioStub(python_utils.OBJECT):
                 encoded as a pickled list of Apache Beam entities.
         """
         self.put_multi(
-            job_utils.get_model_from_beam_entity(m)
+            job_utils.get_ndb_model_from_beam_entity(m)
             for m in pickle.loads(pickled_models))
 
     def _delete_from_datastore_handler(self, pickled_models):
@@ -229,7 +229,7 @@ class DatastoreioStub(python_utils.OBJECT):
                 datastore, encoded as a pickled list of Apache Beam entities.
         """
         self.delete_multi(
-            job_utils.get_model_from_beam_entity(m)
+            job_utils.get_ndb_model_from_beam_entity(m)
             for m in pickle.loads(pickled_models))
 
 

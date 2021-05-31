@@ -187,7 +187,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
     def test_get_beam_entity_from_model(self):
         model = FooModel(id='abc', prop='123')
 
-        beam_entity = job_utils.get_beam_entity_from_model(model)
+        beam_entity = job_utils.get_beam_entity_from_ndb_model(model)
 
         self.assertEqual(beam_entity.key.path_elements, ('FooModel', 'abc'))
         self.assertEqual(beam_entity.key.project, feconf.OPPIA_PROJECT_ID)
@@ -200,16 +200,16 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         beam_entity.set_properties({'prop': '123'})
 
         self.assertEqual(
-            FooModel(id='abc', prop='123'),
-            job_utils.get_model_from_beam_entity(beam_entity))
+            FooModel(id='abc', app=feconf.OPPIA_PROJECT_ID, prop='123'),
+            job_utils.get_ndb_model_from_beam_entity(beam_entity))
 
     def test_from_and_then_to_model(self):
-        model = FooModel(id='abc', prop='123')
+        model = FooModel(id='abc', app=feconf.OPPIA_PROJECT_ID, prop='123')
 
         self.assertEqual(
             model,
-            job_utils.get_model_from_beam_entity(
-                job_utils.get_beam_entity_from_model(model)))
+            job_utils.get_ndb_model_from_beam_entity(
+                job_utils.get_beam_entity_from_ndb_model(model)))
 
     def test_from_and_then_to_beam_entity(self):
         beam_entity = beam_datastore_types.Entity(
@@ -219,8 +219,8 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
         self.assertEqual(
             beam_entity,
-            job_utils.get_beam_entity_from_model(
-                job_utils.get_model_from_beam_entity(beam_entity)))
+            job_utils.get_beam_entity_from_ndb_model(
+                job_utils.get_ndb_model_from_beam_entity(beam_entity)))
 
 
 class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
@@ -246,6 +246,13 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
         beam_query = job_utils.get_beam_query_from_ndb_query(query)
 
         self.assertEqual(beam_query.namespace, 'abc')
+
+    def test_query_with_project(self):
+        query = datastore_services.Query(app='foo-project')
+
+        beam_query = job_utils.get_beam_query_from_ndb_query(query)
+
+        self.assertEqual(beam_query.project, 'foo-project')
 
     def test_query_with_filter(self):
         query = datastore_services.Query(filters=BarModel.prop >= 3)
@@ -307,13 +314,14 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
 class ApplyQueryToModelsTests(test_utils.TestBase):
 
     def make_query(
-            self, kind=None, namespace=None, filters=None, order=None,
-            limit=None):
+            self, kind=None, namespace=None, project=None, filters=None,
+            order=None, limit=None):
         """Returns a new beam_datastore_types.Query object.
 
         Args:
             kind: str|None. The kind to query. If None, all kinds are eligible.
             namespace: str|None. Namespace to restrict results to.
+            project: str|None. Project associated with query.
             filters: list(tuple(str,str,str))|None. Property filters applied
                 by this query. The sequence is:
                 `(property_name, operator, value)`.
@@ -327,8 +335,8 @@ class ApplyQueryToModelsTests(test_utils.TestBase):
         if kind is None and order is None:
             order = ('__key__',)
         return beam_datastore_types.Query(
-            kind=kind, namespace=namespace, filters=filters, order=order,
-            limit=limit)
+            kind=kind, namespace=namespace, project=project, filters=filters,
+            order=order, limit=limit)
 
     def test_query_by_kind(self):
         foo_model = FooModel()
@@ -349,6 +357,16 @@ class ApplyQueryToModelsTests(test_utils.TestBase):
             self.make_query(namespace='a'), model_list)
 
         self.assertEqual(model_list, [namespace_a_model])
+
+    def test_query_by_project(self):
+        project_a_model = FooModel(app='a')
+        project_b_model = FooModel(app='b')
+        model_list = [project_a_model, project_b_model]
+
+        job_utils.apply_query_to_models(
+            self.make_query(project='a'), model_list)
+
+        self.assertEqual(model_list, [project_a_model])
 
     def test_query_with_filter(self):
         model_list = [BarModel(prop=i) for i in python_utils.RANGE(1, 10)]

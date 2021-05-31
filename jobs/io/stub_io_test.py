@@ -61,9 +61,9 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
         with self.stub.context():
             model_pcoll = self.pipeline | self.stub.ReadFromDatastore(query)
 
-            self.assert_pcoll_equal(
-                model_pcoll,
-                [job_utils.get_beam_entity_from_model(m) for m in model_list])
+            self.assert_pcoll_equal(model_pcoll, [
+                job_utils.get_beam_entity_from_ndb_model(m) for m in model_list
+            ])
 
     def test_write_to_datastore(self):
         query = job_utils.get_beam_query_from_ndb_query(
@@ -81,7 +81,8 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             model_pcoll = (
                 self.pipeline
                 | beam.Create([
-                    job_utils.get_beam_entity_from_model(m) for m in model_list
+                    job_utils.get_beam_entity_from_ndb_model(m)
+                    for m in model_list
                 ])
             )
 
@@ -108,7 +109,8 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             model_pcoll = (
                 self.pipeline
                 | beam.Create([
-                    job_utils.get_beam_entity_from_model(m) for m in model_list
+                    job_utils.get_beam_entity_from_ndb_model(m)
+                    for m in model_list
                 ])
             )
 
