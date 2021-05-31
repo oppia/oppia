@@ -416,7 +416,7 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     item.id).owner_ids
                 # Handle for empty owner_ids.
                 if not owner_ids:
-                    yield('EMPTY', item.id)
+                    yield ('EMPTY', item.id)
                 for user_id in owner_ids:
                     user_mail = user_services.get_email_from_user_id(
                         user_id)
@@ -424,7 +424,7 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if (key == 'SUCCESS'):
-            yield(key, len(values))
+        if key == 'SUCCESS':
+            yield (key, len(values))
         else:
             yield (key, values)
