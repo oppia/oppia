@@ -19,11 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging as log
+import logging as native_logging
 
-from google.cloud import logging
+from google.cloud import logging as gcloud_logging
 
-CLIENT = logging.Client()
+CLIENT = gcloud_logging.Client()
 
 
 def enable_logging():
@@ -34,4 +34,4 @@ def enable_logging():
     # Python logging module.
     CLIENT.get_default_handler()
     # Setting the log level to log.DEBUG to capture debug logs.
-    CLIENT.setup_logging(log_level=log.DEBUG)
+    CLIENT.setup_logging(log_level=native_logging.DEBUG)
