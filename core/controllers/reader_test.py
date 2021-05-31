@@ -17,7 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -1753,7 +1752,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.aggregated_stats.pop('num_starts')
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as captured_logs:
+            min_level=logging_services.ERROR
+        ) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,
@@ -1769,7 +1769,8 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             'total_hit_count')
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as captured_logs:
+            min_level=logging_services.ERROR
+        ) as captured_logs:
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
                     'aggregated_stats': self.aggregated_stats,

@@ -193,7 +193,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
         with self.capture_logging(
-            min_level=logging_services.ERROR) as captured_logs:
+            min_level=logging_services.ERROR
+        ) as captured_logs:
             self.process_and_flush_pending_mapreduce_tasks()
 
         self.assertEqual(len(captured_logs), 1)

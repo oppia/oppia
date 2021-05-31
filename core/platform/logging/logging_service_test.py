@@ -19,12 +19,26 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.platform.logging import logging_service
 from core.tests import test_utils
+
+import mock
 
 
 class LoggingServicesUnitTests(test_utils.AppEngineTestBase):
     """Tests for logging_service."""
 
+    MOCK_CLIENT = mock.Mock()
+
+    def setUp(self):
+        super(LoggingServicesUnitTests, self).setUp()
+        self.MOCK_CLIENT.reset_mock()
+
     def test_logging_services(self):
-        logging_service.enable_logging()
+        with self.swap(logging_service, 'CLIENT', self.MOCK_CLIENT):
+            logging_service.enable_logging()
+            self.MOCK_CLIENT.get_default_handler.assert_called()
+            self.MOCK_CLIENT.setup_logging.assert_called_with(
+                log_level=logging.DEBUG)

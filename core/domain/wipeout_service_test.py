@@ -1300,7 +1300,8 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -1693,7 +1694,8 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
             self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
@@ -2431,7 +2433,8 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -2822,7 +2825,8 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3127,7 +3131,8 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -3447,7 +3452,8 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -4003,7 +4009,8 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         ).put()
 
         with self.capture_logging(
-            min_level=logging_services.ERROR) as log_messages:
+            min_level=logging_services.ERROR
+        ) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
             self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
