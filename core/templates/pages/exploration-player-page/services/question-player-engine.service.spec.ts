@@ -1028,10 +1028,8 @@ fdescribe('Question player engine service ', () => {
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
       
-      
       let misconceptionId = sampleQuestion.getStateData()
         .interaction.answerGroups[answerGroupIndex].taggedSkillMisconceptionId;
-
 
       expect(answerClassificationServiceSpy).toHaveBeenCalled();
       expect(misconceptionId).toBe('misconceptionId');
