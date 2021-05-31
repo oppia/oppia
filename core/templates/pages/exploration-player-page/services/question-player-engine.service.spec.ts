@@ -425,7 +425,7 @@ describe('Question player engine service ', () => {
       version: '1'
     } as unknown as FetchExplorationBackendResponse;
 
-    let quesitonPlayerSpy =
+    let questionPlayerSpy =
       spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
     let explorationIdSpy =
       spyOn(contextService, 'getExplorationId').and.returnValue('id1');
@@ -440,7 +440,7 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService.init(
       multipleQuestionBackendDict, successHandler, failHandler);
 
-    expect(quesitonPlayerSpy).toHaveBeenCalled();
+    expect(questionPlayerSpy).toHaveBeenCalled();
     expect(explorationIdSpy).toHaveBeenCalled();
     expect(questionPlayerModeSpy).toHaveBeenCalled();
     expect(versionSpy).toHaveBeenCalled();
