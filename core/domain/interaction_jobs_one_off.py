@@ -410,17 +410,29 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
         exploration = exp_fetchers.get_exploration_from_model(item)
+        emails = []
+        flag = True
         for state in exploration.states.values():
             if state.interaction.id == 'LogicProof':
-                owner_ids = rights_manager.get_exploration_rights(
-                    item.id).owner_ids
-                # Handle for empty owner_ids.
-                if not owner_ids:
-                    yield ('EMPTY', item.id)
-                for user_id in owner_ids:
-                    user_mail = user_services.get_email_from_user_id(
-                        user_id)
-                    yield ('SUCCESS', (user_mail, item.id))
+                exploration_rights = rights_manager.get_exploration_rights(
+                    item.id, strict=False)
+                if exploration_rights is None:
+                    return
+                else:
+                    exp_owner_ids = exploration_rights.owner_ids
+                    # Handle for empty exp_owner_ids.
+                    if not exp_owner_ids:
+                        flag = False
+                    for user_id in exp_owner_ids:
+                        user_mail = user_services.get_email_from_user_id(
+                            user_id)
+                        if user_mail not in emails:
+                            emails.append(user_mail)
+            # The emails list will not be empty at this point.
+            if not flag:
+                yield ('EMPTY', item.id)
+            flag = True
+        yield ('SUCCESS', (emails[0], item.id))
 
     @staticmethod
     def reduce(key, values):
