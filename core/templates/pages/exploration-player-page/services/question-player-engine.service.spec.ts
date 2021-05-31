@@ -20,17 +20,14 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 
-fdescribe('Question player engine service ', () => {
+describe('Question player engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
@@ -41,7 +38,7 @@ fdescribe('Question player engine service ', () => {
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let urlService: UrlService;
   let singleQuestionBackendDict: QuestionBackendDict;
-  let multipleQuestionBackendDict:  QuestionBackendDict[];
+  let multipleQuestionBackendDict: QuestionBackendDict[];
 
   beforeEach(() => {
     singleQuestionBackendDict = {
@@ -162,7 +159,7 @@ fdescribe('Question player engine service ', () => {
       linked_skill_ids: [],
       inapplicable_skill_misconception_ids: [],
     };
-  
+
     multipleQuestionBackendDict = [{
       id: 'id1',
       question_state_data: {
@@ -406,7 +403,7 @@ fdescribe('Question player engine service ', () => {
       linked_skill_ids: [],
       inapplicable_skill_misconception_ids: [],
     }];
-  })
+  });
 
   beforeEach(() => {
     alertsService = TestBed.inject(AlertsService);
@@ -551,6 +548,8 @@ fdescribe('Question player engine service ', () => {
     questionPlayerEngineService.init(
       multipleQuestionBackendDict, successHandler, failHandler);
     let explorationId = questionPlayerEngineService.getExplorationId();
+
+    expect(explorationId).toBe('id1')
   });
 
   it('should return the version of exploration', () =>{
@@ -791,7 +790,7 @@ fdescribe('Question player engine service ', () => {
               return null;
             }
             return html;
-          })
+          });
 
       // eslint-disable-next-line dot-notation
       questionPlayerEngineService['questions'] = [sampleQuestion];
@@ -857,9 +856,10 @@ fdescribe('Question player engine service ', () => {
         answer, interactionRulesService, successCallback);
 
       expect(answerClassificationServiceSpy).toHaveBeenCalled();
-      expect(alertsServiceSpy).toHaveBeenCalledWith('Expression parsing error.');
+      expect(alertsServiceSpy)
+        .toHaveBeenCalledWith('Expression parsing error.');
       expect(expressionInterpolationServiceSpy).toHaveBeenCalled();
-  });
+    });
 
     it('should go to the next question if multiple questions exists', () => {
       let successCallback = jasmine.createSpy('success');
@@ -906,7 +906,7 @@ fdescribe('Question player engine service ', () => {
         // eslint-disable-next-line dot-notation
         questionPlayerEngineService['currentIndex'] <
           // eslint-disable-next-line dot-notation
-          questionPlayerEngineService['questions'].length -1);
+          questionPlayerEngineService['questions'].length - 1);
 
       expect(answerClassificationServiceSpy).toHaveBeenCalled();
       expect(result).toBe(true);
