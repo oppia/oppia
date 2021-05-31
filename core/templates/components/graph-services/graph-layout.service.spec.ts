@@ -258,7 +258,8 @@ describe('Graph Layout Service', () => {
       State4: []
     };
 
-    expect(sgls.getGraphAsAdjacencyLists(nodes, links2)).toEqual(adjacencyLists);
+    expect(sgls.getGraphAsAdjacencyLists(nodes, links2))
+      .toEqual(adjacencyLists);
   });
 
   it('should get indentation levels', () => {
