@@ -410,11 +410,10 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
         exploration = exp_fetchers.get_exploration_from_model(item)
-        owner_ids_empty = False
         found_user_email = False
         user_email = None
         for state in exploration.states.values():
-            if found_user_email or owner_ids_empty:
+            if found_user_email:
                 break
             if state.interaction.id == 'LogicProof':
                 exploration_rights = rights_manager.get_exploration_rights(
@@ -425,18 +424,17 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                 exp_owner_ids = exploration_rights.owner_ids
                 if len(exp_owner_ids) == 0:
-                    owner_ids_empty = True
+                    yield ('EMPTY', item.id)
+                    return
                 for user_id in exp_owner_ids:
                     user_email = user_services.get_email_from_user_id(user_id)
                     if user_email:
                         found_user_email = True
                         # Got user email.
                         break
-            if owner_ids_empty:
-                yield ('EMPTY', item.id)
 
         if found_user_email:
-            yield ('SUCCESS', (user_email, item.id))
+            yield ('EMAIL_DATA', (user_email, item.id))
         else:
             yield ('SUCCESS', 1)
 

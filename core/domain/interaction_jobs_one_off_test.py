@@ -1422,7 +1422,7 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         actual_output = (
             interaction_jobs_one_off
             .LogicProofInteractionOneOffJob.get_output(job_id))
-        expected_output = [(u'[u\'SUCCESS\', 1]')]
+        expected_output = [(u'[u\'EMAIL_DATA\', [u"(u\'albert@example.com\', \'exp_id0\')"]]')]
         self.assertEqual(actual_output, expected_output)
 
         # Update state1 and add state2.
