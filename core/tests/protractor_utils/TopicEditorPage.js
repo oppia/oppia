@@ -250,8 +250,8 @@ var TopicEditorPage = function() {
   };
 
   this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
-    await addSubtopicButton.click();
-    await newSubtopicTitlefield.sendKeys(title);
+    await action.click('Add subtopic button', addSubtopicButton);
+    await action.sendKeys('New subtopic title field', newSubtopicTitlefield, title);
 
     await action.sendKeys(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
@@ -259,21 +259,12 @@ var TopicEditorPage = function() {
       topicThumbnailButton, thumbnailContainer, imgPath, false);
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
-    await waitFor.elementToBeClickable(
-      subtopicPageContentButton,
-      'Edit subtopic htm content button taking too long to be clickable');
-    await subtopicPageContentButton.click();
+    await action.click('Edit subtopic htm content button', subtopicPageContentButton);
     var pageEditor = element(by.css(
       '.protractor-test-create-subtopic-page-content'));
-    await waitFor.visibilityOf(
-      pageEditor, 'Subtopic html editor takes too long to appear');
-    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
-    await pageEditorInput.click();
-    await pageEditorInput.sendKeys(htmlContent);
-    await waitFor.elementToBeClickable(
-      confirmSubtopicCreationButton,
-      'Confirm subtopic creation button takes too long to be clickable');
-    await confirmSubtopicCreationButton.click();
+    await action.click('Subtopic html editor', pageEditor);
+    await action.sendKeys('Page editor input', pageEditorInput);
+    await action.click('Confirm subtopic creation button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
@@ -517,16 +508,11 @@ var TopicEditorPage = function() {
   };
 
   this.saveTopic = async function(commitMessage) {
-    await waitFor.elementToBeClickable(
-      saveTopicButton,
-      'Save topic button takes too long to be clickable');
-    await saveTopicButton.click();
-    await commitMessageField.sendKeys(commitMessage);
+    await action.click('Save topic button', saveTopicButton);
+    await action.sendKeys(
+      'Commit message field', commitMessageField, commitMessage);
 
-    await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable');
-    await closeSaveModalButton.click();
+    await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for saving topic takes too long to appear.');
   };

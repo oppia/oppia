@@ -310,17 +310,10 @@ var getImageSource = async function(customImageElement) {
 
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
-  await waitFor.visibilityOf(
-    imageClickableElement,
-    'Image element is taking too long to appear.');
-  await imageClickableElement.click();
-
+  await action.click('Image clickable element', imageClickableElement);
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isPresent()).toBe(true);
-    await waitFor.elementToBeClickable(
-      thumbnailResetButton,
-      'Topic thumbnail reset button taking too long to appear.');
-    await thumbnailResetButton.click();
+    await action.click('Topic thumbnail reset button', thumbnailResetButton);
   } else {
     expect(await thumbnailResetButton.isPresent()).toBe(false);
   }
@@ -337,7 +330,7 @@ var submitImage = async function(
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  await imageSubmitButton.click();
+  await action.click('Image submit button', imageSubmitButton);
   await waitFor.invisibilityOf(
     imageUploadInput,
     'Image uploader is taking too long to disappear');
