@@ -177,7 +177,7 @@
     "dot-notation": [
       "error",
       {
-        "allowKeywords": true
+        "allowKeywords": false
       }
     ],
     "eol-last":[
