@@ -75,6 +75,7 @@ var skillOpenConceptCard = '.protractor-test-open-concept-card';
 var confirmSkillCreationButton =
   '.protractor-test-confirm-skill-creation-button';
 var skillReviewMaterialInput = '.oppia-rte';
+var skillCkEditor = '.protractor-test-ck-editor';
 
 var updateFormName = '.protractor-update-form-name';
 var updateFormSubmit = '.protractor-update-form-submit';
@@ -258,7 +259,8 @@ const getSkillEditorUrl = async function(browser, page) {
     await page.type(skillDescriptionField, 'Skill Description here');
     await page.click(skillOpenConceptCard);
     await page.waitForSelector(skillReviewMaterialInput, {visible: true});
-    await page.waitForTimeout(5000);
+    await page.waitForSelector(skillCkEditor, {visible: true});
+    await page.click(skillCkEditor);
     await page.keyboard.type('Skill Overview here');
 
     await page.waitForSelector(confirmSkillCreationButton, {visible: true});
