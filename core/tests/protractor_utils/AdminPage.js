@@ -310,8 +310,9 @@ var AdminPage = function() {
         by.css('.protractor-test-one-off-jobs-stop-btn'));
       await action.click(
         'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
-      await browser.refresh();
-      await waitFor.pageToFullyLoad();
+      await waitFor.invisibilityOf(
+        statusMessage,
+        'Status message taking too long to disappear when starting job.');
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
