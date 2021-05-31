@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { fail } from 'assert';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
@@ -43,352 +44,375 @@ fdescribe('Question player engine service ', () => {
   let stateCardObjectFactory: StateCardObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let urlService: UrlService;
+  let singleQuestionBackendDict: QuestionBackendDict;
+  let multipleQuestionBackendDict:  QuestionBackendDict[];
 
-  let singleQuestionBackendDict = {
-    id: 'id1',
-    question_state_data: {
-      classifier_model_id: null,
-      param_changes: [],
-      next_content_id_index: 1,
-      solicit_answer_details: false,
-      content: {
-        content_id: '1',
-        html: 'Question 1'
-      },
-      written_translations: {
-        translations_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      },
-      interaction: {
-        answer_groups: [{
-          outcome: {
-            dest: 'State 6',
-            feedback: {
-              content_id: 'feedback_1',
-              html: '<p>Try Again.</p>'
+  beforeEach(() => {
+    singleQuestionBackendDict = {
+      id: 'id1',
+      question_state_data: {
+        classifier_model_id: null,
+        param_changes: [],
+        next_content_id_index: 1,
+        solicit_answer_details: false,
+        content: {
+          content_id: '1',
+          html: 'Question 1'
+        },
+        written_translations: {
+          translations_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
+          }
+        },
+        interaction: {
+          answer_groups: [{
+            outcome: {
+              dest: 'State 1',
+              feedback: {
+                content_id: 'feedback_1',
+                html: '<p>Try Again.</p>'
+              },
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              labelled_as_correct: null,
             },
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-            labelled_as_correct: null,
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 0}
+            }],
+            training_data: null,
+            tagged_skill_misconception_id: null,
           },
-          rule_specs: [{
-            rule_type: 'Equals',
-            inputs: {x: 0}
+          {
+            outcome: {
+              dest: 'State 2',
+              feedback: {
+                content_id: 'feedback_2',
+                html: '<p>Try Again.</p>'
+              },
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              labelled_as_correct: null,
+            },
+            rule_specs: [{
+              rule_type: 'Equals',
+              inputs: {x: 0}
+            }],
+            training_data: null,
+            tagged_skill_misconception_id: 'misconceptionId',
           }],
-          training_data: null,
-          tagged_skill_misconception_id: null,
-        }],
-        default_outcome: {
-          dest: null,
-          labelled_as_correct: true,
-          missing_prerequisite_skill_id: null,
-          refresher_exploration_id: null,
-          param_changes: [],
-          feedback: {
-            content_id: 'feedback_id',
-            html: '<p>Dummy Feedback</p>'
+          default_outcome: {
+            dest: null,
+            labelled_as_correct: true,
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            param_changes: [],
+            feedback: {
+              content_id: 'feedback_id',
+              html: '<p>Dummy Feedback</p>'
+            }
+          },
+          id: 'TextInput',
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          confirmed_unclassified_answers: [],
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: '<p>This is a hint.</p>'
+              }
+            }
+          ],
+          solution: {
+            correct_answer: 'Solution',
+            explanation: {
+              content_id: 'solution',
+              html: '<p>This is a solution.</p>'
+            },
+            answer_is_exclusive: false
           }
         },
-        id: 'TextInput',
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: '',
-              content_id: 'ca_placeholder_0'
-            }
+        linked_skill_id: null,
+        card_is_checkpoint: true,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
           }
-        },
-        confirmed_unclassified_answers: [],
-        hints: [
-          {
-            hint_content: {
-              content_id: 'hint_1',
-              html: '<p>This is a hint.</p>'
-            }
-          }
-        ],
-        solution: {
-          correct_answer: 'Solution',
-          explanation: {
-            content_id: 'solution',
-            html: '<p>This is a solution.</p>'
-          },
-          answer_is_exclusive: false
         }
       },
-      linked_skill_id: null,
-      card_is_checkpoint: true,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
+      question_state_data_schema_version: 45,
+      language_code: 'en',
+      version: 1,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
+    };
+  
+    multipleQuestionBackendDict = [
+      {
+      id: 'id1',
+      question_state_data: {
+        classifier_model_id: null,
+        param_changes: [],
+        next_content_id_index: 1,
+        solicit_answer_details: false,
+        content: {
+          content_id: '1',
+          html: 'Question 1'
+        },
+        written_translations: {
+          translations_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
+          }
+        },
+        interaction: {
+          answer_groups: [],
+          default_outcome: {
+            dest: null,
+            labelled_as_correct: true,
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            param_changes: [],
+            feedback: {
+              content_id: 'feedback_id',
+              html: '<p>Dummy Feedback</p>'
+            }
+          },
+          id: 'TextInput',
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          confirmed_unclassified_answers: [],
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: '<p>This is a hint.</p>'
+              }
+            }
+          ],
+          solution: {
+            correct_answer: 'Solution',
+            explanation: {
+              content_id: 'solution',
+              html: '<p>This is a solution.</p>'
+            },
+            answer_is_exclusive: false
+          }
+        },
+        linked_skill_id: null,
+        card_is_checkpoint: true,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
+          }
         }
-      }
-    },
-    question_state_data_schema_version: 45,
-    language_code: 'en',
-    version: 1,
-    linked_skill_ids: [],
-    inapplicable_skill_misconception_ids: [],
-  };
-
-  let multipleQuestionBackendDict: QuestionBackendDict[] = [
+      },
+      question_state_data_schema_version: 45,
+      language_code: 'en',
+      version: 1,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
+    } as unknown as QuestionBackendDict,
     {
-    id: 'id1',
-    question_state_data: {
-      classifier_model_id: null,
-      param_changes: [],
-      next_content_id_index: 1,
-      solicit_answer_details: false,
-      content: {
-        content_id: '1',
-        html: 'Question 1'
-      },
-      written_translations: {
-        translations_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        default_outcome: {
-          dest: null,
-          labelled_as_correct: true,
-          missing_prerequisite_skill_id: null,
-          refresher_exploration_id: null,
-          param_changes: [],
-          feedback: {
-            content_id: 'feedback_id',
-            html: '<p>Dummy Feedback</p>'
+      id: 'id2',
+      question_state_data: {
+        classifier_model_id: null,
+        param_changes: [],
+        next_content_id_index: 2,
+        solicit_answer_details: false,
+        content: {
+          content_id: '2',
+          html: 'Question 2'
+        },
+        written_translations: {
+          translations_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
           }
         },
-        id: 'TextInput',
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: '',
-              content_id: 'ca_placeholder_0'
+        interaction: {
+          answer_groups: [],
+          default_outcome: {
+            dest: null,
+            labelled_as_correct: true,
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            param_changes: [],
+            feedback: {
+              content_id: 'feedback_id',
+              html: '<p>Dummy Feedback</p>'
             }
+          },
+          id: 'TextInput',
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          confirmed_unclassified_answers: [],
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: '<p>This is a hint.</p>'
+              }
+            }
+          ],
+          solution: {
+            correct_answer: 'Solution',
+            explanation: {
+              content_id: 'solution',
+              html: '<p>This is a solution.</p>'
+            },
+            answer_is_exclusive: false
           }
         },
-        confirmed_unclassified_answers: [],
-        hints: [
-          {
-            hint_content: {
-              content_id: 'hint_1',
-              html: '<p>This is a hint.</p>'
-            }
+        linked_skill_id: null,
+        card_is_checkpoint: true,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
           }
-        ],
-        solution: {
-          correct_answer: 'Solution',
-          explanation: {
-            content_id: 'solution',
-            html: '<p>This is a solution.</p>'
-          },
-          answer_is_exclusive: false
         }
       },
-      linked_skill_id: null,
-      card_is_checkpoint: true,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      }
+      question_state_data_schema_version: 45,
+      language_code: 'en',
+      version: 1,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
     },
-    question_state_data_schema_version: 45,
-    language_code: 'en',
-    version: 1,
-    linked_skill_ids: [],
-    inapplicable_skill_misconception_ids: [],
-  } as unknown as QuestionBackendDict,
-  {
-    id: 'id2',
-    question_state_data: {
-      classifier_model_id: null,
-      param_changes: [],
-      next_content_id_index: 2,
-      solicit_answer_details: false,
-      content: {
-        content_id: '2',
-        html: 'Question 2'
-      },
-      written_translations: {
-        translations_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        default_outcome: {
-          dest: null,
-          labelled_as_correct: true,
-          missing_prerequisite_skill_id: null,
-          refresher_exploration_id: null,
-          param_changes: [],
-          feedback: {
-            content_id: 'feedback_id',
-            html: '<p>Dummy Feedback</p>'
+    {
+      id: 'id3',
+      question_state_data: {
+        classifier_model_id: null,
+        param_changes: [],
+        next_content_id_index: 1,
+        solicit_answer_details: false,
+        content: {
+          content_id: '3',
+          html: 'Question 3'
+        },
+        written_translations: {
+          translations_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
           }
         },
-        id: 'TextInput',
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: '',
-              content_id: 'ca_placeholder_0'
+        interaction: {
+          answer_groups: [],
+          default_outcome: {
+            dest: null,
+            labelled_as_correct: true,
+            missing_prerequisite_skill_id: null,
+            refresher_exploration_id: null,
+            param_changes: [],
+            feedback: {
+              content_id: 'feedback_id',
+              html: '<p>Dummy Feedback</p>'
             }
+          },
+          id: 'TextInput',
+          customization_args: {
+            rows: {
+              value: 1
+            },
+            placeholder: {
+              value: {
+                unicode_str: '',
+                content_id: 'ca_placeholder_0'
+              }
+            }
+          },
+          confirmed_unclassified_answers: [],
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: '<p>This is a hint.</p>'
+              }
+            }
+          ],
+          solution: {
+            correct_answer: 'Solution',
+            explanation: {
+              content_id: 'solution',
+              html: '<p>This is a solution.</p>'
+            },
+            answer_is_exclusive: false
           }
         },
-        confirmed_unclassified_answers: [],
-        hints: [
-          {
-            hint_content: {
-              content_id: 'hint_1',
-              html: '<p>This is a hint.</p>'
-            }
+        linked_skill_id: null,
+        card_is_checkpoint: true,
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            1: {},
+            ca_placeholder_0: {},
+            feedback_id: {},
+            solution: {},
+            hint_1: {}
           }
-        ],
-        solution: {
-          correct_answer: 'Solution',
-          explanation: {
-            content_id: 'solution',
-            html: '<p>This is a solution.</p>'
-          },
-          answer_is_exclusive: false
         }
       },
-      linked_skill_id: null,
-      card_is_checkpoint: true,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      }
-    },
-    question_state_data_schema_version: 45,
-    language_code: 'en',
-    version: 1,
-    linked_skill_ids: [],
-    inapplicable_skill_misconception_ids: [],
-  },
-  {
-    id: 'id3',
-    question_state_data: {
-      classifier_model_id: null,
-      param_changes: [],
-      next_content_id_index: 1,
-      solicit_answer_details: false,
-      content: {
-        content_id: '3',
-        html: 'Question 3'
-      },
-      written_translations: {
-        translations_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        default_outcome: {
-          dest: null,
-          labelled_as_correct: true,
-          missing_prerequisite_skill_id: null,
-          refresher_exploration_id: null,
-          param_changes: [],
-          feedback: {
-            content_id: 'feedback_id',
-            html: '<p>Dummy Feedback</p>'
-          }
-        },
-        id: 'TextInput',
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: '',
-              content_id: 'ca_placeholder_0'
-            }
-          }
-        },
-        confirmed_unclassified_answers: [],
-        hints: [
-          {
-            hint_content: {
-              content_id: 'hint_1',
-              html: '<p>This is a hint.</p>'
-            }
-          }
-        ],
-        solution: {
-          correct_answer: 'Solution',
-          explanation: {
-            content_id: 'solution',
-            html: '<p>This is a solution.</p>'
-          },
-          answer_is_exclusive: false
-        }
-      },
-      linked_skill_id: null,
-      card_is_checkpoint: true,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          1: {},
-          ca_placeholder_0: {},
-          feedback_id: {},
-          solution: {},
-          hint_1: {}
-        }
-      }
-    },
-    question_state_data_schema_version: 45,
-    language_code: 'en',
-    version: 1,
-    linked_skill_ids: [],
-    inapplicable_skill_misconception_ids: [],
-  }
-];
+      question_state_data_schema_version: 45,
+      language_code: 'en',
+      version: 1,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
+    }
+  ];
+  })
 
   beforeEach(() => {
     alertsService = TestBed.inject(AlertsService);
@@ -476,6 +500,27 @@ fdescribe('Question player engine service ', () => {
     let currentQuestion = questionPlayerEngineService.getCurrentQuestion();
 
     expect(currentQuestion.getId()).toBe('id1');
+  });
+
+  it('should get the current question Id', () =>{
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let exploration = {
+      version: '1'
+    } as unknown as FetchExplorationBackendResponse;
+
+    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'getExplorationId').and.returnValue('id1');
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
+    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
+    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
+      .and.returnValue(Promise.resolve(exploration));
+
+    questionPlayerEngineService.init(
+      multipleQuestionBackendDict, successHandler, failHandler);
+    let currentQuestionId = questionPlayerEngineService.getCurrentQuestionId();
+
+    expect(currentQuestionId).toBe('id1');
   });
 
   it('should return number of questions', () =>{
@@ -628,6 +673,53 @@ fdescribe('Question player engine service ', () => {
     let result = questionPlayerEngineService.isAnswerBeingProcessed();
 
     expect(result).toBe(false);
+  });
+
+  it('should show warning message while loading initial question' +
+    'when question html content is null', () => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    singleQuestionBackendDict.question_state_data
+        .content.html = null;
+    let alertsServiceSpy =
+      spyOn(alertsService, 'addWarning').and.returnValue();
+    let expressionInterpolationServiceSpy =
+      spyOn(expressionInterpolationService, 'processHtml')
+        .and.callFake((html, envs) => {
+          if(html === null) {
+            return null;
+          }
+          return html;
+        });
+
+    questionPlayerEngineService.init(
+      [singleQuestionBackendDict], successHandler, failHandler);
+
+    expect(alertsServiceSpy).toHaveBeenCalledWith('Expression parsing error.');
+    expect(expressionInterpolationServiceSpy).toHaveBeenCalled();
+  });
+
+  it('should call error callback if there are no questions', () => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    // singleQuestionBackendDict.question_state_data
+    //     .content.html = null;
+    // let expressionInterpolationServiceSpy =
+    //   spyOn(expressionInterpolationService, 'processHtml')
+    //     .and.callFake((html, envs) => {
+    //       if(html === null) {
+    //         return null;
+    //       }
+    //       return html;
+    //     });
+
+    questionPlayerEngineService.init(
+      [], successHandler, failHandler);
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+    // expect(expressionInterpolationServiceSpy).toHaveBeenCalled();
   });
 
   describe('on submiting answer ', () => {
@@ -891,14 +983,12 @@ fdescribe('Question player engine service ', () => {
       expect(result).toBe(false);
     });
 
-    fit('should get the misconception Id', () => {
+    it('should get the misconception Id correctly', () => {
       let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult: AnswerClassificationResult = {
-        answerGroupIndex: 0,
+        answerGroupIndex: 1,
         classificationCategorization: "default_outcome",
         outcome: {
           dest: null,
@@ -915,29 +1005,37 @@ fdescribe('Question player engine service ', () => {
         },
         ruleIndex: 0
       } as unknown as AnswerClassificationResult;
+      let answerGroupIndex = answerClassificationResult.answerGroupIndex;
+
+      let sampleQuestion = questionObjectFactory.createFromBackendDict(
+        singleQuestionBackendDict);
 
       let answerClassificationServiceSpy =
         spyOn(answerClassificationService, 'getMatchingClassificationResult')
-          .and.returnValue(answerClassificationResult);
-        spyOn(expressionInterpolationService, 'processHtml')
-          .and.callFake((html, envs) => {
-            if(html === null) {
-              return null;
-            }
-            return html;
-          });
+          .and.returnValue(answerClassificationResult)
+      spyOn(expressionInterpolationService, 'processHtml')
+        .and.callFake((html, envs) => {
+          if(html === null) {
+            return null;
+          }
+          return html;
+        });
 
-
-      questionPlayerEngineService.init(
-          [singleQuestionBackendDict], successHandler, failHandler);
+      // eslint-disable-next-line dot-notation
+      questionPlayerEngineService['questions'] = [sampleQuestion];
+      // eslint-disable-next-line dot-notation
+      questionPlayerEngineService['currentIndex'] = 0;
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
-      // eslint-disable-next-line dot-notation
-      // let currentStateData = questionPlayerEngineService['getCurrentStateData'];
+      
+      
+      let misconceptionId = sampleQuestion.getStateData()
+        .interaction.answerGroups[answerGroupIndex].taggedSkillMisconceptionId;
+
 
       expect(answerClassificationServiceSpy).toHaveBeenCalled();
-      // console.log(currentStateData())
-      // expect(currentStateData)
+      expect(misconceptionId).toBe('misconceptionId');
+
     });
   });
 });
