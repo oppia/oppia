@@ -410,29 +410,32 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
         exploration = exp_fetchers.get_exploration_from_model(item)
-        emails = []
-        flag = True
+        owner_ids_empty = False
+        found_user_email = False
         for state in exploration.states.values():
+            if found_user_email:
+                break
             if state.interaction.id == 'LogicProof':
                 exploration_rights = rights_manager.get_exploration_rights(
                     item.id, strict=False)
                 if exploration_rights is None:
+                    yield ('MISSING_RIGHTS', 0)
                     return
-                else:
-                    exp_owner_ids = exploration_rights.owner_ids
-                    # Handle for empty exp_owner_ids.
-                    if not exp_owner_ids:
-                        flag = False
-                    for user_id in exp_owner_ids:
-                        user_mail = user_services.get_email_from_user_id(
-                            user_id)
-                        if user_mail not in emails:
-                            emails.append(user_mail)
-            # The emails list will not be empty at this point.
-            if not flag:
-                yield ('EMPTY', item.id)
-            flag = True
-        yield ('SUCCESS', (emails[0], item.id))
+
+                exp_owner_ids = exploration_rights.owner_ids
+                if len(exp_owner_ids) == 0:
+                    owner_ids_empty = True
+                for user_id in exp_owner_ids:
+                    if user_services.get_email_from_user_id(user_id):
+                        found_user_email = True
+                        # Got user email.
+                        break
+            if owner_ids_empty:
+                yield ('EMPTY', 0)
+            owner_ids_empty = False # For the next state.
+
+        if found_user_email:
+            yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):
