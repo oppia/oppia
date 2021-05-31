@@ -75,7 +75,6 @@ BeamJobState = python_utils.create_enum( # pylint: disable=invalid-name
     'UNKNOWN')
 
 
-
 class BeamJobRunModel(base_models.BaseModel):
     """Represents the execution of an individual Apache Beam job.
 
