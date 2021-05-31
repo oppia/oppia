@@ -60,7 +60,9 @@ describe('When account is deleted it', function() {
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('user1@delete.com');
-    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });

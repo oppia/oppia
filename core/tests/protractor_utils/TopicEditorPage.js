@@ -151,16 +151,14 @@ var TopicEditorPage = function() {
   };
 
   this.publishTopic = async function() {
-    await publishTopicButton.click();
+    await action.click('Publish Subtopic Button', publishTopicButton);
     await waitFor.invisibilityOf(
       publishTopicButton, 'Topic is taking too long to publish.');
   };
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    await waitFor.elementToBeClickable(
-      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
-    await selectSkillDropdown.click();
+    await action.click('Select Skill Dropdown', selectSkillDropdown);
     await element(by.css('option[label="' + skillDescription + '"]')).click();
     await waitFor.visibilityOf(
       questionItems.first(), 'Question takes too long to appear');
@@ -169,16 +167,15 @@ var TopicEditorPage = function() {
 
   this.saveQuestion = async function() {
     await general.scrollToTop();
-    await saveQuestionButton.click();
+    await action.click('Save Question Button', saveQuestionButton);
     await waitFor.invisibilityOf(
       saveQuestionButton, 'Question modal takes too long to disappear');
   };
 
   this.createQuestionForSkillWithName = async function(skillDescription) {
     await action.click('Select skill dropdown', selectSkillDropdown);
-    await waitFor.elementToBeClickable(
-      selectSkillDropdown, 'Skill select dropdown takes too long to appear.');
-    await selectSkillDropdown.click();
+    await action.click(
+      'Select Skill Dropdown', selectSkillDropdown);
     await element(by.css('option[label="' + skillDescription + '"]')).click();
 
     await action.click('Create question button', createQuestionButton);
@@ -186,10 +183,7 @@ var TopicEditorPage = function() {
   };
 
   this.moveToQuestionsTab = async function() {
-    await waitFor.elementToBeClickable(
-      questionsTabButton,
-      'Questions tab button takes too long to be clickable');
-    await questionsTabButton.click();
+    await action.click('Questions Tab Button', questionsTabButton);
   };
 
   this.expectSubtopicPageContentsToMatch = async function(contents) {
@@ -204,8 +198,9 @@ var TopicEditorPage = function() {
   };
 
   this.changeSubtopicTitle = async function(title) {
-    await subtopicTitleField.clear();
-    await subtopicTitleField.sendKeys(title);
+    await action.clear(
+      'Subtopic Title Field', subtopicTitleField);
+    await action.sendKeys('Subtopic Title Field', subtopicTitleField, title);
   };
 
   this.changeSubtopicPageContents = async function(content) {
@@ -221,15 +216,13 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
     var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
-    await pageEditorInput.click();
-    await pageEditorInput.clear();
-    await pageEditorInput.sendKeys(content);
+    await action.click('Page Editor Input', pageEditorInput);
+    await action.clear('Page Editor Input', pageEditorInput);
+    await action.sendKeys('Page Editor Input', pageEditorInput, content);
     var saveSubtopicPageContentButton = element(by.css(
       '.protractor-test-save-subtopic-content-button'));
-    await waitFor.elementToBeClickable(
-      saveSubtopicPageContentButton,
-      'Save Subtopic Content button taking too long to be clickable');
-    await saveSubtopicPageContentButton.click();
+    await action.click(
+      'Save Subtopic Page Content Button', saveSubtopicPageContentButton);
   };
 
   this.expectNumberOfUncategorizedSkillsToBe = async function(count) {
@@ -238,11 +231,8 @@ var TopicEditorPage = function() {
 
   this.deleteSubtopicWithIndex = async function(index) {
     var subtopicEditOptionBox = subtopicEditOptions.get(index);
-    await subtopicEditOptionBox.click();
-    await waitFor.elementToBeClickable(
-      deleteSubtopicButton,
-      'Delete subtopic button taking too long to be clickable');
-    await deleteSubtopicButton.click();
+    await action.click('Subtopic Edit Option Box', subtopicEditOptionBox);
+    await action.click('Delete Subtopic Button', deleteSubtopicButton);
   };
 
   this.expectNumberOfSubtopicsToBe = async function(count) {
@@ -250,8 +240,9 @@ var TopicEditorPage = function() {
   };
 
   this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
-    await addSubtopicButton.click();
-    await newSubtopicTitlefield.sendKeys(title);
+    await action.click('Add Subtopic Button', addSubtopicButton);
+    await action.sendKeys(
+      'New Subtopic Title Field', newSubtopicTitlefield, title);
 
     await action.sendKeys(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
@@ -259,21 +250,19 @@ var TopicEditorPage = function() {
       topicThumbnailButton, thumbnailContainer, imgPath, false);
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
-    await waitFor.elementToBeClickable(
-      subtopicPageContentButton,
-      'Edit subtopic htm content button taking too long to be clickable');
-    await subtopicPageContentButton.click();
+    await action.click(
+      'Subtopic Page Content Button', subtopicPageContentButton);
     var pageEditor = element(by.css(
       '.protractor-test-create-subtopic-page-content'));
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
     var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
     await pageEditorInput.click();
-    await pageEditorInput.sendKeys(htmlContent);
-    await waitFor.elementToBeClickable(
-      confirmSubtopicCreationButton,
-      'Confirm subtopic creation button takes too long to be clickable');
-    await confirmSubtopicCreationButton.click();
+    await action.sendKeys(
+      'Page Editor Input', pageEditorInput, htmlContent);
+    await action.click(
+      'Confirm Subtopic Creation Button',
+      confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
@@ -298,9 +287,6 @@ var TopicEditorPage = function() {
   this.saveSubtopicExplanation = async function() {
     var saveSubtopicExplanationButton = element(by.css(
       '.protractor-test-save-subtopic-content-button'));
-    await waitFor.elementToBeClickable(
-      saveSubtopicExplanationButton,
-      'Save Subtopic Explanation button taking too long to be clickable');
     await action.click(
       'Save subtopic explanation', saveSubtopicExplanationButton);
   };
@@ -328,10 +314,7 @@ var TopicEditorPage = function() {
   };
 
   this.navigateToReassignModal = async function() {
-    await waitFor.elementToBeClickable(
-      reassignSkillButton,
-      'Reassign skill button taking too long to be clickable');
-    await reassignSkillButton.click();
+    await action.click('Reassign Skill Button', reassignSkillButton);
   };
 
   this.expectSubtopicWithIndexToHaveSkills = async function(
@@ -395,14 +378,13 @@ var TopicEditorPage = function() {
 
   this.navigateToTopicEditorTab = async function() {
     var topicEditorTab = element(by.css('.protractor-test-edit-topic-tab'));
-    await waitFor.elementToBeClickable(
-      topicEditorTab, 'Topic editor tab taking too long to be clickable');
-    await topicEditorTab.click();
+    await action.click(
+      'Topic Editor Tab', topicEditorTab);
   };
 
   this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
     var subtopic = await subtopics.get(subtopicIndex);
-    await subtopic.click();
+    await action.click('Subtopic', subtopic);
     await waitFor.pageToFullyLoad();
   };
 
@@ -436,7 +418,7 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     var storyItem = await storyListItems.get(index);
-    await storyItem.click();
+    await action.click('Story Item', storyItem);
     await waitFor.pageToFullyLoad();
     await waitFor.invisibilityOf(
       storyListTable, 'Story list table too long to disappear.');
@@ -456,10 +438,8 @@ var TopicEditorPage = function() {
   this.createStory = async function(
       storyTitle, storyUrlFragment, storyDescription, imgPath) {
     await general.scrollToTop();
-    await waitFor.elementToBeClickable(
-      createStoryButton,
-      'Create Story button takes too long to be clickable');
-    await createStoryButton.click();
+    await action.click(
+      'Create Story Button', createStoryButton);
 
     await action.sendKeys(
       'Create new story title', newStoryTitleField, storyTitle);
@@ -473,10 +453,8 @@ var TopicEditorPage = function() {
     await workflow.submitImage(
       storyThumbnailButton, thumbnailContainer, imgPath, false);
 
-    await waitFor.elementToBeClickable(
-      confirmStoryCreationButton,
-      'Confirm Create Story button takes too long to be clickable');
-    await confirmStoryCreationButton.click();
+    await action.click(
+      'Confirm Create Story Button', confirmStoryCreationButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -495,9 +473,9 @@ var TopicEditorPage = function() {
   };
 
   this.changeTopicName = async function(newName) {
-    await topicNameField.clear();
-    await topicNameField.sendKeys(newName);
-    await topicNameHeading.click();
+    await action.clear('Topic Name Field', topicNameField);
+    await action.sendKeys('Topic Name Field', topicNameField, newName);
+    await action.click('Topic Name Heading', topicNameHeading);
   };
 
   this.expectTopicNameToBe = async function(name) {
@@ -506,9 +484,12 @@ var TopicEditorPage = function() {
 
   this.changeTopicDescription = async function(newDescription) {
     await general.scrollToTop();
-    await topicDescriptionField.clear();
-    await topicDescriptionField.sendKeys(newDescription);
-    await topicDescriptionHeading.click();
+    await action.clear(
+      'Topic Description Field', topicDescriptionField);
+    await action.sendKeys(
+      'Topic Description Field', topicDescriptionField, newDescription);
+    await action.click(
+      'Topic Description Heading', topicDescriptionHeading);
   };
 
   this.expectTopicDescriptionToBe = async function(description) {
@@ -519,11 +500,8 @@ var TopicEditorPage = function() {
   this.saveTopic = async function(commitMessage) {
     await action.click('Save Topic Button', saveTopicButton);
     await commitMessageField.sendKeys(commitMessage);
-
-    await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable');
-    await closeSaveModalButton.click();
+    await action.click(
+      'Close Save Modal Button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for saving topic takes too long to appear.');
   };
