@@ -30,37 +30,37 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
     def test_in_terminal_state(self):
         cancelled_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_CANCELLED)
+            latest_job_state=beam_job_models.BeamJobState.CANCELLED.value)
         drained_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_DRAINED)
+            latest_job_state=beam_job_models.BeamJobState.DRAINED.value)
         updated_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_UPDATED)
+            latest_job_state=beam_job_models.BeamJobState.UPDATED.value)
         done_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_DONE)
+            latest_job_state=beam_job_models.BeamJobState.DONE.value)
         failed_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_FAILED)
+            latest_job_state=beam_job_models.BeamJobState.FAILED.value)
         cancelling_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_CANCELLING)
+            latest_job_state=beam_job_models.BeamJobState.CANCELLING.value)
         draining_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_DRAINING)
+            latest_job_state=beam_job_models.BeamJobState.DRAINING.value)
         pending_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_PENDING)
+            latest_job_state=beam_job_models.BeamJobState.PENDING.value)
         running_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_RUNNING)
+            latest_job_state=beam_job_models.BeamJobState.RUNNING.value)
         stopped_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_STOPPED)
+            latest_job_state=beam_job_models.BeamJobState.STOPPED.value)
         unknown_job_run = beam_job_models.BeamJobRunModel(
             job_name='FooJob',
-            latest_job_state=beam_job_models.BEAM_JOB_STATE_UNKNOWN)
+            latest_job_state=beam_job_models.BeamJobState.UNKNOWN.value)
 
         self.assertTrue(cancelled_job_run.in_terminal_state)
         self.assertTrue(drained_job_run.in_terminal_state)
