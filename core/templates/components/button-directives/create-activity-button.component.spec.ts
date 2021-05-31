@@ -29,35 +29,15 @@ import { CreateActivityButtonComponent } from './create-activity-button.componen
 class MockWindowRef {
   _window = {
     location: {
-      _hash: '',
-      _hashChange: null,
       _href: '',
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
       get href() {
         return this._href;
       },
       set href(val) {
         this._href = val;
       },
-      reload: (val) => val,
       replace: (val) => {}
     },
-    get onhashchange() {
-      return this.location._hashChange;
-    },
-
-    set onhashchange(val) {
-      this.location._hashChange = val;
-    }
   };
   get nativeWindow() {
     return this._window;
@@ -80,7 +60,7 @@ class MockUrlService {
   }
 }
 
-describe('CreateActivityButtonComponent', () => {
+fdescribe('CreateActivityButtonComponent', () => {
   let component: CreateActivityButtonComponent;
   let fixture: ComponentFixture<CreateActivityButtonComponent>;
   let userService: UserService;
@@ -88,6 +68,48 @@ describe('CreateActivityButtonComponent', () => {
   let explorationCreationService: ExplorationCreationService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
+
+  let userInfoCanCreateCollection = {
+    _isModerator: true,
+    _isAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
+
+  let userInfoCanNotCreateCollection = {
+    _isModerator: true,
+    _isAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    canCreateCollections: () => false,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
@@ -125,19 +147,10 @@ describe('CreateActivityButtonComponent', () => {
     expect(component).toBeDefined();
   });
 
-  it('should initialize and call initCreationProcess()', fakeAsync(() => {
+  it('should initialize and begin creation process if user can' +
+    ' create collections', fakeAsync(() => {
     const userServiceSpy = spyOn(userService, 'getUserInfoAsync')
-      // This throws "Argument of type 'Promise<{ isLoggedIn: () => boolean;
-      // canCreateCollections: () => boolean; }>' is not assignable to parameter
-      // of type 'Promise<UserInfo>'.". This is because the actual
-      // 'getUserInfoAsync' returns more properties than required. We need to
-      // suppress this error because we need only "isLoggedIn" and
-      // "canCreateCollections" functions for testing.
-      // @ts-expect-error
-      .and.returnValue(Promise.resolve({
-        isLoggedIn: () => true,
-        canCreateCollections: () => true
-      }));
+      .and.returnValue(Promise.resolve(userInfoCanCreateCollection));
     const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue({
       mode: 'create'
     });
@@ -157,19 +170,10 @@ describe('CreateActivityButtonComponent', () => {
     expect(component.userIsLoggedIn).toBe(true);
   }));
 
-  it('should initialize and call createNewExploration()', fakeAsync(() => {
+  it('should initialize and create new exploration if user cannot' +
+    ' create collections', fakeAsync(() => {
     const userServiceSpy = spyOn(userService, 'getUserInfoAsync')
-      // This throws "Argument of type 'Promise<{ isLoggedIn: () => boolean;
-      // canCreateCollections: () => boolean; }>' is not assignable to parameter
-      // of type 'Promise<UserInfo>'.". This is because the actual
-      // 'getUserInfoAsync' returns more properties than required. We need to
-      // suppress this error because we need only "isLoggedIn" and
-      // "canCreateCollections" functions for testing.
-      // @ts-expect-error
-      .and.returnValue(Promise.resolve({
-        isLoggedIn: () => true,
-        canCreateCollections: () => false
-      }));
+      .and.returnValue(Promise.resolve(userInfoCanNotCreateCollection));
     const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue({
       mode: 'create'
     });
@@ -190,7 +194,7 @@ describe('CreateActivityButtonComponent', () => {
     expect(component.userIsLoggedIn).toBe(true);
   }));
 
-  it('should return from initCreateProcess() when' +
+  it('should stop the creation process if another' +
     ' creation is in progress', () => {
     component.creationInProgress = true;
     expect(component.initCreationProcess()).toBe();
@@ -207,7 +211,8 @@ describe('CreateActivityButtonComponent', () => {
     expect(explorationCreationServiceSpy).toHaveBeenCalled();
   });
 
-  it('should replace location', () => {
+  it('should redirect user to create new exploration when user clicks' +
+    ' create button and is not on creator dashboard page', () => {
     component.creationInProgress = false;
     component.canCreateCollections = true;
     const urlServiceSpy = spyOn(urlService, 'getPathname').and.returnValue(
@@ -225,13 +230,13 @@ describe('CreateActivityButtonComponent', () => {
     expect(replaceSpy).toHaveBeenCalledWith('/creator-dashboard?mode=create');
   });
 
-  it('should open a create activity modal', () => {
+  it('should open a create activity modal if user' +
+    ' can create collections and is on creator dashboard page', () => {
     component.creationInProgress = false;
     component.canCreateCollections = true;
     const urlServiceSpy = spyOn(urlService, 'getPathname').and.returnValue(
       '/creator-dashboard');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>({
         result: Promise.resolve('success')
       });
@@ -243,14 +248,13 @@ describe('CreateActivityButtonComponent', () => {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should set creationInProgress as false when cancel' +
-    ' button is clicked', fakeAsync(() => {
+  it('should close modal when user clicks outside of' +
+    ' the modal', fakeAsync(() => {
     component.creationInProgress = false;
     component.canCreateCollections = true;
     const urlServiceSpy = spyOn(urlService, 'getPathname').and.returnValue(
       '/creator-dashboard');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return <NgbModalRef>({
         result: Promise.reject('cancel')
       });
@@ -273,13 +277,14 @@ describe('CreateActivityButtonComponent', () => {
     expect(explorationCreationServiceSpy).toHaveBeenCalled();
   });
 
-  it('should register login event and set href', fakeAsync(() => {
+  it('should redirect to login page when user creates exploration' +
+    ' and is not logged in', fakeAsync(() => {
     windowRef.nativeWindow.location.href = '';
 
-    component.onRedirectToLogin('string');
+    component.onRedirectToLogin('login-url');
     tick(150);
     fixture.detectChanges();
 
-    expect(windowRef.nativeWindow.location.href).toBe('string');
+    expect(windowRef.nativeWindow.location.href).toBe('login-url');
   }));
 });
