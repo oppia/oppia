@@ -98,6 +98,15 @@ class DatastoreioStub(python_utils.OBJECT):
         job_utils.apply_query_to_models(query, models)
         return models
 
+    def get_everything(self):
+        """Returns every model in the stub.
+
+        Returns:
+            list(Model). All of the models in the stub.
+        """
+        with self._models_lock:
+            return list(self._models.values())
+
     def put_multi(self, models):
         """Puts the input models into the stub.
 
@@ -138,7 +147,7 @@ class DatastoreioStub(python_utils.OBJECT):
 
         return _ReadFromDatastore(query, self._server_port)
 
-    def WriteToDatastore(self): # pylint: disable=invalid-name
+    def WriteToDatastore(self, unused_project_id): # pylint: disable=invalid-name
         """Returns a PTransform which writes models to the stub.
 
         NOTE: The name is in UpperCamelCase because that's the same name used by
@@ -151,14 +160,11 @@ class DatastoreioStub(python_utils.OBJECT):
             it receives as input into the datastore.
         """
         self._assert_server_context_is_acquired()
-        if self._write_was_called:
-            raise RuntimeError(
-                'At most one WriteToDatastore may be executed in a pipeline')
 
         self._write_was_called = True
         return _WriteToDatastore(self._server_port)
 
-    def DeleteFromDatastore(self): # pylint: disable=invalid-name
+    def DeleteFromDatastore(self, unused_project_id): # pylint: disable=invalid-name
         """Returns a PTransform which deletes models from the stub.
 
         NOTE: The name is in UpperCamelCase because that's the same name used by
@@ -171,9 +177,6 @@ class DatastoreioStub(python_utils.OBJECT):
             it receives as input from the datastore.
         """
         self._assert_server_context_is_acquired()
-        if self._delete_was_called:
-            raise RuntimeError(
-                'At most one DeleteFromDatastore may be executed in a pipeline')
 
         self._delete_was_called = True
         return _DeleteFromDatastore(self._server_port)
@@ -186,7 +189,7 @@ class DatastoreioStub(python_utils.OBJECT):
         """
         if not self._server_context_is_acquired:
             raise RuntimeError(
-                'Must acquire context() before using datastore operations')
+                'Must enter context() before using datastore operations')
 
     def _read_from_datastore_handler(self, pickled_query):
         """XML-RPC handler for a ReadFromDatastore request.
@@ -265,7 +268,7 @@ class _ReadFromDatastore(_DatastoreioTransform):
                 operation requests are sent to.
         """
         super(_ReadFromDatastore, self).__init__(port)
-        self._pickled_query = pickle.dumps(query)
+        self._query = pickle.dumps(query)
 
     def expand(self, pcoll):
         """Returns models from storage using the ReadFromDatastore endpoint.
@@ -277,13 +280,12 @@ class _ReadFromDatastore(_DatastoreioTransform):
         Returns:
             PCollection. The PCollection of models.
         """
-        model_list = pickle.loads(
-            self.server_proxy.ReadFromDatastore(self._pickled_query))
+        model_list = (
+            pickle.loads(self.server_proxy.ReadFromDatastore(self._query)))
 
         return (
             pcoll
-            | 'Get models from the ReadFromDatastore endpoint' >> (
-                beam.Create(model_list))
+            | 'Return ReadFromDatastore response' >> beam.Create(model_list)
         )
 
 

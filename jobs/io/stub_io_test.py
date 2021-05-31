@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+import feconf
 from jobs import job_test_utils
 from jobs import job_utils
 from jobs.io import stub_io
@@ -85,7 +86,9 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             )
 
             self.assert_pcoll_empty(
-                model_pcoll | self.stub.DeleteFromDatastore())
+                model_pcoll
+                | self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
         self.assertItemsEqual(self.stub.get(query), [])
 
@@ -110,23 +113,25 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             )
 
             self.assert_pcoll_empty(
-                model_pcoll | self.stub.DeleteFromDatastore())
+                model_pcoll
+                | self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
         self.assertItemsEqual(self.stub.get(query), [])
 
     def test_read_from_datastore_without_acquiring_context_raises_error(self):
         query = job_utils.get_beam_query_from_ndb_query(
             datastore_services.query_everything())
-        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
+        with self.assertRaisesRegexp(RuntimeError, 'Must enter context'):
             self.stub.ReadFromDatastore(query)
 
     def test_write_to_datastore_without_acquiring_context_raises_error(self):
-        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
-            self.stub.WriteToDatastore()
+        with self.assertRaisesRegexp(RuntimeError, 'Must enter context'):
+            self.stub.WriteToDatastore(feconf.OPPIA_PROJECT_ID)
 
     def test_delete_from_datastore_without_acquiring_context_raises_error(self):
-        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
-            self.stub.DeleteFromDatastore()
+        with self.assertRaisesRegexp(RuntimeError, 'Must enter context'):
+            self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
 
     def test_read_after_write_raises_error(self):
         query = job_utils.get_beam_query_from_ndb_query(
@@ -136,7 +141,9 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             empty_pcoll = self.pipeline | beam.Create([])
 
             self.assert_pcoll_empty(
-                empty_pcoll | self.stub.WriteToDatastore())
+                empty_pcoll
+                | self.stub.WriteToDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
             self.assertRaisesRegexp(
                 RuntimeError,
@@ -151,32 +158,11 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             empty_pcoll = self.pipeline | beam.Create([])
 
             self.assert_pcoll_empty(
-                empty_pcoll | self.stub.DeleteFromDatastore())
+                empty_pcoll
+                | self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
             self.assertRaisesRegexp(
                 RuntimeError,
                 'Cannot read from datastore after a mutation',
                 lambda: self.pipeline | self.stub.ReadFromDatastore(query))
-
-    def test_write_after_write_raises_error(self):
-        with self.stub.context():
-            empty_pcoll = self.pipeline | beam.Create([])
-
-            self.assert_pcoll_empty(empty_pcoll | self.stub.WriteToDatastore())
-
-            self.assertRaisesRegexp(
-                RuntimeError,
-                'At most one WriteToDatastore may be executed',
-                lambda: empty_pcoll | self.stub.WriteToDatastore())
-
-    def test_delete_after_delete_raises_error(self):
-        with self.stub.context():
-            empty_pcoll = self.pipeline | beam.Create([])
-
-            self.assert_pcoll_empty(
-                empty_pcoll | self.stub.DeleteFromDatastore())
-
-            self.assertRaisesRegexp(
-                RuntimeError,
-                'At most one DeleteFromDatastore may be executed',
-                lambda: empty_pcoll | self.stub.DeleteFromDatastore())

@@ -25,63 +25,56 @@ from jobs import job_utils
 import apache_beam as beam
 
 
-class _DatastoreioStubPTransform(beam.PTransform):
-    """Base class that sets up the datastoreio stub with Python 2 compatibility.
-
-    TODO(#11475): Delete this base class once we can use the real datastoreio
-    module with Cloud NDB and Python 3.
-    """
-
-    def __init__(self, datastoreio_stub, label=None):
-        """Initializes a new instance of _DatastoreioStubPTransform.
-
-        Args:
-            datastoreio_stub: stubio.DatastoreioStub. A stub implementation of
-                the datastoreio module.
-            label: str|None. The label associated with the PTransform.
-        """
-        super(_DatastoreioStubPTransform, self).__init__(label=label)
-        self._datastoreio_stub = datastoreio_stub
-
-    @property
-    def datastoreio(self):
-        """Returns a datastoreio module capable of interacting with NDB models.
-
-        Returns:
-            stubio.DatastoreioStub. A stub implementation of the datastoreio
-            module.
-        """
-        return self._datastoreio_stub
-
-
-class GetModels(_DatastoreioStubPTransform):
+class GetModels(beam.PTransform):
     """Reads NDB models from the datastore using a query."""
 
     def __init__(self, query, datastoreio_stub, label=None):
-        super(GetModels, self).__init__(datastoreio_stub, label=label)
-        self._query = job_utils.get_beam_query_from_ndb_query(query)
+        """Initializes the GetModels PTransform.
+
+        Args:
+            query: ndb.Query. The query used to fetch models.
+            datastoreio_stub: stub_io.DatastoreioStub. The stub instance
+                responsible for handling datastoreio operations.
+            label: str|None. The label of the PTransform.
+        """
+        super(GetModels, self).__init__(label=label)
+        self._query = query
+        self._read_from_datastore_ptran = datastoreio_stub.ReadFromDatastore(
+            job_utils.get_beam_query_from_ndb_query(self._query))
 
     def expand(self, pbegin):
         """Returns a PCollection containing the queried models.
 
         Args:
-            pbegin: PCollection. The initial PValue of the pipeline. Used as an
-                anchor for attatching to the rest of the pipeline.
+            pbegin: PValue. The initial PValue of the pipeline, used to anchor
+                the models returned to its underlying pipeline.
 
         Returns:
             PCollection. The PCollection of models.
         """
         return (
             pbegin
-            | ('Reading %r from the datastore' % self._query) >> (
-                self.datastoreio.ReadFromDatastore(self._query))
-            | ('Transforming %r into NDB models' % self._query) >> (
+            | 'Reading %r from the datastore' % self._query >> (
+                self._read_from_datastore_ptran)
+            | 'Transforming %r into NDB models' % self._query >> (
                 beam.Map(job_utils.get_model_from_beam_entity))
         )
 
 
-class PutModels(_DatastoreioStubPTransform):
+class PutModels(beam.PTransform):
     """Writes NDB models to the datastore."""
+
+    def __init__(self, datastoreio_stub, label=None):
+        """Initializes the PutModels PTransform.
+
+        Args:
+            datastoreio_stub: stub_io.DatastoreioStub. The stub instance
+                responsible for handling datastoreio operations.
+            label: str|None. The label of the PTransform.
+        """
+        super(PutModels, self).__init__(label=label)
+        self._write_to_datastore_ptran = (
+            datastoreio_stub.WriteToDatastore(feconf.OPPIA_PROJECT_ID))
 
     def expand(self, model_pcoll):
         """Writes the given models to the datastore.
@@ -97,12 +90,24 @@ class PutModels(_DatastoreioStubPTransform):
             | 'Transforming the NDB models into Apache Beam entities' >> (
                 beam.Map(job_utils.get_beam_entity_from_model))
             | 'Writing the NDB models to the datastore' >> (
-                self.datastoreio.WriteToDatastore(feconf.OPPIA_PROJECT_ID))
+                self._write_to_datastore_ptran)
         )
 
 
-class DeleteModels(_DatastoreioStubPTransform):
+class DeleteModels(beam.PTransform):
     """Deletes NDB models from the datastore."""
+
+    def __init__(self, datastoreio_stub, label=None):
+        """Initializes the DeleteModels PTransform.
+
+        Args:
+            datastoreio_stub: stub_io.DatastoreioStub. The stub instance
+                responsible for handling datastoreio operations.
+            label: str|None. The label of the PTransform.
+        """
+        super(DeleteModels, self).__init__(label=label)
+        self._delete_from_datastore_ptran = (
+            datastoreio_stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID))
 
     def expand(self, model_pcoll):
         """Deletes the given models from the datastore.
@@ -116,7 +121,7 @@ class DeleteModels(_DatastoreioStubPTransform):
         return (
             model_pcoll
             | 'Transforming the NDB keys into Apache Beam keys' >> (
-                beam.Map(job_utils.get_beam_key_from_ndb_key))
+                beam.Map(job_utils.get_beam_entity_from_model))
             | 'Deleting the NDB keys from the datastore' >> (
-                self.datastoreio.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID))
+                self._delete_from_datastore_ptran)
         )
