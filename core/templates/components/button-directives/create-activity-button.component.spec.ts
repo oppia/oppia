@@ -60,7 +60,7 @@ class MockUrlService {
   }
 }
 
-fdescribe('CreateActivityButtonComponent', () => {
+describe('CreateActivityButtonComponent', () => {
   let component: CreateActivityButtonComponent;
   let fixture: ComponentFixture<CreateActivityButtonComponent>;
   let userService: UserService;
