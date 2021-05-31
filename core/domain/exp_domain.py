@@ -1820,15 +1820,13 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
-        """Converts from version 44 to 45. Version 45 adds a new
+        """Converts from version 45 to 46. Version 46 adds a new
         customization arg to NumericInput interaction which allows
         creators to set input should be grater than or equal to zero.
-
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-
         Returns:
             dict. The converted states_dict.
         """
@@ -1838,9 +1836,7 @@ class Exploration(python_utils.OBJECT):
                     'interaction']['customization_args']
                 customization_args.update({
                     'placeholder': {
-                        'value': {
-                            'bool': True
-                        }
+                        'value': True
                     }
                 })
         return states_dict
@@ -1977,7 +1973,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v50_dict_to_v51_dict(cls, exploration_dict):
-        """Converts a v50 exploration dict into a v40 exploration dict.
+        """Converts a v50 exploration dict into a v51 exploration dict.
         Adds a new customization arg to NumericInput interaction
         which allows creators to set input greator than or equal to zero.
         Args:

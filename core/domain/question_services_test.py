@@ -3134,7 +3134,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             linked_skill_id, None)
 
-    def test_migrate_question_state_from_v44_to_latest(self):
+    def test_migrate_question_state_from_v45_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -3208,7 +3208,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             language_code='en',
             version=0,
             linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=44)
+            question_state_data_schema_version=45)
         commit_cmd = question_domain.QuestionChange({
             'cmd': question_domain.CMD_CREATE_NEW
         })
