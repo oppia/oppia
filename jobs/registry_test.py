@@ -35,7 +35,7 @@ class RegistryTests(test_utils.TestBase):
             return unique_obj
 
         get_all_jobs_swap = self.swap(
-            base_jobs._JobMetaclass, 'get_all_jobs', get_all_jobs_mock) # pylint: disable=protected-access
+            base_jobs.JobMetaclass, 'get_all_jobs', get_all_jobs_mock)
 
         with get_all_jobs_swap:
             self.assertIs(registry.get_all_jobs(), unique_obj)
@@ -52,7 +52,7 @@ class RegistryTests(test_utils.TestBase):
             return unique_obj
 
         get_all_job_names_swap = self.swap(
-            base_jobs._JobMetaclass, # pylint: disable=protected-access
+            base_jobs.JobMetaclass,
             'get_all_job_names', get_all_job_names_mock)
 
         with get_all_job_names_swap:
