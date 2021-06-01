@@ -18,15 +18,15 @@
 
 export interface SkillRightsBackendDict {
   'can_edit_skill_description': boolean,
-  'skill_id': string
+  'skill_id': string | null
 }
 
 export class SkillRights {
-  _skillId: string;
+  _skillId: string | null;
   _canEditSkillDescription: boolean;
 
   constructor(
-      skillId: string, canEditSkillDescription: boolean) {
+      skillId: string | null, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }
@@ -42,7 +42,7 @@ export class SkillRights {
     return new SkillRights(null, false);
   }
 
-  getSkillId(): string {
+  getSkillId(): string | null {
     return this._skillId;
   }
 

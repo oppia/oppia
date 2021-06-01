@@ -20,7 +20,7 @@ import { TruncateAtFirstLinePipe } from
   'filters/string-utility-filters/truncate-at-first-line.pipe';
 
 describe('Testing filters', function() {
-  let truncateAtFirstLinePipe: TruncateAtFirstLinePipe;
+  let truncateAtFirstLinePipe: TruncateAtFirstLinePipe = null;
   beforeEach(() => {
     truncateAtFirstLinePipe = new TruncateAtFirstLinePipe();
   });
@@ -31,9 +31,7 @@ describe('Testing filters', function() {
 
   it('should truncate multi-line text to the first non-empty line', () => {
     expect(truncateAtFirstLinePipe.transform('')).toEqual('');
-    /* @ts-ignore: strictNullChecks */
     expect(truncateAtFirstLinePipe.transform(null)).toEqual(null);
-    /* @ts-ignore: strictNullChecks */
     expect(truncateAtFirstLinePipe.transform(undefined)).toEqual(undefined);
 
     expect(truncateAtFirstLinePipe.transform(
