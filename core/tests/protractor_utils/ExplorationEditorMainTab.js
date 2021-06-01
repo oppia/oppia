@@ -59,7 +59,7 @@ var ExplorationEditorMainTab = function() {
   };
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
-  var fadeIn = element(by.css('.protractor-test-fade-in'));
+  var fadeIn = element(by.css('.protractor-test-editor-cards-container'));
   var interaction = element(by.css('.protractor-test-interaction'));
   var interactionEditor = element(
     by.css('.protractor-test-interaction-editor'));
