@@ -1,0 +1,8 @@
+<span *ngIf="answer.correct">
+  <span [innerHTML]="'I18N_INTERACTIONS_LOGIC_PROOF_CORRECT_ANSWERS' | translate"></span>:
+  <pre> {{ answer.displayed_proof[0] | truncateAtFirstLine }}</pre>
+</span>
+<span *ngIf="!answer.correct">
+  <span [innerHTML]="'I18N_INTERACTIONS_LOGIC_PROOF_INCORRECT_ANSWERS' | translate"></span>:
+  <pre> {{ answer.displayed_proof.join('\n') | truncateAtFirstLine }}</pre>
+</span>
