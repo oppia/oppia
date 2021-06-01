@@ -274,7 +274,7 @@ class _Gae(Platform):
             Exception. The value of feconf.BULK_EMAIL_SERVICE_PROVIDER does not
                 correspond to a valid email_services module.
         """
-        if constants.DEV_MODE:
+        if not feconf.CAN_SEND_REQUESTS_TO_BULK_EMAIL_SERVICE_PROVIDER:
             from core.platform.bulk_email import dev_mode_bulk_email_services
             return dev_mode_bulk_email_services
         elif (

@@ -427,7 +427,7 @@ def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
 
 
-# To use mailhcimp email service.
+# To use mailchimp email service.
 BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP = 'mailchimp_email_service'
 # Use GAE email service by default.
 BULK_EMAIL_SERVICE_PROVIDER = BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP
@@ -452,6 +452,10 @@ MAILCHIMP_AUDIENCE_ID = None
 MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
+
+# If requests can be sent to the bulk email provider (requires the Mailchimp API
+# key, username and audience id fields to be filled).
+CAN_SEND_REQUESTS_TO_BULK_EMAIL_SERVICE_PROVIDER = False
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
