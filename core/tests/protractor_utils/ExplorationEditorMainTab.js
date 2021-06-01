@@ -507,7 +507,7 @@ var ExplorationEditorMainTab = function() {
       'State content editor takes too long to disappear');
   };
 
-  this.setContent1 = async function(richTextInstructions) {
+  this.setContentForExplorationEditor = async function(richTextInstructions) {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
