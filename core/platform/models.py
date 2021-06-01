@@ -27,13 +27,14 @@ import python_utils
 
 # Valid model names.
 NAMES = python_utils.create_enum(
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
-    'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
-    'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
-    'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
-    'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'story', 'subtopic', 'suggestion', 'topic', 'translation', 'user')
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
+    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
+    'improvements', 'job', 'opportunity', 'question', 'recommendations',
+    'skill', 'statistics', 'activity', 'audit', 'auth', 'base_model',
+    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
+    'improvements', 'job', 'opportunity', 'question', 'recommendations',
+    'skill', 'statistics', 'story', 'subtopic', 'suggestion', 'topic',
+    'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -97,6 +98,9 @@ class _Gae(Platform):
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
+            elif name == NAMES.beam_job:
+                from core.storage.beam_job import gae_models as beam_job_models
+                returned_models.append(beam_job_models)
             elif name == NAMES.classifier:
                 from core.storage.classifier import gae_models as classifier_data_models # pylint: disable=line-too-long
                 returned_models.append(classifier_data_models)

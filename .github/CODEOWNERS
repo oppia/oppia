@@ -479,6 +479,7 @@
 /core/controllers/tasks*.py @aks681
 /core/domain/audit_validators*.py @vojtechjelinek
 /core/domain/base_model_validators*.py @vojtechjelinek
+/core/domain/beam_job*.py @brianrodri
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
 /core/domain/job_validators*.py @vojtechjelinek
