@@ -124,6 +124,7 @@ RERUN_POLICIES = {
     'contributordashboard': RERUN_POLICY_ALWAYS,
     'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
     'creatordashboard': RERUN_POLICY_ALWAYS,
+    'emaildashboard': RERUN_POLICY_ALWAYS,
     'embedding': RERUN_POLICY_ALWAYS,
     'explorationfeedbacktab': RERUN_POLICY_NEVER,
     'explorationhistorytab': RERUN_POLICY_ALWAYS,
@@ -149,6 +150,9 @@ RERUN_POLICIES = {
     'topicsandskillsdashboard': RERUN_POLICY_ALWAYS,
     'users': RERUN_POLICY_KNOWN_FLAKES,
     'wipeout': RERUN_POLICY_ALWAYS,
+    # The suite name is `full` when no --suite argument is passed. This
+    # indicates that all the tests should be run.
+    'full': RERUN_POLICY_NEVER,
 }
 
 
@@ -304,6 +308,7 @@ def run_tests(args):
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
+    policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
         for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
@@ -323,7 +328,6 @@ def main(args=None):
             # Check whether we should rerun based on this suite's policy.
             test_is_flaky = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
-            policy = RERUN_POLICIES[parsed_args.suite.lower()]
             if policy == RERUN_POLICY_NEVER:
                 break
             if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
