@@ -28,7 +28,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 
-fdescribe('Question player engine service ', () => {
+describe('Question player engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
@@ -577,7 +577,7 @@ fdescribe('Question player engine service ', () => {
       .and.returnValue(Promise.resolve(exploration));
 
     expect(() => {
-      questionPlayerEngineService.getCurrentQuestionId()
+      questionPlayerEngineService.getCurrentQuestionId();
     }).toThrowError('Cannot read property \'getId\' of undefined');
 
     questionPlayerEngineService.init(
@@ -915,7 +915,7 @@ fdescribe('Question player engine service ', () => {
 
       let result = (
         questionPlayerEngineService.getCurrentIndex() <
-          questionPlayerEngineService.getQuestionCount() - 1);   
+          questionPlayerEngineService.getQuestionCount() - 1);
       expect(result).toBe(true);
     });
 
@@ -971,7 +971,7 @@ fdescribe('Question player engine service ', () => {
           return html;
         });
 
-      expect(questionPlayerEngineService.getCurrentQuestion()).toBe(undefined)
+      expect(questionPlayerEngineService.getCurrentQuestion()).toBe(undefined);
 
       questionPlayerEngineService.init(
         [singleQuestionBackendDict], successHandler, failHandler);
@@ -1035,9 +1035,10 @@ fdescribe('Question player engine service ', () => {
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
-  
+
       spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-      spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
+      spyOn(contextService, 'getExplorationId')
+        .and.returnValue('explorationId1');
       spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
       spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
@@ -1046,7 +1047,7 @@ fdescribe('Question player engine service ', () => {
         .and.callFake((html, envs) => {
           return html;
         });
-  
+
       let answerClassificationServiceSpy =
         spyOn(answerClassificationService, 'getMatchingClassificationResult')
           .and.callFake(() => {
@@ -1054,15 +1055,15 @@ fdescribe('Question player engine service ', () => {
               .toBe(true);
             return answerClassificationResult;
           });
-  
+
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, successHandler, failHandler);
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
-  
+
       expect(answerClassificationServiceSpy).toHaveBeenCalled();
     });
-  
+
     it('should return false if answers are not being processed', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
@@ -1074,23 +1075,24 @@ fdescribe('Question player engine service ', () => {
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
       let exploration = sampleExplorationDict;
-  
+
       spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-      spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
+      spyOn(contextService, 'getExplorationId')
+        .and.returnValue('explorationId1');
       spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
       spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
         .and.returnValue(Promise.resolve(exploration));
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
-  
+
       expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
-  
+
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, successHandler, failHandler);
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
-  
+
       expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
     });
   });
