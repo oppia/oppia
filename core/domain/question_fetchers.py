@@ -41,9 +41,9 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         offset: int. Number of query results to skip.
 
     Returns:
-        list(Question), list(list(str)), int. The list of questions and the
+        list(Question), list(list(str)). The list of questions and the
         corresponding linked skill descriptions which are linked to the
-        given skill ids and the next offset value for next batch of questions.
+        given skill ids.
     """
     if not skill_ids:
         return [], []

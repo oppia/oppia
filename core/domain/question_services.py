@@ -461,10 +461,9 @@ def get_displayable_question_skill_link_details(
             a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), list(MergedQuestionSkillLink), int.
+        list(QuestionSummary), list(MergedQuestionSkillLink).
         The list of questions linked to the given skill ids, the list of
-        MergedQuestionSkillLink objects, keyed by question ID and the
-        next offset value for next batch of questions.
+        MergedQuestionSkillLink objects, keyed by question ID.
     """
     if len(skill_ids) == 0:
         return [], []
