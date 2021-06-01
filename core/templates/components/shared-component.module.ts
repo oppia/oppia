@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
@@ -76,6 +76,7 @@ import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
+import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 
 
 // Directives.
@@ -134,6 +135,7 @@ const toastrConfig = {
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
+    NgbPopoverModule,
     FormsModule,
     RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
@@ -204,6 +206,7 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
@@ -264,6 +267,7 @@ const toastrConfig = {
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
@@ -306,6 +310,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
