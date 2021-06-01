@@ -24,7 +24,6 @@ var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 var waitFor = require('../protractor_utils/waitFor.js');
 var action = require('./action.js');
-const { element } = require('protractor');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -482,38 +481,15 @@ var ExplorationEditorMainTab = function() {
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
-  this.setContent = async function(richTextInstructions) {
+  this.setContent = async function(richTextInstructions, expectFadeIn) {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
-    await action.click('stateEditButton', stateEditButton);
-    var stateEditorTag = element(by.tagName('state-content-editor'));
-    await waitFor.visibilityOf(
-      stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.element(
-      by.css('.protractor-test-state-content-editor'));
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
-    await richTextEditor.clear();
-    await richTextInstructions(richTextEditor);
-    expect(await saveStateContentButton.isDisplayed()).toBe(true);
-    await waitFor.elementToBeClickable(saveStateContentButton);
-    await saveStateContentButton.click();
-    await waitFor.invisibilityOf(
-      saveStateContentButton,
-      'State content editor takes too long to disappear');
-  };
-
-  this.setContentForExplorationEditor = async function(richTextInstructions) {
-    // Wait for browser to time out the popover, which is 4000 ms.
-    await waitFor.invisibilityOf(
-      postTutorialPopover, 'Post-tutorial popover does not disappear.');
-    await action.waitForAutosave();
-    await waitFor.fadeInToComplete(
-      fadeIn, 'Editor taking long to fade in');
+    if (expectFadeIn) {
+      await waitFor.fadeInToComplete(
+        fadeIn, 'Editor taking long to fade in');
+    }
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
