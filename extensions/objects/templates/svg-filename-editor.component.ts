@@ -561,6 +561,7 @@ export class SvgFilenameEditorComponent implements OnInit {
     domReady.then(() => {
       this.initializeFabricJs();
       fabric.loadSVGFromString(
+        // @ts-expect-error
         this.savedSvgDiagram, (objects, options, elements) => {
           let groupedObjects = [];
           objects.forEach((obj, index) => {
@@ -573,6 +574,7 @@ export class SvgFilenameEditorComponent implements OnInit {
               if (
                 obj.get('type') === 'rect' &&
                 this.isFullRectangle(elements[index])) {
+                // @ts-expect-error
                 this.canvas.setBackgroundColor(obj.get('fill'));
                 this.fabricjsOptions.bg = obj.get('fill');
                 this.bgPicker.setOptions({
@@ -937,6 +939,7 @@ export class SvgFilenameEditorComponent implements OnInit {
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
+      // @ts-expect-error
       id: 'group' + this.groupCount
     });
     arc.toSVG = this.createCustomToSVG(
@@ -948,6 +951,7 @@ export class SvgFilenameEditorComponent implements OnInit {
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
+      // @ts-expect-error
       id: 'group' + this.groupCount
     });
     tri.toSVG = this.createCustomToSVG(
