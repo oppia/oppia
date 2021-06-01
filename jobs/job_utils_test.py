@@ -185,7 +185,7 @@ class GetModelKeyTests(test_utils.TestBase):
 class BeamEntityToAndFromModelTests(test_utils.TestBase):
 
     def test_get_beam_entity_from_model(self):
-        model = FooModel(id='abc', prop='123')
+        model = FooModel(id='abc', app=feconf.OPPIA_PROJECT_ID, prop='123')
 
         beam_entity = job_utils.get_beam_entity_from_ndb_model(model)
 

@@ -106,7 +106,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         with self.datastoreio_stub.context():
             self.assert_pcoll_empty(
                 self.pipeline
-                | beam.Create(model_list)
+                | beam.Create([model.key for model in model_list])
                 | ndb_io.DeleteModels(self.datastoreio_stub)
             )
 

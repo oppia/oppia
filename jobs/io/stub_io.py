@@ -121,15 +121,15 @@ class DatastoreioStub(python_utils.OBJECT):
         with self._models_lock:
             self._models.update({model.key: model for model in models})
 
-    def delete_multi(self, models):
+    def delete_multi(self, keys):
         """Deletes the models from the stub, if they exist.
 
         Args:
-            models: list(Model). The models to delete from the stub.
+            keys: list(Key). The keys to delete from the stub.
         """
         with self._models_lock:
-            for model in models:
-                self._models.pop(model.key, None)
+            for key in keys:
+                self._models.pop(key, None)
 
     def ReadFromDatastore(self, query): # pylint: disable=invalid-name
         """Returns a PTransform which returns all models from the stub.
@@ -224,18 +224,18 @@ class DatastoreioStub(python_utils.OBJECT):
             job_utils.get_ndb_model_from_beam_entity(m)
             for m in pickle.loads(pickled_models))
 
-    def _delete_from_datastore_handler(self, pickled_models):
+    def _delete_from_datastore_handler(self, pickled_keys):
         """XML-RPC handler for a DeleteFromDatastore request.
 
         IMPORTANT: This operation must be idempotent!
 
         Args:
-            pickled_models: str. The list of models to delete from the
-                datastore, encoded as a pickled list of Apache Beam entities.
+            pickled_keys: str. The list of keys to delete from the datastore,
+                encoded as a pickled list of Apache Beam keys.
         """
         self.delete_multi(
-            job_utils.get_ndb_model_from_beam_entity(m)
-            for m in pickle.loads(pickled_models))
+            job_utils.get_ndb_key_from_beam_key(k)
+            for k in pickle.loads(pickled_keys))
 
 
 class _DatastoreioTransform(beam.PTransform):
@@ -326,20 +326,19 @@ class _WriteToDatastore(_DatastoreioTransform):
 class _DeleteFromDatastore(_DatastoreioTransform):
     """Stub implementation of Apache Beam's DeleteFromDatastore PTransform."""
 
-    def expand(self, model_pcoll):
+    def expand(self, model_key_pcoll):
         """Deletes models from storage using the DeleteFromDatastore endpoint.
 
         Args:
-            model_pcoll: PCollection. The collection of models to delete from
-                storage.
+            model_key_pcoll: PCollection. The keys to delete.
 
         Returns:
             PCollection. An empty PCollection.
         """
         return (
-            model_pcoll
-            | 'Gather entities to delete in a list' >> beam.combiners.ToList()
-            | 'Encode the list of entities to delete using pickle' >> (
+            model_key_pcoll
+            | 'Gather keys to delete in a list' >> beam.combiners.ToList()
+            | 'Encode the list of keys to delete using pickle' >> (
                 beam.Map(pickle.dumps))
             | 'Callout to the DeleteFromDatastore endpoint' >> beam.ParDo(
                 # NOTE: We need to use this lambda because
@@ -347,6 +346,6 @@ class _DeleteFromDatastore(_DatastoreioTransform):
                 # server_proxy transforms it into an RPC request using Python
                 # "magic". Apache Beam requires a genuine function, however, so
                 # we pass a lambda to satisfy it.
-                lambda pickled_models: ( # pylint: disable=unnecessary-lambda
-                    self.server_proxy.DeleteFromDatastore(pickled_models)))
+                lambda pickled_keys: ( # pylint: disable=unnecessary-lambda
+                    self.server_proxy.DeleteFromDatastore(pickled_keys)))
         )

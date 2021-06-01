@@ -81,7 +81,7 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             model_pcoll = (
                 self.pipeline
                 | beam.Create([
-                    job_utils.get_beam_entity_from_ndb_model(m)
+                    job_utils.get_beam_key_from_ndb_key(m.key)
                     for m in model_list
                 ])
             )
@@ -109,7 +109,7 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
             model_pcoll = (
                 self.pipeline
                 | beam.Create([
-                    job_utils.get_beam_entity_from_ndb_model(m)
+                    job_utils.get_beam_key_from_ndb_key(m.key)
                     for m in model_list
                 ])
             )

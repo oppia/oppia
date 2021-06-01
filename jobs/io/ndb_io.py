@@ -110,19 +110,19 @@ class DeleteModels(beam.PTransform):
         super(DeleteModels, self).__init__(label=label)
         self.datastoreio = datastoreio_stub
 
-    def expand(self, model_pcoll):
+    def expand(self, model_key_pcoll):
         """Deletes the given models from the datastore.
 
         Args:
-            model_pcoll: PCollection. The PCollection of NDB models to delete.
+            model_key_pcoll: PCollection. The PCollection of NDB keys to delete.
 
         Returns:
             PCollection. An empty PCollection.
         """
         return (
-            model_pcoll
+            model_key_pcoll
             | 'Transforming the NDB keys into Apache Beam keys' >> (
-                beam.Map(job_utils.get_beam_entity_from_ndb_model))
+                beam.Map(job_utils.get_beam_key_from_ndb_key))
             | 'Deleting the NDB keys from the datastore' >> (
                 self.datastoreio.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID))
         )

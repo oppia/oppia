@@ -23,7 +23,6 @@ import itertools
 import operator
 
 from core.platform import models
-import feconf
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.appengine.api import datastore_types
@@ -186,9 +185,7 @@ def get_beam_entity_from_ndb_model(model):
         beam_datastore_types.Entity. The Apache Beam entity.
     """
     beam_entity = beam_datastore_types.Entity(
-        beam_datastore_types.Key(
-            model.key.flat(), project=feconf.OPPIA_PROJECT_ID,
-            namespace=model.key.namespace()))
+        get_beam_key_from_ndb_key(model.key))
     beam_entity.set_properties(model._to_dict()) # pylint: disable=protected-access
     return beam_entity
 
@@ -202,11 +199,35 @@ def get_ndb_model_from_beam_entity(beam_entity):
     Returns:
         datastore_services.Model. The NDB model.
     """
-    datastore_key = beam_entity.key.to_client_key()
-    model_key = (
-        datastore_services.Key.from_old_key(datastore_key.to_legacy_urlsafe()))
-    model_class = datastore_services.Model._lookup_model(datastore_key.kind) # pylint: disable=protected-access
-    return model_class(key=model_key, **beam_entity.properties)
+    ndb_key = get_ndb_key_from_beam_key(beam_entity.key)
+    ndb_model_class = datastore_services.Model._lookup_model(ndb_key.kind()) # pylint: disable=protected-access
+    return ndb_model_class(key=ndb_key, **beam_entity.properties)
+
+
+def get_ndb_key_from_beam_key(beam_key):
+    """Returns an NDB key equivalent to the given Apache Beam key.
+
+    Args:
+        beam_key: beam_datastore_types.Key. The Apache Beam key.
+
+    Returns:
+        datastore_services.Key. The NDB key.
+    """
+    ds_key = beam_key.to_client_key()
+    return datastore_services.Key.from_old_key(ds_key.to_legacy_urlsafe())
+
+
+def get_beam_key_from_ndb_key(ndb_key):
+    """Returns an Apache Beam key equivalent to the given NDB key.
+
+    Args:
+        ndb_key: datastore_services.Key. The NDB key.
+
+    Returns:
+        beam_datastore_types.Key. The Apache Beam key.
+    """
+    return beam_datastore_types.Key(
+        ndb_key.flat(), project=ndb_key.app(), namespace=ndb_key.namespace())
 
 
 def get_beam_query_from_ndb_query(query):
