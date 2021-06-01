@@ -39,14 +39,14 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   providedIn: 'root'
 })
 export class QuestionPlayerEngineService {
-  explorationId: string = null;
-  questionPlayerMode: boolean = null;
-  version: number = null;
+  private explorationId: string = null;
+  private questionPlayerMode: boolean = null;
+  private version: number = null;
 
-  answerIsBeingProcessed: boolean = false;
-  questions: Question[] = [];
-  currentIndex: number = null;
-  nextIndex: number = null;
+  private answerIsBeingProcessed: boolean = false;
+  private questions: Question[] = [];
+  private currentIndex: number = null;
+  private nextIndex: number = null;
 
   constructor(
       private alertsService: AlertsService,
@@ -109,7 +109,7 @@ export class QuestionPlayerEngineService {
       return;
     }
 
-    this.currentIndex = 0;
+    this.setCurrentIndex(0);
     this.nextIndex = 0;
 
     let interaction = initialState.interaction;
@@ -166,17 +166,24 @@ export class QuestionPlayerEngineService {
         });
     }
 
-    this.answerIsBeingProcessed = false;
+    this.setAnswerIsBeingProcessed(false);
     for (let i = 0; i < questionDicts.length; i++) {
-      this.questions.push(
-        this.questionObjectFactory.createFromBackendDict(questionDicts[i])
-      );
+      this.addQuestion(
+        this.questionObjectFactory.createFromBackendDict(questionDicts[i]));
     }
     this.loadInitialQuestion(successCallback, errorCallback);
   }
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
+  }
+
+  getCurrentIndex(): number {
+    return this.currentIndex;
+  }
+
+  setCurrentIndex(value: number): void {
+    this.currentIndex = value;
   }
 
   getCurrentQuestion(): Question {
@@ -215,6 +222,14 @@ export class QuestionPlayerEngineService {
     return this.answerIsBeingProcessed;
   }
 
+  setAnswerIsBeingProcessed(value: boolean): void {
+    this.answerIsBeingProcessed = value;
+  }
+
+  addQuestion(question: Question): void {
+    this.questions.push(question);
+  }
+
   submitAnswer(
       answer: InteractionAnswer,
       interactionRulesService: InteractionRulesService,
@@ -236,7 +251,7 @@ export class QuestionPlayerEngineService {
     }
 
     let answerString = answer as string;
-    this.answerIsBeingProcessed = true;
+    this.setAnswerIsBeingProcessed(true);
     let oldState = this.getCurrentStateData();
     let recordedVoiceovers = oldState.recordedVoiceovers;
     let classificationResult = (
@@ -266,7 +281,7 @@ export class QuestionPlayerEngineService {
     let feedbackAudioTranslations = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
-      this.answerIsBeingProcessed = false;
+      this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Expression parsing error.');
       return;
     }
@@ -282,11 +297,11 @@ export class QuestionPlayerEngineService {
       answer: 'answer'
     }]);
     if (questionHtml === null) {
-      this.answerIsBeingProcessed = false;
+      this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Expression parsing error.');
       return;
     }
-    this.answerIsBeingProcessed = false;
+    this.setAnswerIsBeingProcessed(false);
 
     let interactionId = oldState.interaction.id;
     let interactionIsInline = (
