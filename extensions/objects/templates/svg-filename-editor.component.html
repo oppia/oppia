@@ -1,11 +1,11 @@
 <div class="fs-container svg-filename-editor">
   <div *ngIf="!isDiagramSaved()" class="diagram-editor-size-toolbar">
     <div class="input-box">
-      Width: 
+      Width:&nbsp;
       <input type="number" [(ngModel)]="diagramWidth" (blur)="onWidthInputBlur()">
     </div>
     <div class="input-box">
-      Height: 
+      Height:&nbsp;
       <input type="number" [(ngModel)]="diagramHeight" (blur)="onHeightInputBlur()">
     </div>
     <div class="dimension-note">
@@ -266,9 +266,9 @@
       <div class="input-tag" *ngIf="isSizeVisible()">
         <select [(ngModel)]="fabricjsOptions.size"
                 (ngModelChange)="onSizeChange()">
-                <option *ngFor="let size of sizes">
-                  {{size}}
-                </option>
+          <option *ngFor="let size of sizes">
+            {{size}}
+          </option>
         </select>
       </div>
       <div class="input-tag" *ngIf="objectIsSelected">

@@ -16,50 +16,53 @@
  * @fileoverview Unit tests for fetching svg file.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { Observable, of } from 'rxjs';
 import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
 
 describe('SvgFileFetcherBackendApiService', () => {
   let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
-
-  class MockHttpClient {
-    get<T>(url: string, options): Observable<T | string> {
-      return of('<svg></svg>');
-    }
-    post<T>(url: string, body: unknown): Observable<T> {
-      return of({filename: 'file.name'} as unknown as T);
-    }
-  }
+  let httpTestingController: HttpTestingController;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: HttpClient,
-          useClass: MockHttpClient
-        }
-      ]
+      imports: [HttpClientTestingModule]
     });
     svgFileFetcherBackendApiService = TestBed.inject(
       SvgFileFetcherBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   }));
 
   it('should send request for svg files', waitForAsync(fakeAsync(() => {
-    svgFileFetcherBackendApiService.fetchSvg('abc').subscribe(
-      res => expect(res).toBe('<svg></svg>')
+    let svg = '';
+    svgFileFetcherBackendApiService.fetchSvg('/abc').subscribe(
+      x => svg = x
     );
+    let req = httpTestingController.expectOne('/abc');
+    expect(req.request.method).toBe('GET');
+    req.flush('<svg><svg>');
+    expect(svg).toBe('<svg><svg>');
   })));
 
   it('should send request for svg files', waitForAsync(fakeAsync(() => {
+    let filename = '';
     svgFileFetcherBackendApiService.postSvgFile(
       new Blob(['abc']),
       {height: 1, width: 1},
       'abc',
       'def'
     ).subscribe(
-      res => expect(res.filename).toBe('file.name')
+      res => filename = res.filename
     );
+    let req = httpTestingController.expectOne(
+      '/createhandler/imageupload/abc/def'
+    );
+    expect(req.request.method).toBe('POST');
+    req.flush({filename: 'file.name'});
+    expect(filename).toBe('file.name');
   })));
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 });

@@ -561,8 +561,7 @@ export class SvgFilenameEditorComponent implements OnInit {
     domReady.then(() => {
       this.initializeFabricJs();
       fabric.loadSVGFromString(
-        // @ts-expect-error
-        this.savedSvgDiagram, (objects, options, elements) => {
+        this.savedSvgDiagram, ((objects, options, elements) => {
           let groupedObjects = [];
           objects.forEach((obj, index) => {
             const objId = elements[index].id;
@@ -574,8 +573,7 @@ export class SvgFilenameEditorComponent implements OnInit {
               if (
                 obj.get('type') === 'rect' &&
                 this.isFullRectangle(elements[index])) {
-                // @ts-expect-error
-                this.canvas.setBackgroundColor(obj.get('fill'));
+                this.canvas.setBackgroundColor(obj.get('fill'), () => {});
                 this.fabricjsOptions.bg = obj.get('fill');
                 this.bgPicker.setOptions({
                   color: obj.get('fill')
@@ -591,7 +589,7 @@ export class SvgFilenameEditorComponent implements OnInit {
             this.canvas.add(new fabric.Group(objs));
             this.groupCount += 1;
           });
-        }
+        }) as unknown as (results: Object[], options) => void
       );
       this.changeDetectorRef.detectChanges();
     });
@@ -939,9 +937,8 @@ export class SvgFilenameEditorComponent implements OnInit {
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
-      // @ts-expect-error
       id: 'group' + this.groupCount
-    });
+    } as unknown as fabric.ICircleOptions);
     arc.toSVG = this.createCustomToSVG(
       arc.toSVG, 'path', (arc as unknown as {id: string}).id, arc);
     const p1 = new PolyPoint (height + center.x, center.y + halfChord);
@@ -951,9 +948,8 @@ export class SvgFilenameEditorComponent implements OnInit {
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
-      // @ts-expect-error
       id: 'group' + this.groupCount
-    });
+    } as unknown as fabric.IPolylineOptions);
     tri.toSVG = this.createCustomToSVG(
       tri.toSVG, tri.type, (tri as unknown as {id: string}).id, tri);
     const rotationAngle = (startAngle + halfAngle) * radiansToDegrees;
