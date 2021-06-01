@@ -22,7 +22,7 @@ import { ExplorationCreationBackendApiService } from 'components/entity-creation
 
 describe('Collection Creation backend api service', () => {
   let explorationCreationBackendApiService:
-  ExplorationCreationBackendApiService = null;
+  ExplorationCreationBackendApiService;
   let httpTestingController: HttpTestingController;
   let SAMPLE_EXPLORATION_ID = 'hyuy4GUlvTqJ';
   let ERROR_STATUS_CODE = 500;

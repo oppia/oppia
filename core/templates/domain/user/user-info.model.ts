@@ -22,9 +22,9 @@ export interface UserInfoBackendDict {
   'is_super_admin': boolean;
   'is_topic_manager': boolean;
   'can_create_collections': boolean;
-  'preferred_site_language_code': string;
-  'username': string;
-  'email': string;
+  'preferred_site_language_code': string | null;
+  'username': string | null;
+  'email': string | null;
   'user_is_logged_in': boolean;
 }
 
@@ -34,16 +34,16 @@ export class UserInfo {
   _isTopicManager: boolean;
   _isSuperAdmin: boolean;
   _canCreateCollections: boolean;
-  _preferredSiteLanguageCode: string;
-  _username: string;
-  _email: string;
+  _preferredSiteLanguageCode: string | null;
+  _username: string | null;
+  _email: string | null;
   _isLoggedIn: boolean;
 
   constructor(
       isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
       isTopicManager: boolean, canCreateCollections: boolean,
-      preferredSiteLanguageCode: string, username: string,
-      email: string, isLoggedIn: boolean) {
+      preferredSiteLanguageCode: string | null, username: string | null,
+      email: string | null, isLoggedIn: boolean) {
     this._isModerator = isModerator;
     this._isAdmin = isAdmin;
     this._isTopicManager = isTopicManager;
@@ -88,15 +88,15 @@ export class UserInfo {
     return this._canCreateCollections;
   }
 
-  getPreferredSiteLanguageCode(): string {
+  getPreferredSiteLanguageCode(): string | null {
     return this._preferredSiteLanguageCode;
   }
 
-  getUsername(): string {
+  getUsername(): string | null {
     return this._username;
   }
 
-  getEmail(): string {
+  getEmail(): string | null {
     return this._email;
   }
 
