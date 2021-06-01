@@ -58,12 +58,11 @@ export class QuestionsListService {
     this._questionSummartiesInitializedEventEmitter.emit();
   }
 
-  private _changeNextQuestionsOffset(
-      nextOffset: number, resetHistory: boolean): void {
+  private _changeNextQuestionsOffset(resetHistory: boolean): void {
     if (resetHistory) {
       this._nextOffsetForQuestions = 0;
     }
-    this._nextOffsetForQuestions += nextOffset;
+    this._nextOffsetForQuestions += AppConstants.NUM_QUESTIONS_PER_PAGE;
   }
 
   private _setMore(more: boolean): void {
@@ -103,8 +102,7 @@ export class QuestionsListService {
               createFromBackendDict(summary));
         });
 
-        this._changeNextQuestionsOffset(
-          questionSummaries.length, resetHistory);
+        this._changeNextQuestionsOffset(resetHistory);
         this._setMore(response.more);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
