@@ -468,7 +468,9 @@ var ExplorationEditorMainTab = function() {
       await action.sendKeys(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
     } else if (refresherExplorationId) {
-      await editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
+      await action.sendKeys(
+        'Edit Outcome Add Exploration Id',
+        editOutcomeDestAddExplorationId, refresherExplorationId);
     }
   };
 
@@ -528,10 +530,10 @@ var ExplorationEditorMainTab = function() {
     var hintTextButton = element(
       by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
     await action.click('Hint Text Button', hintTextButton);
-    var browserActiveElement = element(
+    var CKEditor = element(
       by.css('.protractor-test-ck-editor')).all(by.className(
       'oppia-rte-resizer')).first();
-    await action.sendKeys('Browser Active Element', browserActiveElement, hint);
+    await action.sendKeys('Text CKEditor', CKEditor, hint);
     await action.click('Save Hint Button', saveHintButton);
     await waitFor.invisibilityOf(
       addHintModal, 'Add Hint modal takes too long to close');
@@ -553,11 +555,11 @@ var ExplorationEditorMainTab = function() {
       by.css('.protractor-test-explanation-textarea')).all(
       by.tagName('p')).first();
     await action.click('Explanation Text Area', explanationTextArea);
-    var browserActiveElement = element(
+    var CKEditor = element(
       by.css('.protractor-test-ck-editor')).all(by.className(
       'oppia-rte-resizer')).first();
     await action.sendKeys(
-      'Browser Active Element', browserActiveElement, solution.explanation);
+      'Text CKEditor', CKEditor, solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
     await action.click('Submit Solution Button', submitSolutionButton);
@@ -768,14 +770,16 @@ var ExplorationEditorMainTab = function() {
         var multipleChoiceAnswerOption =
           multipleChoiceAnswerOptions(parameterValues[i]);
         await action.click(
-          'Multiple Choice Answer Option', multipleChoiceAnswerOption);
+          'Multiple Choice Answer Option:' + parameterValues[i],
+          multipleChoiceAnswerOption);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {
           var itemSelectionAnswerOption =
             itemSelectionAnswerOptions(answerArray[j]);
           await action.click(
-            'Item Selection Answer Option', itemSelectionAnswerOption);
+            'Item Selection Answer Option:' + answerArray[j],
+            itemSelectionAnswerOption);
         }
       } else {
         await parameterEditor.setValue(parameterValues[i]);
