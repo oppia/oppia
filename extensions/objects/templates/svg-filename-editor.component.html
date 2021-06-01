@@ -1,7 +1,13 @@
 <div class="fs-container svg-filename-editor">
   <div *ngIf="!isDiagramSaved()" class="diagram-editor-size-toolbar">
-    <div class="input-box">Width: <input type="number" [(ngModel)]="diagramWidth" (blur)="onWidthInputBlur()"></div>
-    <div class="input-box">Height: <input type="number" [(ngModel)]="diagramHeight" (blur)="onHeightInputBlur()"></div>
+    <div class="input-box">
+      Width: 
+      <input type="number" [(ngModel)]="diagramWidth" (blur)="onWidthInputBlur()">
+    </div>
+    <div class="input-box">
+      Height: 
+      <input type="number" [(ngModel)]="diagramHeight" (blur)="onHeightInputBlur()">
+    </div>
     <div class="dimension-note">
       This diagram has a maximum dimension of 490 X 550 px. Changes made to the dimensions will
       be reflected after "Use this Image" button is clicked.
@@ -77,52 +83,82 @@
     </div>
     <div class="vertical-toolbar">
       <div>
-        <button class="icon-tool toolbar-button thin-button" [ngClass]="{'disabled' : !isPencilEnabled()}"
+        <button class="icon-tool toolbar-button thin-button"
+                [ngClass]="{'disabled' : !isPencilEnabled()}"
                 (click)="togglePencilDrawing()"
-                placement="left" ngbTooltip="Pencil" [disabled]="!isPencilEnabled()">
+                placement="left"
+                ngbTooltip="Pencil"
+                [disabled]="!isPencilEnabled()">
           <i class="fas fa-pencil-alt"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-line"
-                [ngClass]="{'disabled' : !areAllToolsEnabled()}" (click)="createLine()"
-                placement="right" ngbTooltip="Line" [disabled]="!areAllToolsEnabled()">
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createLine()"
+                placement="right"
+                ngbTooltip="Line"
+                [disabled]="!areAllToolsEnabled()">
           <i class="fas fa-slash oppia-slash-icon"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-rectangle"
-                [ngClass]="{'disabled' : !areAllToolsEnabled()}" (click)="createRect()"
-                placement="left" ngbTooltip="Rectangle" [disabled]="!areAllToolsEnabled()">
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createRect()"
+                placement="left"
+                ngbTooltip="Rectangle"
+                [disabled]="!areAllToolsEnabled()">
           <i class="far fa-square"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-circle"
-                [ngClass]="{'disabled' : !areAllToolsEnabled()}" (click)="createCircle()"
-                placement="right" ngbTooltip="Circle" [disabled]="!areAllToolsEnabled()">
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createCircle()"
+                placement="right"
+                ngbTooltip="Circle"
+                [disabled]="!areAllToolsEnabled()">
           <i class="far fa-circle"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-text"
-                [ngClass]="{'disabled' : !areAllToolsEnabled()}" (click)="createText()"
-                placement="left" ngbTooltip="Text" [disabled]="!areAllToolsEnabled()">
+                [ngClass]="{'disabled' : !areAllToolsEnabled()}"
+                (click)="createText()"
+                placement="left"
+                ngbTooltip="Text"
+                [disabled]="!areAllToolsEnabled()">
           <i class="fas fa-font"></i>
         </button>
-        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon" [ngClass]="{'disabled' : !isClosedPolygonEnabled()}"
-                (click)="createClosedPolygon()" placement="right" ngbTooltip="Closed Polygon"
+        <button class="icon-tool toolbar-button thin-button oppia-closed-polygon-icon"
+        [ngClass]="{'disabled' : !isClosedPolygonEnabled()}"
+                (click)="createClosedPolygon()"
+                placement="right"
+                ngbTooltip="Closed Polygon"
                 [disabled]="!isClosedPolygonEnabled()">
         </button>
-        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon" [ngClass]="{'disabled' : !isOpenPolygonEnabled()}"
-                (click)="createOpenPolygon()" placement="left" ngbTooltip="Open Polygon"
+        <button class="icon-tool toolbar-button thin-button oppia-open-polygon-icon"
+        [ngClass]="{'disabled' : !isOpenPolygonEnabled()}"
+                (click)="createOpenPolygon()"
+                placement="left"
+                ngbTooltip="Open Polygon"
                 [disabled]="!isOpenPolygonEnabled()">
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-bezier"
-                [ngClass]="{'disabled' : !(areAllToolsEnabled() || isDrawModeBezier())}" (click)="createQuadraticBezier()"
-                placement="right" ngbTooltip="Quadratic Bezier curve" [disabled]="!(areAllToolsEnabled() || isDrawModeBezier())">
+                [ngClass]="{'disabled' : !(areAllToolsEnabled() || isDrawModeBezier())}"
+                (click)="createQuadraticBezier()"
+                placement="right"
+                ngbTooltip="Quadratic Bezier curve"
+                [disabled]="!(areAllToolsEnabled() || isDrawModeBezier())">
           <i class="fas fa-bezier-curve bezier-curve"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-piechart"
-                [ngClass]="{'disabled' : !isPieChartEnabled()}" (click)="createPieChart()"
-                placement="left" ngbTooltip="Pie Chart" [disabled]="!isPieChartEnabled()">
+                [ngClass]="{'disabled' : !isPieChartEnabled()}"
+                (click)="createPieChart()"
+                placement="left"
+                ngbTooltip="Pie Chart"
+                [disabled]="!isPieChartEnabled()">
           <i class="fas fa-chart-pie pie-chart"></i>
         </button>
         <button class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
-                [ngClass]="{'disabled' : !isSvgUploadEnabled()}" (click)="uploadSvgFile()"
-                placement="right" ngbTooltip="Upload SVG" [disabled]="!isSvgUploadEnabled()">
+                [ngClass]="{'disabled' : !isSvgUploadEnabled()}"
+                (click)="uploadSvgFile()"
+                placement="right"
+                ngbTooltip="Upload SVG"
+                [disabled]="!isSvgUploadEnabled()">
           <i class="far fa-file-image file-upload"></i>
         </button>
         <div class="vert-bottom-toolbar">
@@ -150,30 +186,40 @@
             </div>
           </div>
           <div>
-            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon" [ngClass]="{'disabled' : !objectIsSelected}"
-                    (click)="bringObjectForward()" placement="left" ngbTooltip="Bring Forward"
+            <button class="icon-tool toolbar-button thin-button oppia-bring-forward-icon"
+                    [ngClass]="{'disabled' : !objectIsSelected}"
+                    (click)="bringObjectForward()"
+                    placement="left"
+                    ngbTooltip="Bring Forward"
                     [disabled]="!objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon" [ngClass]="{'disabled' : !objectIsSelected}"
-                    (click)="sendObjectBackward()" placement="right" ngbTooltip="Send Backward"
+            <button class="icon-tool toolbar-button thin-button oppia-send-backward-icon"
+                    [ngClass]="{'disabled' : !objectIsSelected}"
+                    (click)="sendObjectBackward()"
+                    placement="right"
+                    ngbTooltip="Send Backward"
                     [disabled]="!objectIsSelected">
             </button>
-            <button class="icon-tool toolbar-button thin-button" [ngClass]="{'disabled' : !isUndoEnabled()}"
+            <button class="icon-tool toolbar-button thin-button"
+                    [ngClass]="{'disabled' : !isUndoEnabled()}"
                     (click)="onUndo()"
                     [disabled]="!isUndoEnabled()">
               <i class="fas fa-undo"></i>
             </button>
-            <button class="icon-tool toolbar-button thin-button" [ngClass]="{'disabled' : !isRedoEnabled()}"
+            <button class="icon-tool toolbar-button thin-button"
+                    [ngClass]="{'disabled' : !isRedoEnabled()}"
                     (click)="onRedo()"
                     [disabled]="!isRedoEnabled()">
               <i class="fas fa-redo"></i>
             </button>
           </div>
-          <button class="toolbar-button fat-button" (click)="removeShape()"
+          <button class="toolbar-button fat-button"
+                  (click)="removeShape()"
                   [disabled]="!objectIsSelected">
             Remove
           </button>
-          <button class="toolbar-button fat-button" (click)="onClear()"
+          <button class="toolbar-button fat-button"
+                  (click)="onClear()"
                   [disabled]="!isClearEnabled()">
             Clear
           </button>
@@ -244,10 +290,15 @@
     </div>
   </div>
   <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box">
-    <button class="btn btn-success float-right protractor-test-save-diagram" (click)="saveSvgFile()" [disabled]="isUserDrawing() || loadingIndicatorIsShown">
+    <button class="btn btn-success float-right protractor-test-save-diagram"
+            (click)="saveSvgFile()"
+            [disabled]="isUserDrawing() || loadingIndicatorIsShown">
       <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
       <span *ngIf="loadingIndicatorIsShown">
-        <mat-progress-spinner [diameter]="25" [mode]="indeterminate" class="oppia-diagram-spinning-button"></mat-progress-spinner>
+        <mat-progress-spinner [diameter]="25"
+                              [mode]="indeterminate"
+                              class="oppia-diagram-spinning-button">
+        </mat-progress-spinner>
       </span>
     </button>
   </div>

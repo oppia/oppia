@@ -324,7 +324,6 @@ export class SvgFilenameEditorComponent implements OnInit {
           height: dimensions.height + 'px',
           width: dimensions.width + 'px'
         };
-        // // $scope.$applyAsync();
       };
       img.src = this.getTrustedResourceUrlForSvgFileName(filename).unsafeUrl;
     };
@@ -400,7 +399,8 @@ export class SvgFilenameEditorComponent implements OnInit {
           svgDataURI));
       if (
         this.imageSaveDestination ===
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      ) {
         this.saveImageToLocalStorage(dimensions, resampledFile);
       } else {
         this.loadingIndicatorIsShown = true;
@@ -416,7 +416,6 @@ export class SvgFilenameEditorComponent implements OnInit {
               height: dimensions.height + 'px',
               width: dimensions.width + 'px'
             };
-            // $scope.$applyAsync();
             this.loadingIndicatorIsShown = false;
           };
           img.src = this.getTrustedResourceUrlForSvgFileName(
@@ -562,7 +561,6 @@ export class SvgFilenameEditorComponent implements OnInit {
     domReady.then(() => {
       this.initializeFabricJs();
       fabric.loadSVGFromString(
-        // @ts-expect-error
         this.savedSvgDiagram, (objects, options, elements) => {
           let groupedObjects = [];
           objects.forEach((obj, index) => {
@@ -575,7 +573,6 @@ export class SvgFilenameEditorComponent implements OnInit {
               if (
                 obj.get('type') === 'rect' &&
                 this.isFullRectangle(elements[index])) {
-                // @ts-expect-error
                 this.canvas.setBackgroundColor(obj.get('fill'));
                 this.fabricjsOptions.bg = obj.get('fill');
                 this.bgPicker.setOptions({
@@ -910,7 +907,6 @@ export class SvgFilenameEditorComponent implements OnInit {
         angle: 0
       };
       this.pieChartDataInput.push(dataInput);
-      // $scope.$applyAsync();
     }
   }
 
@@ -941,7 +937,6 @@ export class SvgFilenameEditorComponent implements OnInit {
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
-      // @ts-expect-error
       id: 'group' + this.groupCount
     });
     arc.toSVG = this.createCustomToSVG(
@@ -953,7 +948,6 @@ export class SvgFilenameEditorComponent implements OnInit {
       stroke: color,
       strokeWidth: 1,
       strokeUniform: true,
-      // @ts-expect-error
       id: 'group' + this.groupCount
     });
     tri.toSVG = this.createCustomToSVG(
@@ -1059,7 +1053,6 @@ export class SvgFilenameEditorComponent implements OnInit {
         color: '#00ff00',
         angle: 0
       }];
-      // $scope.$applyAsync();
     }
   }
 
@@ -1103,7 +1096,6 @@ export class SvgFilenameEditorComponent implements OnInit {
       }
       this.canvas.renderAll();
       this.uploadedSvgDataUrl = null;
-      // $scope.$applyAsync();
     }
   }
 
@@ -1449,8 +1441,9 @@ export class SvgFilenameEditorComponent implements OnInit {
         // Enables drawing a polygon in a device with touch support.
         if (
           this.polyOptions.lines.length !== 0 &&
-              this.drawMode === this.DRAW_MODE_POLY &&
-              this.isTouchDevice) {
+          this.drawMode === this.DRAW_MODE_POLY &&
+          this.isTouchDevice
+        ) {
           this.setPolyStartingPoint(options);
           this.polyOptions.lines[this.polyOptions.lineCounter - 1].set({
             x2: this.polyOptions.x,
@@ -1463,15 +1456,15 @@ export class SvgFilenameEditorComponent implements OnInit {
           this.polyOptions.lines[this.polyOptions.lineCounter]);
         this.polyOptions.lineCounter++;
       }
-      // $scope.$applyAsync();
     });
 
     this.canvas.on('mouse:move', (options) => {
       // Detects the mouse movement while drawing the polygon.
       if (
         this.polyOptions.lines.length !== 0 &&
-            this.drawMode === this.DRAW_MODE_POLY &&
-            !this.isTouchDevice) {
+        this.drawMode === this.DRAW_MODE_POLY &&
+        !this.isTouchDevice
+      ) {
         this.setPolyStartingPoint(options);
         this.polyOptions.lines[this.polyOptions.lineCounter - 1].set({
           x2: this.polyOptions.x,
@@ -1507,7 +1500,8 @@ export class SvgFilenameEditorComponent implements OnInit {
       // not added to the undoStack.
       if (
         this.drawMode === this.DRAW_MODE_NONE ||
-            this.drawMode === this.DRAW_MODE_PENCIL) {
+        this.drawMode === this.DRAW_MODE_PENCIL
+      ) {
         var shape = this.canvas._objects[this.canvas._objects.length - 1];
         if (!this.undoFlag) {
           this.canvasObjects.push(shape);
@@ -1575,7 +1569,6 @@ export class SvgFilenameEditorComponent implements OnInit {
         } else {
           this.displayFontStyles = false;
         }
-        // $scope.$applyAsync();
       }
     };
 
@@ -1591,7 +1584,6 @@ export class SvgFilenameEditorComponent implements OnInit {
       this.objectIsSelected = false;
       this.displayFontStyles = false;
     });
-    // $scope.$applyAsync();
   }
 
   setCanvasDimensions(): void {
