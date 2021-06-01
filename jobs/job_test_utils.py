@@ -53,10 +53,10 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
 
     def setUp(self):
         super(PipelinedTestBase, self).setUp()
-        with python_utils.ExitStack() as exit_stack:
-            exit_stack.enter_context(decorate_beam_errors())
-            exit_stack.enter_context(self.pipeline)
-            self._pipeline_context_stack = exit_stack.pop_all()
+        with python_utils.ExitStack() as pipeline_context_stack:
+            pipeline_context_stack.enter_context(decorate_beam_errors())
+            pipeline_context_stack.enter_context(self.pipeline)
+            self._pipeline_context_stack = pipeline_context_stack.pop_all()
 
     def tearDown(self):
         try:
@@ -171,9 +171,9 @@ class JobTestBase(PipelinedTestBase):
 
     def setUp(self):
         super(JobTestBase, self).setUp()
-        with self._pipeline_context_stack as exit_stack:
-            exit_stack.enter_context(self.job.datastoreio_stub.context())
-            self._pipeline_context_stack = exit_stack.pop_all()
+        with self._pipeline_context_stack as stack:
+            stack.enter_context(self.job.datastoreio_stub.context())
+            self._pipeline_context_stack = stack.pop_all()
 
     def run_job(self):
         """Runs a new instance of self.JOB_CLASS and returns its output.

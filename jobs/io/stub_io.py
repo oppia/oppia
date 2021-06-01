@@ -215,9 +215,10 @@ class DatastoreioStub(python_utils.OBJECT):
             pickled_models: str. The list of models to put into the datastore,
                 encoded as a pickled list of Apache Beam entities.
         """
-        self.put_multi(
+        self.put_multi([
             job_utils.get_ndb_model_from_beam_entity(m)
-            for m in pickle.loads(pickled_models))
+            for m in pickle.loads(pickled_models)
+        ])
 
     def _delete_from_datastore_handler(self, pickled_keys):
         """XML-RPC handler for a DeleteFromDatastore request.
@@ -228,9 +229,10 @@ class DatastoreioStub(python_utils.OBJECT):
             pickled_keys: str. The list of keys to delete from the datastore,
                 encoded as a pickled list of Apache Beam keys.
         """
-        self.delete_multi(
+        self.delete_multi([
             job_utils.get_ndb_key_from_beam_key(k)
-            for k in pickle.loads(pickled_keys))
+            for k in pickle.loads(pickled_keys)
+        ])
 
 
 class _DatastoreioTransform(beam.PTransform):

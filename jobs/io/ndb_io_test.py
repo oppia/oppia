@@ -38,19 +38,29 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
         self.datastoreio_stub = stub_io.DatastoreioStub()
 
     def tearDown(self):
-        self.datastoreio_stub.clear()
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         super(NdbIoTests, self).tearDown()
 
-    def test_stub_is_initially_empty(self):
-        self.assertItemsEqual(self.datastoreio_stub.get_everything(), [])
+    def get_everything(self):
+        """Returns all models in the datastore.
 
-        with self.datastoreio_stub.context():
-            self.assert_pcoll_empty(
-                self.pipeline
-                | ndb_io.GetModels(
-                    datastore_services.query_everything(),
-                    self.datastoreio_stub)
-            )
+        Returns:
+            list(Model). All of the models in the datastore.
+        """
+        return list(datastore_services.query_everything().iter())
+
+    def put_multi(self, model_list, update_last_updated_time=False):
+        """Puts the given models into the datastore.
+
+        Args:
+            model_list: list(Model). The models to put into the datastore.
+            update_last_updated_time: bool. Whether to update the last updated
+                time before putting the model into storage.
+        """
+        datastore_services.update_timestamps_multi(
+            model_list, update_last_updated_time=update_last_updated_time)
+        datastore_services.put_multi(model_list)
 
     def test_read_from_datastore(self):
         model_list = [
@@ -58,10 +68,9 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
             self.create_model(base_models.BaseModel, id='b'),
             self.create_model(base_models.BaseModel, id='c'),
         ]
-        self.datastoreio_stub.put_multi(model_list)
+        self.put_multi(model_list)
 
-        self.assertItemsEqual(
-            self.datastoreio_stub.get_everything(), model_list)
+        self.assertItemsEqual(self.get_everything(), model_list)
 
         with self.datastoreio_stub.context():
             model_pcoll = (
@@ -70,8 +79,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
                     datastore_services.query_everything(),
                     self.datastoreio_stub)
             )
-
-        self.assert_pcoll_equal(model_pcoll, model_list)
+            self.assert_pcoll_equal(model_pcoll, model_list)
 
     def test_write_to_datastore(self):
         model_list = [
@@ -80,7 +88,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
             self.create_model(base_models.BaseModel, id='c'),
         ]
 
-        self.assertItemsEqual(self.datastoreio_stub.get_everything(), [])
+        self.assertItemsEqual(self.get_everything(), [])
 
         with self.datastoreio_stub.context():
             self.assert_pcoll_empty(
@@ -89,8 +97,7 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
                 | ndb_io.PutModels(self.datastoreio_stub)
             )
 
-        self.assertItemsEqual(
-            self.datastoreio_stub.get_everything(), model_list)
+        self.assertItemsEqual(self.get_everything(), model_list)
 
     def test_delete_from_datastore(self):
         model_list = [
@@ -98,10 +105,9 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
             self.create_model(base_models.BaseModel, id='b'),
             self.create_model(base_models.BaseModel, id='c'),
         ]
-        self.datastoreio_stub.put_multi(model_list)
+        self.put_multi(model_list)
 
-        self.assertItemsEqual(
-            self.datastoreio_stub.get_everything(), model_list)
+        self.assertItemsEqual(self.get_everything(), model_list)
 
         with self.datastoreio_stub.context():
             self.assert_pcoll_empty(
@@ -110,4 +116,4 @@ class NdbIoTests(job_test_utils.PipelinedTestBase):
                 | ndb_io.DeleteModels(self.datastoreio_stub)
             )
 
-        self.assertItemsEqual(self.datastoreio_stub.get_everything(), [])
+        self.assertItemsEqual(self.get_everything(), [])
