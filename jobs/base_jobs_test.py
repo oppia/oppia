@@ -27,8 +27,8 @@ from jobs import job_test_utils
 import python_utils
 
 
-class MockJobMetaclass(base_jobs._JobMetaclass): # pylint: disable=protected-access
-    """Subclass of _JobMetaclass to avoid interacting with the real registry."""
+class MockJobMetaclass(base_jobs.JobMetaclass):
+    """Subclass of JobMetaclass to avoid interacting with the real registry."""
 
     _JOB_REGISTRY = {}
 
