@@ -60,6 +60,8 @@ class BeamJob(python_utils.OBJECT):
         Returns:
             list(str). The name of the parameters.
         """
+        # We don't want to include 'self' in the list, run() being a method
+        # should be considered an implementation detail.
         return python_utils.get_args_of_function(self._job_class.run)[1:]
 
     def to_dict(self):
