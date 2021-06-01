@@ -324,7 +324,8 @@ var ExplorationEditorMainTab = function() {
         ruleDescription += '...';
         // Adding "..." to end of string.
         var answerTab = element(by.css('.protractor-test-answer-tab'));
-        expect(await answerTab.getText()).toEqual(ruleDescription);
+        expect(await action.getText('Answer Tab', answerTab)).toEqual(
+          ruleDescription);
       },
       /**
        * Check for correct learner's feedback.
@@ -336,7 +337,7 @@ var ExplorationEditorMainTab = function() {
           by.className('oppia-rte-editor'));
         await waitFor.visibilityOf(
           feedbackRTE, 'Feedback Rich Text Editor not showing up.');
-        expect(await feedbackRTE.getText()).toEqual(
+        expect(await action.getText('Feedback RTE', feedbackRTE)).toEqual(
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
@@ -390,7 +391,7 @@ var ExplorationEditorMainTab = function() {
         var actualOptionTexts = await editOutcomeDestBubble.all(
           by.tagName('option')
         ).map(async function(optionElem) {
-          return await optionElem.getText();
+          return await action.getText('Option element', optionElem);
         });
         expect(actualOptionTexts).toEqual(expectedOptionTexts);
 
@@ -770,7 +771,7 @@ var ExplorationEditorMainTab = function() {
         var multipleChoiceAnswerOption =
           multipleChoiceAnswerOptions(parameterValues[i]);
         await action.click(
-          'Multiple Choice Answer Option:' + parameterValues[i],
+          'Multiple Choice Answer Option:' + i,
           multipleChoiceAnswerOption);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
@@ -778,7 +779,7 @@ var ExplorationEditorMainTab = function() {
           var itemSelectionAnswerOption =
             itemSelectionAnswerOptions(answerArray[j]);
           await action.click(
-            'Item Selection Answer Option:' + answerArray[j],
+            'Item Selection Answer Option:' + j,
             itemSelectionAnswerOption);
         }
       } else {
@@ -859,7 +860,8 @@ var ExplorationEditorMainTab = function() {
   // exploration overview will be disabled.
   this.expectStateNamesToBe = async function(names) {
     var stateNames = await stateNodes.map(async function(stateElement) {
-      return await stateNodeLabel(stateElement).getText();
+      return await action.getText(
+        'State node label', stateNodeLabel(stateElement));
     });
     expect(stateNames.sort()).toEqual(names.sort());
   };
@@ -870,7 +872,8 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await general.scrollToTop();
     var listOfNames = await stateNodes.map(async function(stateElement) {
-      return await stateNodeLabel(stateElement).getText();
+      return await action.getText(
+        'State node label', stateNodeLabel(stateElement));
     });
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
@@ -884,7 +887,8 @@ var ExplorationEditorMainTab = function() {
       throw new Error(
         'State ' + targetName + ' not found by editorMainTab.moveToState.');
     }
-
+    await waitFor.visibilityOf(
+      stateNameContainer, 'State Name Container takes too long to appear');
     var errorMessage = (
       'Current state name is:' +
       await stateNameContainer.getAttribute('textContent') +
@@ -920,6 +924,8 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, name,
       'Expecting current state ' + await stateNameContainer.getAttribute(
         'textContent') + ' to be ' + name);
+    await waitFor.visibilityOf(
+      stateNameContainer, 'State name container taking too long to appear');
     expect(await stateNameContainer.getAttribute('textContent')).toMatch(name);
   };
 };
