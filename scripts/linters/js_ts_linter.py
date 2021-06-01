@@ -539,89 +539,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_sorted_dependencies(self):
-        """This function checks that the dependencies which are
-        imported in the controllers/directives/factories in JS
-        files are in following pattern: dollar imports, regular
-        imports, and constant imports, all in sorted order.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Sorted dependencies'
-        files_to_check = self.all_filepaths
-        components_to_check = ['controller', 'directive', 'factory']
-        failed = False
-        error_messages = []
-
-        for filepath in files_to_check:
-            parsed_expressions = self.parsed_expressions_in_files[filepath]
-            for component in components_to_check:
-                for expression in parsed_expressions[component]:
-                    if not expression:
-                        continue
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    if arguments[0].type == 'Literal':
-                        property_value = python_utils.UNICODE(
-                            arguments[0].value)
-                    arguments = arguments[1:]
-                    for argument in arguments:
-                        if argument.type != 'ArrayExpression':
-                            continue
-                        literal_args = []
-                        function_args = []
-                        dollar_imports = []
-                        regular_imports = []
-                        constant_imports = []
-                        elements = argument.elements
-                        for element in elements:
-                            if element.type == 'Literal':
-                                literal_args.append(
-                                    python_utils.UNICODE(
-                                        element.value))
-                            elif element.type == 'FunctionExpression':
-                                func_args = element.params
-                                for func_arg in func_args:
-                                    function_args.append(
-                                        python_utils.UNICODE(func_arg.name))
-                        for arg in function_args:
-                            if arg.startswith('$'):
-                                dollar_imports.append(arg)
-                            elif re.search('[a-z]', arg):
-                                regular_imports.append(arg)
-                            else:
-                                constant_imports.append(arg)
-                        dollar_imports.sort()
-                        regular_imports.sort()
-                        constant_imports.sort()
-                        sorted_imports = (
-                            dollar_imports + regular_imports + (
-                                constant_imports))
-                        if sorted_imports != function_args:
-                            failed = True
-                            error_message = (
-                                'Please ensure that in %s in file %s, the '
-                                'injected dependencies should be in the '
-                                'following manner: dollar imports, regular '
-                                'imports and constant imports, all in '
-                                'sorted order.'
-                                % (property_value, filepath))
-                            error_messages.append(error_message)
-                        if sorted_imports != literal_args:
-                            failed = True
-                            error_message = (
-                                'Please ensure that in %s in file %s, the '
-                                'stringfied dependencies should be in the '
-                                'following manner: dollar imports, regular '
-                                'imports and constant imports, all in '
-                                'sorted order.'
-                                % (property_value, filepath))
-                            error_messages.append(error_message)
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _match_line_breaks_in_controller_dependencies(self):
         """This function checks whether the line breaks between the dependencies
         listed in the controller of a directive or service exactly match those
@@ -1023,7 +940,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
-        linter_stdout.append(self._check_sorted_dependencies())
         linter_stdout.append(
             self._match_line_breaks_in_controller_dependencies())
         linter_stdout.append(self._check_constants_declaration())
