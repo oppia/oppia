@@ -125,7 +125,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'i18n-language-selector.component.ts',
     'image-uploader.component.ts',
     'image-with-regions-editor.component.ts',
-    'input-response-pair.directive.ts',
+    'input-response-pair.component.ts',
     'int-editor.component.ts',
     'item-selection-input-validation.service.ts',
     'language-util.service.ts',
