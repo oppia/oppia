@@ -138,39 +138,41 @@ def _get_category_from_string(category_name):
     Returns:
         CATEGORY. The enum representing this category.
     """
+    category = None
     if category_name == constants.CATEGORY.feature_suggestion.name:
-        return constants.CATEGORY.feature_suggestion
+        category = constants.CATEGORY.feature_suggestion
     elif category_name == constants.CATEGORY.language_suggestion.name:
-        return constants.CATEGORY.language_suggestion
+        category = constants.CATEGORY.language_suggestion
     elif category_name == constants.CATEGORY.other_suggestion.name:
-        return constants.CATEGORY.other_suggestion
+        category = constants.CATEGORY.other_suggestion
     elif category_name == constants.CATEGORY.lesson_question_issue.name:
-        return constants.CATEGORY.lesson_question_issue
+        category = constants.CATEGORY.lesson_question_issue
     elif category_name == constants.CATEGORY.language_general_issue.name:
-        return constants.CATEGORY.language_general_issue
+        category = constants.CATEGORY.language_general_issue
     elif category_name == constants.CATEGORY.language_audio_issue.name:
-        return constants.CATEGORY.language_audio_issue
+        category = constants.CATEGORY.language_audio_issue
     elif category_name == constants.CATEGORY.language_text_issue.name:
-        return constants.CATEGORY.language_text_issue
+        category = constants.CATEGORY.language_text_issue
     elif category_name == constants.CATEGORY.topics_issue.name:
-        return constants.CATEGORY.topics_issue
+        category = constants.CATEGORY.topics_issue
     elif category_name == constants.CATEGORY.profile_issue.name:
-        return constants.CATEGORY.profile_issue
+        category = constants.CATEGORY.profile_issue
     elif category_name == constants.CATEGORY.other_issue.name:
-        return constants.CATEGORY.other_issue
+        category = constants.CATEGORY.other_issue
     elif category_name == constants.CATEGORY.lesson_player_crash.name:
-        return constants.CATEGORY.lesson_player_crash
+        category = constants.CATEGORY.lesson_player_crash
     elif category_name == constants.CATEGORY.practice_questions_crash.name:
-        return constants.CATEGORY.practice_questions_crash
+        category = constants.CATEGORY.practice_questions_crash
     elif category_name == constants.CATEGORY.options_page_crash.name:
-        return constants.CATEGORY.options_page_crash
+        category = constants.CATEGORY.options_page_crash
     elif category_name == constants.CATEGORY.profile_page_crash.name:
-        return constants.CATEGORY.profile_page_crash
+        category = constants.CATEGORY.profile_page_crash
     elif category_name == constants.CATEGORY.other_crash.name:
-        return constants.CATEGORY.other_crash
+        category = constants.CATEGORY.other_crash
     else:
         raise utils.InvalidInputException(
             'The given category %s is invalid.' % category_name)
+    return category
 
 
 def _get_android_text_size_from_string(text_size_name):
@@ -189,7 +191,7 @@ def _get_android_text_size_from_string(text_size_name):
     elif text_size_name == constants.ANDROID_TEXT_SIZE.large_text_size.name:
         return constants.ANDROID_TEXT_SIZE.large_text_size
     elif text_size_name == (
-        constants.ANDROID_TEXT_SIZE.extra_large_text_size.name):
+            constants.ANDROID_TEXT_SIZE.extra_large_text_size.name):
         return constants.ANDROID_TEXT_SIZE.extra_large_text_size
     else:
         raise utils.InvalidInputException(

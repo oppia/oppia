@@ -1483,8 +1483,9 @@ class AppFeedbackReportFilter(python_utils.OBJECT):
         """Constructs a AppFeedbackReportFilter domain object.
 
         Args:
-            filter_field: FILTER_FIELD_NAMES. The enum type for the filter category,
-                correponding to a field in the AppFeedbackReport object.
+            filter_field: FILTER_FIELD_NAMES. The enum type for the filter
+                category, correponding to a field in the AppFeedbackReport
+                object.
             filter_options: list(str). The possible values for the given filter.
         """
         self.filter_field = filter_field

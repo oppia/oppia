@@ -218,6 +218,46 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(exported_data, expected_data)
 
+    def test_get_all_unscrubbed_expiring_reports(self):
+        expired_timestamp = datetime.datetime.utcnow() - (
+            feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
+            datetime.timedelta(days=10))
+        expired_model = app_feedback_report_models.AppFeedbackReportModel(
+            id='%s.%s.%s' % (
+                self.PLATFORM_ANDROID,
+                int(utils.get_time_in_millisecs(expired_timestamp)),
+                'randomInteger123'),
+            platform=self.PLATFORM_ANDROID,
+            scrubbed_by=None,
+            ticket_id='%s.%s.%s' % (
+                'random_hash',
+                int(self.TICKET_CREATION_TIMESTAMP_MSEC),
+                '16CharString1234'),
+            submitted_on=expired_timestamp,
+            local_timezone_offset_hrs=0,
+            report_type=self.REPORT_TYPE_SUGGESTION,
+            category=self.CATEGORY_OTHER,
+            platform_version=self.PLATFORM_VERSION,
+            android_device_country_locale_code=(
+                self.DEVICE_COUNTRY_LOCALE_CODE_INDIA),
+            android_device_model=self.ANDROID_DEVICE_MODEL,
+            android_sdk_version=self.ANDROID_SDK_VERSION,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
+            audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
+            android_report_info=self.ANDROID_REPORT_INFO,
+            android_report_info_schema_version=(
+                self.ANDROID_REPORT_INFO_SCHEMA_VERSION)
+        )
+        expired_model.created_on = expired_timestamp
+        expired_model.put()
+
+        model_class = app_feedback_report_models.AppFeedbackReportModel
+        model_entities = model_class.get_all_unscrubbed_expiring_reports()
+
+        self.assertEqual(len(model_entities), 1)
+        self.assertEqual(model_entities[0].id, expired_model.id)
+
     def test_get_lowest_supported_role(self):
         model = app_feedback_report_models.AppFeedbackReportModel
         self.assertEqual(

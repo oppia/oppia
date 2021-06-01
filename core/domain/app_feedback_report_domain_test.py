@@ -1036,8 +1036,8 @@ class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
             expected_dict, self.filter.to_dict())
 
     def test_validation_with_invalid_filter_field_fails(self):
-        INVALID_FIELD_NAME = python_utils.create_enum('invalid_filter_field')
-        self.filter.filter_field = INVALID_FIELD_NAME.invalid_filter_field
+        invalid_field_name = python_utils.create_enum('invalid_filter_field')
+        self.filter.filter_field = invalid_field_name.invalid_filter_field
         self._assert_validation_error(
             self.filter,
             'The filter field should be one of ')

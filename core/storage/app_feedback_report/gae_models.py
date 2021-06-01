@@ -269,6 +269,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
         datetime_before_which_to_scrub = datetime_now - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
             datetime.timedelta(days=1))
+        # The below return checks for '== None' rather than 'is None' since
+        # the latter throws "Cannot filter a non-Node argument; received False"
         return cls.query(
             cls.created_on < datetime_before_which_to_scrub,
             cls.scrubbed_by == None).fetch()
@@ -278,8 +280,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
         """Fetches values that can be used to filter reports by.
 
         Args:
-            filter_field: FILTER_FIELD_NAME. The enum type of the field we want to
-                fetch all possible values for.
+            filter_field: FILTER_FIELD_NAME. The enum type of the field we want
+                to fetch all possible values for.
+
         Returns:
             list(str). The possible values that the field name can have.
         """
