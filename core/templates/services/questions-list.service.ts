@@ -35,7 +35,7 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 export class QuestionsListService {
   private _questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
   private _nextOffsetForQuestions: number = 0;
-  private _more: boolean = true;
+  private _moreQuestions: boolean = true;
   private _currentPage: number = 0;
   private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter<void>());
@@ -65,13 +65,13 @@ export class QuestionsListService {
     this._nextOffsetForQuestions += AppConstants.NUM_QUESTIONS_PER_PAGE;
   }
 
-  private _setMore(more: boolean): void {
-    this._more = more;
+  private _setMoreQuestions(moreQuestions: boolean): void {
+    this._moreQuestions = moreQuestions;
   }
 
   isLastQuestionBatch(): boolean {
     return (
-      this._more === false &&
+      this._moreQuestions === false &&
       (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
         this._questionSummariesForOneSkill.length);
   }
@@ -81,7 +81,7 @@ export class QuestionsListService {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
       this._nextOffsetForQuestions = 0;
-      this._more = true;
+      this._moreQuestions = true;
     }
 
     const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
@@ -93,7 +93,7 @@ export class QuestionsListService {
     if (
       (this._currentPage + 1) * num >
        this._questionSummariesForOneSkill.length &&
-       this._more === true && fetchMore) {
+       this._moreQuestions === true && fetchMore) {
       this.questionBackendApiService.fetchQuestionSummariesAsync(
         skillId, this._nextOffsetForQuestions).then(response => {
         let questionSummaries = response.questionSummaries.map(summary => {
@@ -103,7 +103,7 @@ export class QuestionsListService {
         });
 
         this._changeNextQuestionsOffset(resetHistory);
-        this._setMore(response.more);
+        this._setMoreQuestions(response.more);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
       });
