@@ -387,6 +387,9 @@ def apply_change_list(exploration_id, change_list):
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     state.update_next_content_id_index(change.new_value)
                 elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                    state.update_linked_skill_id(change.new_value)
+                elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
                         change.new_value)
@@ -396,7 +399,11 @@ def apply_change_list(exploration_id, change_list):
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    state.update_interaction_answer_groups(change.new_value)
+                    new_answer_groups = [
+                        state_domain.AnswerGroup.from_dict(answer_groups)
+                        for answer_groups in change.new_value
+                    ]
+                    state.update_interaction_answer_groups(new_answer_groups)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None

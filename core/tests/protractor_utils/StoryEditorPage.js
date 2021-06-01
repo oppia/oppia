@@ -213,6 +213,7 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToStoryEditorTab = async function() {
+    await waitFor.pageToFullyLoad();
     await general.scrollToTop();
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
@@ -404,6 +405,7 @@ var StoryEditorPage = function() {
           skillNameInputField,
           'skillNameInputField takes too long to be visible');
         await skillNameInputField.sendKeys(name);
+        await skillNameInputField.click();
       },
 
       _selectSkillBasedOnIndex: async function(index) {

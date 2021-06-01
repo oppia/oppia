@@ -5514,6 +5514,7 @@ export default {
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
+    "linked_skill_id": null,
     "content": {
       "html": "",
       "content_id": "content"
@@ -5558,11 +5559,6 @@ export default {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
-
-  "FIREBASE_AUTH_ENABLED": true,
-
-  // TODO(#11462): Delete this after Firebase authentication has been deployed.
-  "ENABLE_LOGIN_PAGE": true,
 
   // Data required for Firebase authentication.
   //

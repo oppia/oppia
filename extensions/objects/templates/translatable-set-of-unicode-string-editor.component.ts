@@ -16,27 +16,52 @@
  * @fileoverview Directive for translatable set of unicode string editor.
  */
 
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-angular.module('oppia').component('translatableSetOfUnicodeStringEditor', {
-  bindings: {
-    value: '='
-  },
-  template: require(
-    './translatable-set-of-unicode-string-editor.component.html'),
-  controller: [function() {
-    var ctrl = this;
-    ctrl.$onInit = function() {
-      ctrl.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        validators: [{
-          id: 'is_uniquified'
-        }]
-      };
-    };
-  }]
-});
+@Component({
+  selector: 'translatable-set-of-unicode-string-editor',
+  templateUrl: './translatable-set-of-unicode-string-editor.component.html'
+})
+export class TranslatableSetOfUnicodeStringEditorComponent {
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  schema: {
+    type: string;
+    items: { type: string; };
+    validators: { id: string; }[];
+  } = {
+    type: 'list',
+    items: {
+      type: 'unicode'
+    },
+    validators: [{
+      id: 'is_uniquified'
+    }]
+  };
+
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+
+  updateValue(val: string): void {
+    if (this.value.unicodeStrSet === val) {
+      return;
+    }
+    this.value.unicodeStrSet = val;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
+  }
+
+  getSchema(): {
+    type: string;
+    items: { type: string; };
+    validators: { id: string; }[];
+    } {
+    return this.schema;
+  }
+}
+
+angular.module('oppia').directive(
+  'translatableSetOfUnicodeStringEditor',
+  downgradeComponent({
+    component: TranslatableSetOfUnicodeStringEditorComponent
+  }) as angular.IDirectiveFactory);

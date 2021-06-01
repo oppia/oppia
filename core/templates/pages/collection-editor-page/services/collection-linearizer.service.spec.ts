@@ -13,47 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for CollectionLinearizerService.
+ * @fileoverview Unit Tests for CollectionLinearizerService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// collection-linearizer.service.ts is upgraded to Angular 8.
-import { Change } from 'domain/editor/undo_redo/change.model';
-import { CollectionNode, CollectionNodeBackendDict } from
-  'domain/collection/collection-node.model';
-import { Collection } from
-  'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+import { CollectionNode, CollectionNodeBackendDict } from 'domain/collection/collection-node.model';
+import { Collection } from 'domain/collection/collection.model';
+import { CollectionLinearizerService } from './collection-linearizer.service';
 
-require(
-  'pages/collection-editor-page/services/collection-linearizer.service.ts');
+describe('Collection linearizer service', () => {
+  let collectionLinearizerService: CollectionLinearizerService;
+  let firstCollectionNode;
+  let secondCollectionNode;
+  let thirdCollectionNode;
 
-describe('Collection linearizer service', function() {
-  var CollectionLinearizerService = null;
+  beforeEach(() => {
+    collectionLinearizerService = TestBed.inject(CollectionLinearizerService);
 
-  var firstCollectionNode = null;
-  var secondCollectionNode = null;
-  var thirdCollectionNode = null;
-
-  importAllAngularServices();
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('Change', Change);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionLinearizerService = $injector.get('CollectionLinearizerService');
-
-    var firstCollectionNodeBackendObject = {
+    let firstCollectionNodeBackendObject = {
       exploration_id: 'exp_id0',
       exploration_summary: {
         title: 'exp title0',
@@ -64,7 +41,7 @@ describe('Collection linearizer service', function() {
     firstCollectionNode = CollectionNode.create(
       firstCollectionNodeBackendObject as CollectionNodeBackendDict);
 
-    var secondCollectionNodeBackendObject = {
+    let secondCollectionNodeBackendObject = {
       exploration_id: 'exp_id1',
       exploration_summary: {
         title: 'exp title1',
@@ -75,7 +52,7 @@ describe('Collection linearizer service', function() {
     secondCollectionNode = CollectionNode.create(
       secondCollectionNodeBackendObject as CollectionNodeBackendDict);
 
-    var thirdCollectionNodeBackendObject = {
+    let thirdCollectionNodeBackendObject = {
       exploration_id: 'exp_id2',
       exploration_summary: {
         title: 'exp title2',
@@ -85,11 +62,11 @@ describe('Collection linearizer service', function() {
     };
     thirdCollectionNode = CollectionNode.create(
       thirdCollectionNodeBackendObject as CollectionNodeBackendDict);
-  }));
+  });
 
   // The linear order of explorations is: exp_id0 -> exp_id1 -> exp_id2.
-  var createLinearCollection = function() {
-    var collection = Collection.createEmptyCollection();
+  let createLinearCollection = () => {
+    let collection = Collection.createEmptyCollection();
 
     // Add collections in a different order from which they will be displayed
     // by the linearizer for robustness.
@@ -99,124 +76,124 @@ describe('Collection linearizer service', function() {
     return collection;
   };
 
-  describe('removeCollectionNode()', function() {
+  describe('removeCollectionNode()', () => {
     it('should not remove a non-existent node from a single node collection',
-      function() {
-        var collection = Collection.createEmptyCollection();
+      () => {
+        let collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
         expect(
-          CollectionLinearizerService.removeCollectionNode(
+          collectionLinearizerService.removeCollectionNode(
             collection, 'non_existent')).toBe(false);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([firstCollectionNode]);
       }
     );
 
     it('should not remove a non-existent node from a multiple nodes collection',
-      function() {
-        var collection = createLinearCollection();
+      () => {
+        let collection = createLinearCollection();
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual(
           [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
         expect(
-          CollectionLinearizerService.removeCollectionNode(
+          collectionLinearizerService.removeCollectionNode(
             collection, 'non_existent')).toBe(false);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual(
           [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       }
     );
 
     it('should correctly remove a node from a single node collection',
-      function() {
-        var collection = Collection.createEmptyCollection();
+      () => {
+        let collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
         expect(
-          CollectionLinearizerService.removeCollectionNode(
+          collectionLinearizerService.removeCollectionNode(
             collection, 'exp_id0')).toBe(true);
         expect(collection.containsCollectionNode('exp_id0')).toBe(false);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([]);
       }
     );
 
-    it('should correctly remove the first node from a collection', function() {
-      var collection = createLinearCollection();
+    it('should correctly remove the first node from a collection', () => {
+      let collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id0')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.removeCollectionNode(
+        collectionLinearizerService.removeCollectionNode(
           collection, 'exp_id0')).toBe(true);
       expect(collection.containsCollectionNode('exp_id0')).toBe(false);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([secondCollectionNode, thirdCollectionNode]);
     });
 
-    it('should correctly remove the last node from a collection', function() {
-      var collection = createLinearCollection();
+    it('should correctly remove the last node from a collection', () => {
+      let collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id2')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.removeCollectionNode(
+        collectionLinearizerService.removeCollectionNode(
           collection, 'exp_id2')).toBe(true);
       expect(collection.containsCollectionNode('exp_id2')).toBe(false);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([firstCollectionNode, secondCollectionNode]);
     });
 
-    it('should correctly remove a middle node from a collection', function() {
-      var collection = createLinearCollection();
+    it('should correctly remove a middle node from a collection', () => {
+      let collection = createLinearCollection();
       expect(collection.containsCollectionNode('exp_id1')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.removeCollectionNode(
+        collectionLinearizerService.removeCollectionNode(
           collection, 'exp_id1')).toBe(true);
       expect(collection.containsCollectionNode('exp_id1')).toBe(false);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([firstCollectionNode, thirdCollectionNode]);
     });
   });
 
-  describe('appendCollectionNode()', function() {
-    it('should correctly append a node to an empty collection', function() {
-      var collection = Collection.createEmptyCollection();
+  describe('appendCollectionNode()', () => {
+    it('should correctly append a node to an empty collection', () => {
+      let collection = Collection.createEmptyCollection();
       expect(collection.containsCollectionNode('exp_id0')).toBe(false);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([]);
-      CollectionLinearizerService.appendCollectionNode(
+      collectionLinearizerService.appendCollectionNode(
         collection,
         'exp_id0',
         firstCollectionNode.getExplorationSummaryObject());
       firstCollectionNode = collection.getCollectionNodeByExplorationId(
         'exp_id0');
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([firstCollectionNode]);
     });
 
-    it('should correctly append a node to a non-empty collection', function() {
-      var collection = createLinearCollection();
-      var newCollectionNodeBackendObject = {
+    it('should correctly append a node to a non-empty collection', () => {
+      let collection = createLinearCollection();
+      let newCollectionNodeBackendObject = {
         exploration_id: 'exp_id3',
         exploration_summary: {
           title: 'exp title3',
@@ -224,18 +201,18 @@ describe('Collection linearizer service', function() {
           objective: 'exp objective'
         }
       };
-      var newCollectionNode = CollectionNode.create(
+      let newCollectionNode = CollectionNode.create(
         newCollectionNodeBackendObject as CollectionNodeBackendDict);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
-      CollectionLinearizerService.appendCollectionNode(
+      collectionLinearizerService.appendCollectionNode(
         collection, 'exp_id3', newCollectionNode.getExplorationSummaryObject());
       newCollectionNode = collection.getCollectionNodeByExplorationId(
         'exp_id3');
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual([
         collection.getCollectionNodeByExplorationId('exp_id0'),
         collection.getCollectionNodeByExplorationId('exp_id1'),
@@ -244,206 +221,206 @@ describe('Collection linearizer service', function() {
     });
   });
 
-  describe('shiftNodeLeft()', function() {
+  describe('shiftNodeLeft()', () => {
     it('should correctly shift a node in a single node collection',
-      function() {
-        var collection = Collection.createEmptyCollection();
+      () => {
+        let collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([firstCollectionNode]);
         expect(
-          CollectionLinearizerService.shiftNodeLeft(
+          collectionLinearizerService.shiftNodeLeft(
             collection, 'exp_id0')).toBe(true);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([firstCollectionNode]);
       }
     );
 
-    it('should not shift a non-existent node', function() {
-      var collection = createLinearCollection();
+    it('should not shift a non-existent node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
-      expect(CollectionLinearizerService.shiftNodeLeft(
+      expect(collectionLinearizerService.shiftNodeLeft(
         collection, 'non_existent')).toBe(false);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
     });
 
-    it('should correctly shift the first node', function() {
-      var collection = createLinearCollection();
+    it('should correctly shift the first node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeLeft(
+        collectionLinearizerService.shiftNodeLeft(
           collection, 'exp_id0')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
     });
 
-    it('should correctly shift the last node', function() {
-      var collection = createLinearCollection();
+    it('should correctly shift the last node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeLeft(
+        collectionLinearizerService.shiftNodeLeft(
           collection, 'exp_id2')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, thirdCollectionNode, secondCollectionNode]);
     });
 
-    it('should correctly shift a middle node', function() {
-      var collection = createLinearCollection();
+    it('should correctly shift a middle node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeLeft(
+        collectionLinearizerService.shiftNodeLeft(
           collection, 'exp_id1')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [secondCollectionNode, firstCollectionNode, thirdCollectionNode]);
     });
   });
 
-  describe('shiftNodeRight()', function() {
+  describe('shiftNodeRight()', () => {
     it('should correctly shift a node in a single node collection',
-      function() {
-        var collection = Collection.createEmptyCollection();
+      () => {
+        let collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([firstCollectionNode]);
         expect(
-          CollectionLinearizerService.shiftNodeRight(
+          collectionLinearizerService.shiftNodeRight(
             collection, 'exp_id0')).toBe(true);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([firstCollectionNode]);
       }
     );
 
-    it('should not shift a non-existent node', function() {
-      var collection = createLinearCollection();
+    it('should not shift a non-existent node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeRight(
+        collectionLinearizerService.shiftNodeRight(
           collection, 'non_existent')).toBe(false);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
     });
 
-    it('should correctly shift the first node', function() {
-      var collection = createLinearCollection();
+    it('should correctly shift the first node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeRight(
+        collectionLinearizerService.shiftNodeRight(
           collection, 'exp_id0')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [secondCollectionNode, firstCollectionNode, thirdCollectionNode]);
     });
 
-    it('should correctly shift the last node', function() {
-      var collection = createLinearCollection();
+    it('should correctly shift the last node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeRight(
+        collectionLinearizerService.shiftNodeRight(
           collection, 'exp_id2')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
     });
 
-    it('should correctly shift middle node', function() {
-      var collection = createLinearCollection();
+    it('should correctly shift middle node', () => {
+      let collection = createLinearCollection();
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       expect(
-        CollectionLinearizerService.shiftNodeRight(
+        collectionLinearizerService.shiftNodeRight(
           collection, 'exp_id1')).toBe(true);
       expect(
-        CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+        collectionLinearizerService.getCollectionNodesInPlayableOrder(
           collection)).toEqual(
         [firstCollectionNode, thirdCollectionNode, secondCollectionNode]);
     });
   });
 
-  describe('getNextExplorationId()', function() {
+  describe('getNextExplorationId()', () => {
     it('should return no exploration ids for a completed linear collection',
-      function() {
-        var collection = createLinearCollection();
+      () => {
+        let collection = createLinearCollection();
         expect(
-          CollectionLinearizerService.getNextExplorationId(
+          collectionLinearizerService.getNextExplorationId(
             collection, ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual(null);
       }
     );
 
     it('should return next exploration id for a partially completed collection',
-      function() {
-        var collection = createLinearCollection();
+      () => {
+        let collection = createLinearCollection();
         expect(
-          CollectionLinearizerService.getNextExplorationId(
+          collectionLinearizerService.getNextExplorationId(
             collection, ['exp_id0', 'exp_id1'])).toEqual('exp_id2');
       }
     );
   });
 
-  describe('getCollectionNodesInPlayableOrder()', function() {
+  describe('getCollectionNodesInPlayableOrder()', () => {
     it('should correctly return an empty list for an empty collection',
-      function() {
-        var collection = Collection.createEmptyCollection();
+      () => {
+        let collection = Collection.createEmptyCollection();
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([]);
       }
     );
 
     it('should correctly return a list for a collection with a single node',
-      function() {
-        var collection = Collection.createEmptyCollection();
+      () => {
+        let collection = Collection.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual([firstCollectionNode]);
       }
     );
 
     it('should correctly return a list for a collection with multiple nodes',
-      function() {
-        var collection = createLinearCollection();
+      () => {
+        let collection = createLinearCollection();
         expect(
-          CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+          collectionLinearizerService.getCollectionNodesInPlayableOrder(
             collection)).toEqual(
           [firstCollectionNode, secondCollectionNode, thirdCollectionNode]);
       }

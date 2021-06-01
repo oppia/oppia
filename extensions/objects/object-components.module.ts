@@ -54,13 +54,32 @@ import { MathExpressionContentEditorComponent } from './templates/math-expressio
 import { MusicPhraseEditorComponent } from './templates/music-phrase-editor.component';
 import { NonnegativeIntEditorComponent } from './templates/nonnegative-int-editor.component';
 import { NumberWithUnitsEditorComponent } from './templates/number-with-units-editor.component';
+import { NumericExpressionEditorComponent } from './templates/numeric-expression-editor.component';
+import { PositionOfTermsEditorComponent } from './templates/position-of-terms-editor.component';
+import { PositiveIntEditorComponent } from './templates/positive-int-editor.component';
+import { RatioExpressionEditorComponent } from './templates/ratio-expression-editor.component';
+import { RealEditorComponent } from './templates/real-editor.component';
+import { SanitizedUrlEditorComponent } from './templates/sanitized-url-editor.component';
+import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-algebraic-identifier-editor.component';
+import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
 import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.component';
+import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
+import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
+import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
+import { CommonElementsModule } from 'components/common-layout-directives/common-elements/common-elements.module';
+import { MatCardModule } from '@angular/material/card';
+import { SubtitledUnicodeEditorComponent } from './templates/subtitled-unicode-editor.component';
+import { TranslatableSetOfNormalizedStringEditorComponent } from './templates/translatable-set-of-normalized-string-editor.component';
+import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/translatable-set-of-unicode-string-editor.component';
 
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
+    CommonElementsModule,
     FormsModule,
     LeafletModule,
     SharedFormsModule,
@@ -68,6 +87,8 @@ import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.comp
     DynamicContentModule,
     DirectivesModule,
     MatProgressSpinnerModule,
+    MatCardModule,
+    MatCheckboxModule,
     NgbModalModule,
     NgbTooltipModule,
     NgxTrimDirectiveModule
@@ -95,9 +116,24 @@ import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.comp
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
     SetOfUnicodeStringEditorComponent,
-    SvgFilenameEditorComponent
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
   entryComponents: [
     AlgebraicExpressionEditorComponent,
@@ -122,9 +158,24 @@ import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.comp
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
     SetOfUnicodeStringEditorComponent,
-    SvgFilenameEditorComponent
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
   exports: [
     AlgebraicExpressionEditorComponent,
@@ -149,9 +200,24 @@ import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.comp
     MathExpressionContentEditorComponent,
     MusicPhraseEditorComponent,
     NonnegativeIntEditorComponent,
+    NormalizedStringEditorComponent,
     NumberWithUnitsEditorComponent,
+    NumericExpressionEditorComponent,
+    PositionOfTermsEditorComponent,
+    PositiveIntEditorComponent,
+    RatioExpressionEditorComponent,
+    RealEditorComponent,
+    SanitizedUrlEditorComponent,
+    SetOfAlgebraicIdentifierEditorComponent,
+    SetOfTranslatableHtmlContentIdsEditorComponent,
     SetOfUnicodeStringEditorComponent,
-    SvgFilenameEditorComponent
+    SkillSelectorEditorComponent,
+    SubtitledHtmlEditorComponent,
+    SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
+    TranslatableSetOfNormalizedStringEditorComponent,
+    TranslatableSetOfUnicodeStringEditorComponent,
+    UnicodeStringEditorComponent
   ],
 })
 
