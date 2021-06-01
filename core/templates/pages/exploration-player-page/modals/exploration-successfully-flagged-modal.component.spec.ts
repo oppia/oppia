@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
@@ -28,6 +29,7 @@ describe('Exploration Successfully flagged modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         SharedPipesModule
       ],
       declarations: [ExplorationSuccessfullyFlaggedModalComponent],
