@@ -144,7 +144,7 @@ fdescribe('CreateActivityButtonComponent', () => {
       expect(component).toBeDefined();
   });
 
-  it('should begin exploration creation process if user can'+
+  it('should begin activity creation process if user can'+
     ' create collections', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
@@ -184,20 +184,31 @@ fdescribe('CreateActivityButtonComponent', () => {
 
   it('should stop the creation process if another' +
     ' creation is in progress', () => {
+    component.canCreateCollections = false;
+    component.creationInProgress = false;
+
+    const explorationCreationServiceSpy = spyOn(
+      explorationCreationService, 'createNewExploration');
+
+    component.initCreationProcess();
+    expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
+
     component.creationInProgress = true;
-    expect(component.initCreationProcess()).toBe();
+
+    component.initCreationProcess();
+    expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
   });
 
-  // it('should create new exploration if user cannot create collections', () => {
-  //   component.creationInProgress = false;
-  //   component.canCreateCollections = false;
-  //   const explorationCreationServiceSpy = spyOn(
-  //     explorationCreationService, 'createNewExploration');
+  it('should create new exploration if user cannot create collections', () => {
+    component.creationInProgress = false;
+    component.canCreateCollections = false;
+    const explorationCreationServiceSpy = spyOn(
+      explorationCreationService, 'createNewExploration');
 
-  //   component.initCreationProcess();
+    component.initCreationProcess();
 
-  //   expect(explorationCreationServiceSpy).toHaveBeenCalled();
-  // });
+    expect(explorationCreationServiceSpy).toHaveBeenCalled();
+  });
 
   it('should redirect user to create new exploration when user clicks' +
     ' create button and is not on creator dashboard page', () => {
