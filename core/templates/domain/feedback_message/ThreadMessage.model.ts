@@ -26,8 +26,12 @@ export interface ThreadMessageBackendDict {
   'entity_id': string;
   'message_id': number;
   'text': string;
-  'updated_status': string;
-  'updated_subject': string;
+  // These properties can be null as we have defined functions
+  // 'hasStatusUpdate' & 'hasSubjectUpdate' to check for them to be not null,
+  // the corresponding tests with null values for these properties can
+  // be seen in FeedbackThreadObjectFactorySpec.ts file
+  'updated_status': string | null;
+  'updated_subject': string | null;
 }
 
 export class ThreadMessage {
@@ -37,14 +41,15 @@ export class ThreadMessage {
   entityId: string;
   messageId: number;
   text: string = '';
-  updatedStatus: string = null;
-  updatedSubject: string = null;
+  updatedStatus: string | null = null;
+  updatedSubject: string | null = null;
   summary: ThreadMessageSummary;
 
   constructor(
       authorUsername: string, createdOnMsecs: number, entityType: string,
-      entityId: string, messageId: number, text: string, updatedStatus: string,
-      updatedSubject: string, summary: ThreadMessageSummary) {
+      entityId: string, messageId: number, text: string,
+      updatedStatus: string | null, updatedSubject: string | null,
+      summary: ThreadMessageSummary) {
     this.authorUsername = authorUsername;
     this.createdOnMsecs = createdOnMsecs;
     this.entityType = entityType;

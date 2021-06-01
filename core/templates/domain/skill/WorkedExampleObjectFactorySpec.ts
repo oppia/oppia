@@ -18,17 +18,15 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtitledHtml} from
-  'domain/exploration/subtitled-html.model';
-import { WorkedExampleObjectFactory} from
-  'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import { WorkedExampleBackendDict, WorkedExampleObjectFactory} from 'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {
-  let workedExampleDict;
+  let workedExampleDict: WorkedExampleBackendDict;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     workedExampleDict = {
       question: {

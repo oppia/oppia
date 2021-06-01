@@ -26,8 +26,10 @@ export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
+  // These values are passed as null initially, See function
+  // 'createFromTitle' in this file.
+  'thumbnail_filename': string | null;
+  'thumbnail_bg_color': string | null;
   'url_fragment': string;
 }
 
@@ -40,14 +42,13 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  _skillSummary: ShortSkillSummary;
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
+  _thumbnailFilename: string | null;
+  _thumbnailBgColor: string | null;
   _urlFragment: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string, thumbnailBgColor: string,
+      thumbnailFilename: string | null, thumbnailBgColor: string | null,
       urlFragment: string) {
     this._id = subtopicId;
     this._title = title;
@@ -162,7 +163,7 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
@@ -170,7 +171,7 @@ export class Subtopic {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
 
@@ -192,7 +193,10 @@ export class Subtopic {
       skill_ids: [],
       thumbnail_filename: null,
       thumbnail_bg_color: null,
-      url_fragment: null
+      // This value can't be null as we are -passing it
+      // in a 'test' function which expects it to be a string.
+      // See line 99 for reference.
+      url_fragment: ''
     }, {});
   }
 }
