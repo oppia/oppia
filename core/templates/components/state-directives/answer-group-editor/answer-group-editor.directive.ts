@@ -47,7 +47,7 @@ require(
 require('services/alerts.service.ts');
 require('services/external-save.service.ts');
 
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { Subscription } from 'rxjs';
 
