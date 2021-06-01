@@ -1,0 +1,65 @@
+<div class="list-group skill-selector-editor">
+  <mat-card layout="row" class="list-view-item protractor-test-skill-select-header">
+    Search By Skill
+    <input type="text"
+           class="form-control protractor-test-skill-name-input"
+           placeholder="Enter a skill name"
+           [(ngModel)]="skillFilterText"
+           (ngModelChange)="filterSkills($event)"
+           autofocus>
+  </mat-card>
+  <div *ngIf="showLoading" class="oppia-align-center">
+    Loading
+    <loading-dots></loading-dots>
+  </div>
+  <div class="skill-selector-item-container">
+    <div class="oppia-list-group-item-text list-group-item protractor-test-rte-skill-selector-item"
+         *ngFor="let skill of skillsToShow"
+         (click)="selectSkill(skill.id, skill.description)"
+         [ngClass]="{'list-group-item-success': (skill.id === value)}">
+      <label class="list-group-item-heading">{{ skill.description }}</label>
+      <div *ngIf="skill.id === value" class="oppia-skill-summary-text">
+        <strong> Explanation </strong>
+        <div class="skill-explanation-container">
+          <angular-html-bind-wrapper [htmlData]="skill.skill_contents.explanation.html">
+          </angular-html-bind-wrapper>
+        </div>
+        <strong> Worked Examples </strong>
+        <ul>
+          <li *ngFor="let example of skill.skill_contents.worked_examples" class="worked-example-container">
+            <b> Question: </b>
+            <angular-html-bind-wrapper [htmlData]="example.question.html">
+            </angular-html-bind-wrapper>
+            <div class="worked-example-explanation-section">
+              <b> Explanation: </b>
+              <angular-html-bind-wrapper [htmlData]="example.explanation.html">
+              </angular-html-bind-wrapper>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .skill-selector-editor .worked-example-explanation-section {
+    margin-top: 1.5vh;
+  }
+  .skill-selector-editor .skill-selector-item-container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .skill-selector-editor .skill-explanation-container {
+    padding-bottom: 10px;
+    padding-top: 5px;
+  }
+  .skill-selector-editor .worked-example-container {
+    padding-top: 5px;
+  }
+  .skill-selector-editor .oppia-list-group-item-text {
+    color: #000;
+  }
+  .skill-selector-editor .oppia-skill-summary-text {
+    color: #f00;
+  }
+</style>
