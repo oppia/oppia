@@ -467,13 +467,13 @@ def get_displayable_question_skill_link_details(
         next offset value for next batch of questions.
     """
     if len(skill_ids) == 0:
-        return [], [], None
+        return [], []
 
     if len(skill_ids) > 3:
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_skill_link_models, offset = (
+    question_skill_link_models = (
         question_models.QuestionSkillLinkModel.
         get_question_skill_links_by_skill_ids(
             question_count, skill_ids, offset))
@@ -503,8 +503,7 @@ def get_displayable_question_skill_link_details(
                 grouped_difficulties[ind]))
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return (
-        question_summaries, merged_question_skill_links, offset)
+    return (question_summaries, merged_question_skill_links)
 
 
 def get_question_summaries_by_ids(question_ids):

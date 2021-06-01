@@ -355,9 +355,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             offset: int. Number of query results to skip.
 
         Returns:
-            list(QuestionSkillLinkModel), int. The QuestionSkillLinkModels
-            corresponding to given skill_ids, the next offset value for
-            next batch of questions.
+            list(QuestionSkillLinkModel). The QuestionSkillLinkModels
+            corresponding to given skill_ids.
         """
         question_skill_count = min(
             len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
@@ -368,10 +367,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         ).order(-cls.last_updated).fetch(
             question_skill_count, offset=offset)
 
-        return (
-            question_skill_link_models,
-            offset + len(question_skill_link_models)
-        )
+        return question_skill_link_models
+
 
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
