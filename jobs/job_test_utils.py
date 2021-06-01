@@ -24,6 +24,7 @@ import contextlib
 import datetime
 import re
 
+from core.platform import models
 from core.tests import test_utils
 from jobs import base_jobs
 import python_utils
@@ -31,6 +32,8 @@ import python_utils
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class PipelinedTestBase(test_utils.AppEngineTestBase):
@@ -189,16 +192,15 @@ class JobTestBase(PipelinedTestBase):
         """
         return self.job.run()
 
-    def put_multi(self, models):
+    def put_multi(self, model_list):
         """Puts the input models into the datastore.
 
-        Since the datastore is stubbed during unit tests, no actual models are
-        created.
-
         Args:
-            models: list(Model). The NDB models to put into the stub.
+            model_list: list(Model). The NDB models to put into the datastore.
         """
-        self.job.datastoreio_stub.put_multi(models)
+        datastore_services.update_timestamps_multi(
+            model_list, update_last_updated_time=False)
+        datastore_services.put_multi(model_list)
 
     def assert_job_output_is(self, expected):
         """Asserts the output of self.JOB_CLASS matches the given PCollection.
