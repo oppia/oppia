@@ -25,7 +25,6 @@ import datetime
 import re
 
 from core.tests import test_utils
-import feconf
 from jobs import base_jobs
 import python_utils
 
@@ -34,7 +33,7 @@ from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
 
 
-class PipelinedTestBase(test_utils.TestBase):
+class PipelinedTestBase(test_utils.AppEngineTestBase):
     """Base class that runs tests within the context of a TestPipeline."""
 
     # Helpful constants used by tests to create models.
@@ -124,7 +123,7 @@ class PipelinedTestBase(test_utils.TestBase):
         property_values['created_on'] = self.YEAR_AGO
         property_values['last_updated'] = self.YEAR_AGO
         property_values.update(properties)
-        return model_class(app=feconf.OPPIA_PROJECT_ID, **property_values)
+        return model_class(**property_values)
 
     def _assert_pipeline_context_is_acquired(self):
         """Raises a RuntimeError when the pipeline context hasn't been entered.

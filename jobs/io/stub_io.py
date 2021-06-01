@@ -24,10 +24,13 @@ import pickle
 import threading
 import xmlrpc.client
 
+from core.platform import models
 from jobs import job_utils
 import python_utils
 
 import apache_beam as beam
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class DatastoreioStub(python_utils.OBJECT):
@@ -66,8 +69,7 @@ class DatastoreioStub(python_utils.OBJECT):
 
         self._server_port = self._server.server_address[1]
         self._server_context_is_acquired = False
-        self._models = {}
-        self._models_lock = threading.Lock()
+        self._datastore_lock = threading.Lock()
         self._write_was_called = False
         self._delete_was_called = False
 
@@ -86,8 +88,9 @@ class DatastoreioStub(python_utils.OBJECT):
 
     def clear(self):
         """Clears out all models from the stub."""
-        with self._models_lock:
-            self._models.clear()
+        with self._datastore_lock:
+            datastore_services.delete_multi(
+                datastore_services.query_everything().iter(keys_only=True))
 
     def get(self, query):
         """Returns models in the stub that match the given query.
@@ -98,28 +101,21 @@ class DatastoreioStub(python_utils.OBJECT):
         Returns:
             list(Model). All of the models in the stub.
         """
-        with self._models_lock:
-            models = list(self._models.values())
-        job_utils.apply_query_to_models(query, models)
-        return models
+        with self._datastore_lock:
+            model_list = list(datastore_services.query_everything().iter())
+        job_utils.apply_query_to_models(query, model_list)
+        return model_list
 
-    def get_everything(self):
-        """Returns every model in the stub.
-
-        Returns:
-            list(Model). All of the models in the stub.
-        """
-        with self._models_lock:
-            return list(self._models.values())
-
-    def put_multi(self, models):
+    def put_multi(self, model_list):
         """Puts the input models into the stub.
 
         Args:
-            models: list(Model). The NDB models to put into the stub.
+            model_list: list(Model). The NDB models to put into the stub.
         """
-        with self._models_lock:
-            self._models.update({model.key: model for model in models})
+        with self._datastore_lock:
+            datastore_services.update_timestamps_multi(
+                model_list, update_last_updated_time=False)
+            datastore_services.put_multi(model_list)
 
     def delete_multi(self, keys):
         """Deletes the models from the stub, if they exist.
@@ -127,9 +123,8 @@ class DatastoreioStub(python_utils.OBJECT):
         Args:
             keys: list(Key). The keys to delete from the stub.
         """
-        with self._models_lock:
-            for key in keys:
-                self._models.pop(key, None)
+        with self._datastore_lock:
+            datastore_services.delete_multi(keys)
 
     def ReadFromDatastore(self, query): # pylint: disable=invalid-name
         """Returns a PTransform which returns all models from the stub.
@@ -275,12 +270,11 @@ class _ReadFromDatastore(_DatastoreioTransform):
         super(_ReadFromDatastore, self).__init__(port)
         self._query = pickle.dumps(query)
 
-    def expand(self, pcoll):
+    def expand(self, pbegin):
         """Returns models from storage using the ReadFromDatastore endpoint.
 
         Args:
-            pcoll: PCollection. The source PCollection to attach the fetched
-                models to.
+            pbegin: PValue. The first PValue of the pipeline to attach to.
 
         Returns:
             PCollection. The PCollection of models.
@@ -289,7 +283,7 @@ class _ReadFromDatastore(_DatastoreioTransform):
             pickle.loads(self.server_proxy.ReadFromDatastore(self._query)))
 
         return (
-            pcoll
+            pbegin.pipeline
             | 'Return ReadFromDatastore response' >> beam.Create(model_list)
         )
 
