@@ -1138,7 +1138,11 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         self.assertGreater(len(handlers_checked), 0)
 
         for (name, method, handler_is_decorated) in handlers_checked:
-            self.assertTrue(handler_is_decorated)
+            # Since 'BulkEmailWebhookEndpoint' is a class that is not called
+            # from the frontend, but instead from a third party provider via a
+            # webhook, no decorator is required.
+            if name != "BulkEmailWebhookEndpoint":
+                self.assertTrue(handler_is_decorated)
 
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
@@ -1206,6 +1210,14 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                             class_return_type,
                             handler_type_to_name_endings_dict)
                     class_name = clazz.__name__
+                    # BulkEmailWebhookEndpoint is a unique class, compared to
+                    # others, since it is never called from the frontend, and so
+                    # the error raised here on it - 'Please ensure that the name
+                    # of this class ends with 'Page'' - doesn't apply.
+                    # It is only called from the bulk email provider via a
+                    # webhook to update Oppia's database.
+                    if class_name == "BulkEmailWebhookEndpoint":
+                        continue
                     file_name = inspect.getfile(clazz)
                     line_num = inspect.getsourcelines(clazz)[1]
                     allowed_class_ending = handler_type_to_name_endings_dict[

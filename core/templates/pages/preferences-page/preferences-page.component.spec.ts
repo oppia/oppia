@@ -179,12 +179,35 @@ describe('Preferences Controller', function() {
           '"update_type":"email_preferences"');
       };
       $httpBackend.expect(
-        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond(200);
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond({
+          bulk_email_signup_message_should_be_shown: false
+        });
       ctrl.saveEmailPreferences(true, true, true, true);
       $httpBackend.flush();
 
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
+    });
+
+  it('should show signup link if the user cannot be added automatically',
+    function() {
+      expect(ctrl.showEmailSignupLink).toBeFalse();
+      var isRequestTheExpectOne = function(queryParams) {
+        return decodeURIComponent(queryParams).match(
+          '"update_type":"email_preferences"');
+      };
+      $httpBackend.expect(
+        'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond({
+          bulk_email_signup_message_should_be_shown: true
+        });
+      ctrl.saveEmailPreferences(true, true, true, true);
+      $httpBackend.flush();
+
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+
+      expect(ctrl.canReceiveEmailUpdates).toBeFalse();
+      expect(ctrl.showEmailSignupLink).toBeTrue();
     });
 
   it('should save preferred language codes on backend when saving chosen' +
