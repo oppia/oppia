@@ -259,9 +259,10 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'regexp': re.compile(r'import (\{.*\}|\_) from \'lodash\''),
         'message': (
-            'Please do not use "import { someFunction } from \'lodash\'". '
+            'Please do not use "import { someFunction } from \'lodash\'" or 
+            "import _ from \'lodash\'". '
             'Use "import someFunction from \'lodash/someFunction\'" instead.'),
         'excluded_files': (),
         'excluded_dirs': ()
