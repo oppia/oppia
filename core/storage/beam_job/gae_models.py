@@ -103,20 +103,6 @@ class BeamJobRunModel(base_models.BaseModel):
         BeamJobState.UNKNOWN.value,
     ], required=True)
 
-    @property
-    def in_terminal_state(self):
-        """Returns whether the job run has reached a terminal state and is no
-        longer running.
-
-        Returns:
-            bool. Whether the job has reached a terminal state.
-        """
-        return self.latest_job_state in [BeamJobState.CANCELLED.value,
-                                         BeamJobState.DRAINED.value,
-                                         BeamJobState.UPDATED.value,
-                                         BeamJobState.DONE.value,
-                                         BeamJobState.FAILED.value]
-
     @staticmethod
     def get_deletion_policy():
         """Model doesn't contain any data directly corresponding to a user."""

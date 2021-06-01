@@ -97,23 +97,34 @@ def get_beam_jobs():
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
 
 
-def get_beam_job_runs(force_update=False):
+def get_beam_job_runs(refresh=False):
     """Returns all of the Apache Beam job runs recorded in the datastore.
 
     Args:
-        force_update: bool. Whether to refresh the jobs' state before returning
-            them.
+        refresh: bool. Whether to refresh the jobs' state before returning them.
 
     Returns:
         list(BeamJobRun). A list of every job run recorded in the datastore.
     """
     beam_job_run_models = _get_all_beam_job_run_models()
+    beam_job_runs = [
+        _get_beam_job_run_from_model(m) for m in beam_job_run_models
+    ]
 
-    if force_update:
-        _update_beam_job_run_model_states(
-            [m for m in beam_job_run_models if not m.in_terminal_state])
+    if refresh:
+        updated_beam_job_run_models = []
 
-    return [_get_beam_job_run_from_model(m) for m in beam_job_run_models]
+        for i, beam_job_run_model in enumerate(beam_job_run_models):
+            if beam_job_runs[i].in_terminal_state:
+                continue
+            _refresh_state_of_beam_job_run_model(beam_job_run_model)
+            beam_job_runs[i] = _get_beam_job_run_from_model(beam_job_run_model)
+            updated_beam_job_run_models.append(beam_job_run_model)
+
+        if updated_beam_job_run_models:
+            datastore_services.put_multi(updated_beam_job_run_models)
+
+    return beam_job_runs
 
 
 def get_beam_job_run_result(job_id):
@@ -133,29 +144,15 @@ def get_beam_job_run_result(job_id):
             beam_job_run_result_model.stdout, beam_job_run_result_model.stderr))
 
 
-def update_beam_job_run_model_states():
+def refresh_state_of_all_beam_job_run_models():
     """Refreshes the state of all BeamJobRunModels that haven't terminated.
 
     This operation puts the models back into storage transactionally.
     """
-    _update_beam_job_run_model_states(
-        _get_all_beam_job_run_models(include_terminated=False))
-
-
-def _update_beam_job_run_model_states(beam_job_run_models):
-    """Refreshes the state of the given BeamJobRunModels.
-
-    This operation puts the models into storage transactionally.
-
-    Args:
-        beam_job_run_models: list(BeamJobRunModel). The models to update.
-    """
-    # Update the timestamps first because _refresh_beam_job_run_model_state()
-    # will set last_updated to the _actual_ time the state was last updated.
-    datastore_services.update_timestamps_multi(beam_job_run_models)
+    beam_job_run_models = _get_all_beam_job_run_models(include_terminated=False)
 
     for beam_job_run_model in beam_job_run_models:
-        _refresh_beam_job_run_model_state(beam_job_run_model)
+        _refresh_state_of_beam_job_run_model(beam_job_run_model)
 
     datastore_services.put_multi(beam_job_run_models)
 
@@ -201,7 +198,7 @@ def _get_all_beam_job_run_models(include_terminated=True):
         ]))
 
 
-def _refresh_beam_job_run_model_state(beam_job_run_model):
+def _refresh_state_of_beam_job_run_model(beam_job_run_model):
     """Refreshs the state of the given BeamJobRunModel.
 
     Args:
@@ -254,3 +251,4 @@ def _refresh_beam_job_run_model_state(beam_job_run_model):
     else:
         beam_job_run_model.latest_job_state = updated_state
         beam_job_run_model.last_updated = last_updated
+        beam_job_run_model.update_timestamps(update_last_updated_time=False)

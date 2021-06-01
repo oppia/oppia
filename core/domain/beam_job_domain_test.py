@@ -32,11 +32,60 @@ import utils
 
 class BeamJobTests(test_utils.TestBase):
 
+    NOW = datetime.datetime.utcnow()
+
     def test_usage(self):
         job = beam_job_domain.BeamJob(
             base_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.name, 'AuditAllStorageModelsJob')
         self.assertEqual(job.parameter_names, [])
+
+    def test_in_terminal_state(self):
+        cancelled_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLED.value,
+            [], self.NOW, self.NOW)
+        drained_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.DRAINED.value,
+            [], self.NOW, self.NOW)
+        updated_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.UPDATED.value,
+            [], self.NOW, self.NOW)
+        done_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.DONE.value,
+            [], self.NOW, self.NOW)
+        failed_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.FAILED.value,
+            [], self.NOW, self.NOW)
+        cancelling_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.CANCELLING.value,
+            [], self.NOW, self.NOW)
+        draining_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.DRAINING.value,
+            [], self.NOW, self.NOW)
+        pending_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.PENDING.value,
+            [], self.NOW, self.NOW)
+        running_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.RUNNING.value,
+            [], self.NOW, self.NOW)
+        stopped_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.STOPPED.value,
+            [], self.NOW, self.NOW)
+        unknown_beam_job_run = beam_job_domain.BeamJobRun(
+            '123', 'FooJob', beam_job_models.BeamJobState.UNKNOWN.value,
+            [], self.NOW, self.NOW)
+
+        self.assertTrue(cancelled_beam_job_run.in_terminal_state)
+        self.assertTrue(drained_beam_job_run.in_terminal_state)
+        self.assertTrue(updated_beam_job_run.in_terminal_state)
+        self.assertTrue(done_beam_job_run.in_terminal_state)
+        self.assertTrue(failed_beam_job_run.in_terminal_state)
+        self.assertFalse(cancelling_beam_job_run.in_terminal_state)
+        self.assertFalse(draining_beam_job_run.in_terminal_state)
+        self.assertFalse(pending_beam_job_run.in_terminal_state)
+        self.assertFalse(running_beam_job_run.in_terminal_state)
+        self.assertFalse(stopped_beam_job_run.in_terminal_state)
+        self.assertFalse(unknown_beam_job_run.in_terminal_state)
 
     def test_to_dict(self):
         job = beam_job_domain.BeamJob(
@@ -49,32 +98,30 @@ class BeamJobTests(test_utils.TestBase):
 
 class BeamJobRunTests(test_utils.TestBase):
 
-    def setUp(self):
-        super(BeamJobRunTests, self).setUp()
-        self.now = datetime.datetime.utcnow()
+    NOW = datetime.datetime.utcnow()
 
     def test_usage(self):
         run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', ['abc', 'def'], self.now, self.now)
+            '123', 'FooJob', 'RUNNING', ['abc', 'def'], self.NOW, self.NOW)
 
         self.assertEqual(run.job_id, '123')
         self.assertEqual(run.job_name, 'FooJob')
         self.assertEqual(run.job_state, 'RUNNING')
         self.assertEqual(run.job_arguments, ['abc', 'def'])
-        self.assertEqual(run.job_started_on, self.now)
-        self.assertEqual(run.job_updated_on, self.now)
+        self.assertEqual(run.job_started_on, self.NOW)
+        self.assertEqual(run.job_updated_on, self.NOW)
 
     def test_to_dict(self):
         run = beam_job_domain.BeamJobRun(
-            '123', 'FooJob', 'RUNNING', ['abc', 'def'], self.now, self.now)
+            '123', 'FooJob', 'RUNNING', ['abc', 'def'], self.NOW, self.NOW)
 
         self.assertEqual(run.to_dict(), {
             'job_id': '123',
             'job_name': 'FooJob',
             'job_state': 'RUNNING',
             'job_arguments': ['abc', 'def'],
-            'job_started_on_msecs': utils.get_time_in_millisecs(self.now),
-            'job_updated_on_msecs': utils.get_time_in_millisecs(self.now),
+            'job_started_on_msecs': utils.get_time_in_millisecs(self.NOW),
+            'job_updated_on_msecs': utils.get_time_in_millisecs(self.NOW),
         })
 
 

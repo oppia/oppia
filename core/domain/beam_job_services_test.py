@@ -162,7 +162,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         self.assert_domains_equal_models(
             beam_job_services.get_beam_job_runs(), beam_job_run_models)
 
-    def test_get_beam_job_runs_with_force_update(self):
+    def test_get_beam_job_runs_with_refresh(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(job_state='DONE'),
             self.create_beam_job_run_model(job_state='RUNNING'),
@@ -178,8 +178,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             current_state_time=self.NANO_RESOLUTION_RFC_3339_STR)
 
         with gcloud_output_mock:
-            beam_job_runs = beam_job_services.get_beam_job_runs(
-                force_update=True)
+            beam_job_runs = beam_job_services.get_beam_job_runs(refresh=True)
 
         # Only the second model (job_state='RUNNING') should have been updated.
         updated_beam_job_run_models = initial_beam_job_run_models[:]
@@ -190,7 +189,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         self.assert_domains_equal_models(
             beam_job_runs, updated_beam_job_run_models)
 
-    def test_get_beam_job_runs_with_force_update_when_command_fails(self):
+    def test_get_beam_job_runs_with_refresh_when_command_fails(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(job_state='DONE'),
             self.create_beam_job_run_model(job_state='RUNNING'),
@@ -208,7 +207,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         with gcloud_failure_mock, self.capture_logging() as logs:
             self.assertRaisesRegexp(
                 subprocess.CalledProcessError, 'returned non-zero exit status',
-                lambda: beam_job_services.get_beam_job_runs(force_update=True))
+                lambda: beam_job_services.get_beam_job_runs(refresh=True))
 
         self.assertEqual(
             initial_beam_job_run_models,
@@ -216,7 +215,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
                 [m.id for m in initial_beam_job_run_models]))
         self.assertIn('Failed to update the state of job', logs[-1])
 
-    def test_update_beam_job_run_model_states(self):
+    def test_refresh_state_of_all_beam_job_run_models(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(job_state='DONE'),
             self.create_beam_job_run_model(job_state='RUNNING'),
@@ -232,7 +231,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             current_state_time=self.NANO_RESOLUTION_RFC_3339_STR)
 
         with gcloud_output_mock:
-            beam_job_services.update_beam_job_run_model_states()
+            beam_job_services.refresh_state_of_all_beam_job_run_models()
 
         # Only the second model (job_state='RUNNING') should have been updated.
         updated_beam_job_run_models = initial_beam_job_run_models[:]
@@ -245,7 +244,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             beam_job_models.BeamJobRunModel.get_multi(
                 [m.id for m in initial_beam_job_run_models]))
 
-    def test_update_beam_job_run_model_states_when_command_fails(self):
+    def test_refresh_state_of_all_beam_job_run_models_when_command_fails(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(job_state='DONE'),
             self.create_beam_job_run_model(job_state='RUNNING'),
@@ -263,7 +262,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         with gcloud_failure_mock, self.capture_logging() as logs:
             self.assertRaisesRegexp(
                 subprocess.CalledProcessError, 'returned non-zero exit status',
-                beam_job_services.update_beam_job_run_model_states)
+                beam_job_services.refresh_state_of_all_beam_job_run_models)
 
         self.assertEqual(
             initial_beam_job_run_models,

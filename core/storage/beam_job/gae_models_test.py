@@ -27,53 +27,6 @@ from core.tests import test_utils
 class BeamJobRunModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunModel."""
 
-    def test_in_terminal_state(self):
-        cancelled_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.CANCELLED.value)
-        drained_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.DRAINED.value)
-        updated_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.UPDATED.value)
-        done_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.DONE.value)
-        failed_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.FAILED.value)
-        cancelling_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.CANCELLING.value)
-        draining_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.DRAINING.value)
-        pending_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.PENDING.value)
-        running_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.RUNNING.value)
-        stopped_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.STOPPED.value)
-        unknown_job_run = beam_job_models.BeamJobRunModel(
-            job_name='FooJob',
-            latest_job_state=beam_job_models.BeamJobState.UNKNOWN.value)
-
-        self.assertTrue(cancelled_job_run.in_terminal_state)
-        self.assertTrue(drained_job_run.in_terminal_state)
-        self.assertTrue(updated_job_run.in_terminal_state)
-        self.assertTrue(done_job_run.in_terminal_state)
-        self.assertTrue(failed_job_run.in_terminal_state)
-        self.assertFalse(cancelling_job_run.in_terminal_state)
-        self.assertFalse(draining_job_run.in_terminal_state)
-        self.assertFalse(pending_job_run.in_terminal_state)
-        self.assertFalse(running_job_run.in_terminal_state)
-        self.assertFalse(stopped_job_run.in_terminal_state)
-        self.assertFalse(unknown_job_run.in_terminal_state)
-
     def test_get_deletion_policy(self):
         """Model doesn't contain any data directly corresponding to a user."""
         self.assertEqual(
