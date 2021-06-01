@@ -56,7 +56,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self,
             # These values are taken from the official gcloud documentation:
             # https://cloud.google.com/dataflow/docs/guides/using-command-line-intf#jobs_commands
-            current_state=beam_job_models.BEAM_JOB_STATE_RUNNING,
+            current_state='JOB_STATE_RUNNING',
             current_state_time=NANO_RESOLUTION_RFC_3339_STR):
         """Returns a context manager in which subprocess.check_output is swapped
         with an implementation that always returns output similar to a real call

@@ -36,18 +36,55 @@ import utils
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
+# This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
+# https://cloud.google.com/dataflow/docs/reference/rest/v1b3/projects.jobs#jobstate
 _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
-    'JOB_STATE_STOPPED': beam_job_models.BEAM_JOB_STATE_STOPPED,
-    'JOB_STATE_RUNNING': beam_job_models.BEAM_JOB_STATE_RUNNING,
-    'JOB_STATE_DONE': beam_job_models.BEAM_JOB_STATE_DONE,
-    'JOB_STATE_FAILED': beam_job_models.BEAM_JOB_STATE_FAILED,
-    'JOB_STATE_CANCELLED': beam_job_models.BEAM_JOB_STATE_CANCELLED,
-    'JOB_STATE_UPDATED': beam_job_models.BEAM_JOB_STATE_UPDATED,
-    'JOB_STATE_DRAINING': beam_job_models.BEAM_JOB_STATE_DRAINING,
-    'JOB_STATE_DRAINED': beam_job_models.BEAM_JOB_STATE_DRAINED,
-    'JOB_STATE_PENDING': beam_job_models.BEAM_JOB_STATE_PENDING,
-    'JOB_STATE_QUEUED': beam_job_models.BEAM_JOB_STATE_PENDING,
-    'JOB_STATE_CANCELLING': beam_job_models.BEAM_JOB_STATE_CANCELLING,
+    # Indicates that the job has not yet started to run.
+    'JOB_STATE_STOPPED': beam_job_models.BeamJobState.STOPPED,
+    # Indicates that the job is currently running.
+    'JOB_STATE_RUNNING': beam_job_models.BeamJobState.RUNNING,
+    # Indicates that the job has successfully completed. This is a terminal job
+    # state. This state may be set by the Cloud Dataflow service, as a
+    # transition from JOB_STATE_RUNNING. It may also be set via a Cloud Dataflow
+    # jobs.update call, if the job has not yet reached a terminal state.
+    'JOB_STATE_DONE': beam_job_models.BeamJobState.DONE,
+    # Indicates that the job has failed. This is a terminal job state. This
+    # state may only be set by the Cloud Dataflow service, and only as a
+    # transition from JOB_STATE_RUNNING.
+    'JOB_STATE_FAILED': beam_job_models.BeamJobState.FAILED,
+    # Indicates that the job has been explicitly cancelled. This is a terminal
+    # job state. This state may only be set via a Cloud Dataflow jobs.update
+    # call, and only if the job has not yet reached another terminal state.
+    'JOB_STATE_CANCELLED': beam_job_models.BeamJobState.CANCELLED,
+    # Indicates that the job was successfully updated, meaning that this job was
+    # stopped and another job was started, inheriting state from this one. This
+    # is a terminal job state. This state may only be set by the Cloud Dataflow
+    # service, and only as a transition from JOB_STATE_RUNNING.
+    'JOB_STATE_UPDATED': beam_job_models.BeamJobState.UPDATED,
+    # Indicates that the job is in the process of draining. A draining job has
+    # stopped pulling from its input sources and is processing any data that
+    # remains in-flight. This state may be set via a Cloud Dataflow jobs.update
+    # call, but only as a transition from JOB_STATE_RUNNING. Jobs that are
+    # draining may only transition to JOB_STATE_DRAINED, JOB_STATE_CANCELLED, or
+    # JOB_STATE_FAILED.
+    'JOB_STATE_DRAINING': beam_job_models.BeamJobState.DRAINING,
+    # Indicates that the job has been drained. A drained job terminated by
+    # stopping pulling from its input sources and processing any data that
+    # remained in-flight when draining was requested. This state is a terminal
+    # state, may only be set by the Cloud Dataflow service, and only as a
+    # transition from JOB_STATE_DRAINING.
+    'JOB_STATE_DRAINED': beam_job_models.BeamJobState.DRAINED,
+    # Indicates that the job has been created but is not yet running. Jobs that
+    # are pending may only transition to JOB_STATE_RUNNING, or JOB_STATE_FAILED.
+    'JOB_STATE_PENDING': beam_job_models.BeamJobState.PENDING,
+    # Indicates that the job has been created but is being delayed until launch.
+    # Jobs that are queued may only transition to JOB_STATE_PENDING or
+    # JOB_STATE_CANCELLED.
+    'JOB_STATE_QUEUED': beam_job_models.BeamJobState.PENDING,
+    # Indicates that the job has been explicitly cancelled and is in the process
+    # of stopping. Jobs that are cancelling may only transition to
+    # JOB_STATE_CANCELLED or JOB_STATE_FAILED.
+    'JOB_STATE_CANCELLING': beam_job_models.BeamJobState.CANCELLING,
 }
 
 
@@ -113,9 +150,8 @@ def _update_beam_job_run_model_states(beam_job_run_models):
     Args:
         beam_job_run_models: list(BeamJobRunModel). The models to update.
     """
-    # Update the timestamps first because we want the
-    # _refresh_beam_job_run_model_state() function to set last_updated to the
-    # _actual_ time the state was last updated.
+    # Update the timestamps first because _refresh_beam_job_run_model_state()
+    # will set last_updated to the _actual_ time the state was last updated.
     datastore_services.update_timestamps_multi(beam_job_run_models)
 
     for beam_job_run_model in beam_job_run_models:
@@ -151,18 +187,18 @@ def _get_all_beam_job_run_models(include_terminated=True):
     """
     if include_terminated:
         return list(beam_job_models.BeamJobRunModel.query().iter())
-    else:
-        non_terminated_states = [beam_job_models.BEAM_JOB_STATE_CANCELLING,
-                                 beam_job_models.BEAM_JOB_STATE_DRAINING,
-                                 beam_job_models.BEAM_JOB_STATE_PENDING,
-                                 beam_job_models.BEAM_JOB_STATE_RUNNING,
-                                 beam_job_models.BEAM_JOB_STATE_STOPPED,
-                                 beam_job_models.BEAM_JOB_STATE_UNKNOWN]
-        return list(itertools.chain.from_iterable(
-            beam_job_models.BeamJobRunModel.query(
-                beam_job_models.BeamJobRunModel.latest_job_state == state
-            ).iter()
-            for state in non_terminated_states))
+
+    return list(itertools.chain.from_iterable(
+        beam_job_models.BeamJobRunModel.query(
+            beam_job_models.BeamJobRunModel.latest_job_state == state).iter()
+        for state in [
+            beam_job_models.BeamJobState.CANCELLING.value,
+            beam_job_models.BeamJobState.DRAINING.value,
+            beam_job_models.BeamJobState.PENDING.value,
+            beam_job_models.BeamJobState.RUNNING.value,
+            beam_job_models.BeamJobState.STOPPED.value,
+            beam_job_models.BeamJobState.UNKNOWN.value,
+        ]))
 
 
 def _refresh_beam_job_run_model_state(beam_job_run_model):
@@ -172,6 +208,7 @@ def _refresh_beam_job_run_model_state(beam_job_run_model):
         beam_job_run_model: BeamJobRunModel. The model to update.
     """
     job_id = beam_job_run_model.id
+
     try:
         # Sample output from this command:
         # {
@@ -192,17 +229,18 @@ def _refresh_beam_job_run_model_state(beam_job_run_model):
 
         updated_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
             job_description['currentState'],
-            beam_job_models.BEAM_JOB_STATE_UNKNOWN)
+            beam_job_models.BeamJobState.UNKNOWN).value
 
         # The currentStateTime value uses nanosecond resolution. Since strftime
         # only supports microsecond resolution, we slice the nanoseconds off so
         # that it can be parsed correctly.
         #
         # For reference, here's a sample value and its key indices:
-        #     | <- 0                    | <- 26
+        #
+        #     v-- 0               [msec]v-- 26
         #     2015-02-09T19:56:39.510000000Z
-        #                         [msec]   | <- 29 or -1
-        #                         [nsec   ]
+        #                         [ nsecs ]^-- 29 or -1
+        #
         # Thus, we only keep the slices [:26] + [-1:]
         current_state_time = job_description['currentStateTime']
         current_state_time = current_state_time[:26] + current_state_time[-1:]
