@@ -25,6 +25,7 @@ import datetime
 import re
 
 from core.tests import test_utils
+import feconf
 from jobs import base_jobs
 import python_utils
 
@@ -46,14 +47,14 @@ class PipelinedTestBase(test_utils.TestBase):
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
             options=test_pipeline.PipelineOptions(runtime_type_check=True))
-        self._exit_stack = None
+        self._pipeline_context_stack = None
 
     def setUp(self):
         super(PipelinedTestBase, self).setUp()
         with python_utils.ExitStack() as exit_stack:
             exit_stack.enter_context(decorate_beam_errors())
             exit_stack.enter_context(self.pipeline)
-            self._exit_stack = exit_stack.pop_all()
+            self._pipeline_context_stack = exit_stack.pop_all()
 
     def tearDown(self):
         try:
@@ -123,7 +124,7 @@ class PipelinedTestBase(test_utils.TestBase):
         property_values['created_on'] = self.YEAR_AGO
         property_values['last_updated'] = self.YEAR_AGO
         property_values.update(properties)
-        return model_class(**property_values)
+        return model_class(app=feconf.OPPIA_PROJECT_ID, **property_values)
 
     def _assert_pipeline_context_is_acquired(self):
         """Raises a RuntimeError when the pipeline context hasn't been entered.
@@ -145,13 +146,13 @@ class PipelinedTestBase(test_utils.TestBase):
 
     def _is_in_pipeline_context(self):
         """Returns whether the test is currently within the pipeline context."""
-        return self._exit_stack is not None
+        return self._pipeline_context_stack is not None
 
     def _exit_pipeline_context(self):
         """Flushes the pipeline and waits for it to finish running."""
         if self._is_in_pipeline_context():
-            self._exit_stack.close()
-            self._exit_stack = None
+            self._pipeline_context_stack.close()
+            self._pipeline_context_stack = None
 
 
 class JobTestBase(PipelinedTestBase):
@@ -168,9 +169,9 @@ class JobTestBase(PipelinedTestBase):
 
     def setUp(self):
         super(JobTestBase, self).setUp()
-        with self._exit_stack as exit_stack:
+        with self._pipeline_context_stack as exit_stack:
             exit_stack.enter_context(self.job.datastoreio_stub.context())
-            self._exit_stack = exit_stack.pop_all()
+            self._pipeline_context_stack = exit_stack.pop_all()
 
     def run_job(self):
         """Runs a new instance of self.JOB_CLASS and returns its output.

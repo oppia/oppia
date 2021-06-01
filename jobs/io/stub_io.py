@@ -84,6 +84,11 @@ class DatastoreioStub(python_utils.OBJECT):
             thread.join()
             self._server_context_is_acquired = False
 
+    def clear(self):
+        """Clears out all models from the stub."""
+        with self._models_lock:
+            self._models.clear()
+
     def get(self, query):
         """Returns models in the stub that match the given query.
 

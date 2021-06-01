@@ -33,9 +33,13 @@ datastore_services = models.Registry.import_datastore_services()
 
 class NdbIoTests(job_test_utils.PipelinedTestBase):
 
-    def __init__(self, *args, **kwargs):
-        super(NdbIoTests, self).__init__(*args, **kwargs)
+    def setUp(self):
+        super(NdbIoTests, self).setUp()
         self.datastoreio_stub = stub_io.DatastoreioStub()
+
+    def tearDown(self):
+        self.datastoreio_stub.clear()
+        super(NdbIoTests, self).tearDown()
 
     def test_stub_is_initially_empty(self):
         self.assertItemsEqual(self.datastoreio_stub.get_everything(), [])
