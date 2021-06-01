@@ -410,7 +410,6 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.deleted:
             return
         exploration = exp_fetchers.get_exploration_from_model(item)
-        user_email = None
         for state in exploration.states.values():
             if state.interaction.id == 'LogicProof':
                 exploration_rights = rights_manager.get_exploration_rights(
@@ -429,8 +428,8 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     user_email = user_services.get_email_from_user_id(user_id)
                     if user_email:
                         yield ('EMAIL_DATA', (user_email, item.id))
-
-        yield ('SUCCESS', 1)
+                yield ('SUCCESS', 1)
+                return
 
     @staticmethod
     def reduce(key, values):
