@@ -95,6 +95,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 const toastrConfig = {
@@ -154,6 +155,7 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -217,6 +219,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    I18nLanguageSelectorComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -257,6 +260,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
