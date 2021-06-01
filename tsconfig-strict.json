@@ -221,7 +221,7 @@
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.spec.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
-    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts",
+    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
   ],
   "include": ["typings/*.ts"],
   "exclude": ["extensions/classifiers/proto"]
