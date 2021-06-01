@@ -662,7 +662,7 @@ def create_skill_opportunity(skill_id, skill_description):
             'SkillOpportunity corresponding to skill ID %s already exists.' % (
                 skill_id))
 
-    questions, _= (
+    questions, _ = (
         question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
             constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0))
     skill_opportunity = opportunity_domain.SkillOpportunity(

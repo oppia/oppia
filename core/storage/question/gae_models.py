@@ -369,7 +369,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
         return question_skill_link_models
 
-
     @classmethod
     def get_question_skill_links_based_on_difficulty_equidistributed_by_skill(
             cls, total_question_count, skill_ids, difficulty_requested):
