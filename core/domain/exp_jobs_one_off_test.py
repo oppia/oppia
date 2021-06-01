@@ -1884,27 +1884,22 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [['ca_choices_0']]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group_list = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['ca_choices_0']]
+                    })
+            ],
+            [],
+            None
+        )]
+
         written_translations_dict = {
             'translations_mapping': {
                 'ca_choices_0': {},
@@ -1958,7 +1953,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         state2.update_interaction_customization_args(
             customization_args_dict)
         state2.update_next_content_id_index(4)
-        state2.update_interaction_answer_groups([answer_group_dict])
+        state2.update_interaction_answer_groups(state_answer_group_list)
         state2.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
                 written_translations_dict))
@@ -2167,27 +2162,21 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             'allowMultipleItemsInSamePosition': {'value': True}
         }
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': [['ca_choices_0']]
-                },
-                'rule_type': 'IsEqualToOrdering'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group_list = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Introduction', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'IsEqualToOrdering',
+                    {
+                        'x': [['ca_choices_0']]
+                    })
+            ],
+            [],
+            None
+        )]
         written_translations_dict = {
             'translations_mapping': {
                 'ca_choices_0': {},
@@ -2241,7 +2230,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
         state2.update_interaction_customization_args(
             customization_args_dict)
         state2.update_next_content_id_index(4)
-        state2.update_interaction_answer_groups([answer_group_dict])
+        state2.update_interaction_answer_groups(state_answer_group_list)
         state2.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
                 written_translations_dict))
