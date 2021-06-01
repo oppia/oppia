@@ -27,10 +27,10 @@ import utils
 
 
 class BeamJob(python_utils.OBJECT):
-    """Represents the definition of an Apache Beam job.
+    """Encapsulates the definition of an Apache Beam job.
 
     Attributes:
-        name: str. The name of the job class that implements its logic.
+        name: str. The name of the class that implements the job's logic.
         parameter_names: list(str). The name of the parameters the job accepts
             as arguments.
     """
@@ -46,7 +46,7 @@ class BeamJob(python_utils.OBJECT):
 
     @property
     def name(self):
-        """Returns the name of the job class that implements its logic.
+        """Returns the name of the class that implements the job's logic.
 
         Returns:
             str. The name of the job class.
@@ -60,16 +60,17 @@ class BeamJob(python_utils.OBJECT):
         Returns:
             list(str). The name of the parameters.
         """
-        # We don't want to include 'self' in the list, run() being a method
+        # We don't want to include 'self' in the list; run() being a method
         # should be considered an implementation detail.
         return python_utils.get_args_of_function(self._job_class.run)[1:]
 
     def to_dict(self):
-        """Returns a dict representation of the instance.
+        """Returns a dict representation of the BeamJob.
 
         Returns:
             dict(str: *). The dict has the following structure:
-                name: str. The name of the job class that implements its logic.
+                name: str. The name of the class that implements the job's
+                    logic.
                 parameter_names: list(str). The name of the parameters the job
                     accepts as arguments.
         """
@@ -80,15 +81,16 @@ class BeamJob(python_utils.OBJECT):
 
 
 class BeamJobRun(python_utils.OBJECT):
-    """Domain object to represent an individual execution of an Apache Beam job.
+    """Encapsulates individual executions of an Apache Beam job.
 
     Attributes:
-        job_id: str. The name of the job class that implements the job's logic.
-        job_name: str. The arguments provided to the job run.
+        job_id: str. The ID of the job execution.
+        job_name: str. The name of the job class that implements the job's
+            logic.
         job_state: str. The state of the job at the time the model was last
             updated.
         job_arguments: list(str). The arguments provided to the job run.
-        job_started_on: datetime. The time at which the job was created.
+        job_started_on: datetime. The time at which the job was started.
         job_updated_on: datetime. The time at which the job's state was last
             updated.
     """
@@ -99,13 +101,13 @@ class BeamJobRun(python_utils.OBJECT):
         """Initializes a new BeamJobRun instance.
 
         Args:
-            job_id: str. The name of the job class that implements the job's
+            job_id: str. The ID of the job execution.
+            job_name: str. The name of the job class that implements the job's
                 logic.
-            job_name: str. The arguments provided to the job run.
             job_state: str. The state of the job at the time the model was last
                 updated.
             job_arguments: list(str). The arguments provided to the job run.
-            job_started_on: datetime. The time at which the job was created.
+            job_started_on: datetime. The time at which the job was started.
             job_updated_on: datetime. The time at which the job's state was last
                 updated.
         """
@@ -119,7 +121,7 @@ class BeamJobRun(python_utils.OBJECT):
     @property
     def in_terminal_state(self):
         """Returns whether the job run has reached a terminal state and is no
-        longer running.
+        longer executing.
 
         Returns:
             bool. Whether the job has reached a terminal state.
@@ -133,13 +135,13 @@ class BeamJobRun(python_utils.OBJECT):
         ]
 
     def to_dict(self):
-        """Returns a dict representation of the instance.
+        """Returns a dict representation of the BeamJobRun.
 
         Returns:
             dict(str: *). The dict has the following structure:
-                job_id: str. The name of the job class that implements the job's
-                    logic.
-                job_name: str. The arguments provided to the job run.
+                job_id: str. The ID of the job execution.
+                job_name: str. The name of the job class that implements the
+                    job's logic.
                 job_state: str. The state of the job at the time the model was
                     last updated.
                 job_arguments: list(str). The arguments provided to the job run.
@@ -161,29 +163,29 @@ class BeamJobRun(python_utils.OBJECT):
 
 
 class BeamJobRunResult(python_utils.OBJECT):
-    """Represents the result of an Apache Beam job run.
+    """Encapsulates the result of an Apache Beam job run.
 
     Attributes:
-        stdout: str. The unordered standard output from the job.
-        stderr: str. The unordered error output from the job.
+        stdout: str. The standard output produced by the job.
+        stderr: str. The error output produced by the job.
     """
 
     def __init__(self, stdout, stderr):
         """Initializes a new instance of BeamJobRunResult.
 
         Args:
-            stdout: list(str). The unordered standard output from the job.
-            stderr: list(str). The unordered error output from the job.
+            stdout: list(str). The standard output produced by the job.
+            stderr: list(str). The error output produced by the job.
         """
         self.stdout = stdout
         self.stderr = stderr
 
     def to_dict(self):
-        """Returns a dict representation of the instance.
+        """Returns a dict representation of the BeamJobRunResult.
 
         Returns:
             dict(str: str). The dict structure is:
-                stdout: str. The standard output from the job.
-                stderr: str. The error output from the job.
+                stdout: str. The standard output produced by the job.
+                stderr: str. The error output produced by the job.
         """
         return {'stdout': self.stdout, 'stderr': self.stderr}

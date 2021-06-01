@@ -43,10 +43,9 @@ class BeamJobServicesTests(test_utils.TestBase):
 
 class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
-    # Sample string date taken from the official documentation in the ISO
-    # standard RFC-3339 datetime format:
+    # Sample timestamp taken from the official documentation:
     # https://cloud.google.com/dataflow/docs/guides/using-command-line-intf#jobs_commands
-    NANO_RESOLUTION_RFC_3339_STR = '2015-02-09T19:56:39.510000000Z'
+    NANO_RESOLUTION_ISO_8601_STR = '2014-10-02T15:01:23.045123456Z'
 
     def setUp(self):
         super(BeamJobRunServicesTests, self).setUp()
@@ -54,10 +53,8 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
     def swap_check_output_with_gcloud_response(
             self,
-            # These values are taken from the official gcloud documentation:
-            # https://cloud.google.com/dataflow/docs/guides/using-command-line-intf#jobs_commands
             current_state='JOB_STATE_RUNNING',
-            current_state_time=NANO_RESOLUTION_RFC_3339_STR):
+            current_state_time=NANO_RESOLUTION_ISO_8601_STR):
         """Returns a context manager in which subprocess.check_output is swapped
         with an implementation that always returns output similar to a real call
         to: `gcloud --format=json dataflow jobs describe`.
@@ -75,8 +72,8 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
                 "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
 
         Returns:
-            context manager. A context manager in which
-            subprocess.check_output() always returns a sample gcloud response.
+            Context manager. A context manager in which
+            subprocess.check_output() always returns a mock gcloud response.
         """
         value = json.dumps({
             'currentState': current_state,
@@ -87,8 +84,8 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
     def create_beam_job_run_model(
             self, job_id=None, job_name='FooJob', job_arguments=None,
-            job_state='RUNNING'):
-        """Returns a new BeamJobRunModel with simple default values.
+            job_state=beam_job_models.BeamJobState.RUNNING.value):
+        """Returns a new BeamJobRunModel with convenient default values.
 
         Args:
             job_id: str|None. The ID of the job. If None, a value is generated.
@@ -102,10 +99,10 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         Returns:
             BeamJobRunModel. The new model.
         """
-        if job_arguments is None:
-            job_arguments = []
         if job_id is None:
             job_id = python_utils.NEXT(self._id_iter)
+        if job_arguments is None:
+            job_arguments = []
         return beam_job_models.BeamJobRunModel(
             id=job_id, job_name=job_name, job_arguments=job_arguments,
             latest_job_state=job_state)
@@ -150,9 +147,12 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
     def test_get_beam_job_runs(self):
         beam_job_run_models = [
-            self.create_beam_job_run_model(job_state='DONE'),
-            self.create_beam_job_run_model(job_state='RUNNING'),
-            self.create_beam_job_run_model(job_state='FAILED'),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.FAILED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -164,9 +164,12 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
     def test_get_beam_job_runs_with_refresh(self):
         initial_beam_job_run_models = [
-            self.create_beam_job_run_model(job_state='DONE'),
-            self.create_beam_job_run_model(job_state='RUNNING'),
-            self.create_beam_job_run_model(job_state='FAILED'),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.FAILED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -175,25 +178,29 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
         gcloud_output_mock = self.swap_check_output_with_gcloud_response(
             current_state='JOB_STATE_DONE',
-            current_state_time=self.NANO_RESOLUTION_RFC_3339_STR)
+            current_state_time=self.NANO_RESOLUTION_ISO_8601_STR)
 
         with gcloud_output_mock:
             beam_job_runs = beam_job_services.get_beam_job_runs(refresh=True)
 
-        # Only the second model (job_state='RUNNING') should have been updated.
+        # Only the second model (job_state=RUNNING) should have been updated.
         updated_beam_job_run_models = initial_beam_job_run_models[:]
-        updated_beam_job_run_models[1].latest_job_state = 'DONE'
+        updated_beam_job_run_models[1].latest_job_state = (
+            beam_job_models.BeamJobState.DONE.value)
         updated_beam_job_run_models[1].last_updated = (
-            datetime.datetime(2015, 2, 9, 19, 56, 39, 510000))
+            datetime.datetime(2014, 10, 2, 15, 1, 23, 45123))
 
         self.assert_domains_equal_models(
             beam_job_runs, updated_beam_job_run_models)
 
     def test_get_beam_job_runs_with_refresh_when_command_fails(self):
         initial_beam_job_run_models = [
-            self.create_beam_job_run_model(job_state='DONE'),
-            self.create_beam_job_run_model(job_state='RUNNING'),
-            self.create_beam_job_run_model(job_state='FAILED'),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.FAILED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -217,9 +224,12 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
     def test_refresh_state_of_all_beam_job_run_models(self):
         initial_beam_job_run_models = [
-            self.create_beam_job_run_model(job_state='DONE'),
-            self.create_beam_job_run_model(job_state='RUNNING'),
-            self.create_beam_job_run_model(job_state='FAILED'),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.FAILED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -228,16 +238,17 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
         gcloud_output_mock = self.swap_check_output_with_gcloud_response(
             current_state='JOB_STATE_DONE',
-            current_state_time=self.NANO_RESOLUTION_RFC_3339_STR)
+            current_state_time=self.NANO_RESOLUTION_ISO_8601_STR)
 
         with gcloud_output_mock:
             beam_job_services.refresh_state_of_all_beam_job_run_models()
 
-        # Only the second model (job_state='RUNNING') should have been updated.
+        # Only the second model (job_state=RUNNING) should have been updated.
         updated_beam_job_run_models = initial_beam_job_run_models[:]
-        updated_beam_job_run_models[1].latest_job_state = 'DONE'
+        updated_beam_job_run_models[1].latest_job_state = (
+            beam_job_models.BeamJobState.DONE.value)
         updated_beam_job_run_models[1].last_updated = (
-            datetime.datetime(2015, 2, 9, 19, 56, 39, 510000))
+            datetime.datetime(2014, 10, 2, 15, 1, 23, 45123))
 
         self.assertEqual(
             updated_beam_job_run_models,
@@ -246,9 +257,12 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
 
     def test_refresh_state_of_all_beam_job_run_models_when_command_fails(self):
         initial_beam_job_run_models = [
-            self.create_beam_job_run_model(job_state='DONE'),
-            self.create_beam_job_run_model(job_state='RUNNING'),
-            self.create_beam_job_run_model(job_state='FAILED'),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.FAILED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(

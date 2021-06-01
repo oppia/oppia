@@ -89,10 +89,10 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
 
 
 def get_beam_jobs():
-    """Returns the definitions of all registered Apache Beam jobs.
+    """Returns the list of all registered Apache Beam jobs.
 
     Returns:
-        list(BeamJob). A list of job definitions.
+        list(BeamJob). The list of registered Apache Beam jobs.
     """
     return [beam_job_domain.BeamJob(j) for j in jobs_registry.get_all_jobs()]
 
@@ -131,7 +131,7 @@ def get_beam_job_run_result(job_id):
     """Returns the result of the given Apache Beam job run.
 
     Args:
-        job_id: str. The ID of the job to fetch.
+        job_id: str. The ID of the job run to fetch.
 
     Returns:
         BeamJobRunResult. The result of the given Apache Beam job run.
@@ -158,7 +158,7 @@ def refresh_state_of_all_beam_job_run_models():
 
 
 def _get_beam_job_run_from_model(beam_job_run_model):
-    """Returns a corresponding domain object for the given BeamJobRunModel.
+    """Returns a domain object corresponding to the given BeamJobRunModel.
 
     Args:
         beam_job_run_model: BeamJobRunModel. The model.
@@ -207,7 +207,10 @@ def _refresh_state_of_beam_job_run_model(beam_job_run_model):
     job_id = beam_job_run_model.id
 
     try:
-        # Sample output from this command:
+        # We need to run a `gcloud` command to get the updated state. Reference:
+        # https://cloud.google.com/dataflow/docs/guides/using-command-line-intf#jobs_commands
+        #
+        # Sample output:
         # {
         #     "createTime": "2015-02-09T19:39:41.140Z",
         #     "currentState": "JOB_STATE_DONE",
@@ -217,35 +220,32 @@ def _refresh_state_of_beam_job_run_model(beam_job_run_model):
         #     "projectId": "google.com:clouddfe",
         #     "type": "JOB_TYPE_BATCH"
         # }
-        #
-        # Reference:
-        # https://cloud.google.com/dataflow/docs/guides/using-command-line-intf#jobs_commands
-        job_description = json.loads(subprocess.check_output(
+        job_status = json.loads(subprocess.check_output(
             [common.GCLOUD_PATH, '--format=json', 'dataflow', 'jobs',
              'describe', job_id]))
 
         updated_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
-            job_description['currentState'],
+            job_status['currentState'],
             beam_job_models.BeamJobState.UNKNOWN).value
 
         # The currentStateTime value uses nanosecond resolution. Since strftime
         # only supports microsecond resolution, we slice the nanoseconds off so
         # that it can be parsed correctly.
         #
-        # For reference, here's a sample value and its key indices:
+        # For reference, here's a sample value and the relevant indices:
         #
         #     v-- 0               [msec]v-- 26
         #     2015-02-09T19:56:39.510000000Z
         #                         [ nsecs ]^-- 29 or -1
         #
-        # Thus, we only keep the slices [:26] + [-1:]
-        current_state_time = job_description['currentStateTime']
+        # Thus, we only keep the slices [:26] and [-1:].
+        current_state_time = job_status['currentStateTime']
         current_state_time = current_state_time[:26] + current_state_time[-1:]
         last_updated = datetime.datetime.strptime(
             current_state_time, utils.ISO_8601_DATETIME_FORMAT)
 
     except subprocess.CalledProcessError:
-        logging.exception('Failed to update the state of job_id="%s"' % job_id)
+        logging.exception('Failed to update the state of job_id="%s"!' % job_id)
         raise
 
     else:
