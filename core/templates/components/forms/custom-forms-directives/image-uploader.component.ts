@@ -35,6 +35,7 @@ interface ImageTypeMapping {
 export class ImageUploaderComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
   @Input() allowedImageFormats: string[];
+  @Input() activeInFilepathEditor: boolean = false;
   errorMessage: string;
   backgroundWhileUploading: boolean = false;
   @ViewChild('dropArea') dropAreaRef: ElementRef;
@@ -51,6 +52,7 @@ export class ImageUploaderComponent {
     // others in the DOM.
     this.fileInputClassName = (
       'image-uploader-file-input' + this.idGenerationService.generateNewId());
+    console.log(this.activeInFilepathEditor)
   }
 
   ngAfterViewInit(): void {

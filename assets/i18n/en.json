@@ -144,6 +144,7 @@
     "I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO": "This will take you to a page where you can delete your Oppia account.",
     "I18N_DIRECTIVES_BROWSE_DESKTOP": "Browse from Your Desktop",
     "I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Drag an image into this area",
+    "I18N_DIRECTIVES_UPLOAD": "Upload",
     "I18N_DIRECTIVES_UPLOAD_A_FILE": "Upload a file",
     "I18N_DONATE_PAGE_BREADCRUMB": "Donate",
     "I18N_ERROR_DISABLED_EXPLORATION": "Disabled Exploration",

@@ -7,7 +7,8 @@
     <div class="oppia-profile-image-uploader">
       <div ng-hide="uploadedImage">
         <oppia-image-uploader (file-changed)="onFileChanged($event)"
-                              [allowed-image-formats]="allowedImageFormats">
+                              [allowed-image-formats]="allowedImageFormats"
+                              [activeInFilepathEditor]="false">
         </oppia-image-uploader>
       </div>
 

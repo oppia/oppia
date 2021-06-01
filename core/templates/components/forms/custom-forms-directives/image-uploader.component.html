@@ -1,16 +1,18 @@
-<div class="image-uploader-drop-area" [ngClass]="{'image-uploader-is-active': backgroundWhileUploading}" #dropArea>
-  <div class="image-uploader-text">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+<div class="image-uploader-drop-area" [ngClass]="{'image-uploader-is-active': backgroundWhileUploading, 'image-uploader-filepath-editor': activeInFilepathEditor}" #dropArea>
+  <div class="image-uploader-text" *ngIf="!activeInFilepathEditor">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
+  <div class="image-uploader-text" *ngIf="activeInFilepathEditor">{{ 'I18N_DIRECTIVES_BROWSE_DESKTOP' | translate }}</div>
   <span *ngIf="errorMessage"
         class="image-uploader-error-message protractor-test-upload-error">
     <i class="material-icons">&#xE002;</i>
     {{ errorMessage }}
   </span>
-  <span class="image-uploader-license-warning">
+  <span class="image-uploader-license-warning" *ngIf="!activeInFilepathEditor">
     Before uploading images, please ensure that they are<br>
     compatible with the <a href="/about#license" target="_blank" rel="noopener">license terms</a> of the site.<br>
     Please do not upload watermarked images.
   </span>
-  <label for="image-file-input" class="image-uploader-upload-label-button">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
+  <label for="image-file-input" *ngIf="!activeInFilepathEditor" class="image-uploader-upload-label-button">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
+  <label for="image-file-input" *ngIf="activeInFilepathEditor" class="image-uploader-filepath-editor-button">{{ 'I18N_DIRECTIVES_UPLOAD' | translate }}</label>
   <!-- The onclick="this.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
   <input type="file" id="image-file-input" (click)="this.value = null"
          (change)="handleFile()"
@@ -40,6 +42,15 @@
     position: relative;
     text-align: center;
     width: 100%;
+  }
+
+  .image-uploader-filepath-editor {
+    font-size: 14px;
+    height: 150px;
+    width: 100%;
+    padding-top: 35px;
+    border-right: none;
+    margin-bottom: 25px;
   }
 
   .image-uploader-text {
@@ -84,6 +95,23 @@
     right: 8px;
     text-align: center;
   }
+
+  label.image-uploader-filepath-editor-button {
+    cursor: pointer;
+    font-size: 12px;
+    right: 8px;
+    background-color: #3274aa;
+    border-radius: 3px;
+    border: none;
+    color: white;
+    padding: 4px 21px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    display: inline-block;
+    margin: 4px 2px;
+  }
+
 
   label.image-uploader-upload-label-button:hover {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #EAF6FD), color-stop(1, #A7D8F5));
