@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for WelcomeTranslationModalController.
  */
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Welcome Translation Modal Controller', function() {
   let $scope = null;
@@ -25,6 +28,7 @@ describe('Welcome Translation Modal Controller', function() {
   const explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     const $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
