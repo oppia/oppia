@@ -514,6 +514,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 Exception. Mock exception - server error.
             """
             raise Exception('Server error')
+
         with self.swap(
             bulk_email_services, 'add_or_update_user_status',
             _mock_add_or_update_user_status):

@@ -43,7 +43,7 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
             list or not.
 
     Returns:
-        bool. True to mock user creation successful.
+        bool. True to mock successful user creation.
     """
     logging.info(
         'Updated status of email ID %s\'s bulk email preference in the service '

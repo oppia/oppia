@@ -35,11 +35,11 @@ def _get_subscriber_hash(email):
     Args:
         email: str. The email of the user.
 
-    Raises:
-        Exception. Invalid type for email, expected string.
-
     Returns:
         str. The subscriber hash corresponding to the input email.
+
+    Raises:
+        Exception. Invalid type for email, expected string.
     """
     if not isinstance(email, python_utils.BASESTRING):
         raise Exception(
@@ -55,13 +55,13 @@ def _get_mailchimp_class():
 
     NOTE: No other functionalities should be added to this function.
 
-    Raises:
-        Exception. Mailchimp API key is not available.
-        Exception. Mailchimp username is not set.
-
     Returns:
         Mailchimp. A mailchimp class instance with the API key and username
         initialized.
+
+    Raises:
+        Exception. Mailchimp API key is not available.
+        Exception. Mailchimp username is not set.
     """
     if not feconf.MAILCHIMP_API_KEY:
         raise Exception('Mailchimp API key is not available.')
@@ -84,13 +84,14 @@ def _create_user_in_mailchimp_db(user_email):
         user_email: str. Email ID of the user. Email is used to uniquely
             identify the user in the mailchimp DB.
 
+    Returns:
+        bool. Whether the user was successfully added to the db. (This will be
+        False if the user was permanently deleted earlier and therefore cannot
+        be added back.)
+
     Raises:
         Exception. Any error (other than the one mentioned below) raised by the
             mailchimp API.
-
-    Returns:
-        bool. False if the user was permanently deleted earlier and therefore
-        cannot be added back.
     """
     post_data = {
         'email_address': user_email,
@@ -102,8 +103,8 @@ def _create_user_in_mailchimp_db(user_email):
         client.lists.members.create(feconf.MAILCHIMP_AUDIENCE_ID, post_data)
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(python_utils.UNICODE(error))
-        # This is the specific error message returned for the error mentioned in
-        # the docstring.
+        # This is the specific error message returned for the case where the
+        # user was permanently deleted from the Mailchimp database earlier.
         if error_message['title'] == 'Forgotten Email Not Subscribed':
             return False
         raise Exception(error_message['detail'])
@@ -161,13 +162,14 @@ def add_or_update_user_status(user_email, can_receive_email_updates):
         can_receive_email_updates: bool. Whether they want to be subscribed to
             the bulk email list or not.
 
-    Raises:
-        Exception. Any error (other than the one mentioned below) raised by the
-            mailchimp API.
-
     Returns:
-        bool. False if the user was permanently deleted earlier and therefore
-        cannot be added back.
+        bool. Whether the user was successfully added to the db. (This will be
+        False if the user was permanently deleted earlier and therefore cannot
+        be added back.)
+
+    Raises:
+        Exception. Any error (other than the case where the user was permanently
+            deleted earlier) raised by the mailchimp API.
     """
     client = _get_mailchimp_class()
     subscriber_hash = _get_subscriber_hash(user_email)

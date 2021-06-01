@@ -823,20 +823,20 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 
     def test_post_with_different_audience_id(self):
         with self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'):
-            json_response = self.post_json_with_custom_body(
+            json_response = self.post_json(
                 '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'invalid_audience_id',
                     'data[email]': self.EDITOR_EMAIL
-                })
+                }, use_payload=False)
             self.assertEqual(json_response, {})
 
     def test_post_with_invalid_email_id(self):
         with self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'):
-            json_response = self.post_json_with_custom_body(
+            json_response = self.post_json(
                 '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'audience_id',
                     'data[email]': 'invalid_email'
-                })
+                }, use_payload=False)
             self.assertEqual(json_response, {})
 
     def test_post(self):
@@ -846,24 +846,24 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             self.assertEqual(email_preferences.can_receive_email_updates, False)
 
             # User subscribed externally.
-            json_response = self.post_json_with_custom_body(
+            json_response = self.post_json(
                 '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'audience_id',
                     'data[email]': self.EDITOR_EMAIL,
                     'type': 'subscribe'
-                })
+                }, use_payload=False)
             self.assertEqual(json_response, {})
             email_preferences = user_services.get_email_preferences(
                 self.editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, True)
 
             # User unsubscribed externally.
-            json_response = self.post_json_with_custom_body(
+            json_response = self.post_json(
                 '%s' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'audience_id',
                     'data[email]': self.EDITOR_EMAIL,
                     'type': 'unsubscribe'
-                })
+                }, use_payload=False)
             self.assertEqual(json_response, {})
             email_preferences = user_services.get_email_preferences(
                 self.editor_id)
