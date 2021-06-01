@@ -180,8 +180,8 @@ describe('Preferences Controller', function() {
       };
       $httpBackend.expect(
         'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond({
-          bulk_email_signup_message_should_be_shown: false
-        });
+        bulk_email_signup_message_should_be_shown: false
+      });
       ctrl.saveEmailPreferences(true, true, true, true);
       $httpBackend.flush();
 
@@ -198,8 +198,8 @@ describe('Preferences Controller', function() {
       };
       $httpBackend.expect(
         'PUT', '/preferenceshandler/data', isRequestTheExpectOne).respond({
-          bulk_email_signup_message_should_be_shown: true
-        });
+        bulk_email_signup_message_should_be_shown: true
+      });
       ctrl.saveEmailPreferences(true, true, true, true);
       $httpBackend.flush();
 
