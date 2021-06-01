@@ -103,8 +103,9 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
-            exploration_data['exploration_is_linked_to_story'] = bool(
-                exp_services.get_story_id_linked_to_exploration(exploration_id))
+            exploration_data['exploration_is_linked_to_story'] = (
+                exp_services.get_story_id_linked_to_exploration(
+                    exploration_id) is not None)
         except:
             raise self.PageNotFoundException
 
@@ -232,7 +233,9 @@ class ExplorationRightsHandler(EditorHandler):
             if new_member_id is None:
                 raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
-
+            if new_member_id == self.user_id:
+                raise self.InvalidInputException(
+                    'Users are not allowed to assign other roles to themselves')
             rights_manager.assign_role_for_exploration(
                 self.user, exploration_id, new_member_id, new_member_role)
             email_manager.send_role_notification_email(
@@ -257,6 +260,25 @@ class ExplorationRightsHandler(EditorHandler):
             raise self.InvalidInputException(
                 'No change was made to this exploration.')
 
+        self.render_json({
+            'rights': rights_manager.get_exploration_rights(
+                exploration_id).to_dict()
+        })
+
+    @acl_decorators.can_modify_exploration_roles
+    def delete(self, exploration_id):
+        """Deletes user roles from the exploration."""
+        username = self.request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Sorry, we could not find the specified user.')
+        if self.user.user_id == user_id:
+            raise self.InvalidInputException(
+                'Sorry, users cannot remove their own roles.')
+
+        rights_manager.deassign_role_for_exploration(
+            self.user, exploration_id, user_id)
         self.render_json({
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict()
@@ -523,8 +545,8 @@ class StateInteractionStatsHandler(EditorHandler):
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % (
+            logging.exception('Could not find state: %s' % state_name)
+            logging.exception('Available states: %s' % (
                 list(current_exploration.states.keys())))
             raise self.PageNotFoundException
 

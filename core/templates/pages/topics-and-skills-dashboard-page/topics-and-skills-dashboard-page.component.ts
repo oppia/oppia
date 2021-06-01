@@ -24,9 +24,9 @@ require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts');
-require('components/rubrics-editor/rubrics-editor.directive.ts');
+require('components/rubrics-editor/rubrics-editor.component.ts');
 
-require('domain/skill/RubricObjectFactory.ts');
+require('domain/skill/rubric.model.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -34,13 +34,13 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-    'create-new-skill-modal.controller.ts');
+    'create-new-skill-modal.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
-    'skills-list.directive.ts');
+    'skills-list.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
-    'topics-list.directive.ts');
+    'topics-list.component.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
     'topics-and-skills-dashboard-page.service');
@@ -58,19 +58,20 @@ import debounce from 'lodash/debounce';
 import { TopicsAndSkillsDashboardFilter } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
+require('pages/topic-editor-page/services/create-new-skill-modal.service');
 
 angular.module('oppia').component('topicsAndSkillsDashboardPage', {
   template: require('./topics-and-skills-dashboard-page.component.html'),
   controller: [
     '$rootScope', '$scope', '$timeout', 'AlertsService',
-    'FocusManagerService', 'SkillCreationService',
+    'CreateNewSkillModalService', 'FocusManagerService',
     'TopicCreationService', 'TopicsAndSkillsDashboardBackendApiService',
     'TopicsAndSkillsDashboardPageService', 'WindowDimensionsService',
     'FATAL_ERROR_CODES', 'SKILL_STATUS_OPTIONS', 'TOPIC_FILTER_CLASSROOM_ALL',
     'TOPIC_PUBLISHED_OPTIONS', 'TOPIC_SORT_OPTIONS',
     function(
         $rootScope, $scope, $timeout, AlertsService,
-        FocusManagerService, SkillCreationService,
+        CreateNewSkillModalService, FocusManagerService,
         TopicCreationService, TopicsAndSkillsDashboardBackendApiService,
         TopicsAndSkillsDashboardPageService, WindowDimensionsService,
         FATAL_ERROR_CODES, SKILL_STATUS_OPTIONS, TOPIC_FILTER_CLASSROOM_ALL,
@@ -199,7 +200,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       ctrl.createSkill = function() {
-        SkillCreationService.createNewSkill();
+        CreateNewSkillModalService.createNewSkill();
       };
       /**
        * @param {Number} pageNumber - Page number to navigate to.

@@ -120,10 +120,12 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
+    # Currently, "roles" and "banned" fields are not in use.
+    # A list of roles assigned to the user.
+    roles = datastore_services.StringProperty(
+        repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
+    # Flag to indicate whether the user is banned.
+    banned = datastore_services.BooleanProperty(indexed=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -188,7 +190,12 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+
+            # TODO(#12755): Change export policy for roles and banned fields to
+            # "EXPORTED" once the fields are populated in the datastore.
+            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -367,11 +374,6 @@ class CompletedActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
@@ -447,11 +449,6 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     # The ids of the collections partially completed by the user.
     collection_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -533,11 +530,6 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     # The name of the state at which the learner left the exploration when
     # he/she last played it.
     last_played_state_name = datastore_services.StringProperty(default=None)
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -676,11 +668,6 @@ class LearnerPlaylistModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
@@ -749,15 +736,13 @@ class UserContributionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # IDs of explorations that this user has created
-    # Includes subsequently deleted and private explorations.
+    # IDs of explorations that this user has created.
     created_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, default=None)
+        repeated=True, indexed=True)
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
-    # Includes subsequently deleted and private explorations.
     edited_exploration_ids = datastore_services.StringProperty(
-        repeated=True, indexed=True, default=None)
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -1525,11 +1510,6 @@ class CollectionProgressModel(base_models.BaseModel):
     completed_explorations = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
-
-    @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user:
         user_id field.
@@ -1706,11 +1686,6 @@ class StoryProgressModel(base_models.BaseModel):
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
     completed_node_ids = datastore_services.StringProperty(repeated=True)
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():
@@ -1904,6 +1879,12 @@ class UserQueryModel(base_models.BaseModel):
     edited_at_least_n_exps = datastore_services.IntegerProperty(default=None)
     # Query option to check if user has edited fewer than n explorations.
     edited_fewer_than_n_exps = datastore_services.IntegerProperty(default=None)
+    # Query option to check if user has created collection.
+    created_collection = datastore_services.BooleanProperty(default=False)
+    # Query option to check if user has used LogicProof interaction in any
+    # of the explorations that they created.
+    used_logic_proof_interaction = datastore_services.BooleanProperty(
+        default=False)
     # List of all user_ids who satisfy all parameters given in above query.
     # This list will be empty initially. Once query has completed its execution
     # this list will be populated with all qualifying user ids.
@@ -1948,6 +1929,9 @@ class UserQueryModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_at_least_n_exps': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'edited_fewer_than_n_exps':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_collection': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'used_logic_proof_interaction':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'user_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'submitter_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2066,11 +2050,6 @@ class UserSkillMasteryModel(base_models.BaseModel):
     # The degree of mastery of the user in the skill.
     degree_of_mastery = (
         datastore_services.FloatProperty(required=True, indexed=True))
-
-    @staticmethod
-    def get_lowest_supported_role():
-        """The lowest supported role here should be Learner."""
-        return feconf.ROLE_ID_LEARNER
 
     @staticmethod
     def get_deletion_policy():

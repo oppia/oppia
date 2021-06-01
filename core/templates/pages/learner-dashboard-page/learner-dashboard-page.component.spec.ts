@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,166 +16,324 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
+
+import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
 
-require(
-  'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
+import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
+import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { MaterialModule } from 'components/material.module';
+import { FormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 
-describe('Learner dashboard page', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $q = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $uibModal = null;
-  var AlertsService = null;
-  var CsrfTokenService = null;
-  var DateTimeFormatService = null;
-  var ExplorationObjectFactory = null;
-  var LearnerDashboardBackendApiService = null;
-  var SuggestionModalForLearnerDashboardService = null;
-  var UserService = null;
+import { AlertsService } from 'services/alerts.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { UserService } from 'services/user.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-  var profilePictureDataUrl = 'profile-picture-url';
-  var userInfo = {
-    getUsername: () => 'username1'
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+@Pipe({name: 'slice'})
+class MockSlicePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+@Pipe({name: 'truncate'})
+class MockTrunctePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+class MockLearnerDashboardActivityBackendApiService {
+  async removeActivityModalAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      resolve();
+    });
+  }
+}
+
+@Component({selector: 'background-banner', template: ''})
+class BackgroundBannerComponentStub {
+}
+
+@Component({selector: 'exploration-summary-tile', template: ''})
+class ExplorationSummaryTileComponentStub {
+}
+
+@Component({selector: 'collection-summary-tile', template: ''})
+class CollectionSummaryTileComponentStub {
+}
+
+@Component({selector: 'loading-dots', template: ''})
+class LoadingDotsComponentStub {
+}
+
+describe('Learner dashboard page', () => {
+  let component: LearnerDashboardPageComponent;
+  let fixture: ComponentFixture<LearnerDashboardPageComponent>;
+  let alertsService: AlertsService = null;
+  let csrfTokenService: CsrfTokenService = null;
+  let dateTimeFormatService: DateTimeFormatService = null;
+  let explorationObjectFactory: ExplorationObjectFactory = null;
+  let focusManagerService: FocusManagerService;
+  let learnerDashboardBackendApiService:
+    LearnerDashboardBackendApiService = null;
+  let suggestionModalForLearnerDashboardService:
+    SuggestionModalForLearnerDashboardService = null;
+  let userService: UserService = null;
+
+  let profilePictureDataUrl = 'profile-picture-url';
+
+  let explorationDict: ExplorationBackendDict = {
+    init_state_name: 'Introduction',
+    language_code: 'en',
+    states: {},
+    param_changes: [],
+    param_specs: {},
+    is_version_of_draft_valid: true,
+    correctness_feedback_enabled: false,
+    draft_changes: [],
+    version: 1,
+    draft_change_list_id: 3,
+    title: 'Test Exploration',
+
   };
-  var learnerDashboardData = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+  let titleList = [
+    'World War III', 'Quantum Mechanics', 'Algebra',
+    'Nouns', 'Counting Stars', 'Hip Hop', 'Consiousness',
+    'Database Management', 'Plant Cell', 'Zebra'
+  ];
+
+  let categoryList = [
+    'Social', 'Science', 'Mathematics', 'English',
+    'French', 'Arts', 'Pyschology',
+    'Computer Science', 'Biology', 'Zoo'
+  ];
+
+  let threadSummaryList = [{
+    status: 'open',
+    original_author_id: '1',
+    last_updated_msecs: 1000,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Biology',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '2',
+    last_updated_msecs: 1001,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Algebra',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '3',
+    last_updated_msecs: 1002,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Three Balls',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  },
+  {
+    status: 'open',
+    original_author_id: '4',
+    last_updated_msecs: 1003,
+    last_message_text: 'Last Message',
+    total_message_count: 5,
+    last_message_is_read: false,
+    second_last_message_is_read: true,
+    author_last_message: '2',
+    author_second_last_message: 'Last Message',
+    exploration_title: 'Zebra',
+    exploration_id: 'exp1',
+    thread_id: 'thread_1'
+  }
+  ];
+
+  let subscriptionsList = [{
+    creator_impact: 0,
+    creator_picture_data_url: 'creatorA-url',
+    creator_username: 'Bucky',
+  },
+  {
+    creator_impact: 1,
+    creator_picture_data_url: 'creatorB-url',
+    creator_username: 'Arrow',
+  },
+  {
+    creator_impact: 3,
+    creator_picture_data_url: 'creatorD-url',
+    creator_username: 'Deadpool',
+  },
+  {
+    creator_impact: 2,
+    creator_picture_data_url: 'creatorC-url',
+    creator_username: 'Captain America',
+  }];
+
+  let collectionDict: CollectionBackendDict = {
+    id: 'sample_collection_id',
+    title: 'a title',
+    objective: 'an objective',
+    category: 'a category',
+    version: 0,
+    nodes: [],
+    language_code: null,
+    schema_version: null,
+    tags: null,
+    playthrough_dict: {
+      next_exploration_id: 'expId',
+      completed_exploration_ids: ['expId2']
     }
-  }));
+  };
 
-  describe('when succesfully fetching learner dashboard data', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $httpBackend = $injector.get('$httpBackend');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      CsrfTokenService = $injector.get('CsrfTokenService');
-      DateTimeFormatService = $injector.get('DateTimeFormatService');
-      ExplorationObjectFactory = $injector.get('ExplorationObjectFactory');
-      LearnerDashboardBackendApiService = $injector.get(
-        'LearnerDashboardBackendApiService');
-      SuggestionModalForLearnerDashboardService = $injector.get(
-        'SuggestionModalForLearnerDashboardService');
-      UserService = $injector.get('UserService');
+  let learnerDashboardData = {
+    completed_explorations_list: [],
+    completed_collections_list: [],
+    incomplete_explorations_list: [],
+    incomplete_collections_list: [],
+    subscription_list: subscriptionsList,
+    number_of_nonexistent_activities: {
+      incomplete_explorations: 0,
+      incomplete_collections: 0,
+      completed_explorations: 0,
+      completed_collections: 0,
+      exploration_playlist: 0,
+      collection_playlist: 0
+    },
+    completed_to_incomplete_collections: [],
+    thread_summaries: threadSummaryList,
+    number_of_unread_threads: 10,
+    exploration_playlist: [],
+    collection_playlist: []
+  };
 
-      spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
+  let userInfo = {
+    _isModerator: true,
+    _isAdmin: false,
+    _isTopicManager: false,
+    _isSuperAdmin: false,
+    _canCreateCollections: true,
+    _preferredSiteLanguageCode: 'en',
+    _username: 'username1',
+    _email: 'tester@example.org',
+    _isLoggedIn: true,
+    isModerator: () => true,
+    isAdmin: () => false,
+    isSuperAdmin: () => false,
+    isTopicManager: () => false,
+    canCreateCollections: () => true,
+    getPreferredSiteLanguageCode: () =>'en',
+    getUsername: () => 'username1',
+    getEmail: () => 'tester@example.org',
+    isLoggedIn: () => true
+  };
 
-      var explorationDict = {
-        init_state_name: 'Introduction',
-        language_code: 'en',
-        states: {
-          Introduction: {
-            param_changes: [],
-            content: {
-              html: '',
-              audio_translations: {}
-            },
-            recorded_voiceovers: {
-              voiceovers_mapping: {}
-            },
-            written_translations: {
-              translations_mapping: {}
-            },
-            unresolved_answers: {},
-            interaction: {
-              customization_args: {},
-              answer_groups: [],
-              default_outcome: {
-                param_changes: [],
-                dest: 'Introduction',
-                feedback: {
-                  html: '',
-                  audio_translations: {}
-                }
-              },
-              hints: [],
-              confirmed_unclassified_answers: [],
-              id: null
-            }
-          }
-        },
-        param_changes: [],
-        param_specs: {},
-        version: 1
-      };
-      var collectionDict = {
-        objective: '',
-        category: '',
-        version: '0',
-        nodes: [],
-        playthrough_dict: {
-          next_exploration_id: 'expId',
-          completed_exploration_ids: ['expId2']
-        }
-      };
-      learnerDashboardData = {
-        completed_explorations_list: [],
-        completed_collections_list: [],
-        incomplete_explorations_list: [],
-        incomplete_collections_list: [],
-        subscription_list: [{
-          creator_impact: null,
-          creator_picture_data_url: 'creator1-url',
-          creator_username: 'username1',
-        }, {
-          creator_impact: null,
-          creator_picture_data_url: 'creator1-url',
-          creator_username: 'username1',
-        }],
-        number_of_nonexistent_activities: {
-          incomplete_explorations: 0,
-          incomplete_collections: 0,
-          completed_explorations: 0,
-          completed_collections: 0,
-          exploration_playlist: 0,
-          collection_playlist: 0
-        },
-        completed_to_incomplete_collections: [],
-        thread_summaries: [{
-          status: 'open',
-          original_author_id: '1',
-          last_updated_msecs: 1000,
-          last_message_text: 'Last Message',
-          total_message_count: 5,
-          last_message_is_read: false,
-          second_last_message_is_read: true,
-          author_last_message: '2',
-          author_second_last_message: 'Last Message',
-          exploration_title: 'Exploration Title',
-          exploration_id: 'exp1',
-          thread_id: 'thread_1'
-        }],
-        number_of_unread_threads: 10,
-        exploration_playlist: [],
-        collection_playlist: []
-      };
+  describe('when succesfully fetching learner dashboard data', () => {
+    beforeEach(async(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          MaterialModule,
+          FormsModule,
+          HttpClientTestingModule
+        ],
+        declarations: [
+          LearnerDashboardPageComponent,
+          MockTranslatePipe,
+          SortByPipe,
+          MockSlicePipe,
+          MockTrunctePipe,
+          BackgroundBannerComponentStub,
+          ExplorationSummaryTileComponentStub,
+          CollectionSummaryTileComponentStub,
+          LoadingDotsComponentStub,
+        ],
+        providers: [
+          AlertsService,
+          DateTimeFormatService,
+          ExplorationObjectFactory,
+          FocusManagerService,
+          LearnerDashboardBackendApiService,
+          {
+            provide: LearnerDashboardActivityBackendApiService,
+            useClass: MockLearnerDashboardActivityBackendApiService
+          },
+          SuggestionModalForLearnerDashboardService,
+          UrlInterpolationService,
+          UserService,
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
+    }));
 
+    beforeEach(fakeAsync(() => {
+      fixture = TestBed.createComponent(LearnerDashboardPageComponent);
+      component = fixture.componentInstance;
+
+      alertsService = TestBed.inject(AlertsService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+      explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+      focusManagerService = TestBed.inject(FocusManagerService);
+      learnerDashboardBackendApiService =
+        TestBed.inject(LearnerDashboardBackendApiService);
+      suggestionModalForLearnerDashboardService =
+        TestBed.inject(SuggestionModalForLearnerDashboardService);
+      userService = TestBed.inject(UserService);
+
+      spyOn(csrfTokenService, 'getTokenAsync').and.callFake(async() => {
+        return Promise.resolve('sample-csrf-token');
+      });
       // Generate completed explorations and exploration playlist.
       for (let i = 0; i < 10; i++) {
         learnerDashboardData.completed_explorations_list[i] = (
-          ExplorationObjectFactory.createFromBackendDict(
+          explorationObjectFactory.createFromBackendDict(
             Object.assign(explorationDict, {
-              exploration_id: i + 1,
-              title: 'Exploration Title ' + (i + 1),
-              category: 'Astronomy'
+              id: i + 1,
+              title: titleList[i],
+              category: categoryList[i]
             })
           ));
         learnerDashboardData.exploration_playlist[i] = ({
@@ -183,16 +341,16 @@ describe('Learner dashboard page', function() {
         });
       }
 
-      // Generate incomplete explorations.
+      // Generate incomplete explorations and incomplete exploration playlist.
       for (let i = 0; i < 12; i++) {
         learnerDashboardData.incomplete_explorations_list[i] = (
-          ExplorationObjectFactory.createFromBackendDict(
+          explorationObjectFactory.createFromBackendDict(
             Object.assign(explorationDict, {
-              // Create ids from 10 to 22.
+              // Create ids from 11 to 22.
               // (1 to 10 is the complete explorations).
-              exploration_id: i + 11,
-              title: 'Exploration Title ' + (i + 11),
-              category: 'Astronomy'
+              id: Number(i + 11).toString(),
+              title: titleList[i],
+              category: categoryList[i]
             })
           ));
       }
@@ -203,8 +361,8 @@ describe('Learner dashboard page', function() {
           // TODO(#10875): Fix type mismatch.
           Collection.create(
             Object.assign(collectionDict, {
-              id: i + 1,
-              title: 'Collection Title ' + (i + 1),
+              title: titleList[i],
+              category: categoryList[i]
             }) as unknown as CollectionBackendDict
           ));
         learnerDashboardData.collection_playlist[i] = ({
@@ -218,20 +376,26 @@ describe('Learner dashboard page', function() {
           // TODO(#10875): Fix type mismatch.
           Collection.create(
             Object.assign(collectionDict, {
-              // Create ids from 9 to 17.
-              // (0 to 8 is the complete collections).
-              id: i + 10,
+              // Create ids from 9 to 16.
+              // (1 to 8 is the complete collections).
+              id: Number(i + 9).toString(),
               title: 'Collection Title ' + (i + 7),
             }) as unknown as CollectionBackendDict
           ));
       }
 
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and
-        .returnValue($q.resolve(profilePictureDataUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve(userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
-        .and.returnValue($q.resolve({
+      spyOn(userService, 'getProfileImageDataUrlAsync').and
+        .callFake(async() => {
+          return Promise.resolve(profilePictureDataUrl);
+        });
+
+      spyOn(userService, 'getUserInfoAsync').and
+        .callFake(async() => {
+          return Promise.resolve(userInfo);
+        });
+
+      spyOn(learnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
+        .and.returnValue(Promise.resolve({
           completedExplorationsList: (
             learnerDashboardData.completed_explorations_list.map(
               expSummary => LearnerExplorationSummary.createFromBackendDict(
@@ -272,272 +436,1047 @@ describe('Learner dashboard page', function() {
                 .createFromCreatorBackendDict(profileSummary)))
         }));
 
-      $scope = $rootScope.$new();
-      ctrl = $componentController('learnerDashboardPage', {
-        $rootScope: $scope
-      });
-      ctrl.$onInit();
-      $scope.$apply();
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+      flush();
     }));
 
-    it('should initialize correctly controller properties after its' +
-    ' initialization and get data from backend', function() {
-      expect(ctrl.profilePictureDataUrl).toBe(profilePictureDataUrl);
-      expect(ctrl.username).toBe(userInfo.getUsername());
+    it('should initialize correctly component properties after its' +
+    ' initialization and get data from backend', fakeAsync(() => {
+      expect(component.profilePictureDataUrl).toBe(profilePictureDataUrl);
+      expect(component.username).toBe(userInfo.getUsername());
 
-      expect(ctrl.noExplorationActivity).toBe(false);
-      expect(ctrl.noCollectionActivity).toBe(false);
-      expect(ctrl.noActivity).toBe(false);
-    });
+      expect(component.noExplorationActivity).toBe(false);
+      expect(component.noCollectionActivity).toBe(false);
+      expect(component.noActivity).toBe(false);
 
-    it('should get static image url', function() {
-      var imagePath = '/path/to/image.png';
-      expect(ctrl.getStaticImageUrl(imagePath)).toBe(
+      expect(component.incompleteExplorationsList.length).toBe(12);
+      expect(component.incompleteCollectionsList.length).toBe(8);
+
+      expect(component.explorationPlaylist.length).toBe(10);
+      expect(component.explorationPlaylist.length).toBe(10);
+    }));
+
+    it('should set focus without scroll on browse lesson btn', fakeAsync(() => {
+      const focusSpy = spyOn(focusManagerService, 'setFocusWithoutScroll');
+      component.ngOnInit();
+      flush();
+      expect(focusSpy).toHaveBeenCalledWith('ourLessonsBtn');
+    }));
+
+    it('should get static image url', () => {
+      let imagePath = '/path/to/image.png';
+      expect(component.getStaticImageUrl(imagePath)).toBe(
         '/assets/images/path/to/image.png');
     });
 
-    it('should set a new section as active when fetching message summary' +
-      ' list from backend', function() {
-      var threadStatus = 'open';
-      var explorationId = 'exp1';
-      var threadId = 'thread_1';
-      var explorationTitle = 'Exploration Title';
-      var threadMessages = [{
-        message_id: '1',
-        text: 'Feedback 1',
-        updated_status: 'open',
-        suggestion_html: 'An instead of a',
-        current_content_html: 'A orange',
-        description: 'Suggestion for english grammar',
-        author_username: 'username2',
-        author_picture_data_url: 'foo',
-        created_on_msecs: 1200
-      }];
-
-      expect(ctrl.numberOfUnreadThreads).toBe(10);
-
-      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-        .respond({
-          message_summary_list: threadMessages
-        });
-      ctrl.onClickThread(
-        threadStatus, explorationId, threadId, explorationTitle);
-      $httpBackend.flush();
-      expect(ctrl.feedbackThreadActive).toBe(true);
-
-      var newActiveSectionName = 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION';
-      ctrl.setActiveSection(newActiveSectionName);
-
-      expect(ctrl.activeSection).toBe(newActiveSectionName);
-      expect(ctrl.feedbackThreadActive).toBe(false);
-
-      var newActiveSectionName2 = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      ctrl.setActiveSection(newActiveSectionName2);
-
-      expect(ctrl.activeSection).toBe(newActiveSectionName2);
-      expect(ctrl.feedbackThreadActive).toBe(false);
-    });
-
     it('should toggle active subsection type when changing subsection type',
-      function() {
+      () => {
         // Active subsection is set as I18N_DASHBOARD_EXPLORATIONS when
-        // controller is initialized.
-        expect(ctrl.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
+        // component is initialized.
+        expect(component.activeSubsection).toBe('I18N_DASHBOARD_EXPLORATIONS');
 
-        var newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
-        ctrl.setActiveSubsection(newActiveSubsection);
-        expect(ctrl.activeSubsection).toBe(newActiveSubsection);
+        let newActiveSubsection = 'I18N_DASHBOARD_COLLECTIONS';
+        component.setActiveSubsection(newActiveSubsection);
+        expect(component.activeSubsection).toBe(newActiveSubsection);
 
-        var newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
-        ctrl.setActiveSubsection(newActiveSubsection2);
-        expect(ctrl.activeSubsection).toBe(newActiveSubsection2);
+        let newActiveSubsection2 = 'I18N_DASHBOARD_EXPLORATIONS';
+        component.setActiveSubsection(newActiveSubsection2);
+        expect(component.activeSubsection).toBe(newActiveSubsection2);
       });
 
     it('should get the correct exploration page URL corresponding to a given' +
-      ' exploration ID.', function() {
-      expect(ctrl.getExplorationUrl('1')).toBe('/explore/1');
-      expect(ctrl.getExplorationUrl()).toBe('/explore/undefined');
+      ' exploration ID.', () => {
+      expect(component.getExplorationUrl('1')).toBe('/explore/1');
+      expect(component.getExplorationUrl()).toBe('/explore/undefined');
     });
 
     it('should get the correct collection page URL corresponding to a given' +
-      ' collection ID.', function() {
-      expect(ctrl.getCollectionUrl('1')).toBe('/collection/1');
-      expect(ctrl.getCollectionUrl()).toBe('/collection/undefined');
+      ' collection ID.', () => {
+      expect(component.getCollectionUrl('1')).toBe('/collection/1');
+      expect(component.getCollectionUrl()).toBe('/collection/undefined');
     });
 
-    it('should detect when application is being used on a mobile', function() {
-      expect(ctrl.checkMobileView()).toBe(false);
+    it('should detect when application is being used on a mobile', () => {
+      expect(component.checkMobileView()).toBe(false);
 
       spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-      expect(ctrl.checkMobileView()).toBe(true);
+      expect(component.checkMobileView()).toBe(true);
     });
 
-    it('should show username popover based on its length', function() {
-      expect(ctrl.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
-      expect(ctrl.showUsernamePopover('abc')).toBe('none');
+    it('should show username popover based on its length', () => {
+      expect(component.showUsernamePopover('abcdefghijk')).toBe('mouseenter');
+      expect(component.showUsernamePopover('abc')).toBe('none');
     });
 
     it('should change page when going through pages of incomplete explorations',
-      function() {
-        var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
+      () => {
+        let section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        let subsection = 'I18N_DASHBOARD_EXPLORATIONS';
 
-        expect(ctrl.startIncompleteExpIndex).toBe(0);
+        expect(component.startIncompleteExpIndex).toBe(0);
 
-        ctrl.goToNextPage(section, subsection);
-        expect(ctrl.startIncompleteExpIndex).toBe(8);
+        component.goToNextPage(section, subsection);
+        expect(component.startIncompleteExpIndex).toBe(8);
 
-        ctrl.goToPreviousPage(section, subsection);
-        expect(ctrl.startIncompleteExpIndex).toBe(0);
+        component.goToPreviousPage(section, subsection);
+        expect(component.startIncompleteExpIndex).toBe(0);
       });
 
     it('should change page when going through pages of incomplete collections',
-      function() {
-        var section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-        var subsection = 'I18N_DASHBOARD_COLLECTIONS';
+      () => {
+        let section = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        let subsection = 'I18N_DASHBOARD_COLLECTIONS';
 
-        expect(ctrl.startIncompleteCollectionIndex).toBe(0);
+        expect(component.startIncompleteCollectionIndex).toBe(0);
 
-        ctrl.goToNextPage(section, subsection);
-        expect(ctrl.startIncompleteCollectionIndex).toBe(8);
+        component.goToNextPage(section, subsection);
+        expect(component.startIncompleteCollectionIndex).toBe(8);
 
-        ctrl.goToPreviousPage(section, subsection);
-        expect(ctrl.startIncompleteCollectionIndex).toBe(0);
+        component.goToPreviousPage(section, subsection);
+        expect(component.startIncompleteCollectionIndex).toBe(0);
       });
 
     it('should change page when going through pages of complete explorations',
-      function() {
-        var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-        var subsection = 'I18N_DASHBOARD_EXPLORATIONS';
+      () => {
+        let section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
+        let subsection = 'I18N_DASHBOARD_EXPLORATIONS';
 
-        var completedExplorations = learnerDashboardData
+        let completedExplorations = learnerDashboardData
           .completed_explorations_list.map(
             expSummary => LearnerExplorationSummary.createFromBackendDict(
               expSummary));
 
-        expect(ctrl.startCompletedExpIndex).toBe(0);
-        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+        expect(component.startCompletedExpIndex).toBe(0);
+        expect(component.getVisibleExplorationList(
+          component.startCompletedExpIndex))
           .toEqual(completedExplorations.slice(0, 8));
 
-        ctrl.goToNextPage(section, subsection);
-        expect(ctrl.startCompletedExpIndex).toBe(8);
-        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+        component.goToNextPage(section, subsection);
+        expect(component.startCompletedExpIndex).toBe(8);
+        expect(component.getVisibleExplorationList(
+          component.startCompletedExpIndex))
           .toEqual(completedExplorations.slice(8));
 
-        ctrl.goToPreviousPage(section, subsection);
-        expect(ctrl.startCompletedExpIndex).toBe(0);
-        expect(ctrl.getVisibleExplorationList(ctrl.startCompletedExpIndex))
+        component.goToPreviousPage(section, subsection);
+        expect(component.startCompletedExpIndex).toBe(0);
+        expect(component.getVisibleExplorationList(
+          component.startCompletedExpIndex))
           .toEqual(completedExplorations.slice(0, 8));
       });
 
     it('should change page when going through pages of completed collections',
-      function() {
-        var section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
-        var subsection = 'I18N_DASHBOARD_COLLECTIONS';
+      () => {
+        let section = 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION';
+        let subsection = 'I18N_DASHBOARD_COLLECTIONS';
 
-        expect(ctrl.startCompletedCollectionIndex).toBe(0);
+        expect(component.startCompletedCollectionIndex).toBe(0);
 
-        ctrl.goToNextPage(section, subsection);
-        expect(ctrl.startCompletedCollectionIndex).toBe(8);
+        component.goToNextPage(section, subsection);
+        expect(component.startCompletedCollectionIndex).toBe(8);
 
-        ctrl.goToPreviousPage(section, subsection);
-        expect(ctrl.startCompletedCollectionIndex).toBe(0);
+        component.goToPreviousPage(section, subsection);
+        expect(component.startCompletedCollectionIndex).toBe(0);
       });
 
     it('should change explorations sorting options by title when changing' +
-      ' sorting type', function() {
-      ctrl.setExplorationsSortingOptions('title');
-      expect(ctrl.currentExpSortType).toBe('title');
-      expect(ctrl.isCurrentExpSortDescending).toBe(true);
+      ' sorting type', () => {
+      component.setExplorationsSortingOptions('title');
+      expect(component.currentExpSortType).toBe('title');
+      expect(component.isCurrentExpSortDescending).toBe(true);
     });
 
     it('should change explorations sorting options by last played when' +
-      ' changing sorting type', function() {
-      expect(ctrl.isCurrentExpSortDescending).toBe(true);
-      expect(ctrl.currentExpSortType).toBe('last_played');
-      ctrl.setExplorationsSortingOptions('last_played');
-      expect(ctrl.isCurrentExpSortDescending).toBe(false);
+      ' changing sorting type', () => {
+      expect(component.isCurrentExpSortDescending).toBe(true);
+      expect(component.currentExpSortType).toBe('last_played');
+      component.setExplorationsSortingOptions('last_played');
+      expect(component.isCurrentExpSortDescending).toBe(false);
     });
 
     it('should change subscription sorting options by username when changing' +
-      ' sorting type', function() {
-      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
-      expect(ctrl.currentSubscribersSortType).toBe('username');
-      ctrl.setSubscriptionSortingOptions('username');
-      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(false);
+      ' sorting type', () => {
+      expect(component.isCurrentSubscriptionSortDescending).toBe(true);
+      expect(component.currentSubscribersSortType).toBe('username');
+      component.setSubscriptionSortingOptions('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBe(false);
     });
 
     it('should change subscription sorting options by impact when changing' +
-      ' sorting type', function() {
-      ctrl.setSubscriptionSortingOptions('impact');
-      expect(ctrl.currentSubscribersSortType).toBe('impact');
-      expect(ctrl.isCurrentSubscriptionSortDescending).toBe(true);
+      ' sorting type', () => {
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBe(true);
     });
 
     it('should change feedback sorting options by last update msecs when' +
-      ' changing sorting type', function() {
-      expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
-      expect(ctrl.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
-      ctrl.setFeedbackSortingOptions('lastUpdatedMsecs');
-      expect(ctrl.isCurrentFeedbackSortDescending).toBe(false);
+      ' changing sorting type', () => {
+      expect(component.isCurrentFeedbackSortDescending).toBe(true);
+      expect(component.currentFeedbackThreadsSortType).toBe('lastUpdatedMsecs');
+      component.setFeedbackSortingOptions('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBe(false);
     });
 
     it('should change feedback sorting options by exploration when changing' +
-      ' sorting type', function() {
-      ctrl.setFeedbackSortingOptions('exploration');
-      expect(ctrl.currentFeedbackThreadsSortType).toBe('exploration');
-      expect(ctrl.isCurrentFeedbackSortDescending).toBe(true);
+      ' sorting type', () => {
+      component.setFeedbackSortingOptions('exploration');
+      expect(component.currentFeedbackThreadsSortType).toBe('exploration');
+      expect(component.isCurrentFeedbackSortDescending).toBe(true);
     });
 
-    it('should evaluate value of exploration sort key property as null when' +
-      ' sorting option is last played', function() {
-      // The default sort option is exploration last played.
-      expect(ctrl.currentExpSortType).toBe('last_played');
+    it('should sort explorations given sorting property' +
+      ' as last played in ascending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
 
       // The forEach loop is being used here because
-      // getValueOfExplorationSortKey is used in a ng-repeat directive.
-      ctrl.completedExplorationsList.forEach(function(exploration) {
-        expect(ctrl.getValueOfExplorationSortKey(exploration)).toBe(null);
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
       });
-    });
+    }));
 
-    it('should evaluate value of exploration sort key property as string' +
-      ' when sorting option is title', function() {
-      ctrl.setExplorationsSortingOptions('title');
-      expect(ctrl.currentExpSortType).toBe('title');
-      ctrl.completedExplorationsList.forEach(function(exploration, index) {
-        expect(ctrl.getValueOfExplorationSortKey(exploration)).toBe(
-          'Exploration Title ' + (index + 1));
-      });
-    });
+    it('should sort explorations given sorting property' +
+      ' as last played in descending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
 
-    it('should evaluate value of subscription sort key property as string' +
-      ' when sorting option is username', function() {
-      // The default sort option is exploration last played.
-      expect(ctrl.currentSubscribersSortType).toBe('username');
+      component.setExplorationsSortingOptions('last_played');
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+      expect(component.isCurrentExpSortDescending).toBeFalse;
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
 
       // The forEach loop is being used here because
-      // getValueOfSubscriptionSortKey is used in a ng-repeat directive.
-      ctrl.subscriptionsList.forEach(function(subscription) {
-        expect(ctrl.getValueOfSubscriptionSortKey(subscription)).toBe(
-          'username1');
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as category in ascending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('category');
+      expect(component.getValueOfExplorationSortKey()).toBe('category');
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Quantum Nechanics');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as category in descending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('category');
+      expect(component.getValueOfExplorationSortKey()).toBe('category');
+
+      component.setExplorationsSortingOptions('category');
+      expect(component.isCurrentExpSortDescending).toBeFalse;
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Quantum Nechanics');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as title in ascending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('title');
+      expect(component.getValueOfExplorationSortKey()).toBe('title');
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+      });
+    }));
+
+    it('should sort explorations given sorting property' +
+      ' as title in descending order', fakeAsync(() => {
+      // The default sort option for Explorations is last played.
+      expect(component.currentExpSortType).toBe('last_played');
+      expect(component.isCurrentExpSortDescending).toBeTruthy;
+      expect(component.getValueOfExplorationSortKey()).toBe('default');
+
+      component.setExplorationsSortingOptions('title');
+      expect(component.getValueOfExplorationSortKey()).toBe('title');
+
+      component.setExplorationsSortingOptions('title');
+      expect(component.isCurrentExpSortDescending).toBeFalse;
+
+      tick();
+      fixture.detectChanges();
+
+      const explorationTitleNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-exp-summary-tile-title');
+
+      // The forEach loop is being used here because
+      // getValueOfExplorationSortKey is used in a *ngFor directive.
+      // Note that given Exploration list is not sorted.
+      explorationTitleNodes.forEach((titleeNode, index) => {
+        if (index === 0) {
+          expect(titleeNode.innerText).toBe('Zebra');
+        }
+        if (index === 1) {
+          expect(titleeNode.innerText).toBe('World War III');
+        }
+        if (index === 2) {
+          expect(titleeNode.innerText).toBe('Quantum Mechanics');
+        }
+        if (index === 3) {
+          expect(titleeNode.innerText).toBe('Plant Cell');
+        }
+        if (index === 4) {
+          expect(titleeNode.innerText).toBe('Nouns');
+        }
+        if (index === 5) {
+          expect(titleeNode.innerText).toBe('Hip Hop');
+        }
+        if (index === 6) {
+          expect(titleeNode.innerText).toBe('Database Management');
+        }
+        if (index === 7) {
+          expect(titleeNode.innerText).toBe('Counting Stars');
+        }
+        if (index === 8) {
+          expect(titleeNode.innerText).toBe('Consiousness');
+        }
+        if (index === 9) {
+          expect(titleeNode.innerText).toBe('Algebra');
+        }
+      });
+    }));
+
+    it('should sort subscriptions given sorting property as username' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('username');
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(0);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(3);
+        }
       });
 
-      ctrl.setSubscriptionSortingOptions('impact');
-      expect(ctrl.currentSubscribersSortType).toBe('impact');
-      ctrl.subscriptionsList.forEach(function(subscription) {
-        expect(ctrl.getValueOfSubscriptionSortKey(subscription)).toBe(0);
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
       });
-    });
+    }));
+
+    it('should sort subscriptions given sorting property as username' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
+
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('username');
+
+      component.setSubscriptionSortingOptions('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(0);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(1);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+      });
+    }));
+
+    it('should sort subscriptions given sorting property as impact' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(0);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(3);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+      });
+    }));
+
+    it('should sort subscriptions given sorting property as impact' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(0);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+      });
+    }));
+    it('should sort subscriptions given sorting property as impact' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(0);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+      });
+    }));
+    it('should sort subscriptions given sorting property as impact' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Subscriptions is username.
+      expect(component.currentSubscribersSortType).toBe('username');
+      expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.currentSubscribersSortType).toBe('impact');
+      expect(component.getValueOfSubscriptionSortKey()).toBe('impact');
+
+      component.setSubscriptionSortingOptions('impact');
+      expect(component.isCurrentSubscriptionSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const subscriptionsListImpactNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-subscription-name');
+
+      const subscriptionsListUsernameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-impact-number');
+
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListImpactNodes.forEach((impactNode, index) => {
+        if (index === 0) {
+          expect(impactNode.innerText).toBe(3);
+        }
+        if (index === 1) {
+          expect(impactNode.innerText).toBe(2);
+        }
+        if (index === 2) {
+          expect(impactNode.innerText).toBe(1);
+        }
+        if (index === 3) {
+          expect(impactNode.innerText).toBe(0);
+        }
+      });
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      subscriptionsListUsernameNodes.forEach((usernameNode, index) => {
+        if (index === 0) {
+          expect(usernameNode.innerText).toBe('Deadpool');
+        }
+        if (index === 1) {
+          expect(usernameNode.innerText).toBe('Captain America');
+        }
+        if (index === 2) {
+          expect(usernameNode.innerText).toBe('Arrow');
+        }
+        if (index === 3) {
+          expect(usernameNode.innerText).toBe('Bucky');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as last updated' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as last updated' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      component.setFeedbackSortingOptions('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as exploration' +
+      ' in ascending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      component.setFeedbackSortingOptions('explorationTitle');
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('explorationTitle');
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('explorationTitle');
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+      });
+    }));
+
+    it('should sort feedback updates given sorting property as exploration' +
+      ' in descending order', fakeAsync(() => {
+      // The default sort option for Feedback Updates is last updated.
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('lastUpdatedMsecs');
+      expect(component.isCurrentFeedbackSortDescending).toBeTrue();
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('lastUpdatedMsecs');
+
+      component.setFeedbackSortingOptions('explorationTitle');
+      expect(component.currentFeedbackThreadsSortType)
+        .toBe('explorationTitle');
+      expect(component.getValueOfFeedbackThreadSortKey())
+        .toBe('explorationTitle');
+
+      component.setFeedbackSortingOptions('explorationTitle');
+      expect(component.isCurrentFeedbackSortDescending).toBeFalse();
+
+      tick();
+      fixture.detectChanges();
+
+      const feedbackListNameNodes =
+        fixture.debugElement.nativeElement
+          .querySelectorAll('.protractor-test-feedback-exploration');
+
+      // The forEach loop is being used here because
+      // getValueOfSubscriptionSortKey is used in a *ngFor directive.
+      // Note that given subscription list is not sorted.
+      feedbackListNameNodes.forEach((titleNode, index) => {
+        if (index === 0) {
+          expect(titleNode.innerText).toContain('Zebra');
+        }
+        if (index === 1) {
+          expect(titleNode.innerText).toContain('Three Balls');
+        }
+        if (index === 2) {
+          expect(titleNode.innerText).toContain('Biology');
+        }
+        if (index === 3) {
+          expect(titleNode.innerText).toContain('Algebra');
+        }
+      });
+    }));
 
     it('should get messages in the thread from the backend when a thread is' +
-      ' selected', function() {
-      var threadStatus = 'open';
-      var explorationId = 'exp1';
-      var threadId = 'thread_1';
-      var explorationTitle = 'Exploration Title';
-      var threadMessages = [{
-        message_id: '1',
+      ' selected', fakeAsync(() => {
+      let threadStatus = 'open';
+      let explorationId = 'exp1';
+      let threadId = 'thread_1';
+      let explorationTitle = 'Exploration Title';
+      let threadMessages = [{
+        message_id: 1,
         text: 'Feedback 1',
         updated_status: 'open',
         suggestion_html: 'An instead of a',
@@ -547,31 +1486,35 @@ describe('Learner dashboard page', function() {
         author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
+      const threadSpy = spyOn(
+        learnerDashboardBackendApiService, 'onClickThreadAsync')
+        .and.returnValue(Promise.resolve(threadMessages));
 
-      expect(ctrl.numberOfUnreadThreads).toBe(10);
+      expect(component.numberOfUnreadThreads).toBe(10);
+      expect(component.loadingFeedbacks).toBe(false);
 
-      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-        .respond({
-          message_summary_list: threadMessages
-        });
-      ctrl.onClickThread(
+      component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
+      expect(component.loadingFeedbacks).toBe(true);
 
-      expect(ctrl.loadingFeedbacks).toBe(true);
-      expect(ctrl.feedbackThreadActive).toBe(true);
-      expect(ctrl.numberOfUnreadThreads).toBe(9);
-      $httpBackend.flush();
+      tick();
+      fixture.detectChanges();
 
-      expect(ctrl.messageSummaries.length).toBe(1);
-    });
+      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.feedbackThreadActive).toBe(true);
+      expect(component.numberOfUnreadThreads).toBe(6);
+      expect(component.messageSummaries.length).toBe(1);
+      expect(threadSpy).toHaveBeenCalled();
+    }));
 
-    it('should show all threads when a thread is not selected', function() {
-      var threadStatus = 'open';
-      var explorationId = 'exp1';
-      var threadId = 'thread_1';
-      var explorationTitle = 'Exploration Title';
-      var threadMessages = [{
-        message_id: '1',
+    it('should set a new section as active when fetching message summary' +
+      ' list from backend', fakeAsync(() => {
+      let threadStatus = 'open';
+      let explorationId = 'exp1';
+      let threadId = 'thread_1';
+      let explorationTitle = 'Exploration Title';
+      let threadMessages = [{
+        message_id: 1,
         text: 'Feedback 1',
         updated_status: 'open',
         suggestion_html: 'An instead of a',
@@ -581,32 +1524,47 @@ describe('Learner dashboard page', function() {
         author_picture_data_url: 'foo',
         created_on_msecs: 1200
       }];
+      const threadSpy = spyOn(
+        learnerDashboardBackendApiService, 'onClickThreadAsync')
+        .and.returnValue(Promise.resolve(threadMessages));
 
-      expect(ctrl.numberOfUnreadThreads).toBe(10);
+      expect(component.numberOfUnreadThreads).toBe(10);
+      expect(component.loadingFeedbacks).toBe(false);
 
-      $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-        .respond({
-          message_summary_list: threadMessages
-        });
-      ctrl.onClickThread(
+      component.onClickThread(
         threadStatus, explorationId, threadId, explorationTitle);
-      $httpBackend.flush();
-      expect(ctrl.feedbackThreadActive).toBe(true);
+      expect(component.loadingFeedbacks).toBe(true);
 
-      ctrl.showAllThreads();
-      expect(ctrl.feedbackThreadActive).toBe(false);
+      tick();
+      fixture.detectChanges();
 
-      expect(ctrl.numberOfUnreadThreads).toBe(9);
-    });
+      expect(component.loadingFeedbacks).toBe(false);
+      expect(component.feedbackThreadActive).toBe(true);
+      expect(component.numberOfUnreadThreads).toBe(6);
+      expect(component.messageSummaries.length).toBe(1);
+      expect(threadSpy).toHaveBeenCalled();
 
-    it('should add a new message in a thread when there is a thread selected',
-      function() {
-        var threadStatus = 'open';
-        var explorationId = 'exp1';
-        var threadId = 'thread_1';
-        var explorationTitle = 'Exploration Title';
-        var threadMessages = [{
-          message_id: '1',
+      let newActiveSectionName = 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION';
+      component.setActiveSection(newActiveSectionName);
+
+      expect(component.activeSection).toBe(newActiveSectionName);
+      expect(component.feedbackThreadActive).toBe(false);
+
+      let newActiveSectionName2 = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      component.setActiveSection(newActiveSectionName2);
+
+      expect(component.activeSection).toBe(newActiveSectionName2);
+      expect(component.feedbackThreadActive).toBe(false);
+    }));
+
+    it('should show all threads when a thread is not selected',
+      fakeAsync(() => {
+        let threadStatus = 'open';
+        let explorationId = 'exp1';
+        let threadId = 'thread_1';
+        let explorationTitle = 'Exploration Title';
+        let threadMessages = [{
+          message_id: 1,
           text: 'Feedback 1',
           updated_status: 'open',
           suggestion_html: 'An instead of a',
@@ -617,35 +1575,95 @@ describe('Learner dashboard page', function() {
           created_on_msecs: 1200
         }];
 
-        $httpBackend.expect('GET', '/learnerdashboardthreadhandler/thread_1')
-          .respond({
-            message_summary_list: threadMessages
-          });
-        ctrl.onClickThread(
+        const threadSpy =
+          spyOn(learnerDashboardBackendApiService, 'onClickThreadAsync')
+            .and.returnValue(Promise.resolve(threadMessages));
+
+        expect(component.numberOfUnreadThreads).toBe(10);
+        expect(component.loadingFeedbacks).toBe(false);
+
+        component.onClickThread(
           threadStatus, explorationId, threadId, explorationTitle);
-        $httpBackend.flush();
+        expect(component.loadingFeedbacks).toBe(true);
 
-        var threadId = 'thread_1';
-        var message = 'This is a new message';
-        $httpBackend.expect('POST', '/threadhandler/' + threadId).respond(200);
-        ctrl.addNewMessage(threadId, message);
+        tick();
+        fixture.detectChanges();
 
-        expect(ctrl.messageSendingInProgress).toBe(true);
+        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.feedbackThreadActive).toBe(true);
+        expect(component.numberOfUnreadThreads).toBe(6);
+        expect(component.messageSummaries.length).toBe(1);
+        expect(threadSpy).toHaveBeenCalled();
 
-        $httpBackend.flush();
-        expect(ctrl.messageSendingInProgress).toBe(false);
-      });
+        component.showAllThreads();
+        expect(component.feedbackThreadActive).toBe(false);
+
+        expect(component.numberOfUnreadThreads).toBe(6);
+      }));
+
+    it('should add a new message in a thread when there is a thread selected',
+      fakeAsync(() => {
+        let threadStatus = 'open';
+        let explorationId = 'exp1';
+        let threadId = 'thread_1';
+        let explorationTitle = 'Exploration Title';
+        let message = 'This is a new message';
+        let threadMessages = [{
+          message_id: 1,
+          text: 'Feedback 1',
+          updated_status: 'open',
+          suggestion_html: 'An instead of a',
+          current_content_html: 'A orange',
+          description: 'Suggestion for english grammar',
+          author_username: 'username2',
+          author_picture_data_url: 'foo',
+          created_on_msecs: 1200
+        }];
+
+        const threadSpy = spyOn(
+          learnerDashboardBackendApiService, 'onClickThreadAsync')
+          .and.returnValue(Promise.resolve(threadMessages));
+
+        const addMessageSpy = spyOn(
+          learnerDashboardBackendApiService, 'addNewMessageAsync')
+          .and.returnValue(Promise.resolve());
+
+        expect(component.numberOfUnreadThreads).toBe(10);
+        expect(component.loadingFeedbacks).toBe(false);
+
+        component.onClickThread(
+          threadStatus, explorationId, threadId, explorationTitle);
+        expect(component.loadingFeedbacks).toBe(true);
+
+        tick();
+        fixture.detectChanges();
+
+        expect(component.loadingFeedbacks).toBe(false);
+        expect(component.feedbackThreadActive).toBe(true);
+        expect(component.numberOfUnreadThreads).toBe(6);
+        expect(component.messageSummaries.length).toBe(1);
+        expect(threadSpy).toHaveBeenCalled();
+
+        component.addNewMessage(threadId, message);
+        expect(component.messageSendingInProgress).toBe(true);
+
+        tick();
+        fixture.detectChanges();
+
+        expect(component.messageSendingInProgress).toBe(false);
+        expect(addMessageSpy).toHaveBeenCalled();
+      }));
 
     it('should show new and old content when opening suggestion modal',
-      function() {
-        spyOn(SuggestionModalForLearnerDashboardService, 'showSuggestionModal')
-          .and.callThrough();
-        var newContent = 'New content';
-        var oldContent = 'Old content';
-        var description = 'Description';
-        ctrl.showSuggestionModal(newContent, oldContent, description);
+      () => {
+        spyOn(suggestionModalForLearnerDashboardService, 'showSuggestionModal')
+          .and.returnValue(null);
+        let newContent = 'New content';
+        let oldContent = 'Old content';
+        let description = 'Description';
+        component.showSuggestionModal(newContent, oldContent, description);
 
-        expect(SuggestionModalForLearnerDashboardService.showSuggestionModal)
+        expect(suggestionModalForLearnerDashboardService.showSuggestionModal)
           .toHaveBeenCalledWith('edit_exploration_state_content', {
             newContent: newContent,
             oldContent: oldContent,
@@ -653,217 +1671,269 @@ describe('Learner dashboard page', function() {
           });
       });
 
-    it('should open remove activity modal when removing activity', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      var activity = {};
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-
-      expect($uibModal.open).toHaveBeenCalled();
+    it('should open remove activity modal when removing activity', () => {
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      let activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.exploration_playlist[1]);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
     });
 
-    it('should remove an activity from incomplete exploration when closing' +
-      ' remove activity modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+    it('should not remove an incomplete exploration if it is not present',
+      fakeAsync(() => {
+        expect(component.incompleteExplorationsList.length).toBe(12);
 
-      expect(ctrl.incompleteExplorationsList.length).toBe(12);
+        let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+        let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+        // Get exploration with id 100.
+        let activity = LearnerExplorationSummary.createFromBackendDict(
+          // TODO(#10875): Fix type mismatch.
+          {
+            id: '100'
+          } as unknown as LearnerExplorationSummaryBackendDict);
+        component.openRemoveActivityModal(
+          sectionNameI18nId, subsectionName, activity);
 
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      // Get exploration with id 13.
-      var activity = LearnerExplorationSummary.createFromBackendDict(
-        learnerDashboardData.incomplete_explorations_list[2]);
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
+        tick();
+        fixture.detectChanges();
 
-      expect(ctrl.incompleteExplorationsList.length).toBe(11);
-    });
+        expect(component.incompleteExplorationsList.length).toBe(12);
+      }));
 
-    it('should not remove an activity if its not present', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+    it('should not remove an exploration from exploration playlist' +
+      ' if it is not present', fakeAsync(() => {
+      expect(component.explorationPlaylist.length).toBe(10);
 
-      expect(ctrl.incompleteExplorationsList.length).toBe(12);
-
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
-      // Get exploration with id 13.
-      var activity = LearnerExplorationSummary.createFromBackendDict(
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      // Get exploration with id 100.
+      let activity = LearnerExplorationSummary.createFromBackendDict(
         // TODO(#10875): Fix type mismatch.
         {
           id: '100'
         } as unknown as LearnerExplorationSummaryBackendDict);
-      ctrl.openRemoveActivityModal(sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
 
-      expect(ctrl.incompleteExplorationsList.length).toBe(12);
-    });
+      tick();
+      fixture.detectChanges();
+
+      expect(component.explorationPlaylist.length).toBe(10);
+    }));
+
+    it('should not remove a collection from collection playlist' +
+      ' if it is not present', fakeAsync(() => {
+      expect(component.collectionPlaylist.length).toBe(8);
+
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 100.
+      let activity = CollectionSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch.
+        {
+          id: '100'
+        } as unknown as CollectionSummaryBackendDict);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(component.collectionPlaylist.length).toBe(8);
+    }));
+
+    it('should not remove a incomplete collection' +
+      ' if it is not present', fakeAsync(() => {
+      expect(component.incompleteCollectionsList.length).toBe(8);
+
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      // Get collection with id 100.
+      let activity = CollectionSummary.createFromBackendDict(
+        // TODO(#10875): Fix type mismatch.
+        {
+          id: '100'
+        } as unknown as CollectionSummaryBackendDict);
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(component.incompleteCollectionsList.length).toBe(8);
+    }));
+
+    it('should remove an activity from incomplete exploration when closing' +
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.incompleteExplorationsList.length).toBe(12);
+
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      // Get exploration with id 13.
+      let activity = LearnerExplorationSummary.createFromBackendDict(
+        learnerDashboardData.incomplete_explorations_list[2]);
+
+      component.openRemoveActivityModal(
+        sectionNameI18nId, subsectionName, activity);
+
+      tick();
+      fixture.detectChanges();
+
+      expect(component.incompleteExplorationsList.length).toBe(11);
+    }));
 
     it('should remove an activity from incomplete collection when closing' +
-    ' remove activity modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.incompleteCollectionsList.length).toBe(8);
 
-      expect(ctrl.incompleteCollectionsList.length).toBe(8);
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
 
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 11.
-
-      var activity = CollectionSummary.createFromBackendDict(
+      let activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.incomplete_collections_list[2]);
 
-      ctrl.openRemoveActivityModal(
+      component.openRemoveActivityModal(
         sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
 
-      expect(ctrl.incompleteCollectionsList.length).toBe(7);
-    });
+      tick();
+      fixture.detectChanges();
 
-    it('should remove an activity from exploration playlist when closing' +
-      ' remove activity modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      expect(component.incompleteCollectionsList.length).toBe(7);
+    }));
 
-      expect(ctrl.explorationPlaylist.length).toBe(10);
+    it('should remove an exploration from exploration playlist when closing' +
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.explorationPlaylist.length).toBe(10);
 
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
       // Exploration with id 2.
-      var activity = LearnerExplorationSummary.createFromBackendDict(
+      let activity = LearnerExplorationSummary.createFromBackendDict(
         learnerDashboardData.exploration_playlist[1]);
 
-      ctrl.openRemoveActivityModal(
+      component.openRemoveActivityModal(
         sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
 
-      expect(ctrl.explorationPlaylist.length).toBe(9);
-    });
+      tick();
+      fixture.detectChanges();
+
+      expect(component.explorationPlaylist.length).toBe(9);
+    }));
 
     it('should remove an activity from collection playlist when closing' +
-      ' remove activity modal', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve()
-      });
+      ' remove activity modal', fakeAsync(() => {
+      expect(component.collectionPlaylist.length).toBe(8);
 
-      expect(ctrl.collectionPlaylist.length).toBe(8);
-
-      var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      var subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
       // Get collection with id 2.
-      var activity = CollectionSummary.createFromBackendDict(
+      let activity = CollectionSummary.createFromBackendDict(
         learnerDashboardData.collection_playlist[1]);
-
-      ctrl.openRemoveActivityModal(
+      component.openRemoveActivityModal(
         sectionNameI18nId, subsectionName, activity);
-      $scope.$apply();
 
-      expect(ctrl.collectionPlaylist.length).toBe(7);
+      tick();
+
+      expect(component.collectionPlaylist.length).toBe(7);
+    }));
+
+    it('should get css classes based on status', () => {
+      expect(component.getLabelClass('open')).toBe('badge badge-info');
+      expect(component.getLabelClass('compliment')).toBe('badge badge-success');
+      expect(component.getLabelClass('another')).toBe('badge badge-secondary');
     });
 
-    it('should get css classes based on status', function() {
-      expect(ctrl.getLabelClass('open')).toBe('badge badge-info');
-      expect(ctrl.getLabelClass('compliment')).toBe('badge badge-success');
-      expect(ctrl.getLabelClass('another')).toBe('badge badge-secondary');
-    });
-
-    it('should get human readable status from provided status', function() {
-      expect(ctrl.getHumanReadableStatus('open')).toBe('Open');
-      expect(ctrl.getHumanReadableStatus('compliment')).toBe('Compliment');
-      expect(ctrl.getHumanReadableStatus('not_actionable')).toBe(
+    it('should get human readable status from provided status', () => {
+      expect(component.getHumanReadableStatus('open')).toBe('Open');
+      expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
+      expect(component.getHumanReadableStatus('not_actionable')).toBe(
         'Not Actionable');
     });
 
     it('should get formatted date string from the timestamp in milliseconds',
-      function() {
-        // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
-        var NOW_MILLIS = 1416563100000;
-        spyOn(DateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-          .withArgs(NOW_MILLIS).and.returnValue('11/21/2014');
-        expect(ctrl.getLocaleAbbreviatedDatetimeString(NOW_MILLIS)).toBe(
-          '11/21/2014');
+      () => {
+        // This corresponds to Fri, 2 Apr 2021 09:45:00 GMT.
+        let NOW_MILLIS = 1617393321345;
+        spyOn(dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
+          .withArgs(NOW_MILLIS).and.returnValue('4/2/2021');
+        expect(component.getLocaleAbbreviatedDatetimeString(NOW_MILLIS))
+          .toBe('4/2/2021');
       });
+
+    it('should sanitize given png base64 data and generate url', () => {
+      let result = component.decodePngURIData('%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
+
+      fixture.detectChanges();
+
+      expect(result).toBe('шеллы');
+    });
   });
 
-  describe('when fetching dashboard data fails', function() {
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $httpBackend = $injector.get('$httpBackend');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      AlertsService = $injector.get('AlertsService');
-      CsrfTokenService = $injector.get('CsrfTokenService');
-      LearnerDashboardBackendApiService = $injector.get(
-        'LearnerDashboardBackendApiService');
-      UserService = $injector.get('UserService');
-
-      spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
-
-      spyOn(UserService, 'getProfileImageDataUrlAsync')
-        .and.returnValue($q.resolve(profilePictureDataUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve(userInfo));
-      spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
-        .and.returnValue($q.reject({
-          status: 404
-        }));
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('learnerDashboardPage', {
-        $rootScope: $scope
-      });
-      ctrl.$onInit();
+  describe('when fetching dashboard data fails', () => {
+    beforeEach(async(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          MaterialModule,
+          FormsModule,
+          HttpClientTestingModule
+        ],
+        declarations: [
+          LearnerDashboardPageComponent,
+          MockTranslatePipe,
+          SortByPipe,
+          MockSlicePipe,
+          MockTrunctePipe,
+          BackgroundBannerComponentStub,
+          ExplorationSummaryTileComponentStub,
+          CollectionSummaryTileComponentStub,
+          LoadingDotsComponentStub,
+        ],
+        providers: [
+          AlertsService,
+          CsrfTokenService,
+          LearnerDashboardBackendApiService,
+          UserService
+        ],
+        schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
     }));
 
-    it('should show an alert warning', function() {
-      spyOn(AlertsService, 'addWarning').and.callThrough();
-      $scope.$apply();
+    beforeEach(fakeAsync(() => {
+      fixture = TestBed.createComponent(LearnerDashboardPageComponent);
+      component = fixture.componentInstance;
+      alertsService = TestBed.inject(AlertsService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      learnerDashboardBackendApiService =
+        TestBed.inject(LearnerDashboardBackendApiService);
+      userService = TestBed.inject(UserService);
 
-      expect(AlertsService.addWarning).toHaveBeenCalledWith(
+      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+        Promise.resolve('sample-csrf-token'));
+
+      spyOn(userService, 'getProfileImageDataUrlAsync')
+        .and.returnValue(Promise.resolve(profilePictureDataUrl));
+
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
+    }));
+
+    it('should show an alert warning', fakeAsync(() => {
+      const fetchDataSpy = spyOn(
+        learnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
+        .and.rejectWith(404);
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
+
+      component.ngOnInit();
+
+      tick();
+      fixture.detectChanges();
+
+      expect(alertsSpy).toHaveBeenCalledWith(
         'Failed to get learner dashboard data');
-    });
-  });
-
-  describe('when triggering animation', function() {
-    var $$animateJs = null;
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $$animateJs = $injector.get('$$animateJs');
-      $rootScope = $injector.get('$rootScope');
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('learnerDashboardPage', {
-        $rootScope: $scope
-      });
+      expect(fetchDataSpy).toHaveBeenCalled();
     }));
-
-    it('should animate when adding and removing css classes', function() {
-      var element = angular.element(
-        '<div class="menu-sub-section"></div>');
-      var elementSlideUpSpy = spyOn(element, 'slideUp').and.callThrough();
-      var elementSlideDownSpy = spyOn(element, 'slideDown').and.callThrough();
-
-      // $$animateJs is a lower-level service which is used to simulate
-      // animation behavior.
-      // eslint-disable-next-line max-len
-      // Ref: https://stackoverflow.com/questions/33405666/nganimate-1-4-7-unit-test-not-calling-animation-functions
-      $$animateJs(element, 'addClass', {
-        addClass: 'ng-hide'
-      }).start();
-      expect(elementSlideUpSpy).toHaveBeenCalled();
-
-      $$animateJs(element, 'removeClass', {
-        removeClass: 'ng-hide'
-      }).start();
-      expect(elementSlideDownSpy).toHaveBeenCalled();
-    });
   });
 });

@@ -37,16 +37,8 @@ describe('Admin backend api service', () => {
   let failHandler = null;
   let adminBackendResponse = {
     unfinished_job_data: [],
-    role_graph_data: {
-      links: [
-        {
-          source: 'TOPIC_MANAGER',
-          target: 'MODERATOR'
-        }
-      ],
-      nodes: {
-        TOPIC_MANAGER: 'topic manager'
-      }
+    role_to_actions: {
+      guest: ['action for guest']
     },
     topic_summaries: [
       {
@@ -190,7 +182,7 @@ describe('Admin backend api service', () => {
         adminBackendResponse.audit_job_status_summaries.map(
           JobStatusSummary.createFromBackendDict),
       updatableRoles: adminBackendResponse.updatable_roles,
-      roleGraphData: adminBackendResponse.role_graph_data,
+      roleToActions: adminBackendResponse.role_to_actions,
       configProperties: adminBackendResponse.config_properties,
       viewableRoles: adminBackendResponse.viewable_roles,
       unfinishedJobData: adminBackendResponse.unfinished_job_data.map(
@@ -207,7 +199,7 @@ describe('Admin backend api service', () => {
       )
     };
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -617,6 +609,26 @@ describe('Admin backend api service', () => {
     let req = httpTestingController.expectOne(
       '/getcontributorusershandler' +
       '?category=voiceover&language_code=en');
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(
+      ['validUsername'],
+      { status: 200, statusText: 'Success.'});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(result);
+    expect(failHandler).not.toHaveBeenCalled();
+
+    category = 'question';
+    languageCode = null;
+
+    abas.viewContributionReviewersAsync(
+      category, languageCode
+    ).then(successHandler, failHandler);
+
+    req = httpTestingController.expectOne(
+      '/getcontributorusershandler' +
+      '?category=question');
     expect(req.request.method).toEqual('GET');
 
     req.flush(
@@ -1176,6 +1188,34 @@ describe('Admin backend api service', () => {
     let req = httpTestingController.expectOne(
       '/numberofdeletionrequestshandler');
     expect(req.request.method).toEqual('GET');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should grant super admin privileges to user', fakeAsync(() => {
+    abas.grantSuperAdminPrivilegesAsync('abc')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/adminsuperadminhandler');
+    expect(req.request.body).toEqual({username: 'abc'});
+    expect(req.request.method).toEqual('PUT');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should revoke super admin privileges to user', fakeAsync(() => {
+    abas.revokeSuperAdminPrivilegesAsync('abc')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/adminsuperadminhandler?username=abc');
+    expect(req.request.method).toEqual('DELETE');
     req.flush(200);
     flushMicrotasks();
 

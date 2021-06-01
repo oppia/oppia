@@ -24,21 +24,22 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
 import { EventEmitter } from '@angular/core';
+import { Subtopic } from 'domain/topic/subtopic.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
+  var PreventPageUnloadEventService = null;
   var TopicEditorRoutingService = null;
   var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
-  var SubtopicObjectFactory = null;
   var TopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var topic = null;
-  var ShortSkillSummaryObjectFactory = null;
 
   importAllAngularServices();
 
@@ -47,18 +48,17 @@ describe('Topic editor page', function() {
     ContextService = $injector.get('ContextService');
     UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
-    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
-    ShortSkillSummaryObjectFactory = $injector.get(
-      'ShortSkillSummaryObjectFactory');
 
-    var subtopic = SubtopicObjectFactory.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
-    var skillSummary = ShortSkillSummaryObjectFactory.create(
+    var skillSummary = ShortSkillSummary.create(
       'skill1', 'Addition');
     subtopic._skillSummaries = [skillSummary];
     topic = TopicObjectFactory.createInterstitialTopic();
@@ -117,13 +117,18 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toBe('Question Editor');
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should return the change count', function() {

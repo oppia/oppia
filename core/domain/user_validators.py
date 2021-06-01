@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import base_model_validators
-from core.domain import cron_services
 from core.domain import exp_domain
 from core.domain import learner_progress_services
 from core.domain import rights_manager
@@ -97,8 +96,28 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
                     item.id, item.first_contribution_msec))
 
     @classmethod
+    def _validate_that_profile_users_have_role_of_learner(cls, item):
+        """Validates that the profile users have learner role.
+
+        Args:
+            item: datastore_services.Model. UserSettingsModel to validate.
+        """
+        user_auth_details = user_services.get_auth_details_by_user_id(item.id)
+
+        if user_auth_details.is_full_user():
+            return
+
+        if item.role != feconf.ROLE_ID_LEARNER:
+            cls._add_error(
+                'profile user role check',
+                'Entity id %s: A profile user should have learner role, '
+                'found %s' % (item.id, item.role))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_time_fields_of_user_actions]
+        return [
+            cls._validate_time_fields_of_user_actions,
+            cls._validate_that_profile_users_have_role_of_learner]
 
 
 class CompletedActivitiesModelValidator(
@@ -1268,8 +1287,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
         """
         date_four_weeks_ago = (
             datetime.datetime.utcnow() -
-            cron_services.PERIOD_TO_MARK_MODELS_AS_DELETED
-        )
+            feconf.PERIOD_TO_MARK_MODELS_AS_DELETED)
         if item.last_updated < date_four_weeks_ago:
             cls._add_error(
                 'entity %s' % base_model_validators.ERROR_CATEGORY_STALE_CHECK,
@@ -1491,11 +1509,10 @@ class PendingDeletionRequestModelValidator(
         """
         incorrect_keys = []
         allowed_keys = [
-            name for name in
-            models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES.__dict__]
-        for key in item.pseudonymizable_entity_mappings.keys():
-            if key not in allowed_keys:
-                incorrect_keys.append(key)
+            name.value for name in models.MODULES_WITH_PSEUDONYMIZABLE_CLASSES]
+        for module_name in item.pseudonymizable_entity_mappings.keys():
+            if module_name not in allowed_keys:
+                incorrect_keys.append(module_name)
 
         if incorrect_keys:
             cls._add_error(

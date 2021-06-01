@@ -37,7 +37,13 @@ describe('When account is deleted it', function() {
     deleteAccountPage = new DeleteAccountPage.DeleteAccountPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-    expectedConsoleErrors = [];
+    expectedConsoleErrors = [
+      // NOTE: Wipeout disables the Firebase account of users. When we try to
+      // login to a disabled user, the Firebase SDK emits an error log. We
+      // cannot suppress the error without patching the library, so instead we
+      // just ignore it here.
+      'The user account has been disabled by an administrator',
+    ];
   });
 
   it('should request account deletion', async function() {
@@ -46,10 +52,8 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
-    await users.logout();
 
     await users.login('user1@delete.com');
-    await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
@@ -66,13 +70,13 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
-    await users.logout();
 
     await users.login('voiceArtist@oppia.com');
     await general.openEditor(explorationId, false);
-    await general.expect404Error();
-    expectedConsoleErrors = [
-      'Failed to load resource: the server responded with a status of 404'];
+    await general.expectErrorPage(404);
+    expectedConsoleErrors.push(
+      'Failed to load resource: the server responded with a status of 404');
+    await users.logout();
   });
 
   it('should set published exploration as community owned', async function() {
@@ -90,11 +94,11 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete3');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
-    await users.logout();
 
     await users.login('user@check.com');
     await general.openEditor(explorationId, true);
     await workflow.isExplorationCommunityOwned();
+    await users.logout();
   });
 
   it('should keep published exploration with other owner', async function() {
@@ -109,16 +113,15 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete4');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
-    await users.logout();
 
     await users.login('secondOwner@check.com');
     await general.openEditor(explorationId, true);
     await explorationEditorPage.navigateToSettingsTab();
     expect(await workflow.getExplorationManagers()).toEqual(['secondOwner']);
+    await users.logout();
   });
 
   afterEach(async function() {
     await general.checkForConsoleErrors(expectedConsoleErrors);
-    await users.logout();
   });
 });

@@ -59,11 +59,12 @@
             </div>
             <div class="story-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
               <label for="storyMetaTagContent" class="form-heading protractor-test-story-meta-tag-content-label">Meta Tag Content</label>
-              <textarea type="text" class="form-control protractor-test-story-meta-tag-content-field"
+              <textarea type="text" class="form-control protractor-test-story-meta-tag-content-field oppia-autofocus"
                         ng-model="editableMetaTagContent"
                         ng-blur="updateStoryMetaTagContent(editableMetaTagContent)"
                         placeholder="Enter the meta tag content for the story"
-                        maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>">
+                        maxlength="<[MAX_CHARS_IN_META_TAG_CONTENT]>"
+                        focus-on="metaTagInputField">
               </textarea>
             </div>
             <div class="story-url-fragment">
@@ -153,13 +154,13 @@
             </button>
           </div>
           <div ng-if="storyPreviewCardIsShown">
-            <preview-thumbnail name="editableTitle"
-                               aspect-ratio="'16:9'"
-                               description="editableDescription"
-                               filename = "story.getThumbnailFilename()"
-                               thumbnail-bg-color="story.getThumbnailBgColor()"
-                               bg-color="'#2F6687'">
-            </preview-thumbnail>
+            <oppia-preview-thumbnail [name]="editableTitle"
+                                     [aspect-ratio]="'16:9'"
+                                     [description]="editableDescription"
+                                     [filename]="story.getThumbnailFilename()"
+                                     [thumbnail-bg-color]="story.getThumbnailBgColor()"
+                                     [bg-color]="'#2F6687'">
+            </oppia-preview-thumbnail>
           </div>
         </div>
       </md-card>
@@ -341,7 +342,7 @@
   }
   story-editor .show-story-preview-button {
     border-top: 1px solid #c1c1c1;
-    color: #419889;
+    color: #00645d;
     font-size: 15px;
     padding: 10px 0;
     width: 100%;

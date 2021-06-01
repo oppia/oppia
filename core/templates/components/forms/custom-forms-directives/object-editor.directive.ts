@@ -24,26 +24,71 @@ interface ObjectEditorCustomScope extends ng.IScope {
   objType?: string;
   schema: CustomSchema;
   initArgs?: Object;
+  modalId: symbol;
   getInitArgs?: (() => Object);
   alwaysEditable?: boolean;
   isEditable?: boolean;
   getAlwaysEditable?: (() => boolean);
   getIsEditable?: (() => boolean);
   getSchema?: (() => CustomSchema);
+  updateValue: (unknown) => void;
+  value: unknown;
 }
 
 angular.module('oppia').directive('objectEditor', [
-  '$compile', '$log', function($compile, $log) {
+  '$compile', '$log', '$rootScope', function($compile, $log, $rootScope) {
     return {
       scope: {
         alwaysEditable: '@',
         initArgs: '=',
         isEditable: '@',
+        modalId: '<',
         objType: '@',
         getSchema: '&schema',
         value: '='
       },
       link: function(scope: ObjectEditorCustomScope, element) {
+        const MIGRATED_EDITORS: string[] = [
+          'algebraic-expression',
+          'boolean',
+          'code-string',
+          'coord-two-dim',
+          'custom-osk-letters',
+          'drag-and-drop-positive-int',
+          'filepath',
+          'fraction',
+          'graph',
+          'html',
+          'image-with-regions',
+          'int-editor',
+          'list-of-sets-of-translatable-html-content-ids',
+          'list-of-tabs',
+          'list-of-unicode-string',
+          'logic-error-category',
+          'logic-question',
+          'math-equation',
+          'math-expression-content',
+          'set-of-unicode-string',
+          'music-phrase',
+          'number-with-units',
+          'nonnegative-int',
+          'normalized-string',
+          'numeric-expression',
+          'position-of-terms',
+          'positive-int',
+          'ratio-expression',
+          'real',
+          'sanitized-url',
+          'set-of-algebraic-identifier',
+          'set-of-translatable-html-content-ids',
+          'skill-selector',
+          'subtitled-html',
+          'subtitled-unicode',
+          'translatable-html-content-id',
+          'translatable-set-of-normalized-string',
+          'translatable-set-of-unicode-string',
+          'unicode-string'
+        ];
         // Converts a camel-cased string to a lower-case hyphen-separated
         // string.
         var directiveName = scope.objType.replace(
@@ -57,14 +102,30 @@ angular.module('oppia').directive('objectEditor', [
         scope.getIsEditable = function() {
           return scope.isEditable;
         };
+        scope.updateValue = function(e) {
+          scope.value = e;
+          $rootScope.$applyAsync();
+        };
         if (directiveName) {
-          element.html(
-            '<' + directiveName +
-            '-editor get-always-editable="getAlwaysEditable()"' +
-            ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
-            ' get-schema="getSchema()" value="value"></' +
-            directiveName + '-editor>');
-          $compile(element.contents())(scope);
+          if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
+            element.html(
+              '<' + directiveName +
+              '-editor [always-editable]="alwaysEditable"' +
+              ' [init-args]="initArgs" [is-editable]="' +
+              'isEditable" [schema]="getSchema()"' +
+              '[modal-id]="modalId"' +
+              '(value-changed)="updateValue($event)" [value]="value"></' +
+              directiveName + '-editor>');
+            $compile(element.contents())(scope);
+          } else {
+            element.html(
+              '<' + directiveName +
+              '-editor get-always-editable="getAlwaysEditable()"' +
+              ' get-init-args="getInitArgs()" get-is-editable=' +
+              '"getIsEditable()" get-schema="getSchema()" value="value"></' +
+              directiveName + '-editor>');
+            $compile(element.contents())(scope);
+          }
         } else {
           $log.error('Error in objectEditor: no editor type supplied.');
         }

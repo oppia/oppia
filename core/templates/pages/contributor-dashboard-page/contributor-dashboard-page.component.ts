@@ -38,7 +38,7 @@ require(
 require(
   'pages/contributor-dashboard-page/voiceover-opportunities/' +
   'voiceover-opportunities.component.ts');
-
+require('services/stateful/focus-manager.service.ts');
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/local-storage.service.ts');
@@ -51,12 +51,14 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    '$rootScope', 'LanguageUtilService', 'LocalStorageService',
+    '$rootScope', '$timeout', 'FocusManagerService',
+    'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, LanguageUtilService, LocalStorageService,
+        $rootScope, $timeout, FocusManagerService,
+        LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
@@ -89,9 +91,18 @@ angular.module('oppia').component('contributorDashboardPage', {
         return (
           activeTabDetail.customizationOptions.indexOf('language') !== -1);
       };
+
       ctrl.onTabClick = function(activeTabName) {
         ctrl.activeTabName = activeTabName;
+        // The $timeout is required to ensure that focus is applied only
+        // after all the functions in main thread have executed.
+        if (ctrl.activeTabName === 'translateTextTab') {
+          $timeout(() => {
+            FocusManagerService.setFocusWithoutScroll('selectLangDropDown');
+          }, 5);
+        }
       };
+
       ctrl.$onInit = function() {
         ctrl.profilePictureDataUrl = null;
         ctrl.username = null;

@@ -25,6 +25,7 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import auth_services
 from core.domain import caching_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -145,7 +146,7 @@ class AdminHandler(base.BaseHandler):
                 for role in role_services.VIEWABLE_ROLES
             },
             'topic_summaries': topic_summary_dicts,
-            'role_graph_data': role_services.get_role_graph_data(),
+            'role_to_actions': role_services.get_role_actions(),
             'feature_flags': feature_flag_dicts,
         })
 
@@ -289,7 +290,7 @@ class AdminHandler(base.BaseHandler):
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
-            logging.error('[ADMIN] %s', e)
+            logging.exception('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
             python_utils.reraise_exception()
 
@@ -342,6 +343,7 @@ class AdminHandler(base.BaseHandler):
         })
 
         state.update_next_content_id_index(1)
+        state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
@@ -727,6 +729,51 @@ class AdminRoleHandler(base.BaseHandler):
                 topic_domain.ROLE_MANAGER, topic_id)
 
         self.render_json({})
+
+
+class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
+    """Handler for granting a user super admin privileges."""
+
+    PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
+        username = self.payload.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException('No such user exists')
+
+        auth_services.grant_super_admin_privileges(user_id)
+        self.render_json(self.values)
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.UnauthorizedUserException(
+                'Only the default system admin can manage super admins')
+
+        username = self.request.get('username', None)
+        if username is None:
+            raise self.InvalidInputException('Missing username param')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if user_settings is None:
+            raise self.InvalidInputException('No such user exists')
+
+        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+            raise self.InvalidInputException(
+                'Cannot revoke privileges from the default super admin account')
+
+        auth_services.revoke_super_admin_privileges(user_settings.user_id)
+        self.render_json(self.values)
 
 
 class AdminJobOutputHandler(base.BaseHandler):

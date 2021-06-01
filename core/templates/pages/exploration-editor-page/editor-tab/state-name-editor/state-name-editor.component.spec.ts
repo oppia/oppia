@@ -31,7 +31,6 @@ import { ExplorationImprovementsTaskRegistryService } from
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 describe('State Name Editor component', function() {
   var ctrl = null;
   var $httpBackend = null;
@@ -43,10 +42,9 @@ describe('State Name Editor component', function() {
   var stateEditorService = null;
   var stateNameService = null;
   var mockExternalSaveEventEmitter = null;
-  var focusManagerService = null;
   var mockExplorationData = {
     explorationId: 0,
-    autosaveChangeList: function() {}
+    autosaveChangeListAsync: function() {}
   };
 
   var autosaveDraftUrl = 'createhandler/autosave_draft/0';
@@ -66,7 +64,6 @@ describe('State Name Editor component', function() {
     editabilityService = TestBed.get(EditabilityService);
     stateEditorService = TestBed.get(StateEditorService);
     stateNameService = TestBed.get(StateNameService);
-    focusManagerService = TestBed.get(FocusManagerService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -90,8 +87,7 @@ describe('State Name Editor component', function() {
     $rootScope = $injector.get('$rootScope');
     explorationStatesService = $injector.get('ExplorationStatesService');
     routerService = $injector.get('RouterService');
-    focusManagerService = $injector.get('FocusManagerService');
-    spyOn(mockExplorationData, 'autosaveChangeList');
+    spyOn(mockExplorationData, 'autosaveChangeListAsync');
     spyOn(stateNameService, 'isStateNameEditorShown').and.returnValue(true);
 
     explorationStatesService.init({
@@ -257,7 +253,7 @@ describe('State Name Editor component', function() {
       tick(200);
       expect(explorationStatesService.getState('Fifth State')).toBeTruthy();
       expect(explorationStatesService.getState('First State')).toBeFalsy();
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+      expect(mockExplorationData.autosaveChangeListAsync).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
     }));
 
@@ -276,24 +272,24 @@ describe('State Name Editor component', function() {
     // This is not a valid state name.
     ctrl.saveStateName('#!% State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
 
     // Long state names will not save.
     ctrl.saveStateName(
       'This state name is too long to be saved. Try to be brief next time.'
     );
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
 
     // This will not save because it is an already existing state name.
     ctrl.saveStateName('First State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
 
     // Will not save because the memento is the same as the new state name.
     ctrl.saveStateName('Third State');
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
-    expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
+    expect(mockExplorationData.autosaveChangeListAsync).not.toHaveBeenCalled();
   });
 
   it('should save state name when ExternalSave event occurs', function() {
@@ -301,12 +297,5 @@ describe('State Name Editor component', function() {
     ctrl.tmpStateName = 'SampleState';
     mockExternalSaveEventEmitter.emit();
     expect(ctrl.saveStateName).toHaveBeenCalledWith('SampleState');
-  });
-
-  it('should apply focus on main tab', () => {
-    var focusSpy = spyOn(focusManagerService, 'setFocus');
-    ctrl.TabName = 'main';
-    ctrl.initStateNameEditor();
-    expect(focusSpy).toHaveBeenCalledWith('oppiaEditableSection');
   });
 });

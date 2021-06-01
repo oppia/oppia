@@ -80,6 +80,7 @@ describe('Settings Tab Component', () => {
   let explorationWarningsService = null;
   let userEmailPreferencesService = null;
   let userExplorationPermissionsService = null;
+  let userService = null;
   let windowRef = null;
   let routerService = null;
 
@@ -136,8 +137,8 @@ describe('Settings Tab Component', () => {
       data: {
         param_changes: []
       },
-      getData: () => $q.resolve(),
-      autosaveChangeList: () => {}
+      getDataAsync: () => $q.resolve(),
+      autosaveChangeListAsync: () => {}
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
@@ -174,6 +175,7 @@ describe('Settings Tab Component', () => {
       explorationWarningsService = $injector.get('ExplorationWarningsService');
       userEmailPreferencesService = $injector.get(
         'UserEmailPreferencesService');
+      userService = $injector.get('UserService');
 
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve(userPermissions));
@@ -182,6 +184,9 @@ describe('Settings Tab Component', () => {
       spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
       spyOn(explorationStatesService, 'getStateNames').and.returnValue([
         'Introduction']);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+        getUsername: () => 'username1'
+      }));
 
       explorationCategoryService.init('Astrology');
 
@@ -226,6 +231,7 @@ describe('Settings Tab Component', () => {
 
         expect(ctrl.stateNames).toEqual(['Introduction']);
         expect(ctrl.hasPageLoaded).toBe(true);
+        expect(ctrl.loggedInUser).toBe('username1');
       });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
@@ -323,8 +329,8 @@ describe('Settings Tab Component', () => {
         spyOn($uibModal, 'open').and.returnValue({
           result: $q.resolve()
         });
-        spyOn(editableExplorationBackendApiService, 'deleteExploration').and
-          .returnValue($q.resolve());
+        spyOn(editableExplorationBackendApiService, 'deleteExplorationAsync')
+          .and.returnValue($q.resolve());
         spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
           location: {
             reload: () => {}
@@ -353,6 +359,102 @@ describe('Settings Tab Component', () => {
         expect(alertsService.clearWarnings).toHaveBeenCalled();
         expect(windowRef.nativeWindow.location).toBe('');
       });
+
+    it('should open a modal when removeRole is called', function() {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.removeRole('username', 'editor');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should remove role when resolving remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      spyOn(explorationRightsService, 'removeRoleAsync').and
+        .returnValue($q.resolve());
+
+      ctrl.removeRole('username', 'editor');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeRoleAsync).toHaveBeenCalled();
+    });
+
+    it('should not remove role when rejecting remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      spyOn(explorationRightsService, 'removeRoleAsync');
+
+      ctrl.removeRole('username', 'editor');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.removeRoleAsync).not.toHaveBeenCalled();
+    });
+
+    it('should open a modal when reassignRole is called', () => {
+      spyOn($uibModal, 'open').and.callThrough();
+
+      ctrl.openEditRolesForm();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue({result: $q.resolve()});
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+        result: $q.resolve()
+      });
+      ctrl.editRole('Username1', 'editor');
+      ctrl.editRole('Username1', 'owner');
+
+      expect($uibModal.open).toHaveBeenCalled();
+    });
+
+    it('should reassign role when resolving reassign-role-modal', () => {
+      ctrl.openEditRolesForm();
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue({result: $q.resolve()});
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+        result: $q.resolve()
+      });
+      ctrl.editRole('Username1', 'editor');
+      $scope.$apply();
+      ctrl.editRole('Username1', 'owner');
+      $scope.$apply();
+
+      expect(explorationRightsService.saveRoleChanges).toHaveBeenCalledWith(
+        'Username1', 'owner');
+    });
+
+    it('should not reassign role when rejecting remove-role-modal', () => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.reject()
+      });
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
+
+      spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+        .and.returnValue({result: $q.resolve()});
+      spyOn(explorationRightsService, 'saveRoleChanges').and.returnValue({
+        result: $q.resolve()
+      });
+      ctrl.editRole('Username1', 'editor');
+      $scope.$apply();
+      ctrl.editRole('Username1', 'owner');
+      $scope.$apply();
+
+      expect(
+        explorationRightsService.saveRoleChanges).not.toHaveBeenCalled();
+    });
 
     it('should transfer exploration ownership when closing transfer ownership' +
     ' modal', () => {
@@ -492,6 +594,8 @@ describe('Settings Tab Component', () => {
 
     it('should open edit roles form and edit username and role', () => {
       ctrl.openEditRolesForm();
+      explorationRightsService.init(
+        ['owner'], [], [], [], '', false, false, true);
 
       expect(ctrl.isRolesFormOpen).toBe(true);
       expect(ctrl.newMemberUsername).toBe('');
@@ -569,6 +673,69 @@ describe('Settings Tab Component', () => {
       expect(ctrl.areParametersUsed()).toBe(false);
       explorationDataService.data.param_changes.push(paramChangeBackendDict);
       expect(ctrl.areParametersUsed()).toBe(true);
+    });
+
+    describe('on calling onRolesFormUsernameBlur', function() {
+      it('should disable save button when exploration title is empty', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.rolesSaveButtonEnabled = true;
+        spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+          .and.returnValue(false);
+
+        explorationTitleService.init('');
+        ctrl.saveExplorationTitle();
+
+        expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+        expect(ctrl.errorMessage).toBe(
+          'Please provide a title before inviting.');
+      });
+
+      it('should disable save button when adding same role to existing users.',
+        () => {
+          ctrl.openEditRolesForm();
+          ctrl.rolesSaveButtonEnabled = true;
+          explorationRightsService.init(
+            ['Username1'], [], [], [], '', false, false, true);
+          ctrl.newMemberUsername = 'Username1';
+          explorationTitleService.init('Exploration title');
+          ctrl.saveExplorationTitle();
+          spyOn(explorationRightsService, 'getOldRole')
+            .and.returnValue('owner');
+
+          ctrl.onRolesFormUsernameBlur();
+
+          expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+          expect(ctrl.errorMessage).toBe('User is already owner.');
+        });
+
+      it('should disable save button when adding another role to itself',
+        () => {
+          ctrl.newMemberUsername = ctrl.loggedInUser;
+          ctrl.rolesSaveButtonEnabled = true;
+          explorationTitleService.init('Exploration title');
+          ctrl.saveExplorationTitle();
+
+          spyOn(explorationRightsService, 'checkUserAlreadyHasRoles')
+            .and.returnValue(true);
+
+          ctrl.onRolesFormUsernameBlur();
+
+          expect(ctrl.rolesSaveButtonEnabled).toBe(false);
+          expect(ctrl.errorMessage).toBe(
+            'Users are not allowed to assign other roles to themselves.');
+        });
+
+      it('should enable save button when tile and username are valid', () => {
+        ctrl.newMemberUsername = 'newUser';
+        ctrl.newMemberRole = 'owner';
+        ctrl.rolesSaveButtonEnabled = true;
+        explorationTitleService.init('Exploration title');
+        ctrl.saveExplorationTitle();
+        spyOn(explorationRightsService, 'getOldRole')
+          .and.returnValue('editor');
+        expect(ctrl.rolesSaveButtonEnabled).toBe(true);
+        expect(ctrl.errorMessage).toBe('');
+      });
     });
 
     it('should toggle exploration visibility', () => {

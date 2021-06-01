@@ -33,15 +33,10 @@ docstrings in this file.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-
 from constants import constants
 from core import platform_feature_list
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_registry as registry
-from core.platform import models
-
-current_user_services = models.Registry.import_current_user_services()
-
 
 ALL_FEATURES_LIST = (
     platform_feature_list.DEV_FEATURES_LIST +
@@ -49,7 +44,7 @@ ALL_FEATURES_LIST = (
     platform_feature_list.PROD_FEATURES_LIST
 )
 
-ALL_FEATURES_NAMES_SET = set(ALL_FEATURES_LIST)
+ALL_FEATURES_NAMES_SET = set([feature.value for feature in ALL_FEATURES_LIST])
 
 
 class FeatureFlagNotFoundException(Exception):
@@ -85,8 +80,8 @@ def get_all_feature_flag_dicts():
         feature flags.
     """
     return [
-        registry.Registry.get_platform_parameter(name).to_dict()
-        for name in ALL_FEATURES_LIST
+        registry.Registry.get_platform_parameter(_feature.value).to_dict()
+        for _feature in ALL_FEATURES_LIST
     ]
 
 
@@ -149,12 +144,14 @@ def _get_server_mode():
     """Returns the running mode of Oppia.
 
     Returns:
-        str. The server mode of Oppia, 'dev' if Oppia is running in development
-        mode, 'prod' if in production mode.
+        Enum(SERVER_MODES). The server mode of Oppia, dev if Oppia is running
+        in development mode, prod if in production mode.
     """
     return (
         platform_parameter_domain.SERVER_MODES.dev
-        if constants.DEV_MODE else platform_parameter_domain.SERVER_MODES.prod)
+        if constants.DEV_MODE
+        else platform_parameter_domain.SERVER_MODES.prod
+    )
 
 
 def _create_evaluation_context_for_server():

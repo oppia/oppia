@@ -35,7 +35,7 @@ import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
 import { Interaction } from
   'domain/exploration/InteractionObjectFactory';
 import { BindableVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+  'domain/exploration/recorded-voiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
@@ -45,12 +45,14 @@ import {
 } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { Voiceover } from 'domain/exploration/voiceover.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { ExplorationChange } from './exploration-draft.model';
 
 export interface ExplorationBackendDict {
+  'auto_tts_enabled'?: boolean;
+  'correctness_feedback_enabled': boolean;
   'draft_changes': ExplorationChange[];
   'is_version_of_draft_valid': boolean;
   'init_state_name': string;
@@ -60,7 +62,7 @@ export interface ExplorationBackendDict {
   'title': string;
   'language_code': string;
   'draft_change_list_id'?: number;
-  'version'?: string;
+  'version'?: number;
 }
 
 export class Exploration {

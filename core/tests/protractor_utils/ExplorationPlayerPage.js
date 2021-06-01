@@ -33,7 +33,7 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
-  var conversationFeedback = element.all(
+  var conversationFeedback = element(
     by.css('.protractor-test-conversation-feedback'));
   var explorationHeader = element(
     by.css('.protractor-test-exploration-header'));
@@ -135,7 +135,8 @@ var ExplorationPlayerPage = function() {
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
     let submitButton = await element.all(by.tagName('button')).get(1);
     await action.click('Submit Button', submitButton);
-    let afterSubmitText = await element(by.tagName('p')).getText();
+    let afterSubmitText = await element(
+      by.css('.protractor-exploration-flagged-success-message')).getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };
@@ -238,8 +239,9 @@ var ExplorationPlayerPage = function() {
   // Note that the 'latest' feedback may be on either the current or a
   // previous card.
   this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(conversationFeedback);
     await forms.expectRichText(
-      await conversationFeedback.last()
+      conversationFeedback
     ).toMatch(richTextInstructions);
   };
 

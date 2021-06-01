@@ -27,7 +27,7 @@ import string
 import struct
 
 from constants import constants
-from core.domain import obj_services
+from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
 import feconf
@@ -95,8 +95,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 if ca_spec['schema']['obj_type'] == 'SanitizedUrl':
                     self.assertEqual(ca_spec['default_value'], '')
                 else:
-                    obj_class = obj_services.Registry.get_object_class_by_type(
-                        ca_spec['schema']['obj_type'])
+                    obj_class = (
+                        object_registry.Registry.get_object_class_by_type(
+                            ca_spec['schema']['obj_type']))
                     self.assertEqual(
                         ca_spec['default_value'],
                         obj_class.normalize(ca_spec['default_value']))
@@ -165,20 +166,11 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(protractor_file))
 
             main_ts_file = os.path.join(
-                directives_dir, 'oppia-noninteractive-%s.directive.ts'
+                directives_dir, 'oppia-noninteractive-%s.component.ts'
                 % hyphenated_component_id)
             main_html_file = os.path.join(
-                directives_dir, '%s.directive.html' % hyphenated_component_id)
-            # TODO(#9762): Remove this if condition once all the files in the
-            # rich_text_components directory is migrated from directives
-            # to component files.
-            if hyphenated_component_id == 'svgdiagram':
-                main_ts_file = os.path.join(
-                    directives_dir, 'oppia-noninteractive-%s.component.ts'
-                    % hyphenated_component_id)
-                main_html_file = os.path.join(
-                    directives_dir, '%s.component.html'
-                    % hyphenated_component_id)
+                directives_dir, '%s.component.html'
+                % hyphenated_component_id)
             self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 

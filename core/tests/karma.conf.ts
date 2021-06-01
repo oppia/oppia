@@ -51,6 +51,7 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
+      'extensions/classifiers/proto/*'
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -77,7 +78,7 @@ module.exports = function(config) {
     },
     reporters: ['progress', 'coverage-istanbul'],
     coverageIstanbulReporter: {
-      reports: ['html', 'lcovonly'],
+      reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
       fixWebpackSourcePaths: true,
       'report-config': {

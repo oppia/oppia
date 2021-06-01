@@ -36,7 +36,6 @@ require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
-require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/skill/skill-creation-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -84,7 +83,7 @@ angular.module('oppia').factory('QuestionCreationService', [
     var newQuestionSkillIds = [];
 
     var populateMisconceptions = function() {
-      SkillBackendApiService.fetchMultiSkills(
+      SkillBackendApiService.fetchMultiSkillsAsync(
         newQuestionSkillIds).then(
         function(skills) {
           skills.forEach(function(skill) {
@@ -204,7 +203,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       }
       var imagesData = ImageLocalStorageService.getStoredImagesData();
       ImageLocalStorageService.flushStoredImagesData();
-      EditableQuestionBackendApiService.createQuestion(
+      EditableQuestionBackendApiService.createQuestionAsync(
         newQuestionSkillIds, newQuestionSkillDifficulties,
         question.toBackendDict(true), imagesData);
     };

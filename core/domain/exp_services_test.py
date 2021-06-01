@@ -81,6 +81,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     EXP_0_ID = 'An_exploration_0_id'
     EXP_1_ID = 'An_exploration_1_id'
+    EXP_2_ID = 'An_exploration_2_id'
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
@@ -819,6 +820,120 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             opportunity_models.ExplorationOpportunitySummaryModel.get_by_id(
                 self.EXP_1_ID))
 
+    def test_activities_of_deleted_explorations_are_deleted(self):
+        """Test that opportunity summary for deleted explorations are correctly
+        deleted.
+        """
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.CompletedActivitiesModel(
+            id=self.editor_id,
+            exploration_ids=[self.EXP_0_ID],
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.IncompleteActivitiesModel(
+            id=self.owner_id,
+            exploration_ids=[self.EXP_1_ID],
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            user_models.CompletedActivitiesModel.get(
+                self.editor_id, strict=False
+            ).exploration_ids,
+            []
+        )
+        self.assertEqual(
+            user_models.IncompleteActivitiesModel.get(
+                self.owner_id, strict=False
+            ).exploration_ids,
+            []
+        )
+
+    def test_user_data_of_deleted_explorations_are_deleted(self):
+        """Test that user data for deleted explorations are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_0_ID),
+            user_id=self.owner_id,
+            exploration_id=self.EXP_0_ID,
+        ).put()
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % ('other_user_id', self.EXP_0_ID),
+            user_id='other_user_id',
+            exploration_id=self.EXP_0_ID,
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.owner_id, self.EXP_1_ID),
+            user_id=self.owner_id,
+            exploration_id=self.EXP_1_ID,
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        # The user data model has been purged from the backend.
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.get(
+                self.owner_id, self.EXP_0_ID))
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.get(
+                'other_user_id', self.EXP_0_ID))
+        self.assertIsNone(
+            user_models.ExplorationUserDataModel.get(
+                self.owner_id, self.EXP_1_ID))
+
+    def test_deleted_explorations_are_removed_from_user_contributions(self):
+        """Test that user data for deleted explorations are deleted."""
+        self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
+        user_models.UserContributionsModel(
+            id=self.owner_id,
+            created_exploration_ids=[self.EXP_0_ID, self.EXP_2_ID],
+        ).put()
+        user_models.UserContributionsModel(
+            id='user_id',
+            edited_exploration_ids=[self.EXP_0_ID, self.EXP_2_ID],
+        ).put()
+        self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
+        user_models.UserContributionsModel(
+            id='other_user_id',
+            created_exploration_ids=[self.EXP_0_ID, self.EXP_2_ID],
+            edited_exploration_ids=[self.EXP_1_ID],
+        ).put()
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                self.owner_id
+            ).created_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                'user_id'
+            ).edited_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                'other_user_id'
+            ).created_exploration_ids,
+            [self.EXP_2_ID]
+        )
+        self.assertEqual(
+            user_models.UserContributionsModel.get(
+                'other_user_id'
+            ).edited_exploration_ids,
+            []
+        )
+
     def test_feedbacks_belonging_to_exploration_are_deleted(self):
         """Tests that feedbacks belonging to exploration are deleted."""
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
@@ -1207,6 +1322,7 @@ states:
         explanation:
           content_id: solution
           html: <p>hello_world is a string</p>
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -1244,6 +1360,7 @@ states:
             filename: %s
             needs_update: false
     solicit_answer_details: false
+    card_is_checkpoint: true
     written_translations:
       translations_mapping:
         ca_placeholder_2: {}
@@ -1274,6 +1391,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1281,6 +1399,7 @@ states:
         content: {}
         default_outcome: {}
     solicit_answer_details: false
+    card_is_checkpoint: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1631,92 +1750,68 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': (
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image>')
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+                    ), False, [], None, None), [
+                        state_domain.RuleSpec('Equals', {'x': 0}),
+                        state_domain.RuleSpec('Equals', {'x': 1})
+                    ], [], None
+        ), state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state3', state_domain.SubtitledHtml(
+                    'feedback_2', '<p>Outcome2 for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec('Equals', {'x': 0})
+            ],
+            [],
+            None
+        )]
+        state_answer_group_list3 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Outcome for state3</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x':
+                        [(
+                            '<p>This is value1 for ItemSelection</p>'
+                            '<oppia-noninteractive-image filepath-with-'
+                            'value='
+                            '"&amp;quot;s3Choice1.png&amp;quot;"'
+                            ' caption-with-value="&amp;quot;&amp;quot;" '
+                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            '</oppia-noninteractive-image>')
+                        ]}),
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x':
+                        [(
+                            '<p>This is value3 for ItemSelection</p>'
+                            '<oppia-noninteractive-image filepath-with-'
+                            'value='
+                            '"&amp;quot;s3Choice3.png&amp;quot;"'
+                            ' caption-with-value="&amp;quot;&amp;quot;" '
+                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            '</oppia-noninteractive-image>')
+                        ]})
+            ],
+            [],
+            None
+        )]
+
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
 
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))
@@ -1746,6 +1841,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1772,6 +1868,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1786,6 +1883,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1812,6 +1910,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1849,6 +1948,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1875,6 +1975,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1889,6 +1990,7 @@ states:
         content: {}
         default_outcome: {}
   Renamed state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1915,6 +2017,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -2171,7 +2274,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """
 
     _SAMPLE_INIT_STATE_CONTENT = (
-        """classifier_model_id: null
+        """card_is_checkpoint: true
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2197,6 +2301,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2215,7 +2320,8 @@ written_translations:
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2241,6 +2347,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2260,7 +2367,8 @@ written_translations:
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': (
-            """classifier_model_id: null
+            """card_is_checkpoint: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -2286,6 +2394,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2609,9 +2718,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            r'The parameter name \'all\' is reserved. Please choose '
-            'a different name for the parameter being set in'
-        ):
+            re.escape(
+                'The parameter name \'all\' is reserved. Please choose '
+                'a different name for the parameter being set in')):
             exp_services.update_exploration(
                 self.owner_id,
                 self.EXP_0_ID,
@@ -2951,6 +3060,71 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
+
+    def test_update_linked_skill_id(self):
+        """Test updating linked_skill_id."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.linked_skill_id, None)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State1',
+            })], 'Add state name')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].linked_skill_id, None)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                'State1',
+                exp_domain.STATE_PROPERTY_LINKED_SKILL_ID,
+                'string_1'),
+            '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].linked_skill_id, 'string_1')
+
+    def test_update_card_is_checkpoint(self):
+        """Test updating of card_is_checkpoint."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State1',
+            })], 'Add state name')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].card_is_checkpoint, False)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                'State1',
+                exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                True),
+            '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].card_is_checkpoint, True)
+
+    def test_update_card_is_checkpoint_with_non_bool_fails(self):
+        """Test updating of card_is_checkpoint with non bool value."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, True)
+        with self.assertRaisesRegexp(
+            Exception, (
+                'Expected card_is_checkpoint to be a bool, received ')):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_0_ID, _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                    'abc'),
+                '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.card_is_checkpoint, True)
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
@@ -4155,6 +4329,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4189,6 +4364,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4414,11 +4590,25 @@ title: Old Title
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
 
         exp_services.update_exploration(
-            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'init_state_name',
-                'new_value': 'State'
-            })], 'Changed init_state_name.')
+            self.albert_id, self.NEW_EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'init_state_name',
+                    'new_value': 'State',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'State',
+                    'property_name': 'card_is_checkpoint',
+                    'new_value': True,
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'property_name': 'card_is_checkpoint',
+                    'new_value': False,
+                }),
+            ], 'Changed init_state_name and checkpoints.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.init_state_name, 'State')
@@ -5300,5 +5490,52 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                     'StateStats(exp_id=u\'ID1\', exp_version=2, '
                     'state_name=u\'Introduction\')'
                 ], 6, 5
+            )
+        )
+
+    def test_when_few_state_stats_models_are_missing_for_old_exps(self):
+        exp_id = 'ID1'
+        owner_id = 'owner_id'
+        self.save_new_valid_exploration(
+            exp_id, owner_id, title='title', category='Category 1',
+            end_state_name='END', correctness_feedback_enabled=True)
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 2'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 3'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 4'
+            })], 'Changed title.')
+        exp_services.update_exploration(
+            owner_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title 5'
+            })], 'Changed title.')
+        exp_stats = stats_services.get_exploration_stats_by_id(exp_id, 2)
+        exp_stats.state_stats_mapping = {}
+        stats_services.save_stats_model(exp_stats)
+
+        self.assertItemsEqual(
+            exp_services.regenerate_missing_stats_for_exploration('ID1'),
+            (
+                [],
+                [
+                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
+                    'state_name=u\'Introduction\')',
+                    'StateStats(exp_id=u\'ID1\', exp_version=2, '
+                    'state_name=u\'END\')',
+                ], 8, 5
             )
         )

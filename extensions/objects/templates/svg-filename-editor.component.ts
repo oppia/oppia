@@ -16,7 +16,7 @@
  * @fileoverview Component for svg filename editor.
  */
 
-require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('objects/templates/svg-filename-editor.constants.ajs.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
@@ -376,6 +376,7 @@ angular.module('oppia').component('svgFilenameEditor', {
             IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
             ctrl.saveImageToLocalStorage(dimensions, resampledFile);
           } else {
+            ctrl.loadingIndicatorIsShown = true;
             ctrl.postSvgToServer(
               dimensions, resampledFile).then(function(data) {
               // Pre-load image before marking the image as saved.
@@ -389,9 +390,11 @@ angular.module('oppia').component('svgFilenameEditor', {
                   width: dimensions.width + 'px'
                 };
                 $scope.$applyAsync();
+                ctrl.loadingIndicatorIsShown = false;
               };
               img.src = getTrustedResourceUrlForSvgFileName(data.filename);
             }, function(parsedResponse) {
+              ctrl.loadingIndicatorIsShown = false;
               AlertsService.addWarning(
                 parsedResponse.error || 'Error communicating with server.');
               $scope.$applyAsync();

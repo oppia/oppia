@@ -23,6 +23,7 @@ import ast
 import collections
 import contextlib
 import copy
+import functools
 import inspect
 import itertools
 import json
@@ -62,16 +63,13 @@ from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
-import main_mail
 import main_taskqueue
-from proto import text_classifier_pb2
+from proto_files import text_classifier_pb2
 import python_utils
 import schema_utils
 import utils
 
-import contextlib2
 import elasticsearch
-from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 import requests_mock
@@ -85,7 +83,6 @@ import webtest
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
-current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
@@ -183,9 +180,8 @@ def get_storage_model_module_names():
     """Get all module names in storage."""
     # As models.NAMES is an enum, it cannot be iterated over. So we use the
     # __dict__ property which can be iterated over.
-    for name in models.NAMES.__dict__:
-        if '__' not in name:
-            yield name
+    for name in models.NAMES:
+        yield name
 
 
 def get_storage_model_classes():
@@ -535,7 +531,7 @@ class AuthServicesStub(python_utils.OBJECT):
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -1097,8 +1093,41 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
+    def swap_with_call_counter(
+            self, obj, attr, raises=None, returns=None, call_through=False):
+        """Swap obj.attr with a CallCounter instance.
+
+        Args:
+            obj: *. The Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            raises: Exception|None. The exception raised by the swapped
+                function. If None, then no exception is raised.
+            returns: *. The return value of the swapped function.
+            call_through: bool. Whether to call through to the real function,
+                rather than use a stub implementation. If True, the `raises` and
+                `returns` arguments will be ignored.
+
+        Yields:
+            CallCounter. A CallCounter instance that's installed as obj.attr's
+            implementation while within the context manager returned.
+        """
+        if call_through:
+            impl = obj.attr
+        else:
+            def impl(*_, **__):
+                """Behaves according to the given values."""
+                if raises is not None:
+                    # Pylint thinks we're trying to raise `None` even though
+                    # we've explicitly checked for it above.
+                    raise raises # pylint: disable=raising-bad-type
+                return returns
+        call_counter = CallCounter(impl)
+        with self.swap(obj, attr, call_counter):
+            yield call_counter
+
+    @contextlib.contextmanager
     def swap_with_checks(
-            self, obj, attr, new_value, expected_args=None,
+            self, obj, attr, new_function, expected_args=None,
             expected_kwargs=None, called=True):
         """Swap an object's function value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -1124,7 +1153,7 @@ class TestBase(unittest.TestCase):
         Args:
             obj: *. The Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
-            new_value: function. The new function you want to use.
+            new_function: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you want
                 this function to be invoked with. When its value is None, args
                 will not be checked. If the value type is list, the function
@@ -1138,53 +1167,84 @@ class TestBase(unittest.TestCase):
         Yields:
             context. The context with function replaced.
         """
-        original = getattr(obj, attr)
-        # The actual error message will also include detail assert error message
-        # via the `self.longMessage` below.
-        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+        original_function = getattr(obj, attr)
+        original_long_message_value = self.longMessage
+        msg = '%s.%s() failed the expectations of swap_with_checks()' % (
             obj.__name__, attr)
 
-        def wrapper(*args, **kwargs):
-            """Wrapper function for the new value. This function will do the
-            check before the wrapped function is invoked. After the function
-            finished, the wrapper will update how many times this function is
-            invoked.
+        expected_args_iter = iter(expected_args or ())
+        expected_kwargs_iter = iter(expected_kwargs or ())
+
+        @functools.wraps(original_function)
+        def new_function_with_checks(*args, **kwargs):
+            """Wrapper function for the new value which keeps track of how many
+            times this function is invoked.
 
             Args:
                 *args: list(*). The args passed into `attr` function.
                 **kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                *. Result of `new_value`.
+                *. Result of `new_function`.
             """
-            wrapper.called = True
-            if expected_args is not None:
-                self.assertEqual(args, expected_args[0], msg=msg)
-                expected_args.pop(0)
-            if expected_kwargs is not None:
-                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
-                expected_kwargs.pop(0)
-            result = new_value(*args, **kwargs)
-            return result
+            new_function_with_checks.call_num += 1
 
-        wrapper.called = False
-        setattr(obj, attr, wrapper)
-        error_occurred = False
-        try:
-            # This will show the detailed assert message.
+            # Includes assertion error information in addition to the message.
             self.longMessage = True
+
+            if expected_args:
+                next_args = python_utils.NEXT(expected_args_iter, None)
+                self.assertEqual(
+                    args, next_args, msg='*args to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            if expected_kwargs:
+                next_kwargs = python_utils.NEXT(expected_kwargs_iter, None)
+                self.assertEqual(
+                    kwargs, next_kwargs, msg='**kwargs to call #%d of %s' % (
+                        new_function_with_checks.call_num, msg))
+
+            # Reset self.longMessage just in case `new_function()` raises.
+            self.longMessage = original_long_message_value
+
+            return new_function(*args, **kwargs)
+
+        new_function_with_checks.call_num = 0
+        setattr(obj, attr, new_function_with_checks)
+
+        try:
             yield
-        except Exception:
-            error_occurred = True
-            # Raise issues thrown by the called function or assert error.
-            raise
+            # Includes assertion error information in addition to the message.
+            self.longMessage = True
+
+            self.assertEqual(
+                new_function_with_checks.call_num > 0, called, msg=msg)
+            pretty_unused_args = [
+                ', '.join(itertools.chain(
+                    (repr(a) for a in args),
+                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
+                for args, kwargs in python_utils.zip_longest(
+                    expected_args_iter, expected_kwargs_iter, fillvalue={})
+            ]
+            if pretty_unused_args:
+                num_expected_calls = (
+                    new_function_with_checks.call_num + len(pretty_unused_args))
+                missing_call_summary = '\n'.join(
+                    '\tCall %d of %d: %s(%s)' % (
+                        i, num_expected_calls, attr, call_args)
+                    for i, call_args in enumerate(
+                        pretty_unused_args,
+                        start=new_function_with_checks.call_num + 1))
+                self.fail(
+                    msg='Only %d of the %d expected calls were made.\n'
+                    '\n'
+                    'Missing:\n'
+                    '%s : %s' % (
+                        new_function_with_checks.call_num, num_expected_calls,
+                        missing_call_summary, msg))
         finally:
-            setattr(obj, attr, original)
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args, msg=msg)
-                self.assertFalse(expected_kwargs, msg=msg)
-            self.longMessage = False
+            self.longMessage = original_long_message_value
+            setattr(obj, attr, original_function)
 
     def assertRaises(self, *args, **kwargs):
         raise NotImplementedError(
@@ -1305,9 +1365,10 @@ class AppEngineTestBase(TestBase):
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app)
         self.taskqueue_testapp = webtest.TestApp(main_taskqueue.app)
-        self.mail_testapp = webtest.TestApp(main_mail.app)
 
     def tearDown(self):
+        datastore_services.delete_multi(
+            datastore_services.query_everything().iter(keys_only=True))
         self.testbed.deactivate()
         super(AppEngineTestBase, self).tearDown()
 
@@ -1464,7 +1525,7 @@ class GenericTestBase(AppEngineTestBase):
     TODO(#12135): Split this enormous test base into smaller, focused pieces.
     """
 
-    # NOTE: For tests that do not/can not use the default super-admin, authors
+    # NOTE: For tests that do not/can not use the default super admin, authors
     # can override the following class-level constant.
     AUTO_CREATE_DEFAULT_SUPERADMIN_USER = True
 
@@ -1687,6 +1748,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -1707,6 +1769,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1719,6 +1782,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1739,6 +1803,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1778,7 +1843,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',
@@ -1820,11 +1885,6 @@ title: Title
         super(GenericTestBase, self).setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
-
-    def tearDown(self):
-        datastore_services.delete_multi(
-            datastore_services.query_everything().iter(keys_only=True))
-        super(GenericTestBase, self).tearDown()
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -1895,16 +1955,19 @@ title: Title
         with self.login_context(email, is_super_admin=True) as user_id:
             yield user_id
 
-    def signup(self, email, username):
+    def signup(self, email, username, is_super_admin=False):
         """Complete the signup process for the user with the given username.
 
         Args:
             email: str. Email of the given user.
             username: str. Username of the given user.
+            is_super_admin: bool. Whether the user is a super admin.
         """
         user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
-        with self.login_context(email), requests_mock.Mocker() as m:
+        login_context = self.login_context(email, is_super_admin=is_super_admin)
+
+        with login_context, requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
             # calling out to real backend services.
             m.request(requests_mock.ANY, requests_mock.ANY)
@@ -2260,40 +2323,6 @@ title: Title
             url, params=data, headers=headers, status=expected_status_int,
             upload_files=upload_files, expect_errors=expect_errors)
 
-    def post_email(
-            self, recipient_email, sender_email, subject, body, html_body=None,
-            expect_errors=False, expected_status_int=200):
-        """Post an email from the sender to the recipient.
-
-        Args:
-            recipient_email: str. The email of the recipient.
-            sender_email: str. The email of the sender.
-            subject: str. The subject of the email.
-            body: str. The body of the email.
-            html_body: str. The HTML body of the email.
-            expect_errors: bool. Whether errors are expected.
-            expected_status_int: int. The expected status code of the JSON
-                response.
-
-        Returns:
-            json. A JSON response generated by _send_post_request function.
-        """
-        email = mail.EmailMessage(
-            sender=sender_email, to=recipient_email, subject=subject, body=body)
-        if html_body is not None:
-            email.html = html_body
-
-        mime_email = email.to_mime_message()
-        headers = {
-            'Content-Type': mime_email.get_content_type(),
-        }
-        data = mime_email.as_string()
-        incoming_email_url = '/_ah/mail/%s' % recipient_email
-
-        return self._send_post_request(
-            self.mail_testapp, incoming_email_url, data, expect_errors,
-            headers=headers, expected_status_int=expected_status_int)
-
     def post_task(
             self, url, payload, headers, csrf_token=None, expect_errors=False,
             expected_status_int=200):
@@ -2466,7 +2495,8 @@ title: Title
     def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, state_names, interaction_ids,
             title='A title', category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            correctness_feedback_enabled=False):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
@@ -2483,6 +2513,8 @@ title: Title
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            correctness_feedback_enabled: bool. Whether the correctness feedback
+                is enabled or not for the exploration.
 
         Returns:
             Exploration. The exploration domain object.
@@ -2497,6 +2529,7 @@ title: Title
             exploration_id, title=title, init_state_name=state_names[0],
             category=category, objective=objective, language_code=language_code)
 
+        exploration.correctness_feedback_enabled = correctness_feedback_enabled
         exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 python_utils.ZIP(state_names[:-1], state_names[1:])):
@@ -2504,6 +2537,9 @@ title: Title
             self.set_interaction_for_state(
                 from_state, python_utils.NEXT(interaction_ids))
             from_state.interaction.default_outcome.dest = dest_state_name
+            if correctness_feedback_enabled:
+                from_state.interaction.default_outcome.labelled_as_correct = (
+                    True)
         end_state = exploration.states[state_names[-1]]
         self.set_interaction_for_state(end_state, 'EndExploration')
         end_state.update_interaction_default_outcome(None)

@@ -67,6 +67,47 @@ angular.module('oppia').directive('schemaBasedEditor', [
       },
       template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [
+        '$rootScope', function($rootScope) {
+          let ctrl = this;
+          ctrl.$onInit = function() {
+            /**
+             * $rootScope.$applyAsync() is called here to fix the change
+             * detection issue with moderator page. Please refer #12602.
+             * If you are using this directive as an example for the
+             * usage of UpgradeComponent. This call is not mandatory.
+             */
+            $rootScope.$applyAsync();
+          };
+        }]
     };
   }]);
+
+import { Directive, ElementRef, Injector, Input, Output, EventEmitter } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+import { Schema } from 'services/schema-default-value.service';
+// Allow $scope to be provided to parent Component.
+export const ScopeProvider = {
+  deps: ['$injector'],
+  provide: '$scope',
+  useFactory: (injector: Injector): void => injector.get('$rootScope').$new(),
+};
+@Directive({
+  selector: 'schema-based-editor',
+  providers: [ScopeProvider]
+})
+export class SchemaBasedEditorDirective extends UpgradeComponent {
+  @Input() schema: () => Schema;
+  @Input() isDisabled: () => boolean;
+  @Input() localValue;
+  @Output() localValueChange: EventEmitter<unknown> = new EventEmitter();
+  @Input() labelForFocusTarget: () => string;
+  @Input() onInputBlur: () => void;
+  @Input() onInputFocus: () => void;
+
+  constructor(
+      elementRef: ElementRef,
+      injector: Injector) {
+    super('schemaBasedEditor', elementRef, injector);
+  }
+}

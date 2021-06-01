@@ -33,6 +33,9 @@ require('services/math-interactions.service.ts');
 
 angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
   template: require('./numeric-expression-input-interaction.component.html'),
+  bindings: {
+    savedSolution: '<'
+  },
   controller: [
     '$attrs', '$scope', 'CurrentInteractionService', 'DeviceInfoService',
     'GuppyConfigurationService', 'GuppyInitializationService',
@@ -86,14 +89,27 @@ angular.module('oppia').component('oppiaInteractiveNumericExpressionInput', {
       ctrl.$onInit = function() {
         ctrl.hasBeenTouched = false;
         GuppyConfigurationService.init();
-        const { placeholder } = (
+        const { useFractionForDivision, placeholder } = (
           InteractionAttributesExtractorService.getValuesFromAttributes(
             'NumericExpressionInput', $attrs));
+        // This represents a list of special characters in LaTeX. These
+        // characters have a special meaning in LaTeX and thus need to be
+        // escaped.
+        const escapeCharacters = [
+          '&', '%', '$', '#', '_', '{', '}', '~', '^', '\\'];
+        for (var i = 0; i < placeholder.unicode.length; i++) {
+          if (escapeCharacters.includes(placeholder.unicode[i])) {
+            let newPlaceholder = `\\verb|${placeholder.unicode}|`;
+            placeholder.unicode = newPlaceholder;
+            break;
+          }
+        }
+        GuppyConfigurationService.changeDivSymbol(useFractionForDivision);
         GuppyInitializationService.init(
           'guppy-div-learner',
           placeholder.unicode,
-          $attrs.savedSolution !== undefined ?
-          JSON.parse($attrs.savedSolution) : ''
+          ctrl.savedSolution !== undefined ?
+          ctrl.savedSolution : ''
         );
         let eventType = (
           DeviceInfoService.isMobileUserAgent() &&

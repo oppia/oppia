@@ -24,22 +24,24 @@ import inspect
 from constants import constants
 import feconf
 import python_utils
-import utils
 
 # Valid model names.
-NAMES = utils.create_enum(
+NAMES = python_utils.create_enum(
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'classifier',
+    'collection', 'config', 'email', 'exploration', 'feedback', 'improvements',
+    'job', 'opportunity', 'question', 'recommendations', 'skill', 'statistics',
     'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
     'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
     'opportunity', 'question', 'recommendations', 'skill', 'statistics',
-    'story', 'subtopic', 'suggestion', 'topic', 'user')
+    'story', 'subtopic', 'suggestion', 'topic', 'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
 # UPPER_CASE seems more appropriate here.
-MODULES_WITH_PSEUDONYMIZABLE_CLASSES = utils.create_enum(  # pylint: disable=invalid-name
-    NAMES.collection, NAMES.config, NAMES.exploration, NAMES.feedback,
-    NAMES.question, NAMES.skill, NAMES.story, NAMES.subtopic, NAMES.suggestion,
-    NAMES.topic)
+MODULES_WITH_PSEUDONYMIZABLE_CLASSES = (  # pylint: disable=invalid-name
+    NAMES.app_feedback_report, NAMES.collection, NAMES.config,
+    NAMES.exploration, NAMES.feedback, NAMES.question, NAMES.skill, NAMES.story,
+    NAMES.subtopic, NAMES.suggestion, NAMES.topic)
 
 GAE_PLATFORM = 'gae'
 
@@ -70,7 +72,7 @@ class _Gae(Platform):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage module names.
+            model_names: list(NAMES). List of storage module names.
 
         Returns:
             tuple(module). Tuple of storage modules.
@@ -83,6 +85,9 @@ class _Gae(Platform):
             if name == NAMES.activity:
                 from core.storage.activity import gae_models as activity_models
                 returned_models.append(activity_models)
+            elif name == NAMES.app_feedback_report:
+                from core.storage.app_feedback_report import gae_models as app_feedback_report_models # pylint: disable=line-too-long
+                returned_models.append(app_feedback_report_models)
             elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
@@ -143,6 +148,9 @@ class _Gae(Platform):
             elif name == NAMES.topic:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
+            elif name == NAMES.translation:
+                from core.storage.translation import gae_models as translation_models # pylint: disable=line-too-long
+                returned_models.append(translation_models)
             elif name == NAMES.user:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
@@ -184,20 +192,18 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-        model_names = [
-            name for name in NAMES.__dict__
-            if '__' not in name and name != 'base_model']
+        model_names = [name for name in NAMES if name != NAMES.base_model]
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
     def import_auth_services(cls):
-        """Imports and returns gae_auth_services module.
+        """Imports and returns firebase_auth_services module.
 
         Returns:
-            module. The gae_auth_services module.
+            module. The firebase_auth_services module.
         """
-        from core.platform.auth import gae_auth_services
-        return gae_auth_services
+        from core.platform.auth import firebase_auth_services
+        return firebase_auth_services
 
     @classmethod
     def import_transaction_services(cls):
@@ -208,16 +214,6 @@ class _Gae(Platform):
         """
         from core.platform.transactions import gae_transaction_services
         return gae_transaction_services
-
-    @classmethod
-    def import_current_user_services(cls):
-        """Imports and returns gae_current_user_services module.
-
-        Returns:
-            module. The gae_current_user_services module.
-        """
-        from core.platform.users import gae_current_user_services
-        return gae_current_user_services
 
     @classmethod
     def import_datastore_services(cls):
@@ -300,6 +296,21 @@ class _Gae(Platform):
         from core.platform.search import elastic_search_services
         return elastic_search_services
 
+    @classmethod
+    def import_cloud_translate_services(cls):
+        """Imports and returns cloud_translate_services module.
+
+        Returns:
+            module. The cloud_translate_services module.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.cloud_translate import (
+                dev_mode_cloud_translate_services)
+            return dev_mode_cloud_translate_services
+        else:
+            from core.platform.cloud_translate import cloud_translate_services
+            return cloud_translate_services
+
     NAME = 'gae'
 
 
@@ -328,7 +339,7 @@ class Registry(python_utils.OBJECT):
         """Imports and returns the storage modules listed in model_names.
 
         Args:
-            model_names: list(str). List of storage module names.
+            model_names: list(NAMES). List of storage modules.
 
         Returns:
             list(module). The corresponding storage-layer modules.
@@ -367,15 +378,6 @@ class Registry(python_utils.OBJECT):
             module. The auth_services module.
         """
         return cls._get().import_auth_services()
-
-    @classmethod
-    def import_current_user_services(cls):
-        """Imports and returns current_user_services module.
-
-        Returns:
-            module. The current_user_services module.
-        """
-        return cls._get().import_current_user_services()
 
     @classmethod
     def import_datastore_services(cls):
@@ -430,6 +432,15 @@ class Registry(python_utils.OBJECT):
             module. The taskqueue_services module.
         """
         return cls._get().import_taskqueue_services()
+
+    @classmethod
+    def import_cloud_translate_services(cls):
+        """Imports and returns cloud_translate_services module.
+
+        Returns:
+            module. The cloud_translate_services module.
+        """
+        return cls._get().import_cloud_translate_services()
 
     @classmethod
     def import_search_services(cls):

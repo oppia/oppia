@@ -16,13 +16,13 @@
  * @fileoverview Controller for demonstration.
  */
 
-import logicProofShared from 'interactions/LogicProof/static/js/shared.ts';
-import logicProofStudent from 'interactions/LogicProof/static/js/student.ts';
-import logicProofTeacher from 'interactions/LogicProof/static/js/teacher.ts';
-import logicProofData from 'interactions/LogicProof/static/js/data.ts';
-import logicProofTeacher2
-  from 'interactions/LogicProof/static/js/tools/teacher2.ts';
-import defaultStrings from 'interactions/LogicProof/static/js/tools/strings.ts';
+import logicProofShared from 'interactions/LogicProof/static/js/shared';
+import logicProofStudent from 'interactions/LogicProof/static/js/student';
+import logicProofTeacher from 'interactions/LogicProof/static/js/teacher';
+import logicProofData from 'interactions/LogicProof/static/js/data';
+import logicProofTeacher2 from
+  'interactions/LogicProof/static/js/tools/teacher2';
+import defaultStrings from 'interactions/LogicProof/static/js/tools/strings';
 
 var logicDemo = angular.module('logicDemo', []);
 
@@ -285,7 +285,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
     for (var i = 0; i < $scope.REPLACEMENT_PAIRS.length; i++) {
       // We use this as .replace() only replaces one instance.
       output = output.split($scope.REPLACEMENT_PAIRS[i].old).join(
-        $scope.REPLACEMENT_PAIRS[i]['new']);
+        $scope.REPLACEMENT_PAIRS[i].new);
     }
     return output;
   };

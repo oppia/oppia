@@ -5,12 +5,12 @@
 
     <style>
       html, body {
-        background: #eeeeee no-repeat center center fixed;
+        background: #eee no-repeat center center fixed;
         background-size: cover;
       }
 
       .oppia-story-player-tiles-container {
-        background-color: #ffffff;
+        background-color: #fff;
         border-radius: 4px;
         box-shadow: 0 0 8px 6px rgba(0, 0, 0, 0.05);
         height: 100%;
@@ -98,7 +98,7 @@
       }
 
       .oppia-lesson-icon-uncompleted {
-        background-color: #ffffff;
+        background-color: #fff;
         border: #296E5F 3px solid;
         border-radius: 50%;
         height: 40px;
@@ -298,21 +298,21 @@
   </head>
   <body>
     <oppia-root>
-      <div ng-controller="Base">
+      <div ng-controller="Base" dir="<[direction]>">
         <base-content>
           <navbar-pre-logo-action>
-            <story-viewer-navbar-pre-logo-action>
-            </story-viewer-navbar-pre-logo-action>
+            <oppia-story-viewer-navbar-pre-logo-action>
+            </oppia-story-viewer-navbar-pre-logo-action>
           </navbar-pre-logo-action>
 
           <navbar-breadcrumb>
-            <story-viewer-navbar-breadcrumb>
-            </story-viewer-navbar-breadcrumb>
+            <oppia-story-viewer-navbar-breadcrumb>
+            </oppia-story-viewer-navbar-breadcrumb>
           </navbar-breadcrumb>
 
           <content>
             <background-banner></background-banner>
-            <story-viewer-page></story-viewer-page>
+            <oppia-story-viewer-page></oppia-story-viewer-page>
           </content>
 
           <page-footer></page-footer>

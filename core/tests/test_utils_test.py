@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 import os
+import re
 
 from constants import constants
 from core import jobs
@@ -29,9 +30,9 @@ from core.domain import param_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
+import mock
 import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
@@ -411,15 +412,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.save_new_linear_exp_with_state_names_and_interactions(
                 'exp_id', 'owner_id', ['state_name'], [])
 
-    def test_error_is_raised_with_fake_reply_to_id(self):
-        # Generate reply email.
-        recipient_email = 'reply+%s@%s' % (
-            'fake_id', feconf.INCOMING_EMAILS_DOMAIN_NAME)
-        # Send email to Oppia.
-        self.post_email(
-            recipient_email, self.NEW_USER_EMAIL, 'feedback email reply',
-            'New reply', html_body='<p>New reply!</p>', expected_status_int=404)
-
     def test_cannot_perform_delete_json_with_non_dict_params(self):
         with self.assertRaisesRegexp(
             Exception, 'Expected params to be a dict'):
@@ -451,77 +443,51 @@ class TestUtilsTests(test_utils.GenericTestBase):
             logging.warn('3')
             logging.error('4')
             python_utils.PRINT('5')
-        logging.info('6')
+        logging.error('6')
 
         self.assertEqual(logs, ['3', '4'])
 
-    def test_swap_to_always_return_uses_none_by_default(self):
-        class MockClass(python_utils.OBJECT):
-            """Test-only class."""
+    def test_swap_to_always_return_without_value_uses_none(self):
+        obj = mock.Mock()
+        obj.func = lambda: obj
 
-            def method(self):
-                """Returns self."""
-                return self
+        self.assertIs(obj.func(), obj)
 
-        mock = MockClass()
-        self.assertIs(mock.method(), mock)
-
-        with self.swap_to_always_return(mock, 'method'):
-            self.assertIsNone(mock.method())
+        with self.swap_to_always_return(obj, 'func'):
+            self.assertIsNone(obj.func())
 
     def test_swap_to_always_return_with_value(self):
-        right_obj = python_utils.OBJECT()
-        wrong_obj = python_utils.OBJECT()
-        self.assertIsNot(right_obj, wrong_obj)
+        obj = mock.Mock()
+        obj.func = lambda: 0
 
-        class MockClass(python_utils.OBJECT):
-            """Test-only class."""
+        self.assertEqual(obj.func(), 0)
 
-            def method(self):
-                """Returns self."""
-                return wrong_obj
+        with self.swap_to_always_return(obj, 'func', value=123):
+            self.assertEqual(obj.func(), 123)
 
-        mock = MockClass()
-        self.assertIs(mock.method(), wrong_obj)
+    def test_swap_to_always_raise_without_error_uses_empty_exception(self):
+        obj = mock.Mock()
+        obj.func = lambda: None
+        self.assertIsNone(obj.func())
 
-        with self.swap_to_always_return(mock, 'method', value=right_obj):
-            self.assertIs(mock.method(), right_obj)
-
-    def test_swap_to_always_raise_empty_exception_by_default(self):
-        class MockClass(python_utils.OBJECT):
-            """Test-only class."""
-
-            def method(self):
-                """Returns self."""
-                return self
-
-        mock = MockClass()
-        self.assertIs(mock.method(), mock)
-
-        with self.swap_to_always_raise(mock, 'method'):
+        with self.swap_to_always_raise(obj, 'func'):
             try:
-                mock.method()
-            except Exception:
-                pass
+                obj.func()
+            except Exception as e:
+                self.assertIs(type(e), Exception)
+                self.assertEqual(python_utils.UNICODE(e), '')
             else:
-                self.fail(msg='Exception was not raise as expected')
+                self.fail(msg='obj.func() did not raise an Exception')
 
     def test_swap_to_always_raise_with_error(self):
-        right_error = Exception('right error')
-        wrong_error = Exception('wrong error')
+        obj = mock.Mock()
+        obj.func = lambda: python_utils.divide(1, 0)
 
-        class MockClass(python_utils.OBJECT):
-            """Test-only class."""
+        self.assertRaisesRegexp(
+            ZeroDivisionError, 'integer division or modulo by zero', obj.func)
 
-            def method(self):
-                """Returns self."""
-                raise wrong_error
-
-        mock = MockClass()
-        self.assertRaisesRegexp(Exception, 'wrong error', mock.method)
-
-        with self.swap_to_always_raise(mock, 'method', error=right_error):
-            self.assertRaisesRegexp(Exception, 'right error', mock.method)
+        with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
+            self.assertRaisesRegexp(ValueError, 'abc', obj.func)
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
@@ -631,7 +597,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
 
         with self.assertRaisesRegexp(
-            ValueError, r'Exception raised from getcwd\(\)'):
+            ValueError, re.escape('Exception raised from getcwd()')
+        ):
             with getcwd_swap:
                 SwapWithCheckTestClass.getcwd_function_without_args()
 

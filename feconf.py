@@ -178,6 +178,9 @@ IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS = 'exploration_suggestions'
 MAX_TASK_MODELS_PER_FETCH = 25
 MAX_TASK_MODELS_PER_HISTORY_PAGE = 10
 
+PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED = datetime.timedelta(weeks=8)
+PERIOD_TO_MARK_MODELS_AS_DELETED = datetime.timedelta(weeks=4)
+
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
 MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
@@ -210,6 +213,28 @@ NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE = 20
 # for recently published explorations in /library/recently_published page.
 RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 
+# The maximum number of days a feedback report can be saved in storage before it
+# must be scrubbed.
+APP_FEEDBACK_REPORT_MAXIMUM_DAYS = datetime.timedelta(days=90)
+
+# The minimum version of the Android feedback report info blob schema.
+MINIMUM_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the Android feedback report info blob schema.
+CURRENT_ANDROID_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+MINIMUM_WEB_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the web feedback report info blob schema.
+CURRENT_WEB_REPORT_SCHEMA_VERSION = 1
+
+# The current version of the app feedback report daily stats blob schema.
+CURRENT_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
+# The minimum version of the app feedback report daily stats blob schema.
+MINIMUM_FEEDBACK_REPORT_STATS_SCHEMA_VERSION = 1
+
 # The current version of the dashboard stats blob schema. If any backward-
 # incompatible changes are made to the stats blob schema in the data store,
 # this version number must be changed.
@@ -222,7 +247,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 42
+CURRENT_STATE_SCHEMA_VERSION = 45
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -373,8 +398,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
 }
 
 # An array containing the image formats that can be compressed.
-COMPRESSIBLE_IMAGE_FORMATS = [
-    IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG, IMAGE_FORMAT_GIF]
+COMPRESSIBLE_IMAGE_FORMATS = [IMAGE_FORMAT_JPEG, IMAGE_FORMAT_PNG]
 
 # An array containing the accepted audio extensions for uploaded files and
 # the corresponding MIME types.
@@ -504,7 +528,7 @@ SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
 ENABLE_RECORDING_OF_SCORES = False
 
 # No. of pretest questions to display.
-NUM_PRETEST_QUESTIONS = 3
+NUM_PRETEST_QUESTIONS = 0
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -788,6 +812,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/community-library/recently-published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
+MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -838,6 +863,10 @@ SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
+UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
+    '/updatetranslationsuggestionhandler')
+UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
+    '/updatequestionsuggestionhandler')
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
@@ -981,6 +1010,11 @@ ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
+ALLOWED_USER_ROLES = [
+    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
+    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_ADMIN]
+
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
 ROLE_ACTION_UPDATE = 'update'
@@ -1110,8 +1144,22 @@ FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
+# Firebase *explicitly* requires IDs to have at most 128 characters, and may
+# contain any valid ASCII character:
+# https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
+#
+# After manually inspecting ~200 of them, however, we've found that they only
+# use alpha-numeric characters, hence the tighter restriction.
+FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
+
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
+CLOUD_DATASTORE_EMULATOR_PORT = 8089
+
+FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
+FIREBASE_EMULATOR_PORT = 9099
+
 # The name of the cookie Oppia will place the session cookie into. The name is
-# arbitrary. If it is changed later on, then the cookie will live-on in the
+# arbitrary. If it is changed later on, then the cookie will live on in the
 # users' browsers as garbage (although it would expire eventually, see MAX_AGE).
 FIREBASE_SESSION_COOKIE_NAME = 'session'
 # The duration a session cookie from Firebase should remain valid for. After the
@@ -1328,6 +1376,12 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
 # Possible suggestion types.
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]

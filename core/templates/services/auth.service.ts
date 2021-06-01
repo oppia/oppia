@@ -20,32 +20,101 @@ import { Injectable, Optional } from '@angular/core';
 import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-
 import firebase from 'firebase/app';
 import { md5 } from 'hash-wasm';
+
+import { AppConstants } from 'app.constants';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
+
+abstract class AuthServiceImpl {
+  abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential>;
+  abstract signInWithRedirectAsync(): Promise<void>;
+  abstract signOutAsync(): Promise<void>;
+}
+
+class NullAuthServiceImpl extends AuthServiceImpl {
+  private error = new Error('AngularFireAuth is not available');
+
+  async signInWithRedirectAsync(): Promise<void> {
+    throw this.error;
+  }
+
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+    throw this.error;
+  }
+
+  async signOutAsync(): Promise<void> {
+    throw this.error;
+  }
+}
+
+class DevAuthServiceImpl extends AuthServiceImpl {
+  constructor(private angularFireAuth: AngularFireAuth) {
+    super();
+  }
+
+  async signInWithRedirectAsync(): Promise<void> {
+  }
+
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+    return null;
+  }
+
+  async signOutAsync(): Promise<void> {
+    return this.angularFireAuth.signOut();
+  }
+}
+
+class ProdAuthServiceImpl extends AuthServiceImpl {
+  private provider: firebase.auth.GoogleAuthProvider;
+
+  constructor(private angularFireAuth: AngularFireAuth) {
+    super();
+    this.provider = new firebase.auth.GoogleAuthProvider();
+    // Oppia only needs an email address for account management.
+    this.provider.addScope('email');
+    // Always prompt the user to select an account, even when they only own one.
+    this.provider.setCustomParameters({prompt: 'select_account'});
+  }
+
+  /** Returns a promise that never resolves or rejects. */
+  async signInWithRedirectAsync(): Promise<void> {
+    return this.angularFireAuth.signInWithRedirect(this.provider);
+  }
+
+  async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
+    return this.angularFireAuth.getRedirectResult();
+  }
+
+  async signOutAsync(): Promise<void> {
+    return this.angularFireAuth.signOut();
+  }
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private authServiceImpl: AuthServiceImpl;
+
   constructor(
       @Optional() private angularFireAuth: AngularFireAuth,
-      private authBackendApiService: AuthBackendApiService) {}
-
-  static get firebaseAuthIsEnabled(): boolean {
-    return AppConstants.FIREBASE_AUTH_ENABLED;
+      private authBackendApiService: AuthBackendApiService) {
+    if (!this.angularFireAuth) {
+      this.authServiceImpl = new NullAuthServiceImpl();
+    } else if (AuthService.firebaseEmulatorIsEnabled) {
+      this.authServiceImpl = new DevAuthServiceImpl(this.angularFireAuth);
+    } else {
+      this.authServiceImpl = new ProdAuthServiceImpl(this.angularFireAuth);
+    }
   }
 
   static get firebaseEmulatorIsEnabled(): boolean {
-    return (
-      AuthService.firebaseAuthIsEnabled &&
-      AppConstants.FIREBASE_EMULATOR_ENABLED);
+    return AppConstants.EMULATOR_MODE;
   }
 
   static get firebaseConfig(): FirebaseOptions {
-    return !AuthService.firebaseAuthIsEnabled ? undefined : {
+    return {
       apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
       authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
       projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
@@ -60,58 +129,55 @@ export class AuthService {
       ['localhost', 9099] : undefined;
   }
 
-  /**
-   * Prompts the user to sign-in with a trusted identity provider, then fulfills
-   * with true if the user is new, otherwise fulfills with false.
-   * Rejects when sign-in failed.
-   */
-  async signInAsync(): Promise<boolean> {
-    if (!this.angularFireAuth) {
-      throw new Error('AngularFireAuth is not available');
+  async handleRedirectResultAsync(): Promise<boolean> {
+    const creds = await this.authServiceImpl.getRedirectResultAsync();
+    if (creds?.user) {
+      const idToken = await creds.user.getIdToken();
+      await this.authBackendApiService.beginSessionAsync(idToken);
+      return true;
+    } else {
+      return false;
     }
-
-    const creds = AuthService.firebaseEmulatorIsEnabled ?
-      await this.emulatorSignInAsync() : await this.productionSignInAsync();
-
-    const idToken = await creds.user.getIdToken();
-    await this.authBackendApiService.beginSessionAsync(idToken);
-
-    return creds.additionalUserInfo.isNewUser;
   }
 
-  async signOutAsync(): Promise<void> {
-    if (!this.angularFireAuth) {
-      throw new Error('AngularFireAuth is not available');
+  async signInWithEmail(email: string): Promise<void> {
+    if (!AuthService.firebaseEmulatorIsEnabled) {
+      throw new Error('signInWithEmail can only be called in emulator mode');
     }
-
-    await this.angularFireAuth.signOut();
-  }
-
-  /** Assumes that angularFireAuth is not null. */
-  private async emulatorSignInAsync(): Promise<firebase.auth.UserCredential> {
-    const email = prompt('Please enter the email address to sign-in with');
+    // The Firebase Admin SDK, used by our end-to-end tests, stores all emails
+    // in lower case. To ensure that the developer email used to sign in is
+    // consistent with these accounts, we manually change them to lower case.
+    email = email.toLowerCase();
+    // We've configured the Firebase emulator to use email/password for user
+    // authentication. To save developers and end-to-end test authors the
+    // trouble of providing passwords, we always use the md5 hash of the email
+    // address instead. This will never be done in production, where the
+    // emulator DOES NOT run. Instead, production takes the user to the Google
+    // sign-in page, which eventually redirects them back to Oppia.
     const password = await md5(email);
+    let creds: firebase.auth.UserCredential;
     try {
-      return await this.angularFireAuth.signInWithEmailAndPassword(
+      creds = await this.angularFireAuth.signInWithEmailAndPassword(
         email, password);
     } catch (err) {
-      if (err.code !== 'auth/user-not-found') {
+      if (err.code === 'auth/user-not-found') {
+        creds = await this.angularFireAuth.createUserWithEmailAndPassword(
+          email, password);
+      } else {
         throw err;
       }
     }
-    return await this.angularFireAuth.createUserWithEmailAndPassword(
-      email, password);
+    const idToken = await creds.user.getIdToken();
+    await this.authBackendApiService.beginSessionAsync(idToken);
   }
 
-  /** Assumes that angularFireAuth is not null. */
-  private async productionSignInAsync(): Promise<firebase.auth.UserCredential> {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    // Oppia only needs an email address for account management.
-    provider.addScope('email');
-    // Always prompt the user to select an account, even when they only own one.
-    provider.setCustomParameters({prompt: 'select_account'});
-    await this.angularFireAuth.signInWithRedirect(provider);
-    return await this.angularFireAuth.getRedirectResult();
+  async signInWithRedirectAsync(): Promise<void> {
+    return this.authServiceImpl.signInWithRedirectAsync();
+  }
+
+  async signOutAsync(): Promise<void> {
+    await this.authServiceImpl.signOutAsync();
+    await this.authBackendApiService.endSessionAsync();
   }
 }
 

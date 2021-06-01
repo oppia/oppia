@@ -429,6 +429,544 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             exp_domain.ExpVersionReference(0, 1)
 
 
+class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
+    """Test checkpoints validations in an exploration. """
+
+    def setUp(self):
+        super(ExplorationCheckpointsUnitTests, self).setUp()
+        self.exploration = (
+            exp_domain.Exploration.create_default_exploration('eid'))
+        self.new_state = state_domain.State.create_default_state(
+            'Introduction', is_initial_state=True)
+        self.set_interaction_for_state(self.new_state, 'TextInput')
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state
+        }
+        self.set_interaction_for_state(
+            self.exploration.states[self.exploration.init_state_name],
+            'TextInput')
+        self.init_state = (
+            self.exploration.states[self.exploration.init_state_name])
+        self.end_state = state_domain.State.create_default_state('End')
+        self.set_interaction_for_state(self.end_state, 'EndExploration')
+
+        self.end_state.update_interaction_default_outcome(None)
+
+    def test_init_state_with_card_is_checkpoint_false_is_invalid(self):
+        self.init_state.update_card_is_checkpoint(False)
+        self._assert_validation_error(
+            self.exploration, 'Expected card_is_checkpoint of first state to '
+            'be True but found it to be False')
+        self.init_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+    def test_end_state_with_card_is_checkpoint_true_is_invalid(self):
+        default_outcome = self.init_state.interaction.default_outcome
+        default_outcome.dest = self.exploration.init_state_name
+        self.init_state.update_interaction_default_outcome(default_outcome)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        self._assert_validation_error(
+            self.exploration, 'Expected card_is_checkpoint of terminal state '
+            'to be False but found it to be True')
+        self.end_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+    def test_init_state_checkpoint_with_end_exp_interaction_is_valid(self):
+        self.exploration.init_state_name = 'End'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.end_state
+        }
+        self.end_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+        self.end_state.update_card_is_checkpoint(False)
+
+    def test_checkpoint_count_with_count_outside_range_is_invalid(self):
+        self.exploration.init_state_name = 'Introduction'
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        for i in python_utils.RANGE(8):
+            self.exploration.add_states(['State%s' % i])
+            self.exploration.states['State%s' % i].card_is_checkpoint = True
+        self._assert_validation_error(
+            self.exploration, 'Expected checkpoint count to be between 1 and 8 '
+            'inclusive but found it to be 9'
+        )
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+        self.exploration.validate()
+
+    def test_bypassable_state_with_card_is_checkpoint_true_is_invalid(self):
+        # Note: In the graphs below, states with the * symbol are checkpoints.
+
+        # Exploration to test a checkpoint state which has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │   Second* │      │   Third   │
+        # └───────────┘      └─┬─────────┘
+        #                      │
+        #        ┌─────────────┴─┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        second_state = state_domain.State.create_default_state('Second')
+        self.set_interaction_for_state(second_state, 'TextInput')
+        third_state = state_domain.State.create_default_state('Third')
+        self.set_interaction_for_state(third_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state,
+            'Second': second_state,
+            'Third': third_state,
+        }
+
+        # Answer group dicts to connect init_state to second_state and
+        # third_state.
+        init_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Second', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Third', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        # Answer group dict to connect third_state to end_state.
+        third_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_groups)
+        third_state.update_interaction_answer_groups(
+            third_state_answer_groups)
+
+        # The exploration can be completed via third_state. Hence, making
+        # second_state a checkpoint raises a validation error.
+        second_state.card_is_checkpoint = True
+        self._assert_validation_error(
+            self.exploration, 'Cannot make Second a checkpoint as it is '
+            'bypassable'
+        )
+        second_state.card_is_checkpoint = False
+        self.exploration.validate()
+
+        # Exploration to test a checkpoint state when the state in the other
+        # path has no outcome.
+        #       ┌────────────────┐
+        #       │  Introduction* │
+        #       └──┬───────────┬─┘
+        #          │           │
+        #          │           │
+        # ┌────────┴──┐      ┌─┴─────────┐
+        # │  Second*  │      │   Third   │
+        # └────────┬──┘      └───────────┘
+        #          │
+        #        ┌─┴─────────────┐
+        #        │      End      │
+        #        └───────────────┘.
+
+        # Answer group dicts to connect second_state to end_state.
+        second_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        second_state.update_interaction_answer_groups(
+            second_state_answer_groups)
+
+        # Reset the answer group dicts of third_state.
+        third_state.update_interaction_answer_groups([])
+
+        # As second_state is now connected to end_state and third_state has no
+        # outcome, second_state has become non-bypassable.
+        second_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Reset the exploration.
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'End': self.end_state
+        }
+
+        # Exploration to test a bypassable state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └─────┬──────┘
+        #      │            ┌────┴─────┐            │
+        #      │            │    B     │            │
+        #      │            └──┬───────┘            │
+        #      └─────────┐     │                    │
+        #         ┌──────┴─────┴─┐    ┌─────────────┘
+        #         │      D*      │    │
+        #         └─────────────┬┘    │
+        #                       │     │
+        #                    ┌──┴─────┴──┐
+        #                    │    End    │
+        #                    └───────────┘.
+
+        a_state = state_domain.State.create_default_state('A')
+        self.set_interaction_for_state(a_state, 'TextInput')
+        b_state = state_domain.State.create_default_state('B')
+        self.set_interaction_for_state(b_state, 'TextInput')
+        c_state = state_domain.State.create_default_state('C')
+        self.set_interaction_for_state(c_state, 'TextInput')
+        d_state = state_domain.State.create_default_state('D')
+        self.set_interaction_for_state(d_state, 'TextInput')
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state
+        }
+
+        # Answer group dicts to connect init_state to a_state, b_state and
+        # c_state.
+        init_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'A', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'B', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'C', state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_2',
+                                'normalizedStrSet': ['Test2']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        # Answer group dict to connect a_state and b_state to d_state.
+        a_and_b_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        # Answer group dict to connect c_state and d_state to end_state.
+        c_and_d_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+
+        self.init_state.update_interaction_answer_groups(
+            init_state_answer_groups)
+        a_state.update_interaction_answer_groups(
+            a_and_b_state_answer_groups)
+        b_state.update_interaction_answer_groups(
+            a_and_b_state_answer_groups)
+        c_state.update_interaction_answer_groups(
+            c_and_d_state_answer_groups)
+        d_state.update_interaction_answer_groups(
+            c_and_d_state_answer_groups)
+
+        # As a user can complete the exploration by going through c_state,
+        # d_state becomes bypassable. Hence, making d_state a checkpoint raises
+        # validation error.
+        d_state.update_card_is_checkpoint(True)
+        self._assert_validation_error(
+            self.exploration, 'Cannot make D a checkpoint as it is '
+            'bypassable'
+        )
+        d_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+        # Modifying the graph to make D non-bypassable.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬─────┘
+        #      │            ┌────┴─────┐             │
+        #      │            │    B     │             │
+        #      │            └────┬─────┘             │
+        #      │                 │                   │
+        #      │          ┌──────┴───────┐           │
+        #      └──────────┤      D*      ├───────────┘
+        #                 └──────┬───────┘
+        #                        │
+        #                  ┌─────┴─────┐
+        #                  │    End    │
+        #                  └───────────┘.
+
+        # Answer group dict to connect c_state to d_state. Hence, making d_state
+        # non-bypassable.
+        c_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_groups)
+
+        d_state.update_card_is_checkpoint(True)
+        self.exploration.validate()
+
+        # Modifying the graph to add another EndExploration state.
+        #                ┌────────────────┐
+        #                │ Introduction*  │
+        #                └─┬─────┬──────┬─┘
+        # ┌───────────┐    │     │      │     ┌────────────┐
+        # │    A      ├────┘     │      └─────┤      C     │
+        # └────┬──────┘          │            └──────┬───┬─┘
+        #      │            ┌────┴─────┐             │   │
+        #      │            │    B     │             │   │
+        #      │            └────┬─────┘             │   │
+        #      │                 │                   │   │
+        #      │          ┌──────┴───────┐           │   │
+        #      └──────────┤      D*      ├───────────┘   │
+        #                 └──────┬───────┘               │
+        #                        │                       │
+        #                  ┌─────┴─────┐           ┌─────┴─────┐
+        #                  │    End    │           │    End 2  │
+        #                  └───────────┘           └───────────┘.
+
+        new_end_state = state_domain.State.create_default_state('End 2')
+        self.set_interaction_for_state(new_end_state, 'EndExploration')
+        new_end_state.update_interaction_default_outcome(None)
+
+        self.exploration.states = {
+            self.exploration.init_state_name: self.new_state,
+            'A': a_state,
+            'B': b_state,
+            'C': c_state,
+            'D': d_state,
+            'End': self.end_state,
+            'End 2': new_end_state
+        }
+
+        # Answer group dicts to connect c_state to d_state and new_end_state,
+        # making d_state bypassable.
+        c_state_answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'D', state_domain.SubtitledHtml(
+                        'feedback_0', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_0',
+                                'normalizedStrSet': ['Test0']
+                            }
+                        })
+                ],
+                [],
+                None
+            ), state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'End 2', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Contains',
+                        {
+                            'x':
+                            {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test1']
+                            }
+                        })
+                ],
+                [],
+                None
+            )
+        ]
+        c_state.update_interaction_answer_groups(
+            c_state_answer_groups)
+
+        self._assert_validation_error(
+            self.exploration, 'Cannot make D a checkpoint as it is '
+            'bypassable'
+        )
+        d_state.update_card_is_checkpoint(False)
+        self.exploration.validate()
+
+
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
@@ -490,6 +1028,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         init_state.update_interaction_default_outcome(default_outcome)
+        init_state.update_card_is_checkpoint(True)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -526,7 +1065,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         })
 
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
 
         exploration.validate()
 
@@ -540,7 +1083,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         self.set_interaction_for_state(
             init_state, 'TextInput')
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
         answer_group.outcome.dest = exploration.init_state_name
@@ -566,7 +1113,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-            Exception, 'Invalid unicode string set: 15'
+            AssertionError, 'Expected list, received 15'
             ):
             exploration.validate()
 
@@ -578,7 +1125,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_type': 'ErrorContains',
             'inputs': {'x': '{{ExampleParam}}'}
         }
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         old_answer_groups[0]['rule_specs'][0] = temp_rule
 
         self._assert_validation_error(
@@ -685,7 +1236,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.id = 'PencilCodeEditor'
 
         self.set_interaction_for_state(init_state, 'TextInput')
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
             'contentId': 'rule_input_Equals',
@@ -723,7 +1278,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
-        init_state.update_interaction_answer_groups(old_answer_groups)
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+            ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
@@ -736,7 +1295,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Non-terminal interactions must have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'EndExploration')
-        init_state.interaction.answer_groups = answer_groups
+        init_state.interaction.answer_groups = [answer_groups]
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
@@ -749,7 +1308,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         self.set_interaction_for_state(init_state, 'TextInput')
         answer_groups_list = [
-            answer_group.to_dict() for answer_group in answer_groups]
+            state_domain.AnswerGroup.from_dict(answer_group)
+            for answer_group in [answer_groups]
+            ]
         init_state.update_interaction_answer_groups(answer_groups_list)
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
@@ -775,62 +1336,50 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.hints = []
 
         # Validate AnswerGroup.
-        answer_groups_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': 1
-        }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            1
+        )
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         self._assert_validation_error(
             exploration,
             'Expected tagged skill misconception id to be a str, received 1')
-
-        answer_groups_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Contains',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id':
-                'invalid_tagged_skill_misconception_id'
-        }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Contains',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            'invalid_tagged_skill_misconception_id'
+        )
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         self._assert_validation_error(
             exploration,
@@ -853,7 +1402,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.states = {
             exploration.init_state_name: (
                 state_domain.State.create_default_state(
-                    exploration.init_state_name))
+                    exploration.init_state_name, is_initial_state=True))
         }
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name], 'TextInput')
@@ -1284,32 +1833,27 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Adds 1 to content count to exploration (ca_placeholder_0)
         self.set_interaction_for_state(init_state, 'TextInput')
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_5',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_5',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
+        )
         # Adds 1 to content count to exploration (feedback_1).
-        init_state.update_interaction_answer_groups([answer_group_dict])
+        init_state.update_interaction_answer_groups([state_answer_group])
 
         hints_list = [
             state_domain.Hint(
@@ -1656,40 +2200,32 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration.validate()
 
-        param_changes = [{
-            'customization_args': {
+        param_changes = [param_domain.ParamChange(
+            'ParamChange', 'RandomSelector', {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
-            },
-            'name': 'ParamChange',
-            'generator_id': 'RandomSelector'
-        }]
-
-        answer_groups = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': param_changes,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_Equals',
-                        'normalizedStrSet': ['Test']
-                    }
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        exploration.init_state.update_interaction_answer_groups(answer_groups)
+            }
+        )]
+        state_answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name, state_domain.SubtitledHtml(
+                    'feedback_1', 'Feedback'),
+                False, param_changes, None, None),
+            [
+                state_domain.RuleSpec(
+                    'Contains',
+                    {
+                        'x':
+                        {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    })
+            ],
+            [],
+            None
+        )
+        exploration.init_state.update_interaction_answer_groups(
+            [state_answer_group])
         with self.assertRaisesRegexp(
             Exception,
             'The parameter ParamChange was used in an answer group, '
@@ -2586,7 +3122,446 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V47
+    YAML_CONTENT_V48 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 48
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 43
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V49 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 49
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 44
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V50 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 50
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 45
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V50
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
@@ -2717,9 +3692,10 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 50
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -2774,6 +3750,7 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -2794,6 +3771,7 @@ states:
         feedback_1: {}
         solution: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -2808,6 +3786,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -2817,7 +3796,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 42
+states_schema_version: 45
 tags: []
 title: Title
 """)
@@ -2905,6 +3884,7 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -2939,6 +3919,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -2964,9 +3945,10 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 47
+schema_version: 50
 states:
   (untitled state):
+    card_is_checkpoint: true
     classifier_model_id: null
     content:
       content_id: content
@@ -3031,6 +4013,7 @@ states:
         explanation:
           content_id: solution
           html: This is <i>solution</i> for state1
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -3051,6 +4034,7 @@ states:
         feedback_1: {}
         solution: {}
   END:
+    card_is_checkpoint: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3065,6 +4049,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -3074,7 +4059,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 42
+states_schema_version: 45
 tags: []
 title: Title
 """)
@@ -3094,9 +4079,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', title=exp_title, category='Category')
         exploration.add_states([second_state_name])
 
-        def _get_default_state_dict(content_str, dest_name):
+        def _get_default_state_dict(content_str, dest_name, is_init_state):
             """Gets the default state dict of the exploration."""
             return {
+                'linked_skill_id': None,
                 'next_content_id_index': 0,
                 'classifier_model_id': None,
                 'content': {
@@ -3110,6 +4096,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     }
                 },
                 'solicit_answer_details': False,
+                'card_is_checkpoint': is_init_state,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},
@@ -3145,9 +4132,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'states': {
                 feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
                     feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-                    feconf.DEFAULT_INIT_STATE_NAME),
+                    feconf.DEFAULT_INIT_STATE_NAME, True),
                 second_state_name: _get_default_state_dict(
-                    '', second_state_name),
+                    '', second_state_name, False),
             },
             'param_changes': [],
             'param_specs': {},
@@ -3311,70 +4298,63 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             state1.interaction.id, solution_dict)
         state1.update_interaction_solution(solution)
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome1 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': ['ca_choices_0']}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': ['ca_choices_2']}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+        state_answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state1', state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Outcome2 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        }),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 1
+                        })
+                ],
+                [],
+                None),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state3', state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Outcome1 for state2</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': 0
+                        })
+                ],
+                [],
+                None
+            )]
+        state_answer_group_list3 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Outcome for state3</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_0']
+                    }),
+                state_domain.RuleSpec(
+                    'Equals',
+                    {
+                        'x': ['ca_choices_2']
+                    })
+            ],
+            [],
+            None
+        )]
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
 
         expected_html_list = [
             '',
@@ -3404,4 +4384,4 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         actual_outcome_list = exploration.get_all_html_content_strings()
 
-        self.assertEqual(actual_outcome_list, expected_html_list)
+        self.assertEqual(set(actual_outcome_list), set(expected_html_list))

@@ -23,12 +23,12 @@ import {
 import {HTTP_INTERCEPTORS, HttpClient} from '@angular/common/http';
 
 import {
-  MockCsrfTokenService,
   RequestInterceptor
 } from 'services/request-interceptor.service';
+import { CsrfTokenService } from './csrf-token.service';
 
 describe('Request Interceptor Service', () => {
-  let mcts: MockCsrfTokenService = null;
+  let cts: CsrfTokenService = null;
   let httpClient: HttpClient = null;
   let httpTestingController: HttpTestingController = null;
 
@@ -42,14 +42,14 @@ describe('Request Interceptor Service', () => {
       }]
     });
 
-    mcts = TestBed.get(MockCsrfTokenService);
+    cts = TestBed.get(CsrfTokenService);
     httpClient = TestBed.get(HttpClient);
     httpTestingController = TestBed.get(HttpTestingController);
     // This throws "Argument of type 'string[]' is not assignable to parameter
     // of type 'PromiseLike<string>'.". We need to suppress this error because
     // we need to mock the `getTokenAsync` function for testing purposes.
     // @ts-expect-error
-    spyOn(mcts, 'getTokenAsync').and.returnValue(['sample-csrf-token']);
+    spyOn(cts, 'getTokenAsync').and.returnValue(['sample-csrf-token']);
   });
 
   afterEach(() => {
@@ -58,7 +58,7 @@ describe('Request Interceptor Service', () => {
 
   it('should expect request body to be a FormData constructor', () => {
     httpClient.post('/api', {data: 'test'}).subscribe(
-      response => expect(response).toBeTruthy());
+      async(response) => expect(response).toBeTruthy());
 
     let req = httpTestingController.expectOne('/api');
     expect(req.request.method).toEqual('POST');

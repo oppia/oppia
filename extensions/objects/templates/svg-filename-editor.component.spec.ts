@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the svg filename editor.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
@@ -47,6 +50,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
   var $document = angular.element(document);
   $document.find('body').append(mockDocument.outerHTML);
 };
+importAllAngularServices();
 
 describe('SvgFilenameEditor', function() {
   var alertSpy = null;
@@ -59,7 +63,7 @@ describe('SvgFilenameEditor', function() {
   var samplesvg = (
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
-    '"><desc>Created with Fabric.js 3.6.3</desc><defs></defs><rect x="0" y="' +
+    '"><desc>Created with Fabric.js 4.4.0</desc><defs></defs><rect x="0" y="' +
     '0" width="100%" height="100%" fill="rgba(109,106,234,0.937)"/><g transf' +
     'orm="matrix(1 0 0 1 324 91)"><rect style="stroke: rgb(0,0,0); stroke-wi' +
     'dth: 3; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset' +
@@ -602,6 +606,7 @@ describe('SvgFilenameEditor', function() {
 
 describe('SvgFilenameEditor initialized with value attribute',
   function() {
+    importAllAngularServices();
     var svgFilenameCtrl = null;
     var $httpBackend = null;
     var contextService = null;

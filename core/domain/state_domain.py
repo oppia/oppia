@@ -32,6 +32,7 @@ from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rules_registry
+from core.domain import translatable_object_registry
 from extensions.objects.models import objects
 import feconf
 import python_utils
@@ -1028,6 +1029,32 @@ class InteractionCustomizationArg(python_utils.OBJECT):
 
         return cls(ca_value, ca_schema)
 
+    def get_subtitled_unicode(self):
+        """Get all SubtitledUnicode(s) in the customization argument.
+
+        Returns:
+            list(str). A list of SubtitledUnicode.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE],
+            lambda x: x
+        )
+
+    def get_subtitled_html(self):
+        """Get all SubtitledHtml(s) in the customization argument.
+
+        Returns:
+            list(str). A list of SubtitledHtml.
+        """
+        return InteractionCustomizationArg.traverse_by_schema_and_get(
+            self.schema,
+            self.value,
+            [schema_utils.SCHEMA_OBJ_TYPE_SUBTITLED_HTML],
+            lambda x: x
+        )
+
     def get_content_ids(self):
         """Get all content_ids from SubtitledHtml and SubtitledUnicode in the
         customization argument.
@@ -1425,21 +1452,38 @@ class Voiceover(python_utils.OBJECT):
 
 
 class WrittenTranslation(python_utils.OBJECT):
-    """Value object representing a written translation for a content."""
+    """Value object representing a written translation for a content.
+
+    Here, "content" could mean a string or a list of strings. The latter arises,
+    for example, in the case where we are checking for equality of a learner's
+    answer against a given set of strings. In such cases, the number of strings
+    in the translation of the original object may not be the same as the number
+    of strings in the original object.
+    """
 
     DATA_FORMAT_HTML = 'html'
-    DATA_FORMAT_UNICODE = 'unicode'
+    DATA_FORMAT_UNICODE_STRING = 'unicode'
+    DATA_FORMAT_SET_OF_NORMALIZED_STRING = 'set_of_normalized_string'
+    DATA_FORMAT_SET_OF_UNICODE_STRING = 'set_of_unicode_string'
+
+    DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE = {
+        DATA_FORMAT_HTML: 'TranslatableHtml',
+        DATA_FORMAT_UNICODE_STRING: 'TranslatableUnicodeString',
+        DATA_FORMAT_SET_OF_NORMALIZED_STRING: (
+            'TranslatableSetOfNormalizedString'),
+        DATA_FORMAT_SET_OF_UNICODE_STRING: 'TranslatableSetOfUnicodeString',
+    }
 
     def __init__(self, data_format, translation, needs_update):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            data_format: str. 'unicode' or 'html'. Indicates if translation
-                field is html or unicode.
-            translation: str. A piece of user-submitted HTML or unicode. If
-                html, this is cleaned in such a way as to contain a restricted
-                set of HTML tags.
-            needs_update: bool. Whether translation is marked as needing
+            data_format: str. One of the keys in
+                DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE. Indicates the
+                type of the field (html, unicode, etc.).
+            translation: str|list(str). A user-submitted string or list of
+                strings that matches the given data format.
+            needs_update: bool. Whether the translation is marked as needing
                 review.
         """
         self.data_format = data_format
@@ -1476,24 +1520,25 @@ class WrittenTranslation(python_utils.OBJECT):
             written_translation_dict['needs_update'])
 
     def validate(self):
-        """Validates properties of the WrittenTranslation.
+        """Validates properties of the WrittenTranslation, normalizing the
+        translation if needed.
 
         Raises:
             ValidationError. One or more attributes of the WrittenTranslation
                 are invalid.
         """
-        if not isinstance(self.data_format, python_utils.BASESTRING):
+        if self.data_format not in (
+                self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE):
             raise utils.ValidationError(
                 'Invalid data_format: %s' % self.data_format)
 
-        if not (self.data_format == self.DATA_FORMAT_UNICODE or
-                self.data_format == self.DATA_FORMAT_HTML):
-            raise utils.ValidationError(
-                'Invalid data_format: %s' % self.data_format)
-
-        if not isinstance(self.translation, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Invalid translation: %s' % self.translation)
+        translatable_class_name = (
+            self.DATA_FORMAT_TO_TRANSLATABLE_OBJ_TYPE[self.data_format])
+        translatable_obj_class = (
+            translatable_object_registry.Registry.get_object_class(
+                translatable_class_name))
+        self.translation = translatable_obj_class.normalize_value(
+            self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(
@@ -2283,8 +2328,9 @@ class State(python_utils.OBJECT):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, solicit_answer_details,
-            next_content_id_index, classifier_model_id=None):
+            written_translations, solicit_answer_details, card_is_checkpoint,
+            next_content_id_index, linked_skill_id=None,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -2301,8 +2347,12 @@ class State(python_utils.OBJECT):
             solicit_answer_details: bool. Whether the creator wants to ask
                 for answer details from the learner about why they picked a
                 particular answer while playing the exploration.
+            card_is_checkpoint: bool. If the card is marked as a checkpoint by
+                the creator or not.
             next_content_id_index: int. The next content_id index to use for
                 generation of new content_ids.
+            linked_skill_id: str or None. The linked skill ID associated with
+                this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -2321,8 +2371,10 @@ class State(python_utils.OBJECT):
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
+        self.linked_skill_id = linked_skill_id
         self.written_translations = written_translations
         self.solicit_answer_details = solicit_answer_details
+        self.card_is_checkpoint = card_is_checkpoint
         self.next_content_id_index = next_content_id_index
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -2438,8 +2490,21 @@ class State(python_utils.OBJECT):
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
 
+        if not isinstance(self.card_is_checkpoint, bool):
+            raise utils.ValidationError(
+                'Expected card_is_checkpoint to be a boolean, '
+                'received %s' % self.card_is_checkpoint)
+
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
+
+        if self.linked_skill_id is not None:
+            if not isinstance(
+                    self.linked_skill_id,
+                    python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected linked_skill_id to be a str, '
+                    'received %s.' % self.linked_skill_id)
 
     def get_content_html(self, content_id):
         """Returns the content belongs to a given content id of the object.
@@ -2703,6 +2768,14 @@ class State(python_utils.OBJECT):
         """
         self.next_content_id_index = next_content_id_index
 
+    def update_linked_skill_id(self, linked_skill_id):
+        """Update the state linked skill id attribute.
+
+        Args:
+            linked_skill_id: str. The linked skill id to state.
+        """
+        self.linked_skill_id = linked_skill_id
+
     def update_interaction_customization_args(self, customization_args_dict):
         """Update the customization_args of InteractionInstance domain object.
 
@@ -2739,8 +2812,8 @@ class State(python_utils.OBJECT):
         """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
-                AnswerGroup domain object.
+            answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
+                objects.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -2766,21 +2839,17 @@ class State(python_utils.OBJECT):
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
-        for answer_group_dict in answer_groups_list:
-            rule_specs_list = answer_group_dict['rule_specs']
+        for answer_group in answer_groups_list:
+            rule_specs_list = answer_group.rule_specs
             if not isinstance(rule_specs_list, list):
                 raise Exception(
                     'Expected answer group rule specs to be a list, '
                     'received %s' % rule_specs_list)
 
-            answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [],
-                answer_group_dict['training_data'],
-                answer_group_dict['tagged_skill_misconception_id'])
+            answer_group.rule_specs = []
             interaction_answer_groups.append(answer_group)
 
-            for rule_dict in rule_specs_list:
-                rule_spec = RuleSpec.from_dict(rule_dict)
+            for rule_spec in rule_specs_list:
 
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
@@ -2948,6 +3017,19 @@ class State(python_utils.OBJECT):
                 % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
 
+    def update_card_is_checkpoint(self, card_is_checkpoint):
+        """Update the card_is_checkpoint field of a state.
+
+        Args:
+            card_is_checkpoint: bool. The new value of
+                card_is_checkpoint for the state.
+        """
+        if not isinstance(card_is_checkpoint, bool):
+            raise Exception(
+                'Expected card_is_checkpoint to be a boolean, received %s'
+                % card_is_checkpoint)
+        self.card_is_checkpoint = card_is_checkpoint
+
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
@@ -2957,35 +3039,49 @@ class State(python_utils.OBJECT):
 
         Returns:
             dict(str, str). Returns a dict with key as content id and content
-            html as the value.
+            html/unicode as the value.
         """
-        content_id_to_html = {}
+        content_id_to_string = {}
 
-        content_id_to_html[self.content.content_id] = self.content.html
+        content_id_to_string[self.content.content_id] = self.content.html
 
         # TODO(#6178): Remove empty html checks once we add a validation
         # check that ensures each content in state should be non-empty html.
         default_outcome = self.interaction.default_outcome
         if default_outcome is not None and default_outcome.feedback.html != '':
-            content_id_to_html[default_outcome.feedback.content_id] = (
+            content_id_to_string[default_outcome.feedback.content_id] = (
                 default_outcome.feedback.html)
 
         for answer_group in self.interaction.answer_groups:
             if answer_group.outcome.feedback.html != '':
-                content_id_to_html[answer_group.outcome.feedback.content_id] = (
-                    answer_group.outcome.feedback.html)
+                content_id_to_string[
+                    answer_group.outcome.feedback.content_id
+                ] = (answer_group.outcome.feedback.html)
 
         for hint in self.interaction.hints:
             if hint.hint_content.html != '':
-                content_id_to_html[hint.hint_content.content_id] = (
+                content_id_to_string[hint.hint_content.content_id] = (
                     hint.hint_content.html)
 
         solution = self.interaction.solution
         if solution is not None and solution.explanation.html != '':
-            content_id_to_html[solution.explanation.content_id] = (
+            content_id_to_string[solution.explanation.content_id] = (
                 solution.explanation.html)
 
-        return content_id_to_html
+        for ca_dict in self.interaction.customization_args.values():
+            subtitled_htmls = ca_dict.get_subtitled_html()
+            for subtitled_html in subtitled_htmls:
+                if subtitled_html.html != '':
+                    content_id_to_string[subtitled_html.content_id] = (
+                        subtitled_html.html)
+
+            subtitled_unicodes = ca_dict.get_subtitled_unicode()
+            for subtitled_unicode in subtitled_unicodes:
+                if subtitled_unicode.unicode_str != '':
+                    content_id_to_string[subtitled_unicode.content_id] = (
+                        subtitled_unicode.unicode_str)
+
+        return content_id_to_string
 
     def get_content_id_mapping_needing_translations(self, language_code):
         """Returns all text html which can be translated in the given language.
@@ -3001,13 +3097,7 @@ class State(python_utils.OBJECT):
         available_translation_content_ids = (
             self.written_translations
             .get_content_ids_that_are_correctly_translated(language_code))
-
         for content_id in available_translation_content_ids:
-            # Interactions can be translated through editor pages but
-            # _get_all_translatable_content returns contents which are only
-            # translatable through the contributor dashboard page, we are
-            # ignoring the content ids related to interaction translation below
-            # if it doesn't exist in content_id_to_html.
             content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
@@ -3027,9 +3117,11 @@ class State(python_utils.OBJECT):
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
+            'linked_skill_id': self.linked_skill_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
             'solicit_answer_details': self.solicit_answer_details,
+            'card_is_checkpoint': self.card_is_checkpoint,
             'next_content_id_index': self.next_content_id_index
         }
 
@@ -3053,7 +3145,9 @@ class State(python_utils.OBJECT):
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['solicit_answer_details'],
+            state_dict['card_is_checkpoint'],
             state_dict['next_content_id_index'],
+            state_dict['linked_skill_id'],
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -3081,7 +3175,7 @@ class State(python_utils.OBJECT):
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
-            False, 0)
+            False, is_initial_state, 0)
 
     @classmethod
     def convert_html_fields_in_state(

@@ -152,6 +152,7 @@ require('pages/interaction-specs.constants.ajs.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
 
+require('components/on-screen-keyboard/on-screen-keyboard.component');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
@@ -173,6 +174,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'FocusManagerService', 'GraphDataService',
     'LoaderService', 'PageTitleService', 'ParamChangesObjectFactory',
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
+    'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
     'ThreadDataBackendApiService', 'UrlInterpolationService',
@@ -195,6 +197,7 @@ angular.module('oppia').component('explorationEditorPage', {
         FocusManagerService, GraphDataService,
         LoaderService, PageTitleService, ParamChangesObjectFactory,
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
+        StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
         ThreadDataBackendApiService, UrlInterpolationService,
@@ -230,7 +233,7 @@ angular.module('oppia').component('explorationEditorPage', {
       // Called on page load.
       ctrl.initExplorationPage = () => {
         return $q.all([
-          ExplorationDataService.getData((explorationId, lostChanges) => {
+          ExplorationDataService.getDataAsync((explorationId, lostChanges) => {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
@@ -241,11 +244,14 @@ angular.module('oppia').component('explorationEditorPage', {
           ThreadDataBackendApiService.getOpenThreadsCountAsync()
         ]).then(async([explorationData, featuresData, openThreadsCount]) => {
           if (explorationData.exploration_is_linked_to_story) {
+            ctrl.explorationIsLinkedToStory = true;
             ContextService.setExplorationIsLinkedToStory();
           }
 
           ExplorationFeaturesService.init(explorationData, featuresData);
 
+          StateClassifierMappingService.init(
+            ContextService.getExplorationId(), explorationData.version);
           ExplorationStatesService.init(explorationData.states);
 
           ExplorationTitleService.init(explorationData.title);

@@ -38,12 +38,6 @@ STATUS_CHOICES = [
     STATUS_REJECTED
 ]
 
-# The types of suggestions that are offered on the Contributor Dashboard.
-CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
-    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-    feconf.SUGGESTION_TYPE_ADD_QUESTION
-]
-
 # Daily emails are sent to reviewers to notify them of suggestions on the
 # Contributor Dashboard to review. The constants below define the number of
 # question and translation suggestions to fetch to come up with these daily
@@ -157,6 +151,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
     language_code = datastore_services.StringProperty(indexed=True)
+    # A flag that indicates whether the suggestion is edited by the reviewer.
+    edited_by_reviewer = datastore_services.BooleanProperty(
+        default=False, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -188,7 +185,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
             'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'language_code': base_models.EXPORT_POLICY.EXPORTED,
+            'edited_by_reviewer': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -271,13 +269,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+    def get_translation_suggestions_in_review_with_exp_id(
+            cls, exp_id, language_code):
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
         Args:
             exp_id: str. Exploration ID matching the target ID of the
                 translation suggestions.
+            language_code: str. Language code.
 
         Returns:
             list(SuggestionModel). A list of translation suggestions in review
@@ -287,6 +287,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.language_code == language_code)
             .filter(
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id == exp_id)
@@ -315,11 +316,14 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.target_id.IN(exp_ids))
         )
         suggestion_models = []
-        cursor, more = (None, True)
+        offset, more = (0, True)
         while more:
-            results, cursor, more = query.fetch_page(
-                feconf.DEFAULT_QUERY_LIMIT, start_cursor=cursor)
-            suggestion_models.extend(results)
+            results = query.fetch(feconf.DEFAULT_QUERY_LIMIT, offset=offset)
+            if len(results):
+                offset = offset + len(results)
+                suggestion_models.extend(results)
+            else:
+                more = False
         return [suggestion_model.id for suggestion_model in suggestion_models]
 
     @classmethod
@@ -354,7 +358,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             Exception. If there are no suggestion types offered on the
                 Contributor Dashboard.
         """
-        if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
+        if not feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
             raise Exception(
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.')
@@ -366,7 +370,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             .filter(cls.status == STATUS_IN_REVIEW)
             .filter(cls.last_updated < threshold_time)
             .filter(cls.suggestion_type.IN(
-                CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
             .order(cls.last_updated)
             .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
@@ -514,7 +518,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     suggestion_model
                     .target_version_at_submission),
                 'status': suggestion_model.status,
-                'change_cmd': suggestion_model.change_cmd
+                'change_cmd': suggestion_model.change_cmd,
+                'language_code': suggestion_model.language_code,
+                'edited_by_reviewer': suggestion_model.edited_by_reviewer
             }
 
         return user_data

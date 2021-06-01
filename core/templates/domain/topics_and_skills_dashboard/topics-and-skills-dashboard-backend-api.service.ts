@@ -31,9 +31,8 @@ import {
 } from 'domain/skill/augmented-skill-summary.model';
 import {
   ShortSkillSummary,
-  ShortSkillSummaryBackendDict,
-  ShortSkillSummaryObjectFactory
-} from 'domain/skill/ShortSkillSummaryObjectFactory';
+  ShortSkillSummaryBackendDict
+} from 'domain/skill/short-skill-summary.model';
 import { SkillSummary, SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardDomainConstants } from
@@ -62,7 +61,7 @@ export interface CategorizedSkills {
   };
 }
 
-interface TopicsAndSkillsDashboardDataBackendDict {
+export interface TopicsAndSkillsDashboardDataBackendDict {
   'all_classroom_names': string[];
   'untriaged_skill_summary_dicts': SkillSummaryBackendDict[];
   'mergeable_skill_summary_dicts': SkillSummaryBackendDict[];
@@ -75,7 +74,7 @@ interface TopicsAndSkillsDashboardDataBackendDict {
   'categorized_skills_dict': CategorizedSkillsBackendDict;
 }
 
-interface TopicsAndSkillDashboardData {
+export interface TopicsAndSkillDashboardData {
   allClassroomNames: string[];
   canDeleteTopic: boolean;
   canCreateTopic: boolean;
@@ -111,7 +110,6 @@ interface AssignedSkillDataBackendDict {
 export class TopicsAndSkillsDashboardBackendApiService {
   constructor(
     private http: HttpClient,
-    private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
     private urlInterpolationService: UrlInterpolationService) {}
 
   private _topicsAndSkillsDashboardReinitializedEventEmitter =
@@ -127,7 +125,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
         for (let subtopic in subtopicSkillsDict) {
           subtopicSkills[subtopic] = (
             subtopicSkillsDict[subtopic].map(
-              backendDict => this.shortSkillSummaryObjectFactory
+              backendDict => ShortSkillSummary
                 .createFromBackendDict(backendDict)));
         }
         categorizedSkills[topic] = subtopicSkills;

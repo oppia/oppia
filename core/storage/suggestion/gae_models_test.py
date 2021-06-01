@@ -336,7 +336,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_in_review_with_exp_id('exp1'))
+            .get_translation_suggestions_in_review_with_exp_id(
+                'exp1', self.translation_language_code))
 
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(suggestions[0].target_id, 'exp1')
@@ -358,7 +359,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self):
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_in_review_with_exp_id('invalid_exp'))
+            .get_translation_suggestions_in_review_with_exp_id(
+                'invalid_exp', 'hi'))
         self.assertEqual(len(suggestions), 0)
 
     def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
@@ -397,7 +399,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1):
             suggestions = (
                 suggestion_models.GeneralSuggestionModel
-                .get_translation_suggestions_in_review_with_exp_id('exp1'))
+                .get_translation_suggestions_in_review_with_exp_id(
+                    'exp1', self.translation_language_code))
 
         self.assertEqual(len(suggestions), 1)
 
@@ -420,7 +423,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_in_review_with_exp_id('exp1'))
+            .get_translation_suggestions_in_review_with_exp_id(
+                'exp1', self.translation_language_code))
 
         self.assertEqual(len(suggestions), 0)
 
@@ -443,7 +447,24 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         suggestions = (
             suggestion_models.GeneralSuggestionModel
-            .get_translation_suggestions_in_review_with_exp_id('exp1'))
+            .get_translation_suggestions_in_review_with_exp_id(
+                'exp1', self.translation_language_code))
+
+        self.assertEqual(len(suggestions), 0)
+
+    def test_get_exp_translation_suggestions_in_review_for_different_language_code_returns_no_items( # pylint: disable=line-too-long
+            self):
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7', 'hi')
+
+        suggestions = (
+            suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_in_review_with_exp_id('exp1', 'pt'))
 
         self.assertEqual(len(suggestions), 0)
 
@@ -526,7 +547,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
             self):
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
             with self.assertRaisesRegexp(
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
@@ -550,7 +571,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
-            suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types):
             with self.swap(
                 suggestion_models,
@@ -1026,7 +1047,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         test_export_change_cmd = self.change_cmd
         test_export_score_category = 'category1'
         test_export_thread_id = 'exploration.exp1.thread_export'
-        test_export_language_code = None
+        test_export_language_code = 'en'
+        test_export_edited_by_reviewer = False
 
         suggestion_models.GeneralSuggestionModel.create(
             test_export_suggestion_type,
@@ -1053,8 +1075,11 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'target_id': test_export_target_id,
                 'target_version_at_submission': test_export_target_version,
                 'status': test_export_status,
-                'change_cmd': test_export_change_cmd
-            }
+                'change_cmd': test_export_change_cmd,
+                'language_code': test_export_language_code,
+                'edited_by_reviewer': test_export_edited_by_reviewer
+            },
+
         }
 
         self.assertEqual(user_data, test_data)

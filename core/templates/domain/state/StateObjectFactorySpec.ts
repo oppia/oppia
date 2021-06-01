@@ -65,6 +65,7 @@ describe('State Object Factory', () => {
         hints: [],
         solution: null
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       recorded_voiceovers: {
@@ -74,6 +75,7 @@ describe('State Object Factory', () => {
         }
       },
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {
           content: {},
@@ -125,9 +127,11 @@ describe('State Object Factory', () => {
         solution: null,
         id: 'TextInput'
       },
+      linked_skill_id: null,
       next_content_id_index: 0,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: false,
       written_translations: {
         translations_mapping: {
           content: {},
@@ -198,18 +202,19 @@ describe('State Object Factory', () => {
     state.interaction.id = null;
     expect(
       state.getRequiredWrittenTranslationContentIds()
-    ).toEqual(new Set(['content']));
+    ).toEqual(new Set(['content', 'rule_input_2']));
 
     state.writtenTranslations.addContentId('feedback_1');
     state.writtenTranslations.addWrittenTranslation(
       'feedback_1', 'fr', 'html', '<p>Translation</p>');
     expect(
       state.getRequiredWrittenTranslationContentIds()
-    ).toEqual(new Set(['content', 'feedback_1']));
+    ).toEqual(new Set(['content', 'rule_input_2', 'feedback_1']));
 
     state.interaction.id = 'TextInput';
     expect(
       state.getRequiredWrittenTranslationContentIds()
-    ).toEqual(new Set(['content', 'feedback_1', 'hint_1', 'default_outcome']));
+    ).toEqual(new Set([
+      'content', 'rule_input_2', 'feedback_1', 'hint_1', 'default_outcome']));
   });
 });

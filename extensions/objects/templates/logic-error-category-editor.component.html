@@ -1,0 +1,7 @@
+<select class="form-control" [(ngModel)]="category">
+  <option *ngFor="let c of errorCategories"
+          [value]="c.name"
+          [attr.selected]="c.name === category">
+    {{ c.humanReadable }}
+  </option>
+</select>

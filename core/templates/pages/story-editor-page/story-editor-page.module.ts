@@ -27,6 +27,11 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { StoryEditorNavbarComponent } from './navbar/story-editor-navbar.component';
+import { StoryEditorNavbarBreadcrumbComponent } from './navbar/story-editor-navbar-breadcrumb.component';
+import { StorySavePendingChangesModalComponent } from './modal-templates/story-save-pending-changes-modal.component';
+import { StoryEditorSaveModalComponent } from './modal-templates/story-editor-save-modal.component';
+import { StoryPreviewTabComponent } from './story-preview-tab/story-preview-tab.component';
 
 @NgModule({
   imports: [
@@ -35,10 +40,20 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
+    StoryEditorNavbarComponent,
+    StoryPreviewTabComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    StoryEditorNavbarBreadcrumbComponent,
+    StorySavePendingChangesModalComponent,
+    StoryEditorSaveModalComponent,
+    StoryEditorNavbarComponent,
+    StoryPreviewTabComponent
   ],
   providers: [
     {
@@ -62,11 +77,11 @@ class StoryEditorPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(StoryEditorPageModule);
 };
-const downgradedModule = downgradeModule(bootstrapFn);
+const downgradedModule = downgradeModule(bootstrapFnAsync);
 
 declare var angular: ng.IAngularStatic;
 
