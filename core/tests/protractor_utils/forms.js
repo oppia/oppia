@@ -24,6 +24,7 @@ var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -304,6 +305,7 @@ var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: async function(text) {
       await elem.element(by.css('.select2-container')).click();
+      await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
@@ -442,6 +444,7 @@ var MultiSelectEditor = function(elem) {
 //   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(elem, 'RTE taking too long to become visible');
     // TODO(#9821): Find a better way to parse through the tags rather than
     // using xpath.
     // We select all top-level non-paragraph elements, as well as all children

@@ -21,10 +21,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import feconf
 from jobs import job_utils
+from jobs.types import job_run_result
 import python_utils
 
 
-class BaseAuditError(python_utils.OBJECT):
+class BaseAuditError(job_run_result.JobRunResult):
     """Base class for model audit errors.
 
     NOTE: Apache Beam will use pickle to serialize/deserialize class instances.
@@ -49,6 +50,7 @@ class BaseAuditError(python_utils.OBJECT):
         else:
             model_id = job_utils.get_model_id(model_or_kind)
             model_kind = job_utils.get_model_kind(model_or_kind)
+        super(BaseAuditError, self).__init__(stdout=None, stderr=None)
         # At first, self._message is a tuple of model identifiers that will be
         # used to annotate the _actual_ message provided by subclasses.
         self._message = (model_kind, model_id)
@@ -60,6 +62,27 @@ class BaseAuditError(python_utils.OBJECT):
     def __setstate__(self, message):
         """Called by pickle to build an instance from __getstate__'s value."""
         self._message = message
+
+    @property
+    def stdout(self):
+        """Returns an empty string.
+
+        Returns:
+            str. An empty string.
+        """
+        return ''
+
+    @property
+    def stderr(self):
+        """Returns the error message, which includes the erroneous model's id.
+
+        Returns:
+            str. The error message.
+
+        Raises:
+            NotImplementedError. When self.message was never assigned a value.
+        """
+        return self.message
 
     @property
     def message(self):
@@ -131,6 +154,16 @@ class InvalidCommitStatusError(BaseAuditError):
         super(InvalidCommitStatusError, self).__init__(model)
         self.message = (
             'post_commit_status is %s' % model.post_commit_status)
+
+
+class InvalidPublicCommitStatusError(BaseAuditError):
+    """Error class for commit models with inconsistent public status values."""
+
+    def __init__(self, model):
+        super(InvalidPublicCommitStatusError, self).__init__(model)
+        self.message = (
+            'post_commit_status="%s" but post_commit_community_owned=%s' % (
+                model.post_commit_status, model.post_commit_community_owned))
 
 
 class InvalidPrivateCommitStatusError(BaseAuditError):
@@ -213,3 +246,25 @@ class ModelRelationshipError(BaseAuditError):
             'but no such model exists' % (
                 id_property, python_utils.convert_to_bytes(target_id),
                 target_kind))
+
+
+class CommitCmdsNoneError(BaseAuditError):
+    """Error class for None Commit Cmds."""
+
+    def __init__(self, model):
+        super(CommitCmdsNoneError, self).__init__(model)
+        self.message = (
+            'No commit command domain object '
+            'defined for entity with commands: %s' % (
+                model.commit_cmds))
+
+
+class CommitCmdsValidateError(BaseAuditError):
+    """Error class for wrong commit cmmds."""
+
+    def __init__(self, model, commit_cmd_dict, e):
+        super(CommitCmdsValidateError, self).__init__(model)
+        self.message = (
+            'Commit command domain validation for '
+            'command: %s failed with error: %s' % (
+                commit_cmd_dict, e))

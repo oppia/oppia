@@ -95,7 +95,7 @@
         "excludedForTesting.js"
       ],
       "rules": {
-        "oppia/e2e-action": "error",
+        "oppia/e2e-action": "error"
       }
     },
     {
@@ -106,7 +106,7 @@
         "core/tests/protractor_desktop/*.js"
       ],
       "rules": {
-        "oppia/protractor-practices": "error",
+        "oppia/protractor-practices": "error"
       }
     },
     {
@@ -177,7 +177,7 @@
     "dot-notation": [
       "error",
       {
-        "allowKeywords": false
+        "allowKeywords": true
       }
     ],
     "eol-last":[

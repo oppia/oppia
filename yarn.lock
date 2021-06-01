@@ -39,6 +39,13 @@
   dependencies:
     tslib "^2.0.0"
 
+"@angular/elements@10.2.2":
+  version "10.2.2"
+  resolved "https://registry.yarnpkg.com/@angular/elements/-/elements-10.2.2.tgz#1a4a24089049b36eb5cacf74d760b74869fc47a5"
+  integrity sha512-hRoajhy9qNI+Rw4fxpVr6WKOoDQUJKzFPckcA+fnkQ4WJL7EH51Oip2b/JQive5vUCd1qort8wwXITnS4CX5Tw==
+  dependencies:
+    tslib "^2.0.0"
+
 "@angular/fire@^6.1.0":
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/@angular/fire/-/fire-6.1.4.tgz#d3923a68336d7177abbb2676731d0aef566b9739"
@@ -86,6 +93,14 @@
   resolved "https://registry.yarnpkg.com/@angular/upgrade/-/upgrade-10.2.5.tgz#187204eced5b56b3489f46ee88e3efa1426fe789"
   integrity sha512-mQXH7NryXrQ0M7oojoBMl4ORIgxKxGCUHebHG1AN+To2uhXJgAvW0jtk4Tm4tgCXgKQUMS9fXSdXQwWSDI/SKQ==
   dependencies:
+    tslib "^2.0.0"
+
+"@angular/youtube-player@^10.2.2":
+  version "10.2.7"
+  resolved "https://registry.yarnpkg.com/@angular/youtube-player/-/youtube-player-10.2.7.tgz#9f8c5178bdbc656ede82ea62d26537c6dc3cb615"
+  integrity sha512-4NVX/tmwNWFW4G8Y+bZaehKO3GTCniy+HYijctNY8+jsxI5h9RsfHWkRAfX8oPp2KmBJ906//BCTIRqrT+CgUQ==
+  dependencies:
+    "@types/youtube" "^0.0.38"
     tslib "^2.0.0"
 
 "@apidevtools/json-schema-ref-parser@^9.0.3":
@@ -1024,7 +1039,7 @@
   resolved "https://registry.yarnpkg.com/@types/ckeditor/-/ckeditor-4.9.10.tgz#f4d252821c52c2b903b21801c8469ead756122b3"
   integrity sha512-dcOPCXM0Cr5Z0i6eF/aW5LvECrS+cdl2Gi7lU+rEUNWby0w9Yl6mBubjrs29OVAducpuZjB4mfDayE+o4/gGdQ==
 
-"@types/codemirror@0.0.99", "@types/codemirror@^0.0.99":
+"@types/codemirror@^0.0.99":
   version "0.0.99"
   resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.99.tgz#fc3fd1fe84172e76ab802dcaa309f9c9740aeab0"
   integrity sha512-iSNLwL9ZXUDUhhljqyO9lDpxKOnye9Y2IY0vvoarapI3QLpZsx8RF8Ybic4+gne+DVsnc5ReBOQA3p4FVbsXMw==
@@ -1297,6 +1312,11 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/google-protobuf@^3.7.4":
+  version "3.15.2"
+  resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.2.tgz#70753e948cabeb416d71299dc35c3f562a10fb0f"
+  integrity sha512-ubeqvw7sl6CdgeiIilsXB2jIFoD/D0F+/LIEp7xEBEXRNtDJcf05FRINybsJtL7GlkWOUVn6gJs2W9OF+xI6lg==
+
 "@types/google.visualization@^0.0.55":
   version "0.0.55"
   resolved "https://registry.yarnpkg.com/@types/google.visualization/-/google.visualization-0.0.55.tgz#58ad73cdaf268b65ffd84b93442fa5988dc0887c"
@@ -1306,6 +1326,11 @@
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/@types/gtag.js/-/gtag.js-0.0.4.tgz#81427d703b5a889b4fd1c37eaae6f2a6db228e5a"
   integrity sha512-rn4yaEfryXklAtsiai4xHNUgLjGD8AEPQBNSCTa5QrvccFYYBWJQRGwaHiv2U/wdIzcjOuyyBC23YgdQfq5u/Q==
+
+"@types/howler@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@types/howler/-/howler-2.2.2.tgz#54f621983c3635e2e071a95644ba28eea84814c2"
+  integrity sha512-/znab/CjipQ25epk7YcsoEsR96rB77Y/fCLMaNtIzV5oPeUeilc7dYGyMjYi+OQklkllADLM+jGZRSt3d6lhiA==
 
 "@types/html-minifier-terser@^5.0.0":
   version "5.1.1"
@@ -1517,6 +1542,11 @@
   integrity sha512-A1b8SU4D10uoPjwb0lnHmmu8wZhR9d+9o2PKBQT2jU5YPTKsxac6M2qGAdY7VcL+dHHhARVUDmeg0rOrcd9EjA==
   dependencies:
     "@types/node" "*"
+
+"@types/youtube@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/youtube/-/youtube-0.0.38.tgz#04aa5efa61f4d52e9cf682575a9dfed58f31e8c1"
+  integrity sha512-rS0nLlnnZIvOfBNT4957rkKRMHjHxutoVhSEzowocYgNiTMVBmN+Hbkf/L3TeGMMtts9uKZ9gw7O2JLHREVnIw==
 
 "@typescript-eslint/eslint-plugin@^4.0.0":
   version "4.22.0"
@@ -6377,6 +6407,11 @@ google-p12-pem@^3.0.3:
   dependencies:
     node-forge "^0.10.0"
 
+google-protobuf@^3.13.0:
+  version "3.16.0"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.16.0.tgz#87c61829a8aec7d9244dcbed9464e1d0fcbed8ae"
+  integrity sha512-gBY66yYL1wbQMU2r1POkXSXkm035Ni0wFv3vx0K9IEUsJLP9G5rAcFVn0xUXfZneRu6MmDjaw93pt/DE56VOyw==
+
 got@^9.6.0:
   version "9.6.0"
   resolved "https://registry.yarnpkg.com/got/-/got-9.6.0.tgz#edf45e7d67f99545705de1f7bbeeeb121765ed85"
@@ -6593,6 +6628,11 @@ hosted-git-info@^4.0.1:
   integrity sha512-c9OGXbZ3guC/xOlCg1Ci/VgWlwsqDv1yMQL1CWqXDL0hDjXuNcq0zuR4xqPSuasI3kqFDhqSyTjREz5gzq0fXg==
   dependencies:
     lru-cache "^6.0.0"
+
+howler@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/howler/-/howler-2.2.1.tgz#a521a9b495841e8bb9aa12e651bebba0affc179e"
+  integrity sha512-0iIXvuBO/81CcrQ/HSSweYmbT50fT2mIc9XMFb+kxIfk2pW/iKzDbX1n3fZmDXMEIpYvyyfrB+gXwPYSDqUxIQ==
 
 html-dnd@^1.2.1:
   version "1.2.1"
@@ -10510,6 +10550,11 @@ protobufjs@^6.10.0, protobufjs@^6.10.2, protobufjs@^6.8.6:
     "@types/node" ">=13.7.0"
     long "^4.0.0"
 
+protoc-gen-ts@^0.3.4:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/protoc-gen-ts/-/protoc-gen-ts-0.3.5.tgz#81057f55d048c8cf7d305aa8a253d4a50292a1cd"
+  integrity sha512-Q/jVJ5QUUzgwin7b/aoN+MCyOQnM/p3BEnBytkxuhl5orbf0Zs7rjd4NTmpuPcoHrx4mhmTXYOXc23cMhDKdnw==
+
 protractor-jasmine2-screenshot-reporter@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/protractor-jasmine2-screenshot-reporter/-/protractor-jasmine2-screenshot-reporter-0.5.0.tgz#d7c99f599adbc9d22cf7fc784996e9b63cd6ce41"
@@ -10569,6 +10614,11 @@ proxy-from-env@^1.0.0, proxy-from-env@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
+
+proxy-polyfill@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/proxy-polyfill/-/proxy-polyfill-0.3.2.tgz#55f190054a3044e105d9de16e23719e1e9be0898"
+  integrity sha512-ENKSXOMCewnQTOyqrQXxEjIhzT6dy572mtehiItbDoIUF5Sv5UkmRUc8kowg2MFvr232Uo8rwRpNg3V5kgTKbA==
 
 prr@~1.0.1:
   version "1.0.1"

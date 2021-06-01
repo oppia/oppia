@@ -1322,6 +1322,7 @@ states:
         explanation:
           content_id: solution
           html: <p>hello_world is a string</p>
+    linked_skill_id: null
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -1390,6 +1391,7 @@ states:
       hints: []
       id: null
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -1748,92 +1750,68 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         ]
         state2.update_interaction_hints(hint_list2)
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': (
+        state_answer_group_list2 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
                         ' alt-with-value="&amp;quot;&amp;quot;">'
                         '</oppia-noninteractive-image>')
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection</p>'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image>')
-                ]}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+                    ), False, [], None, None), [
+                        state_domain.RuleSpec('Equals', {'x': 0}),
+                        state_domain.RuleSpec('Equals', {'x': 1})
+                    ], [], None
+        ), state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state3', state_domain.SubtitledHtml(
+                    'feedback_2', '<p>Outcome2 for state2</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec('Equals', {'x': 0})
+            ],
+            [],
+            None
+        )]
+        state_answer_group_list3 = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state1', state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Outcome for state3</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x':
+                        [(
+                            '<p>This is value1 for ItemSelection</p>'
+                            '<oppia-noninteractive-image filepath-with-'
+                            'value='
+                            '"&amp;quot;s3Choice1.png&amp;quot;"'
+                            ' caption-with-value="&amp;quot;&amp;quot;" '
+                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            '</oppia-noninteractive-image>')
+                        ]}),
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x':
+                        [(
+                            '<p>This is value3 for ItemSelection</p>'
+                            '<oppia-noninteractive-image filepath-with-'
+                            'value='
+                            '"&amp;quot;s3Choice3.png&amp;quot;"'
+                            ' caption-with-value="&amp;quot;&amp;quot;" '
+                            'alt-with-value="&amp;quot;&amp;quot;">'
+                            '</oppia-noninteractive-image>')
+                        ]})
+            ],
+            [],
+            None
+        )]
+
+        state2.update_interaction_answer_groups(state_answer_group_list2)
+        state3.update_interaction_answer_groups(state_answer_group_list3)
 
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))
@@ -1890,6 +1868,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1931,6 +1910,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -1995,6 +1975,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -2036,6 +2017,7 @@ states:
       hints: []
       id: TextInput
       solution: null
+    linked_skill_id: null
     next_content_id_index: 1
     param_changes: []
     recorded_voiceovers:
@@ -2319,6 +2301,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2364,6 +2347,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2410,6 +2394,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -2733,9 +2718,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         }]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            r'The parameter name \'all\' is reserved. Please choose '
-            'a different name for the parameter being set in'
-        ):
+            re.escape(
+                'The parameter name \'all\' is reserved. Please choose '
+                'a different name for the parameter being set in')):
             exp_services.update_exploration(
                 self.owner_id,
                 self.EXP_0_ID,
@@ -3075,6 +3060,29 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
+
+    def test_update_linked_skill_id(self):
+        """Test updating linked_skill_id."""
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.init_state.linked_skill_id, None)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State1',
+            })], 'Add state name')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].linked_skill_id, None)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, _get_change_list(
+                'State1',
+                exp_domain.STATE_PROPERTY_LINKED_SKILL_ID,
+                'string_1'),
+            '')
+        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        self.assertEqual(
+            exploration.states['State1'].linked_skill_id, 'string_1')
 
     def test_update_card_is_checkpoint(self):
         """Test updating of card_is_checkpoint."""
@@ -4321,6 +4329,7 @@ states:
       hints: []
       id: EndExploration
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:
@@ -4355,6 +4364,7 @@ states:
       hints: []
       id: Continue
       solution: null
+    linked_skill_id: null
     next_content_id_index: 0
     param_changes: []
     recorded_voiceovers:

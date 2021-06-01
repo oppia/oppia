@@ -50,14 +50,8 @@ interface UserRolesBackendResponse {
   [role: string]: string;
 }
 
-interface RoleGraphDataBackendResponse {
-  nodes: {
-    [role: string]: string;
-  };
-  links: {
-    target: string;
-    source: string;
-  }[];
+interface RoleToActionsBackendResponse {
+  [role: string]: string[];
 }
 
 interface ConfigPropertiesBackendResponse {
@@ -150,7 +144,7 @@ export interface AdminPageDataBackendDict {
   'human_readable_current_time': string;
   'audit_job_status_summaries': JobStatusSummaryBackendDict[];
   'updatable_roles': UserRolesBackendResponse;
-  'role_graph_data': RoleGraphDataBackendResponse;
+  'role_to_actions': RoleToActionsBackendResponse;
   'config_properties': ConfigPropertiesBackendResponse;
   'viewable_roles': UserRolesBackendResponse;
   'unfinished_job_data': JobDataBackendDict[];
@@ -168,7 +162,7 @@ export interface AdminPageData {
   humanReadableCurrentTime: string;
   auditJobStatusSummaries: JobStatusSummary[];
   updatableRoles: UserRolesBackendResponse;
-  roleGraphData: RoleGraphDataBackendResponse;
+  roleToActions: RoleToActionsBackendResponse;
   configProperties: ConfigPropertiesBackendResponse;
   viewableRoles: UserRolesBackendResponse;
   unfinishedJobData: Job[];
@@ -200,7 +194,7 @@ export class AdminBackendApiService {
           auditJobStatusSummaries: response.audit_job_status_summaries.map(
             JobStatusSummary.createFromBackendDict),
           updatableRoles: response.updatable_roles,
-          roleGraphData: response.role_graph_data,
+          roleToActions: response.role_to_actions,
           configProperties: response.config_properties,
           viewableRoles: response.viewable_roles,
           unfinishedJobData: response.unfinished_job_data.map(
@@ -222,15 +216,15 @@ export class AdminBackendApiService {
     });
   }
 
-  private _postRequestAsync(
+  private async _postRequestAsync(
       handlerUrl: string, payload?: Object, action?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<void>(
         handlerUrl, { action, ...payload }).toPromise()
         .then(response => {
           resolve(response);
-        }, errorResonse => {
-          reject(errorResonse.error.error);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
         });
     });
   }
@@ -501,7 +495,7 @@ export class AdminBackendApiService {
   }
 
   async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http['delete']<void>(
+    return this.http.delete<void>(
       AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
         params: {username},
       }
@@ -526,7 +520,6 @@ export class AdminBackendApiService {
 
   async deleteUserAsync(userId: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(
         AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {
           params: {

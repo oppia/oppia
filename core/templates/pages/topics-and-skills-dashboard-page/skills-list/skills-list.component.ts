@@ -36,8 +36,8 @@ import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.componen
 import { TopicAssignmentsSummary, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 
 export interface SkillsCategorizedByTopics {
-  [key: string]: {
-    [key: string]: ShortSkillSummary[]
+  [topicName: string]: {
+    [subtopicName: string]: ShortSkillSummary[]
   }
 }
 
@@ -77,7 +77,7 @@ export class SkillsListComponent {
   ) {}
 
   getSkillEditorUrl(skillId: string): string {
-    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
+    let SKILL_EDITOR_URL_TEMPLATE: string = '/skill_editor/<skill_id>#/';
     return this.urlInterpolationService.interpolateUrl(
       SKILL_EDITOR_URL_TEMPLATE, {
         skill_id: skillId
@@ -95,7 +95,7 @@ export class SkillsListComponent {
     modalRef.componentInstance.skillId = skillId;
 
     modalRef.result.then(() => {
-      this.skillBackendApiService.deleteSkill(skillId).then(
+      this.skillBackendApiService.deleteSkillAsync(skillId).then(
         () => {
           setTimeout(() => {
             this.topicsAndSkillsDashboardBackendApiService.
@@ -104,7 +104,7 @@ export class SkillsListComponent {
             this.alertsService.addSuccessMessage(successToast, 1000);
           }, 100);
         }
-      )['catch']((errorMessage: string) => {
+      ).catch((errorMessage: string) => {
         let errorToast: string = null;
         // This error is thrown as part of a final validation check in
         // the backend, hence the message does not include instructions
@@ -153,7 +153,7 @@ export class SkillsListComponent {
             uncategorized_skill_id: skillId
           });
 
-          this.editableTopicBackendApiService.updateTopic(
+          this.editableTopicBackendApiService.updateTopicAsync(
             topicsToUnassign[topic].topicId,
             topicsToUnassign[topic].topicVersion,
             `Unassigned skill with id ${skillId} from the topic.`,
@@ -195,7 +195,7 @@ export class SkillsListComponent {
       for (let i = 0; i < topicIds.length; i++) {
         for (let j = 0; j < topicSummaries.length; j++) {
           if (topicSummaries[j].id === topicIds[i]) {
-            this.editableTopicBackendApiService.updateTopic(
+            this.editableTopicBackendApiService.updateTopicAsync(
               topicIds[i], topicSummaries[j].version,
               'Added skill with id ' + skillId + ' to topic.',
               changeList

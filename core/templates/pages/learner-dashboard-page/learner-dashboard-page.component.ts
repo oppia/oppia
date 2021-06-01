@@ -266,7 +266,6 @@ export class LearnerDashboardPageComponent implements OnInit {
         // So that focus is applied after the loading screen has dissapeared.
         this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
       }, 0);
-    // eslint-disable-next-line dot-notation
     }).catch(errorResponse => {
       // This is placed here in order to satisfy Unit tests.
     });
@@ -540,7 +539,7 @@ export class LearnerDashboardPageComponent implements OnInit {
   openRemoveActivityModal(
       sectionNameI18nId: string, subsectionName: string,
       activity: LearnerExplorationSummary | CollectionSummary): void {
-    this.learnerDashboardActivityBackendApiService.removeActivityModal(
+    this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
       sectionNameI18nId, subsectionName,
       activity.id, activity.title)
       .then(() => {
