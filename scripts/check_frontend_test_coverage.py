@@ -238,7 +238,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'remove-duplicates-in-array.pipe.ts',
     'request-interceptor.service.ts',
     'response-header.directive.ts',
-    'review-material-editor.directive.ts',
+    'review-material-editor.component.ts',
     'role-graph.directive.ts',
     'rubrics-editor.directive.ts',
     'rule-editor.directive.ts',
@@ -275,7 +275,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'skill-editor-navbar-breadcrumb.component.ts',
     'skill-editor-navbar.directive.ts',
     'skill-editor-state.service.ts',
-    'skill-misconceptions-editor.directive.ts',
+    'skill-misconceptions-editor.component.ts',
     'skill-prerequisite-skills-editor.directive.ts',
     'skill-questions-tab.directive.ts',
     'skill-rubrics-editor.directive.ts',
@@ -349,7 +349,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'version-tree.service.ts',
     'voiceover-recording.service.ts',
     'warnings-and-alerts.directive.ts',
-    'worked-example-editor.directive.ts',
+    'worked-example-editor.component.ts',
 ]
 
 

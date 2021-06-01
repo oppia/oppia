@@ -148,13 +148,13 @@ describe('Skill object factory', () => {
 
   it('should find misconception by id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.findMisconceptionById('4')).toEqual(
+    expect(skill.findMisconceptionById(4)).toEqual(
       misconceptionObjectFactory.createFromBackendDict(misconceptionDict2));
   });
 
   it('should delete a misconception given its id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
-    skill.deleteMisconception('2');
+    skill.deleteMisconception(2);
     expect(skill.getMisconceptions()).toEqual(
       [misconceptionObjectFactory.createFromBackendDict(
         misconceptionDict2)]);
@@ -193,12 +193,12 @@ describe('Skill object factory', () => {
   it('should get the correct next misconception id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getNextMisconceptionId()).toEqual(6);
-    skill.deleteMisconception('4');
+    skill.deleteMisconception(4);
     expect(skill.getNextMisconceptionId()).toEqual(6);
 
     var misconceptionToAdd1 = misconceptionObjectFactory
       .createFromBackendDict({
-        id: JSON.stringify(skill.getNextMisconceptionId()),
+        id: skill.getNextMisconceptionId(),
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -207,7 +207,7 @@ describe('Skill object factory', () => {
 
     skill.appendMisconception(misconceptionToAdd1);
     expect(skill.getNextMisconceptionId()).toEqual(7);
-    skill.deleteMisconception('6');
+    skill.deleteMisconception(6);
     expect(skill.getNextMisconceptionId()).toEqual(7);
   });
 

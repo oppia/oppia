@@ -74,7 +74,7 @@ export class SkillUpdateService {
 
   private _applyMisconceptionPropertyChange = (
       skill,
-      misconceptionId: string,
+      misconceptionId: number,
       propertyName: string,
       newValue: string | boolean,
       oldValue: string | boolean,
@@ -280,7 +280,7 @@ export class SkillUpdateService {
     );
   }
 
-  deleteMisconception(skill: Skill, misconceptionId: string): void {
+  deleteMisconception(skill: Skill, misconceptionId: number): void {
     const params = {
       misconception_id: misconceptionId,
     };
@@ -334,7 +334,7 @@ export class SkillUpdateService {
 
   updateMisconceptionName(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldName: string,
       newName: string
   ): void {
@@ -358,7 +358,7 @@ export class SkillUpdateService {
 
   updateMisconceptionMustBeAddressed(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldValue: boolean,
       newValue: boolean
   ): void {
@@ -382,7 +382,7 @@ export class SkillUpdateService {
 
   updateMisconceptionNotes(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldNotes: string,
       newNotes: string
   ): void {
@@ -406,7 +406,7 @@ export class SkillUpdateService {
 
   updateMisconceptionFeedback(
       skill: Skill,
-      misconceptionId: string,
+      misconceptionId: number,
       oldFeedback: string,
       newFeedback: string
   ): void {

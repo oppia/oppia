@@ -20,13 +20,13 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require(
-  'components/review-material-editor/review-material-editor.directive.ts');
+  'components/review-material-editor/review-material-editor.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
-  'worked-example-editor.directive.ts');
+  'worked-example-editor.component.ts');
 require(
   'pages/skill-editor-page/editor-tab/skill-preview-modal.controller.ts');
 require(
@@ -41,6 +41,7 @@ require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/generate-content-id.service.ts');
+require('services/ngb-modal.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 

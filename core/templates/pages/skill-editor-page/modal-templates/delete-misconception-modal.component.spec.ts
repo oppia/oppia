@@ -68,7 +68,7 @@ describe('Delete Misconception Modal Component', () => {
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
 
     let misconceptionDict1 = {
-      id: '2',
+      id: 2,
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',

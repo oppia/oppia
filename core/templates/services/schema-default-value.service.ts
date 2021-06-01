@@ -42,6 +42,12 @@ interface HtmlSchema {
   type: 'html';
   // 'choices' are optional because they may not be present in the schema.
   choices?: string[];
+  'ui_config'?: {
+    'hide_complex_extensions'?: boolean;
+    language?: string;
+    languageDirection?: string;
+    startupFocusEnabled?: boolean;
+  }
 }
 
 interface IntSchema {
@@ -73,6 +79,7 @@ export interface CustomSchema {
   'type': 'custom';
   'obj_type': string;
 }
+
 
 export type Schema = (
   BoolSchema |

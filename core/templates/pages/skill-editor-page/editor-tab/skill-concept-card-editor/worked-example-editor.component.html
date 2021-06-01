@@ -1,35 +1,35 @@
 <div class="h-100">
   <!-- Question Editor -->
-  <div ng-if="!questionEditorIsOpen"
+  <div *ngIf="!questionEditorIsOpen"
        class="h-100"
-       ng-attr-title="Edit worked example question">
+       title="Edit worked example question">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': isEditable()}">
+         [ngClass]="{'oppia-editable-section': isEditable()}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing" ng-click="openQuestionEditor()">
-          <i ng-if="isEditable()"
+        <div class="oppia-click-to-start-editing" (click)="openQuestionEditor()">
+          <i *ngIf="isEditable()"
              class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Worked Example">&#xE254;
           </i>
         </div>
 
         <strong>Example Question</strong>
-        <angular-html-bind class="protractor-test-worked-example-question-field"
-                           html-data="container.workedExampleQuestionHtml">
-        </angular-html-bind>
+        <angular-html-bind-wrapper class="protractor-test-worked-example-question-field"
+                                   [htmlData]="container.workedExampleQuestionHtml">
+        </angular-html-bind-wrapper>
       </div>
     </div>
   </div>
 
-  <div ng-if="isEditable() && questionEditorIsOpen">
+  <div *ngIf="isEditable() && questionEditorIsOpen">
     <form role="form"
           class="form-inline"
-          name="editWorkedExampleForm"
-          ng-submit="saveWorkedExample()">
+          (ngSubmit)="saveWorkedExample()">
       <div class="oppia-rule-details-header">
         <strong>Example Question</strong>
-        <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="container.workedExampleQuestionHtml">
+        <schema-based-editor [schema]="getSchema.bind(this)"
+                             [localValue]="container.workedExampleQuestionHtml"
+                             (localValueChange)="updateQuestionHtml($event)">
         </schema-based-editor>
       </div>
     </form>
@@ -38,13 +38,13 @@
       <div class="float-right">
         <button type="button"
                 class="btn btn-secondary"
-                ng-click="cancelEditQuestion()">
+                (click)="cancelEditQuestion()">
           Cancel
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!container.workedExampleQuestionHtml || editWorkedExampleForm.$invalid"
-                ng-click="saveWorkedExample(true)">
+                [disabled]="!container.workedExampleQuestionHtml"
+                (click)="saveWorkedExample(true)">
           Save
         </button>
       </div>
@@ -53,36 +53,36 @@
   </div>
 
   <!-- Explanation Editor -->
-  <div ng-if="!explanationEditorIsOpen"
+  <div *ngIf="!explanationEditorIsOpen"
        class="h-100 worked-example-explanation-section"
-       ng-attr-title="Edit worked example explanation">
+       title="Edit worked example explanation">
     <div class="oppia-readonly-rule-tile"
-         ng-class="{'oppia-editable-section': isEditable()}">
+         [ngClass]="{'oppia-editable-section': isEditable()}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing" ng-click="openExplanationEditor()">
-          <i ng-if="isEditable()"
+        <div class="oppia-click-to-start-editing" (click)="openExplanationEditor()">
+          <i *ngIf="isEditable()"
              class="material-icons oppia-editor-edit-icon float-right"
              title="Edit Worked Example">&#xE254;
           </i>
         </div>
 
         <strong>Example Explanation</strong>
-        <angular-html-bind class="protractor-test-worked-example-explanation-field"
-                           html-data="container.workedExampleExplanationHtml">
-        </angular-html-bind>
+        <angular-html-bind-wrapper class="protractor-test-worked-example-explanation-field"
+                           [htmlData]="container.workedExampleExplanationHtml">
+        </angular-html-bind-wrapper>
       </div>
     </div>
   </div>
 
-  <div ng-if="isEditable() && explanationEditorIsOpen" class="worked-example-explanation-section">
+  <div *ngIf="isEditable() && explanationEditorIsOpen" class="worked-example-explanation-section">
     <form role="form"
           class="form-inline"
-          name="editWorkedExampleForm"
-          ng-submit="saveWorkedExample()">
+          (ngSubmit)="saveWorkedExample()">
       <div class="oppia-rule-details-header">
         <strong>Example Explanation</strong>
-        <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
-                             local-value="container.workedExampleExplanationHtml">
+        <schema-based-editor [schema]="getSchema.bind(this)"
+                             [localValue]="container.workedExampleExplanationHtml"
+                             (localValueChange)="updateExplanationHtml($event)">
         </schema-based-editor>
       </div>
     </form>
@@ -91,13 +91,13 @@
       <div class="float-right">
         <button type="button"
                 class="btn btn-secondary"
-                ng-click="cancelEditExplanation()">
+                (click)="cancelEditExplanation()">
           Cancel
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!container.workedExampleExplanationHtml || editWorkedExampleForm.$invalid"
-                ng-click="saveWorkedExample(false)">
+                [disabled]="!container.workedExampleExplanationHtml"
+                (click)="saveWorkedExample(false)">
           Save
         </button>
       </div>

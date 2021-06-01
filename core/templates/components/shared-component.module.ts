@@ -59,6 +59,7 @@ import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { ReviewMaterialEditorComponent } from './review-material-editor/review-material-editor.component';
 
 // Directives.
 import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
@@ -151,7 +152,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     UploadActivityModalComponent,
     PromoBarComponent,
     SortByPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    ReviewMaterialEditorComponent
   ],
 
   entryComponents: [
@@ -179,7 +181,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     PromoBarComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    ReviewMaterialEditorComponent
   ],
 
   exports: [
@@ -224,7 +227,8 @@ const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
     SortByPipe,
     LoadingDotsComponent,
     WrapTextWithEllipsisPipe,
-    LearnerDashboardIconsComponent
+    LearnerDashboardIconsComponent,
+    ReviewMaterialEditorComponent
   ],
 })
 

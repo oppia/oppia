@@ -33,6 +33,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { DeleteMisconceptionModalComponent } from './modal-templates/delete-misconception-modal.component';
 import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-editor/skill-description-editor.component';
+import { WorkedExampleEditorComponent } from './editor-tab/skill-concept-card-editor/worked-example-editor.component';
+import { AddMisconceptionModalComponent } from './modal-templates/add-misconception-modal.component';
+import { skillMisconceptionsEditorComponent } from './editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.component';
 
 @NgModule({
   imports: [
@@ -45,14 +48,22 @@ import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-
     OppiaAngularRootComponent,
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
-    SkillDescriptionEditorComponent
+    SkillDescriptionEditorComponent,
+    WorkedExampleEditorComponent,
+    AddMisconceptionModalComponent,
+    skillMisconceptionsEditorComponent,
+    MisconceptionEditorComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     DeleteMisconceptionModalComponent,
     SkillEditorNavbarBreadcrumbComponent,
-    SkillDescriptionEditorComponent
+    SkillDescriptionEditorComponent,
+    WorkedExampleEditorComponent,
+    AddMisconceptionModalComponent,
+    skillMisconceptionsEditorComponent,
+    MisconceptionEditorComponent
   ],
   providers: [
     {
@@ -65,6 +76,10 @@ import { SkillDescriptionEditorComponent } from './editor-tab/skill-description-
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
+    },
+    {
+      provide: '$scope',
+      useExisting: '$rootScope'
     }
   ]
 })
@@ -75,6 +90,7 @@ class SkillEditorPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { MisconceptionEditorComponent } from './editor-tab/skill-misconceptions-editor/misconception-editor.component';
 
 const bootstrapFn = (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

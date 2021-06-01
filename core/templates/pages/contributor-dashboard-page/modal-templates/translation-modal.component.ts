@@ -29,13 +29,7 @@ import { TranslateTextService } from 'pages/contributor-dashboard-page/services/
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
-
-class UiConfig {
-  'hide_complex_extensions': boolean;
-  'startupFocusEnabled'?: boolean;
-  'language'?: string;
-  'languageDirection'?: string;
-}
+import { Schema } from 'services/schema-default-value.service';
 export interface TranslationOpportunity {
   id: string;
   heading: string;
@@ -43,11 +37,6 @@ export interface TranslationOpportunity {
   progressPercentage: string;
   actionButtonTitle: string;
 }
-export interface HTMLSchema {
-    'type': string;
-    'ui_config': UiConfig;
-}
-
 @Component({
   selector: 'oppia-translation-modal',
   templateUrl: './translation-modal.component.html'
@@ -63,10 +52,7 @@ export class TranslationModalComponent {
   textToTranslate = '';
   languageDescription: string;
   previousTranslationAvailable: boolean = false;
-  HTML_SCHEMA: {
-    'type': string;
-    'ui_config': UiConfig;
-  };
+  HTML_SCHEMA: Schema;
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
 
