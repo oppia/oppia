@@ -1268,6 +1268,67 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions), 1)
 
+    def test_get_reviewable_translation_suggestions(self):
+        # Add few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Add few question suggestions.
+        self._create_question_suggestion_with_skill_id('skill1')
+        self._create_question_suggestion_with_skill_id('skill2')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+        # Get all reviewable translation suggestions.
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.reviewer_id_1, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+
+        # Expect that the results correspond to translation suggestions that the
+        # user has rights to review.
+        self.assertEqual(len(suggestions), 3)
+        actual_language_code_list = sorted([
+            suggestion.change.language_code
+            for suggestion in suggestions
+        ])
+        expected_language_code_list = ['hi', 'hi', 'pt']
+        self.assertEqual(actual_language_code_list, expected_language_code_list)
+
+    def test_get_reviewable_question_suggestions(self):
+        # Add few translation suggestions in different languages.
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('pt')
+        self._create_translation_suggestion_with_language_code('bn')
+        self._create_translation_suggestion_with_language_code('bn')
+        # Add few question suggestions.
+        self._create_question_suggestion_with_skill_id('skill1')
+        self._create_question_suggestion_with_skill_id('skill2')
+        # Provide the user permission to review suggestions in particular
+        # languages.
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.reviewer_id_1, 'pt')
+        # Provide the user permission to review question suggestions.
+        user_services.allow_user_to_review_question(self.reviewer_id_1)
+        # Get all reviewable question suggestions.
+        suggestions = suggestion_services.get_reviewable_suggestions(
+            self.reviewer_id_1, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+
+        # Expect that the results correspond to question suggestions.
+        self.assertEqual(len(suggestions), 2)
+        expected_suggestion_type_list = ['skill1', 'skill2']
+        actual_suggestion_type_list = [
+            suggestion.change.skill_id
+            for suggestion in suggestions
+        ]
+        self.assertEqual(
+            actual_suggestion_type_list, expected_suggestion_type_list)
+
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
             self):
         suggestion_1 = self._create_translation_suggestion_with_language_code(
