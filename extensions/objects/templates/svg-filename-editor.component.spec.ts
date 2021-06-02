@@ -282,6 +282,26 @@ describe('SvgFilenameEditor', () => {
     expect(component.currentDiagramHeight).toBe(HEIGHT);
   })));
 
+  it(
+    'should initialize fabric and set diagram status to editing on ' +
+      'reopening svg',
+    waitForAsync(fakeAsync(() => {
+      spyOnProperty(document, 'readyState').and.returnValue('loaded');
+      component.ngOnInit();
+      expect(component.canvas).toBeDefined();
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      var mocktoSVG = (arg) => {
+        return '<path></path>';
+      };
+      var customToSVG = component.createCustomToSVG(
+      mocktoSVG as unknown as () => string, 'path', 'group1', component);
+      component.bgPicker.onOpen();
+      expect(customToSVG()).toBe('<path id="group1"/>');
+      expect(component.diagramStatus).toBe('editing');
+    })));
+
   it('should reset to maximum width correctly', waitForAsync(fakeAsync(() => {
     component.diagramWidth = 600;
     component.onWidthInputBlur();
