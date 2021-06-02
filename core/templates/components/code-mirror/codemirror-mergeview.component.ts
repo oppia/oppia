@@ -27,9 +27,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 export class CodemirrorMergeviewComponent implements
   AfterViewInit, OnInit, OnChanges {
   @Input() options = {};
-  @Input() leftValue;
-  @Input() rightValue;
-  codeMirrorInstance: CodeMirror.MergeView.MergeViewEditor;
+  // Below properties have been assigned as empty string if undefined.
+  // See function 'ngAfterViewInit' for reference.
+  @Input() leftValue: string | undefined;
+  @Input() rightValue: string | undefined;
+  codeMirrorInstance: CodeMirror.MergeView.MergeViewEditor | undefined;
   constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
 
   ngOnInit(): void {
@@ -64,8 +66,10 @@ export class CodemirrorMergeviewComponent implements
         throw new Error('Left pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.codeMirrorInstance.editor().setValue(
-          changes.leftValue.currentValue);
+        if (this.codeMirrorInstance !== undefined) {
+          this.codeMirrorInstance.editor().setValue(
+            changes.leftValue.currentValue);
+        }
       });
     }
     // Watch for changes and set value in right pane.
@@ -77,8 +81,10 @@ export class CodemirrorMergeviewComponent implements
         throw new Error('Right pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.codeMirrorInstance.rightOriginal().setValue(
-          changes.rightValue.currentValue);
+        if (this.codeMirrorInstance !== undefined) {
+          this.codeMirrorInstance.rightOriginal().setValue(
+            changes.rightValue.currentValue);
+        }
       });
     }
   }

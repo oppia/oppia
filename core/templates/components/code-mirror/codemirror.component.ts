@@ -20,31 +20,46 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, Simpl
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
+export interface CodeMirrorMergeViewOptions {
+  lineNumbers: boolean,
+  readOnly: boolean,
+  mode: string,
+  viewportMargin: number
+}
+
 @Component({
   selector: 'oppia-codemirror',
   templateUrl: './codemirror.component.html'
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
-  @Input() options;
-  @Input() value;
-  @Input() refresh: boolean;
+  @Input() options: CodeMirrorMergeViewOptions = {
+    lineNumbers: false,
+    readOnly: false,
+    mode: '',
+    viewportMargin: 100
+  };
+  @Input() value: string = '';
+  @Input() refresh: boolean = false;
   @Input() readOnly = false;
   @Output() valueChange = new EventEmitter();
   @Output() onLoad = new EventEmitter();
-  @ViewChild(CodemirrorComponent) codemirrorComponent: CodemirrorComponent;
+  @ViewChild(CodemirrorComponent) codemirrorComponent:
+   CodemirrorComponent | undefined;
   autoFocus = false;
-  codemirror: CodeMirror.Editor;
+  codemirror: CodeMirror.Editor | undefined;
   constructor() { }
 
-  updateValue(val: unknown): void {
+  updateValue(val: string): void {
     this.value = val;
     this.valueChange.emit(val);
   }
 
   ngAfterViewInit(): void {
     const runAfterViewInit = () => {
-      this.codemirror = this.codemirrorComponent.codeMirror;
-      this.onLoad.emit(this.codemirror);
+      if (this.codemirrorComponent !== undefined) {
+        this.codemirror = this.codemirrorComponent.codeMirror;
+        this.onLoad.emit(this.codemirror);
+      }
     };
     setTimeout(() => runAfterViewInit(), 0);
   }

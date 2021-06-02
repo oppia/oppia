@@ -99,7 +99,7 @@ export const ScopeProvider = {
 export class SchemaBasedEditorDirective extends UpgradeComponent {
   @Input() schema: () => Schema;
   @Input() isDisabled: () => boolean;
-  @Input() localValue;
+  @Input() localValue: string;
   @Output() localValueChange: EventEmitter<unknown> = new EventEmitter();
   @Input() labelForFocusTarget: () => string;
   @Input() onInputBlur: () => void;

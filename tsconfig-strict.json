@@ -34,6 +34,9 @@
     }
   },
   "files": [
+    "core/templates/components/code-mirror/codemirror.component.ts",
+    "core/templates/components/code-mirror/codemirror.component.spec.ts",
+    "core/templates/components/code-mirror/codemirror-mergeview.component.ts",
     "core/templates/components/state-editor/state-editor-properties-services/state-name.service.ts",
     "core/templates/components/state-editor/state-editor-properties-services/state-name.service.spec.ts",
     "core/templates/domain/admin/computation-data.model.ts",
