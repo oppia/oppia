@@ -57,7 +57,7 @@ export interface SolutionBackendDict {
   'explanation': ExplanationBackendDict;
 }
 
-interface ShortAnswerResponse {
+export interface ShortAnswerResponse {
   prefix: string;
   answer: string;
 }
