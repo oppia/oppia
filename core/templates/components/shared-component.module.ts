@@ -99,6 +99,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 import { HammerGestureConfig } from '@angular/platform-browser';
@@ -183,6 +184,7 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -250,12 +252,12 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
-    SideNavigationBarComponent,
-    SideNavigationBarWrapperComponent,
+    I18nLanguageSelectorComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
+    SideNavigationBarWrapperComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
@@ -295,6 +297,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
