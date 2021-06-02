@@ -151,7 +151,7 @@ var TopicEditorPage = function() {
   };
 
   this.publishTopic = async function() {
-    await action.click('Publish Subtopic Button', publishTopicButton);
+    await action.click('Publish Topic Button', publishTopicButton);
     await waitFor.invisibilityOf(
       publishTopicButton, 'Topic is taking too long to publish.');
   };
@@ -378,8 +378,7 @@ var TopicEditorPage = function() {
 
   this.navigateToTopicEditorTab = async function() {
     var topicEditorTab = element(by.css('.protractor-test-edit-topic-tab'));
-    await action.click(
-      'Topic Editor Tab', topicEditorTab);
+    await action.click('Topic Editor Tab', topicEditorTab);
   };
 
   this.navigateToSubtopicWithIndex = async function(subtopicIndex) {
