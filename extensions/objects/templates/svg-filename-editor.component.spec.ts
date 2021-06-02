@@ -268,7 +268,7 @@ describe('SvgFilenameEditor', () => {
     component.bgPicker = mockPicker;
   }));
 
-  it('should update diagram size', () => {
+  it('should update diagram size', waitForAsync(fakeAsync(() => {
     spyOnProperty(document, 'readyState').and.returnValue('loading');
     component.ngOnInit();
     component.continueDiagramEditing();
@@ -280,37 +280,37 @@ describe('SvgFilenameEditor', () => {
     expect(component.currentDiagramWidth).toBe(WIDTH);
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(HEIGHT);
-  });
+  })));
 
-  it('should reset to maximum width correctly', () => {
+  it('should reset to maximum width correctly', waitForAsync(fakeAsync(() => {
     component.diagramWidth = 600;
     component.onWidthInputBlur();
     expect(component.currentDiagramWidth).toBe(
       SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
-  });
+  })));
 
-  it('should reset to maximum height correctly', () => {
+  it('should reset to maximum height correctly', waitForAsync(fakeAsync(() => {
     component.diagramHeight = 600;
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
       SvgFilenameEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
-  });
+  })));
 
-  it('should reset to minimum width correctly', () => {
+  it('should reset to minimum width correctly', waitForAsync(fakeAsync(() => {
     component.diagramWidth = 0;
     component.onWidthInputBlur();
     expect(component.currentDiagramWidth).toBe(
       SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
-  });
+  })));
 
-  it('should reset to minimum height correctly', () => {
+  it('should reset to minimum height correctly', waitForAsync(fakeAsync(() => {
     component.diagramHeight = 0;
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
       SvgFilenameEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
-  });
+  })));
 
-  it('should check if diagram is created', () => {
+  it('should check if diagram is created', waitForAsync(fakeAsync(() => {
     var rect = new fabric.Rect({
       top: 10,
       left: 10,
@@ -319,9 +319,9 @@ describe('SvgFilenameEditor', () => {
     });
     component.canvas.add(rect);
     expect(component.isDiagramCreated()).toBe(true);
-  });
+  })));
 
-  it('should create different shapes', () => {
+  it('should create different shapes', waitForAsync(fakeAsync(() => {
     component.createRect();
     component.createLine();
     component.createCircle();
@@ -342,9 +342,9 @@ describe('SvgFilenameEditor', () => {
     component.createClosedPolygon();
     expect(component.isClosedPolygonEnabled()).toBe(true);
     component.createClosedPolygon();
-  });
+  })));
 
-  it('should change the order of shapes', () => {
+  it('should change the order of shapes', waitForAsync(fakeAsync(() => {
     component.createCircle();
     component.createRect();
     expect(component.canvas.getObjects()[0].get('type')).toBe('circle');
@@ -357,33 +357,35 @@ describe('SvgFilenameEditor', () => {
     component.sendObjectBackward();
     expect(component.canvas.getObjects()[0].get('type')).toBe('circle');
     expect(component.canvas.getObjects()[1].get('type')).toBe('rect');
-  });
+  })));
 
-  it('should undo and redo the creation of shapes', () => {
-    for (var i = 0; i < 6; i++) {
-      component.createRect();
-    }
-    expect(component.canvas.getObjects().length).toBe(6);
-    expect(component.isUndoEnabled()).toBe(true);
-    component.onUndo();
-    expect(component.canvas.getObjects().length).toBe(5);
-    expect(component.isRedoEnabled()).toBe(true);
-    component.onRedo();
-    expect(component.canvas.getObjects().length).toBe(6);
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[5]);
-    component.removeShape();
-    expect(component.canvas.getObjects().length).toBe(5);
-    component.onUndo();
-    expect(component.canvas.getObjects().length).toBe(6);
-    component.onRedo();
-    expect(component.canvas.getObjects().length).toBe(5);
-    expect(component.isClearEnabled()).toBe(true);
-    component.onClear();
-    expect(component.objectUndoStack.length).toBe(0);
-  });
+  it(
+    'should undo and redo the creation of shapes',
+    waitForAsync(fakeAsync(() => {
+      for (var i = 0; i < 6; i++) {
+        component.createRect();
+      }
+      expect(component.canvas.getObjects().length).toBe(6);
+      expect(component.isUndoEnabled()).toBe(true);
+      component.onUndo();
+      expect(component.canvas.getObjects().length).toBe(5);
+      expect(component.isRedoEnabled()).toBe(true);
+      component.onRedo();
+      expect(component.canvas.getObjects().length).toBe(6);
+      component.canvas.setActiveObject(
+        component.canvas.getObjects()[5]);
+      component.removeShape();
+      expect(component.canvas.getObjects().length).toBe(5);
+      component.onUndo();
+      expect(component.canvas.getObjects().length).toBe(6);
+      component.onRedo();
+      expect(component.canvas.getObjects().length).toBe(5);
+      expect(component.isClearEnabled()).toBe(true);
+      component.onClear();
+      expect(component.objectUndoStack.length).toBe(0);
+    })));
 
-  it('should change properties of a shape', () => {
+  it('should change properties of a shape', waitForAsync(fakeAsync(() => {
     component.createRect();
     component.canvas.setActiveObject(
       component.canvas.getObjects()[0]);
@@ -419,9 +421,9 @@ describe('SvgFilenameEditor', () => {
     expect(textObj.get(
       'fontFamily' as keyof fabric.Object)).toBe('comic sans ms');
     expect(textObj.get('fontSize' as keyof fabric.Object)).toBe(12);
-  });
+  })));
 
-  it('should draw polygon using mouse events', () => {
+  it('should draw polygon using mouse events', waitForAsync(fakeAsync(() => {
     component.createClosedPolygon();
     component.canvas.fire('mouse:down', {
       e: {
@@ -453,9 +455,9 @@ describe('SvgFilenameEditor', () => {
     });
     component.createClosedPolygon();
     expect(component.canvas.getObjects()[1].get('type')).toBe('polyline');
-  });
+  })));
 
-  it('should create a bezier curve', () => {
+  it('should create a bezier curve', waitForAsync(fakeAsync(() => {
     component.createRect();
     component.createQuadraticBezier();
     expect(component.isDrawModeBezier()).toBe(true);
@@ -490,9 +492,9 @@ describe('SvgFilenameEditor', () => {
       [['M', 100, 100], ['Q', 200, 200, 300, 300]]
     );
     expect(component.canvas.getObjects()[1].get('type')).toBe('path');
-  });
+  })));
 
-  it('should create a pie chart', () => {
+  it('should create a pie chart', waitForAsync(fakeAsync(() => {
     component.createPieChart();
     expect(component.isPieChartEnabled()).toBe(true);
     expect(component.isDrawModePieChart()).toBe(true);
@@ -500,9 +502,9 @@ describe('SvgFilenameEditor', () => {
     component.pieChartDataInput[2].data = 100;
     component.createPieChart();
     expect(component.isDrawModePieChart()).toBe(false);
-  });
+  })));
 
-  it('should upload an svg file', () => {
+  it('should upload an svg file', waitForAsync(fakeAsync(() => {
     var fileContent = (
       'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
       'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
@@ -535,7 +537,7 @@ describe('SvgFilenameEditor', () => {
     component.loadType = 'nogroup';
     component.uploadSvgFile();
     expect(component.canvas.getObjects()[1].get('type')).toBe('circle');
-  });
+  })));
 
   it('should set title with onOpen color picker function', waitForAsync(() => {
     const domReady = new Promise((resolve, reject) => {
@@ -556,19 +558,21 @@ describe('SvgFilenameEditor', () => {
     });
   }));
 
-  it('should trigger object selection and scaling events', () => {
-    component.createRect();
-    component.createText();
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[0]);
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[1]);
-    expect(component.isSizeVisible()).toBe(true);
-    expect(component.displayFontStyles).toBe(true);
-    component.canvas.fire('object:scaling');
-    expect(component.canvas.getObjects()[1].get('scaleX')).toBe(1);
-    expect(component.canvas.getObjects()[1].get('scaleY')).toBe(1);
-  });
+  it(
+    'should trigger object selection and scaling events',
+    waitForAsync(fakeAsync(() => {
+      component.createRect();
+      component.createText();
+      component.canvas.setActiveObject(
+        component.canvas.getObjects()[0]);
+      component.canvas.setActiveObject(
+        component.canvas.getObjects()[1]);
+      expect(component.isSizeVisible()).toBe(true);
+      expect(component.displayFontStyles).toBe(true);
+      component.canvas.fire('object:scaling');
+      expect(component.canvas.getObjects()[1].get('scaleX')).toBe(1);
+      expect(component.canvas.getObjects()[1].get('scaleY')).toBe(1);
+    })));
 
   it('should save svg file created by the editor', waitForAsync(
     fakeAsync(() => {
@@ -585,10 +589,12 @@ describe('SvgFilenameEditor', () => {
       expect(component.validate()).toBe(true);
     })));
 
-  it('should not save svg file when no diagram is created', () => {
-    component.saveSvgFile();
-    expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
-  });
+  it(
+    'should not save svg file when no diagram is created',
+    waitForAsync(fakeAsync(() => {
+      component.saveSvgFile();
+      expect(alertSpy).toHaveBeenCalledWith('Custom Diagram not created.');
+    })));
 
   it('should handle rejection when saving an svg file fails', waitForAsync(
     fakeAsync(() => {
@@ -604,18 +610,19 @@ describe('SvgFilenameEditor', () => {
       expect(alertSpy).toHaveBeenCalledWith(errorMessage);
     })));
 
-  it('should allow user to continue editing the diagram', () => {
-    component.savedSvgDiagram = 'saved';
-    component.savedSvgDiagram = samplesvg;
-    component.continueDiagramEditing();
-    var mocktoSVG = (arg) => {
-      return '<path></path>';
-    };
-    var customToSVG = component.createCustomToSVG(
+  it('should allow user to continue editing the diagram', waitForAsync(
+    fakeAsync(() => {
+      component.savedSvgDiagram = 'saved';
+      component.savedSvgDiagram = samplesvg;
+      component.continueDiagramEditing();
+      var mocktoSVG = (arg) => {
+        return '<path></path>';
+      };
+      var customToSVG = component.createCustomToSVG(
       mocktoSVG as unknown as () => string, 'path', 'group1', component);
-    expect(customToSVG()).toBe('<path id="group1"/>');
-    expect(component.diagramStatus).toBe('editing');
-  });
+      expect(customToSVG()).toBe('<path id="group1"/>');
+      expect(component.diagramStatus).toBe('editing');
+    })));
 });
 
 
@@ -813,24 +820,26 @@ describe(
     }));
 
 
-    it('should save svg file to local storage created by the svg editor',
-      () => {
+    it(
+      'should save svg file to local storage created by the svg editor',
+      waitForAsync(fakeAsync(() => {
         component.createRect();
         component.saveSvgFile();
         expect(component.data.savedSvgFileName).toBe('350_450.svg');
         expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
         expect(component.validate()).toBe(true);
       }
+      ))
     );
 
     it('should allow user to continue editing the diagram and delete the ' +
-    'image from local storage', () => {
+    'image from local storage', waitForAsync(fakeAsync(() => {
       component.data.savedSvgFileName = 'image.svg';
       component.savedSvgDiagram = 'saved';
       component.savedSvgDiagram = samplesvg;
       component.continueDiagramEditing();
       expect(component.diagramStatus).toBe('editing');
-    });
+    })));
   });
 
 
@@ -862,7 +871,7 @@ describe('should fail svg tag validation', () => {
     component = fixture.componentInstance;
   }));
 
-  it('should fail svg validation', () => {
+  it('should fail svg validation', waitForAsync(fakeAsync(() => {
     var invalidSvgTag = (
       '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
       'f5b7-4194e2380d9f" x="143" y="97" width="12" height29" stroke="hsla(0' +
@@ -871,7 +880,7 @@ describe('should fail svg tag validation', () => {
     expect(() => {
       component.isSvgTagValid(invalidSvgTag);
     }).toThrowError('Invalid tags in svg:script');
-  });
+  })));
 });
 
 describe('should fail svg attribute validation', () => {
@@ -900,7 +909,7 @@ describe('should fail svg attribute validation', () => {
   }));
 
 
-  it('should fail svg validation', () => {
+  it('should fail svg validation', waitForAsync(fakeAsync(() => {
     var invalidWidthAttribute = (
       '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
       'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
@@ -909,5 +918,5 @@ describe('should fail svg attribute validation', () => {
     expect(() => {
       component.isSvgTagValid(invalidWidthAttribute);
     }).toThrowError('Invalid attributes in svg:widht');
-  });
+  })));
 });

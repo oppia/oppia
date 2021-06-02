@@ -16,7 +16,8 @@
  * @fileoverview Component for svg filename editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectorRef, Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -177,6 +178,7 @@ export class SvgFilenameEditorComponent implements OnInit {
   x: number;
   y: number;
   constructor(
+    @Inject(DOCUMENT) private document: Document,
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
@@ -190,8 +192,8 @@ export class SvgFilenameEditorComponent implements OnInit {
 
   ngOnInit(): void {
     const domReady = new Promise((resolve, reject) => {
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', resolve);
+      if (this.document.readyState === 'loading') {
+        this.document.addEventListener('DOMContentLoaded', resolve);
       } else {
         resolve(0);
       }
@@ -551,8 +553,8 @@ export class SvgFilenameEditorComponent implements OnInit {
     this.diagramStatus = this.STATUS_EDITING;
     this.data = {};
     const domReady = new Promise((resolve, reject) => {
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', resolve);
+      if (this.document.readyState === 'loading') {
+        this.document.addEventListener('DOMContentLoaded', resolve);
       } else {
         resolve(0);
       }
@@ -1365,7 +1367,7 @@ export class SvgFilenameEditorComponent implements OnInit {
   }
 
   createColorPicker(value: string): void {
-    var parent = document.getElementById(value + '-color');
+    var parent = this.document.getElementById(value + '-color');
 
     var onChangeFunc = {
       stroke: () => this.onStrokeChange(),
@@ -1375,7 +1377,7 @@ export class SvgFilenameEditorComponent implements OnInit {
     let onOpen = () => {
       // This DOM manipulation is necessary because the color picker is not
       // configurable in the third-party module.
-      let alphaSliders = document.querySelectorAll(
+      let alphaSliders = this.document.querySelectorAll(
         '.picker_alpha .picker_selector');
       alphaSliders.forEach((element) => {
         element.setAttribute('title', 'Transparency Slider');
@@ -1383,9 +1385,9 @@ export class SvgFilenameEditorComponent implements OnInit {
     };
     let onChange = (color) => {
       parent.style.background = color.rgbaString;
-      var topAlphaSquare = document.getElementById(
+      var topAlphaSquare = this.document.getElementById(
         'top-' + value + '-alpha');
-      var bottomAlphaSquare = document.getElementById(
+      var bottomAlphaSquare = this.document.getElementById(
         'bottom-' + value + '-alpha');
       var opacity = 1 - color.rgba[3];
       topAlphaSquare.style.opacity = opacity.toString();
