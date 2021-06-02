@@ -35,7 +35,8 @@ import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 export class QuestionsListService {
   private _questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
   private _nextOffsetForQuestions: number = 0;
-  private _moreQuestions: boolean = true;
+  // Whether there are more questions available to fetch.
+  private _moreQuestionsAvailable: boolean = true;
   private _currentPage: number = 0;
   private _questionSummartiesInitializedEventEmitter: EventEmitter<void> = (
     new EventEmitter<void>());
@@ -65,13 +66,13 @@ export class QuestionsListService {
     this._nextOffsetForQuestions += AppConstants.NUM_QUESTIONS_PER_PAGE;
   }
 
-  private _setMoreQuestions(moreQuestions: boolean): void {
-    this._moreQuestions = moreQuestions;
+  private _setMoreQuestionsAvailable(moreQuestionsAvailable: boolean): void {
+    this._moreQuestionsAvailable = moreQuestionsAvailable;
   }
 
   isLastQuestionBatch(): boolean {
     return (
-      this._moreQuestions === false &&
+      this._moreQuestionsAvailable === false &&
       (this._currentPage + 1) * AppConstants.NUM_QUESTIONS_PER_PAGE >=
         this._questionSummariesForOneSkill.length);
   }
@@ -81,7 +82,7 @@ export class QuestionsListService {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
       this._nextOffsetForQuestions = 0;
-      this._moreQuestions = true;
+      this._moreQuestionsAvailable = true;
     }
 
     const num = AppConstants.NUM_QUESTIONS_PER_PAGE;
@@ -93,7 +94,7 @@ export class QuestionsListService {
     if (
       (this._currentPage + 1) * num >
        this._questionSummariesForOneSkill.length &&
-       this._moreQuestions === true && fetchMore) {
+       this._moreQuestionsAvailable === true && fetchMore) {
       this.questionBackendApiService.fetchQuestionSummariesAsync(
         skillId, this._nextOffsetForQuestions).then(response => {
         let questionSummaries = response.questionSummaries.map(summary => {
@@ -103,7 +104,7 @@ export class QuestionsListService {
         });
 
         this._changeNextQuestionsOffset(resetHistory);
-        this._setMoreQuestions(response.more);
+        this._setMoreQuestionsAvailable(response.more);
         this._setQuestionSummariesForOneSkill(
           questionSummaries, resetHistory);
       });

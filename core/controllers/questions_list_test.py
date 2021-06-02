@@ -89,10 +89,9 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             more = json_response['more']
             self.assertTrue(more)
             json_response = self.get_json(
-                '%s/%s,%s?offset=%s' % (
+                '%s/%s,%s?offset=4' % (
                     feconf.QUESTIONS_LIST_URL_PREFIX,
-                    self.skill_id, self.skill_id_2,
-                    4
+                    self.skill_id, self.skill_id_2
                 ))
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
