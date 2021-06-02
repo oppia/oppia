@@ -31,8 +31,7 @@ class BeamJob(python_utils.OBJECT):
 
     Attributes:
         name: str. The name of the class that implements the job's logic.
-        parameter_names: list(str). The name of the parameters the job accepts
-            as arguments.
+        argument_names: list(str). The name of the job's arguments.
     """
 
     def __init__(self, job_class):
@@ -54,11 +53,11 @@ class BeamJob(python_utils.OBJECT):
         return self._job_class.__name__
 
     @property
-    def parameter_names(self):
-        """Returns the name of the parameters the job accepts as arguments.
+    def argument_names(self):
+        """Returns the names of the job's arguments.
 
         Returns:
-            list(str). The name of the parameters.
+            list(str). The name of the job's arguments.
         """
         # We don't want to include 'self' in the list; run() being a method
         # should be considered an implementation detail.
@@ -71,17 +70,16 @@ class BeamJob(python_utils.OBJECT):
             dict(str: *). The dict has the following structure:
                 name: str. The name of the class that implements the job's
                     logic.
-                parameter_names: list(str). The name of the parameters the job
-                    accepts as arguments.
+                argument_names: list(str). The name of the job's arguments.
         """
         return {
             'name': self.name,
-            'parameter_names': self.parameter_names,
+            'argument_names': self.argument_names,
         }
 
 
 class BeamJobRun(python_utils.OBJECT):
-    """Encapsulates individual executions of an Apache Beam job.
+    """Encapsulates an individual execution of an Apache Beam job.
 
     Attributes:
         job_id: str. The ID of the job execution.
@@ -174,8 +172,8 @@ class BeamJobRunResult(python_utils.OBJECT):
         """Initializes a new instance of BeamJobRunResult.
 
         Args:
-            stdout: list(str). The standard output produced by the job.
-            stderr: list(str). The error output produced by the job.
+            stdout: str. The standard output produced by the job.
+            stderr: str. The error output produced by the job.
         """
         self.stdout = stdout
         self.stderr = stderr

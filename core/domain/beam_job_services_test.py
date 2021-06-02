@@ -107,28 +107,6 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             id=job_id, job_name=job_name, job_arguments=job_arguments,
             latest_job_state=job_state)
 
-    def assert_domain_equals_model(self, beam_job_run, beam_job_run_model):
-        """Asserts that the domain object has the same values as the model.
-
-        Args:
-            beam_job_run: BeamJobRun. The domain object.
-            beam_job_run_model: BeamJobRunModel. The model.
-
-        Raises:
-            AssertionError. The domain object and model have at least one
-                difference.
-        """
-        self.assertEqual(beam_job_run.job_id, beam_job_run_model.id)
-        self.assertEqual(beam_job_run.job_name, beam_job_run_model.job_name)
-        self.assertEqual(
-            beam_job_run.job_state, beam_job_run_model.latest_job_state)
-        self.assertEqual(
-            beam_job_run.job_arguments, beam_job_run_model.job_arguments)
-        self.assertEqual(
-            beam_job_run.job_started_on, beam_job_run_model.created_on)
-        self.assertEqual(
-            beam_job_run.job_updated_on, beam_job_run_model.last_updated)
-
     def assert_domains_equal_models(self, beam_job_runs, beam_job_run_models):
         """Asserts that the domain objects have the same values as the models.
 
@@ -143,7 +121,12 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         domain_objs = sorted(beam_job_runs, key=lambda j: j.job_id)
         model_objs = sorted(beam_job_run_models, key=lambda m: m.id)
         for domain_obj, model_obj in python_utils.ZIP(domain_objs, model_objs):
-            self.assert_domain_equals_model(domain_obj, model_obj)
+            self.assertEqual(domain_obj.job_id, model_obj.id)
+            self.assertEqual(domain_obj.job_name, model_obj.job_name)
+            self.assertEqual(domain_obj.job_state, model_obj.latest_job_state)
+            self.assertEqual(domain_obj.job_arguments, model_obj.job_arguments)
+            self.assertEqual(domain_obj.job_started_on, model_obj.created_on)
+            self.assertEqual(domain_obj.job_updated_on, model_obj.last_updated)
 
     def test_get_beam_job_runs(self):
         beam_job_run_models = [
@@ -152,7 +135,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.FAILED.value),
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -169,7 +152,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.FAILED.value),
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -183,7 +166,9 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         with gcloud_output_mock:
             beam_job_runs = beam_job_services.get_beam_job_runs(refresh=True)
 
-        # Only the second model (job_state=RUNNING) should have been updated.
+        # Only the second model (job_state=RUNNING) should have been updated,
+        # the other two (DONE and CANCELLED) are in terminal states and don't
+        # need to be checked.
         updated_beam_job_run_models = initial_beam_job_run_models[:]
         updated_beam_job_run_models[1].latest_job_state = (
             beam_job_models.BeamJobState.DONE.value)
@@ -200,7 +185,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.FAILED.value),
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -229,7 +214,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.FAILED.value),
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
@@ -243,7 +228,9 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         with gcloud_output_mock:
             beam_job_services.refresh_state_of_all_beam_job_run_models()
 
-        # Only the second model (job_state=RUNNING) should have been updated.
+        # Only the second model (job_state=RUNNING) should have been updated,
+        # the other two (DONE and CANCELLED) are in terminal states and don't
+        # need to be checked.
         updated_beam_job_run_models = initial_beam_job_run_models[:]
         updated_beam_job_run_models[1].latest_job_state = (
             beam_job_models.BeamJobState.DONE.value)
@@ -262,7 +249,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
-                job_state=beam_job_models.BeamJobState.FAILED.value),
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
 
         beam_job_models.BeamJobRunModel.update_timestamps_multi(

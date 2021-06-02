@@ -38,7 +38,7 @@ class BeamJobTests(test_utils.TestBase):
         job = beam_job_domain.BeamJob(
             base_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.name, 'AuditAllStorageModelsJob')
-        self.assertEqual(job.parameter_names, [])
+        self.assertEqual(job.argument_names, [])
 
     def test_in_terminal_state(self):
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
@@ -92,7 +92,7 @@ class BeamJobTests(test_utils.TestBase):
             base_validation_jobs.AuditAllStorageModelsJob)
         self.assertEqual(job.to_dict(), {
             'name': 'AuditAllStorageModelsJob',
-            'parameter_names': [],
+            'argument_names': [],
         })
 
 

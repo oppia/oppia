@@ -145,10 +145,7 @@ def get_beam_job_run_result(job_id):
 
 
 def refresh_state_of_all_beam_job_run_models():
-    """Refreshes the state of all BeamJobRunModels that haven't terminated.
-
-    This operation puts the models back into storage transactionally.
-    """
+    """Refreshes the state of all BeamJobRunModels that haven't terminated."""
     beam_job_run_models = _get_all_beam_job_run_models(include_terminated=False)
 
     for beam_job_run_model in beam_job_run_models:
