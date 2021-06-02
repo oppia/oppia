@@ -23,9 +23,7 @@ import hmac
 import json
 import logging
 import os
-import sys
 import time
-import traceback
 
 from core.domain import auth_domain
 from core.domain import auth_services
@@ -196,7 +194,7 @@ class BaseHandler(webapp2.RequestHandler):
                     user_settings = (
                         user_services.create_new_user(auth_id, email))
                 else:
-                    logging.error(
+                    logging.exception(
                         'Cannot find user %s with email %s on page %s' % (
                             auth_id, email, self.request.uri))
                     auth_services.destroy_auth_session(self.response)
@@ -228,11 +226,7 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.user = user_services.get_user_actions_info(self.user_id)
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not (
-                    self.current_user_is_super_admin or
-                    self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
-                and self.request.path not in AUTH_HANDLER_PATHS):
+        if not self._is_requested_path_currently_accessible_to_user():
             auth_services.destroy_auth_session(self.response)
             return
 
@@ -257,11 +251,7 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not (
-                    self.current_user_is_super_admin or
-                    self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
-                and self.request.path not in AUTH_HANDLER_PATHS):
+        if not self._is_requested_path_currently_accessible_to_user():
             self.handle_exception(
                 self.TemporaryMaintenanceException(), self.app.debug)
             return
@@ -300,12 +290,36 @@ class BaseHandler(webapp2.RequestHandler):
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
-                logging.error('%s: payload %s', e, self.payload)
+                logging.exception('%s: payload %s', e, self.payload)
 
                 self.handle_exception(e, self.app.debug)
                 return
 
         super(BaseHandler, self).dispatch()
+
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
+
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
+        """
+        return (
+            self.current_user_is_super_admin or
+            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
@@ -384,7 +398,10 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-        self.response.cache_control.no_cache = True
+
+        # The 'no-store' must be used to properly invalidate the cache when we
+        # deploy a new version, using only 'no-cache' doesn't work properly.
+        self.response.cache_control.no_store = True
         self.response.cache_control.must_revalidate = True
         self.response.headers[b'Strict-Transport-Security'] = (
             b'max-age=31536000; includeSubDomains')
@@ -487,7 +504,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.error(b''.join(traceback.format_exception(*sys.exc_info())))
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -497,7 +514,7 @@ class BaseHandler(webapp2.RequestHandler):
                     'error': 'Could not find the page %s.' % self.request.uri})
             return
 
-        logging.error('Exception raised: %s', exception)
+        logging.exception('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,75 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for AdminDataService.
+ * @fileoverview Unit tests for ReleaseCoordinatorBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminPageData } from
-  'domain/admin/admin-backend-api.service';
+import { JobsData, JobsDataBackendDict, ReleaseCoordinatorBackendApiService } from './release-coordinator-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
-import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
-import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
-import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-
-describe('Admin Data Service', () => {
-  let adminDataService: AdminDataService = null;
+describe('Release coordinator backend api service', () => {
+  let rcbas: ReleaseCoordinatorBackendApiService;
   let httpTestingController: HttpTestingController;
-  var sampleAdminData = {
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
+  let jobsDataBackendResponse: JobsDataBackendDict = {
     unfinished_job_data: [],
-    role_to_actions: {
-      guest: ['action for guest']
-    },
-    topic_summaries: [
-      {
-        topic_model_created_on: 1591196558882.194,
-        uncategorized_skill_count: 0,
-        name: 'Empty Topic',
-        additional_story_count: 0,
-        total_skill_count: 0,
-        version: 1,
-        canonical_story_count: 0,
-        subtopic_count: 0,
-        description: '',
-        id: 'VqgPTpt7JyJy',
-        topic_model_last_updated: 1591196558882.2,
-        language_code: 'en',
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#C6DCDA'
-      }
-    ],
     one_off_job_status_summaries: [],
-    updatable_roles: {
-      TOPIC_MANAGER: 'topic manager'
-    },
     human_readable_current_time: 'June 03 15:31:20',
     audit_job_status_summaries: [],
-    demo_collections: [],
-    config_properties: {
-      oppia_csrf_secret: {
-        schema: {
-          type: 'unicode'
-        },
-        value: '3WHOWnD3sy0r1wukJ2lX4vBS_YA=',
-        description: 'Text used to encrypt CSRF tokens.'
-      }
-    },
-    demo_exploration_ids: ['19'],
     recent_job_data: [],
-    demo_explorations: [
-      [
-        '0',
-        'welcome.yaml'
-      ]
-    ],
     continuous_computations_data: [
       {
         is_startable: true,
@@ -93,99 +49,300 @@ describe('Admin Data Service', () => {
         is_stoppable: false,
         last_finished_msec: null
       }
-    ],
-    viewable_roles: {
-      TOPIC_MANAGER: 'topic manager'
-    },
-    feature_flags: [{
-      name: 'dummy_feature',
-      description: 'this is a dummy feature',
-      data_type: 'bool',
-      rules: [{
-        filters: [{
-          type: PlatformParameterFilterType.ServerMode,
-          conditions: [<[string, string]>['=', 'dev']]
-        }],
-        value_when_matched: true
-      }],
-      rule_schema_version: 1,
-      default_value: false,
-      is_feature: true,
-      feature_stage: FeatureStage.DEV
-    }]
+    ]
   };
-  let adminDataResponse: AdminPageData;
+  let jobsData: JobsData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AdminDataService]
+      imports: [HttpClientTestingModule]
     });
-    adminDataService = TestBed.get(AdminDataService);
+
+    rcbas = TestBed.get(ReleaseCoordinatorBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    adminDataResponse = {
-      demoExplorations: sampleAdminData.demo_explorations,
-      demoCollections: sampleAdminData.demo_collections,
-      demoExplorationIds: sampleAdminData.demo_exploration_ids,
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+    jobsData = {
       oneOffJobStatusSummaries:
-        sampleAdminData.one_off_job_status_summaries.map(
-          JobStatusSummary.createFromBackendDict),
+       jobsDataBackendResponse.one_off_job_status_summaries.map(
+         JobStatusSummary.createFromBackendDict),
       humanReadableCurrentTime:
-      sampleAdminData.human_readable_current_time,
+       jobsDataBackendResponse.human_readable_current_time,
       auditJobStatusSummaries:
-        sampleAdminData.audit_job_status_summaries.map(
-          JobStatusSummary.createFromBackendDict),
-      updatableRoles: sampleAdminData.updatable_roles,
-      roleToActions: sampleAdminData.role_to_actions,
-      configProperties: sampleAdminData.config_properties,
-      viewableRoles: sampleAdminData.viewable_roles,
-      unfinishedJobData: sampleAdminData.unfinished_job_data.map(
+       jobsDataBackendResponse.audit_job_status_summaries.map(
+         JobStatusSummary.createFromBackendDict),
+      unfinishedJobData: jobsDataBackendResponse.unfinished_job_data.map(
         Job.createFromBackendDict),
-      recentJobData: sampleAdminData.recent_job_data.map(
+      recentJobData: jobsDataBackendResponse.recent_job_data.map(
         Job.createFromBackendDict),
       continuousComputationsData:
-        sampleAdminData.continuous_computations_data.map(
-          ComputationData.createFromBackendDict),
-      topicSummaries: sampleAdminData.topic_summaries.map(
-        TopicSummary.createFromBackendDict),
-      featureFlags: sampleAdminData.feature_flags.map(
-        dict => PlatformParameter.createFromBackendDict(dict))
+       jobsDataBackendResponse.continuous_computations_data.map(
+         ComputationData.createFromBackendDict)
     };
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+      return Promise.resolve('sample-csrf-token');
+    });
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should return the correct admin data', fakeAsync(() => {
-    adminDataService.getDataAsync().then(function(response) {
-      expect(response).toEqual(adminDataResponse);
+  it('should fetch the jobs data', fakeAsync(() => {
+    rcbas.getJobsDataAsync().then((adminData) => {
+      expect(adminData).toEqual(jobsData);
     });
 
-    var req = httpTestingController.expectOne(
-      '/adminhandler');
+    let req = httpTestingController.expectOne('/jobshandler');
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleAdminData);
+    req.flush(jobsDataBackendResponse);
 
     flushMicrotasks();
   }));
 
-  it('should cache the response and not make a second request',
+  it('should use the rejection handler if the backend request failed.',
     fakeAsync(() => {
-      adminDataService.getDataAsync();
+      rcbas.getJobsDataAsync().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
-        '/adminhandler');
+        '/jobshandler');
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleAdminData);
 
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
       flushMicrotasks();
 
-      adminDataService.getDataAsync().then(function(response) {
-        expect(response).toEqual(adminDataResponse);
-      });
-
-      httpTestingController.expectNone('/adminhandler');
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
+
+  it('should request to start a new job when calling startNewJobAsync',
+    fakeAsync(() => {
+      let jobType = 'ActivityContributorsSummaryOneOffJob';
+      let payload = {
+        action: 'start_new_job',
+        job_type: jobType
+      };
+      rcbas.startNewJobAsync(jobType).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/jobshandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should request to cancel the job given its id' +
+   'and type when calling cancelJobAsync', fakeAsync(() => {
+    let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
+    let jobType = 'AuditContributorsOneOffJob';
+    let payload = {
+      action: 'cancel_job',
+      job_id: jobId,
+      job_type: jobType
+    };
+    rcbas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/jobshandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should request to start computation given the job' +
+   'name when calling startComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'start_computation',
+      computation_type: computationType
+    };
+    rcbas.startComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/jobshandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should request to stop computation given the job' +
+   'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    rcbas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/jobshandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to stop computation given the job' +
+   'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'InvalidComputaionType';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    rcbas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/jobshandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush({
+      error: 'Some error in the backend.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
+
+  it('should request to show the output of valid' +
+   'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/joboutputhandler?job_id=' +
+     'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ['[u\'fully-validated UserSettingsModel\', 1]']};
+    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should request to show the sorted output of valid' +
+   'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/joboutputhandler?job_id=' +
+     'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ['[u\'SUCCESS_KEPT\', 1]',
+      '[u\'SUCCESS_DELETED\', 1]']};
+    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to show the output of invalid' +
+   'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'Invalid jobId';
+    let adminJobOutputUrl = '/joboutputhandler?job_id=Invalid%20jobId';
+    rcbas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Internal Server Error'
+    }, {
+      status: 500, statusText: 'NoneType object has no attribute output'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Internal Server Error');
+  }));
+
+  it('should flush the memory cache when calling' +
+   'flushMemoryCacheAsync', fakeAsync(() => {
+    rcbas.flushMemoryCacheAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/memorycachehandler');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to flush the memory cache when calling' +
+   'flushMemoryCacheAsync', fakeAsync(() => {
+    rcbas.flushMemoryCacheAsync()
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/memorycachehandler');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush({
+      error: 'Failed to flush memory cache.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to flush memory cache.');
+  }));
+
+  it('should get the data of memory cache profile when' +
+   'calling getMemoryCacheProfileAsync', fakeAsync(() => {
+    rcbas.getMemoryCacheProfileAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/memorycachehandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(200);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should fail to get the data of memory cache profile' +
+   'when calling getMemoryCacheProfileAsync', fakeAsync(() => {
+    rcbas.getMemoryCacheProfileAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/memorycachehandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: 'Failed to get data.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+  }));
 });

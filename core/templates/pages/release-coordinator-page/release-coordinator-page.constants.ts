@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia release-coordinator page.
+ * @fileoverview Constants for the Oppia release coordinator page.
  */
 
 export const ReleaseCoordinatorPageConstants = {
   TAB_ID_JOBS: 'jobs',
   TAB_ID_MISC: ' misc',
-
-  PROFILE_URL_TEMPLATE: '/profile/<username>'
 } as const;

@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the admin page."""
+"""Tests for the release coordinator page."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -47,11 +47,42 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, sum([int(value) for value in values]))
 
 
+class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
+    """Test for release coordinator pages."""
+
+    def setUp(self):
+        """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
+        super(ReleaseCoordinatorPageTest, self).setUp()
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def test_guest_user_cannot_access_the_page(self):
+        self.get_html_response(
+            '/release-coordinator', expected_status_int=302)
+
+    def test_exploration_editor_cannot_access_the_page(self):
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(
+            '/release-coordinator', expected_status_int=401)
+
+    def test_release_coordinator_can_acces_the_page(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        response = self.get_html_response('/release-coordinator')
+        response.mustcontain(
+            '<oppia-release-coordinator-page></oppia-release-coordinator-page>')
+        self.logout()
+
+
 class JobsHandlerTest(test_utils.GenericTestBase):
     """Test for the JobsHandler."""
 
     def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
         super(JobsHandlerTest, self).setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -64,8 +95,6 @@ class JobsHandlerTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_RELEASE_COORDINATOR)
 
     def test_only_release_coordinator_allowed_to_use_jobs_handler(self):
-        """Test access rights to the admin page."""
-
         # Guest user.
         self.get_json('/jobshandler', expected_status_int=401)
 
@@ -288,6 +317,21 @@ class JobsHandlerTest(test_utils.GenericTestBase):
         status = jobs_test.StartExplorationEventCounter.get_status_code()
         self.assertEqual(
             status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+
+        self.logout()
+
+    def test_handler_with_invalid_action_raise_400(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        self.get_json('/jobshandler')
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/jobshandler', {
+                'action': 'invalid_action'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid action: invalid_action')
 
         self.logout()
 

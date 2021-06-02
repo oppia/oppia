@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the release-coordinator page."""
+"""Controllers for the release coordinator page."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-
-import logging
 
 from core import jobs
 from core import jobs_registry
@@ -25,7 +23,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import caching_services
 import feconf
-import python_utils
 import utils
 
 
@@ -35,16 +32,15 @@ class ReleaseCoordinatorPage(base.BaseHandler):
     @acl_decorators.can_access_release_coordinator_page
     def get(self):
         """Handles GET requests."""
-
         self.render_template('release-coordinator-page.mainpage.html')
 
 
 class JobsHandler(base.BaseHandler):
-    """Handler for the admin page."""
+    """Handler to present/start/stop jobs through release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_run_any_job
     def get(self):
         """Handles GET requests."""
         recent_job_data = jobs.get_data_for_recent_jobs()
@@ -97,51 +93,49 @@ class JobsHandler(base.BaseHandler):
             'unfinished_job_data': unfinished_job_data,
         })
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_run_any_job
     def post(self):
         """Handles POST requests."""
-        try:
-            if self.payload.get('action') == 'start_new_job':
-                for klass in (
-                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry.AUDIT_JOB_MANAGERS)):
-                    if klass.__name__ == self.payload.get('job_type'):
-                        klass.enqueue(klass.create_new())
-                        break
-            elif self.payload.get('action') == 'cancel_job':
-                job_id = self.payload.get('job_id')
-                job_type = self.payload.get('job_type')
-                for klass in (
-                        jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry.AUDIT_JOB_MANAGERS)):
-                    if klass.__name__ == job_type:
-                        klass.cancel(job_id, self.user_id)
-                        break
-            elif self.payload.get('action') == 'start_computation':
-                computation_type = self.payload.get('computation_type')
-                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                    if klass.__name__ == computation_type:
-                        klass.start_computation()
-                        break
-            elif self.payload.get('action') == 'stop_computation':
-                computation_type = self.payload.get('computation_type')
-                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-                    if klass.__name__ == computation_type:
-                        klass.stop_computation(self.user_id)
-                        break
-            self.render_json({})
-        except Exception as e:
-            logging.error('[RELEASE COORDINATOR] %s', e)
-            self.render_json({'error': python_utils.UNICODE(e)})
-            python_utils.reraise_exception()
+        action = self.payload.get('action')
+        if action == 'start_new_job':
+            for klass in (
+                    jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                        jobs_registry.AUDIT_JOB_MANAGERS)):
+                if klass.__name__ == self.payload.get('job_type'):
+                    klass.enqueue(klass.create_new())
+                    break
+        elif action == 'cancel_job':
+            job_id = self.payload.get('job_id')
+            job_type = self.payload.get('job_type')
+            for klass in (
+                    jobs_registry.ONE_OFF_JOB_MANAGERS + (
+                        jobs_registry.AUDIT_JOB_MANAGERS)):
+                if klass.__name__ == job_type:
+                    klass.cancel(job_id, self.user_id)
+                    break
+        elif action == 'start_computation':
+            computation_type = self.payload.get('computation_type')
+            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                if klass.__name__ == computation_type:
+                    klass.start_computation()
+                    break
+        elif action == 'stop_computation':
+            computation_type = self.payload.get('computation_type')
+            for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                if klass.__name__ == computation_type:
+                    klass.stop_computation(self.user_id)
+                    break
+        else:
+            raise self.InvalidInputException('Invalid action: %s' % action)
+        self.render_json({})
 
 
 class JobOutputHandler(base.BaseHandler):
-    """Retrieves job output to show on the admin page."""
+    """Retrieves job output to show on the release coordinator page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_run_any_job
     def get(self):
         """Handles GET requests."""
         job_id = self.request.get('job_id')
@@ -155,7 +149,7 @@ class MemoryCacheHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_manage_memcache
     def get(self):
         cache_stats = caching_services.get_memory_cache_stats()
         self.render_json({
@@ -164,7 +158,7 @@ class MemoryCacheHandler(base.BaseHandler):
             'total_keys_stored': cache_stats.total_number_of_keys_stored
         })
 
-    @acl_decorators.can_access_release_coordinator_page
+    @acl_decorators.can_manage_memcache
     def delete(self):
         caching_services.flush_memory_cache()
         self.render_json({})

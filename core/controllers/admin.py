@@ -83,9 +83,15 @@ class AdminHandler(base.BaseHandler):
 
         feature_flag_dicts = feature_services.get_all_feature_flag_dicts()
 
+        config_properties = config_domain.Registry.get_config_property_schemas()
+
+        # Removes promo-bar related configs as promo-bar is handlded by
+        # release coordinators in /release-coordinator page.
+        del config_properties['promo_bar_enabled']
+        del config_properties['promo_bar_message']
+
         self.render_json({
-            'config_properties': (
-                config_domain.Registry.get_config_property_schemas()),
+            'config_properties': config_properties,
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
@@ -214,7 +220,7 @@ class AdminHandler(base.BaseHandler):
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
-            logging.error('[ADMIN] %s', e)
+            logging.exception('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
             python_utils.reraise_exception()
 

@@ -35,11 +35,11 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
 
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
-  profilePictureDataUrl: string = '';
-  username: string = '';
-  profileUrl: string = '';
-  logoutUrl = AppConstants.LOGOUT_URL;
-  profileDropdownIsActive = false;
+  profilePictureDataUrl: string;
+  username: string;
+  profileUrl: string;
+  logoutUrl: string = AppConstants.LOGOUT_URL;
+  profileDropdownIsActive: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -61,6 +61,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   switchTab(tabName: string): void {
     if (tabName !== this.activeTab) {
       this.activeTabChange.emit(tabName);
+      this.activeTab = tabName;
     }
   }
 
@@ -70,21 +71,21 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   }
 
   async getUserInfoAsync(): Promise<void> {
-    this.activeTab = this.TAB_ID_JOBS;
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
-        ReleaseCoordinatorPageConstants.PROFILE_URL_TEMPLATE, {
+        '/profile/<username>', {
           username: this.username
-        })
-    );
+        }));
   }
 
   ngOnInit(): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
+
+    this.activeTab = this.TAB_ID_JOBS;
   }
 }
 

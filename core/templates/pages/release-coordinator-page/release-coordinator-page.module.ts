@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
-
     SharedComponentsModule
   ],
   declarations: [

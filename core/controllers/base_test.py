@@ -48,7 +48,6 @@ import main
 import python_utils
 import utils
 
-import contextlib2
 from mapreduce import main as mapreduce_main
 import webapp2
 import webtest
@@ -218,6 +217,15 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
         self.delete_json('/community-library/data', expected_status_int=404)
+
+    def test_html_requests_have_no_store_cache_policy(self):
+        response = self.get_html_response('/community-library')
+        # We set 'no-store' and 'must-revalidate', but webapp
+        # adds 'no-cache' since it is basically a subset of 'no-store'.
+        self.assertEqual(
+            response.headers['Cache-Control'],
+            'must-revalidate, no-cache, no-store'
+        )
 
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
@@ -555,7 +563,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual('http://localhost/', response.headers['location'])
 
     def test_unauthorized_user_exception_raised_when_session_is_stale(self):
-        with contextlib2.ExitStack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -572,7 +580,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F')
 
     def test_unauthorized_user_exception_raised_when_session_is_invalid(self):
-        with contextlib2.ExitStack() as exit_stack:
+        with python_utils.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(self.swap_with_call_counter(
                 auth_services, 'destroy_auth_session'))
             logs = exit_stack.enter_context(
@@ -598,7 +606,12 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MaintenanceModeTests, self).setUp()
-        with contextlib2.ExitStack() as context_stack:
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+        with python_utils.ExitStack() as context_stack:
             context_stack.enter_context(
                 self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True))
             self.context_stack = context_stack.pop_all()
@@ -620,6 +633,19 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(self):
         self.context_stack.enter_context(self.super_admin_context())
+        destroy_auth_session_call_counter = self.context_stack.enter_context(
+            self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
+
+        response = self.get_html_response('/community-library')
+
+        self.assertIn('<library-page>', response.body)
+        self.assertNotIn('<maintenance-page>', response.body)
+        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+
+    def test_html_response_is_not_rejected_when_user_is_release_coordinator(
+            self):
+        self.context_stack.enter_context(
+            self.login_context(self.RELEASE_COORDINATOR_EMAIL))
         destroy_auth_session_call_counter = self.context_stack.enter_context(
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
@@ -1378,7 +1404,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -1391,7 +1418,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)

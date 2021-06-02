@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia admin page.
+ * @fileoverview Constants for the release coordinator page.
  */
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
@@ -24,6 +24,3 @@ angular.module('oppia').constant(
   'TAB_ID_JOBS', ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
 angular.module('oppia').constant(
   'TAB_ID_MISC', ReleaseCoordinatorPageConstants.TAB_ID_MISC);
-
-angular.module('oppia').constant(
-  'PROFILE_URL_TEMPLATE', ReleaseCoordinatorPageConstants.PROFILE_URL_TEMPLATE);
