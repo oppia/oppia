@@ -158,7 +158,7 @@ export class ReleaseCoordinatorBackendApiService {
 
   async flushMemoryCacheAsync(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http['delete']<void>(
+      this.http.delete<void>(
         '/memorycachehandler').toPromise().then(response => {
         resolve(response);
       }, errorResponse => {
