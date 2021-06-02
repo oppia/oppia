@@ -476,8 +476,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'check_if_on_ci', lambda: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'always'])
 
     def test_no_reruns_off_ci_pass(self):
         def mock_run_tests(unused_args):
@@ -496,8 +498,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             flake_checker, 'check_if_on_ci', lambda: False))
         self.exit_stack.enter_context(self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(0,)]))
+        self.exit_stack.enter_context(self.swap(
+            run_e2e_tests, 'RERUN_POLICIES', MOCK_RERUN_POLICIES))
 
-        run_e2e_tests.main(args=['--suite', 'mySuite'])
+        run_e2e_tests.main(args=['--suite', 'always'])
 
     def test_start_tests_skip_build(self):
         self.exit_stack.enter_context(self.swap_with_checks(
