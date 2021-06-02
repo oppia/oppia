@@ -77,6 +77,7 @@ import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 
 
 // Directives.
@@ -99,6 +100,8 @@ import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
 
 // Miscellaneous.
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
@@ -106,7 +109,6 @@ import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';
 import { MissingTranslationCustomHandler } from 'pages/missing-translations-handler';
 import constants from 'assets/constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const toastrConfig = {
   allowHtml: false,
@@ -206,6 +208,7 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -269,6 +272,7 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    I18nLanguageSelectorComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -310,6 +314,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
