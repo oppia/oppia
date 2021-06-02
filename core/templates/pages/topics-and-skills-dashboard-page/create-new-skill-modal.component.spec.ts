@@ -16,7 +16,6 @@
  * @fileoverview Unit Test for create new skill modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
@@ -44,7 +43,6 @@ describe('Create new skill modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule,
         FormsModule
       ],
       declarations: [
