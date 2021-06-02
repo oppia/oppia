@@ -29,7 +29,7 @@ export interface ThreadMessageBackendDict {
   // These properties can be null as we have defined functions
   // 'hasStatusUpdate' & 'hasSubjectUpdate' to check for them to be not null,
   // the corresponding tests with null values for these properties can
-  // be seen in FeedbackThreadObjectFactorySpec.ts file
+  // be seen in FeedbackThreadObjectFactorySpec.ts file.
   'updated_status': string | null;
   'updated_subject': string | null;
 }
