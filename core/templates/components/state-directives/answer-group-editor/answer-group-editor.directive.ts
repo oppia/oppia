@@ -274,8 +274,10 @@ angular.module('oppia').directive('answerGroupEditor', [
                 if (
                   ctrl.originalContentIdToContent.hasOwnProperty(contentId) &&
                   updatedContentIdToContent.hasOwnProperty(contentId) &&
-                  (!_.isEqual(ctrl.originalContentIdToContent[contentId],
-                    updatedContentIdToContent[contentId]))
+                  !isEqual(
+                    ctrl.originalContentIdToContent[contentId],
+                    updatedContentIdToContent[contentId]
+                  )
                 ) {
                   contentIdsWithModifiedContent.push(contentId);
                 }
