@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for RefresherExplorationConfirmationModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -51,7 +50,6 @@ describe('Refresher Exploration Confirmation Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [
         RefresherExplorationConfirmationModal
       ],
