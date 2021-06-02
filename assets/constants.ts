@@ -5254,7 +5254,7 @@ export default {
   }],
 
   "TRANSLATION_TIPS": {
-    // Arabic
+    // Arabic.
     "ar": [
       // eslint-disable-next-line max-len
       "In Oppia, we prefer to use simple words that can be easily understood by children. For example, we use “تابع قائلًا” instead of “أردف قائلًا”. Furthermore, the English words that are used in the Arab society regularly can be translated as follows; Arabic word (The regularly used English word). For example, we can translate the word cupcakes this way; كعك القوالب الصغيرة (cupcakes). ",
@@ -5268,7 +5268,7 @@ export default {
       // eslint-disable-next-line max-len
       "Use the hyperlinks to different cards as shown in the original English Text."
     ],
-    // Bangla
+    // Bangla.
     "bn": [
       // eslint-disable-next-line max-len
       "Use simple Bangla words that are used in daily communication. Note that common English words (pencil, etc.) can be written as transliterations (e.g পেন্সিল ).",
@@ -5279,7 +5279,7 @@ export default {
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Bangla as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
     ],
-    // Chinese
+    // Chinese.
     "zh": [
       // eslint-disable-next-line max-len
       "Write fractions or numbers as they are, unless they are written out in words. For instance, one-fifth would be (五分之一)",
@@ -5294,7 +5294,7 @@ export default {
       // eslint-disable-next-line max-len
       "Make sure that you have selected the correct words (e.g. words such as 再 and 在 )."
     ],
-    // Hindi
+    // Hindi.
     "hi": [
       // eslint-disable-next-line max-len
       "Prefer simple Hindi words that are used in daily communication Note that common English words (pen, paper, cake, etc.) can be written as transliterations (पेन, पेपर, केक). For harder words, include the English word in parentheses, e.g. अंश (Numerator), हर (Denominator), भिन्न (Fraction).",
@@ -5307,7 +5307,7 @@ export default {
       // eslint-disable-next-line max-len
       "If the original card has “components” (such as pictures, links, and equations), these need to be added to the translated content. You can use the “Copy tool” for this -- click on the Copy tool and then click on the component you want to carry over. Also, double-click on the image and translate the alt text (and caption, if any)."
     ],
-    // Spanish
+    // Spanish.
     "es": [
       "Include proper punctuation, ¡blank!, ¿question? and accent marks.",
       // eslint-disable-next-line max-len
@@ -5317,7 +5317,7 @@ export default {
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Spanish as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
     ],
-    // Portuguese
+    // Portuguese.
     "pt": [
       // eslint-disable-next-line max-len
       "When translating names of mathematical terms, look for how these names are used in Brazilian education/literature instead of translating literally. For example, while the names may be similar in some cases (e.g. \"The Commutative Property of Multiplication\" would be \"A Propriedade Comutativa da Multiplicação\"), in other cases the literal translation will not match the names used in Brazil (e.g. \"The Carrying Method of multiplication\" would be \"O Método Tradicional de Multiplicação\"). Also, terms like \"Place Values\" may have a different translation depending on the context, which may be \"casa\"/\"ordem\" or \"valor relativo\".",
