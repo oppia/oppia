@@ -25,6 +25,13 @@ import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.servic
 import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
 
+interface MemoryCacheProfile {
+  totalAllocatedInBytes: string,
+  peakAllocatedInBytes: string,
+  totalKeysStored: string
+}
+
+
 @Component({
   selector: 'oppia-release-coordinator-page',
   templateUrl: './release-coordinator-page.component.html',
@@ -32,7 +39,7 @@ import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.cons
 export class ReleaseCoordinatorPageComponent implements OnInit {
   statusMessage: string;
   activeTab: string;
-  memoryCacheProfile = null;
+  memoryCacheProfile: MemoryCacheProfile;
   memoryCacheDataFetched: boolean;
   promoBarConfigForm: FormGroup;
   submitButtonDisabled: boolean;
