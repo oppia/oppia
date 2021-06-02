@@ -40,15 +40,13 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   profileUrl: string;
   logoutUrl: string = AppConstants.LOGOUT_URL;
   profileDropdownIsActive: boolean = false;
+  logoWebpImageSrc: string;
+  logoPngImageSrc: string;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
   ) {}
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
 
   activateProfileDropdown(): boolean {
     return this.profileDropdownIsActive = true;
@@ -84,6 +82,11 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   ngOnInit(): void {
     this.getProfileImageDataAsync();
     this.getUserInfoAsync();
+
+    this.logoPngImageSrc = this.urlInterpolationService.getStaticImageUrl(
+      '/logo/288x128_logo_white.png');
+    this.logoWebpImageSrc = this.urlInterpolationService.getStaticImageUrl(
+      '/logo/288x128_logo_white.webp');
 
     this.activeTab = this.TAB_ID_JOBS;
   }
