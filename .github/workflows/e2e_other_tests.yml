@@ -51,6 +51,9 @@ jobs:
       - name: Run e2e Admin Page Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="adminPage"
+      - name: Run e2e Admin Page Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --prod_env --skip-install --skip-build --suite="releaseCoordinatorPageFeatures"
       - name: Uploading protractor-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
