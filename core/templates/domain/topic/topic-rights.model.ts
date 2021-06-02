@@ -17,7 +17,7 @@
  * topic rights domain objects.
  */
 
-export interface TopicRightsBackendDict {
+interface TopicRightsBackendDict {
   'published': boolean;
   'can_publish_topic': boolean;
   'can_edit_topic': boolean;

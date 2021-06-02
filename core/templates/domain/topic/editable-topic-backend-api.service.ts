@@ -47,7 +47,7 @@ interface FetchTopicBackendResponse {
   'skill_creation_is_allowed': boolean;
 }
 
-export interface FetchTopicResponse {
+interface FetchTopicResponse {
   topicDict: TopicBackendDict;
   groupedSkillSummaries: {
     [topicName: string]: SkillSummaryBackendDict[];
@@ -83,7 +83,7 @@ interface UpdateTopicBackendResponse {
   };
 }
 
-export interface UpdateTopicResponse {
+interface UpdateTopicResponse {
   topicDict: TopicBackendDict;
   skillIdToDescriptionDict: SkillIdToDescriptionMap;
   skillIdToRubricsDict: {
@@ -162,13 +162,13 @@ export class EditableTopicBackendApiService {
   }
 
   private _fetchSubtopicPage(
-      topicId: number,
+      topicId: string,
       subtopicId: number,
       successCallback: (value?: SubtopicPageBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
     let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
-        topic_id: topicId.toString(),
+        topic_id: topicId,
         subtopic_id: subtopicId.toString()
       });
 
@@ -283,7 +283,7 @@ export class EditableTopicBackendApiService {
   }
 
   async fetchSubtopicPageAsync(
-      topicId: number,
+      topicId: string,
       subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);

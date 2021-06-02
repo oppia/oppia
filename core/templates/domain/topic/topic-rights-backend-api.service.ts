@@ -23,7 +23,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { TopicRightsBackendDict } from './topic-rights.model';
 
 interface TopicRightsBackendResponse {
   'topic_id': string,
@@ -43,7 +42,7 @@ export class TopicRightsBackendApiService {
 
   private _fetchTopicRights(
       topicId: string,
-      successCallback: (value?: TopicRightsBackendDict) => void,
+      successCallback: (value?: TopicRightsBackendResponse) => void,
       errorCallback: (reason?: string) => void): void {
     let topicRightsUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_RIGHTS_URL_TEMPLATE, {
@@ -51,7 +50,7 @@ export class TopicRightsBackendApiService {
       });
 
     this.httpClient.get(topicRightsUrl).toPromise().then(
-      (response: TopicRightsBackendDict) => {
+      (response: TopicRightsBackendResponse) => {
         successCallback(response);
       }, (errorResponse) => {
         errorCallback(errorResponse.error.error);
@@ -108,7 +107,7 @@ export class TopicRightsBackendApiService {
   }
 
   async fetchTopicRightsAsync(
-      topicId: string): Promise<TopicRightsBackendDict> {
+      topicId: string): Promise<TopicRightsBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopicRights(topicId, resolve, reject);
     });
