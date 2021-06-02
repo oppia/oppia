@@ -347,10 +347,12 @@ import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { SvgFileFetcherBackendApiService } from 'objects/templates/svg-file-fetcher-backend-api.service';
 import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
 import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import { DeleteAccountBackendApiService } from 'pages/delete-account-page/services/delete-account-backend-api.service';
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
@@ -685,6 +687,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
+  ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
@@ -693,6 +696,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ThreadDataBackendApiService', ThreadDataBackendApiService],
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
+  ['TopicEditorStateService', TopicEditorStateService],
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
