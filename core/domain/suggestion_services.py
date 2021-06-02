@@ -600,19 +600,24 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         list(Suggestion). A list of suggestions which the given user is allowed
         to review.
     """
-    all_suggestions = ([
-        get_suggestion_from_model(s) for s in (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_suggestions_of_suggestion_type(
-                suggestion_type, user_id))
-    ])
-    user_review_rights = user_services.get_user_contribution_rights(user_id)
+    all_suggestions = []
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        contribution_rights = user_services.get_user_contribution_rights(
+            user_id)
         language_codes = (
-            user_review_rights.can_review_translation_for_language_codes)
-        return [
-            suggestion for suggestion in all_suggestions
-            if suggestion.change.language_code in language_codes]
+            contribution_rights.can_review_translation_for_language_codes)
+        all_suggestions = ([
+            get_suggestion_from_model(s) for s in (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_translation_suggestions(
+                    user_id, language_codes))
+        ])
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        all_suggestions = ([
+            get_suggestion_from_model(s) for s in (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_question_suggestions(user_id))
+        ])
 
     return all_suggestions
 
@@ -656,11 +661,12 @@ def get_translation_suggestions_waiting_longest_for_review(language_code):
     ]
 
 
-def get_translation_suggestions_in_review_by_exploration(exp_id):
+def get_translation_suggestions_in_review_by_exploration(exp_id, language_code):
     """Returns translation suggestions in review by exploration ID.
 
     Args:
         exp_id: str. Exploration ID.
+        language_code: str. Language code.
 
     Returns:
         list(Suggestion). A list of translation suggestions in review with
@@ -668,7 +674,8 @@ def get_translation_suggestions_in_review_by_exploration(exp_id):
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
-        .get_translation_suggestions_in_review_with_exp_id(exp_id)
+        .get_translation_suggestions_in_review_with_exp_id(
+            exp_id, language_code)
     )
     return [
         get_suggestion_from_model(model) if model else None
