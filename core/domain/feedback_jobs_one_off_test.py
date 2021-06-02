@@ -392,10 +392,10 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
 
 class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off Text message length limit job."""
+    """Tests for the one-off text message length limit job."""
 
     # Text with length more than 10000.
-    TEXT = 'a' * 10001
+    TEXT_WITH_LENGTH_PAST_LIMIT = 'a' * 10001
 
     def setUp(self):
         super(TextMessageLengthAuditOneOffJobTests, self).setUp()
@@ -417,7 +417,8 @@ class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
         # Create a thread.
         thread_id = feedback_services.create_thread(
-            'exploration', '0', None, 'subject 1', self.TEXT)
+            'exploration', '0', None, 'subject 1',
+            self.TEXT_WITH_LENGTH_PAST_LIMIT)
 
         output = self._run_one_off_job()
         self.assertEqual(
@@ -429,10 +430,10 @@ class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
 
 class TrimTextMessageLengthOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off Trim text message length job."""
+    """Tests for the one-off trim text message length job."""
 
     # Text with length more than 10000.
-    TEXT = 'a' * 10005
+    TEXT_WITH_LENGTH_PAST_LIMIT = 'a' * 10005
 
     def setUp(self):
         super(TrimTextMessageLengthOneOffJobTests, self).setUp()
@@ -454,7 +455,8 @@ class TrimTextMessageLengthOneOffJobTests(test_utils.GenericTestBase):
 
         # Create a thread.
         thread_id = feedback_services.create_thread(
-            'exploration', '0', None, 'subject 1', self.TEXT)
+            'exploration', '0', None, 'subject 1',
+            self.TEXT_WITH_LENGTH_PAST_LIMIT)
 
         output = self._run_one_off_job()
         self.assertEqual(

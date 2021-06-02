@@ -105,7 +105,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class TextMessageLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that audits and validates text length"""
+    """Job that audits and validates text length."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -128,7 +128,7 @@ class TextMessageLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class TrimTextMessageLengthOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that trims the text length"""
+    """Job that trims the text length."""
 
     @classmethod
     def entity_classes_to_map_over(cls):

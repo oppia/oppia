@@ -196,7 +196,8 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function(reviewMessage) {
-        if (ValidatorsService.isValidReviewMessage(reviewMessage, true)) {
+        if (ValidatorsService.isValidReviewMessage(reviewMessage,
+          /* ShowWarnings= */ true)) {
           $scope.resolvingSuggestion = true;
           SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
             'Translation');

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import feedback_services
 from core.platform import models
@@ -154,19 +155,22 @@ class GeneralFeedbackMessageModelValidator(
 
     @classmethod
     def _validate_text(cls, item):
-        """Validate that text length is less than 10000 characters.
+        """Validate text length is less than 10000 characters.
 
         Args:
             item: datastore_services.Model. GeneralFeedbackMessageModel to
                 validate.
-        """
 
+                MAX_REVIEW_MESSAGE_LENGTH: The max review message length
+                allowed.
+        """
         if item.text:
-            if len(item.text) > 10000:
+            if len(item.text) > constants.MAX_REVIEW_MESSAGE_LENGTH:
                 cls._add_error(
                     'text',
-                    'Entity id %s: has text length of more than 10000 '
-                    'characters' % (item.id))
+                    'Entity id %s: has text length of more than %s '
+                    'characters' % (
+                        item.id, constants.MAX_REVIEW_MESSAGE_LENGTH))
 
     @classmethod
     def _validate_message_id(
