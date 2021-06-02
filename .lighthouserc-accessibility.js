@@ -35,6 +35,7 @@ module.exports = {
         "http://127.0.0.1:8181/emaildashboard",
         'http://127.0.0.1:8181/get-started',
         'http://127.0.0.1:8181/learner-dashboard',
+        'http://127.0.0.1:8181/license',
         'http://127.0.0.1:8181/nonprofits',
         "http://127.0.0.1:8181/moderator",
         'http://127.0.0.1:8181/parents',
@@ -126,6 +127,12 @@ module.exports = {
         },
         {
           'matchingUrlPattern': '^http://127.0.0.1:8181/learner-dashboard$',
+          'assertions': {
+            'categories:accessibility': ['error', {'minScore': 1}]
+          }
+        },
+        {
+          'matchingUrlPattern': '^http://127.0.0.1:8181/license$',
           'assertions': {
             'categories:accessibility': ['error', {'minScore': 1}]
           }

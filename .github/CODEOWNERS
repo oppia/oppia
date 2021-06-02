@@ -611,6 +611,7 @@
 /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/participation-playbook/ @jameesjohn @vojtechjelinek
+/core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
