@@ -17,10 +17,11 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NO_ERRORS_SCHEMA, Pipe, SimpleChanges } from '@angular/core';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -46,7 +47,40 @@ describe('Edit Thumbnail Modal Component', () => {
   let closeSpy: jasmine.Spy;
   let dismissSpy: jasmine.Spy;
 
-  beforeEach(fakeAsync(() => {
+  class MockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = () => {
+        return 'Fake onload executed';
+      };
+    }
+    readAsDataURL(file) {
+      this.onload();
+      return 'The file is loaded';
+    }
+  }
+
+  class MockImageObject {
+    source = null;
+    onload = null;
+    constructor() {
+      this.onload = () => {
+        return 'Fake onload executed';
+      };
+    }
+    set src(url) {
+      this.onload();
+    }
+  }
+
+  let mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
+      return { tags: ['script'], attrs: [] };
+    },
+  };
+
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
@@ -57,22 +91,39 @@ describe('Edit Thumbnail Modal Component', () => {
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal
+        },
+        {
+          provide: SvgSanitizerService,
+          useValue: mockSvgSanitizerService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(EditThumbnailModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-  });
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockImageObject'.
+    // @ts-expect-error
+    spyOn(window, 'Image').and.returnValue(new MockImageObject());
+    // This throws "Argument of type 'mockReaderObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". This is because
+    // 'HTMLImageElement' has around 250 more properties. We have only defined
+    // the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
+    spyOn(component, 'updateBackgroundColor').and.callThrough();
+    spyOn(component, 'setImageDimensions').and.callThrough();
+  }));
 
   it('should load a image file in onchange event and save it if it\'s a' +
-    ' svg file', fakeAsync(() => {
+    ' svg file', () => {
+    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
+    const resetSpy = spyOn(component, 'reset').and.callThrough();
     let fileContent = (
       'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
       'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
@@ -82,41 +133,17 @@ describe('Edit Thumbnail Modal Component', () => {
     component.invalidImageWarningIsShown = false;
     component.uploadedImageMimeType = 'image/svg+xml';
     component.imgSrc = 'source';
-    spyOn(component, 'isUploadedImageSvg').and.returnValue(true);
-    spyOn(component, 'updateBackgroundColor').and.callThrough();
-    spyOn(component, 'setImageDimensions').and.callThrough();
-    let mockFileReader = {
-      result: '',
-      readAsDataURL: (blobInput) => {},
-      onload: () => {}
-    };
-    // This throws "Argument of type 'mockReaderObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(mockFileReader);
-    let mockImageReader = {
-      result: '',
-      naturalHeight: 100,
-      naturalWidth: 100,
-      src: 'source',
-      onload: () => {}
-    };
-    // This throws "Argument of type 'mockImageObject' is not assignable to
-    // parameter of type 'HTMLImageElement'.". This is because
-    // 'HTMLImageElement' has around 250 more properties. We have only defined
-    // the properties we need in 'mockImageObject'.
-    // @ts-expect-error
-    spyOn(window, 'Image').and.returnValue(mockImageReader);
+
     component.onFileChanged(file);
-    flush();
     expect(component.invalidImageWarningIsShown).toBe(false);
-  }));
+    expect(component.tags).toEqual(['script']);
+    expect(component.attrs).toEqual([]);
+    expect(resetSpy).toHaveBeenCalled();
+  });
 
   it('should not load file if it is not a svg type', () => {
+    spyOn(component, 'isUploadedImageSvg').and.returnValue(false);
     expect(component.invalidImageWarningIsShown).toBe(false);
-
     // This is just a mocked base 64 in order to test the FileReader event
     // and its result property.
     const dataBase64Mock = 'PHN2ZyB4bWxucz0iaHR0cDo';
@@ -142,6 +169,12 @@ describe('Edit Thumbnail Modal Component', () => {
     };
     component.ngOnChanges(changes);
     expect(component.openInUploadMode).toBeFalse();
+  });
+
+  it('should check for uploaded image to be svg', () => {
+    component.uploadedImageMimeType = 'image/svg+xml';
+    let result = component.isUploadedImageSvg();
+    expect(result).toBeTrue();
   });
 
   it('should set image dimensions', () => {

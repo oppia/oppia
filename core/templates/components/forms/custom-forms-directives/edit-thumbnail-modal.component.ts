@@ -90,6 +90,35 @@ export class EditThumbnailModalComponent implements OnChanges {
     this.bgColor = color;
   }
 
+  setUploadedFile(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        //   Setting a default height of 300px and width of
+        //   150px since most browsers use these dimensions
+        //   for SVG files that do not have an explicit
+        //   height and width defined.
+        this.setImageDimensions(
+          img.naturalHeight || 150,
+          img.naturalWidth || 300);
+      };
+      this.imgSrc = <string>reader.result;
+      this.updateBackgroundColor(this.tempBgColor);
+      img.src = this.imgSrc;
+      this.uploadedImage = this.imgSrc;
+      this.invalidTagsAndAttributes = (
+        this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+          this.imgSrc));
+      this.tags = this.invalidTagsAndAttributes.tags;
+      this.attrs = this.invalidTagsAndAttributes.attrs;
+      if (this.tags.length > 0 || this.attrs.length > 0) {
+        this.reset();
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   onFileChanged(file: File): void {
     this.uploadedImageMimeType = file.type;
     this.invalidImageWarningIsShown = false;
@@ -98,33 +127,7 @@ export class EditThumbnailModalComponent implements OnChanges {
       attrs: []
     };
     if (this.isUploadedImageSvg()) {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        this.imgSrc = reader.result as string;
-        this.updateBackgroundColor(this.tempBgColor);
-        let img = new Image();
-
-        img.onload = () => {
-          //   Setting a default height of 300px and width of
-          //   150px since most browsers use these dimensions
-          //   for SVG files that do not have an explicit
-          //   height and width defined.
-          this.setImageDimensions(
-            img.naturalHeight || 150,
-            img.naturalWidth || 300);
-        }
-        img.src = this.imgSrc;
-        this.uploadedImage = this.imgSrc;
-        this.invalidTagsAndAttributes = (
-          this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
-            this.imgSrc));
-        this.tags = this.invalidTagsAndAttributes.tags;
-        this.attrs = this.invalidTagsAndAttributes.attrs;
-        if (this.tags.length > 0 || this.attrs.length > 0) {
-          this.reset();
-        }
-      }
+      this.setUploadedFile(file);
     } else {
       this.reset();
       this.invalidImageWarningIsShown = true;
