@@ -22,6 +22,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DeleteAccountPageComponent } from './delete-account-page.component';
 import { DeleteAccountBackendApiService } from './services/delete-account-backend-api.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -38,6 +39,7 @@ describe('Delete account page', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [DeleteAccountPageComponent, MockTranslatePipe],
       providers: [
         DeleteAccountBackendApiService,
