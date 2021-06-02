@@ -2812,8 +2812,8 @@ class State(python_utils.OBJECT):
         """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
-                AnswerGroup domain object.
+            answer_groups_list: list(AnswerGroup). List of AnswerGroup domain
+                objects.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -2839,21 +2839,17 @@ class State(python_utils.OBJECT):
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
-        for answer_group_dict in answer_groups_list:
-            rule_specs_list = answer_group_dict['rule_specs']
+        for answer_group in answer_groups_list:
+            rule_specs_list = answer_group.rule_specs
             if not isinstance(rule_specs_list, list):
                 raise Exception(
                     'Expected answer group rule specs to be a list, '
                     'received %s' % rule_specs_list)
 
-            answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [],
-                answer_group_dict['training_data'],
-                answer_group_dict['tagged_skill_misconception_id'])
+            answer_group.rule_specs = []
             interaction_answer_groups.append(answer_group)
 
-            for rule_dict in rule_specs_list:
-                rule_spec = RuleSpec.from_dict(rule_dict)
+            for rule_spec in rule_specs_list:
 
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs

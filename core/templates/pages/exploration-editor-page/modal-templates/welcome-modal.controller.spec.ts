@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Unit tests for WelcomeModalController.
  */
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Welcome Modal Controller', function() {
   var $scope = null;
@@ -25,6 +28,7 @@ describe('Welcome Modal Controller', function() {
   var explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');
