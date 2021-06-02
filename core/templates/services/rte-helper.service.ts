@@ -103,7 +103,7 @@ angular.module('oppia').factory('RteHelperService', [
             }
           },
           controller: 'RteHelperModalController'
-        }).result.then(onSubmitCallback)['catch'](onDismissCallback);
+        }).result.then(onSubmitCallback).catch(onDismissCallback);
       }
 
     };
