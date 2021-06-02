@@ -22,7 +22,6 @@ import { WindowDimensionsService } from
 import { UrlService } from
   'services/contextual/url.service';
 import { of } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/landing-pages/stewards-landing-page/' +
@@ -36,7 +35,6 @@ describe('Stewards Landing Page', function() {
   var windowDimensions = new WindowDimensionsService(windowRef);
 
   beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRef);
     $provide.value('WindowDimensionsService', windowDimensions);

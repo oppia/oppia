@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for CreateNewSkillModalService.
  */
 
-import { HttpClientModule } from '@angular/common/http';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
@@ -95,7 +94,6 @@ describe('Create New Skill Modal Service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientModule],
       providers: [
         {
           provide: NgbModal,

@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
@@ -44,7 +45,6 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('History tab component', function() {
   var ctrl = null;
@@ -78,7 +78,11 @@ describe('History tab component', function() {
     commit_cmds: []
   }];
 
-  importAllAngularServices();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);

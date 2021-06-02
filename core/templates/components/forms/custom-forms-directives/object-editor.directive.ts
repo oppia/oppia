@@ -84,7 +84,6 @@ angular.module('oppia').directive('objectEditor', [
           'skill-selector',
           'subtitled-html',
           'subtitled-unicode',
-          'svg-filename',
           'translatable-html-content-id',
           'translatable-set-of-normalized-string',
           'translatable-set-of-unicode-string',

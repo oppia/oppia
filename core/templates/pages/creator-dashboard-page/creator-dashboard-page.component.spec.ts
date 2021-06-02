@@ -22,9 +22,9 @@ import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collecti
 import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { UpgradedServices } from 'services/UpgradedServices';
 import { Suggestion } from 'domain/suggestion/suggestion.model';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
@@ -70,7 +70,12 @@ describe('Creator dashboard controller', () => {
     canCreateCollections: () => true
   };
 
-  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia', $provide => {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
 
   beforeEach(angular.mock.inject(($injector, $componentController) => {
     $httpBackend = $injector.get('$httpBackend');
@@ -678,6 +683,7 @@ describe('Creator dashboard controller', () => {
       threads_for_suggestions_to_review_list: [],
       suggestions_to_review_list: []
     };
+
     beforeEach(function() {
       spyOn(CreatorDashboardBackendApiService, 'fetchDashboardDataAsync')
         .and.returnValue($q.resolve({

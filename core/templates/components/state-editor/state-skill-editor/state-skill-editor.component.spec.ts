@@ -33,7 +33,6 @@ import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
 describe('State Skill Editor Component', () => {
@@ -124,8 +123,7 @@ describe('State Skill Editor Component', () => {
         MatCardModule,
         MatCheckboxModule,
         MatRadioModule,
-        FormsModule,
-        HttpClientTestingModule
+        FormsModule
       ],
       declarations: [
         StateSkillEditorComponent,

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for DisplayHintModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
@@ -44,7 +43,6 @@ describe('Display hint modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       declarations: [
         DisplayHintModalComponent,
         AngularHtmlBindWrapperDirective
