@@ -21,13 +21,9 @@ import { AppConstants } from 'app.constants';
 
 export class MissingTranslationCustomHandler implements
   MissingTranslationHandler {
-  getAppConstants(): typeof AppConstants {
-    return AppConstants;
-  }
-
   handle(params: MissingTranslationHandlerParams): string {
-    if (params.key in this.getAppConstants().DEFAULT_TRANSLATIONS) {
-      return this.getAppConstants().DEFAULT_TRANSLATIONS[params.key];
+    if (params.key in AppConstants.DEFAULT_TRANSLATIONS) {
+      return AppConstants.DEFAULT_TRANSLATIONS[params.key];
     }
     return params.key;
   }

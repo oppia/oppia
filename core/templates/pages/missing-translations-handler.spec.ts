@@ -23,30 +23,18 @@ describe('Missing Translations Handler', () => {
   let mth = new MissingTranslationCustomHandler();
 
   it ('should return correct value for existing default translations', () => {
-    let value = 'Library';
-    spyOn(mth, 'getAppConstants').and.returnValue(
-      {DEFAULT_TRANSLATIONS: {
-        key: value
-      }} as unknown as typeof AppConstants);
     expect(mth.handle({
-      key: 'key',
+      key: 'I18N_SIGNUP_PAGE_SUBTITLE',
       translateService: null,
-    })).toEqual(value);
+    })).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
   });
 
   it('should return key if correct value is not available in app constants',
     () => {
-      let key = 'I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB';
-      spyOn(mth, 'getAppConstants').and.returnValue(
-        {DEFAULT_TRANSLATIONS: {}} as
-        unknown as typeof AppConstants);
+      let key = 'KEY_NOT_AVAILABLE_IN_APP_CONSTANTS';
       expect(mth.handle({
         key,
         translateService: null,
       })).toEqual(key);
     });
-
-  it('should get app constants', () => {
-    expect(mth.getAppConstants()).toBeDefined();
-  });
 });
