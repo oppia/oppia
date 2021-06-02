@@ -169,7 +169,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   entityId: string;
   entityType: string;
   canvas = new fabric.Canvas()
-  isSVGImageUploaded: boolean = false;
+  initializedSvgImage: boolean = false;
+  createSvgMode: boolean = false;
   drawMode = DRAW_MODE_NONE;
   polygonMode = CLOSED_POLYGON_MODE;
   isTouchDevice: boolean;
@@ -1722,7 +1723,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   createCustomToSVG(toSVG, type, id): () => string {
     return ()  => {
-      let svgString = toSVG;
+      let svgString = toSVG(this);
       console.log(svgString)
       let domParser = new DOMParser();
       let doc = domParser.parseFromString(svgString, 'image/svg+xml');
@@ -2026,11 +2027,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         this.imgData = (<FileReader>e.target).result;
         let imageData: string | SafeResourceUrl = (<FileReader>e.target).result;
         if (file.name.endsWith('.svg')) {
-          this.svgFileUploaded();
-          this.uploadedSvgDataUrl = (<FileReader>e.target).result;
-          this.uploadSvgFileInCanvas();
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
             imageData as string);
+          if(imageData != null) {
+            this.initializeSvgFile();
+            this.uploadedSvgDataUrl = (<FileReader>e.target).result;
+            this.uploadSvgFileInCanvas();
+          }
         }
         this.data = {
           mode: this.MODE_UPLOADED,
@@ -2167,8 +2170,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     this.processedImageIsTooLarge = imageSize > this.HUNDRED_KB_IN_BYTES;
   }
 
-  svgFileUploaded(): void {
-    this.isSVGImageUploaded = true;
+  createSvgFile(): void {
+    this.initializeSvgFile();
+    this.createSvgMode = true;
+  }
+
+  initializeSvgFile(): void {
+    this.initializedSvgImage = true;
     if (this.value) {
       this.setSavedImageFilename(this.value, true);
       let dimensions = (
@@ -2438,6 +2446,9 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       this.saveImageToLocalStorage(dimensions, resampledFile, imageType);
     } else {
       this.postImageToServer(dimensions, resampledFile, imageType);
+    }
+    if(this.initializedSvgImage) {
+      this.initializedSvgImage = false
     }
   }
 

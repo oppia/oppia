@@ -29,7 +29,7 @@
     </div>
     <div class="filepath-editor-image-container"
          [attr.style]="getImageContainerDynamicStyles()">
-      <div *ngIf="isNoImageUploaded()">
+      <div *ngIf="isNoImageUploaded() && !initializedSvgImage">
         <div class="filepath-editor-image-uploader">
           <oppia-image-uploader (fileChanged)="onFileChanged($event)"
                                 [allowedImageFormats]="allowedImageFormats"
@@ -39,10 +39,10 @@
         <div class="filepath-editor-verticalLine"></div>
         <div class="filepath-editor-image-creator">
           <div class="filepath-editor-image-creator-text" ></div>
-          <button class="filepath-editor-image-create-button" (click)="svgEditorModal = true">Create</button>
+          <button class="filepath-editor-image-create-button" (click)="createSvgFile()">Create</button>
         </div>
       </div>
-      <div *ngIf="isImageUploaded()  && !isSVGImageUploaded"
+      <div *ngIf="isImageUploaded()  && !initializedSvgImage"
            class="filepath-editor-image-crop-container"
            (mousemove)="onMouseMoveOnImageArea($event)">
         <div *ngIf="isUserCropping()"
@@ -69,7 +69,7 @@
         <img [src]="data.metadata.uploadedImageData"
              [attr.style]="getUploadedImageDynamicStyles()">
       </div>
-      <div *ngIf="isSVGImageUploaded" class="filepath-editor-image-crop-container">
+      <div *ngIf="initializedSvgImage" class="filepath-editor-image-crop-container">
         <div ui-validate="'validate()'" class="fs-container">
           <div class="svg-editor" *ngIf="!isDiagramSaved()">
             <div class="fabric-canvas" [attr.id]="canvasContainerId">
@@ -179,7 +179,7 @@
                         tooltip-placement="left" uib-tooltip="Pie Chart" [disabled]="!isPieChartEnabled()">
                   <i class="fas fa-chart-pie pie-chart"></i>
                 </button>
-                <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
+                <button *ngIf="!createSvgMode" type="button" class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
                         [ngClass]="{'disabled' : !isSvgUploadEnabled()}" (click)="uploadSvgFileInCanvas()"
                         tooltip-placement="right" uib-tooltip="Upload SVG" [disabled]="!isSvgUploadEnabled()">
                   <i class="far fa-file-image file-upload"></i>
@@ -269,14 +269,16 @@
               <div class="input-tag" *ngIf="displayFontStyles">
                 <select [(ngModel)]="fabricjsOptions.fontFamily"
                         (ngModelChange)="onFontChange()">
+                  <option *ngFor="let font of fontFamily" [ngValue]="font">{{font}}</option>
                         <!-- [ngModelOptions]=" let font of font in fontFamily" -->
                 </select>
               </div>
             </div>
             <div class="horizontal-toolbar bottom-toolbar" *ngIf="!isDrawModePieChart() && !isDrawModeSvgUpload()">
               <div class="input-tag" *ngIf="isSizeVisible()">
-                <select [ngModel]="fabricjsOptions.size" 
+                <select [(ngModel)]="fabricjsOptions.size" 
                 (ngModelChange)="onSizeChange()">
+                <option *ngFor="let size of sizes" [ngValue]="size">{{size}}</option>
                 <!-- [ngModelOptions]="let size of size in sizes" -->
                 </select>
               </div>
@@ -300,10 +302,7 @@
           </div>
           <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box">
             <button type="button" class="btn btn-success float-right protractor-test-save-diagram" (click)="saveSvgFile()" [disabled]="isUserDrawing() || loadingIndicatorIsShown">
-              <span *ngIf="!loadingIndicatorIsShown">Use This Image</span>
-              <span *ngIf="loadingIndicatorIsShown">
-                <!-- <mat-progress-spinner diameter="25px" mode="indeterminate" class="oppia-diagram-spinning-button"></mat-progress-spinner> -->
-              </span>
+              <span>Use This Image</span>
             </button>
           </div>
         </div>
@@ -324,13 +323,15 @@
       </div>
     </div>
     <div *ngIf="isImageUploaded()" class="filepath-editor-save-box">
-      <button type="button"
+      <button *ngIf="!initializedSvgImage"
+              type="button"
               class="btn btn-success filepath-editor-use"
               (click)="saveUploadedFile()"
               [disabled]="isUserCropping()">
         Use This Image
       </button>
-      <button type="button"
+      <button *ngIf="!initializedSvgImage"
+              type="button"
               class="btn btn-secondary filepath-editor-discard"
               (click)="discardUploadedFile()"
               [disabled]="isUserCropping()">

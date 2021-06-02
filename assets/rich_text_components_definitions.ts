@@ -59,7 +59,7 @@ export default {
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
-      "description": "The image (Allowed extensions: gif, jpeg, jpg, png, svg)",
+      "description": "Image",
       "schema": {
         "type": "custom",
         "obj_type": "Filepath"
@@ -161,39 +161,6 @@ export default {
       "schema": {
         "type": "custom",
         "obj_type": "SkillSelector"
-      },
-      "default_value": ""
-    }]
-  },
-  "Svgdiagram": {
-    "backend_id": "svgdiagram",
-    "category": "Basic Input",
-    "description": "A custom SVG diagram.",
-    "frontend_id": "svgdiagram",
-    "tooltip": "Insert diagram",
-    "icon_data_url": "/rich_text_components/Svgdiagram/Svgdiagram.png",
-    "is_complex": false,
-    "requires_fs": true,
-    "is_block_element": true,
-    "customization_arg_specs": [{
-      "name": "svg_filename",
-      "description": "The SVG Diagram Editor",
-      "schema": {
-        "type": "custom",
-        "obj_type": "SvgFilename"
-      },
-      "default_value": ""
-    }, {
-      "name": "alt",
-      "description": "Briefly explain this diagram to a visually impaired learner",
-      "schema": {
-        "type": "unicode",
-        "validators": [{
-          "id": "is_nonempty"
-        }],
-        "ui_config": {
-          "placeholder": "Description of the diagram"
-        }
       },
       "default_value": ""
     }]
