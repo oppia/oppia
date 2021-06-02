@@ -145,12 +145,12 @@ const toastrConfig = {
     SharedFormsModule,
     SharedPipesModule,
     /**
-     * The Translate Module will look for translations in the following pattern:
+     * The Translate Module will look for translations in the following order:
      * 1. Look for translation in primary language (fetched from backend)
      * 2. Look for translation in default language (fetched from backend)
-     * 3. Look for translation presnt in AppConstants.ts (
+     * 3. Look for translation present in AppConstants.ts (
      *    used until translations after fetched from backend)
-     * 4. shows the key itself, if the translation is not found.
+     * 4. shows the key, if the translation is not found.
      */
     TranslateModule.forRoot({
       defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
@@ -169,11 +169,6 @@ const toastrConfig = {
         deps: [TranslateDefaultParser, I18nLanguageCodeService]
       }
     }),
-    /**
-     * The cookie shares a common name with angular-translate's cookie.
-     * This way, we have a single source of truth for both frameworks.
-     * The cookie will expire after 24 hrs.
-     */
     TranslateCacheModule.forRoot({
       cacheService: {
         provide: TranslateCacheService,

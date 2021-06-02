@@ -27,7 +27,7 @@ export class TranslateCustomParser extends TranslateParser {
   ) {
     super();
     /**
-     * The default parser by default expects {{}} as delimiters.
+     * The default parser expects {{}} as delimiters.
      * but we use <[ ]> delimiters for interpolation in our translations.
      * So, here templateMatcher is modified to look for <[ ]> instead.
      */
