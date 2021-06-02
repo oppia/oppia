@@ -83,13 +83,13 @@
                 <img [src]="data.metadata.uploadedImageData" class="uploaded-svg-image">
                 <div class="container">
                   <label>
-                    <input type="radio" (click)="loadTypeSelection('group')" checked>
+                    <input type="radio" [(ngModel)]="loadType" (click)="loadTypeSelection('group')" value= "group" checked>
                     <span>
                       Load as Single Image
                     </span>
                   </label>
-                  <label>
-                    <input ngDefaultControl type="radio" (click)="loadTypeSelection('nogroup')">
+                    <label>
+                    <input ngDefaultControl type="radio" value= "nogroup" [(ngModel)]="loadType" (click)="loadTypeSelection('nogroup')">
                     <span>
                       Load as Individual Shapes
                     </span>

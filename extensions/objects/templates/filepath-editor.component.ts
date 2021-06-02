@@ -875,7 +875,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   };
 
   loadTypeSelection(type: string): void {
-    if(type === 'group'){
+    if(type === 'group') {
       this.loadType === 'group'
     } else {
       this.loadType === 'nogroup'
