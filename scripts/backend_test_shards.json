@@ -219,6 +219,7 @@
         "jobs.transforms.question_validation_test",
         "jobs.transforms.feedback_validation_test",
         "jobs.types.base_validation_errors_test",
+        "jobs.types.job_run_result_test",
         "jobs.types.model_property_test",
         "jobs.types.topic_validation_errors_test",
         "jobs.types.user_validation_errors_test",
@@ -230,7 +231,9 @@
         "core.domain.exp_jobs_one_off_test",
         "core.domain.collection_validators_test",
         "core.domain.suggestion_jobs_one_off_test",
-        "core.domain.image_validation_services_test"
+        "core.domain.image_validation_services_test",
+        "core.storage.beam_job.gae_models_test",
+        "core.domain.beam_job_validators_test"
     ],
     "11": [
         "core.platform.taskqueue.cloud_taskqueue_services_test",
