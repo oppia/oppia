@@ -149,11 +149,20 @@ describe('Topic editor state service', () => {
     }
   }
 
+  class MockEditableStoryBackendApiService {
+    deleteStoryAsync(storyId: string): Promise<Object> {
+      return Promise.resolve({});
+    }
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       providers: [
         AlertsService,
-        EditableStoryBackendApiService,
+        {
+          provide: EditableStoryBackendApiService,
+          useClass: MockEditableStoryBackendApiService
+        },
         {
           provide: EditableTopicBackendApiService,
           useClass: MockEditableTopicBackendApiService
