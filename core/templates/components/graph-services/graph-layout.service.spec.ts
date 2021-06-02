@@ -17,11 +17,12 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 
 import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { StateGraphLayoutService } from './graph-layout.service';
 
-describe('Graph Layout Service', () => {
+fdescribe('Graph Layout Service', () => {
   let sgls: StateGraphLayoutService = null;
   let nodeData1 = {
     State1: {
@@ -250,8 +251,7 @@ describe('Graph Layout Service', () => {
       State3: 'State3',
       State4: 'State4',
     };
-
-    let adjacencyLists = {
+    let expectedAdjacencyLists = {
       State1: ['State2', 'State3'],
       State2: ['State4'],
       State3: ['State4'],
@@ -259,30 +259,73 @@ describe('Graph Layout Service', () => {
     };
 
     expect(sgls.getGraphAsAdjacencyLists(nodes, links2))
-      .toEqual(adjacencyLists);
+      .toEqual(expectedAdjacencyLists);
   });
 
-  it('should get indentation levels', () => {
+  it('should get correct indentation level', () => {
     let adjacencyLists = {
-      State1: ['State2', 'State3'],
-      State2: ['State4'],
-      State3: ['State4'],
-      State4: []
+      State1: ['State2', 'State3', 'State4'],
+      State2: ['State3', 'State4'],
+      State3: ['State4', 'State5'],
+      State4: ['State5'],
+      State5: []
+    };
+
+    let longestPathIds: string[] = [
+      'State1',
+      'State2',
+      'State3',
+      'State4',
+      'State5'
+    ];
+
+    expect(sgls.getIndentationLevels(adjacencyLists, longestPathIds)).toEqual(
+      [0, 0.5, 1, 0, 0]);
+
+    let shortestPathIds: string[] = [
+      'State1',
+      'State4',
+      'State5'
+    ];
+    expect(sgls.getIndentationLevels(adjacencyLists, shortestPathIds)).toEqual(
+      [0, 0, 0]);
+
+  });
+
+  it('should not return indentation level greater' +
+    ' than MAX_INDENTATION_LEVEL', () => {
+    let adjacencyLists = {
+      'State1': ['State2','State3'],
+      'State2': ['State3','State6'],
+      'State6': ['State3','State8'],
+      'State8': ['State3','State7'],
+      'State7': ['State3','State9'],
+      'State9': ['State3','State10'],
+      'State10': ['State3'],
+      'State3': ['State5'],
+      'State5':[]
     };
 
     let trunkNodeIds: string[] = [
       'State1',
       'State2',
+      'State6',
+      'State8',
+      'State7',
+      'State9',
+      'State10',
       'State3',
-      'State4',
+      'State5'
     ];
 
-    let indentationLevels: number[] = [0, 0.5, 0, 0];
-    expect(sgls.getIndentationLevels(adjacencyLists, trunkNodeIds)).toEqual(
-      indentationLevels);
+    let returnedIndentationLevels = sgls.getIndentationLevels(
+      adjacencyLists, trunkNodeIds);
+    returnedIndentationLevels.forEach(indentationLevel => {
+      expect(indentationLevel).toBeLessThanOrEqual(sgls.MAX_INDENTATION_LEVEL);
+    });
   });
 
-  it('should get augmented links', () => {
+  it('should return correct augmented links with bezier curve', () => {
     let nodeData = {
       State1: {
         depth: 0,
@@ -342,8 +385,7 @@ describe('Graph Layout Service', () => {
       }
     };
 
-
-    let augmentedLinks = [
+    let expectedAugmentedLinks = [
       {
         source: {
           depth: 0,
@@ -502,10 +544,15 @@ describe('Graph Layout Service', () => {
           ' 0.6591281709017246 0.23000000000000004 0.6866666666666665'
       }
     ];
-    expect(sgls.getAugmentedLinks(nodeData, links2)).toEqual(augmentedLinks);
+
+    let returnedAugmentedLinks = sgls.getAugmentedLinks(nodeData, links2);
+    for (var i = 0; i < returnedAugmentedLinks.length; i++) {
+      expect(returnedAugmentedLinks[i].d).toBe(expectedAugmentedLinks[i].d);
+    }
   });
 
-  it('should return when x, y label of source and target are same', () => {
+  it('should return undefined when source and target nodes overlap' +
+    ' while processing augmented links', () => {
     let nodeData = {
       State1: {
         depth: 0,
@@ -565,20 +612,89 @@ describe('Graph Layout Service', () => {
       }
     };
 
-
-    expect(sgls.getAugmentedLinks(nodeData, links2)).toBe(undefined);
+    expect(sgls.getAugmentedLinks(nodeData, links2)).toBeUndefined();
   });
 
-  it('should get graph witdh and height', () => {
-    let graphWidth = sgls.getGraphWidth(4, 15);
-    let graphHeight = sgls.getGraphHeight(nodeData1);
+  it('should get correct graph width and height ', () => {
+    let nodeData = {
+      State1: {
+        depth: 1,
+        offset: 0,
+        reachable: true,
+        x0: 0.07250000000000001,
+        y0: 0.42000000000000004,
+        xLabel: 0.1625,
+        yLabel: 0.5,
+        id: "State1",
+        label: "State1",
+        height: 0.16,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      Introduction: {
+        depth: 0,
+        offset: 0,
+        reachable: true,
+        x0: 0.07250000000000001,
+        y0: 0.15333333333333335,
+        xLabel: 0.1625,
+        yLabel: 0.23333333333333334,
+        id: "Introduction",
+        label: "Introduction",
+        height: 0.16,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      End: {
+        depth: 2,
+        offset: 0,
+        reachable: true,
+        x0: 0.07250000000000001,
+        y0: 0.6866666666666666,
+        xLabel: 0.1625,
+        yLabel: 0.7666666666666666,
+        id: "End",
+        label: "End",
+        height: 0.16,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      State2: {
+        depth: 1,
+        offset: 1,
+        reachable: true,
+        x0: 0.29750000000000004,
+        y0: 0.42000000000000004,
+        xLabel: 0.3875,
+        yLabel: 0.5,
+        id: "State2",
+        label: "State2",
+        height: 0.16,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      }
+    };
 
+    let graphWidthUpperBound = sgls.getGraphWidth(
+      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
+    let graphHeight = sgls.getGraphHeight(nodeData);
+
+    expect(graphWidthUpperBound).toBe(630);
+    expect(graphHeight).toBe(210);
+  });
+
+  it('should get graph width and height when nodes' +
+    ' overflow to next row', () => {
+    let graphWidth = sgls.getGraphWidth(
+      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
+    let graphHeight = sgls.getGraphHeight(nodeData1);
 
     expect(graphWidth).toBe(630);
     expect(graphHeight).toBe(420);
   });
 
-  it('should compute layout and get last computed arrangement', () => {
+
+  it('should compute graph layout', () => {
     let nodes: GraphNodes = {
       State1: 'State1',
       State2: 'State2',
@@ -595,23 +711,333 @@ describe('Graph Layout Service', () => {
     let initNodeId: string = 'State1';
     let finalNodeIds: string[] = ['State4'];
 
-    expect(sgls.getLastComputedArrangement()).toEqual(null);
     expect(sgls.computeLayout(nodes, links1, initNodeId, finalNodeIds)).toEqual(
       nodeData1);
-    expect(sgls.getLastComputedArrangement()).toEqual(nodeData1);
   });
 
-  it('should get graph boundaries', () => {
-    let graphBoundaries = {
-      bottom: 5.873333333333333,
-      left: -4.9275,
-      right: 6.04,
-      top: -4.873333333333333
+  it('should overflow nodes to next row if there are' +
+    ' too many nodes at a depth', () => {
+    let MAX_NODES_PER_ROW = AppConstants.MAX_NODES_PER_ROW;
+    let nodes: GraphNodes = {
+      State0: 'State0',
+      End: 'End'
     };
-    expect(sgls.getGraphBoundaries(nodeData1)).toEqual(graphBoundaries);
+
+    let initNodeId: string = 'State0';
+    let finalNodeIds: string[] = ['End'];
+    let links = [];
+
+    for(let i = 1; i <= MAX_NODES_PER_ROW+1; i++) {
+      let stateName = 'State' + (i+1);
+      nodes[stateName] = stateName;
+
+      links.push({
+        source: 'State0',
+        target: stateName
+      });
+      links.push({
+        source: stateName,
+        target: 'End'
+      });
+    }
+
+    let returnedLayoutNodeData = sgls.computeLayout(
+      nodes, links, initNodeId, finalNodeIds);
+    let countNodesDepthOne: number = 0;
+    for(let nodeId in nodes) {
+      if(returnedLayoutNodeData[nodeId].depth === 1) {
+        countNodesDepthOne++;
+      }
+    }
+
+    expect(countNodesDepthOne).toEqual(MAX_NODES_PER_ROW);
   });
 
-  it('should modify position values', () => {
+  it('should place orhpaned node at max depth while computing layout', () => {
+    let nodes = {
+      End: 'End',
+      State0: 'State0',
+      Orphan: 'Orphan',
+      State1: 'State1',
+      State2: 'State2',
+      State3: 'State3',
+      State4: 'State4',
+      State5: 'State5'
+    };
+
+    let links = [
+      {
+        'source':'State5',
+        'target':'End'
+      },
+      {
+        'source':'State4',
+        'target':'End'
+      },
+      {
+        'source':'State3',
+        'target':'End'
+      },
+      {
+        'source':'State2',
+        'target':'End'
+      },
+      {
+        'source':'State1',
+        'target':'End'
+      },
+      {
+        'source':'State0',
+        'target':'State1'
+      },
+      {
+        'source':'State0',
+        'target':'State2'
+      },
+      {
+        'source':'State0',
+        'target':'State3'
+      },
+      {
+        'source':'State0',
+        'target':'State4'
+      },
+      {
+        'source':'State0',
+        'target':'State5'
+      },
+      {
+        'source':'State0',
+        'target':'State0'
+      }
+    ];
+    let initNodeId = 'State0';
+    let finalNodeIds = ['End'];
+
+    let returnedLayout = sgls.computeLayout(
+      nodes, links, initNodeId, finalNodeIds);
+
+    expect(returnedLayout['End'].depth).toBe(3);
+    expect(returnedLayout['Orphan'].depth).toBe(4);
+  })
+
+  it('should get last computed layout', () => {
+    let nodes: GraphNodes = {
+      State1: 'State1',
+      State2: 'State2',
+      State3: 'State3',
+      State4: 'State4',
+      State5: 'State5',
+      State6: 'State6',
+      State7: 'State7',
+      State8: 'State8',
+      State9: 'State9',
+      Orphaned: 'Orphaned'
+    };
+
+    let initNodeId: string = 'State1';
+    let finalNodeIds: string[] = ['State4'];
+
+    expect(sgls.getLastComputedArrangement()).toBe(null);
+
+    let computedLayout = sgls.computeLayout(
+      nodes, links1, initNodeId, finalNodeIds);
+
+    expect(sgls.getLastComputedArrangement()).toBe(computedLayout);
+  });
+
+  it('should return graph boundaries with width less than equal to' +
+    ' maximum allowed graph width', () => {
+    let nodeData = {
+      State5: {
+        depth: 2,
+        offset: 1,
+        reachable: true,
+        x0: 0.29750000000000004,
+        y0: 0.54,
+        xLabel: 0.3875,
+        yLabel: 0.6,
+        id: "State5",
+        label: "State5",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      State4: {
+        depth: 1,
+        offset: 3,
+        reachable: true,
+        x0: 0.7475,
+        y0: 0.33999999999999997,
+        xLabel: 0.8375,
+        yLabel: 0.4,
+        id: "State4",
+        label: "State4",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      State3: {
+        depth: 1,
+        offset: 2,
+        reachable: true,
+        x0: 0.5225000000000001,
+        y0: 0.33999999999999997,
+        xLabel: 0.6125,
+        yLabel: 0.4,
+        id: "State3",
+        label: "State3",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      State2: {
+        depth: 1,
+        offset: 1,
+        reachable: true,
+        x0: 0.29750000000000004,
+        y0: 0.33999999999999997,
+        xLabel: 0.3875,
+        yLabel: 0.4,
+        id: "State2",
+        label: "State2",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      State1: {
+        depth: 1,
+        offset: 0,
+        reachable: true,
+        x0: 0.07250000000000001,
+        y0: 0.33999999999999997,
+        xLabel: 0.1625,
+        yLabel: 0.4,
+        id: "State1",
+        label: "State1",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      Introduction: {
+        depth: 0,
+        offset: 0,
+        reachable: true,
+        x0: 0.07250000000000001,
+        y0: 0.14,
+        xLabel: 0.1625,
+        yLabel: 0.2,
+        id: "Introduction",
+        label: "Introduction",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      },
+      End: {
+        depth: 3,
+        offset: 0,
+        reachable: true,
+        x0: 0.07250000000000001,
+        y0: 0.7400000000000001,
+        xLabel: 0.1625,
+        yLabel: 0.8,
+        id: "End",
+        label: "End",
+        height: 0.12,
+        width: 0.18000000000000002,
+        reachableFromEnd: false
+      }
+    };
+    let expectedGraphBoundaries = {
+      'bottom': 245.8,
+      'left': 40.675000000000004,
+      'right': 589.325,
+      'top': 34.2
+    };
+
+    let expectedWidth = expectedGraphBoundaries.bottom +
+      expectedGraphBoundaries.top;
+
+    expect(expectedWidth).toBeLessThanOrEqual(sgls.getGraphWidth(
+      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH));
+    expect(sgls.getGraphBoundaries(nodeData)).toEqual(expectedGraphBoundaries);
+  });
+
+  it('should return graph boundaries with height equal to' +
+  ' the graph height', () => {
+  let nodeData = {
+    State1: {
+      depth: 1,
+      offset: 0,
+      reachable: true,
+      x0: 0.07250000000000001,
+      y0: 0.42000000000000004,
+      xLabel: 0.1625,
+      yLabel: 0.5,
+      id: "State1",
+      label: "State1",
+      height: 0.16,
+      width: 0.18000000000000002,
+      reachableFromEnd: false
+    },
+    Introduction: {
+      depth: 0,
+      offset: 0,
+      reachable: true,
+      x0: 0.07250000000000001,
+      y0: 0.15333333333333335,
+      xLabel: 0.1625,
+      yLabel: 0.23333333333333334,
+      id: "Introduction",
+      label: "Introduction",
+      height: 0.16,
+      width: 0.18000000000000002,
+      reachableFromEnd: false
+    },
+    End: {
+      depth: 2,
+      offset: 0,
+      reachable: true,
+      x0: 0.07250000000000001,
+      y0: 0.6866666666666666,
+      xLabel: 0.1625,
+      yLabel: 0.7666666666666666,
+      id: "End",
+      label: "End",
+      height: 0.16,
+      width: 0.18000000000000002,
+      reachableFromEnd: false
+    },
+    State2: {
+      depth: 1,
+      offset: 1,
+      reachable: true,
+      x0: 0.29750000000000004,
+      y0: 0.42000000000000004,
+      xLabel: 0.3875,
+      yLabel: 0.5,
+      id: "State2",
+      label: "State2",
+      height: 0.16,
+      width: 0.18000000000000002,
+      reachableFromEnd: false
+    }
+  };
+  let expectedGraphBoundaries = {
+    bottom: 182.79999999999998,
+    left: 40.675000000000004,
+    right: 305.82500000000005,
+    top: 27.200000000000003
+  };
+
+  let expectedHeight = expectedGraphBoundaries.bottom +
+    expectedGraphBoundaries.top;
+
+  expect(expectedHeight).toBeLessThanOrEqual(sgls.getGraphHeight(nodeData));
+  expect(sgls.getGraphBoundaries(nodeData)).toEqual(expectedGraphBoundaries);
+});
+
+  it('should modify position values in node data to use pixels', () => {
     let nodeData = {
       State1: {
         depth: 0,
@@ -896,9 +1322,29 @@ describe('Graph Layout Service', () => {
         reachableFromEnd: false
       }
     };
-    let returnedNodeData = sgls.modifyPositionValues(nodeData, 1, 2);
 
-    expect(returnedNodeData).not.toEqual(nodeData1);
-    expect(returnedNodeData).toEqual(modifiedNodeDta);
+    let graphWidth = sgls.getGraphWidth(
+      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
+    let graphHeight = sgls.getGraphHeight(nodeData);
+
+    let expectedNodeData = sgls.modifyPositionValues(
+      nodeData, graphWidth, graphHeight);
+
+    expect(expectedNodeData['State1'].x0).toEqual(
+      expectedNodeData['State1'].x0 * graphWidth);
+    expect(expectedNodeData['State1'].width).toEqual(
+      expectedNodeData['State1'].width * graphWidth);
+    expect(expectedNodeData['State1'].xLabel).toEqual(
+      expectedNodeData['State1'].xLabel * graphWidth);
+
+    expect(expectedNodeData['State1'].y0).toEqual(
+      expectedNodeData['State1'].y0 * graphHeight);
+    expect(expectedNodeData['State1'].height).toEqual(
+      expectedNodeData['State1'].height * graphWidth);
+    expect(expectedNodeData['State1'].yLabel).toEqual(
+      expectedNodeData['State1'].yLabel * graphWidth);
+
+    expect(expectedNodeData).not.toEqual(nodeData1);
+    expect(expectedNodeData).toEqual(modifiedNodeDta);
   });
 });
