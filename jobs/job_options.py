@@ -48,7 +48,7 @@ class JobOptions(pipeline_options.GoogleCloudOptions):
     JOB_OPTIONS = {
         # TODO(#11475): Delete this option once we're able to use the real
         # datastoreio module once we've finished migrating to Python 3.
-        'datastoreio': (
+        'datastoreio_stub': (
             validate_datastoreio_stub,
             'Source of datastore operations for the pipeline to depend upon'),
     }
