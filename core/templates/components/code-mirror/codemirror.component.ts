@@ -20,7 +20,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, Simpl
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
-export interface CodeMirrorMergeViewOptions {
+interface CodeMirrorMergeViewOptions {
   lineNumbers: boolean,
   readOnly: boolean,
   mode: string,
@@ -32,21 +32,16 @@ export interface CodeMirrorMergeViewOptions {
   templateUrl: './codemirror.component.html'
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
-  @Input() options: CodeMirrorMergeViewOptions = {
-    lineNumbers: false,
-    readOnly: false,
-    mode: '',
-    viewportMargin: 100
-  };
-  @Input() value: string = '';
+  @Input() options!: CodeMirrorMergeViewOptions;
+  @Input() value!: string;
   @Input() refresh: boolean = false;
   @Input() readOnly = false;
   @Output() valueChange = new EventEmitter();
   @Output() onLoad = new EventEmitter();
-  @ViewChild(CodemirrorComponent) codemirrorComponent:
-   CodemirrorComponent | undefined;
+  @ViewChild(CodemirrorComponent) codemirrorComponent!: CodemirrorComponent;
   autoFocus = false;
   codemirror: CodeMirror.Editor | undefined;
+
   constructor() { }
 
   updateValue(val: string): void {
@@ -59,6 +54,8 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
       if (this.codemirrorComponent !== undefined) {
         this.codemirror = this.codemirrorComponent.codeMirror;
         this.onLoad.emit(this.codemirror);
+      } else {
+        throw new Error('CodemirrorComponent not found');
       }
     };
     setTimeout(() => runAfterViewInit(), 0);

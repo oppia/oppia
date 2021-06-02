@@ -17,8 +17,7 @@
  * subtopic domain objects.
  */
 
-import { ShortSkillSummary } from
-  'domain/skill/short-skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 import constants from 'assets/constants';
 
@@ -30,7 +29,7 @@ export interface SubtopicBackendDict {
   // 'createFromTitle' in this file.
   'thumbnail_filename': string | null;
   'thumbnail_bg_color': string | null;
-  'url_fragment': string;
+  'url_fragment': string | null;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -44,12 +43,12 @@ export class Subtopic {
   _skillIds: string[];
   _thumbnailFilename: string | null;
   _thumbnailBgColor: string | null;
-  _urlFragment: string;
+  _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
       thumbnailFilename: string | null, thumbnailBgColor: string | null,
-      urlFragment: string) {
+      urlFragment: string | null) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -84,7 +83,7 @@ export class Subtopic {
     this._title = title;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment(): string | null {
     return this._urlFragment;
   }
 
@@ -93,20 +92,22 @@ export class Subtopic {
   }
 
   validate(): string[] {
-    var issues = [];
+    let issues = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
       constants.VALID_URL_FRAGMENT_REGEX);
-    if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
-      issues.push('Subtopic url fragment is invalid.');
+    if (this._urlFragment !== null) {
+      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+        issues.push('Subtopic url fragment is invalid.');
+      }
     }
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
     }
-    var skillIds = this._skillSummaries.map(function(skillSummary) {
+    let skillIds = this._skillSummaries.map((skillSummary) => {
       return skillSummary.getId();
     });
-    for (var i = 0; i < skillIds.length; i++) {
-      var skillId = skillIds[i];
+    for (let i = 0; i < skillIds.length; i++) {
+      let skillId = skillIds[i];
       if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
         issues.push(
           'The skill with id ' + skillId + ' is duplicated in' +
@@ -149,7 +150,7 @@ export class Subtopic {
   }
 
   removeSkill(skillId: string): void {
-    var index = this._skillSummaries.map(function(skillSummary) {
+    let index = this._skillSummaries.map((skillSummary) => {
       return skillSummary.getId();
     }).indexOf(skillId);
     if (index > -1) {
@@ -193,10 +194,7 @@ export class Subtopic {
       skill_ids: [],
       thumbnail_filename: null,
       thumbnail_bg_color: null,
-      // This value can't be null as we are -passing it
-      // in a 'test' function which expects it to be a string.
-      // See line 99 for reference.
-      url_fragment: ''
+      url_fragment: null
     }, {});
   }
 }

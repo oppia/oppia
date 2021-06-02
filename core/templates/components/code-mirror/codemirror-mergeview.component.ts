@@ -31,7 +31,10 @@ export class CodemirrorMergeviewComponent implements
   // See function 'ngAfterViewInit' for reference.
   @Input() leftValue: string | undefined;
   @Input() rightValue: string | undefined;
-  codeMirrorInstance: CodeMirror.MergeView.MergeViewEditor | undefined;
+  // Non-null assertion operator(!) to ignore
+  // the case when CodeMirror is undefined.
+  codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
+
   constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
 
   ngOnInit(): void {
@@ -69,6 +72,8 @@ export class CodemirrorMergeviewComponent implements
         if (this.codeMirrorInstance !== undefined) {
           this.codeMirrorInstance.editor().setValue(
             changes.leftValue.currentValue);
+        } else {
+          throw new Error('CodeMirror not found');
         }
       });
     }
@@ -84,6 +89,8 @@ export class CodemirrorMergeviewComponent implements
         if (this.codeMirrorInstance !== undefined) {
           this.codeMirrorInstance.rightOriginal().setValue(
             changes.rightValue.currentValue);
+        } else {
+          throw new Error('CodeMirror not found');
         }
       });
     }
