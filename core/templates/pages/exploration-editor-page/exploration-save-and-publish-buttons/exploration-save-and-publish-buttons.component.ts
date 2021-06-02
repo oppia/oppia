@@ -22,6 +22,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'confirm-or-cancel-modal.controller.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
@@ -36,13 +39,15 @@ require('services/editability.service.ts');
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$scope', 'ChangeListService', 'EditabilityService',
+    '$scope', '$uibModal', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
-    'ExplorationWarningsService', 'UserExplorationPermissionsService',
+    'ExplorationWarningsService', 'UrlInterpolationService',
+    'UserExplorationPermissionsService',
     function(
-        $scope, ChangeListService, EditabilityService,
+        $scope, $uibModal, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService, UserExplorationPermissionsService) {
+        ExplorationWarningsService, UrlInterpolationService,
+        UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       $scope.isPrivate = function() {
@@ -66,7 +71,30 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ExplorationSaveService.discardChanges();
       };
 
+      let isModalDisplayed = false;
+
       $scope.getChangeListLength = function() {
+        var countChanges = ChangeListService.getChangeList().length;
+
+        const MIN_CHANGES_DISPLAY_PROMPT = 50;
+
+        if (countChanges >= MIN_CHANGES_DISPLAY_PROMPT && !isModalDisplayed &&
+          !$scope.saveIsInProcess) {
+          isModalDisplayed = true;
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration-editor-page/modal-templates/' +
+              'exploration-save-prompt-modal.template.html'),
+            backdrop: 'static',
+            controller: 'ConfirmOrCancelModalController'
+          }).result.then(function() {
+            $scope.saveChanges();
+          }, function() {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          });
+        }
         return ChangeListService.getChangeList().length;
       };
 
