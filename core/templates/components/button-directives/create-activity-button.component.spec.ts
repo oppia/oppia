@@ -56,7 +56,7 @@ class MockUrlService {
   }
 }
 
-fdescribe('CreateActivityButtonComponent', () => {
+describe('CreateActivityButtonComponent', () => {
   let component: CreateActivityButtonComponent;
   let fixture: ComponentFixture<CreateActivityButtonComponent>;
   let userService: UserService;
@@ -142,9 +142,9 @@ fdescribe('CreateActivityButtonComponent', () => {
   it('should successfully instantiate the component from beforeEach block',
     () => {
       expect(component).toBeDefined();
-  });
+    });
 
-  it('should begin activity creation process if user can'+
+  it('should begin activity creation process if user can' +
     ' create collections', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
