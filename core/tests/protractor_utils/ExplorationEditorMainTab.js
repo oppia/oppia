@@ -481,7 +481,7 @@ var ExplorationEditorMainTab = function() {
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
-  this.setContent = async function(richTextInstructions, expectFadeIn) {
+  this.setContent = async function(richTextInstructions, expectFadeIn = false) {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
