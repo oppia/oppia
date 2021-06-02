@@ -320,7 +320,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         $scope.activeSuggestion.suggestion_id = 'suggestion_1';
         $scope.editedContent.html = '<p>In Hindi</p>';
         $scope.activeSuggestion.change = {
-          cmd: 'update_translation',
+          cmd: 'add_written_translation',
           state_name: 'State 3',
           content_id: 'content',
           language_code: 'hi',

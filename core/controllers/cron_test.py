@@ -401,12 +401,14 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     def _create_translation_suggestion(self):
         """Creates a translation suggestion."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': self.default_translation_html
+            'translation_html': self.default_translation_html,
+            'data_format': 'html',
+            'needs_update': False
         }
 
         return suggestion_services.create_suggestion(
@@ -572,12 +574,14 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion in the given language_code."""
         add_translation_change_dict = {
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
             'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>'
+            'translation_html': '<p>This is the translated content.</p>',
+            'data_format': 'html',
+            'needs_update': False
         }
 
         return suggestion_services.create_suggestion(

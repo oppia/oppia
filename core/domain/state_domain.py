@@ -1637,7 +1637,7 @@ class WrittenTranslations(python_utils.OBJECT):
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
-    def mark_translation_as_needing_update(self, content_id):
+    def mark_written_translation_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
         languages.
 
@@ -2724,7 +2724,7 @@ class State(python_utils.OBJECT):
         self.written_translations.add_translation(
             content_id, language_code, translation_html)
 
-    def update_translation(
+    def add_written_translation(
             self, content_id, language_code, html, data_format, needs_update):
         """Update a translation for the given content id in a given language.
 
@@ -2740,14 +2740,15 @@ class State(python_utils.OBJECT):
         self.written_translations.translations_mapping[content_id][
             language_code] = written_translation
 
-    def mark_translation_as_needing_update(self, content_id):
+    def mark_written_translation_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
         languages.
 
         Args:
             content_id: str. The id of the content.
         """
-        self.written_translations.mark_translation_as_needing_update(content_id)
+        self.written_translations.mark_written_translation_as_needing_update(
+            content_id)
 
     def update_content(self, content):
         """Update the content of this state.

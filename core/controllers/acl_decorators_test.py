@@ -3553,12 +3553,14 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
     exploration_id = 'exp_id'
     target_version_id = 1
     change_dict = {
-        'cmd': 'add_translation',
+        'cmd': 'add_written_translation',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '<p>old content html</p>',
         'state_name': 'State 1',
-        'translation_html': '<p>Translation for content.</p>'
+        'translation_html': '<p>Translation for content.</p>',
+        'data_format': 'html',
+        'needs_update': False
     }
 
     class MockHandler(base.BaseHandler):

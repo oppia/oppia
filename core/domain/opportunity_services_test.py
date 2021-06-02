@@ -55,12 +55,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     suggestion_target_id = '0'
     suggestion_target_version_at_submission = 1
     suggestion_change = {
-        'cmd': exp_domain.CMD_ADD_TRANSLATION,
+        'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'End State',
         'content_id': 'content',
         'language_code': 'hi',
         'content_html': '',
-        'translation_html': '<p>This is translated html.</p>'
+        'translation_html': '<p>This is translated html.</p>',
+        'data_format': 'html',
+        'needs_update': False
     }
 
     def setUp(self):
@@ -439,12 +441,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }
             }),
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>'
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html',
+                'needs_update': False
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -456,12 +460,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 }
             }),
             exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': 'End State',
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>'
+                'translation_html': '<p>Translated text</p>',
+                'data_format': 'html',
+                'needs_update': False
             }),
         ]
         exp_services.update_exploration(

@@ -51,9 +51,9 @@ angular.module('oppia').factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-    var CMD_UPDATE_TRANSLATION = 'update_translation';
-    var CMD_MARK_TRANSLATION_AS_NEEDING_UPDATE = (
-      'mark_translation_as_needing_update');
+    var CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation';
+    var CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
+      'mark_written_translation_as_needing_update');
     var autosaveInProgressEventEmitter: EventEmitter<boolean> = (
       new EventEmitter<boolean>());
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
@@ -260,11 +260,11 @@ angular.module('oppia').factory('ChangeListService', [
        * @param {string} translationHtml - The translation html.
        * @param {boolean} needsUpdate - Whether the content needs to be updated.
        */
-      addTranslation: function(
+      addWrittenTranslation: function(
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate) {
         addChange({
-          cmd: CMD_UPDATE_TRANSLATION,
+          cmd: CMD_ADD_WRITTEN_TRANSLATION,
           content_id: contentId,
           data_format: dataFormat,
           language_code: languageCode,
@@ -283,7 +283,7 @@ angular.module('oppia').factory('ChangeListService', [
        */
       markTranslationAsNeedingUpdate: function(contentId, stateName) {
         addChange({
-          cmd: CMD_MARK_TRANSLATION_AS_NEEDING_UPDATE,
+          cmd: CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
           content_id: contentId,
           state_name: stateName
         });

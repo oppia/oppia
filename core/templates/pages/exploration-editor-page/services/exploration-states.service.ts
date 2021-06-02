@@ -417,7 +417,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveWrittenTranslation: function(
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate) {
-        ChangeListService.addTranslation(
+        ChangeListService.addWrittenTranslation(
           contentId, dataFormat, languageCode, stateName,
           translationHtml, needsUpdate);
         let stateData = _states.getState(stateName);

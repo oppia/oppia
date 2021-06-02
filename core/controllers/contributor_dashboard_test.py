@@ -460,12 +460,14 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
     def test_handler_does_not_return_in_review_content(self):
         change_dict = {
-            'cmd': 'add_translation',
+            'cmd': 'add_written_translation',
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+            'needs_update': False
         }
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,

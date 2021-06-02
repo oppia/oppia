@@ -53,7 +53,7 @@ export class TranslateTextBackendApiService {
       target_id: expId,
       target_version_at_submission: expVersion,
       change: {
-        cmd: 'update_translation',
+        cmd: 'add_written_translation',
         content_id: contentId,
         state_name: stateName,
         language_code: languageCode,

@@ -575,10 +575,17 @@ class SuggestionTranslateContent(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_TRANSLATION,
                     self.get_score_type()))
 
-        if self.change.cmd != exp_domain.CMD_ADD_TRANSLATION:
+        # Suggestions in the future will only use CMD_ADD_WRITTEN_TRANSLATION.
+        # CMD_ADD_TRANSLATION is added in the following check to support older
+        # suggestions.
+        accepted_cmds = [
+            exp_domain.CMD_ADD_TRANSLATION,
+            exp_domain.CMD_ADD_WRITTEN_TRANSLATION
+        ]
+        if self.change.cmd not in accepted_cmds:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_ADD_TRANSLATION, self.change.cmd))
+                    exp_domain.CMD_ADD_WRITTEN_TRANSLATION, self.change.cmd))
 
         if not utils.is_supported_audio_language_code(
                 self.change.language_code):

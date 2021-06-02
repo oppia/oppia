@@ -401,12 +401,14 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                         'html': '<p>The new content to voiceover</p>'
                     }
                 }), exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_ADD_TRANSLATION,
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
                     'content_html': '<p>The new content to voiceover</p>',
-                    'translation_html': '<p>Translation in Hindi</p>'
+                    'translation_html': '<p>Translation in Hindi</p>',
+                    'data_format': 'html',
+                    'needs_update': False
                 })], 'Adds new content to init state and its translation')
 
         content = voiceover_services.get_text_to_create_voiceover_application(
