@@ -430,6 +430,7 @@ class LogicProofInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         yield ('EMAIL_DATA', (user_email, item.id))
                 yield ('SUCCESS', 1)
                 return
+        yield ('SUCCESS', 1)
 
     @staticmethod
     def reduce(key, values):
