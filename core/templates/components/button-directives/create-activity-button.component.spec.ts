@@ -153,16 +153,16 @@ describe('CreateActivityButtonComponent', () => {
 
     spyOn(component, 'initCreationProcess');
 
-    expect(component.canCreateCollections).toBe(false);
     expect(component.userIsLoggedIn).toBe(false);
+    expect(component.canCreateCollections).toBe(false);
 
     component.ngOnInit();
     tick();
     fixture.detectChanges();
 
-    expect(component.initCreationProcess).toHaveBeenCalled();
-    expect(component.canCreateCollections).toBe(true);
     expect(component.userIsLoggedIn).toBe(true);
+    expect(component.canCreateCollections).toBe(true);
+    expect(component.initCreationProcess).toHaveBeenCalled();
   }));
 
   it('should create a new exploration automatically if the user' +
@@ -172,19 +172,19 @@ describe('CreateActivityButtonComponent', () => {
     const explorationCreationServiceSpy = spyOn(
       explorationCreationService, 'createNewExploration');
 
-    expect(component.canCreateCollections).toBe(false);
     expect(component.userIsLoggedIn).toBe(false);
+    expect(component.canCreateCollections).toBe(false);
 
     component.ngOnInit();
     tick();
     fixture.detectChanges();
 
-    expect(explorationCreationServiceSpy).toHaveBeenCalled();
-    expect(component.canCreateCollections).toBe(false);
     expect(component.userIsLoggedIn).toBe(true);
+    expect(component.canCreateCollections).toBe(false);
+    expect(explorationCreationServiceSpy).toHaveBeenCalled();
   }));
 
-  it('should stop the creation process if another' +
+  it('should not start a new creation process if another' +
     ' creation is in progress', () => {
     component.canCreateCollections = false;
     component.creationInProgress = false;
@@ -193,9 +193,8 @@ describe('CreateActivityButtonComponent', () => {
       explorationCreationService, 'createNewExploration');
 
     component.initCreationProcess();
+    expect(component.creationInProgress).toBe(true);
     expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
-
-    component.creationInProgress = true;
 
     component.initCreationProcess();
     expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
@@ -212,7 +211,7 @@ describe('CreateActivityButtonComponent', () => {
     expect(explorationCreationServiceSpy).toHaveBeenCalled();
   });
 
-  it('should redirect user to create new exploration when user clicks' +
+  it('should redirect user to a new exploration when user clicks' +
     ' create button and is not on creator dashboard page', () => {
     component.creationInProgress = false;
     component.canCreateCollections = true;
@@ -230,7 +229,7 @@ describe('CreateActivityButtonComponent', () => {
     expect(replaceSpy).toHaveBeenCalledWith('/creator-dashboard?mode=create');
   });
 
-  it('should open a create activity modal if user' +
+  it('should not redirect user but open a create activity modal if user' +
     ' can create collections and is on creator dashboard page', () => {
     component.creationInProgress = false;
     component.canCreateCollections = true;
@@ -249,11 +248,11 @@ describe('CreateActivityButtonComponent', () => {
     expect(modalSpy).toHaveBeenCalled();
   });
 
-  it('should close modal when user clicks outside of' +
-    ' the modal', fakeAsync(() => {
+  it('should handle modal\'s failure callback' +
+    ' and stop creation process', fakeAsync(() => {
     component.creationInProgress = false;
     component.canCreateCollections = true;
-    const urlServiceSpy = spyOn(urlService, 'getPathname').and.returnValue(
+    spyOn(urlService, 'getPathname').and.returnValue(
       '/creator-dashboard');
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return <NgbModalRef>({
@@ -264,7 +263,6 @@ describe('CreateActivityButtonComponent', () => {
     component.initCreationProcess();
     tick();
 
-    expect(urlServiceSpy).toHaveBeenCalled();
     expect(modalSpy).toHaveBeenCalled();
     expect(component.creationInProgress).toBe(false);
   }));
