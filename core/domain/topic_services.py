@@ -40,6 +40,7 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+import requests
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -268,7 +269,22 @@ def apply_change_list(topic_id, change_list):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    print('*************')
+                    print('Inside update topic thumbnail property')
+                    def compute_thumbnail_size_by_name(topic_id, thumbnail_filename):
+                        thumbnail_url = ('http://localhost:8181/assetsdevhandler/topic/%s'
+                                         '/assets/thumbnail/%s' % (topic_id, thumbnail_filename))
+
+                        # Alternate method which is not working currently
+                        # response = requests.head(thumbnail_url)
+                        # print('Thumbnail size is....')
+                        # print(response.headers['content-length'])
+                        return python_utils.url_open(thumbnail_url).headers['Content-Length']
+
                     topic.update_thumbnail_filename(change.new_value)
+                    thumbnail_size_in_bytes = compute_thumbnail_size_by_name(topic_id, change.new_value)
+                    topic.update_thumbnail_size_in_bytes(thumbnail_size_in_bytes)
+
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
                     topic.update_thumbnail_bg_color(change.new_value)
