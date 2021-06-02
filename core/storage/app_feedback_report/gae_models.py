@@ -270,7 +270,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
             datetime.timedelta(days=1))
         # The below return checks for '== None' rather than 'is None' since
-        # the latter throws "Cannot filter a non-Node argument; received False"
+        # the latter throws "Cannot filter a non-Node argument; received False".
         return cls.query(
             cls.created_on < datetime_before_which_to_scrub,
             cls.scrubbed_by == None).fetch()
