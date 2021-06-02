@@ -196,7 +196,7 @@ export class AudioPlayerService {
   }
 
   setProgress(progress: number): void {
-    if (progress > 0 && progress < 1) {
+    if (progress >= 0 && progress <= 1) {
       this.setCurrentTime(this.getAudioDuration() * progress);
     }
   }
