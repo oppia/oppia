@@ -198,7 +198,24 @@ describe('User Backend Api Service', () => {
     expect(req.request.method).toEqual('GET');
     req.flush(response);
     flushMicrotasks();
-
     expect(titleService.getTitle()).toBe('(10) home');
+  }));
+
+  it('should update preferred site langauge', fakeAsync(() => {
+    let siteLanguageUrl = '/save_site_language';
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    userBackendApiService.updatePreferredSiteLanguageAsync('en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(siteLanguageUrl);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
   }));
 });

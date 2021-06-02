@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
@@ -74,6 +74,7 @@ import { TopNavigationBarComponent } from './common-layout-directives/navigation
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
+import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 
 
 // Directives.
@@ -93,6 +94,7 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 const toastrConfig = {
@@ -122,6 +124,7 @@ const toastrConfig = {
     NgbTooltipModule,
     NgbNavModule,
     NgbModalModule,
+    NgbPopoverModule,
     FormsModule,
     RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
@@ -151,6 +154,8 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
@@ -212,7 +217,9 @@ const toastrConfig = {
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    I18nLanguageSelectorComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -254,6 +261,8 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
+    InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,

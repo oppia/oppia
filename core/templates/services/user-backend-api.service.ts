@@ -73,6 +73,7 @@ export class UserBackendApiService {
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
   numUnseenNotifications: string | number;
+  private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {
     return this.http.get<UserInfoBackendDict>(
@@ -133,8 +134,14 @@ export class UserBackendApiService {
         }
       });
   }
+  async updatePreferredSiteLanguageAsync(
+      currentLanguageCode: string
+  ): Promise<Object> {
+    return this.http.put(this.SITE_LANGUAGE_URL, {
+      site_language_code: currentLanguageCode
+    }).toPromise();
+  }
 }
-
 angular.module('oppia').factory(
   'UserBackendApiService',
   downgradeInjectable(UserBackendApiService));
