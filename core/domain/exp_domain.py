@@ -81,10 +81,12 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
+# TODO(#12981): Write a one-off job to modify all existing translation
+# suggestions to use CMD_ADD_WRITTEN_TRANSLATION.
 # DEPRECATED: This command is deprecated. Please do not use. The command remains
-# here to support old suggestions.
-# This takes additional 'state_name', 'content_id', 'language_code' and
-# 'content_html' and 'translation_html' parameters.
+# here to support old suggestions. This takes additional 'state_name',
+# 'content_id', 'language_code' and 'content_html' and 'translation_html'
+# parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
 # 'needs_update', 'date_format', 'content_html' and 'translation_html'
