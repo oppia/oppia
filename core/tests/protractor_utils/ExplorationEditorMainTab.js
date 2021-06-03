@@ -779,7 +779,7 @@ var ExplorationEditorMainTab = function() {
           var itemSelectionAnswerOption =
             itemSelectionAnswerOptions(answerArray[j]);
           await action.click(
-            'Item Selection Answer Option:' + j,
+            'Item Selection Answer Option: ' + j,
             itemSelectionAnswerOption);
         }
       } else {
