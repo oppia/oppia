@@ -26,7 +26,7 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 interface SaveAudioResponse {
