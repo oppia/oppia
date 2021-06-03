@@ -117,9 +117,10 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
             classroom_topic_ids.extend(classroom_dict['topic_ids'])
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
-        classroom_topics_with_skills = (
-            filter(lambda topic: topic.get_all_skill_ids() if topic else False,
-            classroom_topics))
+        classroom_topics_with_skills = [
+            topic for topic in classroom_topics
+            if topic and topic.get_all_skill_ids()
+        ]
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
         id_to_skill_opportunity_dict = {
