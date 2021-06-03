@@ -134,17 +134,13 @@ export class AssetsBackendApiService {
     }));
     let imageUploadUrlTemplate = '/createhandler/imageupload/' +
     '<entity_type>/<entity_id>';
-    try {
-      return this.http.post<{filename: string}>(
-        this.urlInterpolationService.interpolateUrl(
-          imageUploadUrlTemplate, {
-            entity_type: entityType,
-            entity_id: entityId
-          }
-        ), form);
-    } catch(reason) {
-      return throwError(reason.error);
-    }
+    return this.http.post<{filename: string}>(
+      this.urlInterpolationService.interpolateUrl(
+        imageUploadUrlTemplate, {
+          entity_type: entityType,
+          entity_id: entityId
+        }
+      ), form);
   }
 
   isCached(filename: string): boolean {

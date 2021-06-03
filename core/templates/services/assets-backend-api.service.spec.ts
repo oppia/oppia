@@ -216,27 +216,6 @@ describe('Assets Backend API Service', () => {
       expect(onFailure).toHaveBeenCalled();
     }));
 
-    it('should handle rejection when saving a thumbnail fails', fakeAsync(() => {
-      const onSuccess = jasmine.createSpy('onSuccess');
-      const onFailure = jasmine.createSpy('onFailure');
-
-      assetsBackendApiService.postThumbnailFile(
-        new Blob(['abc']),
-        'filename.svg',
-        'entity_type',
-        'entity_id'
-      ).subscribe(onSuccess, onFailure);
-      flushMicrotasks();
-
-      httpTestingController.expectOne(
-        '/createhandler/imageupload/entity_type/entity_id'
-      ).flush(null, {status: 400, statusText: 'Failure'});
-      flushMicrotasks();
-
-      expect(onSuccess).not.toHaveBeenCalled();
-      expect(onFailure).toHaveBeenCalled();
-    }));
-
     it('should handle rejection when saving a file fails', fakeAsync(() => {
       const onSuccess = jasmine.createSpy('onSuccess');
       const onFailure = jasmine.createSpy('onFailure');
