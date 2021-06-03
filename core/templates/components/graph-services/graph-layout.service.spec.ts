@@ -23,7 +23,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { StateGraphLayoutService } from './graph-layout.service';
 
-describe('Graph Layout Service', () => {
+fdescribe('Graph Layout Service', () => {
   let sgls: StateGraphLayoutService = null;
 
   // Represents the nodes of a graph, with node labels as keys, and the
@@ -417,6 +417,9 @@ describe('Graph Layout Service', () => {
       }
     };
 
+    // Here, bezier curve follows the format 'M%f %f Q %f %f %f %f'. The
+    // floating point values are caluclated with the help of the position values
+    // of source and target nodes (in links2) and nodeData.
     let expectedBezierCurveValues = [
       'M0.1625 0.31333333333333335 Q 0.2025 0.3666666666666667 0.1625 0.42',
       'M0.23 0.31333333333333335 Q 0.30557165934031566' +
@@ -730,135 +733,276 @@ describe('Graph Layout Service', () => {
 
   it('should return graph boundaries with width less than equal to' +
     ' maximum allowed graph width', () => {
-    let nodeData = {
-      State5: {
-        depth: 2,
-        offset: 1,
-        reachable: true,
-        x0: 0.29750000000000004,
-        y0: 0.54,
-        xLabel: 0.3875,
-        yLabel: 0.6,
-        id: 'State5',
-        label: 'State5',
-        height: 0.12,
-        width: 0.18000000000000002,
-        reachableFromEnd: false
-      },
-      State4: {
+    let graphWidthUpperBound = sgls.getGraphWidth(
+      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
+
+    // Here, nodeDataWithPositionValueInPixel1 ans 2 has position values
+    // (x0, xLabel, width etc.) in terms of pixels.
+    // nodeDataWithPositionInPixel1, 2 and 3 are node data of graphs with
+    // MAX_NODE_PER_ROW - 1, MAX_NODE_PER_ROW and MAX_NODE_PER_ROW + 1 nodes in
+    // a row. Right now, MAX_NODE_PER_ROW is 4.
+    let nodeDataWithPositionValueInPixel1 = {
+      State1: {
         depth: 1,
-        offset: 3,
+        offset: 0,
         reachable: true,
-        x0: 0.7475,
-        y0: 0.33999999999999997,
-        xLabel: 0.8375,
-        yLabel: 0.4,
-        id: 'State4',
-        label: 'State4',
-        height: 0.12,
-        width: 0.18000000000000002,
-        reachableFromEnd: false
-      },
-      State3: {
-        depth: 1,
-        offset: 2,
-        reachable: true,
-        x0: 0.5225000000000001,
-        y0: 0.33999999999999997,
-        xLabel: 0.6125,
-        yLabel: 0.4,
-        id: 'State3',
-        label: 'State3',
-        height: 0.12,
-        width: 0.18000000000000002,
+        x0: 45.675000000000004,
+        y0: 81.19999999999999,
+        xLabel: 102.375,
+        yLabel: 98.00000000000001,
+        id: 'State1',
+        label: 'State1',
+        height: 33.6,
+        width: 113.40000000000002,
         reachableFromEnd: false
       },
       State2: {
         depth: 1,
         offset: 1,
         reachable: true,
-        x0: 0.29750000000000004,
-        y0: 0.33999999999999997,
-        xLabel: 0.3875,
-        yLabel: 0.4,
+        x0: 187.42500000000004,
+        y0: 81.19999999999999,
+        xLabel: 244.125,
+        yLabel: 98.00000000000001,
         id: 'State2',
         label: 'State2',
-        height: 0.12,
-        width: 0.18000000000000002,
+        height: 33.6,
+        width: 113.40000000000002,
         reachableFromEnd: false
       },
-      State1: {
+      State3: {
         depth: 1,
-        offset: 0,
+        offset: 2,
         reachable: true,
-        x0: 0.07250000000000001,
-        y0: 0.33999999999999997,
-        xLabel: 0.1625,
-        yLabel: 0.4,
-        id: 'State1',
-        label: 'State1',
-        height: 0.12,
-        width: 0.18000000000000002,
+        x0: 329.17500000000007,
+        y0: 81.19999999999999,
+        xLabel: 385.875,
+        yLabel: 98.00000000000001,
+        id: 'State3',
+        label: 'State3',
+        height: 33.6,
+        width: 113.40000000000002,
         reachableFromEnd: false
       },
       Introduction: {
         depth: 0,
         offset: 0,
         reachable: true,
-        x0: 0.07250000000000001,
-        y0: 0.14,
-        xLabel: 0.1625,
-        yLabel: 0.2,
+        x0: 45.675000000000004,
+        y0: 25.200000000000003,
+        xLabel: 102.375,
+        yLabel: 42.00000000000001,
         id: 'Introduction',
         label: 'Introduction',
-        height: 0.12,
-        width: 0.18000000000000002,
-        reachableFromEnd: false
-      },
-      End: {
-        depth: 3,
-        offset: 0,
-        reachable: true,
-        x0: 0.07250000000000001,
-        y0: 0.7400000000000001,
-        xLabel: 0.1625,
-        yLabel: 0.8,
-        id: 'End',
-        label: 'End',
-        height: 0.12,
-        width: 0.18000000000000002,
+        height: 33.6,
+        width: 113.40000000000002,
         reachableFromEnd: false
       }
     };
-    let graphWidthUpperBound = sgls.getGraphWidth(
-      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-    let graphHeight = sgls.getGraphHeight(nodeData);
-
-    // Here, nodeData has position values (x0, xLabel, width etc.) in terms of
-    // fractions of total height and width. modifyPositionValues converts these
-    // values to pixels.
-    let nodeDataWithPositionValueInPixel = sgls.modifyPositionValues(
-      nodeData, graphWidthUpperBound, graphHeight);
-
+    let nodeDataWithPositionValueInPixel2 = {
+      State1: {
+        depth: 1,
+        offset: 0,
+        reachable: true,
+        x0: 45.675000000000004,
+        y0: 81.19999999999999,
+        xLabel: 102.375,
+        yLabel: 98.00000000000001,
+        id: 'State1',
+        label: 'State1',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State2: {
+        depth: 1,
+        offset: 1,
+        reachable: true,
+        x0: 187.42500000000004,
+        y0: 81.19999999999999,
+        xLabel: 244.125,
+        yLabel: 98.00000000000001,
+        id: 'State2',
+        label: 'State2',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State3: {
+        depth: 1,
+        offset: 2,
+        reachable: true,
+        x0: 329.17500000000007,
+        y0: 81.19999999999999,
+        xLabel: 385.875,
+        yLabel: 98.00000000000001,
+        id: 'State3',
+        label: 'State3',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      Introduction: {
+        depth: 0,
+        offset: 0,
+        reachable: true,
+        x0: 45.675000000000004,
+        y0: 25.200000000000003,
+        xLabel: 102.375,
+        yLabel: 42.00000000000001,
+        id: 'Introduction',
+        label: 'Introduction',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State4: {
+        depth: 1,
+        offset: 3,
+        reachable: true,
+        x0: 470.925,
+        y0: 81.19999999999999,
+        xLabel: 527.625,
+        yLabel: 98.00000000000001,
+        id: 'State4',
+        label: 'State4',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      }
+    };
+    let nodeDataWithPositionValueInPixel3 = {
+      State1: {
+        depth: 1,
+        offset: 0,
+        reachable: true,
+        x0: 45.675000000000004,
+        y0: 88.2,
+        xLabel: 102.375,
+        yLabel: 105,
+        id: 'State1',
+        label: 'State1',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State2: {
+        depth: 1,
+        offset: 1,
+        reachable: true,
+        x0: 187.42500000000004,
+        y0: 88.2,
+        xLabel: 244.125,
+        yLabel: 105,
+        id: 'State2',
+        label: 'State2',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State3: {
+        depth: 1,
+        offset: 2,
+        reachable: true,
+        x0: 329.17500000000007,
+        y0: 88.2,
+        xLabel: 385.875,
+        yLabel: 105,
+        id: 'State3',
+        label: 'State3',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      Introduction: {
+        depth: 0,
+        offset: 0,
+        reachable: true,
+        x0: 45.675000000000004,
+        y0: 32.2,
+        xLabel: 102.375,
+        yLabel: 49,
+        id: 'Introduction',
+        label: 'Introduction',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State4: {
+        depth: 1,
+        offset: 3,
+        reachable: true,
+        x0: 470.925,
+        y0: 88.2,
+        xLabel: 527.625,
+        yLabel: 105,
+        id: 'State4',
+        label: 'State4',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      },
+      State5: {
+        depth: 2,
+        offset: 1,
+        reachable: true,
+        x0: 187.42500000000004,
+        y0: 144.2,
+        xLabel: 244.125,
+        yLabel: 161,
+        id: 'State5',
+        label: 'State5',
+        height: 33.6,
+        width: 113.40000000000002,
+        reachableFromEnd: false
+      }
+    }
     // The expectedGraphBoundaries are calculated from the x0 and y0 values from
     // nodeDataWithPositionValueInPixel, where leftEdge is
-    // minimum(nodeData[nodeId].x0 - BORDER_PADDING) of all nodes,
-    // ans rightEdge is maximum(nodeData[nodeId].x0 + BORDER_PADDING +
-    // nodeData[nodeId].width) of all nodes. Similarly, bottomEdge and topEdge
-    // are calculated using y0 and node height.
-    let expectedGraphBoundaries = {
-      bottom: 245.8,
-      left: 40.675000000000004,
-      right: 589.325,
-      top: 34.2
-    };
+    // minimum(nodeDataWithPositionValueInPixel[nodeId].x0 - BORDER_PADDING)
+    // of all nodes, and rightEdge is
+    // maximum(nodeDataWithPositionValueInPixel[nodeId].x0 + BORDER_PADDING +
+    // nodeDataWithPositionValueInPixel[nodeId].width) of all nodes. Similarly,
+    // bottomEdge and topEdge are calculated using y0 and node height.
+    let expectedGraphBoundaries1 = sgls.getGraphBoundaries(
+      nodeDataWithPositionValueInPixel1);
+    let expectedGraphBoundaries2 = sgls.getGraphBoundaries(
+        nodeDataWithPositionValueInPixel2);
+    let expectedGraphBoundaries3 = sgls.getGraphBoundaries(
+          nodeDataWithPositionValueInPixel3);
 
-    let expectedWidth = expectedGraphBoundaries.right -
-      expectedGraphBoundaries.left;
+    // The width of graph calculated as difference b/w left and right edge.
+    let expectedWidth1 = expectedGraphBoundaries1.right -
+      expectedGraphBoundaries1.left;
+    let expectedWidth2 = expectedGraphBoundaries2.right -
+      expectedGraphBoundaries2.left;
+    let expectedWidth3 = expectedGraphBoundaries3.right -
+      expectedGraphBoundaries3.left;
 
-    expect(expectedWidth).toBeLessThanOrEqual(graphWidthUpperBound);
-    expect(sgls.getGraphBoundaries(nodeDataWithPositionValueInPixel))
-      .toEqual(expectedGraphBoundaries);
+    // This is the maximum upperbound for graph witdh taking padding fraction
+    // into consideration.
+    let widthUpperBound = 548.6500000000001;
+
+    // The height of graph calculated as difference b/w bottom and right top.
+    let expectedHeight1 = expectedGraphBoundaries1.bottom -
+    expectedGraphBoundaries1.top;
+    let expectedHeight2 = expectedGraphBoundaries2.bottom -
+      expectedGraphBoundaries2.top;
+    let expectedHeight3 = expectedGraphBoundaries3.bottom -
+      expectedGraphBoundaries3.top;
+
+    // Here, we see that for 3 nodes the graph width is less than
+    // the upper bound, for  4 nodes the graph width is equal to the
+    // upper bound and the width becomes constant for nodes > 4.
+    expect(expectedWidth1).toBeLessThan(expectedWidth2);
+    expect(expectedWidth2).toEqual(widthUpperBound);
+    expect(expectedWidth3).toEqual(widthUpperBound);
+
+    // As height does not have an upper bound, it increases as a node overflows
+    // to the next row.
+
+    expect(expectedHeight1).toEqual(expectedHeight2);
+    expect(expectedHeight2).toBeLessThan(expectedHeight3);
   });
 
   it('should return graph boundaries with height equal to' +
