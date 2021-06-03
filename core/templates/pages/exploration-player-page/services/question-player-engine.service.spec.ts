@@ -21,14 +21,16 @@ import { AnswerClassificationResult } from 'domain/classifier/answer-classificat
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 
-describe('Question player engine service ', () => {
+fdescribe('Question player engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
@@ -43,6 +45,8 @@ describe('Question player engine service ', () => {
   let multipleQuestionsBackendDict: QuestionBackendDict[];
   let sampleExplorationDict: FetchExplorationBackendResponse;
   let outcomeObjectFactory: OutcomeObjectFactory;
+  let stateCardObjectFactory: StateCardObjectFactory;
+  let focusManagerService: FocusManagerService;
 
   beforeEach(() => {
     singleQuestionBackendDict = {
@@ -476,7 +480,9 @@ describe('Question player engine service ', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
+    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    focusManagerService = TestBed.inject(FocusManagerService);
     urlService = TestBed.inject(UrlService);
   });
 
@@ -560,7 +566,6 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService.recordNewCardAdded();
     let currentQuestion2 = questionPlayerEngineService.getCurrentQuestion();
 
-    expect(answerClassificationServiceSpy).toHaveBeenCalled();
     expect(currentQuestion2.getId()).toBe('questionId2');
   });
 
@@ -724,7 +729,7 @@ describe('Question player engine service ', () => {
     expect(languageCode).toBe('ab');
   });
 
-  it('should check for preview mode', () => {
+  it('should return false if questions are not in the preview mode', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let exploration = sampleExplorationDict;
@@ -744,7 +749,7 @@ describe('Question player engine service ', () => {
   });
 
   it('should show warning message while loading a question ' +
-    'when question html content is null', () => {
+    'if the question html content is null', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
@@ -762,10 +767,9 @@ describe('Question player engine service ', () => {
       [singleQuestionBackendDict], successHandler, failHandler);
 
     expect(alertsServiceSpy).toHaveBeenCalledWith('Expression parsing error.');
-    expect(expressionInterpolationServiceSpy).toHaveBeenCalled();
   });
 
-  it('should call error callback if there are no questions', () => {
+  it('should not load questions if there are no questions', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
@@ -775,7 +779,7 @@ describe('Question player engine service ', () => {
     expect(failHandler).toHaveBeenCalled();
   });
 
-  describe('on submiting answer ', () => {
+  describe('on submitting answer ', () => {
     it('should submit answer correctly', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
@@ -788,35 +792,35 @@ describe('Question player engine service ', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      let answerClassificationServiceSpy =
-        spyOn(answerClassificationService, 'getMatchingClassificationResult')
-          .and.returnValue(answerClassificationResult);
+
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
 
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, successHandler, failHandler);
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
 
-      expect(answerClassificationServiceSpy).toHaveBeenCalled();
+      expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
       expect(successCallback).toHaveBeenCalled();
     });
 
-    it('should return when the answer is still being processed', () => {
+    it('should do nothing if the answer is already being processed', () => {
       let successCallback = jasmine.createSpy('success');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
 
-      let answerClassificationServiceSpy =
-        spyOn(answerClassificationService, 'getMatchingClassificationResult');
+
+      spyOn(answerClassificationService, 'getMatchingClassificationResult');
 
       questionPlayerEngineService.setAnswerIsBeingProcessed(true);
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
 
-      expect(answerClassificationServiceSpy).not.toHaveBeenCalled();
+      expect(successCallback).not.toHaveBeenCalled();
     });
 
-    it('should show warning message given that feedback ' +
+    it('should show warning message if the feedback ' +
       'html content is null', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
@@ -827,6 +831,7 @@ describe('Question player engine service ', () => {
         outcomeObjectFactory
           .createNew('default', null, null, []), 1, 0, 'default_outcome'
       );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
@@ -849,7 +854,7 @@ describe('Question player engine service ', () => {
         .toHaveBeenCalledWith('Expression parsing error.');
     });
 
-    it('should show warning message given that question ' +
+    it('should show warning message if the question ' +
       'html content is null', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
@@ -860,6 +865,7 @@ describe('Question player engine service ', () => {
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
 
       singleQuestionBackendDict.question_state_data
         .content.html = null;
@@ -887,102 +893,6 @@ describe('Question player engine service ', () => {
 
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Expression parsing error.');
-    });
-
-    it('should return true if multiple questions exists', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory
-          .createNew('default', '', '', []), 1, 0, 'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml')
-        .and.callFake((html, envs) => {
-          return html;
-        });
-
-      questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
-      questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
-
-      let result = (
-        questionPlayerEngineService.getCurrentIndex() <
-          questionPlayerEngineService.getQuestionCount() - 1);
-      expect(result).toBe(true);
-    });
-
-    it('should return false if there are no multiple questions', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory
-          .createNew('default', '', '', []), 1, 0, 'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      let answerClassificationServiceSpy =
-        spyOn(answerClassificationService, 'getMatchingClassificationResult')
-          .and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml')
-        .and.callFake((html, envs) => {
-          return html;
-        });
-
-      questionPlayerEngineService.init(
-        [singleQuestionBackendDict], successHandler, failHandler);
-      questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
-
-      let result = (
-        questionPlayerEngineService.getCurrentIndex() <
-          questionPlayerEngineService.getQuestionCount() - 1);
-
-      expect(answerClassificationServiceSpy).toHaveBeenCalled();
-      expect(result).toBe(false);
-    });
-
-    it('should return the misconception Id correctly', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory
-          .createNew('default', '', '', []), 1, 0, 'default_outcome'
-      );
-      let answerGroupIndex = answerClassificationResult.answerGroupIndex;
-
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml')
-        .and.callFake((html, envs) => {
-          return html;
-        });
-
-      expect(questionPlayerEngineService.getCurrentQuestion()).toBe(undefined);
-
-      questionPlayerEngineService.init(
-        [singleQuestionBackendDict], successHandler, failHandler);
-      questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
-
-      let misconceptionId = questionPlayerEngineService.getCurrentQuestion()
-        .getStateData().interaction.answerGroups[answerGroupIndex]
-        .taggedSkillMisconceptionId;
-
-      expect(misconceptionId).toBe('misconceptionId');
     });
 
     it('should update the current index when a card is added', () => {
@@ -1024,76 +934,40 @@ describe('Question player engine service ', () => {
       expect(questionPlayerEngineService.getCurrentIndex()).toBe(1);
     });
 
-    it('should return true if answers are being processed', () => {
+    it('should not create next question if the existing ' +
+      'question is the last one', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let answer = 'answer';
-      let exploration = sampleExplorationDict;
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-      spyOn(contextService, 'getExplorationId')
-        .and.returnValue('explorationId1');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-      spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-        .and.returnValue(Promise.resolve(exploration));
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml')
         .and.callFake((html, envs) => {
           return html;
         });
-
-      let answerClassificationServiceSpy =
-        spyOn(answerClassificationService, 'getMatchingClassificationResult')
-          .and.callFake(() => {
-            expect(questionPlayerEngineService.isAnswerBeingProcessed())
-              .toBe(true);
-            return answerClassificationResult;
-          });
+      spyOn(focusManagerService, 'generateFocusLabel')
+        .and.returnValue('focusLabel')
 
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
+        [singleQuestionBackendDict], successHandler, failHandler);
+
+      let nextQuestion = null;
+
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
 
-      expect(answerClassificationServiceSpy).toHaveBeenCalled();
-    });
-
-    it('should return false if answers are not being processed', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory
-          .createNew('default', '', '', []), 1, 0, 'default_outcome'
-      );
-      let exploration = sampleExplorationDict;
-
-      spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-      spyOn(contextService, 'getExplorationId')
-        .and.returnValue('explorationId1');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-      spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-        .and.returnValue(Promise.resolve(exploration));
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.returnValue(answerClassificationResult);
-
-      expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
-
-      questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
-      questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
-
-      expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
+      expect(successCallback).toHaveBeenCalledWith(
+        nextQuestion, true, '', undefined, null,
+        null, false, 'misconceptionId',
+        null, null, true, 'focusLabel');
     });
   });
 });
