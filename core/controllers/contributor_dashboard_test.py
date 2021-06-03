@@ -78,8 +78,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
+        topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            '0', 'topic', 'abbrev', 'description')
+            topic_id, 'topic', 'abbrev', 'description')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -89,7 +90,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic('0', self.admin_id)
+        topic_services.publish_topic(topic_id, self.admin_id)
 
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
@@ -98,7 +99,17 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.save_new_skill(
                 skill_id, self.admin_id, description='skill_description')
             topic_services.add_uncategorized_skill(
-                self.admin_id, '0', skill_id)
+                self.admin_id, topic_id, skill_id)
+
+        # Add skill opportunity topic to a classroom.
+        config_services.set_property(
+            self.admin_id, 'classroom_pages_data', [{
+                'name': 'math',
+                'url_fragment': 'math-one',
+                'topic_ids': [topic_id],
+                'course_details': '',
+                'topic_list_intro': ''
+            }])
 
         self.expected_skill_opportunity_dict_0 = {
             'id': self.skill_id_0,
@@ -191,6 +202,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 self.expected_skill_opportunity_dict_0,
                 self.expected_skill_opportunity_dict_1])
 
+        self.assertFalse(response['more'])
+        self.assertTrue(
+            isinstance(response['next_cursor'], python_utils.BASESTRING))
+
+    def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
+            self):
+        config_services.revert_property(
+            self.admin_id, 'classroom_pages_data')
+
+        response = self.get_json(
+            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+            params={})
+
+        self.assertEqual(
+            response['opportunities'], [])
         self.assertFalse(response['more'])
         self.assertTrue(
             isinstance(response['next_cursor'], python_utils.BASESTRING))

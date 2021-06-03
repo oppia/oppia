@@ -111,13 +111,21 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        topics_with_skills = topic_fetchers.get_all_topics_with_skills()
+        # We want to focus attention on lessons that part of a classroom.
+        # See issue #12221.
+        classroom_topic_ids = []
+        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
+            classroom_topic_ids.extend(classroom_dict['topic_ids'])
+        classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
+        classroom_topics_with_skills = (
+            filter(lambda topic: topic.get_all_skill_ids() if topic else False,
+            classroom_topics))
         skill_opportunities, cursor, more = (
             opportunity_services.get_skill_opportunities(cursor))
         id_to_skill_opportunity_dict = {
             opp.id: opp.to_dict() for opp in skill_opportunities}
         opportunities = []
-        for topic in topics_with_skills:
+        for topic in classroom_topics_with_skills:
             for skill_id in topic.get_all_skill_ids():
                 if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
                     break
