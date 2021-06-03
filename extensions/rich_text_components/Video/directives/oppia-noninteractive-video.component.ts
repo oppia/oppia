@@ -19,18 +19,19 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  *
- * All of the rte components follow this pattern of updateView and ngOnChanges.
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
  * This is because these are also web-components (So basically, we can create
- * this component using document.createElement). CkEditor creates instances of
+ * this component using document.createElement). CKEditor creates instances of
  * these on the fly and runs ngOnInit before we can set the @Input properties.
- * When the input properties are not set, we get errors in the console. The `if`
- * condition in update view prevents that from happening.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
  * The `if` condition in the updateView and ngOnChanges might look like the
- * literal opposite but thats not the case. We from the previous statements
- * above that the if condition in the updateView is for preventing the code to
- * run until all the values needed for a successful execution are present. The
- * if condition in ngOnChanges is to optimize the re-runs of updateView and only
- * re-run when a property we care about has changed in value.
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
  */
 
 import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
