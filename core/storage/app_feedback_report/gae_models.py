@@ -274,7 +274,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
         # the latter throws "Cannot filter a non-Node argument; received False".
         return cls.query(
             cls.created_on < datetime_before_which_to_scrub,
-            cls.scrubbed_by == None).fetch()
+            cls.scrubbed_by == None).fetch()  # pylint: disable=singleton-comparison
 
     @classmethod
     def get_filter_options_for_field(cls, filter_field):

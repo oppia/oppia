@@ -548,13 +548,13 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         'randomInteger123')
     REPORT_IDS_LIST = [REPORT_ID]
     TICKET_NAME = 'example ticket name'
-    REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'other_suggestion'
+    REPORT_TYPE_SUGGESTION = constants.REPORT_TYPE.suggestion
+    CATEGORY_OTHER = constants.CATEGORY.other_suggestion
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
     ANDROID_SDK_VERSION = 28
-    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    ENTRY_POINT_NAVIGATION_DRAWER = constants.ENTRY_POINT.navigation_drawer
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
@@ -732,7 +732,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
                 'error The report with id %s is invalid.\']]' % (
                     self.ticket_id, report_model_to_delete.id))]
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
 
 class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
