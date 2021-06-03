@@ -160,8 +160,8 @@ class BeamJobRun(python_utils.OBJECT):
         }
 
 
-class BeamJobRunResult(python_utils.OBJECT):
-    """Encapsulates the result of an Apache Beam job run.
+class AggregateBeamJobRunResult(python_utils.OBJECT):
+    """Encapsulates the complete result of an Apache Beam job run.
 
     Attributes:
         stdout: str. The standard output produced by the job.
@@ -169,7 +169,7 @@ class BeamJobRunResult(python_utils.OBJECT):
     """
 
     def __init__(self, stdout, stderr):
-        """Initializes a new instance of BeamJobRunResult.
+        """Initializes a new instance of AggregateBeamJobRunResult.
 
         Args:
             stdout: str. The standard output produced by the job.
@@ -179,7 +179,7 @@ class BeamJobRunResult(python_utils.OBJECT):
         self.stderr = stderr
 
     def to_dict(self):
-        """Returns a dict representation of the BeamJobRunResult.
+        """Returns a dict representation of the AggregateBeamJobRunResult.
 
         Returns:
             dict(str: str). The dict structure is:

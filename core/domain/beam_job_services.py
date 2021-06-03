@@ -134,23 +134,23 @@ def get_beam_job_run_result(job_id):
         job_id: str. The ID of the job run to fetch.
 
     Returns:
-        BeamJobRunResult. The result of the given Apache Beam job run.
+        AggregateBeamJobRunResult. The result of the given Apache Beam job run.
     """
     beam_job_run_result_models = beam_job_models.BeamJobRunResultModel.query(
         beam_job_models.BeamJobRunResultModel.job_id == job_id).iter()
 
     # Job results are inherently unordered; there's no need to sort them.
-    stdout, stderr = [], []
+    stdouts, stderrs = [], []
     for beam_job_run_result_model in beam_job_run_result_models:
         if beam_job_run_result_model.stdout:
-            stdout.append(beam_job_run_result_model.stdout)
+            stdouts.append(beam_job_run_result_model.stdout)
         if beam_job_run_result_model.stderr:
-            stderr.append(beam_job_run_result_model.stderr)
+            stderrs.append(beam_job_run_result_model.stderr)
 
     return (
-        None if not stdout and not stderr else
-        beam_job_domain.BeamJobRunResult(
-            stdout='\n'.join(stdout), stderr='\n'.join(stderr)))
+        None if not stdouts and not stderrs else
+        beam_job_domain.AggregateBeamJobRunResult(
+            stdout='\n'.join(stdouts), stderr='\n'.join(stderrs)))
 
 
 def refresh_state_of_all_beam_job_run_models():

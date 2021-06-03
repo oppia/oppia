@@ -88,26 +88,29 @@ class BeamJobRunResultModelValidatorTests(BeamJobValidatorTestBase):
     RESULT_MODEL_CLASS = beam_job_models.BeamJobRunResultModel
 
     def test_model_with_corresponding_job_run_model(self):
+        result_model_id = self.RESULT_MODEL_CLASS.get_new_id()
+        self.RESULT_MODEL_CLASS(id=result_model_id, job_id='123').put()
         self.RUN_MODEL_CLASS(
             id='123', job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
-        self.RESULT_MODEL_CLASS(id='123', stdout='', stderr='').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
             ['fully-validated BeamJobRunResultModel', 1],
         ])
 
     def test_model_without_corresponding_job_run_model(self):
+        result_model_id = self.RESULT_MODEL_CLASS.get_new_id()
+        self.RESULT_MODEL_CLASS(
+            id=result_model_id, job_id='456', stdout='', stderr='').put()
         self.RUN_MODEL_CLASS(
             id='123', job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
-        self.RESULT_MODEL_CLASS(id='456', stdout='', stderr='').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
             ['failed validation check for beam_job_ids field check of '
              'BeamJobRunResultModel',
-             ['Entity id 456: based on field beam_job_ids having value 456, '
+             ['Entity id %s: based on field beam_job_ids having value 456, '
               'expected model BeamJobRunModel with id 456 but it doesn\'t '
-              'exist']
+              'exist' % result_model_id]
             ],
         ])

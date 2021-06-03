@@ -125,16 +125,16 @@ class BeamJobRunTests(test_utils.TestBase):
         })
 
 
-class BeamJobRunResultTests(test_utils.TestBase):
+class AggregateBeamJobRunResultTests(test_utils.TestBase):
 
     def test_usage(self):
-        result = beam_job_domain.BeamJobRunResult('abc', '123')
+        result = beam_job_domain.AggregateBeamJobRunResult('abc', '123')
 
         self.assertEqual(result.stdout, 'abc')
         self.assertEqual(result.stderr, '123')
 
     def test_to_dict(self):
-        result = beam_job_domain.BeamJobRunResult('abc', '123')
+        result = beam_job_domain.AggregateBeamJobRunResult('abc', '123')
 
         self.assertEqual(result.to_dict(), {
             'stdout': 'abc',

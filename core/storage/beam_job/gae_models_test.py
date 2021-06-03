@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import base64
+
 from core.platform import models
 from core.tests import test_utils
 
@@ -53,15 +55,19 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
 class BeamJobRunResultModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunResultModel."""
 
-    def test_put_generates_an_id(self):
-        model = beam_job_models.BeamJobRunResultModel(job_id='123', batch_num=1)
-
-        self.assertIsNone(model.key)
-
+    def test_get_new_id_raises_error_after_too_many_failed_attempts(self):
+        model = beam_job_models.BeamJobRunResultModel(
+            id=beam_job_models.BeamJobRunResultModel.get_new_id(), job_id='123')
         model.put()
 
-        self.assertIsNotNone(model.key)
-        self.assertIsNotNone(model.key.id())
+        collision_context = self.swap_to_always_return(
+            base64, 'urlsafe_b64encode', value=model.id)
+
+        with collision_context:
+            self.assertRaisesRegexp(
+                RuntimeError,
+                r'Failed to generate a unique ID after \d+ attempts',
+                beam_job_models.BeamJobRunResultModel.get_new_id)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
