@@ -21,7 +21,6 @@ import { AnswerClassificationResult } from 'domain/classifier/answer-classificat
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -30,7 +29,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
 
-fdescribe('Question player engine service ', () => {
+describe('Question player engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
