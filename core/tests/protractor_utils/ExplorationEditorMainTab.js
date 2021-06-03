@@ -771,7 +771,7 @@ var ExplorationEditorMainTab = function() {
         var multipleChoiceAnswerOption =
           multipleChoiceAnswerOptions(parameterValues[i]);
         await action.click(
-          'Multiple Choice Answer Option:' + i,
+          'Multiple Choice Answer Option: ' + i,
           multipleChoiceAnswerOption);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
@@ -779,7 +779,7 @@ var ExplorationEditorMainTab = function() {
           var itemSelectionAnswerOption =
             itemSelectionAnswerOptions(answerArray[j]);
           await action.click(
-            'Item Selection Answer Option:' + j,
+            'Item Selection Answer Option: ' + j,
             itemSelectionAnswerOption);
         }
       } else {
