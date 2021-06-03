@@ -1,4 +1,3 @@
-/* eslint-disable oppia/no-test-blockers */
 // Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +25,7 @@ import { TestBed } from '@angular/core/testing';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
-fdescribe('Topic questions tab', function() {
+describe('Topic questions tab', function() {
   var $rootScope = null;
   var $scope = null;
   var $window = null;
