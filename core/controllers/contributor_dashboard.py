@@ -111,7 +111,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        # We want to focus attention on lessons that part of a classroom.
+        # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
         classroom_topic_ids = []
         for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
