@@ -20,10 +20,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ShortSkillSummary } from
-  'domain/skill/short-skill-summary.model';
-import { StorySummaryBackendDict, StorySummary } from
-  'domain/story/story-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { StorySummaryBackendDict, StorySummary } from 'domain/story/story-summary.model';
 import {
   SkillIdToDescriptionMap,
   SubtopicBackendDict,
