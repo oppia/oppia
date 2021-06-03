@@ -119,7 +119,7 @@
   ],
   "rules": {
     "oppia/break-after-parens": "error",
-    "oppia/check-component-name-count": "error",
+    "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
     "oppia/no-testonly": "error",
     "oppia/test-message-style": "error",
@@ -178,7 +178,7 @@
     "dot-notation": [
       "error",
       {
-        "allowKeywords": false
+        "allowKeywords": true
       }
     ],
     "eol-last":[
