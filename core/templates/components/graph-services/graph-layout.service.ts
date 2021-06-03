@@ -507,12 +507,7 @@ export class StateGraphLayoutService {
         nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
         bottomEdge);
     }
-    console.error({
-      bottom: bottomEdge,
-      left: leftEdge,
-      right: rightEdge,
-      top: topEdge
-    });
+
     return {
       bottom: bottomEdge,
       left: leftEdge,
