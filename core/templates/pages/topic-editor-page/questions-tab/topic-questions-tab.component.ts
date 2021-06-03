@@ -42,6 +42,7 @@ angular.module('oppia').component('questionsTab', {
       $scope.getGroupedSkillSummaries =
         TopicEditorStateService.getGroupedSkillSummaries;
       $scope.getSkillsCategorizedByTopics = null;
+
       var _initTab = function() {
         $scope.question = null;
         $scope.skillId = null;
@@ -78,6 +79,7 @@ angular.module('oppia').component('questionsTab', {
           skillId, true, true
         );
       };
+
       ctrl.$onInit = function() {
       // To set autofocus when screen loads.
         $window.onload = function() {
