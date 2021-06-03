@@ -186,7 +186,7 @@ handlers:
     X-Xss-Protection: "1; mode=block"
   secure: always
   expiration: "0"
--url: /license
+- url: /license
   static_files: webpack_bundles/license.mainpage.html
   upload: webpack_bundles/license.mainpage.html
   http_headers:

@@ -43,6 +43,7 @@ export class SharingLinksComponent implements OnInit {
   classroomUrl: string;
   activityId: string;
   activityUrlFragment: string;
+  activityCreateUrl: string;
   serverName: string;
   escapedTwitterText: string;
 
@@ -55,10 +56,14 @@ export class SharingLinksComponent implements OnInit {
   ngOnInit(): void {
     if (this.shareType === 'exploration') {
       this.activityId = this.explorationId;
-      this.activityUrlFragment = 'explore';
+      this.activityUrlFragment = 'create';
+      //this.activityCreateUrl = 'create';
     } else if (this.shareType === 'collection') {
       this.activityId = this.collectionId;
       this.activityUrlFragment = 'collection';
+    } else if (this.shareType === 'create') {
+      this.activityId = this.collectionId;
+      this.activityCreateUrl = 'create';
     } else {
       throw new Error(
         'SharingLinks directive can only be used either in the' +
@@ -111,6 +116,9 @@ export class SharingLinksComponent implements OnInit {
       this.siteAnalyticsService.registerShareExplorationEvent(network);
     } else if (this.shareType === 'collection') {
       this.siteAnalyticsService.registerShareCollectionEvent(network);
+    }
+    else if (this.shareType === 'create') {
+      this.siteAnalyticsService.registerShareExplorationCreateEvent(network);
     }
     window.open(this.getUrl(network), '', 'height=460, width=640');
   }

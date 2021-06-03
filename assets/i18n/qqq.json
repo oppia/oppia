@@ -380,6 +380,7 @@
 	"I18N_LIBRARY_SUB_HEADER": "Subtitle title of the library page. - The library page shows all the explorations and collections available. It should be a single phrase and fit in one line.",
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Tooltip displayed inside the exploration card in the library - It's on top of the number of times the exploration has been viewed for the users.\n{{Identical|View}}",
 	"I18N_LIBRARY_VIEW_ALL": "Text of a button shown to the side of the exploration group. - When clicked, it shows all the explorations included on the associated group. It should be a small text.\n{{Identical|View all}}",
+	"I18N_LICENSE_TERMS_HEADING": "Heading to be displayed on top of the license page.",
 	"I18N_LOGOUT_LOADING": "Text displayed in the middle of the page while the user is being logged out.",
 	"I18N_LOGOUT_PAGE_TITLE": "Title displayed in the tab on the Browser in the logout page - In this page the user is waiting for the logout process to complete. Keep in two or three short words.",
 	"I18N_MODAL_CANCEL_BUTTON": "Text that is displayed in a button of a modal. On clicking it the modal closes.\n{{Identical|Cancel}}",

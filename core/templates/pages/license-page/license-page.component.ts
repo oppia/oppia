@@ -30,6 +30,8 @@
    styleUrls: []
  })
  export class LicensePageComponent implements OnInit {
+  TAB_ID_PARTICIPATION: string = 'participation';
+  TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
  
    constructor(
      private siteAnalyticsService: SiteAnalyticsService,
@@ -38,8 +40,19 @@
    ) {}
  
    ngOnInit(): void {}
+   getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  onApplyToTeachWithOppia(): boolean {
+    this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
+    }, 150);
+    return false;
+  }
  }
  
- angular.module('oppia').directive('licensePageComponent',
+ angular.module('oppia').directive('licensePage',
    downgradeComponent({component: LicensePageComponent}));
  
