@@ -19,8 +19,8 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { TranslateModule } from '@ngx-translate/core';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './exploration-successfully-flagged-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Exploration Successfully flagged modal', () => {
   let component: ExplorationSuccessfullyFlaggedModalComponent;
@@ -29,10 +29,12 @@ describe('Exploration Successfully flagged modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedPipesModule,
-        TranslateModule.forRoot()
+        SharedPipesModule
       ],
-      declarations: [ExplorationSuccessfullyFlaggedModalComponent],
+      declarations: [
+        ExplorationSuccessfullyFlaggedModalComponent,
+        MockTranslatePipe
+      ],
       providers: [
         NgbActiveModal
       ]
