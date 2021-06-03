@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for playthroughIssues.
  */
-
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Playthrough Issues Component', function() {
   var $q = null;
@@ -63,7 +60,7 @@ describe('Playthrough Issues Component', function() {
   }];
 
   beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
