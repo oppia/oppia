@@ -22,8 +22,7 @@ import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 import { CodeMirrorComponent } from './codemirror.component';
 import { CodeMirrorModule } from './codemirror.module';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Oppia CodeMirror Component', () => {
+describe('Oppia CodeMirror Component', () => {
   let component: CodeMirrorComponent;
   let fixture: ComponentFixture<CodeMirrorComponent>;
 
