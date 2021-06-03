@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the question player engine service.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -45,7 +45,6 @@ fdescribe('Question player engine service ', () => {
   let multipleQuestionsBackendDict: QuestionBackendDict[];
   let sampleExplorationDict: FetchExplorationBackendResponse;
   let outcomeObjectFactory: OutcomeObjectFactory;
-  let stateCardObjectFactory: StateCardObjectFactory;
   let focusManagerService: FocusManagerService;
 
   beforeEach(() => {
@@ -480,7 +479,6 @@ fdescribe('Question player engine service ', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     urlService = TestBed.inject(UrlService);
@@ -656,7 +654,7 @@ fdescribe('Question player engine service ', () => {
     expect(languageCode).toBe('ab');
   });
 
-  it('should always return false when calling \'isInPreviewMode()\' ', () => {
+  it('should always return false when calling \'isInPreviewMode()\'', () => {
     let previewMode = questionPlayerEngineService.isInPreviewMode();
 
     expect(previewMode).toBe(false);
