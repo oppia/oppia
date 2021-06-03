@@ -79,6 +79,7 @@ export class StateEditorService {
   linkedSkillId: string = null;
   explorationIsWhitelisted: boolean = false;
   solicitAnswerDetails: boolean = null;
+  cardIsCheckpoint: boolean = null;
   stateContentEditorInitialised: boolean = false;
   stateInteractionEditorInitialised: boolean = false;
   stateResponsesInitialised: boolean = false;
@@ -262,6 +263,14 @@ export class StateEditorService {
 
   getSolicitAnswerDetails(): boolean {
     return this.solicitAnswerDetails;
+  }
+
+  setCardIsCheckpoint(newCardIsCheckpoint: boolean): void {
+    this.cardIsCheckpoint = newCardIsCheckpoint;
+  }
+
+  getCardIsCheckpoint(): boolean {
+    return this.cardIsCheckpoint;
   }
 
   setStateNames(newStateNames: string[]): void {

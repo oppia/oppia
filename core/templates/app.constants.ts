@@ -71,6 +71,15 @@ export const AppConstants = {
       'There is an answer among the top 10 which has no explicit feedback.',
   },
 
+  CHECKPOINT_ERROR_MESSAGES: {
+    INIT_CARD: 'The first card of the lesson must be a checkpoint.',
+    TERMINAL_CARD:
+      'Checkpoints are not allowed on the last card of the lesson.',
+    CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
+    BYPASSABLE_CARD:
+      'Checkpoints must not be assigned to cards that can be bypassed.'
+  },
+
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',
 
   EXPLORATION_AND_SKILL_ID_PATTERN: /^[a-zA-Z0-9_-]+$/,

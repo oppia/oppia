@@ -37,6 +37,9 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-card-is-checkpoint.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -99,7 +102,7 @@ angular.module('oppia').directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', 'StateContentService',
+        '$scope', 'StateCardIsCheckpointService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateHintsService', 'StateInteractionIdService',
         'StateLinkedSkillIdService', 'StateNameService',
@@ -107,7 +110,7 @@ angular.module('oppia').directive('stateEditor', [
         'StateSolicitAnswerDetailsService', 'StateSolutionService',
         'WindowDimensionsService', 'INTERACTION_SPECS',
         function(
-            $scope, StateContentService,
+            $scope, StateCardIsCheckpointService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateHintsService, StateInteractionIdService,
             StateLinkedSkillIdService, StateNameService,
@@ -179,6 +182,8 @@ angular.module('oppia').directive('stateEditor', [
                     $scope.stateName, stateData.paramChanges);
                   StateSolicitAnswerDetailsService.init(
                     $scope.stateName, stateData.solicitAnswerDetails);
+                  StateCardIsCheckpointService.init(
+                    $scope.stateName, stateData.cardIsCheckpoint);
                   StateSolutionService.init(
                     $scope.stateName, stateData.interaction.solution);
                   updateInteractionVisibility(stateData.interaction.id);
