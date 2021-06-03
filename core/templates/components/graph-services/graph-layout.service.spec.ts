@@ -554,7 +554,7 @@ describe('Graph Layout Service', () => {
     // used as a scaling factor to determine width of graph nodes.
     expect(graphWidthUpperBound).toBe(
       AppConstants.MAX_NODES_PER_ROW * AppConstants.MAX_NODE_LABEL_LENGTH * 10.5
-      );
+    );
     // Here, graphHeight = 70 * (maxDepth + 1), here maxDepth is 2.
     expect(graphHeight).toBe(210);
   });
@@ -1106,6 +1106,5 @@ describe('Graph Layout Service', () => {
     expect(modifiedNodeData.State1.yLabel).toEqual(nodeData.State1.yLabel);
     expect(modifiedNodeData.State1.width).toEqual(nodeData.State1.width);
     expect(modifiedNodeData.State1.height).toEqual(nodeData.State1.height);
-
   });
 });
