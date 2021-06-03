@@ -1099,7 +1099,7 @@ describe('Graph Layout Service', () => {
     let modifiedNodeData = sgls.modifyPositionValues(
       nodeData, graphWidthUpperBound, graphHeight);
 
-    // Verifying the position values of State1
+    // Verifying the position values of State1.
     expect(modifiedNodeData.State1.x0).toEqual(nodeData.State1.x0);
     expect(modifiedNodeData.State1.y0).toEqual(nodeData.State1.y0);
     expect(modifiedNodeData.State1.xLabel).toEqual(nodeData.State1.xLabel);
