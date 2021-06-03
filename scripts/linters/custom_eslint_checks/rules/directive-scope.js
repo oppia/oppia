@@ -33,7 +33,7 @@ module.exports = {
     schema: [],
     messages: {
       scopeNotFound: 'Please ensure that directive in file has a scope: {}.',
-      messageId: (
+      trueScope: (
         'Please ensure that directive in file does not have scope set to true.')
     },
   },
@@ -56,6 +56,10 @@ module.exports = {
         if (controllerFunctionNode.body.body[0].type !== 'ReturnStatement') {
           return;
         }
+        if (controllerFunctionNode.body.body[0].argument.type != (
+          'ObjectExpression')) {
+          return;
+        }
         var returnDictProperties = (
           controllerFunctionNode.body.body[0].argument.properties);
 
@@ -68,7 +72,7 @@ module.exports = {
           if (property.value.raw === 'true') {
             context.report({
               node: node,
-              messageId: 'messageId'
+              messageId: 'trueScope'
             });
           }
         });

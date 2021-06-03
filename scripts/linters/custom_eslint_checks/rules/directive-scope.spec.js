@@ -62,6 +62,13 @@ ruleTester.run('directive-scope', rule, {
     function($filter) {
       'testing'
     })`
+  },
+  {
+    code:
+    `angular.module('oppia').directive('requireIsFloat', [
+    '$filter', function($filter) {
+      return ('testing');
+    }]);`
   }],
 
   invalid: [
