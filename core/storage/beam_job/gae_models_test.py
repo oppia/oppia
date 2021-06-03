@@ -84,6 +84,8 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
         export_policy = (
             beam_job_models.BeamJobRunResultModel.get_export_policy())
         self.assertEqual(
+            export_policy['job_id'], base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        self.assertEqual(
             export_policy['stdout'], base_models.EXPORT_POLICY.NOT_APPLICABLE)
         self.assertEqual(
             export_policy['stderr'], base_models.EXPORT_POLICY.NOT_APPLICABLE)

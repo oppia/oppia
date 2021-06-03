@@ -179,6 +179,7 @@ class BeamJobRunResultModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(BeamJobRunResultModel, cls).get_export_policy(), **{
+            'job_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'stdout': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'stderr': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
