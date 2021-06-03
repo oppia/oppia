@@ -17,17 +17,18 @@
  */
 
 import { AppConstants } from 'app.constants';
-import { MissingTranslationCustomHandler } from './missing-translations-handler';
+import { MissingTranslationCustomHandler } from './missing-translation-custom-handler';
 
-describe('Missing Translations Handler', () => {
+describe('Missing Translations Custom Handler', () => {
   let mth = new MissingTranslationCustomHandler();
 
-  it ('should return correct value for existing default translations', () => {
-    expect(mth.handle({
-      key: 'I18N_SIGNUP_PAGE_SUBTITLE',
-      translateService: null,
-    })).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
-  });
+  it('should return correct translation for existing default translations',
+    () => {
+      expect(mth.handle({
+        key: 'I18N_SIGNUP_PAGE_SUBTITLE',
+        translateService: null,
+      })).toEqual(AppConstants.DEFAULT_TRANSLATIONS.I18N_SIGNUP_PAGE_SUBTITLE);
+    });
 
   it('should return key if correct value is not available in app constants',
     () => {

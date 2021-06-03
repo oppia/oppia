@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-import { Pipe, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -30,12 +30,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {

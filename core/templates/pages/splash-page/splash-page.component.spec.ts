@@ -31,13 +31,8 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { SplashPageComponent } from './splash-page.component';
 import { of } from 'rxjs';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
 class MockI18nLanguageCodeService {
   codeChangeEventEmitter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {

@@ -32,6 +32,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { of } from 'rxjs';
 import { UrlService } from 'services/contextual/url.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
 class LearnerDashboardIconsComponentStub {
@@ -39,13 +40,6 @@ class LearnerDashboardIconsComponentStub {
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
   }

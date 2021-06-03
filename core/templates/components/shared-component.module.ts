@@ -107,7 +107,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';
-import { MissingTranslationCustomHandler } from 'pages/missing-translations-handler';
+import { MissingTranslationCustomHandler } from 'pages/missing-translation-custom-handler';
 import constants from 'assets/constants';
 
 const toastrConfig = {

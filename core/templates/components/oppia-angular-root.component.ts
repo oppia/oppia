@@ -61,6 +61,9 @@
  *       loading
  */
 
+import { TranslateService } from '@ngx-translate/core';
+import { TranslateCacheService } from 'ngx-translate-cache';
+
 import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
@@ -460,8 +463,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { TranslateService } from '@ngx-translate/core';
-import { TranslateCacheService } from 'ngx-translate-cache';
 
 @Component({
   selector: 'oppia-angular-root',

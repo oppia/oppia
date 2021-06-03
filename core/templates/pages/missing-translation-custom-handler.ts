@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Handler for the missing translations.
+ * @fileoverview The custom handler to handle the missing translations.
  */
 
 import { MissingTranslationHandler, MissingTranslationHandlerParams } from '@ngx-translate/core';

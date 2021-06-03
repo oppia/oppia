@@ -30,13 +30,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { PageTitleService } from 'services/page-title.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
