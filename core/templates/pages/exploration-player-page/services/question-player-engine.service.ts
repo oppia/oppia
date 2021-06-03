@@ -39,9 +39,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   providedIn: 'root'
 })
 export class QuestionPlayerEngineService {
-  private explorationId: string = null;
   private questionPlayerMode: boolean = null;
-  private version: number = null;
 
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
@@ -154,18 +152,7 @@ export class QuestionPlayerEngineService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
-    this.explorationId = this.contextService.getExplorationId();
     this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
-    this.version = this.urlService.getExplorationVersionFromUrl();
-
-    if (!this.questionPlayerMode) {
-      this.readOnlyExplorationBackendApiService
-        .loadExplorationAsync(this.explorationId, this.version)
-        .then((exploration) => {
-          this.version = exploration.version;
-        });
-    }
-
     this.setAnswerIsBeingProcessed(false);
     for (let i = 0; i < questionDicts.length; i++) {
       this.addQuestion(
@@ -196,14 +183,6 @@ export class QuestionPlayerEngineService {
 
   getQuestionCount(): number {
     return this.questions.length;
-  }
-
-  getExplorationId(): string {
-    return this.explorationId;
-  }
-
-  getExplorationVersion(): number {
-    return this.version;
   }
 
   clearQuestions(): void {
