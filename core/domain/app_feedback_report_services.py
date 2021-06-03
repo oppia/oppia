@@ -522,7 +522,7 @@ def _get_android_report_from_model(android_report_model):
     report_info_dict = android_report_model.android_report_info
     user_supplied_feedback = app_feedback_report_domain.UserSuppliedFeedback(
         _get_report_type_from_string(android_report_model.report_type),
-        android_report_model.category,
+        _get_category_from_string(android_report_model.category),
         report_info_dict['user_feedback_selected_items'],
         report_info_dict['user_feedback_other_text_input'])
     device_system_context = (

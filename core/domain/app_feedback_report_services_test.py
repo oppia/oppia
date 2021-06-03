@@ -229,7 +229,8 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             user_supplied_feedback.report_type.name,
             self.android_report_model.report_type)
         self.assertEqual(
-            user_supplied_feedback.category, self.android_report_model.category)
+            user_supplied_feedback.category.name,
+            self.android_report_model.category)
         self.assertEqual(
             user_supplied_feedback.user_feedback_selected_items, None)
         self.assertEqual(

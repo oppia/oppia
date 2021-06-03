@@ -146,8 +146,9 @@ class AppFeedbackReportModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, entity_id, platform, submitted_on, hours_offset, report_type,
-            category, platform_version, android_device_country_locale_code,
+            cls, entity_id, platform, submitted_on, local_timezone_offset_hrs,
+            report_type, category, platform_version,
+            android_device_country_locale_code,
             android_sdk_version, android_device_model, entry_point,
             entry_point_topic_id, entry_point_story_id,
             entry_point_exploration_id, entry_point_subtopic_id,
@@ -160,8 +161,8 @@ class AppFeedbackReportModel(base_models.BaseModel):
             platform: str. The platform the report is submitted on.
             submitted_on: datetime.datetime. The date and time the report was
                 submitted, in the user's local time zone.
-            hours_offset: int. The hours offset from UTC of the user's local
-                time zone.
+            local_timezone_offset_hrs: int. The hours offset from UTC of the
+                user's local time zone.
             report_type: str. The type of report.
             category: str. The category the report is providing feedback on.
             platform_version: str. The version of Oppia that the report was
@@ -205,7 +206,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
                 feconf.CURRENT_WEB_REPORT_SCHEMA_VERSION)
         report_entity = cls(
             id=entity_id, platform=platform, submitted_on=submitted_on,
-            local_timezone_offset_hrs=hours_offset,
+            local_timezone_offset_hrs=local_timezone_offset_hrs,
             report_type=report_type, category=category,
             platform_version=platform_version,
             android_device_country_locale_code=(

@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import types
 
+from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_validators
 from core.domain import prod_validation_jobs_one_off as prod_validation_jobs
 from core.platform import models
@@ -51,13 +52,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
     TICKET_ID = '%s.%s.%s' % (
         'random_hash', int(TICKET_CREATION_TIMESTAMP_MSEC),
         '16CharString1234')
-    REPORT_TYPE_SUGGESTION = 'suggestion'
-    CATEGORY_OTHER = 'other_suggestion'
+    REPORT_TYPE_SUGGESTION = constants.REPORT_TYPE.suggestion
+    CATEGORY_OTHER = constants.CATEGORY.other_suggestion
     PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
     ANDROID_SDK_VERSION = 28
-    ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
+    ENTRY_POINT_NAVIGATION_DRAWER = constants.ENTRY_POINT.navigation_drawer
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
@@ -93,14 +94,14 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             platform=self.PLATFORM_ANDROID,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
-            report_type=self.REPORT_TYPE_SUGGESTION,
-            category=self.CATEGORY_OTHER,
+            report_type=self.REPORT_TYPE_SUGGESTION.name,
+            category=self.CATEGORY_OTHER.name,
             platform_version=self.PLATFORM_VERSION,
             android_device_country_locale_code=(
                 self.COUNTRY_LOCALE_CODE_INDIA),
             android_sdk_version=self.ANDROID_SDK_VERSION,
             android_device_model=self.ANDROID_DEVICE_MODEL,
-            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
             entry_point_topic_id=None,
             entry_point_story_id=None,
             entry_point_exploration_id=None,
@@ -201,13 +202,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             platform=self.PLATFORM_ANDROID,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
-            report_type=self.REPORT_TYPE_SUGGESTION,
-            category=self.CATEGORY_OTHER,
+            report_type=self.REPORT_TYPE_SUGGESTION.name,
+            category=self.CATEGORY_OTHER.name,
             platform_version=self.PLATFORM_VERSION,
             android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
-            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
@@ -295,13 +296,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             platform=self.PLATFORM_WEB,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
-            report_type=self.REPORT_TYPE_SUGGESTION,
-            category=self.CATEGORY_OTHER,
+            report_type=self.REPORT_TYPE_SUGGESTION.name,
+            category=self.CATEGORY_OTHER.name,
             platform_version=self.PLATFORM_VERSION,
             android_device_country_locale_code=None,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
-            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
             entry_point_topic_id=None, entry_point_story_id=None,
             entry_point_exploration_id=None, entry_point_subtopic_id=None,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
@@ -344,13 +345,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             platform=self.PLATFORM_WEB,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
-            report_type=self.REPORT_TYPE_SUGGESTION,
-            category=self.CATEGORY_OTHER,
+            report_type=self.REPORT_TYPE_SUGGESTION.name,
+            category=self.CATEGORY_OTHER.name,
             platform_version=self.PLATFORM_VERSION,
             android_device_country_locale_code=None,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
-            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
             entry_point_topic_id=None, entry_point_story_id=None,
             entry_point_exploration_id=None, entry_point_subtopic_id=None,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
@@ -483,13 +484,13 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
             platform=self.PLATFORM_ANDROID,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
-            report_type=self.REPORT_TYPE_SUGGESTION,
-            category=self.CATEGORY_OTHER,
+            report_type=self.REPORT_TYPE_SUGGESTION.name,
+            category=self.CATEGORY_OTHER.name,
             platform_version=self.PLATFORM_VERSION,
             android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
-            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
             entry_point_topic_id=None,
             entry_point_story_id=None,
             entry_point_exploration_id=None,
@@ -596,13 +597,13 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
             ticket_id=self.ticket_id,
             submitted_on=self.REPORT_SUBMITTED_TIMESTAMP,
             local_timezone_offset_hrs=0,
-            report_type=self.REPORT_TYPE_SUGGESTION,
-            category=self.CATEGORY_OTHER,
+            report_type=self.REPORT_TYPE_SUGGESTION.name,
+            category=self.CATEGORY_OTHER.name,
             platform_version=self.PLATFORM_VERSION,
             android_device_country_locale_code=self.COUNTRY_LOCALE_CODE_INDIA,
             android_device_model=self.ANDROID_DEVICE_MODEL,
             android_sdk_version=self.ANDROID_SDK_VERSION,
-            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER,
+            entry_point=self.ENTRY_POINT_NAVIGATION_DRAWER.name,
             text_language_code=self.TEXT_LANGUAGE_CODE_ENGLISH,
             audio_language_code=self.AUDIO_LANGUAGE_CODE_ENGLISH,
             android_report_info=self.ANDROID_REPORT_INFO,
