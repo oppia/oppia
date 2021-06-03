@@ -31,7 +31,7 @@ class BeamJob(python_utils.OBJECT):
 
     Attributes:
         name: str. The name of the class that implements the job's logic.
-        argument_names: list(str). The name of the job's arguments.
+        argument_names: list(str). The names of the job's arguments.
     """
 
     def __init__(self, job_class):
@@ -57,7 +57,7 @@ class BeamJob(python_utils.OBJECT):
         """Returns the names of the job's arguments.
 
         Returns:
-            list(str). The name of the job's arguments.
+            list(str). The names of the job's arguments.
         """
         # We don't want to include 'self' in the list; run() being a method
         # should be considered an implementation detail.
@@ -70,7 +70,7 @@ class BeamJob(python_utils.OBJECT):
             dict(str: *). The dict has the following structure:
                 name: str. The name of the class that implements the job's
                     logic.
-                argument_names: list(str). The name of the job's arguments.
+                argument_names: list(str). The names of the job's arguments.
         """
         return {
             'name': self.name,
@@ -124,13 +124,13 @@ class BeamJobRun(python_utils.OBJECT):
         Returns:
             bool. Whether the job has reached a terminal state.
         """
-        return self.job_state in [
+        return self.job_state in (
             beam_job_models.BeamJobState.CANCELLED.value,
             beam_job_models.BeamJobState.DRAINED.value,
             beam_job_models.BeamJobState.UPDATED.value,
             beam_job_models.BeamJobState.DONE.value,
             beam_job_models.BeamJobState.FAILED.value,
-        ]
+        )
 
     def to_dict(self):
         """Returns a dict representation of the BeamJobRun.
@@ -186,4 +186,7 @@ class BeamJobRunResult(python_utils.OBJECT):
                 stdout: str. The standard output produced by the job.
                 stderr: str. The error output produced by the job.
         """
-        return {'stdout': self.stdout, 'stderr': self.stderr}
+        return {
+            'stdout': self.stdout,
+            'stderr': self.stderr,
+        }

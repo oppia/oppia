@@ -118,8 +118,8 @@ def get_beam_job_runs(refresh=False):
             if beam_job_runs[i].in_terminal_state:
                 continue
             _refresh_state_of_beam_job_run_model(beam_job_run_model)
-            beam_job_runs[i] = _get_beam_job_run_from_model(beam_job_run_model)
             updated_beam_job_run_models.append(beam_job_run_model)
+            beam_job_runs[i] = _get_beam_job_run_from_model(beam_job_run_model)
 
         if updated_beam_job_run_models:
             datastore_services.put_multi(updated_beam_job_run_models)
@@ -185,14 +185,14 @@ def _get_all_beam_job_run_models(include_terminated=True):
     return list(itertools.chain.from_iterable(
         beam_job_models.BeamJobRunModel.query(
             beam_job_models.BeamJobRunModel.latest_job_state == state).iter()
-        for state in [
+        for state in (
             beam_job_models.BeamJobState.CANCELLING.value,
             beam_job_models.BeamJobState.DRAINING.value,
             beam_job_models.BeamJobState.PENDING.value,
             beam_job_models.BeamJobState.RUNNING.value,
             beam_job_models.BeamJobState.STOPPED.value,
             beam_job_models.BeamJobState.UNKNOWN.value,
-        ]))
+        )))
 
 
 def _refresh_state_of_beam_job_run_model(beam_job_run_model):
@@ -225,11 +225,12 @@ def _refresh_state_of_beam_job_run_model(beam_job_run_model):
             job_status['currentState'],
             beam_job_models.BeamJobState.UNKNOWN).value
 
-        # The currentStateTime value uses nanosecond resolution. Since strftime
-        # only supports microsecond resolution, we slice the nanoseconds off so
-        # that it can be parsed correctly.
+        # The currentStateTime value is an ISO 8601 formatted timestamp with
+        # nanosecond resolution. Since strftime only supports microsecond
+        # resolution, we slice the nanoseconds off so that it can be parsed
+        # correctly.
         #
-        # For reference, here's a sample value and the relevant indices:
+        # For reference, here's a sample value and its relevant indices:
         #
         #     v-- 0               [msec]v-- 26
         #     2015-02-09T19:56:39.510000000Z
