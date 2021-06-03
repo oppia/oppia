@@ -25,6 +25,38 @@ import { StateGraphLayoutService } from './graph-layout.service';
 
 describe('Graph Layout Service', () => {
   let sgls: StateGraphLayoutService = null;
+
+  // Represents the nodes of a graph, with node labels as keys, and the
+  // following structure:
+  //
+  //   ┌────────┬───────────────State1───────────────┬───────┐
+  //   │        │               │ │ │                │       │
+  //   │        │        ┌──────┘ │ └──────┐         │       │
+  //   ▼        ▼        ▼        ▼        ▼         ▼       ▼
+  // State2   State3   State5   State6   State7   State8◄──State9
+  //   │         │                                   │
+  //   │         └────────────────┐                  │
+  //   │                          ▼                  │
+  //   └───────────────────────►State4◄──────────────┘
+  //
+  //                           Orphaned.
+  // The corresponding value of labels are objects with the following keys
+  // (only which are used in this spec file):
+  //   - x0: the x-position of the top-left corner of the node, measured
+  //       as a fraction of the total width.
+  //   - y0: the y-position of the top-left corner of the node, measured
+  //       as a fraction of the total height.
+  //   - width: the width of the node, measured as a fraction of the total
+  //       width.
+  //   - height: the height of the node, measured as a fraction of the total
+  //       height.
+  //   - xLabel: the x-position of the middle of the box containing
+  //       the node label, measured as a fraction of the total width.
+  //       The node label is centered horizontally within this box.
+  //   - yLabel: the y-position of the middle of the box containing
+  //       the node label, measured as a fraction of the total height.
+  //       The node label is centered vertically within this box.
+
   let nodeData1 = {
     State1: {
       depth: 0,
@@ -263,7 +295,7 @@ describe('Graph Layout Service', () => {
       .toEqual(expectedAdjacencyLists);
   });
 
-  it('should get correct indentation level', () => {
+  it('should return indentation levels for a segment of nodes', () => {
     let adjacencyLists = {
       State1: ['State2', 'State3', 'State4'],
       State2: ['State3', 'State4'],
@@ -325,7 +357,7 @@ describe('Graph Layout Service', () => {
     });
   });
 
-  it('should return correct augmented links with bezier curve', () => {
+  it('should return augmented links with bezier curves', () => {
     let nodeData = {
       State1: {
         depth: 0,
@@ -546,13 +578,18 @@ describe('Graph Layout Service', () => {
     ];
 
     let returnedAugmentedLinks = sgls.getAugmentedLinks(nodeData, links2);
+
     for (var i = 0; i < returnedAugmentedLinks.length; i++) {
+      // Check if the returned augmented links have a bezier curve
+      // which is equal to the expected value.
       expect(returnedAugmentedLinks[i].d).toBe(expectedAugmentedLinks[i].d);
     }
   });
 
   it('should return undefined when source and target nodes overlap' +
     ' while processing augmented links', () => {
+    // The nodes State1 and State2 overlap as State1.xLabel === State2.xLabel
+    // and State1.yLabel === State2.yLabel .
     let nodeData = {
       State1: {
         depth: 0,
@@ -581,38 +618,17 @@ describe('Graph Layout Service', () => {
         height: 0.16,
         width: 0.18000000000000002,
         reachableFromEnd: false
-      },
-      State3: {
-        depth: 1,
-        offset: 1,
-        reachable: true,
-        x0: 0.29750000000000004,
-        y0: 0.42000000000000004,
-        xLabel: 0.3875,
-        yLabel: 0.5,
-        id: 'State3',
-        label: 'State3',
-        height: 0.16,
-        width: 0.18000000000000002,
-        reachableFromEnd: false
-      },
-      State4: {
-        depth: 2,
-        offset: 0,
-        reachable: true,
-        x0: 0.07250000000000001,
-        y0: 0.6866666666666666,
-        xLabel: 0.1625,
-        yLabel: 0.7666666666666666,
-        id: 'State4',
-        label: 'State4',
-        height: 0.16,
-        width: 0.18000000000000002,
-        reachableFromEnd: false
       }
     };
 
-    expect(sgls.getAugmentedLinks(nodeData, links2)).toBeUndefined();
+    let links = [
+      {
+        source: 'State1',
+        target: 'State2'
+      }
+    ];
+
+    expect(sgls.getAugmentedLinks(nodeData, links)).toBeUndefined();
   });
 
   it('should get correct graph width and height', () => {
@@ -689,7 +705,13 @@ describe('Graph Layout Service', () => {
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
     let graphHeight = sgls.getGraphHeight(nodeData1);
 
-    expect(graphWidth).toBe(630);
+    // 10.5 is a rough upper bound for the width of a single letter in pixels,
+    // used as a scaling factor to determine width of graph nodes.
+    expect(graphWidth).toBe(
+      AppConstants.MAX_NODES_PER_ROW * AppConstants.MAX_NODE_LABEL_LENGTH * 10.5
+    );
+
+    // Here, graphHeight = 70 * (maxDepth + 1), here maxDepth is 5.
     expect(graphHeight).toBe(420);
   });
 
@@ -948,11 +970,15 @@ describe('Graph Layout Service', () => {
         reachableFromEnd: false
       }
     };
-    let graphWidth = sgls.getGraphWidth(
+    let graphWidthUpperBound = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
     let graphHeight = sgls.getGraphHeight(nodeData);
+
+    // Here, nodeData has position values (x0, xLabel, width etc.) in terms of
+    // fractions of total height and width. modifyPositionValues converts these
+    // values to pixels.
     let nodeDataWithPositionValueInPixel = sgls.modifyPositionValues(
-      nodeData, graphWidth, graphHeight);
+      nodeData, graphWidthUpperBound, graphHeight);
     let expectedGraphBoundaries = {
       bottom: 245.8,
       left: 40.675000000000004,
@@ -960,10 +986,10 @@ describe('Graph Layout Service', () => {
       top: 34.2
     };
 
-    let expectedWidth = expectedGraphBoundaries.bottom +
-      expectedGraphBoundaries.top;
+    let expectedWidth = expectedGraphBoundaries.left +
+      expectedGraphBoundaries.right;
 
-    expect(expectedWidth).toBeLessThanOrEqual(graphWidth);
+    expect(expectedWidth).toBeLessThanOrEqual(graphWidthUpperBound);
     expect(sgls.getGraphBoundaries(nodeDataWithPositionValueInPixel))
       .toEqual(expectedGraphBoundaries);
   });
@@ -1201,7 +1227,13 @@ describe('Graph Layout Service', () => {
     let modifiedNodeData = sgls.modifyPositionValues(
       nodeData, graphWidth, graphHeight);
 
-    expect(modifiedNodeData).not.toEqual(nodeData1);
-    expect(modifiedNodeData).toEqual(nodeData);
+    for (let nodeId in nodeData1) {
+      expect(modifiedNodeData[nodeId].x0).toEqual(nodeData[nodeId].x0);
+      expect(modifiedNodeData[nodeId].y0).toEqual(nodeData[nodeId].y0);
+      expect(modifiedNodeData[nodeId].xLabel).toEqual(nodeData[nodeId].xLabel);
+      expect(modifiedNodeData[nodeId].yLabel).toEqual(nodeData[nodeId].yLabel);
+      expect(modifiedNodeData[nodeId].width).toEqual(nodeData[nodeId].width);
+      expect(modifiedNodeData[nodeId].height).toEqual(nodeData[nodeId].height);
+    }
   });
 });
