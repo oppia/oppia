@@ -49,6 +49,12 @@ describe('Oppia CodeMirror Component', () => {
     subscription.unsubscribe();
   }));
 
+  it('should throw error if CodeMirrorComponent is undefined', () => {
+    component.codemirrorComponent = undefined;
+    expect(() => component.ngAfterViewInit()).toThrowError(
+      'CodemirrorComponent not found');
+  });
+
   it('should notify that it has loaded', waitForAsync(() => {
     const valueChangeSpy = jasmine.createSpy('valueChangeSpy');
     let subscription = component.valueChange.subscribe(valueChangeSpy);

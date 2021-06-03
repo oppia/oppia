@@ -32,14 +32,17 @@ export class CodemirrorMergeviewComponent implements
   @Input() leftValue: string | undefined;
   @Input() rightValue: string | undefined;
   // Non-null assertion operator(!) to ignore
-  // the case when CodeMirror is undefined.
+  // the case when CodeMirror is undefined or null.
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
+  // We can't directly test for window.CodeMirror to be undefined
+  // so we are assigning it to 'originalCodeMirror' here.
+  originalCodeMirror: typeof window.CodeMirror | undefined = window.CodeMirror;
 
   constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
 
   ngOnInit(): void {
     // Require CodeMirror.
-    if (window.CodeMirror === undefined) {
+    if (this.originalCodeMirror === undefined) {
       throw new Error('CodeMirror not found.');
     }
   }
@@ -62,36 +65,28 @@ export class CodemirrorMergeviewComponent implements
   ngOnChanges(changes: SimpleChanges): void {
     // Watch for changes and set value in left pane.
     if (changes.leftValue &&
-      changes.leftValue.currentValue !==
-      changes.leftValue.previousValue &&
-      this.codeMirrorInstance) {
+        changes.leftValue.currentValue !==
+        changes.leftValue.previousValue &&
+        this.codeMirrorInstance !== undefined) {
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        if (this.codeMirrorInstance !== undefined) {
-          this.codeMirrorInstance.editor().setValue(
-            changes.leftValue.currentValue);
-        } else {
-          throw new Error('CodeMirror not found');
-        }
+        this.codeMirrorInstance.editor().setValue(
+          changes.leftValue.currentValue);
       });
     }
     // Watch for changes and set value in right pane.
     if (changes.rightValue &&
-      changes.rightValue.currentValue !==
-      changes.rightValue.previousValue &&
-      this.codeMirrorInstance) {
+        changes.rightValue.currentValue !==
+        changes.rightValue.previousValue &&
+        this.codeMirrorInstance !== undefined) {
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        if (this.codeMirrorInstance !== undefined) {
-          this.codeMirrorInstance.rightOriginal().setValue(
-            changes.rightValue.currentValue);
-        } else {
-          throw new Error('CodeMirror not found');
-        }
+        this.codeMirrorInstance.rightOriginal().setValue(
+          changes.rightValue.currentValue);
       });
     }
   }

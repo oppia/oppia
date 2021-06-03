@@ -38,7 +38,8 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   @Input() readOnly = false;
   @Output() valueChange = new EventEmitter();
   @Output() onLoad = new EventEmitter();
-  @ViewChild(CodemirrorComponent) codemirrorComponent!: CodemirrorComponent;
+  @ViewChild(CodemirrorComponent) codemirrorComponent:
+   CodemirrorComponent | undefined;
   autoFocus = false;
   codemirror: CodeMirror.Editor | undefined;
 
@@ -50,15 +51,15 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
-    const runAfterViewInit = () => {
-      if (this.codemirrorComponent !== undefined) {
+    if (this.codemirrorComponent === undefined) {
+      throw new Error('CodemirrorComponent not found');
+    } else {
+      const runAfterViewInit = () => {
         this.codemirror = this.codemirrorComponent.codeMirror;
         this.onLoad.emit(this.codemirror);
-      } else {
-        throw new Error('CodemirrorComponent not found');
-      }
-    };
-    setTimeout(() => runAfterViewInit(), 0);
+      };
+      setTimeout(() => runAfterViewInit(), 0);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

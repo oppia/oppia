@@ -39,12 +39,10 @@ describe('Oppia CodeMirror Component', () => {
   }));
 
   it('should throw error if codemirror is undefined', () => {
-    const originalCodeMirror = window.CodeMirror;
-    window.CodeMirror = undefined;
+    component.originalCodeMirror = undefined;
     expect(() => {
       component.ngOnInit();
     }).toThrowError('CodeMirror not found.');
-    window.CodeMirror = originalCodeMirror;
   });
 
   it('should call merge view', () => {
