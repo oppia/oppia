@@ -417,173 +417,28 @@ describe('Graph Layout Service', () => {
       }
     };
 
-    let expectedAugmentedLinks = [
-      {
-        source: {
-          depth: 0,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.15333333333333335,
-          xLabel: 0.1625,
-          yLabel: 0.23333333333333334,
-          id: 'State1',
-          label: 'State1',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        target: {
-          depth: 0,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.15333333333333335,
-          xLabel: 0.1625,
-          yLabel: 0.23333333333333334,
-          id: 'State1',
-          label: 'State1',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        }
-      },
-      {
-        source: {
-          depth: 0,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.15333333333333335,
-          xLabel: 0.1625,
-          yLabel: 0.23333333333333334,
-          id: 'State1',
-          label: 'State1',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        target: {
-          depth: 1,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.42000000000000004,
-          xLabel: 0.1625,
-          yLabel: 0.5,
-          id: 'State2',
-          label: 'State2',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        d: 'M0.1625 0.31333333333333335 Q 0.2025 0.3666666666666667 0.1625 0.42'
-      },
-      {
-        source: {
-          depth: 0,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.15333333333333335,
-          xLabel: 0.1625,
-          yLabel: 0.23333333333333334,
-          id: 'State1',
-          label: 'State1',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        target: {
-          depth: 1,
-          offset: 1,
-          reachable: true,
-          x0: 0.29750000000000004,
-          y0: 0.42000000000000004,
-          xLabel: 0.3875,
-          yLabel: 0.5,
-          id: 'State3',
-          label: 'State3',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        d: 'M0.23 0.31333333333333335 Q 0.30557165934031566' +
-          ' 0.3408718290982754 0.32 0.42'
-      },
-      {
-        source: {
-          depth: 1,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.42000000000000004,
-          xLabel: 0.1625,
-          yLabel: 0.5,
-          id: 'State2',
-          label: 'State2',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        target: {
-          depth: 2,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.6866666666666666,
-          xLabel: 0.1625,
-          yLabel: 0.7666666666666666,
-          id: 'State4',
-          label: 'State4',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        d: 'M0.1625 0.5800000000000001 Q 0.2025 0.6333333333333333' +
-          ' 0.1625 0.6866666666666665'
-      },
-      {
-        source: {
-          depth: 1,
-          offset: 1,
-          reachable: true,
-          x0: 0.29750000000000004,
-          y0: 0.42000000000000004,
-          xLabel: 0.3875,
-          yLabel: 0.5,
-          id: 'State3',
-          label: 'State3',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        target: {
-          depth: 2,
-          offset: 0,
-          reachable: true,
-          x0: 0.07250000000000001,
-          y0: 0.6866666666666666,
-          xLabel: 0.1625,
-          yLabel: 0.7666666666666666,
-          id: 'State4',
-          label: 'State4',
-          height: 0.16,
-          width: 0.18000000000000002,
-          reachableFromEnd: false
-        },
-        d: 'M0.32 0.5800000000000001 Q 0.30557165934031566' +
+    let expectedBezierCurveValues = [
+      'M0.1625 0.31333333333333335 Q 0.2025 0.3666666666666667 0.1625 0.42',
+      'M0.23 0.31333333333333335 Q 0.30557165934031566' +
+          ' 0.3408718290982754 0.32 0.42',
+      'M0.1625 0.5800000000000001 Q 0.2025 0.6333333333333333' +
+          ' 0.1625 0.6866666666666665',
+      'M0.32 0.5800000000000001 Q 0.30557165934031566' +
           ' 0.6591281709017246 0.23000000000000004 0.6866666666666665'
-      }
     ];
 
     let returnedAugmentedLinks = sgls.getAugmentedLinks(nodeData, links2);
+    let returnedBezierCurveValues = [];
 
-    for (var i = 0; i < returnedAugmentedLinks.length; i++) {
-      // Check if the returned augmented links have a bezier curve
-      // which is equal to the expected value.
-      expect(returnedAugmentedLinks[i].d).toBe(expectedAugmentedLinks[i].d);
+    // Starting with index 1 as, links2 has first link with same source and
+    // target node. SO, first augmentedLink will not have a Bezier curve.
+    for (var i = 1; i < returnedAugmentedLinks.length; i++) {
+      returnedBezierCurveValues.push(returnedAugmentedLinks[i].d);
     }
+
+    // Check if the returned augmented links have a bezier curve
+    // which is equal to the expected value.
+    expect(returnedBezierCurveValues).toEqual(expectedBezierCurveValues);
   });
 
   it('should return undefined when source and target nodes overlap' +
@@ -695,7 +550,12 @@ describe('Graph Layout Service', () => {
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
     let graphHeight = sgls.getGraphHeight(nodeData);
 
-    expect(graphWidthUpperBound).toBe(630);
+    // 10.5 is a rough upper bound for the width of a single letter in pixels,
+    // used as a scaling factor to determine width of graph nodes.
+    expect(graphWidthUpperBound).toBe(
+      AppConstants.MAX_NODES_PER_ROW * AppConstants.MAX_NODE_LABEL_LENGTH * 10.5
+      );
+    // Here, graphHeight = 70 * (maxDepth + 1), here maxDepth is 2.
     expect(graphHeight).toBe(210);
   });
 
@@ -979,6 +839,13 @@ describe('Graph Layout Service', () => {
     // values to pixels.
     let nodeDataWithPositionValueInPixel = sgls.modifyPositionValues(
       nodeData, graphWidthUpperBound, graphHeight);
+
+    // The expectedGraphBoundaries are calculated from the x0 and y0 values from
+    // nodeDataWithPositionValueInPixel, where leftEdge is
+    // minimum(nodeData[nodeId].x0 - BORDER_PADDING) of all nodes,
+    // ans rightEdge is maximum(nodeData[nodeId].x0 + BORDER_PADDING +
+    // nodeData[nodeId].width) of all nodes. Similarly, bottomEdge and topEdge
+    // are calculated using y0 and node height.
     let expectedGraphBoundaries = {
       bottom: 245.8,
       left: 40.675000000000004,
@@ -986,8 +853,8 @@ describe('Graph Layout Service', () => {
       top: 34.2
     };
 
-    let expectedWidth = expectedGraphBoundaries.left +
-      expectedGraphBoundaries.right;
+    let expectedWidth = expectedGraphBoundaries.right -
+      expectedGraphBoundaries.left;
 
     expect(expectedWidth).toBeLessThanOrEqual(graphWidthUpperBound);
     expect(sgls.getGraphBoundaries(nodeDataWithPositionValueInPixel))
@@ -1067,7 +934,7 @@ describe('Graph Layout Service', () => {
       top: 27.200000000000003
     };
 
-    let expectedHeight = expectedGraphBoundaries.bottom +
+    let expectedHeight = expectedGraphBoundaries.bottom -
       expectedGraphBoundaries.top;
 
     expect(expectedHeight).toBeLessThanOrEqual(graphHeight);
@@ -1220,20 +1087,25 @@ describe('Graph Layout Service', () => {
     };
     let nodeData1 = cloneDeep(nodeData);
 
-    let graphWidth = sgls.getGraphWidth(
+    let graphWidthUpperBound = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
     let graphHeight = sgls.getGraphHeight(nodeData1);
 
+    // Here, modifiedNodeData is nodeData with position values in pixels.
+    // For ex, nodeData.State1.x0 = 0.07250000000000001 which is expressed
+    // in fraction of graph width. It can be converted to pixels by multiplying
+    // with graph width. So, modifiedNodeDate.State1.x0 = 0.07250000000000001 *
+    // graphWidthUpperBound (630) = 47.675.
     let modifiedNodeData = sgls.modifyPositionValues(
-      nodeData, graphWidth, graphHeight);
+      nodeData, graphWidthUpperBound, graphHeight);
 
-    for (let nodeId in nodeData1) {
-      expect(modifiedNodeData[nodeId].x0).toEqual(nodeData[nodeId].x0);
-      expect(modifiedNodeData[nodeId].y0).toEqual(nodeData[nodeId].y0);
-      expect(modifiedNodeData[nodeId].xLabel).toEqual(nodeData[nodeId].xLabel);
-      expect(modifiedNodeData[nodeId].yLabel).toEqual(nodeData[nodeId].yLabel);
-      expect(modifiedNodeData[nodeId].width).toEqual(nodeData[nodeId].width);
-      expect(modifiedNodeData[nodeId].height).toEqual(nodeData[nodeId].height);
-    }
+    // Verifying the position values of State1
+    expect(modifiedNodeData.State1.x0).toEqual(nodeData.State1.x0);
+    expect(modifiedNodeData.State1.y0).toEqual(nodeData.State1.y0);
+    expect(modifiedNodeData.State1.xLabel).toEqual(nodeData.State1.xLabel);
+    expect(modifiedNodeData.State1.yLabel).toEqual(nodeData.State1.yLabel);
+    expect(modifiedNodeData.State1.width).toEqual(nodeData.State1.width);
+    expect(modifiedNodeData.State1.height).toEqual(nodeData.State1.height);
+
   });
 });
