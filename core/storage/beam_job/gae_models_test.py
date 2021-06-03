@@ -28,7 +28,6 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunModel."""
 
     def test_get_deletion_policy(self):
-        """Model doesn't contain any data directly corresponding to a user."""
         self.assertEqual(
             beam_job_models.BeamJobRunModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
@@ -54,8 +53,17 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
 class BeamJobRunResultModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunResultModel."""
 
+    def test_put_generates_an_id(self):
+        model = beam_job_models.BeamJobRunResultModel(job_id='123', batch_num=1)
+
+        self.assertIsNone(model.key)
+
+        model.put()
+
+        self.assertIsNotNone(model.key)
+        self.assertIsNotNone(model.key.id())
+
     def test_get_deletion_policy(self):
-        """Model doesn't contain any data directly corresponding to a user."""
         self.assertEqual(
             beam_job_models.BeamJobRunResultModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)

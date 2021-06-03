@@ -276,12 +276,25 @@ class GetBeamJobRunResultTests(test_utils.AppEngineTestBase):
 
     def test_get_beam_run_result(self):
         beam_job_models.BeamJobRunResultModel(
-            id='123', stdout='abc', stderr='def').put()
+            job_id='123', stdout='abc', stderr='def').put()
 
         beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
 
         self.assertEqual(beam_job_run_result.stdout, 'abc')
         self.assertEqual(beam_job_run_result.stderr, 'def')
 
-    def test_get_beam_run_result_for_missing_job_result(self):
+    def test_get_beam_run_result_with_no_results(self):
         self.assertIsNone(beam_job_services.get_beam_job_run_result('123'))
+
+    def test_get_beam_run_result_with_result_batches(self):
+        beam_job_models.BeamJobRunResultModel(job_id='123', stdout='abc').put()
+        beam_job_models.BeamJobRunResultModel(job_id='123', stderr='123').put()
+        beam_job_models.BeamJobRunResultModel(
+            job_id='123', stdout='def', stderr='456').put()
+
+        beam_job_run_result = beam_job_services.get_beam_job_run_result('123')
+
+        self.assertItemsEqual(
+            beam_job_run_result.stdout.split('\n'), ['abc', 'def'])
+        self.assertItemsEqual(
+            beam_job_run_result.stderr.split('\n'), ['123', '456'])
