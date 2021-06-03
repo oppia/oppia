@@ -51,15 +51,13 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit(): void {
-    if (this.codemirrorComponent === undefined) {
-      throw new Error('CodemirrorComponent not found');
-    } else {
-      const runAfterViewInit = () => {
+    const runAfterViewInit = () => {
+      if (this.codemirrorComponent !== undefined) {
         this.codemirror = this.codemirrorComponent.codeMirror;
         this.onLoad.emit(this.codemirror);
-      };
-      setTimeout(() => runAfterViewInit(), 0);
-    }
+      }
+    };
+    setTimeout(() => runAfterViewInit(), 0);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

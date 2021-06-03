@@ -65,9 +65,9 @@ export class CodemirrorMergeviewComponent implements
   ngOnChanges(changes: SimpleChanges): void {
     // Watch for changes and set value in left pane.
     if (changes.leftValue &&
-        changes.leftValue.currentValue !==
-        changes.leftValue.previousValue &&
-        this.codeMirrorInstance !== undefined) {
+      changes.leftValue.currentValue !==
+      changes.leftValue.previousValue &&
+      this.codeMirrorInstance !== undefined) {
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
@@ -78,9 +78,9 @@ export class CodemirrorMergeviewComponent implements
     }
     // Watch for changes and set value in right pane.
     if (changes.rightValue &&
-        changes.rightValue.currentValue !==
-        changes.rightValue.previousValue &&
-        this.codeMirrorInstance !== undefined) {
+      changes.rightValue.currentValue !==
+      changes.rightValue.previousValue &&
+      this.codeMirrorInstance !== undefined) {
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
