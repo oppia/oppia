@@ -622,50 +622,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _match_line_breaks_in_controller_dependencies(self):
-        """This function checks whether the line breaks between the dependencies
-        listed in the controller of a directive or service exactly match those
-        between the arguments of the controller function.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Controller dependency line break'
-        files_to_check = self.all_filepaths
-        failed = False
-        error_messages = []
-
-        # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
-        pattern_to_match = (
-            r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
-            r'function\((?P<function_parameters>[\S\s]*?)\)')
-
-        for filepath in files_to_check:
-            file_content = self.file_cache.read(filepath)
-            matched_patterns = re.findall(pattern_to_match, file_content)
-            for matched_pattern in matched_patterns:
-                stringfied_dependencies, function_parameters = (
-                    matched_pattern)
-                stringfied_dependencies = (
-                    stringfied_dependencies.strip().replace(
-                        '\'', '').replace(' ', ''))[:-1]
-                function_parameters = (
-                    function_parameters.strip().replace(' ', ''))
-                if stringfied_dependencies != function_parameters:
-                    failed = True
-                    error_messages.append(
-                        'Please ensure that in file %s the line breaks '
-                        'pattern between the dependencies mentioned as '
-                        'strings:\n[%s]\nand the dependencies mentioned '
-                        'as function parameters: \n(%s)\nfor the '
-                        'corresponding controller should '
-                        'exactly match.' % (
-                            filepath, stringfied_dependencies,
-                            function_parameters))
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
         the constants are not declared in files other than *.constants.ajs.ts
@@ -1024,8 +980,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
         linter_stdout.append(self._check_sorted_dependencies())
-        linter_stdout.append(
-            self._match_line_breaks_in_controller_dependencies())
         linter_stdout.append(self._check_constants_declaration())
         linter_stdout.append(self._check_comments())
         linter_stdout.append(self._check_ts_ignore())

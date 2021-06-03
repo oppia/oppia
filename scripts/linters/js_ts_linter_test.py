@@ -67,8 +67,6 @@ INVALID_SCOPE_TRUE_FILEPATH = os.path.join(
 INVALID_SCOPE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_scope.ts')
 INVALID_SORTED_DEPENDENCIES_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
-INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_line_breaks_in_controller_dependencies.ts')
 INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
 INVALID_CONSTANT_FILEPATH = os.path.join(
@@ -240,38 +238,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
             ' in file ', 'the stringfied dependencies should be in the '
             'following manner: dollar imports, regular imports and '
             'constant imports, all in sorted order.'])
-        self.validate(lint_task_report, expected_messages, 1)
-
-    def test_match_line_breaks_in_controller_dependencies(self):
-        def mock_compile_all_ts_files():
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*') % (
-                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
-                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
-                    'true', 'es5', './node_modules/@types',
-                    INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH)
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_LINE_BREAK_IN_CONTROLLER_DEPENDENCIES_FILEPATH],
-                FILE_CACHE).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        expected_messages = [
-            'Please ensure that in file',
-            'the line breaks pattern between the dependencies mentioned as'
-            ' strings:\n[$rootScope,$window,BackgroundMaskService,\n'
-            'SidebarStatusService,UrlService]\nand the dependencies '
-            'mentioned as function parameters: \n($rootScope,$window,\n'
-            'BackgroundMaskService,\nSidebarStatusService,UrlService)\n'
-            'for the corresponding controller should exactly match.'
-            ]
         self.validate(lint_task_report, expected_messages, 1)
 
     def test_check_constants_declaration(self):
