@@ -22,6 +22,17 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ../yarn_cache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - uses: ./.github/actions/install-oppia-dependencies
       - name: Run ESLint Tests
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

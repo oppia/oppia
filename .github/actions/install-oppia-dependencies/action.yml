@@ -3,17 +3,6 @@ description: 'Installs wheel, third-party python libs, and loads yarn cache.'
 runs:
   using: 'composite'
   steps:
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: ../yarn_cache
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
     - name: Setup python by installing wheel
       run: pip install wheel==0.35.0
       shell: bash
