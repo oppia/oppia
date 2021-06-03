@@ -23,7 +23,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { StateGraphLayoutService } from './graph-layout.service';
 
-fdescribe('Graph Layout Service', () => {
+describe('Graph Layout Service', () => {
   let sgls: StateGraphLayoutService = null;
 
   // Represents the nodes of a graph, with node labels as keys, and the
@@ -733,9 +733,6 @@ fdescribe('Graph Layout Service', () => {
 
   it('should return graph boundaries with width less than equal to' +
     ' maximum allowed graph width', () => {
-    let graphWidthUpperBound = sgls.getGraphWidth(
-      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-
     // Here, nodeDataWithPositionValueInPixel1 ans 2 has position values
     // (x0, xLabel, width etc.) in terms of pixels.
     // nodeDataWithPositionInPixel1, 2 and 3 are node data of graphs with
@@ -956,7 +953,7 @@ fdescribe('Graph Layout Service', () => {
         width: 113.40000000000002,
         reachableFromEnd: false
       }
-    }
+    };
     // The expectedGraphBoundaries are calculated from the x0 and y0 values from
     // nodeDataWithPositionValueInPixel, where leftEdge is
     // minimum(nodeDataWithPositionValueInPixel[nodeId].x0 - BORDER_PADDING)
@@ -967,9 +964,9 @@ fdescribe('Graph Layout Service', () => {
     let expectedGraphBoundaries1 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel1);
     let expectedGraphBoundaries2 = sgls.getGraphBoundaries(
-        nodeDataWithPositionValueInPixel2);
+      nodeDataWithPositionValueInPixel2);
     let expectedGraphBoundaries3 = sgls.getGraphBoundaries(
-          nodeDataWithPositionValueInPixel3);
+      nodeDataWithPositionValueInPixel3);
 
     // The width of graph calculated as difference b/w left and right edge.
     let expectedWidth1 = expectedGraphBoundaries1.right -
