@@ -271,7 +271,7 @@ describe('SvgFilenameEditor', () => {
   }));
 
   it(
-    'should update diagram size when dom is loading',
+    'should wait before updating diagram size when dom is loading',
     waitForAsync(fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loading');
       spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
@@ -685,7 +685,8 @@ describe('SvgFilenameEditor', () => {
     })));
 
   it(
-    'should allow user to continue editing the diagram when dom is loading',
+    'should wait for the dom to load before allowing the user to continue ' +
+    'editing the diagram',
     waitForAsync(fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loading');
       spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
