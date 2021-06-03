@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-import { Pipe, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
