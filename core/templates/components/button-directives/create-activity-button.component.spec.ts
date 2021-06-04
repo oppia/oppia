@@ -58,7 +58,7 @@ class MockUrlService {
   }
 }
 
-fdescribe('CreateActivityButtonComponent', () => {
+describe('CreateActivityButtonComponent', () => {
   let component: CreateActivityButtonComponent;
   let fixture: ComponentFixture<CreateActivityButtonComponent>;
   let userService: UserService;
@@ -298,7 +298,8 @@ fdescribe('CreateActivityButtonComponent', () => {
     tick(150);
     fixture.detectChanges();
 
-    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith('createActivityButton');
+    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+      'createActivityButton');
     expect(windowRef.nativeWindow.location.href).toBe('login-url');
   }));
 });
