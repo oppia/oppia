@@ -19,12 +19,10 @@
 import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
@@ -35,14 +33,10 @@ describe('Question player engine service ', () => {
   let contextService: ContextService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let questionObjectFactory: QuestionObjectFactory;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
-  let questionPlayerEngineService: QuestionPlayerEngineService;
-  let urlService: UrlService;
 
+  let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
-  let sampleExplorationDict: FetchExplorationBackendResponse;
   let outcomeObjectFactory: OutcomeObjectFactory;
   let focusManagerService: FocusManagerService;
 
@@ -409,63 +403,6 @@ describe('Question player engine service ', () => {
       linked_skill_ids: [],
       inapplicable_skill_misconception_ids: [],
     }];
-
-    sampleExplorationDict = {
-      exploration_id: 'explorationId1',
-      is_logged_in: true,
-      session_id: 'KERH',
-      exploration: {
-        init_state_name: 'Introduction',
-        param_changes: [],
-        param_specs: null,
-        title: 'Exploration',
-        language_code: 'en',
-        correctness_feedback_enabled: true,
-        objective: 'To learn',
-        states: {
-          Introduction: {
-            param_changes: [],
-            classifier_model_id: null,
-            recorded_voiceovers: null,
-            solicit_answer_details: true,
-            card_is_checkpoint: true,
-            written_translations: null,
-            linked_skill_id: null,
-            next_content_id_index: null,
-            content: {
-              html: '',
-              content_id: 'content'
-            },
-            interaction: {
-              customization_args: {},
-              answer_groups: [],
-              solution: null,
-              hints: [],
-              default_outcome: {
-                param_changes: [],
-                dest: 'Introduction',
-                feedback: {
-                  html: '',
-                  content_id: 'content'
-                },
-                labelled_as_correct: true,
-                refresher_exploration_id: 'exp',
-                missing_prerequisite_skill_id: null
-              },
-              confirmed_unclassified_answers: [],
-              id: null
-            }
-          }
-        }
-      },
-      version: 1,
-      can_edit: true,
-      preferred_audio_language_code: 'en',
-      preferred_language_codes: [],
-      auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
-      record_playthrough_probability: 1
-    };
   });
 
   beforeEach(() => {
@@ -475,12 +412,9 @@ describe('Question player engine service ', () => {
     expressionInterpolationService =
       TestBed.inject(ExpressionInterpolationService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
-    readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
-    urlService = TestBed.inject(UrlService);
   });
 
   it('should load questions when initialized', () => {
@@ -488,10 +422,7 @@ describe('Question player engine service ', () => {
     let failHandler = jasmine.createSpy('fail');
 
     spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-    spyOn(contextService, 'getExplorationId')
-      .and.returnValue('explorationId1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
 
@@ -505,7 +436,6 @@ describe('Question player engine service ', () => {
     let successCallback = jasmine.createSpy('success');
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    let exploration = sampleExplorationDict;
     let answer = 'answer';
     let interactionRulesService: InteractionRulesService;
     let answerClassificationResult = new AnswerClassificationResult(
@@ -514,11 +444,7 @@ describe('Question player engine service ', () => {
     );
 
     spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-      .and.returnValue(Promise.resolve(exploration));
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(answerClassificationResult);
     spyOn(expressionInterpolationService, 'processHtml')
@@ -540,14 +466,9 @@ describe('Question player engine service ', () => {
   it('should return the current question Id', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    let exploration = sampleExplorationDict;
 
     spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-      .and.returnValue(Promise.resolve(exploration));
 
     expect(() => {
       questionPlayerEngineService.getCurrentQuestionId();
@@ -563,14 +484,9 @@ describe('Question player engine service ', () => {
   it('should return number of questions', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    let exploration = sampleExplorationDict;
 
     spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-      .and.returnValue(Promise.resolve(exploration));
 
     questionPlayerEngineService.init(
       multipleQuestionsBackendDict, successHandler, failHandler);
@@ -590,14 +506,9 @@ describe('Question player engine service ', () => {
   it('should clear all questions', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    let exploration = sampleExplorationDict;
 
     spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-      .and.returnValue(Promise.resolve(exploration));
 
     questionPlayerEngineService.init(
       multipleQuestionsBackendDict, successHandler, failHandler);
@@ -614,7 +525,6 @@ describe('Question player engine service ', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let answer = 'answer';
-    let exploration = sampleExplorationDict;
     let interactionRulesService: InteractionRulesService;
     let answerClassificationResult = new AnswerClassificationResult(
       outcomeObjectFactory
@@ -622,11 +532,7 @@ describe('Question player engine service ', () => {
     );
 
     spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId1');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-      .and.returnValue(Promise.resolve(exploration));
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(answerClassificationResult);
     spyOn(expressionInterpolationService, 'processHtml')
@@ -660,7 +566,7 @@ describe('Question player engine service ', () => {
   });
 
   it('should show warning message while loading a question ' +
-    'if the question html content is null', () => {
+    'if the question name is empty', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
@@ -674,21 +580,29 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService.init(
       [singleQuestionBackendDict], successHandler, failHandler);
 
-    expect(alertsServiceSpy).toHaveBeenCalledWith('Expression parsing error.');
+    expect(alertsServiceSpy).toHaveBeenCalledWith(
+      'Question name should not be empty.');
   });
 
   it('should not load questions if there are no questions', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
+    let alertsServiceSpy =
+    spyOn(alertsService, 'addWarning').and.returnValue();
+
     questionPlayerEngineService.init(
       [], successHandler, failHandler);
+
+    expect(alertsServiceSpy).toHaveBeenCalledWith(
+      'Questions can not be empty.');
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   });
 
   describe('on submitting answer ', () => {
-    it('should submit answer correctly', () => {
+    it('should call success callback if the submitted' +
+      'answer is correct', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -699,7 +613,6 @@ describe('Question player engine service ', () => {
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
-
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
@@ -719,7 +632,6 @@ describe('Question player engine service ', () => {
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
 
-
       spyOn(answerClassificationService, 'getMatchingClassificationResult');
 
       questionPlayerEngineService.setAnswerIsBeingProcessed(true);
@@ -730,7 +642,7 @@ describe('Question player engine service ', () => {
     });
 
     it('should show warning message if the feedback ' +
-      'html content is null', () => {
+      'content is empty', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -758,11 +670,11 @@ describe('Question player engine service ', () => {
         answer, interactionRulesService, successCallback);
 
       expect(alertsServiceSpy)
-        .toHaveBeenCalledWith('Expression parsing error.');
+        .toHaveBeenCalledWith('Feedback content should not be empty.');
     });
 
     it('should show warning message if the question ' +
-      'html content is null', () => {
+      'name is empty', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -797,7 +709,7 @@ describe('Question player engine service ', () => {
         answer, interactionRulesService, successCallback);
 
       expect(alertsServiceSpy)
-        .toHaveBeenCalledWith('Expression parsing error.');
+        .toHaveBeenCalledWith('Question name should not be empty.');
     });
 
     it('should update the current index when a card is added', () => {
@@ -805,7 +717,6 @@ describe('Question player engine service ', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let answer = 'answer';
-      let exploration = sampleExplorationDict;
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
@@ -814,16 +725,12 @@ describe('Question player engine service ', () => {
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
       spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-      spyOn(contextService, 'getExplorationId')
-        .and.returnValue('explorationId1');
       spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
-      spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
-        .and.returnValue(Promise.resolve(exploration));
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
       spyOn(expressionInterpolationService, 'processHtml')
         .and.callFake((html, envs) => html);
+
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, successHandler, failHandler);
       questionPlayerEngineService.submitAnswer(

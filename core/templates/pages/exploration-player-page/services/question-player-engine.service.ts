@@ -20,7 +20,6 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
@@ -31,7 +30,6 @@ import { AnswerClassificationService, InteractionRulesService } from 'pages/expl
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -39,8 +37,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   providedIn: 'root'
 })
 export class QuestionPlayerEngineService {
-  private questionPlayerMode: boolean = null;
-
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
   private currentIndex: number = null;
@@ -54,10 +50,7 @@ export class QuestionPlayerEngineService {
       private expressionInterpolationService: ExpressionInterpolationService,
       private focusManagerService: FocusManagerService,
       private questionObjectFactory: QuestionObjectFactory,
-      private readOnlyExplorationBackendApiService:
-        ReadOnlyExplorationBackendApiService,
-      private stateCardObjectFactory: StateCardObjectFactory,
-      private urlService: UrlService) {
+      private stateCardObjectFactory: StateCardObjectFactory) {
 
   }
 
@@ -94,6 +87,7 @@ export class QuestionPlayerEngineService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     if (!this.questions || this.questions.length === 0) {
+      this.alertsService.addWarning('Questions can not be empty.');
       errorCallback();
       return;
     }
@@ -103,7 +97,7 @@ export class QuestionPlayerEngineService {
 
     let questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null) {
-      this.alertsService.addWarning('Expression parsing error.');
+      this.alertsService.addWarning('Question name should not be empty.');
       return;
     }
 
@@ -152,7 +146,6 @@ export class QuestionPlayerEngineService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
-    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
     this.setAnswerIsBeingProcessed(false);
     for (let i = 0; i < questionDicts.length; i++) {
       this.addQuestion(
@@ -261,7 +254,7 @@ export class QuestionPlayerEngineService {
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
-      this.alertsService.addWarning('Expression parsing error.');
+      this.alertsService.addWarning('Feedback content should not be empty.');
       return;
     }
 
@@ -277,7 +270,7 @@ export class QuestionPlayerEngineService {
     }]);
     if (questionHtml === null) {
       this.setAnswerIsBeingProcessed(false);
-      this.alertsService.addWarning('Expression parsing error.');
+      this.alertsService.addWarning('Question name should not be empty.');
       return;
     }
     this.setAnswerIsBeingProcessed(false);

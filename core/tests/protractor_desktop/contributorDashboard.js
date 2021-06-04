@@ -96,7 +96,7 @@ describe('Contributor dashboard page', function() {
       HINDI_LANGUAGE);
   });
 
-  it('should allow reviewer to accept question suggestions', async function() {
+  fit('should allow reviewer to accept question suggestions', async function() {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);
     await contributorDashboardPage.get();
@@ -156,6 +156,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.expectNumberOfOpportunitiesToBe(1);
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
       'Question 1', SKILL_DESCRIPTIONS[0], 'Accepted', null);
+    debugger;
     await users.logout();
   });
 
