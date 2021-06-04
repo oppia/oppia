@@ -6,11 +6,14 @@ runs:
     - name: Setup python by installing wheel
       run: pip install wheel==0.35.0
       shell: bash
-    - name: Check Yarn Cache
-      run: yarn cache list
+    - name: Check Yarn Cache Files
+      run: ls /home/runner/work/oppia/yarn_cache
       shell: bash
     - name: Install third party
       run: python -m scripts.install_third_party_libs
+      shell: bash
+    - name: Check Yarn Cache Files
+      run: ls /home/runner/work/oppia/yarn_cache
       shell: bash
     - name: Check Yarn Cache
       run: yarn cache list
