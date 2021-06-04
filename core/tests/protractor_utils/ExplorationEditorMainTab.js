@@ -59,6 +59,7 @@ var ExplorationEditorMainTab = function() {
   };
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
+  var fadeIn = element(by.css('.protractor-test-editor-cards-container'));
   var interaction = element(by.css('.protractor-test-interaction'));
   var interactionEditor = element(
     by.css('.protractor-test-interaction-editor'));
@@ -480,11 +481,15 @@ var ExplorationEditorMainTab = function() {
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
-  this.setContent = async function(richTextInstructions) {
+  this.setContent = async function(richTextInstructions, expectFadeIn = false) {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
+    if (expectFadeIn) {
+      await waitFor.fadeInToComplete(
+        fadeIn, 'Editor taking long to fade in');
+    }
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(

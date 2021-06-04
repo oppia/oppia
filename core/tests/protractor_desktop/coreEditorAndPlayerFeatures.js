@@ -183,7 +183,7 @@ describe('Enable correctness feedback and set correctness', function() {
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorMainTab.setStateName('First');
       await explorationEditorMainTab.setContent(await forms.toRichText(
-        'Select the right option.'));
+        'Select the right option.'), true);
       await explorationEditorMainTab.setInteraction('NumericInput');
 
       // Set correctness in response editor.
@@ -217,7 +217,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
