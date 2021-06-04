@@ -1,5 +1,5 @@
 name: 'Install Dependencies'
-description: 'Installs wheel, third-party python libs, and loads yarn cache.'
+description: 'Installs wheel and third-party python libs.'
 runs:
   using: 'composite'
   steps:
