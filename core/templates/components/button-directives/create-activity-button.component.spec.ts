@@ -228,11 +228,17 @@ fdescribe('CreateActivityButtonComponent', () => {
         replace: (val: string) => {}
       }
     });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return <NgbModalRef>({
+        result: Promise.resolve('success')
+      });
+    });
     const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
     component.initCreationProcess();
 
     expect(replaceSpy).toHaveBeenCalledWith('/creator-dashboard?mode=create');
+    expect(modalSpy).not.toHaveBeenCalled();
   });
 
   it('should not redirect user but open a create activity modal if user' +
