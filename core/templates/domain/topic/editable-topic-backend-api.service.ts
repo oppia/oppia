@@ -162,7 +162,7 @@ export class EditableTopicBackendApiService {
   }
 
   private _fetchSubtopicPage(
-      topicId: number,
+      topicId: string,
       subtopicId: number,
       successCallback: (value?: SubtopicPageBackendDict) => void,
       errorCallback: (reason?: string) => void): void {
@@ -283,7 +283,7 @@ export class EditableTopicBackendApiService {
   }
 
   async fetchSubtopicPageAsync(
-      topicId: number,
+      topicId: string,
       subtopicId: number): Promise<SubtopicPageBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicPage(topicId, subtopicId, resolve, reject);
