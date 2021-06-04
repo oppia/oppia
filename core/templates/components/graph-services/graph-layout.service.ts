@@ -411,6 +411,8 @@ export class StateGraphLayoutService {
     var GRID_NODE_Y_PADDING_FRACTION = 0.2;
     // As above, but for the horizontal padding.
     var GRID_NODE_X_PADDING_FRACTION = 0.1;
+    var X_LABEL_OFFSET_CHECKPOINT_ICON = 0.01;
+    var WIDTH_OFFSET_CHECKPOINT_ICON = 0.02;
 
     // Helper function that returns a horizontal position, in terms of a
     // fraction of the total width, given a horizontal offset in terms of
@@ -443,14 +445,15 @@ export class StateGraphLayoutService {
       nodeData[nodeId].yLabel = getVerticalPosition(
         nodeData[nodeId].depth + 0.5);
       nodeData[nodeId].xLabel = getHorizontalPosition(
-        nodeData[nodeId].offset + 0.5);
+        nodeData[nodeId].offset + 0.5) + X_LABEL_OFFSET_CHECKPOINT_ICON;
 
       nodeData[nodeId].height = (
         (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows
       ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
       nodeData[nodeId].width = (
         (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
-      ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2);
+      ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2) +
+      WIDTH_OFFSET_CHECKPOINT_ICON;
     }
 
     // Assign id and label to each node.
