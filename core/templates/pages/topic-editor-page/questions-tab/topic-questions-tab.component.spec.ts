@@ -40,12 +40,12 @@ describe('Topic questions tab', function() {
   var topicReinitializedEventEmitter = null;
 
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
-    id: '3',
-    description: 'description3',
-    language_code: 'language_code',
-    version: 1,
-    misconception_count: null,
-    worked_examples_count: null,
+    id: 'test_id',
+    description: 'description',
+    language_code: 'sadf',
+    version: 10,
+    misconception_count: 0,
+    worked_examples_count: 1,
     skill_model_created_on: 2,
     skill_model_last_updated: 3
   };
@@ -63,14 +63,27 @@ describe('Topic questions tab', function() {
     [SkillSummary.createFromBackendDict(skillSummaryBackendDict)]);
 
   const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
-    allClassroomNames: null,
-    canDeleteTopic: null,
-    canCreateTopic: null,
-    canDeleteSkill: null,
-    canCreateSkill: null,
+    allClassroomNames: [
+      'math'
+    ],
+    canDeleteTopic: true,
+    canCreateTopic: true,
+    canDeleteSkill: true,
+    canCreateSkill: true,
     untriagedSkillSummaries: untriagedSkillSummariesData,
-    mergeableSkillSummaries: null,
-    totalSkillCount: null,
+    mergeableSkillSummaries: [
+      {
+        id: 'ho60YBh7c3Sn',
+        description: 'terst',
+        languageCode: 'en',
+        version: 1,
+        misconceptionCount: 0,
+        workedExamplesCount: 0,
+        skillModelCreatedOn: 1622827020924.104,
+        skillModelLastUpdated: 1622827020924.109
+      }
+    ],
+    totalSkillCount: 1,
     topicSummaries: null,
     categorizedSkillsDict: categorizedSkillsDictData
   };
@@ -173,18 +186,22 @@ describe('Topic questions tab', function() {
   });
 
   it('should initialize tab when topic is initialized', function() {
+    // Setup
     const topicRights = TopicRights.createInterstitialRights();
     const allSkillSummaries = subtopic1.getSkillSummaries();
     $scope.allSkillSummaries = null;
     $scope.topicRights = null;
     $scope.topic = null;
 
+    // Baseline verification
     expect($scope.question).toBeNull();
     expect($scope.skillId).toBeNull();
     expect($scope.topic).toBeNull();
 
+    // Action
     topicInitializedEventEmitter.emit();
 
+    // Endline verification
     expect($scope.allSkillSummaries).toEqual(allSkillSummaries);
     expect($scope.topicRights).toEqual(topicRights);
     expect($scope.topic).toBe(topic);
@@ -217,21 +234,30 @@ describe('Topic questions tab', function() {
   });
 
   it('should unsubscribe when component is destroyed', function() {
-    spyOn(ctrl.directiveSubscriptions, 'unsubscribe');
+    spyOn(ctrl.directiveSubscriptions, 'unsubscribe').and.callThrough();
+
+    expect(ctrl.directiveSubscriptions.closed).toBe(false);
 
     ctrl.$onDestroy();
 
     expect(ctrl.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+    expect(ctrl.directiveSubscriptions.closed).toBe(true);
   });
 
   it('should reinitialize questions list when a skill is selected', function() {
-    spyOn(qls, 'resetPageNumber');
+    spyOn(qls, 'resetPageNumber').and.callThrough();
     spyOn(qls, 'getQuestionSummariesAsync');
+    qls.incrementPageNumber();
+    qls.incrementPageNumber();
+
+    expect($scope.selectedSkillId).toBeNull();
+    expect(qls.getCurrentPageNumber()).toBe(2);
 
     $scope.reinitializeQuestionsList('1');
 
     expect($scope.selectedSkillId).toEqual('1');
     expect(qls.resetPageNumber).toHaveBeenCalled();
+    expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.getQuestionSummariesAsync).toHaveBeenCalledWith('1', true, true);
   });
 });
