@@ -29,6 +29,23 @@ from core.tests import test_utils
 class BeamJobRunModelTest(test_utils.GenericTestBase):
     """Tests for BeamJobRunModel."""
 
+    def test_get_new_id_raises_error_after_too_many_failed_attempts(self):
+        model = beam_job_models.BeamJobRunModel(
+            id=beam_job_models.BeamJobRunModel.get_new_id(),
+            job_name='FooJob', job_arguments=[],
+            latest_job_state=beam_job_models.BeamJobState.RUNNING.value)
+        model.update_timestamps()
+        model.put()
+
+        collision_context = self.swap_to_always_return(
+            base64, 'urlsafe_b64encode', value=model.id)
+
+        with collision_context:
+            self.assertRaisesRegexp(
+                RuntimeError,
+                r'Failed to generate a unique ID after \d+ attempts',
+                beam_job_models.BeamJobRunModel.get_new_id)
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             beam_job_models.BeamJobRunModel.get_deletion_policy(),
@@ -41,6 +58,9 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self):
         export_policy = beam_job_models.BeamJobRunModel.get_export_policy()
+        self.assertEqual(
+            export_policy['dataflow_job_id'],
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
         self.assertEqual(
             export_policy['job_name'],
             base_models.EXPORT_POLICY.NOT_APPLICABLE)
@@ -58,6 +78,7 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
     def test_get_new_id_raises_error_after_too_many_failed_attempts(self):
         model = beam_job_models.BeamJobRunResultModel(
             id=beam_job_models.BeamJobRunResultModel.get_new_id(), job_id='123')
+        model.update_timestamps()
         model.put()
 
         collision_context = self.swap_to_always_return(

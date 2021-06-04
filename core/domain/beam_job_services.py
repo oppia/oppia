@@ -210,7 +210,12 @@ def _refresh_state_of_beam_job_run_model(beam_job_run_model):
     Args:
         beam_job_run_model: BeamJobRunModel. The model to update.
     """
-    job_id = beam_job_run_model.id
+    job_id = beam_job_run_model.dataflow_job_id
+    if job_id is None:
+        beam_job_run_model.latest_job_state = (
+            beam_job_models.BeamJobState.UNKNOWN.value)
+        beam_job_run_model.update_timestamps()
+        return
 
     try:
         # We need to run a `gcloud` command to get the updated state. Reference:

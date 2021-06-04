@@ -41,7 +41,7 @@ class BeamJobServicesTests(test_utils.TestBase):
             [j.name for j in beam_jobs], jobs_registry.get_all_job_names())
 
 
-class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
+class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     # Sample timestamp taken from the official documentation:
     # https://cloud.google.com/dataflow/docs/guides/using-command-line-intf#jobs_commands
@@ -83,11 +83,15 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.swap_to_always_return(subprocess, 'check_output', value=value))
 
     def create_beam_job_run_model(
-            self, job_id=None, job_name='FooJob', job_arguments=None,
+            self, dataflow_job_id='abc',
+            job_id=None, job_name='FooJob', job_arguments=None,
             job_state=beam_job_models.BeamJobState.RUNNING.value):
         """Returns a new BeamJobRunModel with convenient default values.
 
         Args:
+            dataflow_job_id: str|None. The ID of the dataflow job corresponding
+                to the BeamJobRun. When the job is run synchronously, this value
+                should be None.
             job_id: str|None. The ID of the job. If None, a value is generated.
             job_name: str. The name of the job class that implements the
                 job's logic.
@@ -104,8 +108,8 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         if job_arguments is None:
             job_arguments = []
         return beam_job_models.BeamJobRunModel(
-            id=job_id, job_name=job_name, job_arguments=job_arguments,
-            latest_job_state=job_state)
+            id=job_id, dataflow_job_id=dataflow_job_id, job_name=job_name,
+            job_arguments=job_arguments, latest_job_state=job_state)
 
     def assert_domains_equal_models(self, beam_job_runs, beam_job_run_models):
         """Asserts that the domain objects have the same values as the models.
@@ -178,6 +182,34 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         self.assert_domains_equal_models(
             beam_job_runs, updated_beam_job_run_models)
 
+    def test_get_beam_job_runs_with_refresh_of_non_dataflow_job(self):
+        initial_beam_job_run_models = [
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                dataflow_job_id=None,
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
+        ]
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(
+            initial_beam_job_run_models)
+        beam_job_models.BeamJobRunModel.put_multi(initial_beam_job_run_models)
+
+        utcnow = datetime.datetime.utcnow()
+        with self.mock_datetime_utcnow(utcnow):
+            beam_job_runs = beam_job_services.get_beam_job_runs(refresh=True)
+
+        # Only the second model (job_state=RUNNING) should have been updated,
+        # the other two (DONE and CANCELLED) are in terminal states and don't
+        # need to be checked.
+        updated_beam_job_run_models = initial_beam_job_run_models[:]
+        updated_beam_job_run_models[1].latest_job_state = (
+            beam_job_models.BeamJobState.UNKNOWN.value)
+        updated_beam_job_run_models[1].last_updated = utcnow
+        self.assert_domains_equal_models(
+            beam_job_runs, updated_beam_job_run_models)
+
     def test_get_beam_job_runs_with_refresh_when_command_fails(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(
@@ -216,7 +248,6 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.CANCELLED.value),
         ]
-
         beam_job_models.BeamJobRunModel.update_timestamps_multi(
             initial_beam_job_run_models)
         beam_job_models.BeamJobRunModel.put_multi(initial_beam_job_run_models)
@@ -237,6 +268,36 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         updated_beam_job_run_models[1].last_updated = (
             datetime.datetime(2014, 10, 2, 15, 1, 23, 45123))
 
+        self.assertEqual(
+            updated_beam_job_run_models,
+            beam_job_models.BeamJobRunModel.get_multi(
+                [m.id for m in initial_beam_job_run_models]))
+
+    def test_refresh_state_of_all_beam_job_run_models_of_non_dataflow_job(self):
+        initial_beam_job_run_models = [
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                dataflow_job_id=None,
+                job_state=beam_job_models.BeamJobState.RUNNING.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
+        ]
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(
+            initial_beam_job_run_models)
+        beam_job_models.BeamJobRunModel.put_multi(initial_beam_job_run_models)
+
+        utcnow = datetime.datetime.utcnow()
+        with self.mock_datetime_utcnow(utcnow):
+            beam_job_services.refresh_state_of_all_beam_job_run_models()
+
+        # Only the second model (job_state=RUNNING) should have been updated,
+        # the other two (DONE and CANCELLED) are in terminal states and don't
+        # need to be checked.
+        updated_beam_job_run_models = initial_beam_job_run_models[:]
+        updated_beam_job_run_models[1].latest_job_state = (
+            beam_job_models.BeamJobState.UNKNOWN.value)
+        updated_beam_job_run_models[1].last_updated = utcnow
         self.assertEqual(
             updated_beam_job_run_models,
             beam_job_models.BeamJobRunModel.get_multi(
@@ -272,7 +333,7 @@ class BeamJobRunServicesTests(test_utils.AppEngineTestBase):
         self.assertIn('Failed to update the state of job', logs[-1])
 
 
-class GetBeamJobRunResultTests(test_utils.AppEngineTestBase):
+class GetBeamJobRunResultTests(test_utils.GenericTestBase):
 
     def test_get_beam_run_result(self):
         beam_job_models.BeamJobRunResultModel(
