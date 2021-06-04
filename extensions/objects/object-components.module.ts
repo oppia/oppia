@@ -23,6 +23,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 import { NgxTrimDirectiveModule } from 'ngx-trim-directive';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AlgebraicExpressionEditorComponent } from './templates/algebraic-expression-editor.component';
 import { BooleanEditorComponent } from './templates/boolean-editor.component';
 import { CodeStringEditorComponent } from './templates/code-string-editor.component';
@@ -36,7 +37,7 @@ import { GraphInputInteractionModule } from 'interactions/GraphInput/graph-input
 import { GraphEditorComponent } from './templates/graph-editor.component';
 import { SharedFormsModule } from 'components/forms/shared-forms.module';
 import { HtmlEditorComponent } from './templates/html-editor.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
 import { IntEditorComponent } from './templates/int-editor.component';
@@ -63,6 +64,7 @@ import { SetOfAlgebraicIdentifierEditorComponent } from './templates/set-of-alge
 import { SetOfTranslatableHtmlContentIdsEditorComponent } from './templates/set-of-translatable-html-content-ids-editor.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SubtitledHtmlEditorComponent } from './templates/subtitled-html-editor.component';
+import { SvgFilenameEditorComponent } from './templates/svg-filename-editor.component';
 import { NormalizedStringEditorComponent } from './templates/normalized-string-editor.component';
 import { UnicodeStringEditorComponent } from './templates/unicode-string-editor.component';
 import { SkillSelectorEditorComponent } from './templates/skill-selector-editor.component';
@@ -84,9 +86,11 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     GraphInputInteractionModule,
     DynamicContentModule,
     DirectivesModule,
+    MatProgressSpinnerModule,
     MatCardModule,
     MatCheckboxModule,
     NgbModalModule,
+    NgbTooltipModule,
     NgxTrimDirectiveModule
   ],
   declarations: [
@@ -126,6 +130,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -167,6 +172,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent
@@ -208,6 +214,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
     SkillSelectorEditorComponent,
     SubtitledHtmlEditorComponent,
     SubtitledUnicodeEditorComponent,
+    SvgFilenameEditorComponent,
     TranslatableSetOfNormalizedStringEditorComponent,
     TranslatableSetOfUnicodeStringEditorComponent,
     UnicodeStringEditorComponent

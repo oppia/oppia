@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for ExplorationPlayerStateService.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { EditableExplorationBackendApiService }
   from 'domain/exploration/editable-exploration-backend-api.service';
@@ -144,6 +145,7 @@ describe('Exploration Player State Service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         ExplorationPlayerStateService,
         PlayerTranscriptService,
