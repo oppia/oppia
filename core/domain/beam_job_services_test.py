@@ -90,8 +90,9 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
         Args:
             dataflow_job_id: str|None. The ID of the dataflow job corresponding
-                to the BeamJobRun. When the job is run synchronously, this value
-                should be None.
+                to the BeamJobRun. When this value is None, that signals that
+                the job has been run synchronously (like a function call), and
+                cannot be polled for updates.
             job_id: str|None. The ID of the job. If None, a value is generated.
             job_name: str. The name of the job class that implements the
                 job's logic.
@@ -131,6 +132,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             self.assertEqual(domain_obj.job_arguments, model_obj.job_arguments)
             self.assertEqual(domain_obj.job_started_on, model_obj.created_on)
             self.assertEqual(domain_obj.job_updated_on, model_obj.last_updated)
+            self.assertEqual(
+                domain_obj.is_synchronous, model_obj.dataflow_job_id is None)
 
     def test_get_beam_job_runs(self):
         beam_job_run_models = [

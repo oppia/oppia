@@ -175,7 +175,8 @@ def _get_beam_job_run_from_model(beam_job_run_model):
     return beam_job_domain.BeamJobRun(
         beam_job_run_model.id, beam_job_run_model.job_name,
         beam_job_run_model.latest_job_state, beam_job_run_model.job_arguments,
-        beam_job_run_model.created_on, beam_job_run_model.last_updated)
+        beam_job_run_model.created_on, beam_job_run_model.last_updated,
+        beam_job_run_model.dataflow_job_id is None)
 
 
 def _get_all_beam_job_run_models(include_terminated=True):

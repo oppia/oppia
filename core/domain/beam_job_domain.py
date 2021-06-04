@@ -91,11 +91,16 @@ class BeamJobRun(python_utils.OBJECT):
         job_started_on: datetime. The time at which the job was started.
         job_updated_on: datetime. The time at which the job's state was last
             updated.
+        is_synchronous: bool. Whether the job has been run synchronously.
+            Synchronous jobs are similar to function calls that return
+            immediately. Asynchronous jobs, on the other hand, are sent off to
+            the Google Dataflow service for asynchronous execution and need to
+            be polled for updates.
     """
 
     def __init__(
             self, job_id, job_name, job_state, job_arguments, job_started_on,
-            job_updated_on):
+            job_updated_on, is_synchronous):
         """Initializes a new BeamJobRun instance.
 
         Args:
@@ -108,6 +113,7 @@ class BeamJobRun(python_utils.OBJECT):
             job_started_on: datetime. The time at which the job was started.
             job_updated_on: datetime. The time at which the job's state was last
                 updated.
+            is_synchronous: bool. Whether the job has been run synchronously.
         """
         self.job_id = job_id
         self.job_name = job_name
@@ -115,6 +121,7 @@ class BeamJobRun(python_utils.OBJECT):
         self.job_arguments = job_arguments
         self.job_started_on = job_started_on
         self.job_updated_on = job_updated_on
+        self.is_synchronous = is_synchronous
 
     @property
     def in_terminal_state(self):
@@ -157,6 +164,7 @@ class BeamJobRun(python_utils.OBJECT):
                 utils.get_time_in_millisecs(self.job_started_on)),
             'job_updated_on_msecs': (
                 utils.get_time_in_millisecs(self.job_updated_on)),
+            'is_synchronous': self.is_synchronous,
         }
 
 
