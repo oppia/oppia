@@ -45,7 +45,7 @@ module.exports = {
     return {
       [selector]: function(node) {
         var args = node.arguments;
-        if (args.length !== 2 && args[1].type !== 'ArrayExpression') {
+        if (args.length !== 2 || args[1].type !== 'ArrayExpression') {
           return;
         }
 
