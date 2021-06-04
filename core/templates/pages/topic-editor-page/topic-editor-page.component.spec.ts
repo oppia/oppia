@@ -32,6 +32,7 @@ describe('Topic editor page', function() {
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
+  var PreventPageUnloadEventService = null;
   var TopicEditorRoutingService = null;
   var UndoRedoService = null;
   var TopicEditorStateService = null;
@@ -47,6 +48,8 @@ describe('Topic editor page', function() {
     ContextService = $injector.get('ContextService');
     UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
@@ -114,13 +117,18 @@ describe('Topic editor page', function() {
     expect(ctrl.getNavbarText()).toBe('Question Editor');
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(UrlService, 'getTopicIdFromUrl').and.returnValue('topic_1');
+    spyOn(PageTitleService, 'setPageTitle').and.callThrough();
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should return the change count', function() {

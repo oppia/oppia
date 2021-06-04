@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
+import feconf
 from jobs import job_test_utils
 from jobs import job_utils
 from jobs.io import stub_io
@@ -37,134 +38,156 @@ class DatastoreioStubTests(job_test_utils.PipelinedTestBase):
         super(DatastoreioStubTests, self).setUp()
         self.stub = stub_io.DatastoreioStub()
 
+    def get_everything(self):
+        """Returns all models in the datastore.
+
+        Returns:
+            list(Model). All of the models in the datastore.
+        """
+        return list(datastore_services.query_everything().iter())
+
+    def put_multi(self, model_list, update_last_updated_time=False):
+        """Puts the given models into the datastore.
+
+        Args:
+            model_list: list(Model). The models to put into the datastore.
+            update_last_updated_time: bool. Whether to update the last updated
+                time before putting the model into storage.
+        """
+        datastore_services.update_timestamps_multi(
+            model_list, update_last_updated_time=update_last_updated_time)
+        datastore_services.put_multi(model_list)
+
     def test_stub_is_initially_empty(self):
-        query = job_utils.get_beam_query_from_ndb_query(
+        query_everything = job_utils.get_beam_query_from_ndb_query(
             datastore_services.query_everything())
 
-        self.assertItemsEqual(self.stub.get(query), [])
+        self.assertItemsEqual(self.get_everything(), [])
 
         with self.stub.context():
             self.assert_pcoll_empty(
-                self.pipeline | self.stub.ReadFromDatastore(query))
+                self.pipeline | self.stub.ReadFromDatastore(query_everything))
 
     def test_read_from_datastore(self):
-        query = job_utils.get_beam_query_from_ndb_query(
+        query_everything = job_utils.get_beam_query_from_ndb_query(
             datastore_services.query_everything())
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
             self.create_model(base_models.BaseModel, id='c'),
         ]
-        self.stub.put_multi(model_list)
+        self.put_multi(model_list)
 
         with self.stub.context():
-            model_pcoll = self.pipeline | self.stub.ReadFromDatastore(query)
+            model_pcoll = (
+                self.pipeline
+                | self.stub.ReadFromDatastore(query_everything)
+            )
 
-            self.assert_pcoll_equal(model_pcoll, model_list)
+            self.assert_pcoll_equal(model_pcoll, [
+                job_utils.get_beam_entity_from_ndb_model(m) for m in model_list
+            ])
 
     def test_write_to_datastore(self):
-        query = job_utils.get_beam_query_from_ndb_query(
-            datastore_services.query_everything())
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
             self.create_model(base_models.BaseModel, id='c'),
         ]
-        self.stub.put_multi(model_list)
+        self.put_multi(model_list)
 
-        self.assertItemsEqual(self.stub.get(query), model_list)
+        self.assertItemsEqual(self.get_everything(), model_list)
 
         with self.stub.context():
-            model_pcoll = self.pipeline | beam.Create(model_list)
+            model_pcoll = (
+                self.pipeline
+                | beam.Create([
+                    job_utils.get_beam_key_from_ndb_key(m.key)
+                    for m in model_list
+                ])
+            )
 
             self.assert_pcoll_empty(
-                model_pcoll | self.stub.DeleteFromDatastore())
+                model_pcoll
+                | self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
-        self.assertItemsEqual(self.stub.get(query), [])
+        self.assertItemsEqual(self.get_everything(), [])
 
     def test_delete_from_datastore(self):
-        query = job_utils.get_beam_query_from_ndb_query(
-            datastore_services.query_everything())
         model_list = [
             self.create_model(base_models.BaseModel, id='a'),
             self.create_model(base_models.BaseModel, id='b'),
             self.create_model(base_models.BaseModel, id='c'),
         ]
-        self.stub.put_multi(model_list)
+        self.put_multi(model_list)
 
-        self.assertItemsEqual(self.stub.get(query), model_list)
+        self.assertItemsEqual(self.get_everything(), model_list)
 
         with self.stub.context():
-            model_pcoll = self.pipeline | beam.Create(model_list)
+            model_pcoll = (
+                self.pipeline
+                | beam.Create([
+                    job_utils.get_beam_key_from_ndb_key(m.key)
+                    for m in model_list
+                ])
+            )
 
             self.assert_pcoll_empty(
-                model_pcoll | self.stub.DeleteFromDatastore())
+                model_pcoll
+                | self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
-        self.assertItemsEqual(self.stub.get(query), [])
+        self.assertItemsEqual(self.get_everything(), [])
 
     def test_read_from_datastore_without_acquiring_context_raises_error(self):
-        query = job_utils.get_beam_query_from_ndb_query(
+        query_everything = job_utils.get_beam_query_from_ndb_query(
             datastore_services.query_everything())
-        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
-            self.stub.ReadFromDatastore(query)
+        with self.assertRaisesRegexp(RuntimeError, 'Must enter context'):
+            self.stub.ReadFromDatastore(query_everything)
 
     def test_write_to_datastore_without_acquiring_context_raises_error(self):
-        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
-            self.stub.WriteToDatastore()
+        with self.assertRaisesRegexp(RuntimeError, 'Must enter context'):
+            self.stub.WriteToDatastore(feconf.OPPIA_PROJECT_ID)
 
     def test_delete_from_datastore_without_acquiring_context_raises_error(self):
-        with self.assertRaisesRegexp(RuntimeError, 'Must acquire context'):
-            self.stub.DeleteFromDatastore()
+        with self.assertRaisesRegexp(RuntimeError, 'Must enter context'):
+            self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
 
     def test_read_after_write_raises_error(self):
-        query = job_utils.get_beam_query_from_ndb_query(
+        query_everything = job_utils.get_beam_query_from_ndb_query(
             datastore_services.query_everything())
 
         with self.stub.context():
             empty_pcoll = self.pipeline | beam.Create([])
 
             self.assert_pcoll_empty(
-                empty_pcoll | self.stub.WriteToDatastore())
+                empty_pcoll
+                | self.stub.WriteToDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
             self.assertRaisesRegexp(
-                RuntimeError,
-                'Cannot read from datastore after a mutation',
-                lambda: self.pipeline | self.stub.ReadFromDatastore(query))
+                RuntimeError, 'Cannot read from datastore after a mutation',
+                lambda: (
+                    self.pipeline
+                    | self.stub.ReadFromDatastore(query_everything)
+                ))
 
     def test_read_after_delete_raises_error(self):
-        query = job_utils.get_beam_query_from_ndb_query(
+        query_everything = job_utils.get_beam_query_from_ndb_query(
             datastore_services.query_everything())
 
         with self.stub.context():
             empty_pcoll = self.pipeline | beam.Create([])
 
             self.assert_pcoll_empty(
-                empty_pcoll | self.stub.DeleteFromDatastore())
+                empty_pcoll
+                | self.stub.DeleteFromDatastore(feconf.OPPIA_PROJECT_ID)
+            )
 
             self.assertRaisesRegexp(
-                RuntimeError,
-                'Cannot read from datastore after a mutation',
-                lambda: self.pipeline | self.stub.ReadFromDatastore(query))
-
-    def test_write_after_write_raises_error(self):
-        with self.stub.context():
-            empty_pcoll = self.pipeline | beam.Create([])
-
-            self.assert_pcoll_empty(empty_pcoll | self.stub.WriteToDatastore())
-
-            self.assertRaisesRegexp(
-                RuntimeError,
-                'At most one WriteToDatastore may be executed',
-                lambda: empty_pcoll | self.stub.WriteToDatastore())
-
-    def test_delete_after_delete_raises_error(self):
-        with self.stub.context():
-            empty_pcoll = self.pipeline | beam.Create([])
-
-            self.assert_pcoll_empty(
-                empty_pcoll | self.stub.DeleteFromDatastore())
-
-            self.assertRaisesRegexp(
-                RuntimeError,
-                'At most one DeleteFromDatastore may be executed',
-                lambda: empty_pcoll | self.stub.DeleteFromDatastore())
+                RuntimeError, 'Cannot read from datastore after a mutation',
+                lambda: (
+                    self.pipeline
+                    | self.stub.ReadFromDatastore(query_everything)
+                ))
