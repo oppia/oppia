@@ -889,7 +889,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           id: 'group' + this.groupCount
         });
         obj.toSVG = this.createCustomToSVG(
-          obj.toSVG, obj.type, obj.id);
+          obj.toSVG.bind(obj), obj.type, obj.id);
       });
       this.canvas.add(new fabric.Group(objects));
       this.groupCount += 1;
@@ -1723,7 +1723,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   createCustomToSVG(toSVG, type, id): () => string {
     return ()  => {
-      let svgString = toSVG(this);
+      let svgString = toSVG();
       console.log(svgString)
       let domParser = new DOMParser();
       let doc = domParser.parseFromString(svgString, 'image/svg+xml');
@@ -1748,7 +1748,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         groupedObjects.push([]);
       }
       obj.toSVG = this.createCustomToSVG(
-        obj.toSVG, obj.type, obj.id);
+        obj.toSVG.bind(obj), obj.type, obj.id);
       groupedObjects[groupId].push(obj);
     }
     return groupedObjects;

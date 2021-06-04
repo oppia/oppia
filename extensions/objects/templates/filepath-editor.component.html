@@ -79,6 +79,11 @@
               <div class="container upload-warning">
                 Note: The uploaded svg may not be rendered exactly.
               </div>
+              <div *ngIf="uploadedSvgDataUrl === null">
+                <oppia-image-uploader (fileChanged)="onFileChanged($event)"
+                                      [allowedImageFormats]="allowedImageFormats">
+                </oppia-image-uploader>
+              </div>
               <div *ngIf="isFileUploaded()">
                 <img [src]="data.metadata.uploadedImageData" class="uploaded-svg-image">
                 <div class="container">
@@ -179,7 +184,7 @@
                         tooltip-placement="left" uib-tooltip="Pie Chart" [disabled]="!isPieChartEnabled()">
                   <i class="fas fa-chart-pie pie-chart"></i>
                 </button>
-                <button *ngIf="!createSvgMode" type="button" class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
+                <button type="button" class="icon-tool toolbar-button thin-button protractor-test-create-svgupload"
                         [ngClass]="{'disabled' : !isSvgUploadEnabled()}" (click)="uploadSvgFileInCanvas()"
                         tooltip-placement="right" uib-tooltip="Upload SVG" [disabled]="!isSvgUploadEnabled()">
                   <i class="far fa-file-image file-upload"></i>
@@ -270,16 +275,14 @@
                 <select [(ngModel)]="fabricjsOptions.fontFamily"
                         (ngModelChange)="onFontChange()">
                   <option *ngFor="let font of fontFamily" [ngValue]="font">{{font}}</option>
-                        <!-- [ngModelOptions]=" let font of font in fontFamily" -->
                 </select>
               </div>
             </div>
             <div class="horizontal-toolbar bottom-toolbar" *ngIf="!isDrawModePieChart() && !isDrawModeSvgUpload()">
               <div class="input-tag" *ngIf="isSizeVisible()">
                 <select [(ngModel)]="fabricjsOptions.size" 
-                (ngModelChange)="onSizeChange()">
+                        (ngModelChange)="onSizeChange()">
                 <option *ngFor="let size of sizes" [ngValue]="size">{{size}}</option>
-                <!-- [ngModelOptions]="let size of size in sizes" -->
                 </select>
               </div>
               <div class="input-tag" *ngIf="objectIsSelected">
