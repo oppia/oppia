@@ -186,22 +186,22 @@ describe('Topic questions tab', function() {
   });
 
   it('should initialize tab when topic is initialized', function() {
-    // Setup
+    // Setup.
     const topicRights = TopicRights.createInterstitialRights();
     const allSkillSummaries = subtopic1.getSkillSummaries();
     $scope.allSkillSummaries = null;
     $scope.topicRights = null;
     $scope.topic = null;
 
-    // Baseline verification
+    // Baseline verification.
     expect($scope.question).toBeNull();
     expect($scope.skillId).toBeNull();
     expect($scope.topic).toBeNull();
 
-    // Action
+    // Action.
     topicInitializedEventEmitter.emit();
 
-    // Endline verification
+    // Endline verification.
     expect($scope.allSkillSummaries).toEqual(allSkillSummaries);
     expect($scope.topicRights).toEqual(topicRights);
     expect($scope.topic).toBe(topic);
