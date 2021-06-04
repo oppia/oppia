@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the check-component-name-count.js file.
+ * @fileoverview Tests for the no-multiple-component.js file.
  */
 
 'use strict';
