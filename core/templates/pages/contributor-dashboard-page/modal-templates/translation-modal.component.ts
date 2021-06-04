@@ -142,6 +142,9 @@ export class TranslationModalComponent {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
+        // If this is made true, then the translation can not be validated
+        // properly since there can be complex extensions in the translatable
+        // text as complex extensions are not hidden in the exploration editor.
         hide_complex_extensions: false,
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection: (
@@ -159,8 +162,7 @@ export class TranslationModalComponent {
   }
 
   onContentClick(event: MouseEvent): boolean | void {
-    const paragraphCopyValidation = this.validateParagraphCopy(event);
-    if (paragraphCopyValidation) {
+    if (this.validateParagraphCopy(event)) {
       return this.triedToCopyText = true;
     }
     this.triedToCopyText = false;
@@ -178,10 +180,11 @@ export class TranslationModalComponent {
     const paragraphChildrenElements: Element[] = (
       target.localName === 'p') ? Array.from(
         target.children) : [];
-    const triedTextCopy = target.localName === 'p' && !(
-      paragraphChildrenElements.some(
-        child => child.localName === 'oppia-noninteractive-math'));
-    return triedTextCopy;
+    const mathElementsIncluded = paragraphChildrenElements.some(
+      child => child.localName === 'oppia-noninteractive-math');
+    const triedToTextCopy = target.localName === 'p' && !(
+      mathElementsIncluded);
+    return triedToTextCopy;
   }
 
   isCopyModeActive(): boolean {
@@ -239,7 +242,7 @@ export class TranslationModalComponent {
   }
 
   getImageAttributeTexts(htmlElements: HTMLElement[]): ImageDetails {
-    const imageDetails: ImageDetails = {
+    return {
       filePaths: this.getElementAttributeTexts(
         htmlElements, 'filepath-with-value'),
       alts: this.getElementAttributeTexts(
@@ -247,8 +250,6 @@ export class TranslationModalComponent {
       descriptions: this.getElementAttributeTexts(
         htmlElements, 'caption-with-value')
     };
-
-    return imageDetails;
   }
 
   copiedAllElements(
@@ -273,8 +274,6 @@ export class TranslationModalComponent {
   isTranslationCompleted(
       originalElements: HTMLElement[],
       translatedElements: HTMLElement[]): boolean {
-    originalElements.sort();
-    translatedElements.sort();
 
     const filteredOriginalElements = originalElements.filter(
       (element: HTMLElement) => element.nodeType === Node.ELEMENT_NODE);
