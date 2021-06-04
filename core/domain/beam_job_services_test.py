@@ -182,7 +182,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
         self.assert_domains_equal_models(
             beam_job_runs, updated_beam_job_run_models)
 
-    def test_get_beam_job_runs_with_refresh_of_non_dataflow_job(self):
+    def test_get_beam_job_runs_with_refresh_of_synchronous_job(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.DONE.value),
@@ -273,7 +273,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             beam_job_models.BeamJobRunModel.get_multi(
                 [m.id for m in initial_beam_job_run_models]))
 
-    def test_refresh_state_of_all_beam_job_run_models_of_non_dataflow_job(self):
+    def test_refresh_state_of_all_beam_job_run_models_of_synchronous_job(self):
         initial_beam_job_run_models = [
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.DONE.value),

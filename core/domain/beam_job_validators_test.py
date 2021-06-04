@@ -59,8 +59,9 @@ class BeamJobRunModelValidatorTests(BeamJobValidatorTestBase):
     RUN_MODEL_CLASS = beam_job_models.BeamJobRunModel
 
     def test_model_with_registered_job_name(self):
+        run_model_id = self.RUN_MODEL_CLASS.get_new_id()
         self.RUN_MODEL_CLASS(
-            id='123', job_name='AuditAllStorageModelsJob',
+            id=run_model_id, job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
@@ -68,15 +69,17 @@ class BeamJobRunModelValidatorTests(BeamJobValidatorTestBase):
         ])
 
     def test_model_with_unregistered_job_name(self):
+        run_model_id = self.RUN_MODEL_CLASS.get_new_id()
         self.RUN_MODEL_CLASS(
-            id='123', job_name='FooJob',
+            id=run_model_id, job_name='FooJob',
             latest_job_state='RUNNING').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
             ['failed validation check for beam_job_name_error of '
              'BeamJobRunModel',
-             ['Entity id 123: The job_name field has a value FooJob which is '
-              'not among the job names in jobs.registry.get_all_jobs()'],
+             ['Entity id %s: The job_name field has a value FooJob which is '
+              'not among the job names in jobs.registry.get_all_jobs()' % (
+                  run_model_id)],
             ],
         ])
 
@@ -88,10 +91,11 @@ class BeamJobRunResultModelValidatorTests(BeamJobValidatorTestBase):
     RESULT_MODEL_CLASS = beam_job_models.BeamJobRunResultModel
 
     def test_model_with_corresponding_job_run_model(self):
+        run_model_id = self.RUN_MODEL_CLASS.get_new_id()
         result_model_id = self.RESULT_MODEL_CLASS.get_new_id()
-        self.RESULT_MODEL_CLASS(id=result_model_id, job_id='123').put()
+        self.RESULT_MODEL_CLASS(id=result_model_id, job_id=run_model_id).put()
         self.RUN_MODEL_CLASS(
-            id='123', job_name='AuditAllStorageModelsJob',
+            id=run_model_id, job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
 
         self.assertEqual(self.run_job_and_get_output(), [
@@ -99,11 +103,12 @@ class BeamJobRunResultModelValidatorTests(BeamJobValidatorTestBase):
         ])
 
     def test_model_without_corresponding_job_run_model(self):
+        run_model_id = self.RUN_MODEL_CLASS.get_new_id()
         result_model_id = self.RESULT_MODEL_CLASS.get_new_id()
         self.RESULT_MODEL_CLASS(
             id=result_model_id, job_id='456', stdout='', stderr='').put()
         self.RUN_MODEL_CLASS(
-            id='123', job_name='AuditAllStorageModelsJob',
+            id=run_model_id, job_name='AuditAllStorageModelsJob',
             latest_job_state='RUNNING').put()
 
         self.assertEqual(self.run_job_and_get_output(), [

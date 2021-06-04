@@ -17,10 +17,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import base64
-
 from core.platform import models
 from core.tests import test_utils
+import utils
 
 (base_models, beam_job_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.beam_job])
@@ -38,7 +37,7 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
         model.put()
 
         collision_context = self.swap_to_always_return(
-            base64, 'urlsafe_b64encode', value=model.id)
+            utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
             self.assertRaisesRegexp(
@@ -82,7 +81,7 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
         model.put()
 
         collision_context = self.swap_to_always_return(
-            base64, 'urlsafe_b64encode', value=model.id)
+            utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
             self.assertRaisesRegexp(

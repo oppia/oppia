@@ -19,11 +19,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import base64
 import uuid
 
 from core.platform import models
 import python_utils
+import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
@@ -87,8 +87,7 @@ def _get_new_model_id(model_class):
         str. The new ID.
     """
     for _ in python_utils.RANGE(_MAX_ID_GENERATION_ATTEMPTS):
-        new_uuid = uuid.uuid4().bytes
-        new_id = base64.urlsafe_b64encode(new_uuid).rstrip(b'=').decode('ascii')
+        new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
         if model_class.get(new_id, strict=False) is None:
             return new_id
     raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
