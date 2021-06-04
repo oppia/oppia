@@ -20,6 +20,7 @@ import { ExplorationCreationService } from 'components/entity-creation-services/
 import { TranslatePipe } from 'filters/translate.pipe';
 import { UrlParamsType, UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { CreateActivityButtonComponent } from './create-activity-button.component';
 
@@ -57,12 +58,13 @@ class MockUrlService {
   }
 }
 
-describe('CreateActivityButtonComponent', () => {
+fdescribe('CreateActivityButtonComponent', () => {
   let component: CreateActivityButtonComponent;
   let fixture: ComponentFixture<CreateActivityButtonComponent>;
   let userService: UserService;
   let urlService: MockUrlService;
   let explorationCreationService: ExplorationCreationService;
+  let siteAnalyticsService: SiteAnalyticsService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
 
@@ -126,7 +128,8 @@ describe('CreateActivityButtonComponent', () => {
           provide: WindowRef,
           useValue: windowRef
         },
-        ExplorationCreationService
+        ExplorationCreationService,
+        SiteAnalyticsService
       ]
     }).compileComponents();
   }));
@@ -137,6 +140,7 @@ describe('CreateActivityButtonComponent', () => {
     userService = TestBed.inject(UserService);
     urlService = TestBed.inject(UrlService);
     explorationCreationService = TestBed.inject(ExplorationCreationService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     ngbModal = TestBed.inject(NgbModal);
     fixture.detectChanges();
   });
@@ -146,8 +150,8 @@ describe('CreateActivityButtonComponent', () => {
       expect(component).toBeDefined();
     });
 
-  it('should begin activity creation process if user can' +
-    ' create collections', fakeAsync(() => {
+  it('should begin activity creation process if user can create collections' +
+    ' and is redirected to creator dashboard', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
 
@@ -165,8 +169,9 @@ describe('CreateActivityButtonComponent', () => {
     expect(component.initCreationProcess).toHaveBeenCalled();
   }));
 
-  it('should create a new exploration automatically if the user' +
-    ' cannot create collections', fakeAsync(() => {
+  it('should create a new exploration automatically if the user cannot create' +
+    ' collections and is redirected to creator dashboard after' +
+    ' logging in', fakeAsync(() => {
     spyOn(userService, 'getUserInfoAsync')
       .and.returnValue(Promise.resolve(userInfoForNonCollectionCreator));
     const explorationCreationServiceSpy = spyOn(
@@ -200,7 +205,8 @@ describe('CreateActivityButtonComponent', () => {
     expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('should create new exploration if user cannot create collections', () => {
+  it('should create new exploration if user cannot create' +
+    ' collections and is on the creator dashboard page', () => {
     component.creationInProgress = false;
     component.canCreateCollections = false;
     const explorationCreationServiceSpy = spyOn(
@@ -268,22 +274,25 @@ describe('CreateActivityButtonComponent', () => {
   }));
 
   it('should show upload exploration modal', () => {
-    const explorationCreationServiceSpy = spyOn(
+    const showUploadExplorationModalSpy = spyOn(
       explorationCreationService, 'showUploadExplorationModal');
 
     component.showUploadExplorationModal();
 
-    expect(explorationCreationServiceSpy).toHaveBeenCalled();
+    expect(showUploadExplorationModalSpy).toHaveBeenCalled();
   });
 
   it('should redirect to login page when user creates exploration' +
     ' and is not logged in', fakeAsync(() => {
     windowRef.nativeWindow.location.href = '';
+    const siteAnalyticsServiceSpy = spyOn(
+      siteAnalyticsService, 'registerStartLoginEvent');
 
     component.onRedirectToLogin('login-url');
     tick(150);
     fixture.detectChanges();
 
+    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith('createActivityButton');
     expect(windowRef.nativeWindow.location.href).toBe('login-url');
   }));
 });
