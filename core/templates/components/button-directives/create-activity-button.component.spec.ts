@@ -150,44 +150,127 @@ describe('CreateActivityButtonComponent', () => {
       expect(component).toBeDefined();
     });
 
-  it('should begin activity creation process if user can create collections' +
-    ' and is redirected to creator dashboard', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+  describe('when user can create collections', () => {
+    it('should begin activity creation process if the' +
+      ' url parameter \'mode\' is set as \'create\'', fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        mode: 'create'
+      });
+      spyOn(component, 'initCreationProcess');
 
-    spyOn(component, 'initCreationProcess');
+      expect(component.userIsLoggedIn).toBe(false);
+      expect(component.canCreateCollections).toBe(false);
 
-    expect(component.userIsLoggedIn).toBe(false);
-    expect(component.canCreateCollections).toBe(false);
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
 
-    component.ngOnInit();
-    tick();
-    fixture.detectChanges();
+      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.canCreateCollections).toBe(true);
+      expect(urlService.getUrlParams).toHaveBeenCalled();
+      expect(component.initCreationProcess).toHaveBeenCalled();
+    }));
 
-    expect(component.userIsLoggedIn).toBe(true);
-    expect(component.canCreateCollections).toBe(true);
-    expect(component.initCreationProcess).toHaveBeenCalled();
-  }));
+    it('should redirect user to creator dashboard page when the user' +
+      ' clicks on the create button', () => {
+      component.creationInProgress = false;
+      component.canCreateCollections = true;
+      spyOn(urlService, 'getPathname').and.returnValue('not/creator-dashboard');
+      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+        location: {
+          replace: (val: string) => {}
+        }
+      });
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return <NgbModalRef>({
+          result: Promise.resolve('success')
+        });
+      });
+      const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
-  it('should create a new exploration automatically if the user cannot create' +
-    ' collections and is redirected to creator dashboard after' +
-    ' logging in', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfoForNonCollectionCreator));
-    const explorationCreationServiceSpy = spyOn(
-      explorationCreationService, 'createNewExploration');
+      component.initCreationProcess();
 
-    expect(component.userIsLoggedIn).toBe(false);
-    expect(component.canCreateCollections).toBe(false);
+      expect(replaceSpy).toHaveBeenCalledWith('/creator-dashboard?mode=create');
+      expect(modalSpy).not.toHaveBeenCalled();
+    });
 
-    component.ngOnInit();
-    tick();
-    fixture.detectChanges();
+    it('should not redirect user but open a create activity modal if user' +
+      ' is on the creator dashboard page', () => {
+      component.creationInProgress = false;
+      component.canCreateCollections = true;
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/creator-dashboard');
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return <NgbModalRef>({
+          result: Promise.resolve('success')
+        });
+      });
+      const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
-    expect(component.userIsLoggedIn).toBe(true);
-    expect(component.canCreateCollections).toBe(false);
-    expect(explorationCreationServiceSpy).toHaveBeenCalled();
-  }));
+      component.initCreationProcess();
+
+      expect(replaceSpy).not.toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalled();
+    });
+
+    it('should handle modal\'s failure callback' +
+    ' and stop creation process', fakeAsync(() => {
+      component.creationInProgress = false;
+      component.canCreateCollections = true;
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/creator-dashboard');
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return <NgbModalRef>({
+          result: Promise.reject('cancel')
+        });
+      });
+
+      component.initCreationProcess();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalled();
+      expect(component.creationInProgress).toBe(false);
+    }));
+  });
+
+  describe('when user cannot create collection', () => {
+    it('should create a new exploration automatically if' +
+      ' url parameter \'mode\' is set as \'create\'', fakeAsync(() => {
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue(Promise.resolve(userInfoForNonCollectionCreator));
+      const explorationCreationServiceSpy = spyOn(
+        explorationCreationService, 'createNewExploration');
+      spyOn(urlService, 'getUrlParams').and.returnValue({
+        mode: 'create'
+      });
+
+      expect(component.userIsLoggedIn).toBe(false);
+      expect(component.canCreateCollections).toBe(false);
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.canCreateCollections).toBe(false);
+      expect(urlService.getUrlParams).toHaveBeenCalled();
+      expect(explorationCreationServiceSpy).toHaveBeenCalled();
+    }));
+
+    it('should create new exploration if the user is on' +
+      ' the creator dashboard page', () => {
+      component.creationInProgress = false;
+      component.canCreateCollections = false;
+      const explorationCreationServiceSpy = spyOn(
+        explorationCreationService, 'createNewExploration');
+
+      component.initCreationProcess();
+
+      expect(explorationCreationServiceSpy).toHaveBeenCalled();
+    });
+  });
 
   it('should not start a new creation process if another' +
     ' creation is in progress', () => {
@@ -204,80 +287,6 @@ describe('CreateActivityButtonComponent', () => {
     component.initCreationProcess();
     expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
   });
-
-  it('should create new exploration if user cannot create' +
-    ' collections and is on the creator dashboard page', () => {
-    component.creationInProgress = false;
-    component.canCreateCollections = false;
-    const explorationCreationServiceSpy = spyOn(
-      explorationCreationService, 'createNewExploration');
-
-    component.initCreationProcess();
-
-    expect(explorationCreationServiceSpy).toHaveBeenCalled();
-  });
-
-  it('should redirect user to a new exploration when user clicks' +
-    ' create button and is not on creator dashboard page', () => {
-    component.creationInProgress = false;
-    component.canCreateCollections = true;
-    spyOn(urlService, 'getPathname').and.returnValue(
-      'not/creator-dashboard');
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        replace: (val: string) => {}
-      }
-    });
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>({
-        result: Promise.resolve('success')
-      });
-    });
-    const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
-
-    component.initCreationProcess();
-
-    expect(replaceSpy).toHaveBeenCalledWith('/creator-dashboard?mode=create');
-    expect(modalSpy).not.toHaveBeenCalled();
-  });
-
-  it('should not redirect user but open a create activity modal if user' +
-    ' can create collections and is on creator dashboard page', () => {
-    component.creationInProgress = false;
-    component.canCreateCollections = true;
-    spyOn(urlService, 'getPathname').and.returnValue(
-      '/creator-dashboard');
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>({
-        result: Promise.resolve('success')
-      });
-    });
-    const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
-
-    component.initCreationProcess();
-
-    expect(replaceSpy).not.toHaveBeenCalled();
-    expect(modalSpy).toHaveBeenCalled();
-  });
-
-  it('should handle modal\'s failure callback' +
-    ' and stop creation process', fakeAsync(() => {
-    component.creationInProgress = false;
-    component.canCreateCollections = true;
-    spyOn(urlService, 'getPathname').and.returnValue(
-      '/creator-dashboard');
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return <NgbModalRef>({
-        result: Promise.reject('cancel')
-      });
-    });
-
-    component.initCreationProcess();
-    tick();
-
-    expect(modalSpy).toHaveBeenCalled();
-    expect(component.creationInProgress).toBe(false);
-  }));
 
   it('should show upload exploration modal', () => {
     const showUploadExplorationModalSpy = spyOn(
@@ -301,5 +310,18 @@ describe('CreateActivityButtonComponent', () => {
     expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
       'createActivityButton');
     expect(windowRef.nativeWindow.location.href).toBe('login-url');
+  }));
+
+  it('should call the site analytics service on redirect' +
+    ' to login', fakeAsync(() => {
+    const siteAnalyticsServiceSpy = spyOn(
+      siteAnalyticsService, 'registerStartLoginEvent');
+
+    component.onRedirectToLogin('login-url');
+    tick(150);
+    fixture.detectChanges();
+
+    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+      'createActivityButton');
   }));
 });
