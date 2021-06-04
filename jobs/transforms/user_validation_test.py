@@ -278,4 +278,3 @@ class RelationshipsOfTests(test_utils.TestBase):
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserEmailPreferencesModel', 'id'),
             ['UserSettingsModel'])
-
