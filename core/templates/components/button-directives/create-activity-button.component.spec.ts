@@ -18,6 +18,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UrlParamsType, UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -215,8 +216,8 @@ describe('CreateActivityButtonComponent', () => {
       expect(modalSpy).toHaveBeenCalled();
     });
 
-    it('should handle modal\'s failure callback' +
-    ' and stop creation process', fakeAsync(() => {
+    it('should stop the creation process when there is an error with' +
+    ' the create activity modal opening', fakeAsync(() => {
       component.creationInProgress = false;
       component.canCreateCollections = true;
       spyOn(urlService, 'getPathname').and.returnValue(
@@ -230,7 +231,12 @@ describe('CreateActivityButtonComponent', () => {
       component.initCreationProcess();
       tick();
 
-      expect(modalSpy).toHaveBeenCalled();
+      expect(modalSpy).toHaveBeenCalledWith(
+        CreateActivityModalComponent,
+        {
+          backdrop: true
+        }
+      );
       expect(component.creationInProgress).toBe(false);
     }));
   });
@@ -259,8 +265,8 @@ describe('CreateActivityButtonComponent', () => {
       expect(explorationCreationServiceSpy).toHaveBeenCalled();
     }));
 
-    it('should create new exploration if the user is on' +
-      ' the creator dashboard page', () => {
+    it('should create new exploration when the user clicks' +
+      ' on the create button', () => {
       component.creationInProgress = false;
       component.canCreateCollections = false;
       const explorationCreationServiceSpy = spyOn(
