@@ -21,7 +21,7 @@ require(
   'pages/exploration-player-page/layout-directives/audio-bar.directive.ts');
 require(
   'pages/exploration-player-page/learner-experience/' +
-  'input-response-pair.directive.ts');
+  'input-response-pair.component.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/audio-preloader.service.ts');

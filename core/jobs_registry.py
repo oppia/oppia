@@ -163,6 +163,8 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.AppFeedbackReportModelAuditOneOffJob,
     prod_validation_jobs_one_off.AppFeedbackReportTicketModelAuditOneOffJob,
     prod_validation_jobs_one_off.AppFeedbackReportStatsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BeamJobRunModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BeamJobRunResultModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
