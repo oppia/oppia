@@ -13,46 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the playbook page.
+ * @fileoverview Component for the license page.
  */
 
- import { Component, OnInit } from '@angular/core';
- import { downgradeComponent } from '@angular/upgrade/static';
- 
- import { UrlInterpolationService } from
-   'domain/utilities/url-interpolation.service';
- import { WindowRef } from 'services/contextual/window-ref.service';
- import { SiteAnalyticsService } from 'services/site-analytics.service';
- 
- @Component({
-   selector: 'license-page',
-   templateUrl: './license-page.component.html',
-   styleUrls: []
- })
- export class LicensePageComponent implements OnInit {
-  TAB_ID_PARTICIPATION: string = 'participation';
-  TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
- 
-   constructor(
-     private siteAnalyticsService: SiteAnalyticsService,
-     private urlInterpolationService: UrlInterpolationService,
-     private windowRef: WindowRef
-   ) {}
- 
-   ngOnInit(): void {}
-   getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-  onApplyToTeachWithOppia(): boolean {
-    this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
-    }, 150);
-    return false;
+@Component({
+  selector: 'license-page',
+  templateUrl: './license-page.component.html',
+  styleUrls: []
+})
+export class LicensePageComponent {
+  constructor() {
+
   }
- }
- 
- angular.module('oppia').directive('licensePage',
-   downgradeComponent({component: LicensePageComponent}));
- 
+}
+
+angular.module('oppia').directive('licensePage',
+  downgradeComponent({component: LicensePageComponent}));

@@ -13,85 +13,72 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the teach page.
+ * @fileoverview Unit tests for the license page.
  */
 
- import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
- import { ComponentFixture, TestBed } from
-   '@angular/core/testing';
- 
- import { LicensePageComponent } from './license-page.component';
- import { UrlInterpolationService } from
-   'domain/utilities/url-interpolation.service';
- import { WindowRef } from 'services/contextual/window-ref.service';
- import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
- import { SiteAnalyticsService } from 'services/site-analytics.service';
- import { TranslateService } from 'services/translate.service';
- 
- @Pipe({name: 'translate'})
- class MockTranslatePipe {
-   transform(value: string, params: Object | undefined): string {
-     return value;
-   }
- }
- 
- class MockTranslateService {
-   languageCode = 'es';
-   use(newLanguageCode: string): string {
-     this.languageCode = newLanguageCode;
-     return this.languageCode;
-   }
- }
- 
- class MockI18nLanguageCodeService {
-   codeChangeEventEmiiter = new EventEmitter<string>();
-   getCurrentI18nLanguageCode() {
-     return 'en';
-   }
- 
-   get onI18nLanguageCodeChange() {
-     return this.codeChangeEventEmiiter;
-   }
- }
- 
- class MockSiteAnalyticsService {
-   registerApplyToTeachWithOppiaEvent(): void {
-     return;
-   }
- }
- 
- let component: LicensePageComponent;
- let fixture: ComponentFixture<LicensePageComponent>;
- 
- describe('License Page', () => {
-   let siteAnalyticsService = null;
- 
-   beforeEach(() => {
-     TestBed.configureTestingModule({
-       declarations: [LicensePageComponent, MockTranslatePipe],
-       providers: [
-         {
-           provide: I18nLanguageCodeService,
-           useClass: MockI18nLanguageCodeService
-         },
-         {
-           provide: SiteAnalyticsService,
-           useClass: MockSiteAnalyticsService
-         },
-         {
-           provide: TranslateService,
-           useClass: MockTranslateService
-         },
-       ],
-       schemas: [NO_ERRORS_SCHEMA]
-     }).compileComponents();
-     siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-   });
- 
-   beforeEach(() => {
-     fixture = TestBed.createComponent(LicensePageComponent);
-     component = fixture.componentInstance;
-     fixture.detectChanges();
-   });
- });
- 
+import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed } from
+  '@angular/core/testing';
+
+import { LicensePageComponent } from './license-page.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
+
+class MockTranslateService {
+  languageCode = 'es';
+  use(newLanguageCode: string): string {
+    this.languageCode = newLanguageCode;
+    return this.languageCode;
+  }
+}
+
+class MockI18nLanguageCodeService {
+  codeChangeEventEmiiter = new EventEmitter<string>();
+  getCurrentI18nLanguageCode() {
+    return 'en';
+  }
+
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmiiter;
+  }
+}
+
+let component: LicensePageComponent;
+let fixture: ComponentFixture<LicensePageComponent>;
+
+describe('License Page', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [LicensePageComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(LicensePageComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should successfully instantiate the component',
+    () => {
+      expect(component).toBeDefined();
+    });
+});
