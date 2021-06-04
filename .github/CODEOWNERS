@@ -159,7 +159,7 @@
 
 
 # Dev workflow team.
-/.circleci/ @U8NWXD @kevintab95 @krishnarao22
+/.circleci/ @kevintab95 @krishnarao22
 /.eslintignore @Hudda @DubeySandeep
 /.eslintrc @Hudda @DubeySandeep
 /.htmllintrc @Hudda @DubeySandeep
@@ -655,17 +655,17 @@
 /assets/ @nithusha21
 /data/ @nithusha21
 /core/templates/karma.module.ts @vojtechjelinek
-/core/tests/protractor_utils/ @U8NWXD @kevintab95 @krishnarao22
-/core/tests/protractor_desktop/ @U8NWXD @kevintab95 @krishnarao22
-/core/tests/protractor/ @U8NWXD @kevintab95 @krishnarao22
-/core/tests/protractor.conf.js @U8NWXD @kevintab95 @krishnarao22
-/extensions/interactions/*/protractor.js @U8NWXD @kevintab95 @krishnarao22
-/extensions/interactions/protractor.js @U8NWXD @kevintab95 @krishnarao22
-/extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95 @krishnarao22
-/extensions/rich_text_components/protractor.js @U8NWXD @kevintab95 @krishnarao22
-/extensions/objects/protractor.js @U8NWXD @kevintab95 @krishnarao22
-/scripts/backend_test_shards.json @U8NWXD @krishnarao22
-/.github/actions @U8NWXD @krishnarao22
+/core/tests/protractor_utils/ @kevintab95 @krishnarao22
+/core/tests/protractor_desktop/ @kevintab95 @krishnarao22
+/core/tests/protractor/ @kevintab95 @krishnarao22
+/core/tests/protractor.conf.js @kevintab95 @krishnarao22
+/extensions/interactions/*/protractor.js @kevintab95 @krishnarao22
+/extensions/interactions/protractor.js @kevintab95 @krishnarao22
+/extensions/rich_text_components/*/protractor.js @kevintab95 @krishnarao22
+/extensions/rich_text_components/protractor.js @kevintab95 @krishnarao22
+/extensions/objects/protractor.js @kevintab95 @krishnarao22
+/scripts/backend_test_shards.json @krishnarao22
+/.github/actions @krishnarao22
 
 
 # Python 3 Migration project.
@@ -705,4 +705,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @DubeySandeep @U8NWXD @krishnarao22
+/.github/workflows/ @DubeySandeep @krishnarao22
