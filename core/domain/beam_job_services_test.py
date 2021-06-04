@@ -187,6 +187,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.DONE.value),
             self.create_beam_job_run_model(
+                # Synchronous jobs do not create Dataflow Jobs, so the value of
+                # the dataflow_job_id is None.
                 dataflow_job_id=None,
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
@@ -278,6 +280,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             self.create_beam_job_run_model(
                 job_state=beam_job_models.BeamJobState.DONE.value),
             self.create_beam_job_run_model(
+                # Synchronous jobs do not create Dataflow Jobs, so the value of
+                # the dataflow_job_id is None.
                 dataflow_job_id=None,
                 job_state=beam_job_models.BeamJobState.RUNNING.value),
             self.create_beam_job_run_model(
