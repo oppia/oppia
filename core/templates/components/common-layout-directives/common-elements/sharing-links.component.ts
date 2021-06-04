@@ -43,7 +43,6 @@ export class SharingLinksComponent implements OnInit {
   classroomUrl: string;
   activityId: string;
   activityUrlFragment: string;
-  activityCreateUrl: string;
   serverName: string;
   escapedTwitterText: string;
 
