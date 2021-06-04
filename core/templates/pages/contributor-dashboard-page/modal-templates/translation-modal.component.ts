@@ -274,7 +274,6 @@ export class TranslationModalComponent {
   isTranslationCompleted(
       originalElements: HTMLElement[],
       translatedElements: HTMLElement[]): boolean {
-
     const filteredOriginalElements = originalElements.filter(
       (element: HTMLElement) => element.nodeType === Node.ELEMENT_NODE);
     const filteredTranslatedElements = translatedElements.filter(
