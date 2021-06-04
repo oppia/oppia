@@ -56,6 +56,9 @@ angular.module('oppia').constant(
   'STATE_ERROR_MESSAGES', AppConstants.STATE_ERROR_MESSAGES);
 
 angular.module('oppia').constant(
+  'CHECKPOINT_ERROR_MESSAGES', AppConstants.CHECKPOINT_ERROR_MESSAGES);
+
+angular.module('oppia').constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
   AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE);
 
