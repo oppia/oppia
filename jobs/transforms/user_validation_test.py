@@ -22,8 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.platform import models
+from core.tests import test_utils
 import feconf
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import user_validation
 from jobs.types import base_validation_errors
 from jobs.types import user_validation_errors
@@ -267,3 +269,13 @@ class ValidateArchivedModelsMarkedDeletedTests(
             | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_user_email_preferences_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserEmailPreferencesModel', 'id'),
+            ['UserSettingsModel'])
+

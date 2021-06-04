@@ -112,7 +112,9 @@
         "core.domain.skill_jobs_one_off_test",
         "core.domain.email_validators_test",
         "core.domain.exploration_validators_test",
-        "scripts.check_if_pr_is_low_risk_test"
+        "scripts.check_if_pr_is_low_risk_test",
+        "scripts.scripts_test_utils_test",
+        "scripts.servers_test"
     ],
     "5": [
         "core.domain.suggestion_validators_test",
@@ -202,6 +204,7 @@
         "jobs.base_jobs_test",
         "jobs.decorators.validation_decorators_test",
         "jobs.io.stub_io_test",
+        "jobs.io.ndb_io_test",
         "jobs.job_options_test",
         "jobs.job_test_utils_test",
         "jobs.job_utils_test",
@@ -212,10 +215,16 @@
         "jobs.transforms.auth_validation_test",
         "jobs.transforms.base_validation_test",
         "jobs.transforms.user_validation_test",
+        "jobs.transforms.config_validation_test",
+        "jobs.transforms.collection_validation_test",
+        "jobs.transforms.question_validation_test",
+        "jobs.transforms.feedback_validation_test",
         "jobs.types.base_validation_errors_test",
+        "jobs.types.job_run_result_test",
         "jobs.types.model_property_test",
         "jobs.types.topic_validation_errors_test",
-        "jobs.types.user_validation_errors_test"
+        "jobs.types.user_validation_errors_test",
+        "jobs.types.feedback_validation_errors_test"
     ],
     "10": [
         "core.domain.question_jobs_one_off_test",
@@ -223,7 +232,9 @@
         "core.domain.exp_jobs_one_off_test",
         "core.domain.collection_validators_test",
         "core.domain.suggestion_jobs_one_off_test",
-        "core.domain.image_validation_services_test"
+        "core.domain.image_validation_services_test",
+        "core.storage.beam_job.gae_models_test",
+        "core.domain.beam_job_validators_test"
     ],
     "11": [
         "core.platform.taskqueue.cloud_taskqueue_services_test",
@@ -248,7 +259,6 @@
         "core.storage.subtopic.gae_models_test",
         "core.domain.user_domain_test",
         "core.storage.opportunity.gae_models_test",
-        "jinja_utils_test",
         "scripts.build_test",
         "scripts.install_third_party_libs_test",
         "core.storage.statistics.gae_models_test",
@@ -257,7 +267,6 @@
         "scripts.docstrings_checker_test",
         "core.platform.search.elastic_search_services_test",
         "scripts.typescript_checks_test",
-        "core.platform.auth.gae_auth_services_test",
         "core.storage.skill.gae_models_test",
         "core.platform.taskqueue.cloud_tasks_emulator_test",
         "core.platform.cloud_translate.cloud_translate_emulator_test",
@@ -304,7 +313,6 @@
         "scripts.linters.js_ts_linter_test",
         "core.domain.question_validators_test",
         "scripts.pre_push_hook_test",
-        "core.platform.users.gae_current_user_services_test",
         "core.platform.search.gae_search_services_test",
         "scripts.release_scripts.update_configs_test",
         "core.storage.improvements.gae_models_test",

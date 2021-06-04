@@ -20,19 +20,37 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import feconf
+from jobs.io import stub_io
 
-import apache_beam as beam
 from apache_beam.options import pipeline_options
+
+
+def validate_datastoreio_stub(obj):
+    """Asserts that the given object is an instance of DatastoreioStub.
+
+    Args:
+        obj: *. The object to validate.
+
+    Returns:
+        DatastoreioStub. The validated object, unchanged.
+
+    Raises:
+        TypeError. The object is not an instance of DatastoreioStub.
+    """
+    if not isinstance(obj, stub_io.DatastoreioStub):
+        raise TypeError('obj=%r is not an instance of DatastoreioStub' % obj)
+    return obj
 
 
 class JobOptions(pipeline_options.GoogleCloudOptions):
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
-        'model_getter': (
-            beam.PTransform,
-            'The type of PTransform the pipeline should use to fetch models '
-            'from the datastore.'),
+        # TODO(#11475): Delete this option once we're able to use the real
+        # datastoreio module once we've finished migrating to Python 3.
+        'datastoreio_stub': (
+            validate_datastoreio_stub,
+            'Source of datastore operations for the pipeline to depend upon'),
     }
 
     def __init__(self, flags=None, **job_options):

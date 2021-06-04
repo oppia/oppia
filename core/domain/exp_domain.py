@@ -55,6 +55,7 @@ STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
+STATE_PROPERTY_LINKED_SKILL_ID = 'linked_skill_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
@@ -233,6 +234,7 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
+        STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
         STATE_PROPERTY_INTERACTION_HANDLERS,
@@ -705,6 +707,8 @@ class Exploration(python_utils.OBJECT):
 
             state.next_content_id_index = sdict['next_content_id_index']
 
+            state.linked_skill_id = sdict['linked_skill_id']
+
             state.solicit_answer_details = sdict['solicit_answer_details']
 
             state.card_is_checkpoint = sdict['card_is_checkpoint']
@@ -963,87 +967,89 @@ class Exploration(python_utils.OBJECT):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check if first state is a checkpoint or not.
-        if not self.states[self.init_state_name].card_is_checkpoint:
-            raise utils.ValidationError(
-                'Expected card_is_checkpoint of first state to be True'
-                ' but found it to be %s'
-                % (self.states[self.init_state_name].card_is_checkpoint)
-            )
-
-        # Check if terminal states are checkpoints.
-        for state_name, state in self.states.items():
-            interaction = state.interaction
-            if interaction.is_terminal:
-                if state_name != self.init_state_name:
-                    if self.states[state_name].card_is_checkpoint:
-                        raise utils.ValidationError(
-                            'Expected card_is_checkpoint of terminal state to '
-                            'be False but found it to be %s'
-                            % self.states[state_name].card_is_checkpoint
-                        )
-
-        # Check if checkpoint count is between 1 and 8, inclusive.
-        checkpoint_count = 0
-        for state_name, state in self.states.items():
-            if state.card_is_checkpoint:
-                checkpoint_count = checkpoint_count + 1
-        if not 1 <= checkpoint_count <= 8:
-            raise utils.ValidationError(
-                'Expected checkpoint count to be between 1 and 8 inclusive '
-                'but found it to be %s'
-                % checkpoint_count
-            )
-
-        # Check if a state marked as a checkpoint is bypassable.
-        non_initial_checkpoint_state_names = []
-        for state_name, state in self.states.items():
-            if state_name != self.init_state_name and state.card_is_checkpoint:
-                non_initial_checkpoint_state_names.append(state_name)
-
-        # For every non-initial checkpoint state we remove it from the states
-        # dict. Then we check if we can reach a terminal state after removing
-        # the state with checkpoint. As soon as we find a terminal state, we
-        # break out of the loop and raise a validation error. Since, we reached
-        # a terminal state, this implies that the user was not required to go
-        # through the checkpoint. Hence, the checkpoint is bypassable.
-        for state_name_to_exclude in non_initial_checkpoint_state_names:
-            new_states = copy.deepcopy(self.states)
-            new_states.pop(state_name_to_exclude)
-            processed_state_names = set()
-            curr_queue = [self.init_state_name]
-            excluded_state_is_bypassable = False
-            while curr_queue:
-                if curr_queue[0] == state_name_to_exclude:
-                    curr_queue.pop(0)
-                    continue
-                curr_state_name = curr_queue[0]
-                curr_queue = curr_queue[1:]
-                if not curr_state_name in processed_state_names:
-                    processed_state_names.add(curr_state_name)
-                    curr_state = new_states[curr_state_name]
-
-                    # We do not need to check if the current state is terminal
-                    # or not before getting all outcomes, as when we find a
-                    # terminal state in an outcome, we break out of the for loop
-                    # and raise a validation error.
-                    all_outcomes = (
-                        curr_state.interaction.get_all_outcomes())
-                    for outcome in all_outcomes:
-                        dest_state = outcome.dest
-                        if self.states[dest_state].interaction.is_terminal:
-                            excluded_state_is_bypassable = True
-                            break
-                        if (dest_state not in curr_queue and
-                                dest_state not in processed_state_names):
-                            curr_queue.append(dest_state)
-                if excluded_state_is_bypassable:
-                    raise utils.ValidationError(
-                        'Cannot make %s a checkpoint as it is bypassable'
-                        % state_name_to_exclude)
-
         if strict:
             warnings_list = []
+
+            # Check if first state is a checkpoint or not.
+            if not self.states[self.init_state_name].card_is_checkpoint:
+                raise utils.ValidationError(
+                    'Expected card_is_checkpoint of first state to be True'
+                    ' but found it to be %s'
+                    % (self.states[self.init_state_name].card_is_checkpoint)
+                )
+
+            # Check if terminal states are checkpoints.
+            for state_name, state in self.states.items():
+                interaction = state.interaction
+                if interaction.is_terminal:
+                    if state_name != self.init_state_name:
+                        if self.states[state_name].card_is_checkpoint:
+                            raise utils.ValidationError(
+                                'Expected card_is_checkpoint of terminal state '
+                                'to be False but found it to be %s'
+                                % self.states[state_name].card_is_checkpoint
+                            )
+
+            # Check if checkpoint count is between 1 and 8, inclusive.
+            checkpoint_count = 0
+            for state_name, state in self.states.items():
+                if state.card_is_checkpoint:
+                    checkpoint_count = checkpoint_count + 1
+            if not 1 <= checkpoint_count <= 8:
+                raise utils.ValidationError(
+                    'Expected checkpoint count to be between 1 and 8 inclusive '
+                    'but found it to be %s'
+                    % checkpoint_count
+                )
+
+            # Check if a state marked as a checkpoint is bypassable.
+            non_initial_checkpoint_state_names = []
+            for state_name, state in self.states.items():
+                if (state_name != self.init_state_name
+                        and state.card_is_checkpoint):
+                    non_initial_checkpoint_state_names.append(state_name)
+
+            # For every non-initial checkpoint state we remove it from the
+            # states dict. Then we check if we can reach a terminal state after
+            # removing the state with checkpoint. As soon as we find a terminal
+            # state, we break out of the loop and raise a validation error.
+            # Since, we reached a terminal state, this implies that the user was
+            # not required to go through the checkpoint. Hence, the checkpoint
+            # is bypassable.
+            for state_name_to_exclude in non_initial_checkpoint_state_names:
+                new_states = copy.deepcopy(self.states)
+                new_states.pop(state_name_to_exclude)
+                processed_state_names = set()
+                curr_queue = [self.init_state_name]
+                excluded_state_is_bypassable = False
+                while curr_queue:
+                    if curr_queue[0] == state_name_to_exclude:
+                        curr_queue.pop(0)
+                        continue
+                    curr_state_name = curr_queue[0]
+                    curr_queue = curr_queue[1:]
+                    if not curr_state_name in processed_state_names:
+                        processed_state_names.add(curr_state_name)
+                        curr_state = new_states[curr_state_name]
+
+                        # We do not need to check if the current state is
+                        # terminal or not before getting all outcomes, as when
+                        # we find a terminal state in an outcome, we break out
+                        # of the for loop and raise a validation error.
+                        all_outcomes = (
+                            curr_state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            dest_state = outcome.dest
+                            if self.states[dest_state].interaction.is_terminal:
+                                excluded_state_is_bypassable = True
+                                break
+                            if (dest_state not in curr_queue and
+                                    dest_state not in processed_state_names):
+                                curr_queue.append(dest_state)
+                    if excluded_state_is_bypassable:
+                        raise utils.ValidationError(
+                            'Cannot make %s a checkpoint as it is bypassable'
+                            % state_name_to_exclude)
 
             try:
                 self._verify_all_states_reachable()
@@ -1797,6 +1803,24 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v44_dict_to_v45_dict(cls, states_dict):
+        """Converts from version 44 to 45. Version 45 contains
+        linked skill id.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        for state_dict in states_dict.values():
+            state_dict['linked_skill_id'] = None
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -1833,7 +1857,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 49
+    CURRENT_EXP_SCHEMA_VERSION = 50
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -1905,6 +1929,28 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v49_dict_to_v50_dict(cls, exploration_dict):
+        """Converts a v49 exploration dict into a v50 exploration dict.
+        Version 50 contains linked skill id to exploration state.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v49.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v50.
+        """
+
+        exploration_dict['schema_version'] = 50
+
+        exploration_dict['states'] = cls._convert_states_v44_dict_to_v45_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 45
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -1954,6 +2000,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v48_dict_to_v49_dict(
                 exploration_dict)
             exploration_schema_version = 49
+
+        if exploration_schema_version == 49:
+            exploration_dict = cls._convert_v49_dict_to_v50_dict(
+                exploration_dict)
+            exploration_schema_version = 50
 
         return exploration_dict
 
