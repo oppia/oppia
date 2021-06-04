@@ -56,7 +56,7 @@ module.exports = {
         if (controllerFunctionNode.body.body[0].type !== 'ReturnStatement') {
           return;
         }
-        if (controllerFunctionNode.body.body[0].argument.type != (
+        if (controllerFunctionNode.body.body[0].argument.type !== (
           'ObjectExpression')) {
           return;
         }
@@ -76,12 +76,12 @@ module.exports = {
             });
             return;
           }
-          if (scopeFound && property.value.type != 'ObjectExpression') {
-          context.report({
-            node: node,
-            messageId: 'scopeNotFound'
-          });
-        }
+          if (scopeFound && property.value.type !== 'ObjectExpression') {
+            context.report({
+              node: node,
+              messageId: 'scopeNotFound'
+            });
+          }
         });
       }
     };
