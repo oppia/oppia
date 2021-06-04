@@ -216,8 +216,8 @@ describe('Topic questions tab', function() {
     $scope.topicRights = null;
     $scope.topic = null;
 
-    expect($scope.question).toBeNull();
-    expect($scope.skillId).toBeNull();
+    expect($scope.allSkillSummaries).toBeNull();
+    expect($scope.topicRights).toBeNull();
     expect($scope.topic).toBeNull();
 
 
