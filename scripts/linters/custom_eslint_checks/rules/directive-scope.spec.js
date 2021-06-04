@@ -105,6 +105,7 @@ ruleTester.run('directive-scope', rule, {
       '$filter', function($filter) {
         return {
           require: 'ngModel',
+          scope: 'testing',
           restrict: 'A',
           link: function(scope, elm, attrs, ctrl) {
             var floatValidator = function(viewValue) {

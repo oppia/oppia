@@ -74,14 +74,15 @@ module.exports = {
               node: node,
               messageId: 'trueScope'
             });
+            return;
           }
-        });
-        if (!scopeFound) {
+          if (scopeFound && property.value.type != 'ObjectExpression') {
           context.report({
             node: node,
             messageId: 'scopeNotFound'
           });
         }
+        });
       }
     };
   }
