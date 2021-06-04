@@ -40,6 +40,9 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateCardIsCheckpointService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -76,6 +79,7 @@ describe('Exploration editor tab component', function() {
   var siteAnalyticsService = null;
   var stateEditorRefreshService = null;
   var solutionObjectFactory = null;
+  var stateCardIsCheckpointService = null;
   var stateEditorService = null;
   var userExplorationPermissionsService = null;
   var focusManagerService = null;
@@ -129,6 +133,9 @@ describe('Exploration editor tab component', function() {
       'StateClassifierMappingService',
       TestBed.get(StateClassifierMappingService));
     $provide.value(
+      'StateCardIsCheckpointService',
+      TestBed.get(StateCardIsCheckpointService));
+    $provide.value(
       'StateEditorService', TestBed.get(StateEditorService));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
     $provide.value(
@@ -145,6 +152,8 @@ describe('Exploration editor tab component', function() {
     $uibModal = $injector.get('$uibModal');
     $timeout = $injector.get('$timeout');
     stateEditorService = $injector.get('StateEditorService');
+    stateCardIsCheckpointService = $injector.get(
+      'StateCardIsCheckpointService');
     editabilityService = $injector.get('EditabilityService');
     focusManagerService = $injector.get('FocusManagerService');
     explorationInitStateNameService = $injector.get(
@@ -164,6 +173,7 @@ describe('Exploration editor tab component', function() {
 
     explorationStatesService.init({
       'First State': {
+        card_is_checkpoint: true,
         content: {
           content_id: 'content',
           html: 'First State Content'
@@ -242,6 +252,7 @@ describe('Exploration editor tab component', function() {
         }
       },
       'Second State': {
+        card_is_checkpoint: false,
         content: {
           content_id: 'content',
           html: 'Second State Content'
@@ -596,6 +607,19 @@ describe('Exploration editor tab component', function() {
     ctrl.saveSolicitAnswerDetails(true);
 
     expect(stateEditorService.solicitAnswerDetails).toBe(true);
+  });
+
+  it('should save card is checkpoint on change', function() {
+    stateEditorService.setActiveStateName('Second State');
+    stateEditorService.setCardIsCheckpoint(
+      explorationStatesService.getState('Second State').cardIsCheckpoint);
+
+    expect(stateEditorService.cardIsCheckpoint).toBe(false);
+
+    stateCardIsCheckpointService.displayed = true;
+    ctrl.onChangeCardIsCheckpoint();
+
+    expect(stateEditorService.cardIsCheckpoint).toBe(true);
   });
 
   it('should mark all audio as needing update when closing modal', function() {
