@@ -3671,9 +3671,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value:
-            content_id: ca_placeholder_2
-            unicode_str: ''
+          value: False
         rows:
           value: 1
       default_outcome:
@@ -3742,9 +3740,7 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
-          value:
-            content_id: ca_placeholder_0
-            unicode_str: ''
+          value: False
         rows:
           value: 1
       default_outcome:

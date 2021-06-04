@@ -373,10 +373,10 @@ export class InteractionObjectFactory {
   ): NumericInputCustomizationArgs {
     const { placeholder } = caBackendDict;
     return {
-      placeholder: {
+      placeholder,/*: {
         value: this.subtitledUnicodeFactory.createFromBackendDict(
           placeholder.value)
-      },
+      },*/
       input: {
         value: true
       }

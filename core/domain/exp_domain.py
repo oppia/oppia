@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import json
+import pdb
 import re
 import string
 
@@ -1832,14 +1833,27 @@ class Exploration(python_utils.OBJECT):
         """
         for state_dict in states_dict.values():
             if state_dict['interaction']['id'] == 'NumericInput':
+                customization_args = state_dict['interaction']['customization_args']
+                customization_args.update({
+                    'placeholder': {
+                        'value': False
+                    }
+                })
+
+        return states_dict
+        """for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'NumericInput':
+                pdb.set_trace()
                 customization_args = state_dict[
                     'interaction']['customization_args']
+                pdb.set_trace()
                 customization_args.update({
                     'placeholder': {
                         'value': True
                     }
                 })
-        return states_dict
+        pdb.set_trace()
+        return states_dict"""
 
     @classmethod
     def update_states_from_model(

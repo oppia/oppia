@@ -40,15 +40,12 @@ class NumericInput(base.BaseInteraction):
 
     _customization_arg_specs = [{
         'name': 'placeholder',
-        'description': 'Input should be greater than zero.',
+        'description': (
+            'Represent division using fractions (rather than ÷).'),
         'schema': {
-        'type': 'bool',
-        'validators': [{
-           'min_value': 0,
-           'id': 'is_at_least'
-         }]
-     },
-     'default_value': False
+            'type': 'bool'
+        },
+        'default_value': False
     }]
 
     _answer_visualization_specs = [{
