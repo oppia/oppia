@@ -133,7 +133,8 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
             self.assertEqual(domain_obj.job_started_on, model_obj.created_on)
             self.assertEqual(domain_obj.job_updated_on, model_obj.last_updated)
             self.assertEqual(
-                domain_obj.is_synchronous, model_obj.dataflow_job_id is None)
+                domain_obj.job_is_synchronous,
+                model_obj.dataflow_job_id is None)
 
     def test_get_beam_job_runs(self):
         beam_job_run_models = [
