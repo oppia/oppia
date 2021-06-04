@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for topic questions tab.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { EventEmitter } from '@angular/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { QuestionsListService } from 'services/questions-list.service';
@@ -99,6 +100,8 @@ describe('Topic questions tab', function() {
     }
   }
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -120,7 +123,6 @@ describe('Topic questions tab', function() {
     $window = $injector.get('$window');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    focusManagerService = $injector.get('FocusManagerService');
     topicInitializedEventEmitter = new EventEmitter();
     topicReinitializedEventEmitter = new EventEmitter();
 
