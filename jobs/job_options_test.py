@@ -32,14 +32,14 @@ class JobOptionsTests(test_utils.TestBase):
     def test_default_values(self):
         options = job_options.JobOptions()
 
-        self.assertIsNone(options.datastoreio)
+        self.assertIsNone(options.datastoreio_stub)
 
     def test_overwritten_values(self):
         datastoreio_stub = stub_io.DatastoreioStub()
 
-        options = job_options.JobOptions(datastoreio=datastoreio_stub)
+        options = job_options.JobOptions(datastoreio_stub=datastoreio_stub)
 
-        self.assertIs(options.datastoreio, datastoreio_stub)
+        self.assertIs(options.datastoreio_stub, datastoreio_stub)
 
     def test_valid_datastoreio_value(self):
         obj = stub_io.DatastoreioStub()
