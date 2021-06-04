@@ -196,8 +196,8 @@ describe('Topic questions tab', function() {
     $scope.topic = null;
 
     // Baseline verification.
-    expect($scope.question).toBeNull();
-    expect($scope.skillId).toBeNull();
+    expect($scope.allSkillSummaries).toBeNull();
+    expect($scope.topicRights).toBeNull();
     expect($scope.topic).toBeNull();
 
     // Action.
