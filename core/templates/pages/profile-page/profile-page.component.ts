@@ -195,6 +195,10 @@ export class ProfilePageComponent {
   updateSubscriptionButtonPopoverText(): void {
     if (this.userNotLoggedIn) {
       this.subscriptionButtonPopoverText = (
+        'Log in or sign up to subscribe to your ' +
+        'favorite creators.');
+    } else if (this.isAlreadySubscribed) {
+      this.subscriptionButtonPopoverText = (
         'Unsubscribe to stop receiving email notifications ' +
         'regarding new explorations published by ' +
         this.username.value + '.');
