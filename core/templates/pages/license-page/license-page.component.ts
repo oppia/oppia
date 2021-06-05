@@ -25,9 +25,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class LicensePageComponent {
-  constructor() {
-
-  }
+  constructor() {}
 }
 
 angular.module('oppia').directive('licensePage',

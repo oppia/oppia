@@ -437,8 +437,7 @@ module.exports = {
       filename: 'license.mainpage.html',
       meta: {
         name: defaultMeta.name,
-        description: 'This page has the license terms which is shown' +
-        'bafore uploading an audio or an image.'
+        description: 'License terms that Oppia is attributed under.'
       },
       template:
         commonPrefix + '/pages/license-page/license.mainpage.html',
