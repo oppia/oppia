@@ -43,7 +43,7 @@ describe('Assets Backend API Service', () => {
         .and.returnValue(Promise.resolve('token'));
     });
 
-    // Blob bases urls mean urls that start with 'blob:'
+    // Blob bases urls mean urls that start with 'blob:'.
     it(
       'should fetch blobs from backend given blob based urls',
       fakeAsync(() => {
@@ -59,7 +59,7 @@ describe('Assets Backend API Service', () => {
       })
     );
 
-    // Blob bases urls mean urls that start with 'blob:'
+    // Blob bases urls mean urls that start with 'blob:'.
     it(
       'should throw an error when the url is not for blob',
       fakeAsync(() => {
