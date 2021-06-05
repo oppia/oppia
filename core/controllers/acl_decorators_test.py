@@ -2938,7 +2938,8 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.second_admin_email, self.second_admin_username)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_curriculum_admins([self.ADMIN_USERNAME, self.second_admin_username])
+        self.set_curriculum_admins(
+            [self.ADMIN_USERNAME, self.second_admin_username])
         self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)

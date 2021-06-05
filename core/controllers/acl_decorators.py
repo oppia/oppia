@@ -1784,7 +1784,8 @@ def can_view_question_editor(handler):
             question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException
-        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in self.user.actions:
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
+                self.user.actions):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(

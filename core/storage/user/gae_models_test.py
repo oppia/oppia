@@ -169,9 +169,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
         self.assertItemsEqual(
-            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_CURRICULUM_ADMIN),
-            actual_users
-        )
+            user_models.UserSettingsModel.get_by_role(
+                feconf.ROLE_ID_CURRICULUM_ADMIN), actual_users)
 
     def test_export_data_for_nonexistent_user_raises_exception(self):
         with self.assertRaisesRegexp(
