@@ -57,7 +57,7 @@ module.exports = {
     return {
       'CallExpression[callee.property.name=directive]': function(node) {
         var arg = node.arguments;
-        if (arg.length !== 2 && arg[1].type !== 'ArrayExpression') {
+        if (arg.length !== 2 || arg[1].type !== 'ArrayExpression') {
           return;
         }
         var lengthOfElements = arg[1].elements.length;
