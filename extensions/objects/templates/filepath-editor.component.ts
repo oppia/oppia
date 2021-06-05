@@ -143,7 +143,10 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   entityId: string;
   entityType: string;
   // Check the note before imports and after fileoverview.
-  private imgData;
+  private imgData: {
+    safeValue?: SafeResourceUrl | string;
+    unsafeValue?: string;
+  } = {};
   // Check the note before imports and after fileoverview.
   private _data: FilepathData;
 
@@ -238,7 +241,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       e.preventDefault();
       this.userIsDraggingCropArea = false;
       this.userIsResizingCropArea = false;
-    }, false);
+    }, { passive: false });
     if (this.value) {
       this.resetComponent(this.value);
     }
@@ -529,6 +532,27 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
           imageFileName);
         return this.svgSanitizerService.getTrustedSvgResourceUrl(rawImageData);
       }
+      if (imageUrl.startsWith('blob')) {
+        this.assetsBackendApiService.getBlobDataFromBlobUrl$(
+          imageUrl
+        ).subscribe(
+          imgBlob => {
+            const reader = new FileReader();
+            reader.readAsDataURL(imgBlob);
+            reader.onloadend = () => {
+              if (imgBlob.type === 'image/svg+xml') {
+                this.imgData.safeValue = (
+                  this.svgSanitizerService.getTrustedSvgResourceUrl(
+                    reader.result as string
+                  )
+                );
+              } else {
+                this.imgData.safeValue = reader.result;
+              }
+            };
+          }
+        );
+      }
       return imageUrl;
     }
     const encodedFilepath = window.encodeURIComponent(imageFileName);
@@ -575,7 +599,6 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   onMouseMoveOnImageArea(e: MouseEvent): void {
     e.preventDefault();
-
     const coords = this.getEventCoorindatesRelativeToImageContainer(e);
 
     if (this.userIsDraggingCropArea) {
@@ -661,7 +684,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     if (this.isUserCropping()) {
       const data = 'url(' + (
         // Check point 2 in the note before imports and after fileoverview.
-        this.imgData || this.data.metadata.uploadedImageData) + ')';
+        this.imgData.unsafeValue || this.data.metadata.uploadedImageData) + ')';
       styles.background = data + ' no-repeat';
 
       const x = this.cropArea.x1 + 3; // Add crop area border.
@@ -695,7 +718,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     const width = (this.cropArea.x2 - this.cropArea.x1) * r;
     const height = (this.cropArea.y2 - this.cropArea.y1) * r;
     // Check point 2 in the note before imports and after fileoverview.
-    const imageDataURI = this.imgData || (
+    const imageDataURI = this.imgData.unsafeValue || (
       this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
 
@@ -704,6 +727,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     if (mimeType === 'data:image/gif') {
       let successCb = obj => {
         this.validateProcessedFilesize(obj.image);
+        this.imgData.unsafeValue = obj.image;
         newImageFile = (
           this.imageUploadHelperService.convertImageDataToImageFile(
             obj.image));
@@ -716,23 +740,31 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         imageDataURI, width, height, processFrameCb, successCb);
     } else if (mimeType === 'data:image/svg+xml') {
       // Check point 2 in the note before imports and after fileoverview.
-      const imageData = this.imgData || (
+      const imageData = this.imgData.unsafeValue || (
         this.data.metadata.uploadedImageData as string);
+      this.imgData.unsafeValue = imageData;
       newImageFile = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           this.data.metadata.uploadedImageData as string));
-      this.updateDimensions(newImageFile, imageData, width, height);
+      this.updateDimensions(
+        newImageFile,
+        this.svgSanitizerService.getTrustedSvgResourceUrl(imageData) as string,
+        width,
+        height
+      );
     } else {
       // Generate new image data and file.
       const newImageData = this.getCroppedImageData(
         // Check point 2 in the note before imports and after fileoverview.
-        this.imgData || this.data.metadata.uploadedImageData,
+        this.imgData.unsafeValue || this.data.metadata.uploadedImageData,
         x1, y1, width, height);
       this.validateProcessedFilesize(newImageData);
 
       newImageFile = (
         this.imageUploadHelperService.convertImageDataToImageFile(
           newImageData));
+      this.imgData.unsafeValue = newImageData;
+      this.imgData.safeValue = newImageData;
       this.updateDimensions(newImageFile, newImageData, width, height);
     }
   }
@@ -745,7 +777,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     // Update image data.
     this.data.metadata.uploadedFile = newImageFile;
     this.data.metadata.uploadedImageData = newImageData;
-    this.imgData = newImageData;
+    this.imgData.safeValue = newImageData;
     this.data.metadata.originalWidth = width;
     this.data.metadata.originalHeight = height;
     // Check point 1 in the note before imports and after fileoverview.
@@ -815,7 +847,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   private updateValidationWithLatestDimensions(): void {
     const dimensions = this.calculateTargetImageDimensions();
-    const imageDataURI = <string> this.data.metadata.uploadedImageData;
+    const imageDataURI = this.imgData.unsafeValue || (
+      this.data.metadata.uploadedImageData as string);
     const mimeType = (<string>imageDataURI).split(';')[0];
     if (mimeType === 'data:image/gif') {
       let successCb = obj => {
@@ -852,11 +885,14 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       const img = new Image();
       img.onload = () => {
         // Check point 2 in the note before imports and after fileoverview.
-        this.imgData = (<FileReader>e.target).result;
+        this.imgData.unsafeValue = (<FileReader>e.target).result as string;
         let imageData: string | SafeResourceUrl = (<FileReader>e.target).result;
         if (file.name.endsWith('.svg')) {
           imageData = this.svgSanitizerService.getTrustedSvgResourceUrl(
             imageData as string);
+          this.imgData.safeValue = imageData;
+        } else {
+          this.imgData.safeValue = this.imgData.unsafeValue;
         }
         this.data = {
           mode: this.MODE_UPLOADED,
@@ -883,6 +919,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
   }
 
   setSavedImageFilename(filename: string, updateParent: boolean): void {
+    const imageURI = this.getTrustedResourceUrlForImageFileName(
+      filename, true);
+    if (typeof imageURI !== 'string' || !imageURI.startsWith('blob')) {
+      this.imgData.safeValue = imageURI;
+    }
+    this.imgData.unsafeValue = this.getTrustedResourceUrlForImageFileName(
+      filename, false) as string;
     this.data = {
       mode: this.MODE_SAVED,
       metadata: {
@@ -935,7 +978,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
     // Check mime type from imageDataURI.
     // Check point 2 in the note before imports and after fileoverview.
-    const imageDataURI = this.imgData || (
+    const imageDataURI = this.imgData.unsafeValue || (
       this.data.metadata.uploadedImageData as string);
     const mimeType = imageDataURI.split(';')[0];
     let resampledFile;
@@ -1052,7 +1095,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     reader.onload = () => {
       const imageData = reader.result as string;
       // Check point 2 in the note before imports and after fileoverview.
-      this.imgData = imageData;
+      this.imgData.unsafeValue = imageData;
       this.imageLocalStorageService.saveImage(filename, imageData);
       const img = new Image();
       img.onload = () => {

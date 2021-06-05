@@ -26,6 +26,52 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Assets Backend API Service', () => {
+  describe('irrespective of dev/ emulator mode', () => {
+    let assetsBackendApiService: AssetsBackendApiService;
+    let csrfTokenService: CsrfTokenService;
+    let httpTestingController: HttpTestingController;
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+      });
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
+
+      spyOn(csrfTokenService, 'getTokenAsync')
+        .and.returnValue(Promise.resolve('token'));
+    });
+
+    // Blob bases urls mean urls that start with 'blob:'
+    it(
+      'should fetch blobs from backend given blob based urls',
+      fakeAsync(() => {
+        let blob;
+        let response = new Blob(['abc']);
+        assetsBackendApiService.getBlobDataFromBlobUrl$('blob:/abc').subscribe(
+          x => blob = x
+        );
+        let req = httpTestingController.expectOne('/abc');
+        expect(req.request.method).toBe('GET');
+        req.flush(response);
+        expect(blob).toBe(response);
+      })
+    );
+
+    // Blob bases urls mean urls that start with 'blob:'
+    it(
+      'should throw an error when the url is not for blob',
+      fakeAsync(() => {
+        expect(
+          () => {
+            assetsBackendApiService.getBlobDataFromBlobUrl$('/abc');
+          }
+        ).toThrowError('Expected url to start with blob:');
+      })
+    );
+  });
+
   describe('on dev mode', () => {
     let assetsBackendApiService: AssetsBackendApiService;
     let csrfTokenService: CsrfTokenService;

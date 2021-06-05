@@ -26,6 +26,7 @@ import { AudioFile } from 'domain/utilities/audio-file.model';
 import { FileDownloadRequest } from 'domain/utilities/file-download-request.model';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { Observable } from 'rxjs';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 interface SaveAudioResponse {
@@ -158,6 +159,13 @@ export class AssetsBackendApiService {
       entityType: string, entityId: string, filename: string): string {
     return this.getDownloadUrl(
       entityType, entityId, filename, AppConstants.ASSET_TYPE_THUMBNAIL);
+  }
+
+  getBlobDataFromBlobUrl$(url: string): Observable<Blob> {
+    if (!url.startsWith('blob')) {
+      throw new Error('Expected url to start with blob:');
+    }
+    return this.http.get(url, {responseType: 'blob'});
   }
 
   private getDownloadUrl(

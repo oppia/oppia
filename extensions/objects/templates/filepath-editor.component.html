@@ -59,7 +59,7 @@
             Cancel
           </div>
         </div>
-        <img [src]="data.metadata.uploadedImageData"
+        <img [src]="imgData.safeValue"
              [attr.style]="getUploadedImageDynamicStyles()">
       </div>
       <div *ngIf="isImageSaved()">
@@ -69,7 +69,7 @@
              title="Delete this image">
             &#xE872;
           </i>
-          <img [src]="data.metadata.savedImageUrl" [ngStyle]="imageContainerStyle">
+          <img [src]="imgData.safeValue" [ngStyle]="imageContainerStyle">
         </div>
       </div>
     </div>
