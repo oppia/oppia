@@ -179,6 +179,7 @@ class ConfigProperty(python_utils.OBJECT):
     - before_end_body_tag_hook.
     - before_end_head_tag_hook.
     - carousel_slides_config.
+    - classroom_page_is_accessible.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
