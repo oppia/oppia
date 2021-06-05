@@ -41,7 +41,8 @@ class NumericInput(base.BaseInteraction):
     _customization_arg_specs = [{
         'name': 'placeholder',
         'description': (
-            'Represent division using fractions (rather than ÷).'),
+            'Allow only input greater than or equal to zero for' +
+            ' Number Input interaction.'),
         'schema': {
             'type': 'bool'
         },
