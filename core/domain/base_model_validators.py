@@ -757,6 +757,8 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                 continue
             try:
                 change_domain_object(commit_cmd_dict)
+            except utils.DeprecatedError:
+                pass
             except Exception as e:
                 cmd_name = commit_cmd_dict.get('cmd')
                 cls._add_error(

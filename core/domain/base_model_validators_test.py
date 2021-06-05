@@ -25,6 +25,7 @@ import re
 from constants import constants
 from core import jobs_registry
 from core.domain import base_model_validators
+from core.domain import change_domain
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
@@ -114,6 +115,18 @@ class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     pass
 
 
+class MockChangeDomainModel(change_domain.BaseChange):
+    ALLOWED_COMMANDS = [{
+        'name': 'mock_command',
+        'required_attribute_names': ['mock_property'],
+        'optional_attribute_names': [],
+        'allowed_values': {'mock_property': ['valid_value']},
+        'deprecated_values': {'mock_property': ['deprecated_value']}
+    }]
+
+    DEPRECATED_COMMANDS = ['deprecated_command']
+
+
 class MockCommitLogEntryModelValidator(
         base_model_validators.BaseCommitLogEntryModelValidator):
 
@@ -122,7 +135,7 @@ class MockCommitLogEntryModelValidator(
     @classmethod
     def _get_change_domain_class(cls, item):
         if item.id.startswith('mock'):
-            return MockCommitLogEntryModel
+            return MockChangeDomainModel
         else:
             cls._add_error(
                 'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
@@ -146,6 +159,9 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
         self.invalid_model = MockModel(id='mockmodel')
         self.invalid_model.update_timestamps()
         self.invalid_model.put()
@@ -368,6 +384,108 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
                 'commit message check': [
                     'Entity id mock-12345: '
                     'Commit message larger than accepted length'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_no_error_is_raised_when_commit_cmd_valid(self):
+        commit_cmd = {
+            'cmd': 'mock_command',
+            'mock_property': 'valid_value'
+        }
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=self.owner_id,
+            commit_type='create',
+            commit_cmds=[commit_cmd],
+            post_commit_status='public')
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertEqual(mock_validator.errors, {})
+
+    def test_error_raised_when_commit_cmd_invalid(self):
+        commit_cmd = {
+            'cmd': 'invalid_cmd'
+        }
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id='user_id',
+            commit_cmds=[commit_cmd])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'commit cmd invalid_cmd check': [
+                    'Entity id mock-12345: '
+                    'Commit command domain validation for command:'
+                    ' %s failed with error:'
+                    ' Command invalid_cmd is not allowed' % commit_cmd
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_no_error_is_raised_when_commit_cmd_deprecated(self):
+        commit_cmd = {
+            'cmd': 'deprecated_command'
+        }
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=self.owner_id,
+            commit_type='create',
+            commit_cmds=[commit_cmd],
+            post_commit_status='public')
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertEqual(mock_validator.errors, {})
+
+    def test_no_error_is_raised_when_commit_cmd_value_deprecated(self):
+        commit_cmd = {
+            'cmd': 'mock_command',
+            'mock_property': 'deprecated_value'
+        }
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=self.owner_id,
+            commit_type='create',
+            commit_cmds=[commit_cmd],
+            post_commit_status='public')
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertEqual(mock_validator.errors, {})
+
+    def test_error_is_raised_when_commit_cmd_value_invalid(self):
+        commit_cmd = {
+            'cmd': 'mock_command',
+            'mock_property': 'invalid_value'
+        }
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=self.owner_id,
+            commit_type='create',
+            commit_cmds=[commit_cmd],
+            post_commit_status='public')
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'commit cmd mock_command check': [
+                    'Entity id mock-12345: '
+                    'Commit command domain validation for command:'
+                    ' %s failed with error:'
+                    ' Value for mock_property in cmd mock_command:'
+                    ' invalid_value is not allowed' % commit_cmd
                 ]
             },
             mock_validator.errors

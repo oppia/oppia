@@ -1277,6 +1277,9 @@ EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
+    },
+    'deprecated_values': {
+        'new_status': ['publicized']
     }
 })
 
