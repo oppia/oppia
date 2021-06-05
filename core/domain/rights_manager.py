@@ -711,6 +711,8 @@ def check_can_unpublish_activity(user, activity_rights):
     if activity_rights.community_owned:
         return False
 
+    print user.roles, "Check"*50
+
     if activity_rights.is_published():
         if role_services.ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY in user.actions:
             return True

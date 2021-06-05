@@ -1998,7 +1998,7 @@ title: Title
                 },
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_user_role(self, username, user_role):
+    def add_user_role(self, username, user_role):
         """Sets the given role for this user.
 
         Args:
@@ -2006,7 +2006,7 @@ title: Title
             user_role: str. Role of the given user.
         """
         with self.super_admin_context():
-            self.post_json('/adminrolehandler', {
+            self.put_json('/adminrolehandler', {
                 'username': username,
                 'role': user_role,
             }, csrf_token=self.get_new_csrf_token())
@@ -2018,7 +2018,7 @@ title: Title
             admin_usernames: list(str). List of usernames.
         """
         for name in admin_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
+            self.add_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
     def set_topic_managers(self, topic_manager_usernames):
         """Sets role of given users as TOPIC_MANAGER.
@@ -2027,7 +2027,7 @@ title: Title
             topic_manager_usernames: list(str). List of usernames.
         """
         for name in topic_manager_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
+            self.add_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
@@ -2036,7 +2036,7 @@ title: Title
             moderator_usernames: list(str). List of usernames.
         """
         for name in moderator_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
+            self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
     def mark_users_banned(self, banned_username):
         """Marks a user banned.
@@ -2056,7 +2056,7 @@ title: Title
             collection_editor_usernames: list(str). List of usernames.
         """
         for name in collection_editor_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
+            self.add_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
         """Gets the user ID corresponding to the given email.

@@ -186,7 +186,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         super(WipeoutServicePreDeleteTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.add_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
@@ -351,7 +351,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             self.USER_3_USERNAME)
 
     def test_pre_delete_user_with_activities_multiple_owners(self):
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
@@ -503,7 +503,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
-        self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.add_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -3877,9 +3877,9 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.user_1_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.user_2_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_actions = user_services.get_user_actions_info(
             self.user_1_id)

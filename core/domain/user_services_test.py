@@ -540,10 +540,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_ids.append(user_id)
             user_services.set_username(user_id, name)
 
-        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
-        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
-        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
-        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+        user_services.add_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.add_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.add_user_role(user_ids[2], feconf.ROLE_ID_TOPIC_MANAGER)
+        user_services.add_user_role(user_ids[3], feconf.ROLE_ID_TOPIC_MANAGER)
 
         self.assertEqual(
             set(user_services.get_usernames_by_role(feconf.ROLE_ID_MODERATOR)),
@@ -551,7 +551,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             set(user_services.get_usernames_by_role(
-                feconf.ROLE_ID_BANNED_USER)),
+                feconf.ROLE_ID_TOPIC_MANAGER)),
             set(['name3', 'name4']))
 
     def test_get_user_ids_by_role(self):
@@ -568,10 +568,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_ids.append(user_id)
             user_services.set_username(user_id, name)
 
-        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
-        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
-        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
-        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+        user_services.add_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.add_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.add_user_role(user_ids[2],
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+        user_services.add_user_role(user_ids[3],
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
 
         self.assertEqual(
             set(user_services.get_user_ids_by_role(feconf.ROLE_ID_MODERATOR)),
@@ -579,7 +581,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             set(user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_BANNED_USER)),
+                feconf.ROLE_ID_CURRICULUM_ADMIN)),
             set([user_ids[2], user_ids[3]]))
 
     def test_update_user_creator_dashboard_display(self):
@@ -602,7 +604,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_setting.creator_dashboard_display_pref,
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
 
-    def test_update_user_role(self):
+    def test_add_user_role(self):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -614,64 +616,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_user_roles_from_id(user_id),
             [feconf.ROLE_ID_FULL_USER])
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.assertEqual(
-            user_services.get_user_roles_from_id(user_id),
-            [feconf.ROLE_ID_COLLECTION_EDITOR])
+            user_services.get_user_roles_from_id(user_id),[
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR])
 
-    def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
-            self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.roles, [feconf.ROLE_ID_FULL_USER])
-        self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_BANNED_USER)
-
-        self.assertEqual(
-            user_services.get_user_roles_from_id(user_id),
-            feconf.ROLE_ID_BANNED_USER)
-        self.assertEqual(user_settings_model.roles, [])
-        self.assertTrue(user_settings_model.banned)
-
-    def test_assign_ban_user_to_exp_editor_updates_roles(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_BANNED_USER)
-
-        self.assertEqual(
-            user_services.get_user_roles_from_id(user_id),
-            feconf.ROLE_ID_BANNED_USER)
-        self.assertEqual(user_settings_model.roles, [])
-        self.assertTrue(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_FULL_USER)
-
-        self.assertEqual(
-            user_services.get_user_roles_from_id(user_id),
-            feconf.ROLE_ID_FULL_USER)
-        self.assertEqual(
-            user_settings_model.roles, [feconf.ROLE_ID_FULL_USER])
-        self.assertFalse(user_settings_model.banned)
-
-    def test_assign_exp_editor_to_other_roles_updates_roles(self):
+    def test_adding_other_roles_to_full_user_updates_roles(self):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
@@ -686,51 +637,44 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_settings_model.roles, [feconf.ROLE_ID_FULL_USER])
         self.assertFalse(user_settings_model.banned)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
         self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(
             user_settings_model.roles, [
-                feconf.ROLE_ID_FULL_USER,
-                feconf.ROLE_ID_COLLECTION_EDITOR])
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR])
         self.assertFalse(user_settings_model.banned)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_TOPIC_MANAGER)
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
         self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.assertEqual(
             user_settings_model.roles, [
-                feconf.ROLE_ID_FULL_USER,
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR,
                 feconf.ROLE_ID_TOPIC_MANAGER])
+
         self.assertFalse(user_settings_model.banned)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_MODERATOR)
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
         self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_MODERATOR)
-        self.assertEqual(
             user_settings_model.roles, [
-                feconf.ROLE_ID_FULL_USER,
-                feconf.ROLE_ID_MODERATOR])
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR,
+                feconf.ROLE_ID_TOPIC_MANAGER, feconf.ROLE_ID_MODERATOR])
         self.assertFalse(user_settings_model.banned)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             user_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
         user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
         self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_CURRICULUM_ADMIN)
-        self.assertEqual(
             user_settings_model.roles, [
-                feconf.ROLE_ID_FULL_USER,
+                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR,
+                feconf.ROLE_ID_TOPIC_MANAGER, feconf.ROLE_ID_MODERATOR,
                 feconf.ROLE_ID_CURRICULUM_ADMIN])
         self.assertFalse(user_settings_model.banned)
 
@@ -763,124 +707,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             profile_user_id)
 
         self.assertEqual(
-            profile_user_settings_model.role, feconf.ROLE_ID_MOBILE_LEARNER)
-        self.assertEqual(
             profile_user_settings_model.roles, [feconf.ROLE_ID_MOBILE_LEARNER])
         self.assertFalse(profile_user_settings_model.banned)
-
-    def test_adding_banned_role_to_user_also_updates_roles_and_banned_fields(
-            self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
-        self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_BANNED_USER)
-
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_BANNED_USER)
-        self.assertEqual(user_settings_model.roles, [])
-        self.assertTrue(user_settings_model.banned)
-
-    def test_assign_ban_user_to_exp_editor_updates_roles(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_BANNED_USER)
-
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_BANNED_USER)
-        self.assertEqual(user_settings_model.roles, [])
-        self.assertTrue(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_EXPLORATION_EDITOR)
-
-        self.assertEqual(
-            user_services.get_user_role_from_id(user_id),
-            feconf.ROLE_ID_EXPLORATION_EDITOR)
-        self.assertEqual(
-            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
-        self.assertFalse(user_settings_model.banned)
-
-    def test_assign_exp_editor_to_other_roles_updates_roles(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
-        self.assertEqual(
-            user_settings_model.roles, [feconf.ROLE_ID_EXPLORATION_EDITOR])
-        self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_COLLECTION_EDITOR)
-        self.assertEqual(
-            user_settings_model.roles, [
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_COLLECTION_EDITOR])
-        self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_TOPIC_MANAGER)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.assertEqual(
-            user_settings_model.roles, [
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_TOPIC_MANAGER])
-        self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_MODERATOR)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_MODERATOR)
-        self.assertEqual(
-            user_settings_model.roles, [
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_MODERATOR])
-        self.assertFalse(user_settings_model.banned)
-
-        user_services.update_user_role(
-            user_id, feconf.ROLE_ID_ADMIN)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-
-        self.assertEqual(
-            user_settings_model.role, feconf.ROLE_ID_ADMIN)
-        self.assertEqual(
-            user_settings_model.roles, [
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
-                feconf.ROLE_ID_ADMIN])
-        self.assertFalse(user_settings_model.banned)
 
     def test_profile_user_settings_have_correct_roles(self):
         auth_id = 'test_id'
@@ -911,9 +739,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             profile_user_id)
 
         self.assertEqual(
-            profile_user_settings_model.role, feconf.ROLE_ID_LEARNER)
-        self.assertEqual(
-            profile_user_settings_model.roles, [feconf.ROLE_ID_LEARNER])
+            profile_user_settings_model.roles, [feconf.ROLE_ID_MOBILE_LEARNER])
         self.assertFalse(profile_user_settings_model.banned)
 
     def test_get_all_profiles_auth_details_non_existent_id_raises_error(self):
@@ -923,7 +749,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_all_profiles_auth_details_by_parent_user_id(
                 non_existent_user_id)
 
-    def test_update_user_role_from_learner_to_other_role_raises_exception(self):
+    def test_add_user_role_to_mobile_learner_raises_exception(self):
         auth_id = 'test_id'
         user_email = 'test@email.com'
         user_pin = '12345'
@@ -947,23 +773,24 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             user_services.get_user_roles_from_id(profile_user_id),
-            feconf.ROLE_ID_MOBILE_LEARNER)
+            [feconf.ROLE_ID_MOBILE_LEARNER])
         error_msg = 'The role of a Learner cannot be changed.'
         with self.assertRaisesRegexp(Exception, error_msg):
-            user_services.update_user_role(
+            user_services.add_user_role(
                 profile_user_id, feconf.ROLE_ID_FULL_USER)
 
-    def test_update_user_role_from_other_role_to_learner_raises_exception(self):
+    def test_add_full_user_role_to_learner_raises_exception(self):
         auth_id = 'test_id'
         user_email = 'test@email.com'
 
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         self.assertEqual(
             user_services.get_user_roles_from_id(user_id),
-            feconf.ROLE_ID_FULL_USER)
-        error_msg = 'Updating to a Learner role is not allowed.'
+            [feconf.ROLE_ID_FULL_USER])
+        error_msg = 'Adding a %s role is not allowed.' % (
+            feconf.ROLE_ID_MOBILE_LEARNER)
         with self.assertRaisesRegexp(Exception, error_msg):
-            user_services.update_user_role(
+            user_services.add_user_role(
                 user_id, feconf.ROLE_ID_MOBILE_LEARNER)
 
     def test_create_new_user_creates_a_new_user_auth_details_entry(self):
@@ -1112,7 +939,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'id': model.id,
                 'display_alias': model.display_alias,
                 'pin': model.pin,
-                'role': model.role
+                'roles': model.roles
             } for model in
             user_models.UserSettingsModel.get_multi(
                 [profile_1_id, profile_2_id])
@@ -1123,13 +950,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'id': profile_1_id,
                 'display_alias': display_alias_2,
                 'pin': profile_pin,
-                'role': feconf.ROLE_ID_MOBILE_LEARNER
+                'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
             },
             {
                 'id': profile_2_id,
                 'display_alias': display_alias_3,
                 'pin': None,
-                'role': feconf.ROLE_ID_MOBILE_LEARNER
+                'roles': [feconf.ROLE_ID_MOBILE_LEARNER]
             }
         ]
         self.assertItemsEqual(
@@ -1415,8 +1242,13 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        user_services.add_user_role(
+            self.owner_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        user_services.add_user_role(self.owner_id, feconf.ROLE_ID_MODERATOR)
+
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.owner = user_services.get_user_actions_info(self.owner_id)
+
 
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
@@ -1536,7 +1368,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         exp_services.publish_exploration_and_update_user_profiles(
             self.owner, self.EXP_ID)
-        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.owner, self.EXP_ID)
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
@@ -1648,7 +1480,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID)
         collection_services.publish_collection_and_update_user_profiles(
             self.owner, self.COL_ID)
-        rights_manager.unpublish_collection(self.admin, self.COL_ID)
+        rights_manager.unpublish_collection(self.owner, self.COL_ID)
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.

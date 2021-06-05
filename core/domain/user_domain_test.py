@@ -266,11 +266,11 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             user_services.set_username(self.owner_id, self.OWNER_USERNAME)
 
-    def test_cannot_update_user_role_with_invalid_role(self):
+    def test_cannot_add_user_role_with_invalid_role(self):
         with self.assertRaisesRegexp(
             Exception, 'Role invalid_role does not exist.'
         ):
-            user_services.update_user_role(self.owner_id, 'invalid_role')
+            user_services.add_user_role(self.owner_id, 'invalid_role')
 
     def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(self):
         observed_log_messages = []

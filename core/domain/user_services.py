@@ -1221,7 +1221,7 @@ def add_user_role(user_id, role):
     if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
         raise Exception('The role of a Learner cannot be changed.')
     if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
-        raise Exception('Adding a default role is not allowed.')
+        raise Exception('Adding a %s role is not allowed.' % role)
 
     user_settings.roles.append(role)
     role_services.log_role_query(

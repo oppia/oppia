@@ -43,7 +43,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     USER_1_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     USER_2_ID = 'user2_id'
     USER_2_EMAIL = 'user2@example.com'
-    USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
     USER_3_EMAIL = 'user3@example.com'
     USER_3_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
@@ -65,17 +64,20 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE
+            roles=[self.USER_1_ROLE],
+            banned=False
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_1_ID,
             email=self.PROFILE_1_EMAIL,
-            role=self.PROFILE_1_ROLE
+            roles=[self.PROFILE_1_ROLE],
+            banned=False
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
             email=self.USER_2_EMAIL,
-            role=self.USER_2_ROLE,
+            role=[],
+            banned=True,
             deleted=True
         ).put()
         user_models.UserSettingsModel(

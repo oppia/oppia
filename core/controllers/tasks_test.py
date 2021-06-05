@@ -56,7 +56,7 @@ class TasksTests(test_utils.EmailTestBase):
         self.user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.set_user_role(
+        self.add_user_role(
             self.EDITOR_USERNAME, feconf.ROLE_ID_FULL_USER)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')

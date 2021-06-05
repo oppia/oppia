@@ -3583,7 +3583,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.en_language_reviewer)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.author = user_services.get_user_actions_info(self.author_id)
-        user_services.update_user_role(self.admin_id, feconf.ROLE_ID_ADMIN)
+        user_services.add_user_role(
+            self.admin_id, feconf.ROLE_ID_CROLE_ID_CURRICULUM_ADMIN)
         user_services.allow_user_to_review_translation_in_language(
             self.hi_language_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(

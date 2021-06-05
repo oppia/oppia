@@ -3029,7 +3029,7 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        user_services.update_user_role(
+        user_services.add_user_role(
             self.user_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_actions = user_services.get_user_actions_info(self.user_id)
 
