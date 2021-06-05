@@ -33,7 +33,7 @@ interface CodeMirrorMergeViewOptions {
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   @Input() options!: CodeMirrorMergeViewOptions;
-  @Input() value!: string;
+  @Input() value!: unknown;
   @Input() refresh: boolean = false;
   @Input() readOnly = false;
   @Output() valueChange = new EventEmitter();
@@ -49,7 +49,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
 
   constructor() { }
 
-  updateValue(val: string): void {
+  updateValue(val: unknown): void {
     this.value = val;
     this.valueChange.emit(val);
   }
