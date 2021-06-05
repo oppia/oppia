@@ -247,7 +247,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 44
+CURRENT_STATE_SCHEMA_VERSION = 45
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -863,6 +863,10 @@ SUBTOPIC_VIEWER_URL_PREFIX = '/subtopic'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
+UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX = (
+    '/updatetranslationsuggestionhandler')
+UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
+    '/updatequestionsuggestionhandler')
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
@@ -1014,6 +1018,11 @@ ALLOWED_USER_ROLES = [
 
 POSSIBLE_REGISTERED_USER_DEFAULT_ROLES = [
     ROLE_ID_FULL_USER, ROLE_ID_MOBILE_LEARNER]
+
+ALLOWED_USER_ROLES = [
+    ROLE_ID_GUEST, ROLE_ID_BANNED_USER, ROLE_ID_LEARNER,
+    ROLE_ID_EXPLORATION_EDITOR, ROLE_ID_COLLECTION_EDITOR,
+    ROLE_ID_TOPIC_MANAGER, ROLE_ID_MODERATOR, ROLE_ID_ADMIN]
 
 # Intent of the User making query to role structure via admin interface. Used
 # to store audit data regarding queries to role IDs.
@@ -1378,6 +1387,12 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
 # Possible suggestion types.
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]
+
+# The types of suggestions that are offered on the Contributor Dashboard.
+CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]

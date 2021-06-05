@@ -867,6 +867,102 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'edited_by_reviewer': False
         }
 
+    def test_pre_update_validate_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+
+        change = {
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'Introduction'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change cmd must be equal to %s' % (
+                exp_domain.CMD_ADD_TRANSLATION)
+        ):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_state_name(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+        change = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change state_name must be equal to Introduction'
+        ):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_language_code(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+        change = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'en',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The language code must be equal to hi'
+        ):
+            suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
+
+    def test_pre_update_validate_change_content_html(self):
+        expected_suggestion_dict = self.suggestion_dict
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'],
+            expected_suggestion_dict['language_code'], self.fake_date)
+        change = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'en',
+            'content_html': '<p>This is the changed content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>'
+        }
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The new change content_html must be equal to <p>This is a ' +
+            'content.</p>'
+        ):
+            suggestion.pre_update_validate(
+                exp_domain.ExplorationChange(change))
+
     def test_create_suggestion_add_translation(self):
         expected_suggestion_dict = self.suggestion_dict
 
@@ -1886,7 +1982,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
-    def test_pre_update_validate_change_question_dict(self):
+    def test_pre_update_validate_complains_if_nothing_changed(self):
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -1906,12 +2002,100 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', self.fake_date)
 
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The new change question_dict must not be equal to the '
-            'old question_dict'):
+            'At least one of the new skill_difficulty or question_dict '
+            'should be changed.'):
             suggestion.pre_update_validate(
-                question_domain.QuestionSuggestionChange(change))
+                question_domain.QuestionSuggestionChange(new_change))
+
+    def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
+            self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.6
+        }
+
+        self.assertEqual(
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change)), None)
+
+    def test_pre_update_validate_accepts_a_change_in_state_data_only(self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', 'en', self.fake_date)
+
+        new_change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'hi',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1',
+            'skill_difficulty': 0.3
+        }
+
+        self.assertEqual(
+            suggestion.pre_update_validate(
+                question_domain.QuestionSuggestionChange(new_change)), None)
 
     def test_validate_author_id(self):
         expected_suggestion_dict = self.suggestion_dict

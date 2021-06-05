@@ -297,6 +297,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -339,6 +340,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -381,6 +383,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -425,6 +428,7 @@ interaction:
   hints: []
   id: TextInput
   solution: null
+linked_skill_id: null
 next_content_id_index: 1
 param_changes: []
 recorded_voiceovers:
@@ -964,7 +968,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
 
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
@@ -986,13 +990,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                 'Available states: [u\'Introduction\']'
             ]
         )
-        # The last log message is the traceback for an Exception. It cannot be
-        # exactly compared to a static string because the traceback includes
-        # filepaths which will vary depending on the machine that runs the
-        # test. So the starting portion of the traceback that will remain
-        # constant is matched instead.
-        self.assertTrue(
-            'Traceback (most recent call last):' in observed_log_messages[2])
+        self.assertRaisesRegexp(Exception, 'Bad response: 503')
 
         self.logout()
 

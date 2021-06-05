@@ -125,12 +125,14 @@ angular.module('oppia').factory('ExplorationStatesService', [
         'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
       recorded_voiceovers: ['recordedVoiceovers'],
+      linked_skill_id: ['linkedSkillId'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
       next_content_id_index: ['nextContentIdIndex'],
       solicit_answer_details: ['solicitAnswerDetails'],
+      card_is_checkpoint: ['cardIsCheckpoint'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs'],
@@ -309,6 +311,17 @@ angular.module('oppia').factory('ExplorationStatesService', [
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
       },
+      getCheckpointCount: function() {
+        var count: number = 0;
+        if (_states) {
+          _states.getStateNames().forEach(function(stateName) {
+            if (_states.getState(stateName).cardIsCheckpoint) {
+              count++;
+            }
+          });
+        }
+        return count;
+      },
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
@@ -339,6 +352,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
         stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(_states.getState(stateName));
         });
+      },
+      saveLinkedSkillId: function(stateName, newLinkedSkillId) {
+        saveStateProperty(stateName, 'linked_skill_id', newLinkedSkillId);
       },
       saveNextContentIdIndex: function(stateName, newNextContentIdIndex) {
         saveStateProperty(
@@ -406,6 +422,13 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveSolicitAnswerDetails: function(stateName, newSolicitAnswerDetails) {
         saveStateProperty(
           stateName, 'solicit_answer_details', newSolicitAnswerDetails);
+      },
+      getCardIsCheckpointMemento: function(stateName) {
+        return getStatePropertyMemento(stateName, 'card_is_checkpoint');
+      },
+      saveCardIsCheckpoint: function(stateName, newCardIsCheckpoint) {
+        saveStateProperty(
+          stateName, 'card_is_checkpoint', newCardIsCheckpoint);
       },
       getWrittenTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'written_translations');

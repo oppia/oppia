@@ -209,53 +209,41 @@ describe('graphUtilsService', () => {
   });
 
   it('should find the next lexicographical permutation', () => {
-    let permutation: number[] = [0, 1, 2, 3];
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([0, 1, 3, 2]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([0, 2, 1, 3]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([0, 2, 3, 1]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([0, 3, 1, 2]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([0, 3, 2, 1]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([1, 0, 2, 3]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([1, 0, 3, 2]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([1, 2, 0, 3]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([1, 2, 3, 0]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([1, 3, 0, 2]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([1, 3, 2, 0]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([2, 0, 1, 3]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([2, 0, 3, 1]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([2, 1, 0, 3]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([2, 1, 3, 0]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([2, 3, 0, 1]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([2, 3, 1, 0]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([3, 0, 1, 2]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([3, 0, 2, 1]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([3, 1, 0, 2]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([3, 1, 2, 0]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([3, 2, 0, 1]);
-    permutation = utilsService.nextPermutation(permutation);
-    expect(permutation).toEqual([3, 2, 1, 0]);
+    let permutation: number[] | null = [0, 1, 2, 3];
+
+    [
+      [0, 1, 3, 2],
+      [0, 2, 1, 3],
+      [0, 2, 3, 1],
+      [0, 3, 1, 2],
+      [0, 3, 2, 1],
+      [1, 0, 2, 3],
+      [1, 0, 3, 2],
+      [1, 2, 0, 3],
+      [1, 2, 3, 0],
+      [1, 3, 0, 2],
+      [1, 3, 2, 0],
+      [2, 0, 1, 3],
+      [2, 0, 3, 1],
+      [2, 1, 0, 3],
+      [2, 1, 3, 0],
+      [2, 3, 0, 1],
+      [2, 3, 1, 0],
+      [3, 0, 1, 2],
+      [3, 0, 2, 1],
+      [3, 1, 0, 2],
+      [3, 1, 2, 0],
+      [3, 2, 0, 1],
+      [3, 2, 1, 0],
+    ].forEach(expectedPermutation => {
+      if (!permutation) {
+        return;
+      }
+
+      permutation = utilsService.nextPermutation(permutation);
+      expect(permutation).toEqual(expectedPermutation);
+    });
+
     permutation = utilsService.nextPermutation(permutation);
     expect(permutation).toBe(null);
   });

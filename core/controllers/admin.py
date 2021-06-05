@@ -287,7 +287,7 @@ class AdminHandler(base.BaseHandler):
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
-            logging.error('[ADMIN] %s', e)
+            logging.exception('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
             python_utils.reraise_exception()
 
@@ -340,6 +340,7 @@ class AdminHandler(base.BaseHandler):
         })
 
         state.update_next_content_id_index(1)
+        state.update_linked_skill_id(None)
         state.update_content(state_domain.SubtitledHtml('1', question_content))
         recorded_voiceovers = state_domain.RecordedVoiceovers({})
         written_translations = state_domain.WrittenTranslations({})
