@@ -69,7 +69,6 @@ describe('AutosaveInfoModalsService', () => {
       });
     });
   });
-  
 
   it('should call ngbModal open when opening non strict validation fail' +
     ' modal', fakeAsync(() => {
