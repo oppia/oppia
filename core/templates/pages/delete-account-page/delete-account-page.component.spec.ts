@@ -22,6 +22,7 @@ import { DeleteAccountPageComponent } from './delete-account-page.component';
 import { DeleteAccountBackendApiService } from './services/delete-account-backend-api.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Delete account page', () => {
   let component: DeleteAccountPageComponent;
@@ -31,6 +32,7 @@ describe('Delete account page', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [DeleteAccountPageComponent, MockTranslatePipe],
       providers: [
         DeleteAccountBackendApiService,
