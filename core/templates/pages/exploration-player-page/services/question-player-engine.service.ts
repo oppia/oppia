@@ -87,7 +87,7 @@ export class QuestionPlayerEngineService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     if (!this.questions || this.questions.length === 0) {
-      this.alertsService.addWarning('Questions can not be empty.');
+      this.alertsService.addWarning('There are no questions to display.');
       errorCallback();
       return;
     }

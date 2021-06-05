@@ -20,6 +20,7 @@ import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -32,13 +33,13 @@ describe('Question player engine service ', () => {
   let answerClassificationService: AnswerClassificationService;
   let contextService: ContextService;
   let expressionInterpolationService: ExpressionInterpolationService;
-  let questionObjectFactory: QuestionObjectFactory;
-
-  let questionPlayerEngineService: QuestionPlayerEngineService;
-  let singleQuestionBackendDict: QuestionBackendDict;
+  let focusManagerService: FocusManagerService;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
   let outcomeObjectFactory: OutcomeObjectFactory;
-  let focusManagerService: FocusManagerService;
+  let questionObjectFactory: QuestionObjectFactory;
+  let questionPlayerEngineService: QuestionPlayerEngineService;
+  let singleQuestionBackendDict: QuestionBackendDict;
+  let stateCardObjectFactory: StateCardObjectFactory
 
   beforeEach(() => {
     singleQuestionBackendDict = {
@@ -415,6 +416,7 @@ describe('Question player engine service ', () => {
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
+    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
   });
 
   it('should load questions when initialized', () => {
@@ -572,8 +574,8 @@ describe('Question player engine service ', () => {
 
     singleQuestionBackendDict.question_state_data
       .content.html = null;
-    let alertsServiceSpy =
-      spyOn(alertsService, 'addWarning').and.returnValue();
+    let alertsServiceSpy = spyOn(
+      alertsService, 'addWarning').and.returnValue();
     spyOn(expressionInterpolationService, 'processHtml')
       .and.callFake((html, envs) => html);
 
@@ -588,14 +590,14 @@ describe('Question player engine service ', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let alertsServiceSpy =
-    spyOn(alertsService, 'addWarning').and.returnValue();
+    let alertsServiceSpy = spyOn(
+      alertsService, 'addWarning').and.returnValue();
 
     questionPlayerEngineService.init(
       [], successHandler, failHandler);
 
     expect(alertsServiceSpy).toHaveBeenCalledWith(
-      'Questions can not be empty.');
+      'There are no questions to display.');
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   });
@@ -656,8 +658,8 @@ describe('Question player engine service ', () => {
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
-      let alertsServiceSpy =
-        spyOn(alertsService, 'addWarning').and.returnValue();
+      let alertsServiceSpy = spyOn(
+        alertsService, 'addWarning').and.returnValue();
       spyOn(expressionInterpolationService, 'processHtml')
         .and.callFake((html, envs) => html);
 
@@ -693,8 +695,8 @@ describe('Question player engine service ', () => {
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
-      let alertsServiceSpy =
-        spyOn(alertsService, 'addWarning').and.returnValue();
+      let alertsServiceSpy = spyOn(
+        alertsService, 'addWarning').and.returnValue();
       spyOn(questionPlayerEngineService, 'init').and.callFake(() => {
         questionPlayerEngineService.addQuestion(sampleQuestion);
       });
@@ -743,6 +745,41 @@ describe('Question player engine service ', () => {
       expect(questionPlayerEngineService.getCurrentIndex()).toBe(1);
     });
 
+    it('should create next question if the existing ' +
+      'question is not the last one', () => {
+      let successCallback = jasmine.createSpy('success');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let answer = 'answer';
+      let interactionRulesService: InteractionRulesService;
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory
+          .createNew('default', '', '', []), 1, 0, 'default_outcome'
+      );
+      let sampleCard = stateCardObjectFactory.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id');
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      spyOn(expressionInterpolationService, 'processHtml')
+        .and.callFake((html, envs) => html);
+      spyOn(focusManagerService, 'generateFocusLabel')
+        .and.returnValue('focusLabel');
+
+      questionPlayerEngineService.init(
+        multipleQuestionsBackendDict, successHandler, failHandler);
+
+      let createNewCardSpy = spyOn(
+        stateCardObjectFactory, 'createNewCard').and.returnValue(sampleCard);
+
+      questionPlayerEngineService.submitAnswer(
+        answer, interactionRulesService, successCallback);
+
+      expect(createNewCardSpy).toHaveBeenCalled();
+    });
+
     it('should not create next question if the existing ' +
       'question is the last one', () => {
       let successCallback = jasmine.createSpy('success');
@@ -766,15 +803,13 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.init(
         [singleQuestionBackendDict], successHandler, failHandler);
 
-      let nextQuestion = null;
+      let createNewCardSpy = spyOn(
+        stateCardObjectFactory, 'createNewCard').and.returnValue(null);
 
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
 
-      expect(successCallback).toHaveBeenCalledWith(
-        nextQuestion, true, '', undefined, null,
-        null, false, 'misconceptionId',
-        null, null, true, 'focusLabel');
+      expect(createNewCardSpy).not.toHaveBeenCalled();
     });
   });
 });
