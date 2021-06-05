@@ -368,14 +368,14 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromNumericInputCustomizationArgsBackendDict(
+  /*_createFromNumericInputCustomizationArgsBackendDict(
       caBackendDict: NumericInputCustomizationArgsBackendDict
   ): NumericInputCustomizationArgs {
     const { placeholder } = caBackendDict;
     return {
       placeholder
     };
-  }
+  }*/
 
   convertFromCustomizationArgsBackendDict(
       interactionId: string,

@@ -35,7 +35,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
-describe('Interaction object factory', () => {
+fdescribe('Interaction object factory', () => {
   let iof = null;
   let oof = null;
   let agof = null;
@@ -356,9 +356,9 @@ describe('Interaction object factory', () => {
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
-        placeholder: {
+        /*placeholder: {
           value: true
-        }
+        }*/
       },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
@@ -367,9 +367,9 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      placeholder: {
+      /*placeholder: {
         value: true
-      }
+      }*/
     });
   });
 
