@@ -66,7 +66,8 @@ module.exports = {
         // Storing function() in functionNode by taking last
         // element as because its type is FunctionExpression.
         var functionNode = arg[1].elements[lengthOfElements - 1];
-        if (functionNode.body.body[0].type !== 'ReturnStatement') {
+        if ((functionNode.body.body[0].type !== 'ReturnStatement') || (
+          functionNode.body.body[0].argument.type !== 'ObjectExpression')) {
           return;
         }
         var returnDictProp = functionNode.body.body[0].argument.properties;
