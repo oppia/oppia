@@ -16,16 +16,16 @@
  * @fileoverview Component for editing user roles.
  */
 
- import { Component, OnInit, Input } from '@angular/core';
- import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Input } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
- import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service'
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 
- @Component({
-   selector: 'dialog-overview-example-dialog',
-   templateUrl: './topic-manager-role-editor-modal.component.html',
- })
- export class TopicManagerRoleEditorModalComponent implements OnInit {
+@Component({
+  selector: 'oppia-topic-manager-role-editor-modal',
+  templateUrl: './topic-manager-role-editor-modal.component.html',
+})
+export class TopicManagerRoleEditorModalComponent implements OnInit {
   @Input() managerInTopicsWithId;
   @Input() topicIdToName;
   @Input() username;
@@ -37,43 +37,41 @@
   constructor(
     private activeModal: NgbActiveModal,
     private adminBackendApiService: AdminBackendApiService
-    ) {}
+  ) {}
 
-  private updateTopicIdsForSelection() {
+  private updateTopicIdsForSelection(): void {
     this.topicIdsForSelection = Object.keys(this.topicIdToName).filter(
       topicId => !this.managerInTopicsWithId.includes(topicId));
-    console.log(this.topicIdsForSelection)
   }
 
-  addTopic() {
+  addTopic(): void {
     this.managerInTopicsWithId.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
     this.adminBackendApiService.addUserRoleAsync(
       'TOPIC_MANAGER', this.username, this.topicIdInUpdate).then(()=> {
-        this.newTopicId = null;
-        this.topicIdInUpdate = null;
-        this.updateTopicIdsForSelection();
-      });
+      this.newTopicId = null;
+      this.topicIdInUpdate = null;
+      this.updateTopicIdsForSelection();
+    });
   }
 
-  removeTopicId(topicIdToRemove) {
+  removeTopicId(topicIdToRemove: string): void {
     let topicIdIndex = this.managerInTopicsWithId.indexOf(topicIdToRemove);
     this.topicIdInUpdate = topicIdToRemove;
     this.adminBackendApiService.removeUserRoleAsync(
       'TOPIC_MANAGER', this.username, topicIdToRemove, false).then(() => {
-        this.managerInTopicsWithId.splice(topicIdIndex, 1);
-        this.topicIdInUpdate = null;
-        this.updateTopicIdsForSelection();
-      });
+      this.managerInTopicsWithId.splice(topicIdIndex, 1);
+      this.topicIdInUpdate = null;
+      this.updateTopicIdsForSelection();
+    });
   }
 
-  close() {
-    this.activeModal.close(this.managerInTopicsWithId)
+  close(): void {
+    this.activeModal.close(this.managerInTopicsWithId);
   }
 
-  ngOnInit(){
+  ngOnInit(): void {
     this.updateTopicIdsForSelection();
   }
-
- }
+}

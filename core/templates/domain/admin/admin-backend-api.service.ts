@@ -322,8 +322,8 @@ export class AdminBackendApiService {
   }
 
   async removeUserRoleAsync(
-    newRole: string, username: string, topicId: string,
-    removeFromAllTopics: boolean
+      newRole: string, username: string, topicId: string,
+      removeFromAllTopics: boolean
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.delete<void>(
@@ -613,16 +613,15 @@ export class AdminBackendApiService {
   }
 
   async markUserBannedAsync(username: string): Promise<void> {
-
     return new Promise((resolve, reject) => {
       this.http.put<void>(
         AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
         { username }).toPromise()
-          .then(response => {
-            resolve(response);
-          }, errorResponse => {
-            reject(errorResponse.error.error);
-          });
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
@@ -631,11 +630,11 @@ export class AdminBackendApiService {
       this.http.delete<void>(
         AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
         { params: { username } }).toPromise()
-          .then(response => {
-            resolve(response);
-          }, errorResponse => {
-            reject(errorResponse.error.error);
-          });
+        .then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 }
