@@ -18,7 +18,6 @@
 
 import { TestBed } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { GraphLink, GraphNodes } from 'services/compute-graph.service';
 import { StateGraphLayoutService } from './graph-layout.service';
@@ -57,6 +56,13 @@ describe('Graph Layout Service', () => {
   //       the node label, measured as a fraction of the total height.
   //       The node label is centered vertically within this box.
 
+  // Expected $.State4.xLabel = 0.17250000000000001 to equal 0.1625.
+  // Expected $.State5.xLabel = 0.9600000000000001 to equal 0.9500000000000001.
+  // Expected $.State6.xLabel = 0.51 to equal 0.5.
+  // Expected $.State7.xLabel = 0.7350000000000001 to equal 0.7250000000000001.
+  // Expected $.State8.xLabel = 0.17250000000000001 to equal 0.1625.
+  // Expected $.State9.xLabel = 0.28500000000000003 to equal 0.275.
+
   let nodeData1 = {
     State1: {
       depth: 0,
@@ -64,12 +70,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.07250000000000001,
       y0: 0.12666666666666668,
-      xLabel: 0.1625,
+      xLabel: 0.17250000000000001,
       yLabel: 0.16666666666666669,
       id: 'State1',
       label: 'State1',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: true
     },
     State2: {
@@ -78,12 +84,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.41000000000000003,
       y0: 0.26,
-      xLabel: 0.5,
+      xLabel: 0.51,
       yLabel: 0.30000000000000004,
       id: 'State2',
       label: 'State2',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: true
     },
     State3: {
@@ -92,12 +98,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.6350000000000001,
       y0: 0.26,
-      xLabel: 0.7250000000000001,
+      xLabel: 0.7350000000000001,
       yLabel: 0.30000000000000004,
       id: 'State3',
       label: 'State3',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: true
     },
     State4: {
@@ -106,12 +112,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.07250000000000001,
       y0: 0.66,
-      xLabel: 0.1625,
+      xLabel: 0.17250000000000001,
       yLabel: 0.7,
       id: 'State4',
       label: 'State4',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: true
     },
     State5: {
@@ -120,12 +126,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.8600000000000001,
       y0: 0.26,
-      xLabel: 0.9500000000000001,
+      xLabel: 0.9600000000000001,
       yLabel: 0.30000000000000004,
       id: 'State5',
       label: 'State5',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: false
     },
     State6: {
@@ -134,12 +140,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.41000000000000003,
       y0: 0.3933333333333333,
-      xLabel: 0.5,
+      xLabel: 0.51,
       yLabel: 0.43333333333333335,
       id: 'State6',
       label: 'State6',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: false
     },
     State7: {
@@ -148,12 +154,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.6350000000000001,
       y0: 0.3933333333333333,
-      xLabel: 0.7250000000000001,
+      xLabel: 0.7350000000000001,
       yLabel: 0.43333333333333335,
       id: 'State7',
       label: 'State7',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: false
     },
     State8: {
@@ -162,12 +168,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.07250000000000001,
       y0: 0.5266666666666667,
-      xLabel: 0.1625,
+      xLabel: 0.17250000000000001,
       yLabel: 0.5666666666666667,
       id: 'State8',
       label: 'State8',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: true
     },
     State9: {
@@ -176,12 +182,12 @@ describe('Graph Layout Service', () => {
       reachable: true,
       x0: 0.185,
       y0: 0.26,
-      xLabel: 0.275,
+      xLabel: 0.28500000000000003,
       yLabel: 0.30000000000000004,
       id: 'State9',
       label: 'State9',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: true
     },
     Orphaned: {
@@ -190,12 +196,12 @@ describe('Graph Layout Service', () => {
       reachable: false,
       x0: 0.07250000000000001,
       y0: 0.7933333333333333,
-      xLabel: 0.1625,
+      xLabel: 0.17250000000000001,
       yLabel: 0.8333333333333333,
       id: 'Orphaned',
       label: 'Orphaned',
       height: 0.08,
-      width: 0.18000000000000002,
+      width: 0.2,
       reachableFromEnd: false
     }
   };
@@ -326,6 +332,44 @@ describe('Graph Layout Service', () => {
 
   it('should not return indentation level greater' +
     ' than MAX_INDENTATION_LEVEL', () => {
+    // ┌───────────┐
+    // │   State1  ├──┐
+    // └────┬──────┘  │
+    //      │         ▼
+    //      │ ┌───────────┐
+    //      │ │   State2  ├──┐
+    //      │ └┬──────────┘  │
+    //      │  │             ▼
+    //      │  │     ┌───────────┐
+    //      │  │ ┌───┤   State6  ├──┐
+    //      │  │ │   └───────────┘  │
+    //      │  │ │                  ▼
+    //      │  │ │          ┌───────────┐
+    //      │  │ │ ┌────────┤   State8  ├──┐
+    //      │  │ │ │        └───────────┘  │
+    //      │  │ │ │                       ▼
+    //      │  │ │ │               ┌───────────┐
+    //      │  │ │ │ ┌─────────────┤   State7  ├──┐
+    //      │  │ │ │ │             └───────────┘  │
+    //      │  │ │ │ │                            ▼
+    //      │  │ │ │ │                    ┌───────────┐
+    //      │  │ │ │ │                 ┌──┤   State9  │
+    //      │  │ │ │ │                 │  └─────┬─────┘
+    //      │  │ │ │ │                 │        │
+    //      │  │ │ │ │                 │  ┌─────▼─────┐
+    //      │  │ │ │ │                 │  │   State10 │
+    //      ▼  ▼ ▼ ▼ ▼                 │  └─┬─────────┘
+    // ┌───────────┐ ◄─────────────────┘    │
+    // │   State3  │                        │
+    // └─────┬─────┘◄───────────────────────┘
+    //       │
+    // ┌─────▼─────┐
+    // │   State5  │
+    // └───────────┘
+    // Here, State1, State2, State6, State8, State7, State9 have indentation
+    // level equal to 0, 0.5, 1, 1.5, 2, 2.5. But, State10 does not have
+    // indentation level equal to 3, as it is placed right below State9.
+    // So, the indentation level of State10 is also 2.5.
     let adjacencyLists = {
       State1: ['State2', 'State3'],
       State2: ['State3', 'State6'],
@@ -418,7 +462,7 @@ describe('Graph Layout Service', () => {
     };
 
     // Here, bezier curve follows the format 'M%f %f Q %f %f %f %f'. The
-    // floating point values are caluclated with the help of the position values
+    // floating point values are calculated with the help of the position values
     // of source and target nodes (in links2) and nodeData.
     let expectedBezierCurveValues = [
       'M0.1625 0.31333333333333335 Q 0.2025 0.3666666666666667 0.1625 0.42',
@@ -434,7 +478,7 @@ describe('Graph Layout Service', () => {
     let returnedBezierCurveValues = [];
 
     // Starting with index 1 as, links2 has first link with same source and
-    // target node. SO, first augmentedLink will not have a Bezier curve.
+    // target node. So, first augmentedLink will not have a Bezier curve.
     for (var i = 1; i < returnedAugmentedLinks.length; i++) {
       returnedBezierCurveValues.push(returnedAugmentedLinks[i].d);
     }
@@ -733,11 +777,19 @@ describe('Graph Layout Service', () => {
 
   it('should return graph boundaries with width less than equal to' +
     ' maximum allowed graph width', () => {
-    // Here, nodeDataWithPositionValueInPixel1 ans 2 has position values
+    // Here, nodeDataWithPositionValueInPixel1, 2 and 3 have position values
     // (x0, xLabel, width etc.) in terms of pixels.
     // nodeDataWithPositionInPixel1, 2 and 3 are node data of graphs with
     // MAX_NODE_PER_ROW - 1, MAX_NODE_PER_ROW and MAX_NODE_PER_ROW + 1 nodes in
     // a row. Right now, MAX_NODE_PER_ROW is 4.
+
+    // ┌──────────────┐
+    // │ Introduction │
+    // └──┬────────┬──┴──────┐
+    //    │        │         │
+    // ┌──▼───┐ ┌──▼───┐ ┌───▼──┐
+    // │State1│ │State2│ │State3│
+    // └──────┘ └──────┘ └──────┘.
     let nodeDataWithPositionValueInPixel1 = {
       State1: {
         depth: 1,
@@ -750,7 +802,7 @@ describe('Graph Layout Service', () => {
         id: 'State1',
         label: 'State1',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State2: {
@@ -764,7 +816,7 @@ describe('Graph Layout Service', () => {
         id: 'State2',
         label: 'State2',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State3: {
@@ -778,7 +830,7 @@ describe('Graph Layout Service', () => {
         id: 'State3',
         label: 'State3',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       Introduction: {
@@ -792,10 +844,18 @@ describe('Graph Layout Service', () => {
         id: 'Introduction',
         label: 'Introduction',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       }
     };
+
+    // ┌──────────────┬───────────────┐
+    // │ Introduction │               │
+    // └──┬────────┬──┴──────┐        │
+    //    │        │         │        │
+    // ┌──▼───┐ ┌──▼───┐ ┌───▼──┐  ┌──▼───┐
+    // │State1│ │State2│ │State3│  │State4│
+    // └──────┘ └──────┘ └──────┘  └──────┘.
     let nodeDataWithPositionValueInPixel2 = {
       State1: {
         depth: 1,
@@ -808,7 +868,7 @@ describe('Graph Layout Service', () => {
         id: 'State1',
         label: 'State1',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State2: {
@@ -822,7 +882,7 @@ describe('Graph Layout Service', () => {
         id: 'State2',
         label: 'State2',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State3: {
@@ -836,7 +896,7 @@ describe('Graph Layout Service', () => {
         id: 'State3',
         label: 'State3',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       Introduction: {
@@ -850,7 +910,7 @@ describe('Graph Layout Service', () => {
         id: 'Introduction',
         label: 'Introduction',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State4: {
@@ -864,10 +924,22 @@ describe('Graph Layout Service', () => {
         id: 'State4',
         label: 'State4',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       }
     };
+
+    //      ┌──────────────┬───────────────┐
+    // ┌────┤ Introduction │               │
+    // │    └──┬────────┬──┴──────┐        │
+    // │       │        │         │        │
+    // │    ┌──▼───┐ ┌──▼───┐ ┌───▼──┐  ┌──▼───┐
+    // │    │State1│ │State2│ │State3│  │State4│
+    // │    └──────┘ └──────┘ └──────┘  └──────┘
+    // │             ┌──────┐
+    // └─────────────►State5│
+    //               └──────┘
+    // So, here State5 moves on to the next row.
     let nodeDataWithPositionValueInPixel3 = {
       State1: {
         depth: 1,
@@ -880,7 +952,7 @@ describe('Graph Layout Service', () => {
         id: 'State1',
         label: 'State1',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State2: {
@@ -894,7 +966,7 @@ describe('Graph Layout Service', () => {
         id: 'State2',
         label: 'State2',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State3: {
@@ -908,7 +980,7 @@ describe('Graph Layout Service', () => {
         id: 'State3',
         label: 'State3',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       Introduction: {
@@ -922,7 +994,7 @@ describe('Graph Layout Service', () => {
         id: 'Introduction',
         label: 'Introduction',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State4: {
@@ -936,7 +1008,7 @@ describe('Graph Layout Service', () => {
         id: 'State4',
         label: 'State4',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       },
       State5: {
@@ -950,56 +1022,62 @@ describe('Graph Layout Service', () => {
         id: 'State5',
         label: 'State5',
         height: 33.6,
-        width: 113.40000000000002,
+        width: 126,
         reachableFromEnd: false
       }
     };
-    // The expectedGraphBoundaries are calculated from the x0 and y0 values from
-    // nodeDataWithPositionValueInPixel, where leftEdge is
-    // minimum(nodeDataWithPositionValueInPixel[nodeId].x0 - BORDER_PADDING)
-    // of all nodes, and rightEdge is
-    // maximum(nodeDataWithPositionValueInPixel[nodeId].x0 + BORDER_PADDING +
-    // nodeDataWithPositionValueInPixel[nodeId].width) of all nodes. Similarly,
-    // bottomEdge and topEdge are calculated using y0 and node height.
-    let expectedGraphBoundaries1 = sgls.getGraphBoundaries(
+
+    let actualGraphBoundaries1 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel1);
-    let expectedGraphBoundaries2 = sgls.getGraphBoundaries(
+    let actualGraphBoundaries2 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel2);
-    let expectedGraphBoundaries3 = sgls.getGraphBoundaries(
+    let actualGraphBoundaries3 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel3);
 
     // The width of graph calculated as difference b/w left and right edge.
-    let expectedWidth1 = expectedGraphBoundaries1.right -
-      expectedGraphBoundaries1.left;
-    let expectedWidth2 = expectedGraphBoundaries2.right -
-      expectedGraphBoundaries2.left;
-    let expectedWidth3 = expectedGraphBoundaries3.right -
-      expectedGraphBoundaries3.left;
+    let actualWidth1 = actualGraphBoundaries1.right -
+      actualGraphBoundaries1.left;
+    let actualWidth2 = actualGraphBoundaries2.right -
+      actualGraphBoundaries2.left;
+    let actualWidth3 = actualGraphBoundaries3.right -
+      actualGraphBoundaries3.left;
 
-    // This is the maximum upperbound for graph witdh taking padding fraction
-    // into consideration.
-    let widthUpperBound = 548.6500000000001;
+    // This is the maximum upperbound for graph width taking padding fraction
+    // into consideration. First we calculate the x0 of the rightmost node.
+    // rightMostNode.x0 = HORIZONTAL_EDGE_PADDING_FRACTION +
+    // fractionalGridWidth * offsetInGridRectangle, where
+    // HORIZONTAL_EDGE_PADDING_FRACTION = 0.05,
+    // fractionalGridWidth = (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) /
+    // totalColumns  = (1.0 - 0.05 * 2)/4 = 0.225, and
+    // offsetInGridRectangle = rightMostNode.offset +
+    // GRID_NODE_X_PADDING_FRACTION = 3 + 0.1 = 3.1
+    // So, rightMostNode.x0 = 0.05 + 0.225 * 3.1 = 0.7475. Converting it to
+    // pixel, rightMostNode.x0 = 630 * 0.747 = 470.925. Now, the rightEdge =
+    // rightMostNode.x0 + BORDER_PADDING + rightMostNode.width = 470.925 + 5 +
+    // 126 = 601.925.
+    // Now, if we calculate the leftEdge of leftMostState (here State1), we'll
+    // get 40.675000000000004. So width = 601.925 - 40.675000000000004 = 561.25.
+    let widthUpperBoundPixels = 561.25;
 
     // The height of graph calculated as difference b/w bottom and right top.
-    let expectedHeight1 = expectedGraphBoundaries1.bottom -
-    expectedGraphBoundaries1.top;
-    let expectedHeight2 = expectedGraphBoundaries2.bottom -
-      expectedGraphBoundaries2.top;
-    let expectedHeight3 = expectedGraphBoundaries3.bottom -
-      expectedGraphBoundaries3.top;
+    let actualHeight1 = actualGraphBoundaries1.bottom -
+    actualGraphBoundaries1.top;
+    let actualHeight2 = actualGraphBoundaries2.bottom -
+      actualGraphBoundaries2.top;
+    let actualHeight3 = actualGraphBoundaries3.bottom -
+      actualGraphBoundaries3.top;
 
     // Here, we see that for 3 nodes the graph width is less than
     // the upper bound, for  4 nodes the graph width is equal to the
     // upper bound and the width becomes constant for nodes > 4.
-    expect(expectedWidth1).toBeLessThan(expectedWidth2);
-    expect(expectedWidth2).toEqual(widthUpperBound);
-    expect(expectedWidth3).toEqual(widthUpperBound);
+    expect(actualWidth1).toBeLessThan(actualWidth2);
+    expect(actualWidth2).toEqual(widthUpperBoundPixels);
+    expect(actualWidth3).toEqual(widthUpperBoundPixels);
 
     // As height does not have an upper bound, it increases as a node overflows
     // to the next row.
-
-    expect(expectedHeight1).toEqual(expectedHeight2);
-    expect(expectedHeight2).toBeLessThan(expectedHeight3);
+    expect(actualHeight1).toEqual(actualHeight2);
+    expect(actualHeight2).toBeLessThan(actualHeight3);
   });
 
   it('should return graph boundaries with height equal to' +
@@ -1068,6 +1146,13 @@ describe('Graph Layout Service', () => {
     let nodeDataWithPositionValueInPixel = sgls.modifyPositionValues(
       nodeData, graphWidth, graphHeight);
 
+    // The expectedGraphBoundaries are calculated from the x0 and y0 values from
+    // nodeDataWithPositionValueInPixel, where leftEdge is
+    // minimum(nodeDataWithPositionValueInPixel[nodeId].x0 - BORDER_PADDING)
+    // of all nodes, and rightEdge is
+    // maximum(nodeDataWithPositionValueInPixel[nodeId].x0 + BORDER_PADDING +
+    // nodeDataWithPositionValueInPixel[nodeId].width) of all nodes. Similarly,
+    // bottomEdge and topEdge are calculated using y0 and node height.
     let expectedGraphBoundaries = {
       bottom: 182.79999999999998,
       left: 40.675000000000004,
@@ -1096,7 +1181,7 @@ describe('Graph Layout Service', () => {
         id: 'State1',
         label: 'State1',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: true
       },
       State2: {
@@ -1110,7 +1195,7 @@ describe('Graph Layout Service', () => {
         id: 'State2',
         label: 'State2',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: true
       },
       State3: {
@@ -1124,7 +1209,7 @@ describe('Graph Layout Service', () => {
         id: 'State3',
         label: 'State3',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: true
       },
       State4: {
@@ -1138,7 +1223,7 @@ describe('Graph Layout Service', () => {
         id: 'State4',
         label: 'State4',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: true
       },
       State5: {
@@ -1152,7 +1237,7 @@ describe('Graph Layout Service', () => {
         id: 'State5',
         label: 'State5',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: false
       },
       State6: {
@@ -1166,7 +1251,7 @@ describe('Graph Layout Service', () => {
         id: 'State6',
         label: 'State6',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: false
       },
       State7: {
@@ -1180,7 +1265,7 @@ describe('Graph Layout Service', () => {
         id: 'State7',
         label: 'State7',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: false
       },
       State8: {
@@ -1194,7 +1279,7 @@ describe('Graph Layout Service', () => {
         id: 'State8',
         label: 'State8',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: true
       },
       State9: {
@@ -1208,7 +1293,7 @@ describe('Graph Layout Service', () => {
         id: 'State9',
         label: 'State9',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: true
       },
       Orphaned: {
@@ -1222,30 +1307,47 @@ describe('Graph Layout Service', () => {
         id: 'Orphaned',
         label: 'Orphaned',
         height: 0.08,
-        width: 0.18000000000000002,
+        width: 0.2,
         reachableFromEnd: false
       }
     };
-    let nodeData1 = cloneDeep(nodeData);
 
     let graphWidthUpperBound = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-    let graphHeight = sgls.getGraphHeight(nodeData1);
+    let graphHeight = sgls.getGraphHeight(nodeData);
 
     // Here, modifiedNodeData is nodeData with position values in pixels.
     // For ex, nodeData.State1.x0 = 0.07250000000000001 which is expressed
     // in fraction of graph width. It can be converted to pixels by multiplying
     // with graph width. So, modifiedNodeDate.State1.x0 = 0.07250000000000001 *
-    // graphWidthUpperBound (630) = 47.675.
+    // graphWidthUpperBound (630) = 47.675000000000004.
     let modifiedNodeData = sgls.modifyPositionValues(
       nodeData, graphWidthUpperBound, graphHeight);
 
+    // The expectedPositionValues are calculated similarly as given above.
+    let expectedPositionValues = {
+      State1: {
+        x0: 45.675000000000004,
+        y0: 53.2,
+        xLabel: 102.375,
+        yLabel: 70.00000000000001,
+        width: 126,
+        height: 33.6
+      }
+    };
+
     // Verifying the position values of State1.
-    expect(modifiedNodeData.State1.x0).toEqual(nodeData.State1.x0);
-    expect(modifiedNodeData.State1.y0).toEqual(nodeData.State1.y0);
-    expect(modifiedNodeData.State1.xLabel).toEqual(nodeData.State1.xLabel);
-    expect(modifiedNodeData.State1.yLabel).toEqual(nodeData.State1.yLabel);
-    expect(modifiedNodeData.State1.width).toEqual(nodeData.State1.width);
-    expect(modifiedNodeData.State1.height).toEqual(nodeData.State1.height);
+    expect(modifiedNodeData.State1.x0).toEqual(
+      expectedPositionValues.State1.x0);
+    expect(modifiedNodeData.State1.y0).toEqual(
+      expectedPositionValues.State1.y0);
+    expect(modifiedNodeData.State1.xLabel).toEqual(
+      expectedPositionValues.State1.xLabel);
+    expect(modifiedNodeData.State1.yLabel).toEqual(
+      expectedPositionValues.State1.yLabel);
+    expect(modifiedNodeData.State1.width).toEqual(
+      expectedPositionValues.State1.width);
+    expect(modifiedNodeData.State1.height).toEqual(
+      expectedPositionValues.State1.height);
   });
 });
