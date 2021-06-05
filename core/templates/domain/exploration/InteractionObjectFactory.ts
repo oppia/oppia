@@ -69,7 +69,6 @@ import {
   SubtitledUnicodeObjectFactory, SubtitledUnicode
 } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { boolean } from 'mathjs';
 
 
 export interface InteractionBackendDict {
@@ -370,7 +369,7 @@ export class InteractionObjectFactory {
   }
 
   _createFromNumericInputCustomizationArgsBackendDict(
-  caBackendDict: NumericInputCustomizationArgsBackendDict
+      caBackendDict: NumericInputCustomizationArgsBackendDict
   ): NumericInputCustomizationArgs {
     const { placeholder } = caBackendDict;
     return {

@@ -141,7 +141,8 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 upper bound of the range  should be greater than or equal to zero. '
+      message: 'Rule 2 upper bound of the range  should be greater than' +
+      ' or equal to zero. '
     }]);
   });
 
@@ -164,7 +165,8 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range  should be greater than or equal to zero. '
+      message: 'Rule 1 upper bound of the range  should be greater than or' +
+      ' equal to zero. '
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -191,7 +193,8 @@ describe('NumericInputValidationService', () => {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 upper bound of the range  should be greater than or equal to zero. '
+      message: 'Rule 1 upper bound of the range  should be greater than' +
+      ' or equal to zero. '
     }, {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 2 will never be matched ' +

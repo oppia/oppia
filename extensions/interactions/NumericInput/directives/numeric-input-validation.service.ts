@@ -39,13 +39,13 @@ export class NumericInputValidationService {
         baseInteractionValidationService) {}
 
   isCustomizationArgTrue(
-    customizationArgs: NumericInputCustomizationArgs): boolean {
-      if(customizationArgs.placeholder.value === true) {
-        return true;
-      }
-      return false;
+      customizationArgs: NumericInputCustomizationArgs): boolean {
+    if (customizationArgs.placeholder.value === true) {
+      return true;
+    }
+    return false;
   }
-  
+
   getCustomizationArgsWarnings(
       customizationArgs: NumericInputCustomizationArgs): Warning[] {
     return [];

@@ -27,7 +27,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import json
-import pdb
 import re
 import string
 
@@ -1802,7 +1801,7 @@ class Exploration(python_utils.OBJECT):
             state_dict['card_is_checkpoint'] = bool(
                 state_name == init_state_name)
         return states_dict
-  
+
     @classmethod
     def _convert_states_v44_dict_to_v45_dict(cls, states_dict):
         """Converts from version 44 to 45. Version 45 contains
@@ -1826,16 +1825,20 @@ class Exploration(python_utils.OBJECT):
         """Converts from version 45 to 46. Version 46 adds a new
         customization arg to NumericInput interaction which allows
         creators to set input should be grater than or equal to zero.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
+
         for state_dict in states_dict.values():
             if state_dict['interaction']['id'] == 'NumericInput':
-                customization_args = state_dict['interaction']['customization_args']
+                customization_args = state_dict['interaction'][
+                    'customization_args']
                 customization_args.update({
                     'placeholder': {
                         'value': False
@@ -1952,7 +1955,6 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
-
     @classmethod
     def _convert_v49_dict_to_v50_dict(cls, exploration_dict):
         """Converts a v49 exploration dict into a v50 exploration dict.
@@ -1979,9 +1981,11 @@ class Exploration(python_utils.OBJECT):
         """Converts a v50 exploration dict into a v51 exploration dict.
         Adds a new customization arg to NumericInput interaction
         which allows creators to set input greator than or equal to zero.
+
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v50.
+
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v51.

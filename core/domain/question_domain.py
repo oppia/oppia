@@ -1100,10 +1100,12 @@ class Question(python_utils.OBJECT):
         """Converts from version 45 to 46. Version 46 adds a new
         customization arg to NumericInput interaction which allows
         creators to set input range greater than or equal to zero.
+
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
                 initialize a State domain object.
+
         Returns:
             dict. The converted question_state_dict.
         """
