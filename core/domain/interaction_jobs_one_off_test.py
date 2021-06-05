@@ -28,6 +28,7 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (job_models, exp_models, base_models, classifier_models) = (
     models.Registry.import_models([
@@ -1295,7 +1296,7 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
-        exploration.add_states(['State1', 'State2'])
+        exploration.add_states(['State1'])
 
         state1 = exploration.states['State1']
 
@@ -1339,7 +1340,86 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
             u'[u\'EMAIL_DATA\', [u"(u\'albert@example.com\', \'exp_id0\')"]]')]
         self.assertEqual(actual_output, expected_output)
 
-        # Update state1 and add state2.
+    def test_missing_rights_when_exploration_rights_is_none(self):
+        """Test that MISSING_RIGHTS is yield when exploration rights is none."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        state1.update_interaction_id('LogicProof')
+
+        customization_args_dict1 = {
+            'question': {
+                'value': {
+                    'assumptions': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'results': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'default_proof_string': ''
+                }
+            },
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+
+        exp_services.save_new_exploration(self.user_id, exploration)
+
+        self.set_admins([self.USER_NAME])
+        owner = user_services.get_user_actions_info(self.user_id)
+
+        rights_manager.set_private_viewability_of_exploration(
+            owner, self.VALID_EXP_ID, True)
+
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            self.VALID_EXP_ID)
+        exp_rights_model.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete model')
+
+        # Start LogicProofInteractionOneOffJob job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.create_new())
+        interaction_jobs_one_off.LogicProofInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.get_output(job_id))
+        expected_output = [u'[u\'MISSING_RIGHTS\', [u\'exp_id0\']]',
+                           u'[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+    def test_success_when_interaction_id_is_not_logicproof(self):
+        """Test that SUCCESS is yield when interaction id is not logicProof."""
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exp_services.save_new_exploration(self.user_id, exploration)
+
+        # Start LogicProofInteractionOneOffJob job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.create_new())
+        interaction_jobs_one_off.LogicProofInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.get_output(job_id))
+        expected_output = [u'[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
