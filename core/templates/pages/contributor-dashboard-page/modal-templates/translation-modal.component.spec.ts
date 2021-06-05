@@ -210,7 +210,8 @@ describe('Translation Modal Component', () => {
   describe('when clicking on the translatable content', () => {
     const nonParagraphTarget: HTMLElement = document.createElement('div');
     const paragraphTarget: HTMLElement = document.createElement('p');
-    const mathTarget: HTMLElement = document.createElement('oppia-noninteractive-math');
+    const mathTarget: HTMLElement = document.createElement(
+      'oppia-noninteractive-math');
     let broadcastSpy: jasmine.Spy<(target: HTMLElement) => void>;
     let propagationSpy: jasmine.Spy<() => void>;
     beforeEach(fakeAsync(() => {
