@@ -414,13 +414,13 @@ class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_text_length_limit(self):
         """Checks text length."""
-
         # Create a thread.
         thread_id = feedback_services.create_thread(
             'exploration', '0', None, 'subject 1',
             self.TEXT_WITH_LENGTH_PAST_LIMIT)
 
         output = self._run_one_off_job()
+
         self.assertEqual(
             [
                 u'[u\'SUCCESS\', 1]',
@@ -452,13 +452,13 @@ class TrimTextMessageLengthOneOffJobTests(test_utils.GenericTestBase):
 
     def test_trim_text_length(self):
         """Trims text length."""
-
         # Create a thread.
         thread_id = feedback_services.create_thread(
             'exploration', '0', None, 'subject 1',
             self.TEXT_WITH_LENGTH_PAST_LIMIT)
 
         output = self._run_one_off_job()
+
         self.assertEqual(
             [
                 u'[u\'SUCCESS\', 1]',

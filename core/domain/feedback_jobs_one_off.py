@@ -17,6 +17,7 @@
 from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals # pylint: disable=import-only-modules
 
+from constants import constants
 from core import jobs
 from core.domain import feedback_services
 from core.platform import models
@@ -114,7 +115,7 @@ class TextMessageLengthAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         if model_instance.text:
-            if len(model_instance.text) > 10000:
+            if len(model_instance.text) > constants.MAX_REVIEW_MESSAGE_LENGTH:
                 yield (model_instance.thread_id, model_instance.message_id)
 
         yield ('SUCCESS', 1)
@@ -137,8 +138,9 @@ class TrimTextMessageLengthOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         if model_instance.text:
-            if len(model_instance.text) > 10000:
-                model_instance.text = model_instance.text[:10000]
+            if len(model_instance.text) > constants.MAX_REVIEW_MESSAGE_LENGTH:
+                model_instance.text = (
+                    model_instance.text[:constants.MAX_REVIEW_MESSAGE_LENGTH])
                 model_instance.update_timestamps(update_last_updated_time=False)
                 model_instance.put()
                 yield (model_instance.thread_id, model_instance.message_id)
