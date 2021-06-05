@@ -26,10 +26,8 @@ export interface ThreadMessageBackendDict {
   'entity_id': string;
   'message_id': number;
   'text': string;
-  // These properties can be null as we have defined functions
-  // 'hasStatusUpdate' & 'hasSubjectUpdate' to check for them to be not null,
-  // the corresponding tests with null values for these properties can
-  // be seen in FeedbackThreadObjectFactorySpec.ts file.
+  // Status and Subject for frontend instances of thread message
+  // domain objects should be null initially.
   'updated_status': string | null;
   'updated_subject': string | null;
 }

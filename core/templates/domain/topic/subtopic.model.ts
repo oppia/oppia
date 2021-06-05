@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * subtopic domain objects.
  */
 
@@ -25,8 +25,9 @@ export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  // These values are passed as null initially, See function
-  // 'createFromTitle' in this file.
+  // 'null' value for 'thumbnail_filename', 'thumbnail_bg_color' &
+  // 'url_fragment' indicates that these properties hasn't been provided
+  // yet for a subtopic.
   'thumbnail_filename': string | null;
   'thumbnail_bg_color': string | null;
   'url_fragment': string | null;
@@ -92,7 +93,7 @@ export class Subtopic {
   }
 
   validate(): string[] {
-    let issues = [];
+    let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
       constants.VALID_URL_FRAGMENT_REGEX);
     if (this._urlFragment !== null) {
@@ -118,7 +119,7 @@ export class Subtopic {
   }
 
   prepublishValidate(): string[] {
-    let issues = [];
+    let issues: string[] = [];
     if (!this._thumbnailFilename) {
       issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
     }

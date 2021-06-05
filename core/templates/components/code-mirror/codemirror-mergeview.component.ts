@@ -18,6 +18,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-codemirror-mergeview',
@@ -31,18 +32,19 @@ export class CodemirrorMergeviewComponent implements
   // See function 'ngAfterViewInit' for reference.
   @Input() leftValue: string | undefined;
   @Input() rightValue: string | undefined;
-  // Non-null assertion operator(!) to ignore
-  // the case when CodeMirror is undefined or null.
+  // 'ngOnChanges' sometimes runs before the view has been initialized,
+  // to cater this we are checking it be to not undefined.
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
-  // We can't directly test for window.CodeMirror to be undefined
-  // so we are assigning it to 'originalCodeMirror' here.
-  originalCodeMirror: typeof window.CodeMirror | undefined = window.CodeMirror;
 
-  constructor(private elementRef: ElementRef, private ngZone: NgZone) { }
+  constructor(
+    private elementRef: ElementRef,
+    private ngZone: NgZone,
+    private windowRef: WindowRef) { }
 
   ngOnInit(): void {
     // Require CodeMirror.
-    if (this.originalCodeMirror === undefined) {
+    if (
+      (this.windowRef.nativeWindow as typeof window).CodeMirror === undefined) {
       throw new Error('CodeMirror not found.');
     }
   }

@@ -19,11 +19,13 @@
 import { NgZone, SimpleChanges } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import CodeMirror from 'node_modules/@types/codemirror';
+import { WindowRef } from 'services/contextual/window-ref.service';
 import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
 
 describe('Oppia CodeMirror Component', () => {
   let component: CodemirrorMergeviewComponent;
   let fixture: ComponentFixture<CodemirrorMergeviewComponent>;
+  let windowRef: WindowRef;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -35,11 +37,12 @@ describe('Oppia CodeMirror Component', () => {
     fixture = TestBed.createComponent(CodemirrorMergeviewComponent);
     component = fixture.componentInstance;
     const zone: NgZone = TestBed.inject(NgZone);
+    windowRef = TestBed.inject(WindowRef);
     spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
   }));
 
   it('should throw error if codemirror is undefined', () => {
-    component.originalCodeMirror = undefined;
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({});
     expect(() => {
       component.ngOnInit();
     }).toThrowError('CodeMirror not found.');
