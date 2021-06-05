@@ -20,6 +20,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { TestBed } from '@angular/core/testing';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('AutosaveInfoModalsService', () => {
   let AutosaveInfoModalsService = null;
@@ -39,6 +40,7 @@ describe('AutosaveInfoModalsService', () => {
   });
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(($injector) => {
     AutosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     $uibModal = $injector.get('$uibModal');
