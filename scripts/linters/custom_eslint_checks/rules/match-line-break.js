@@ -22,13 +22,13 @@
 
 module.exports = {
   meta: {
-    type: 'problem',
+    type: 'suggestion',
     docs: {
       description: (
         'Lint check to ensure that  the line breaks between the dependencies' +
         ' listed in the controller of a directive or service exactly' +
         'match those between the arguments of the controller function'),
-      category: 'Possible Errors',
+      category: 'Stylistic Issues',
       recommended: true,
     },
     fixable: null,
@@ -57,10 +57,14 @@ module.exports = {
     return {
       'CallExpression[callee.property.name=directive]': function(node) {
         var arg = node.arguments;
+        // In angular, components function take 2 arguments and type of last
+        // arguments is an ArrayExpression.
         if (arg.length !== 2 || arg[1].type !== 'ArrayExpression') {
           return;
         }
         var lengthOfElements = arg[1].elements.length;
+        // Storing function() in functionNode by taking last
+        // element as because its type is FunctionExpression.
         var functionNode = arg[1].elements[lengthOfElements - 1];
         if (functionNode.body.body[0].type !== 'ReturnStatement') {
           return;
