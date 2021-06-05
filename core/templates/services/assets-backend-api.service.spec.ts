@@ -52,7 +52,7 @@ describe('Assets Backend API Service', () => {
         assetsBackendApiService.getBlobDataFromBlobUrl$('blob:/abc').subscribe(
           x => blob = x
         );
-        let req = httpTestingController.expectOne('/abc');
+        let req = httpTestingController.expectOne('blob:/abc');
         expect(req.request.method).toBe('GET');
         req.flush(response);
         expect(blob).toBe(response);
