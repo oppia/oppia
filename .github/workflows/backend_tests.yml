@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        shard: [1]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
