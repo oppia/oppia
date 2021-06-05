@@ -50,10 +50,11 @@ describe('Collections', function() {
     await users.createUser('creator@explorations.com', CREATOR_USERNAME);
     await users.createUser('player@collections.com', PLAYER_USERNAME);
     await users.createUser('alice@collections.com', EDITOR_USERNAME);
-    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    await users.createAndLoginCurriculumAdminUser(
+      'testadm@collections.com', 'testadm');
     await adminPage.get();
-    await adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
-    await adminPage.updateRole(PLAYER_USERNAME, 'collection editor');
+    await adminPage.addRole(EDITOR_USERNAME, 'collection editor');
+    await adminPage.addRole(PLAYER_USERNAME, 'collection editor');
     await users.logout();
 
     await users.login('creator@explorations.com');

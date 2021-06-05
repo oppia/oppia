@@ -36,7 +36,7 @@ describe('Email Dashboard', function() {
     await waitFor.pageToFullyLoad();
     await preferencesPage.toggleEmailUpdatesCheckbox();
     await users.logout();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'management@emaildashboard.com', 'management');
     await browser.get(EMAIL_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();

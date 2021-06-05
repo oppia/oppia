@@ -42,7 +42,7 @@ describe('Classroom page functionality', function() {
     topicEditorPage = (
       new TopicEditorPage.TopicEditorPage());
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
     await adminPage.editConfigProperty(
       'Make classroom page accessible.',

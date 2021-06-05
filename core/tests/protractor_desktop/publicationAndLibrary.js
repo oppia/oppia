@@ -46,7 +46,7 @@ describe('Library index page', function() {
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'superUser@publicationAndLibrary.com', 'superUser');
     // TODO(#7569): Change this test to work with the improvements tab.
     await adminPage.editConfigProperty(

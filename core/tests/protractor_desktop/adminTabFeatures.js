@@ -34,15 +34,15 @@ describe('Admin Page', function() {
       'collectionEdtior1@adminTab.com', 'collectionEditor1');
     await users.createUser(
       'newQuestionReviewer@adminTab.com', 'newQuestionReviewer');
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'management@adminTab.com', 'management');
     await adminPage.get();
-    await adminPage.updateRole('moderator1', 'moderator');
+    await adminPage.addRole('moderator1', 'moderator');
     await adminPage.viewRolesByUsername('moderator1', true);
     await adminPage.expectUsernamesToMatch(['moderator1']);
 
     await adminPage.get();
-    await adminPage.updateRole('moderator2', 'moderator');
+    await adminPage.addRole('moderator2', 'moderator');
     await adminPage.viewRolesByUsername('moderator2', true);
     await adminPage.expectUsernamesToMatch(['moderator2']);
 
@@ -50,7 +50,7 @@ describe('Admin Page', function() {
     await adminPage.expectUsernamesToMatch(['moderator1', 'moderator2']);
 
     await adminPage.get();
-    await adminPage.updateRole('collectionEditor1', 'collection editor');
+    await adminPage.addRole('collectionEditor1', 'collection editor');
     await adminPage.getUsersAsssignedToRole('collection editor');
     await adminPage.expectUsernamesToMatch(['collectionEditor1']);
 
@@ -58,7 +58,8 @@ describe('Admin Page', function() {
   });
 
   it('should run,verify and stop one-off jobs', async function() {
-    await users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
+    await users.createAndLoginCurriculumAdminUser(
+      'adminA@adminTab.com', 'alphaMan');
     await adminPage.getJobsTab();
 
     // The following jobs are selected arbitrarily.

@@ -34,7 +34,7 @@ describe('Classroom page functionality', function() {
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
 
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
     await adminPage.editConfigProperty(
       'Make classroom page accessible.',

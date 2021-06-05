@@ -37,9 +37,12 @@ var AdminPage = function() {
   var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
     by.css('.protractor-test-roles-tab-container'));
-  var updateFormName = element(by.css('.protractor-update-form-name'));
-  var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
-  var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var usernameInputFieldForRolesEditing = element(
+    by.css('.protractor-username-for-role-editor'));
+  var editUserRoleButton = element(by.css('.protractor-role-edit-button'));
+  var addNewRoleButton = element(by.css('.protractor-add-new-role-button'));
+  var progressSpinner = element(by.css('.protractor-progress-spinner'));
+  var roleSelector = element(by.css('.protractor-new-role-selector'));
   var statusMessage = element(by.css('.protractor-test-status-message'));
 
   var addContributionRightsForm = element(
@@ -336,18 +339,17 @@ var AdminPage = function() {
       jobName.toLowerCase())).toEqual(true);
   };
 
-  this.updateRole = async function(name, newRole) {
+  this.addRole = async function(name, newRole) {
     await action.click('Admin Roles Tab', adminRolesTab);
+    await action.sendKeys(
+      'Username input field', usernameInputFieldForRolesEditing, name);
+    await action.click('Edit user role button', editUserRoleButton);
 
-    // Change values for "update role" form, and submit it.
-    await action.sendKeys('Update Form Name', updateFormName, name);
-    await action.select('Role Drop Down', roleSelect, newRole);
-    await action.click('Update Form Submit', updateFormSubmit);
-    await waitFor.visibilityOf(
-      statusMessage, 'Confirmation message not visible');
-    await waitFor.textToBePresentInElement(
-      statusMessage, 'successfully updated to',
-      'Could not set role successfully');
+    await action.click('Add new role', addNewRoleButton);
+    await action.matSelect('New role selector', roleSelector, newRole);
+
+    await waitFor.invisibilityOf(
+      progressSpinner, 'Progress spinner is taking too long to disappear.');
   };
 
   this.getUsersAsssignedToRole = async function(role) {

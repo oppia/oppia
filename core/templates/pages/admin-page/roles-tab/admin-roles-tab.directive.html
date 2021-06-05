@@ -74,19 +74,31 @@
       <h2>Role editor</h2>
       <div class="oppia-username-form">
         <mat-form-field class="example-form-field">
-          <input matInput type="text" placeholder="Username" [(ngModel)]="username" [disabled]="rolesFetched">
+          <input matInput
+                 class="protractor-username-for-role-editor"
+                 type="text"
+                 placeholder="Username"
+                 [(ngModel)]="username"
+                 [disabled]="rolesFetched">
           <button mat-button *ngIf="username" matSuffix mat-icon-button aria-label="Clear" (click)="clearEditor()">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>
-        <button mat-icon-button color="primary" *ngIf="username && !rolesFetched" (click)="startEditing()">
+        <button mat-icon-button
+                color="primary"
+                class="protractor-role-edit-button"
+                *ngIf="username && !rolesFetched"
+                (click)="startEditing()">
           <mat-icon aria-label="Example icon-button with a heart icon">edit</mat-icon>
         </button>
       </div>
-      <div *ngIf="!rolesFetched">Please fillout the username above to editor the user role.</div>
+      <div *ngIf="!username">Please fillout the username above to editor the user role.</div>
 
       <div class="oppia-roles-editor-form-container">
-        <div *ngIf="rolesFetched">
+        <mat-card *ngIf="startedEditingRole && !rolesFetched" >
+          <mat-spinner class="mx-auto" [diameter]="30"></mat-spinner>
+        </mat-card>
+        <div *ngIf="startedEditingRole && rolesFetched">
           <mat-card *ngIf="userIsBanned" class="oppia-roles-editor-card-container">
             <div class="d-flex flex-column align-items-center">
               <h3>User "{{ username }}" is banned from the application.</h3>
@@ -116,7 +128,7 @@
               <mat-list-item  class="oppia-flex"  *ngFor="let role of userRoles">
                 <div class="d-flex align-items-center oppia-user-role">
                   <span class="oppia-user-role-description"><strong>{{ UPDATABLE_ROLES[role] | titlecase }}</strong></span>
-                  <div class="oppia-progress-spinner" *ngIf="roleInUpdate === role">
+                  <div class="oppia-progress-spinner protractor-progress-spinner" *ngIf="roleInUpdate === role">
                     <mat-spinner [diameter]="24"></mat-spinner>
                   </div>
                   <div class="d-flex" *ngIf="roleInUpdate !== role">
@@ -132,9 +144,9 @@
               <mat-list-item *ngIf="selectingNewRole">
                 <span class="oppia-user-role-description">
                   <mat-form-field>
-                    <mat-select (selectionChange)="addNewRole($event.value)">
+                    <mat-select (selectionChange)="addNewRole($event.value)" class="protractor-new-role-selector">
                       <mat-option [value]="role" *ngFor="let role of possibleRolesToAdd">
-                        {{ UPDATABLE_ROLES[role] }}
+                        {{UPDATABLE_ROLES[role]}}
                       </mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -142,7 +154,7 @@
               </mat-list-item>
             </mat-list>
             <button mat-button
-                    class="oppia-add-role-button"
+                    class="oppia-add-role-button protractor-add-new-role-button"
                     color="primary"
                     (click)="addRole()"
                     *ngIf="!selectingNewRole">

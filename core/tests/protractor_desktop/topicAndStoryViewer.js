@@ -81,7 +81,7 @@ describe('Topic and Story viewer functionality', function() {
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
     await adminPage.editConfigProperty(
       'Make classroom page accessible.',
@@ -183,7 +183,7 @@ describe('Topic and Story viewer functionality', function() {
   it(
     'should check for topic description, stories and revision cards',
     async function() {
-      await users.createAndLoginAdminUser(
+      await users.createAndLoginCurriculumAdminUser(
         'creator1@storyViewer.com', 'creatorStoryViewer1');
       await topicViewerPage.get('math', 'Topic TASV1');
       await topicViewerPage.expectTopicInformationToBe('Description');

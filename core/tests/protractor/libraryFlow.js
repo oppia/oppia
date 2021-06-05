@@ -48,7 +48,7 @@ describe('Library pages tour', function() {
 
   var rateExploration = async function() {
     var adminPage = new AdminPage.AdminPage();
-    await users.createAndLoginAdminUser('random@gmail.com', 'random');
+    await users.createAndLoginCurriculumAdminUser('random@gmail.com', 'random');
     // We need an exploration to rate here.
     if (browser.isMobile) {
       await adminPage.reloadExploration(
@@ -134,7 +134,7 @@ describe('Rating', function() {
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
 

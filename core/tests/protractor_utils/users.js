@@ -109,22 +109,22 @@ var createAndLoginUser = async function(
   await _completeSignup(username);
 };
 
-var createAndLoginAdminUser = async function(email, username) {
+var createAndLoginCurriculumAdminUser = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
   await adminPage.get();
-  await adminPage.updateRole(username, 'admin');
+  await adminPage.addRole(username, ' curriculum admin ');
 };
 
-var createAndLoginAdminUserMobile = async function(email, username) {
+var createAndLoginCurriculumAdminUserMobile = async function(email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
 };
 
 var createAdminMobile = async function(email, username) {
-  await createAndLoginAdminUserMobile(email, username);
+  await createAndLoginCurriculumAdminUserMobile(email, username);
   await logout();
 };
 
@@ -138,12 +138,12 @@ var createModerator = async function(email, username) {
   await login(email);
   await _completeSignup(username);
   await adminPage.get();
-  await adminPage.updateRole(username, 'moderator');
+  await adminPage.addRole(username, 'moderator');
   await logout();
 };
 
 var createAdmin = async function(email, username) {
-  await createAndLoginAdminUser(email, username);
+  await createAndLoginCurriculumAdminUser(email, username);
   await logout();
 };
 
@@ -158,6 +158,7 @@ exports.createUser = createUser;
 exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
-exports.createAndLoginAdminUser = createAndLoginAdminUser;
+exports.createAndLoginCurriculumAdminUser = createAndLoginCurriculumAdminUser;
 exports.createAdminMobile = createAdminMobile;
-exports.createAndLoginAdminUserMobile = createAndLoginAdminUserMobile;
+exports.createAndLoginCurriculumAdminUserMobile = (
+  createAndLoginCurriculumAdminUserMobile);

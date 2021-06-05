@@ -64,7 +64,7 @@ describe('Contributor dashboard page', function() {
     adminPage = new AdminPage.AdminPage();
     await users.createUser(USER_EMAILS[0], 'user0');
     await users.createUser(USER_EMAILS[1], 'user1');
-    await users.createAndLoginAdminUser(ADMIN_EMAIL, 'management');
+    await users.createAndLoginCurriculumAdminUser(ADMIN_EMAIL, 'management');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
       'Boolean', async function(elem) {
@@ -246,7 +246,7 @@ describe('Admin page contribution rights form', function() {
       translationReviewerEmail, translationReviewerUsername);
     await users.createUser(voiceoverReviewerEmail, voiceoverReviewerUsername);
     await users.createUser(questionReviewerEmail, questionReviewerUsername);
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'primaryAdmin@adminTab.com', 'primary');
     await adminPage.editConfigProperty(
       'Whether the contributor can suggest questions for skill opportunities.',
@@ -257,7 +257,7 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add translation reviewer', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'adminToAssignTranslationReviewer@adminTab.com',
       'assignTranslationReviewer');
     await adminPage.assignTranslationReviewer(
@@ -274,7 +274,7 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add voiceover reviewer', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'adminToAssignVoiceoverReviewer@adminTab.com', 'assignVoiceoverReviewer');
     await adminPage.assignVoiceoverReviewer(
       voiceoverReviewerUsername, HINDI_LANGUAGE);
@@ -290,7 +290,7 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question reviewer', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'adminToAssignQuestionReviewer@adminTab.com', 'assignQuestionReviewer');
     await adminPage.assignQuestionReviewer(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionReviewer(questionReviewerUsername);
@@ -303,7 +303,7 @@ describe('Admin page contribution rights form', function() {
   });
 
   it('should allow admin to add question contributor', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'adminToAddQuestionContributor@adminTab.com', 'addQuestionContributor');
     await adminPage.assignQuestionContributor(questionReviewerUsername);
     await adminPage.expectUserToBeQuestionContributor(questionReviewerUsername);
@@ -328,7 +328,7 @@ describe('Translation contribution featured languages', () => {
       new ContributorDashboardPage.ContributorDashboardPage());
     contributorDashboardTranslateTextTab = (
       contributorDashboardPage.getTranslateTextTab());
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'config@contributorDashboard.com', 'contributorDashboard');
     const adminPage = new AdminPage.AdminPage();
     await adminPage.editConfigProperty(

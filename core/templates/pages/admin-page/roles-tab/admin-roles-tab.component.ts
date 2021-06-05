@@ -43,6 +43,7 @@ export class RolesEditorComponent implements OnInit {
   errorMessage = null;
   changingBannedVlaue = false;
   userIsBanned = false;
+  startedEditingRole = false;
 
   constructor(
     private adminDataService: AdminDataService,
@@ -52,6 +53,7 @@ export class RolesEditorComponent implements OnInit {
   ) {}
 
   startEditing(): void {
+    this.startedEditingRole = true;
     this.adminBackendApiService.viewUsersRoleAsync(
       'username', null, this.username).then((userRoles) => {
       this.rolesFetched = true;
@@ -162,6 +164,7 @@ export class RolesEditorComponent implements OnInit {
     this.roleInUpdate = null;
     this.changingBannedVlaue = false;
     this.userIsBanned = false;
+    this.startedEditingRole = false;
   }
 
   ngOnInit(): void {

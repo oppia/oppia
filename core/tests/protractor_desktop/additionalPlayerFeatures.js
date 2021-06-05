@@ -219,7 +219,8 @@ describe('Full exploration editor', function() {
 
   it('should give option for redirection when author has specified ' +
       'a refresher exploration ID', async function() {
-    await users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    await users.createAndLoginCurriculumAdminUser(
+      'testadm@collections.com', 'testadm');
 
     // Create Parent Exploration not added to collection.
     await creatorDashboardPage.get();

@@ -115,13 +115,13 @@ describe('Site language', function() {
     var EDITOR_USERNAME = 'langCollections';
 
     await users.createUser('lang@collections.com', EDITOR_USERNAME);
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'langCreator@explorations.com', CREATOR_USERNAME);
     await users.logout();
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'testlangadm@collections.com', 'testlangadm');
     await adminPage.get();
-    await adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
+    await adminPage.addRole(EDITOR_USERNAME, 'collection editor');
     await users.logout();
 
     await users.login('langCreator@explorations.com');

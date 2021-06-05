@@ -36,7 +36,7 @@ describe('Profile menu flow', function() {
 
   it('should visit the topics and skills dashboard from the profile ' +
     'dropdown menu when user is admin', async function() {
-    await users.createAndLoginAdminUser(
+    await users.createAndLoginCurriculumAdminUser(
       'desktopAndMobileAdm@profileMenuFlow.com', 'desktopAndMobileAdm');
     await learnerDashboardPage.get();
     await general.navigateToTopicsAndSkillsDashboardPage();

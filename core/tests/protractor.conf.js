@@ -140,10 +140,6 @@ var suites = {
       'protractor_desktop/publicationAndLibrary.js'
     ],
 
-    releaseCoordinatorPageFeatures: [
-      'protractor_desktop/releaseCoordinatorPageFeatures.js'
-    ],
-
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ],
