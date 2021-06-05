@@ -21,17 +21,17 @@
 
 module.exports = {
   meta: {
-    type: 'problem',
+    type: 'suggestion',
     docs: {
       description: (
         'Lint check to ensure that the dependencies are in sorted order'),
-      category: 'Possible Errors',
+      category: 'Stylistic Issues',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      unSortedDependencies: (
+      unsortedDependencies: (
         'Please ensure that the injected dependencies should be in the' +
         ' following manner: dollar imports, local imports and' +
         ' constant imports, all in sorted-order.')
@@ -45,10 +45,13 @@ module.exports = {
     return {
       [selector]: function(node) {
         var args = node.arguments;
+        // In angular, components function take 2 arguments and type of last
+        // arguments is always an ArrayExpression.
         if (args.length !== 2 || args[1].type !== 'ArrayExpression') {
           return;
         }
-
+        // Removing last element as because its type is FunctionExpression
+        // storing all literal type elements in dependenciesLiteralNodes.
         var dependenciesLiteralNodes = args[1].elements.slice(0, -1);
 
         var dependenciesLiterals = [];
@@ -57,15 +60,15 @@ module.exports = {
           constantInjections = [];
 
         dependenciesLiteralNodes.forEach(function(node) {
-          var v = node.value;
-          dependenciesLiterals.push(v);
+          var literalNodeValue = node.value;
+          dependenciesLiterals.push(literalNodeValue);
 
-          if (/^\$/.test(v)) {
-            dollarInjections.push(v);
-          } else if (/[a-z]/.test(v)) {
-            localInjections.push(v);
+          if (/^\$/.test(literalNodeValue)) {
+            dollarInjections.push(literalNodeValue);
+          } else if (/[a-z]/.test(literalNodeValue)) {
+            localInjections.push(literalNodeValue);
           } else {
-            constantInjections.push(v);
+            constantInjections.push(literalNodeValue);
           }
         });
 
@@ -76,7 +79,7 @@ module.exports = {
           if (dependenciesLiterals[i] !== sortedLiterals[i]) {
             context.report({
               node: args[1],
-              messageId: 'unSortedDependencies'
+              messageId: 'unsortedDependencies'
             });
             return;
           }
