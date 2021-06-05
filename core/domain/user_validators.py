@@ -107,7 +107,7 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
         if user_auth_details.is_full_user():
             return
 
-        if item.role != feconf.ROLE_ID_LEARNER:
+        if item.role != feconf.ROLE_ID_MOBILE_LEARNER:
             cls._add_error(
                 'profile user role check',
                 'Entity id %s: A profile user should have learner role, '

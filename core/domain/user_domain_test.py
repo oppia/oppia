@@ -99,7 +99,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
-        self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+        self.assertEqual(self.owner.role, feconf.ROLE_ID_FULL_USER)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',

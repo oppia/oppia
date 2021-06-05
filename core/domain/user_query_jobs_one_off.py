@@ -181,8 +181,10 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_model = user_models.UserQueryModel.get(query_id)
         job_class = UserQueryOneOffJob
 
-        if (user_id == query_model.submitter_id or
-                user_services.is_at_least_moderator(user_id)):
+        if (
+            user_id == query_model.submitter_id or
+            user_services.is_moderator(user_id) or
+            user_services.is_admin(user_id)):
             return
 
         query_criteria_satisfied = True

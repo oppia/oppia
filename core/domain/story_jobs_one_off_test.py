@@ -565,7 +565,7 @@ class StoryExplorationsAuditOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test stories.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'

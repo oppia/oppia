@@ -68,7 +68,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -147,7 +147,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -236,7 +236,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -338,7 +338,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
         super(CreateExplorationDecoratorTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_banned_users([self.username])
+        self.mark_user_banned(self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/create', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -388,7 +388,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_collection_editors([self.username])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/create', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -443,7 +443,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
         super(AccessCreatorDashboardTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_banned_users([self.username])
+        self.mark_user_banned(self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/access', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -485,7 +485,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -599,7 +599,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -681,7 +681,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -776,7 +776,7 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
         super(ManageEmailDashboardTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
@@ -854,7 +854,7 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
         super(AccessModeratorPageTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -958,7 +958,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         super(SendModeratorEmailsTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1049,8 +1049,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.banned_username])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.mark_user_banned(self.banned_username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
@@ -1174,8 +1174,8 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.username])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.mark_user_banned(self.username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -1257,7 +1257,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
         super(ManageOwnAccountTests, self).setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1423,7 +1423,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
         super(SuggestChangesToExplorationTests, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
-        self.set_banned_users([self.banned_username])
+        self.mark_user_banned(self.banned_username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1464,7 +1464,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
         super(SuggestChangesDecoratorsTests, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
-        self.set_banned_users([self.banned_username])
+        self.mark_user_banned(self.banned_username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1651,7 +1651,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -1724,7 +1724,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
@@ -1786,7 +1786,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_collection_editors([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -1890,7 +1890,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         super(AccessLearnerDashboardDecoratorTests, self).setUp()
         self.signup(self.user_email, self.user)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -1930,7 +1930,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -2000,7 +2000,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(EditStoryDecoratorTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
@@ -2088,7 +2088,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -2187,12 +2187,12 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryViewerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         story_data_url = (
             '/mock_story_data/<classroom_url_fragment>/'
             '<topic_url_fragment>/<story_url_fragment>')
@@ -2338,12 +2338,12 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SubtopicViewerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         subtopic_data_url = (
             '/mock_subtopic_data/<classroom_url_fragment>/'
             '<topic_url_fragment>/<subtopic_url_fragment>')
@@ -2475,12 +2475,12 @@ class TopicViewerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(TopicViewerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
         topic_data_url = (
             '/mock_topic_data/<classroom_url_fragment>/<topic_url_fragment>')
         topic_page_url = (
@@ -2577,12 +2577,12 @@ class CreateSkillTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CreateSkillTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_create_skill', self.MockHandler)],
@@ -2632,7 +2632,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ManageQuestionSkillStatusTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
@@ -2696,12 +2696,12 @@ class CreateTopicTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CreateTopicTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_create_topic', self.MockHandler)],
@@ -2750,12 +2750,12 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ManageRightsForTopicTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -2809,12 +2809,12 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ChangeTopicPublicationStatusTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.signup(self.banned_user_email, self.banned_user)
-        self.set_banned_users([self.banned_user])
+        self.mark_user_banned(self.banned_user)
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -2882,7 +2882,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PerformCronTaskTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
@@ -2934,7 +2934,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.second_admin_email, self.second_admin_username)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
-        self.set_admins([self.ADMIN_USERNAME, self.second_admin_username])
+        self.set_curriculum_admins([self.ADMIN_USERNAME, self.second_admin_username])
         self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -3009,7 +3009,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([user_services.get_username(self.user_id_a)])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -3121,7 +3121,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3211,8 +3211,8 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.username])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.mark_user_banned(self.username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3359,8 +3359,8 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
-        self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.banned_username])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.mark_user_banned(self.banned_username)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],

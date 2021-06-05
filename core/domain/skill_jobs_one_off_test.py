@@ -266,7 +266,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
 
         rubrics = [
             skill_domain.Rubric(
@@ -435,7 +435,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
 
         rubrics = [
             skill_domain.Rubric(

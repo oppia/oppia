@@ -142,6 +142,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(
         user_ids, include_deleted=include_marked_deleted)
+
     if strict:
         for user_id, user_settings_model in python_utils.ZIP(
                 user_ids, user_settings_models):
@@ -153,7 +154,8 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
             result.append(user_domain.UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                role=feconf.ROLE_ID_ADMIN,
+                roles=[feconf.ROLE_ID_CURRICULUM_ADMIN],
+                banned= False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -277,19 +279,19 @@ def get_user_settings_by_auth_id(auth_id, strict=False):
         return None
 
 
-def get_user_role_from_id(user_id):
-    """Returns role of the user with given user_id.
+def get_user_roles_from_id(user_id):
+    """Returns roles of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        str. Role of the user with given id.
+        list(str). Roles of the user with given id.
     """
     user_settings = get_user_settings(user_id, strict=False)
     if user_settings is None:
-        return feconf.ROLE_ID_GUEST
-    return user_settings.role
+        return [feconf.ROLE_ID_GUEST]
+    return user_settings.roles
 
 
 def _create_user_contribution_rights_from_model(user_contribution_rights_model):
@@ -553,9 +555,9 @@ def get_user_actions_info(user_id):
     Returns:
         UserActionsInfo. User object with system committer user id.
     """
-    role = get_user_role_from_id(user_id)
-    actions = role_services.get_all_actions(role)
-    return user_domain.UserActionsInfo(user_id, role, actions)
+    roles = get_user_roles_from_id(user_id)
+    actions = role_services.get_all_actions(roles)
+    return user_domain.UserActionsInfo(user_id, roles, actions)
 
 
 def get_system_user():
@@ -586,9 +588,6 @@ def _save_user_settings(user_settings):
         user_settings_dict['id'] = user_settings.user_id
         user_model = user_models.UserSettingsModel(**user_settings_dict)
 
-    # TODO(#12755): Remove update_roles_and_banned_fields call once roles and
-    # banned fields are in use.
-    update_roles_and_banned_fields(user_model)
     user_model.update_timestamps()
     user_model.put()
 
@@ -605,7 +604,8 @@ def _get_user_settings_from_model(user_settings_model):
     return user_domain.UserSettings(
         user_id=user_settings_model.id,
         email=user_settings_model.email,
-        role=user_settings_model.role,
+        roles=user_settings_model.roles,
+        banned=user_settings_model.banned,
         username=user_settings_model.username,
         last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
@@ -731,7 +731,7 @@ def create_new_user(auth_id, email):
             user_settings.user_id, auth_id))
     user_id = user_models.UserSettingsModel.get_new_id('')
     user_settings = user_domain.UserSettings(
-        user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
+        user_id, email, [feconf.ROLE_ID_FULL_USER], False,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -786,7 +786,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             raise Exception('User id cannot already exist for a new user.')
         user_id = user_models.UserSettingsModel.get_new_id()
         user_settings = user_domain.UserSettings(
-            user_id, email, feconf.ROLE_ID_LEARNER,
+            user_id, email, [feconf.ROLE_ID_MOBILE_LEARNER], False,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
@@ -862,7 +862,6 @@ def _save_existing_users_settings(user_settings_list):
             user_settings_models, user_settings_list):
         user_settings.validate()
         user_model.populate(**user_settings.to_dict())
-        update_roles_and_banned_fields(user_model)
 
     user_models.UserSettingsModel.update_timestamps_multi(user_settings_models)
     user_models.UserSettingsModel.put_multi(user_settings_models)
@@ -1209,8 +1208,8 @@ def update_preferred_audio_language_code(
     _save_user_settings(user_settings)
 
 
-def update_user_role(user_id, role):
-    """Updates the role of the user with given user_id.
+def add_user_role(user_id, role):
+    """Updates the roles of the user with given user_id.
 
     Args:
         user_id: str. The unique ID of the user whose role is to be updated.
@@ -1219,15 +1218,43 @@ def update_user_role(user_id, role):
     Raises:
         Exception. The given role does not exist.
     """
-    if not role_services.is_valid_role(role):
-        raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
-    if user_settings.role == feconf.ROLE_ID_LEARNER:
+    if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
         raise Exception('The role of a Learner cannot be changed.')
-    if role == feconf.ROLE_ID_LEARNER:
-        raise Exception('Updating to a Learner role is not allowed.')
-    user_settings.role = role
+    if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
+        raise Exception('Adding a default role is not allowed.')
+
+    user_settings.roles.append(role)
+    role_services.log_role_query(
+        user_id, feconf.ROLE_ACTION_ADD, role=role,
+        username=user_settings.username)
+
     _save_user_settings(user_settings)
+
+def remove_user_role(user_id, role):
+    """Updates the roles of the user with given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user whose role is to be updated.
+        role: str. The role to be assigned to user with given id.
+
+    Raises:
+        Exception. The given role does not exist.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    if feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles:
+        raise Exception('The role of a Learner cannot be changed.')
+    if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
+        raise Exception('Removing a default role is not allowed.')
+
+    user_settings.roles.remove(role)
+
+    role_services.log_role_query(
+        user_id, feconf.ROLE_ACTION_REMOVE, role=role,
+        username=user_settings.username)
+
+    _save_user_settings(user_settings)
+
 
 
 def mark_user_for_deletion(user_id):
@@ -1844,20 +1871,16 @@ def update_dashboard_stats_log(user_id):
     model.put()
 
 
-def is_at_least_moderator(user_id):
-    """Checks if a user with given user_id is at least a moderator.
+def is_moderator(user_id):
+    """Checks if a user with given user_id is a moderator.
 
     Args:
         user_id: str. The unique ID of the user.
 
     Returns:
-        bool. True if user is atleast a moderator, False otherwise.
+        bool. True if user is a moderator, False otherwise.
     """
-    user_role = get_user_role_from_id(user_id)
-    if (user_role == feconf.ROLE_ID_MODERATOR or
-            user_role == feconf.ROLE_ID_ADMIN):
-        return True
-    return False
+    return feconf.ROLE_ID_MODERATOR in get_user_roles_from_id(user_id)
 
 
 def is_admin(user_id):
@@ -1869,10 +1892,7 @@ def is_admin(user_id):
     Returns:
         bool. True if user is an admin, False otherwise.
     """
-    user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_ADMIN:
-        return True
-    return False
+    return feconf.ROLE_ID_CURRICULUM_ADMIN in get_user_roles_from_id(user_id)
 
 
 def is_topic_manager(user_id):
@@ -1884,10 +1904,7 @@ def is_topic_manager(user_id):
     Returns:
         bool. Whether the user is a topic manager.
     """
-    user_role = get_user_role_from_id(user_id)
-    if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
-        return True
-    return False
+    return feconf.ROLE_ID_TOPIC_MANAGER in get_user_roles_from_id(user_id)
 
 
 def can_review_translation_suggestions(user_id, language_code=None):
@@ -2177,29 +2194,20 @@ def create_login_url(return_url):
     return '/login?%s' % python_utils.url_encode({'return_url': return_url})
 
 
-def update_roles_and_banned_fields(user_settings_model):
-    """Updates the new roles and banned fields in the UserSettingsModel which
-    are not in use but needs to kept in sync.
+def mark_user_banned(user_id):
+    user_settings = get_user_settings(user_id)
+    user_settings.mark_banned()
+    _save_user_settings(user_settings)
 
-    TODO(#12755): Remove this function once the roles and banned field of
-    UserSettingsModel are in use. It is not recommended to use this function in
-    new places.
 
-    Args:
-        user_settings_model: UserSettingsModel. The models which needs update.
-    """
-    if user_settings_model.role == feconf.ROLE_ID_BANNED_USER:
-        user_settings_model.banned = True
-        user_settings_model.roles = []
-        return
-    if user_settings_model.role in [
-            feconf.ROLE_ID_LEARNER, feconf.ROLE_ID_EXPLORATION_EDITOR]:
-        user_settings_model.banned = False
-        user_settings_model.roles = [user_settings_model.role]
-        return
+def unmark_user_banned(user_id):
+    user_auth_details = auth_services.get_user_auth_details_from_model(
+        auth_models.UserAuthDetailsModel.get(user_id))
 
-    # Learners are not allowed to have other roles, so user with role other than
-    # exploration editor or learner should have exploration editor role.
-    user_settings_model.roles = [
-        feconf.ROLE_ID_EXPLORATION_EDITOR, user_settings_model.role]
-    user_settings_model.banned = False
+    user_settings = get_user_settings(user_id)
+    user_settings.unmark_banned(
+        feconf.ROLE_ID_FULL_USER if user_auth_details.is_full_user() else (
+            feconf.ROLE_ID_MOBILE_LEARNER
+        ))
+
+    _save_user_settings(user_settings)

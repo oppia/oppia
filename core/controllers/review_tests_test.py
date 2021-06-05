@@ -44,7 +44,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.topic_id = 'topic_id'

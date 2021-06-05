@@ -427,7 +427,7 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -539,7 +539,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(actual_output, [])
 
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
@@ -573,7 +573,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(actual_output, [])
 
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
@@ -623,7 +623,7 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
@@ -1356,7 +1356,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
                 job_id))
         self.assertEqual(actual_output, [])
 
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
@@ -1393,7 +1393,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
@@ -1421,7 +1421,7 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         owner = user_services.get_user_actions_info(self.albert_id)
 
         rights_manager.set_private_viewability_of_exploration(
@@ -2858,7 +2858,7 @@ class RegenerateMissingExpCommitLogModelsTests(test_utils.GenericTestBase):
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
         self.user = user_services.get_user_actions_info(self.user_id)
-        self.set_admins(['user'])
+        self.set_curriculum_admins(['user'])
 
         self.save_new_valid_exploration(
             '0', self.user_id, end_state_name='End')
@@ -3082,7 +3082,7 @@ class ExpCommitLogModelRegenerationValidatorTests(test_utils.GenericTestBase):
 
         self.signup('user@email', 'user')
         self.user_id = self.get_user_id_from_email('user@email')
-        self.set_admins(['user'])
+        self.set_curriculum_admins(['user'])
         self.exp_id = '0b'
 
         exp = exp_domain.Exploration.create_default_exploration(

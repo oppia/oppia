@@ -247,7 +247,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 config_domain
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value):
             admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_ADMIN)
+                feconf.ROLE_ID_CURRICULUM_ADMIN)
             suggestion_types_needing_reviewers = (
                 suggestion_services
                 .get_suggestion_types_that_need_reviewers()
@@ -259,7 +259,7 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
                 .ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW
                 .value):
             admin_ids = user_services.get_user_ids_by_role(
-                feconf.ROLE_ID_ADMIN)
+                feconf.ROLE_ID_CURRICULUM_ADMIN)
             info_about_suggestions_waiting_too_long_for_review = (
                 suggestion_services
                 .get_info_about_suggestions_waiting_too_long_for_review()

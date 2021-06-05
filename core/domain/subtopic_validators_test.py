@@ -57,7 +57,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
@@ -286,7 +286,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
@@ -526,7 +526,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,
@@ -703,7 +703,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
             '%s' % i,

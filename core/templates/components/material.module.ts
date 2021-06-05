@@ -25,6 +25,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input"
+import { MatIconModule } from "@angular/material/icon";
+import {MatListModule} from '@angular/material/list';
+import { MatSelectModule } from '@angular/material/select';
+
 
 @NgModule({
   imports: [
@@ -35,7 +41,11 @@ import { MatSliderModule } from '@angular/material/slider';
     MatCheckboxModule,
     MatProgressSpinnerModule,
     MatRadioModule,
-    MatSliderModule
+    MatSliderModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatListModule
   ],
   exports: [
     BrowserAnimationsModule,
@@ -44,7 +54,12 @@ import { MatSliderModule } from '@angular/material/slider';
     MatCheckboxModule,
     MatProgressSpinnerModule,
     MatRadioModule,
-    MatSliderModule
+    MatSliderModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatListModule,
+    MatSelectModule
   ]
 })
 export class MaterialModule {}

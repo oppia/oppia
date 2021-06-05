@@ -141,10 +141,7 @@ class AdminHandler(base.BaseHandler):
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.UPDATABLE_ROLES
             },
-            'viewable_roles': {
-                role: role_services.HUMAN_READABLE_ROLES[role]
-                for role in role_services.VIEWABLE_ROLES
-            },
+            'viewable_roles': role_services.VIEWABLE_ROLES,
             'topic_summaries': topic_summary_dicts,
             'role_to_actions': role_services.get_role_actions(),
             'feature_flags': feature_flag_dicts,
@@ -412,7 +409,7 @@ class AdminHandler(base.BaseHandler):
             Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
-            if self.user.role != feconf.ROLE_ID_ADMIN:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.')
             topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -577,7 +574,7 @@ class AdminHandler(base.BaseHandler):
             Exception. User does not have enough rights to generate data.
         """
         if constants.DEV_MODE:
-            if self.user.role != feconf.ROLE_ID_ADMIN:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.')
             skill_id = skill_services.get_new_skill_id()
@@ -692,40 +689,122 @@ class AdminRoleHandler(base.BaseHandler):
             if user_id is None:
                 raise self.InvalidInputException(
                     'User with given username does not exist.')
-            user_role_dict = {
-                username: user_services.get_user_role_from_id(user_id)
+
+            user_settings = user_services.get_user_settings(user_id)
+            user_roles = user_settings.roles
+            topic_ids = []
+            if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
+                topic_ids = [
+                    t_r.id for t_r in topic_fetchers.get_topic_rights_with_user(
+                        user_id)]
+            user_roles_dict = {
+                'roles': user_roles,
+                'topic_ids': topic_ids,
+                'banned': user_settings.banned
             }
-            self.render_json(user_role_dict)
+            self.render_json(user_roles_dict)
         else:
             raise self.InvalidInputException(
                 'Invalid filter criterion to view roles.')
 
     @acl_decorators.can_access_admin_page
-    def post(self):
+    def put(self):
         username = self.payload.get('username')
         role = self.payload.get('role')
         topic_id = self.payload.get('topic_id')
         user_id = user_services.get_user_id_from_username(username)
+
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
 
-        if (
-                user_services.get_user_role_from_id(user_id) ==
-                feconf.ROLE_ID_TOPIC_MANAGER):
-            topic_services.deassign_user_from_all_topics(
-                user_services.get_system_user(), user_id)
+        if role == feconf.ROLE_ID_TOPIC_MANAGER:
+            if feconf.ROLE_ID_TOPIC_MANAGER not in self.roles:
+                user_services.add_user_role(user_id, role)
 
-        user_services.update_user_role(user_id, role)
-        role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_UPDATE, role=role,
-            username=username)
-
-        if topic_id:
             user = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)
+
+        else:
+            user_services.add_user_role(user_id, role)
+
+        self.render_json({})
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        username = self.request.get('username')
+        role = self.request.get('role')
+        topic_id = self.request.get('topic_id')
+        remove_from_all_topics = self.request.get(
+            'remove_from_all_topics', False)
+
+        user_id = user_services.get_user_id_from_username(username)
+
+        print topic_id, remove_from_all_topics, "Check"*50, self.roles, role
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+
+        if role != feconf.ROLE_ID_TOPIC_MANAGER:
+            user_services.remove_user_role(user_id, role)
+            self.render_json({})
+            return
+
+        if remove_from_all_topics:
+            topic_services.deassign_user_from_all_topics(
+                user_services.get_system_user(), user_id)
+            user_services.remove_user_role(user_id, role)
+            self.render_json({})
+            return
+
+        topic_ids = [
+            t_r.id for t_r in topic_fetchers.get_topic_rights_with_user(
+                user_id)]
+        if topic_id not in topic_ids:
+            raise self.InvalidInputException(
+                'User does no have rights in the give topic.')
+
+        topic_services.deassign_manager_role_from_topic(
+            user_services.get_system_user(), user_id, topic_id)
+
+        if len(topic_ids) == 1:
+            user_services.remove_user_role(user_id, role)
+
+        self.render_json({})
+
+
+class BannedUsersHandler(base.BaseHandler):
+    """Handler for roles tab of admin page. Used to view and update roles."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        pass
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.payload.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+        user_services.mark_user_banned(user_id)
+
+        self.render_json({})
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        username = self.request.get('username')
+        user_id = user_services.get_user_id_from_username(username)
+
+        if user_id is None:
+            raise self.InvalidInputException(
+                'User with given username does not exist.')
+        user_services.unmark_user_banned(user_id)
 
         self.render_json({})
 

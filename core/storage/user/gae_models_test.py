@@ -40,17 +40,17 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_EMAIL = 'user@example.com'
-    USER_1_ROLE = feconf.ROLE_ID_ADMIN
+    USER_1_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     USER_2_ID = 'user2_id'
     USER_2_EMAIL = 'user2@example.com'
     USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
     USER_3_EMAIL = 'user3@example.com'
-    USER_3_ROLE = feconf.ROLE_ID_ADMIN
+    USER_3_ROLE = feconf.ROLE_ID_CURRICULUM_ADMIN
     GENERIC_PIN = '12345'
     PROFILE_1_ID = 'profile_id'
     PROFILE_1_EMAIL = 'user@example.com'
-    PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
+    PROFILE_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
     GENERIC_USERNAME = 'user'
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(datetime.datetime(2019, 5, 20))
@@ -167,7 +167,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.USER_3_ID)
         ]
         self.assertItemsEqual(
-            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_ADMIN),
+            user_models.UserSettingsModel.get_by_role(feconf.ROLE_ID_CURRICULUM_ADMIN),
             actual_users
         )
 
@@ -182,7 +182,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': 'user@example.com',
-            'role': feconf.ROLE_ID_ADMIN,
+            'role': feconf.ROLE_ID_CURRICULUM_ADMIN,
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
@@ -209,7 +209,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': self.USER_3_EMAIL,
-            'role': feconf.ROLE_ID_ADMIN,
+            'role': feconf.ROLE_ID_CURRICULUM_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
             'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
@@ -2353,7 +2353,7 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_1_id'
     USER_1_EMAIL = 'email@email.com'
-    USER_1_ROLE = feconf.ROLE_ID_LEARNER
+    USER_1_ROLE = feconf.ROLE_ID_MOBILE_LEARNER
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""

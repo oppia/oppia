@@ -86,6 +86,7 @@ export class TranslationModalComponent {
   }
 
   ngOnInit(): void {
+    console.log(AppConstants.PLACEHOLDER_OUTCOME_DEST, "INNNNEEEERRRRRRRRRRRRR");
     this.activeLanguageCode =
     this.translationLanguageService.getActiveLanguageCode();
     // We need to set the context here so that the rte fetches

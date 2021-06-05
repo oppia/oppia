@@ -625,7 +625,7 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
         super(ThreadListHandlerForTopicsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -671,7 +671,7 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(RecentFeedbackMessagesHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'exp_id'
 
@@ -720,7 +720,7 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackStatsHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'exp_id'
 

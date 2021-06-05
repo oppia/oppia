@@ -57,7 +57,7 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.topic_id_1 = 'topic1'
         self.topic_id_2 = 'topic2'

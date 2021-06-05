@@ -61,7 +61,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -332,7 +332,7 @@ class SkillOpportunityModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         for i in python_utils.RANGE(3):

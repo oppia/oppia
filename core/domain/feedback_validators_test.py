@@ -50,7 +50,7 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         exp = exp_domain.Exploration.create_default_exploration(
             '0',

@@ -64,7 +64,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -347,7 +347,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
@@ -499,7 +499,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.exp_id = exp_fetchers.get_new_exploration_id()
         exp = self.save_new_valid_exploration(

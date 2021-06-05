@@ -171,7 +171,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
     def test_sender_id_validation(self):
         sender_ids_to_test = [
@@ -586,7 +586,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.new_footer = (
             'Unsubscribe from emails at your '
@@ -952,7 +952,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.new_footer = (
             'You can change your email preferences via the '
@@ -5097,7 +5097,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.signup(self.RECIPIENT_A_EMAIL, self.RECIPIENT_A_USERNAME)
         self.signup(self.RECIPIENT_B_EMAIL, self.RECIPIENT_B_USERNAME)
-        self.set_admins([self.SENDER_USERNAME, ])
+        self.set_curriculum_admins([self.SENDER_USERNAME, ])
         self.recipient_a_id = self.get_user_id_from_email(
             self.RECIPIENT_A_EMAIL)
         self.recipient_b_id = self.get_user_id_from_email(
@@ -5505,7 +5505,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
-        self.set_admins([self.SENDER_USERNAME])
+        self.set_curriculum_admins([self.SENDER_USERNAME])
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self):

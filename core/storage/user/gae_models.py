@@ -48,7 +48,7 @@ class UserSettingsModel(base_models.BaseModel):
     # TODO(1995YogeshSharma): Remove the default value once the one-off
     # migration (to give role to all users) is run.
     role = datastore_services.StringProperty(
-        required=True, indexed=True, default=feconf.ROLE_ID_EXPLORATION_EDITOR)
+        required=True, indexed=True, default=feconf.ROLE_ID_FULL_USER)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = datastore_services.DateTimeProperty(default=None)
     # When the user last logged in. This may be out-of-date by up to
@@ -356,7 +356,7 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-        return cls.query(cls.role == role).fetch()
+        return cls.query(cls.roles == role).fetch()
 
 
 class CompletedActivitiesModel(base_models.BaseModel):

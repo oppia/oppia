@@ -73,7 +73,7 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
@@ -208,7 +208,7 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
         profile_user_settings_model = user_models.UserSettingsModel.get_by_id(
             profile_user_id)
         self.assertEqual(
-            profile_user_settings_model.role, feconf.ROLE_ID_LEARNER)
+            profile_user_settings_model.role, feconf.ROLE_ID_MOBILE_LEARNER)
 
         profile_user_settings_model.role = feconf.ROLE_ID_MODERATOR
 
@@ -237,7 +237,7 @@ class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         # Note: There will a total of 3 UserSettingsModel even though
         # only two users signup in the test since superadmin signup
@@ -698,7 +698,7 @@ class ExpUserLastPlaythroughModelValidatorTests(
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
@@ -2068,7 +2068,7 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
@@ -2264,7 +2264,7 @@ class StoryProgressModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [self.save_new_valid_exploration(
@@ -2465,7 +2465,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.user_query_id = user_query_services.save_new_user_query(
             self.admin_id, {
@@ -2646,7 +2646,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.user_query_id = user_query_services.save_new_user_query(
             self.admin_id, {
@@ -2767,7 +2767,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),

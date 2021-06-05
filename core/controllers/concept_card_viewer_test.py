@@ -35,7 +35,7 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),

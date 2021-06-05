@@ -160,7 +160,7 @@ def pre_delete_user(user_id):
                 profile_user_settings.role
             )
         )
-    if user_settings.role != feconf.ROLE_ID_LEARNER:
+    if feconf.ROLE_ID_MOBILE_LEARNER not in user_settings.roles:
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
@@ -279,7 +279,7 @@ def delete_user(pending_deletion_request):
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.feedback)
     _delete_models(user_id, models.NAMES.improvements)
-    if user_role != feconf.ROLE_ID_LEARNER:
+    if user_role != feconf.ROLE_ID_MOBILE_LEARNER:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
         _pseudonymize_app_feedback_report_models(pending_deletion_request)

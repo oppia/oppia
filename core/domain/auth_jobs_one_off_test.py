@@ -440,7 +440,7 @@ class PopulateFirebaseAccountsOneOffJobTests(FirebaseOneOffJobTestBase):
             email = 'email_%s@test.com' % auth_id
         user_models.UserSettingsModel(
             id=user_id, email=email, deleted=deleted,
-            role=feconf.ROLE_ID_EXPLORATION_EDITOR,
+            role=feconf.ROLE_ID_FULL_USER,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
         ).put()
         return auth_domain.AuthIdUserIdPair(auth_id, user_id)
@@ -828,7 +828,7 @@ class AuditFirebaseImportReadinessOneOffJobTests(test_utils.GenericTestBase):
         """
         user_models.UserSettingsModel(
             id=user_id, email=email, deleted=deleted,
-            role=feconf.ROLE_ID_EXPLORATION_EDITOR,
+            role=feconf.ROLE_ID_FULL_USER,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE]
         ).put()
 

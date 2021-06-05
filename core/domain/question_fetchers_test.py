@@ -42,7 +42,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)

@@ -96,7 +96,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         # Change title and category.
         exp_services.update_exploration(
@@ -126,7 +126,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
     def test_library_handler_for_created_explorations(self):
         """Test the library data handler for manually created explorations."""
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)

@@ -55,7 +55,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
         self.applicant = user_services.get_user_actions_info(self.applicant_id)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'

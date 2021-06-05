@@ -522,7 +522,7 @@ class InteractionsInStoriesAuditOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.user_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.set_admins([self.ALBERT_NAME])
+        self.set_curriculum_admins([self.ALBERT_NAME])
         self.login(self.ALBERT_EMAIL, is_super_admin=True)
         self.process_and_flush_pending_mapreduce_tasks()
 

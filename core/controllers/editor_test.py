@@ -66,7 +66,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -1147,9 +1147,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id),
+                (feconf.ROLE_ID_FULL_USER, self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id)
+                (feconf.ROLE_ID_FULL_USER, self.owner_id, exp_id)
             ])
             self.logout()
 
@@ -1164,9 +1164,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id),
+                (feconf.ROLE_ID_CURRICULUM_ADMIN, self.admin_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id)
+                (feconf.ROLE_ID_CURRICULUM_ADMIN, self.admin_id, exp_id)
             ])
 
             self.logout()
@@ -1351,7 +1351,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
         self.assert_can_edit(exp_id)
 
         # Ban joe.
-        self.set_banned_users(['joe'])
+        self.mark_user_banned('joe')
 
         # Test that Joe is banned (He can still access the library page).
         self.get_html_response(feconf.LIBRARY_INDEX_URL)

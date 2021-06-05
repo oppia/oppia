@@ -323,8 +323,7 @@ ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA = {
 
 SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-        user_services.is_at_least_moderator),
+    feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_DAILY_BATCH: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
@@ -338,8 +337,7 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: user_services.is_admin,
-    feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-        user_services.is_at_least_moderator),
+    feconf.EMAIL_INTENT_DELETE_EXPLORATION: user_services.is_moderator,
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ONBOARD_REVIEWER: (

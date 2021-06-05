@@ -50,16 +50,16 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
-        admin_model.role = feconf.ROLE_ID_ADMIN
+        admin_model.role = feconf.ROLE_ID_CURRICULUM_ADMIN
         admin_model.update_timestamps()
         admin_model.put()
 
         model_id = '%s.%s.%s.%s' % (
             self.admin_id, int(math.floor(time.time())),
-            feconf.ROLE_ACTION_UPDATE, random.randint(0, 1000))
+            feconf.ROLE_ACTION_ADD, random.randint(0, 1000))
         self.model_instance = audit_models.RoleQueryAuditModel(
             id=model_id, user_id=self.admin_id,
-            intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
+            intent=feconf.ROLE_ACTION_ADD, role='c', username='d')
         self.model_instance.update_timestamps()
         self.model_instance.put()
 
@@ -117,11 +117,11 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_invalid_id(self):
         model_invalid_id = '%s.%s.%s.%s' % (
-            'a', int(math.floor(time.time())), feconf.ROLE_ACTION_UPDATE,
+            'a', int(math.floor(time.time())), feconf.ROLE_ACTION_ADD,
             random.randint(0, 1000))
         model_instance_with_invalid_id = audit_models.RoleQueryAuditModel(
             id=model_invalid_id, user_id=self.admin_id,
-            intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
+            intent=feconf.ROLE_ACTION_ADD, role='c', username='d')
         model_instance_with_invalid_id.update_timestamps()
         model_instance_with_invalid_id.put()
         expected_output = [(
@@ -146,7 +146,7 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
-        admin_model.role = feconf.ROLE_ID_ADMIN
+        admin_model.role = feconf.ROLE_ID_CURRICULUM_ADMIN
         admin_model.update_timestamps()
         admin_model.put()
 

@@ -265,7 +265,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_load_new_structures_data(self):
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -301,7 +301,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_generate_dummy_skill_and_questions_data(self):
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -321,7 +321,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         topic_id = 'topic'
         story_id = 'story'
@@ -395,7 +395,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_regenerate_missing_exploration_stats_action(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
         self.save_new_default_exploration('ID', 'owner_id')
 
@@ -1281,7 +1281,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(AdminRoleHandlerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
 
     def test_view_and_update_role(self):
         user_email = 'user1@example.com'
@@ -1295,7 +1295,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'filter_criterion': 'username', 'username': 'user1'})
         self.assertEqual(
-            response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
+            response_dict, {'user1': feconf.ROLE_ID_FULL_USER})
 
         # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()
@@ -1399,7 +1399,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={'filter_criterion': 'username', 'username': username})
 
         self.assertEqual(
-            response_dict, {username: feconf.ROLE_ID_EXPLORATION_EDITOR})
+            response_dict, {username: feconf.ROLE_ID_FULL_USER})
 
         # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()

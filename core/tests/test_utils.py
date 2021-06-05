@@ -2011,14 +2011,14 @@ title: Title
                 'role': user_role,
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_admins(self, admin_usernames):
+    def set_curriculum_admins(self, admin_usernames):
         """Sets role of given users as ADMIN.
 
         Args:
             admin_usernames: list(str). List of usernames.
         """
         for name in admin_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_ADMIN)
+            self.set_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
     def set_topic_managers(self, topic_manager_usernames):
         """Sets role of given users as TOPIC_MANAGER.
@@ -2038,14 +2038,16 @@ title: Title
         for name in moderator_usernames:
             self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def set_banned_users(self, banned_usernames):
-        """Sets role of given users as BANNED_USER.
+    def mark_users_banned(self, banned_username):
+        """Marks a user banned.
 
         Args:
-            banned_usernames: list(str). List of usernames.
+            banned_username: str. The username of the user..
         """
-        for name in banned_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_BANNED_USER)
+        with self.super_admin_context():
+            self.put_json('/bannedusershandler', {
+                'username': banned_username
+            }, csrf_token=self.get_new_csrf_token())
 
     def set_collection_editors(self, collection_editor_usernames):
         """Sets role of given users as COLLECTION_EDITOR.

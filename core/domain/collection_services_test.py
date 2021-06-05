@@ -72,7 +72,7 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         self.owner = user_services.get_user_actions_info(self.owner_id)

@@ -38,7 +38,7 @@ class UserSettings(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         email: str. The user email.
-        role: str. Role of the user.
+        roles: list(str). Roles of the user.
         username: str or None. Identifiable username to display in the UI.
         last_agreed_to_terms: datetime.datetime or None. When the user last
             agreed to the terms of the site.
@@ -70,7 +70,7 @@ class UserSettings(python_utils.OBJECT):
     """
 
     def __init__(
-            self, user_id, email, role, username=None,
+            self, user_id, email, roles, banned, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
             last_started_state_translation_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None, last_edited_an_exploration=None,
@@ -86,7 +86,8 @@ class UserSettings(python_utils.OBJECT):
         Args:
             user_id: str. The unique ID of the user.
             email: str. The user email.
-            role: str. Role of the user.
+            roles: list(str). Roles of the user.
+            banned: bool. Whetehr the uses is banned.
             username: str or None. Identifiable username to display in the UI.
             last_agreed_to_terms: datetime.datetime or None. When the user
                 last agreed to the terms of the site.
@@ -126,7 +127,7 @@ class UserSettings(python_utils.OBJECT):
         """
         self.user_id = user_id
         self.email = email
-        self.role = role
+        self.roles = roles
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (
@@ -149,18 +150,19 @@ class UserSettings(python_utils.OBJECT):
         self.preferred_audio_language_code = preferred_audio_language_code
         self.pin = pin
         self.display_alias = display_alias
+        self.banned = banned
         self.deleted = deleted
         self.created_on = created_on
 
     def validate(self):
-        """Checks that the user_id, email, role, pin and display_alias
+        """Checks that the user_id, email, roles, banned, pin and display_alias
         fields of this UserSettings domain object are valid.
 
         Raises:
             ValidationError. The user_id is not str.
             ValidationError. The email is not str.
             ValidationError. The email is invalid.
-            ValidationError. The role is not str.
+            ValidationError. The roles is not a list.
             ValidationError. Given role does not exist.
             ValidationError. The pin is not str.
             ValidationError. The display alias is not str.
@@ -177,11 +179,35 @@ class UserSettings(python_utils.OBJECT):
         ):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
-        if not isinstance(self.role, python_utils.BASESTRING):
+        if not isinstance(self.banned, bool):
             raise utils.ValidationError(
-                'Expected role to be a string, received %s' % self.role)
-        if not role_services.is_valid_role(self.role):
-            raise utils.ValidationError('Role %s does not exist.' % self.role)
+                'Expected banned to be a bool, received %s' % self.role)
+
+        if not isinstance(self.roles, list):
+            raise utils.ValidationError(
+                'Expected role to be a list, received %s' % self.role)
+
+        if self.banned:
+            if self.roles:
+                raise utils.ValidationError(
+                    'Expected roles for banned user to be empty, '
+                    'recieved %s.' % self.roles)
+        else:
+            defalut_roles = []
+            if len(self.roles) != len(set(self.roles)):
+                raise utils.ValidationError(
+                    'Roles contains duplicate values: %s' % self.roles)
+            for role in self.roles:
+                if role not in feconf.ALLOWED_USER_ROLES:
+                    raise utils.ValidationError(
+                        'Role %s does not exist.' % role)
+
+                if role in feconf.POSSIBLE_REGISTERED_USER_DEFAULT_ROLES:
+                    defalut_roles.append(role)
+
+            if len(defalut_roles) != 1:
+                raise utils.ValidationError(
+                    'Expected roles to contains one default role.')
 
         if self.pin is not None:
             if not isinstance(self.pin, python_utils.BASESTRING):
@@ -275,7 +301,8 @@ class UserSettings(python_utils.OBJECT):
         """
         return {
             'email': self.email,
-            'role': self.role,
+            'roles': self.roles,
+            'banned': self.banned,
             'username': self.username,
             'normalized_username': self.normalized_username,
             'last_agreed_to_terms': self.last_agreed_to_terms,
@@ -386,19 +413,26 @@ class UserSettings(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'This username is not available.')
 
+    def mark_banned(self):
+        self.banned = True
+        self.roles = []
+
+    def unmark_banned(self, default_role):
+        self.banned = False
+        self.roles = [default_role]
 
 class UserActionsInfo(python_utils.OBJECT):
     """A class representing information of user actions.
 
     Attributes:
         user_id: str. The unique ID of the user.
-        role: str. The role ID of the user.
+        roles: list(str). The roles of the user.
         actions: list(str). A list of actions accessible to the role.
     """
 
     def __init__(self, user_id, role, actions):
         self._user_id = user_id
-        self._role = role
+        self._roles = role
         self._actions = actions
 
     @property
@@ -411,13 +445,13 @@ class UserActionsInfo(python_utils.OBJECT):
         return self._user_id
 
     @property
-    def role(self):
-        """Returns the role ID of user.
+    def roles(self):
+        """Returns the roles of user.
 
         Returns:
-            role: str. The role ID of the user.
+            role: list(str). The roles of the user.
         """
-        return self._role
+        return self._roles
 
     @property
     def actions(self):

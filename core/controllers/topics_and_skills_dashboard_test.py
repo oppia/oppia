@@ -46,7 +46,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()

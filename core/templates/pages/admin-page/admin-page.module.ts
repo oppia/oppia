@@ -36,13 +36,16 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
+import { RolesEditorComponent } from "./roles-tab/admin-roles-tab.component";
+import { TopicManagerRoleEditorModalComponent } from "./roles-tab/topic-manager-role-editor-modal.component";
+
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -51,7 +54,9 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     AdminJobsTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    RolesEditorComponent,
+    TopicManagerRoleEditorModalComponent
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
@@ -60,7 +65,9 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     AdminJobsTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
-    RolesAndActionsVisualizerComponent
+    RolesAndActionsVisualizerComponent,
+    RolesEditorComponent,
+    TopicManagerRoleEditorModalComponent
   ],
   providers: [
     {

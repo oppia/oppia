@@ -27,9 +27,8 @@
                       (set-status-message)="$ctrl.setStatusMessage($event)">
   </admin-features-tab>
 
-  <admin-roles-tab ng-if="$ctrl.isRolesTabOpen()"
-                   set-status-message="$ctrl.setStatusMessage">
-  </admin-roles-tab>
+  <oppia-roles-editor ng-if="$ctrl.isRolesTabOpen()">
+  </oppia-roles-editor>
 
   <admin-misc-tab ng-if="$ctrl.isMiscTabOpen()"
                   set-status-message="$ctrl.setStatusMessage">

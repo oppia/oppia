@@ -1103,7 +1103,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -2193,7 +2193,7 @@ class CleanUpCollectionProgressModelOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_curriculum_admins([self.OWNER_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
@@ -2910,7 +2910,7 @@ class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             new_user_model.roles, [
-                feconf.ROLE_ID_EXPLORATION_EDITOR,
+                feconf.ROLE_ID_FULL_USER,
                 feconf.ROLE_ID_COLLECTION_EDITOR])
         self.assertFalse(new_user_model.banned)
         self.assertEqual(
@@ -2921,7 +2921,7 @@ class UserRolesPopulationOneOffJobTests(test_utils.GenericTestBase):
             id='user-id',
             email='email@email.com',
             normalized_username='username',
-            role=feconf.ROLE_ID_BANNED_USER)
+            role='banned')
         model.update_timestamps()
         model.put()
 

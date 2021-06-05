@@ -140,6 +140,10 @@ var suites = {
       'protractor_desktop/publicationAndLibrary.js'
     ],
 
+    releaseCoordinatorPageFeatures: [
+      'protractor_desktop/releaseCoordinatorPageFeatures.js'
+    ],
+
     subscriptions: [
       'protractor/subscriptionsFlow.js'
     ],
@@ -369,7 +373,7 @@ exports.config = {
     }
 
     // Screenshots will only run on CircleCI, since we don't have videos here.
-    // We don't need these on Github Actions since we have videos. 
+    // We don't need these on Github Actions since we have videos.
 
     if (process.env.CIRCLECI) {
       // This takes screenshots of failed tests. For more information see

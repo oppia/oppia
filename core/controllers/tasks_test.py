@@ -57,7 +57,7 @@ class TasksTests(test_utils.EmailTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.set_user_role(
-            self.EDITOR_USERNAME, feconf.ROLE_ID_EXPLORATION_EDITOR)
+            self.EDITOR_USERNAME, feconf.ROLE_ID_FULL_USER)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(

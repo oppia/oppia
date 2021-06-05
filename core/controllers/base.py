@@ -249,13 +249,12 @@ class BaseHandler(webapp2.RequestHandler):
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 
-        self.role = (
-            feconf.ROLE_ID_GUEST
-            if self.user_id is None else user_settings.role)
+        self.roles = (
+            [feconf.ROLE_ID_GUEST]
+            if self.user_id is None else user_settings.roles)
         self.user = user_services.get_user_actions_info(self.user_id)
 
-        self.values['is_moderator'] = (
-            user_services.is_at_least_moderator(self.user_id))
+        self.values['is_moderator'] = user_services.is_moderator(self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))

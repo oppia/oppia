@@ -48,7 +48,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
 
-        self.set_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
