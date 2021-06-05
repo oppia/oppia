@@ -17,8 +17,8 @@
  * interaction.
  */
 
-var customizeInteraction = function(elem, placeholder) {
-  // There are no customizations.
+var objects = require(process.cwd() + '/extensions/objects/protractor.js');
+var customizeInteraction = async function(elem, placeholder) {
   await objects.BooleanEditor(elem.element(by.tagName(
     'schema-based-bool-editor'))).setValue(placeholder);
 };

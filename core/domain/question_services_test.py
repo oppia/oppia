@@ -3134,7 +3134,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             linked_skill_id, None)
 
-    def test_migrate_question_state_from_v45_to_latest(self):
+    def test_migrate_question_state_from_v44_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -3174,95 +3174,11 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {
-                        'value': False
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
                     },
-                    'rows': {'value': 1}
-                },
-                'default_outcome': {
-                    'dest': None,
-                    'feedback': {
-                        'content_id': 'feedback_1',
-                        'html': 'Correct Answer'
-                    },
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                    'labelled_as_correct': True,
-                    'missing_prerequisite_skill_id': None
-                },
-                'hints': [],
-                'solution': {},
-                'id': 'TextInput'
-            },
-            'next_content_id_index': 4,
-            'param_changes': [],
-            'solicit_answer_details': False,
-            'classifier_model_id': None
-        }
-        question_model = question_models.QuestionModel(
-            id='question_id',
-            question_state_data=question_state_dict,
-            language_code='en',
-            version=0,
-            linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=45)
-        commit_cmd = question_domain.QuestionChange({
-            'cmd': question_domain.CMD_CREATE_NEW
-        })
-        commit_cmd_dicts = [commit_cmd.to_dict()]
-        question_model.commit(
-            'user_id_admin', 'question model created', commit_cmd_dicts)
-
-        question = question_fetchers.get_question_from_model(question_model)
-        self.assertEqual(
-            question.question_state_data_schema_version,
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-        cust_args = question.question_state_data.interaction.customization_args
-        cust_val = False
-        self.assertEqual(
-            cust_args['placeholder'].value, False)
-
-    def test_migrate_question_state_from_v46_to_latest(self):
-        answer_group = {
-            'outcome': {
-                'dest': 'abc',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': True,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': ['Test']
-                },
-                'rule_type': 'Equals'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        question_state_dict = {
-            'content': {
-                'content_id': 'content_1',
-                'html': 'Question 1'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    'explanation': {}
-                }
-            },
-            'interaction': {
-                'answer_groups': [answer_group],
-                'confirmed_unclassified_answers': [],
-                'customization_args': {
-                    'placeholder': {
-                        'value': False,
                     'rows': {'value': 1}
                 },
                 'default_outcome': {
@@ -3284,6 +3200,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'param_changes': [],
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'linked_skill_id': None,
             'classifier_model_id': None
         }
         question_model = question_models.QuestionModel(
@@ -3292,7 +3209,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             language_code='en',
             version=0,
             linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=45)
+            question_state_data_schema_version=44)
         commit_cmd = question_domain.QuestionChange({
             'cmd': question_domain.CMD_CREATE_NEW
         })
@@ -3306,7 +3223,5 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         cust_args = question.question_state_data.interaction.customization_args
-        cust_val = False
         self.assertEqual(
-            cust_args['placeholder'].value, False)
-
+            cust_args['placeholder'].value.unicode_str, '')

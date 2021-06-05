@@ -40,7 +40,7 @@ export class NumericInputValidationService {
 
   isCustomizationArgTrue(
     customizationArgs: NumericInputCustomizationArgs): boolean {
-      if(customizationArgs.input.value === true) {
+      if(customizationArgs.placeholder.value === true) {
         return true;
       }
       return false;
@@ -113,12 +113,11 @@ export class NumericInputValidationService {
           case 'Equals':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
-            if (x < 0 && customizationArgs.input.value) {
+            if (x < 0 && customizationArgs.placeholder.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' input ' +
-                  //(i + 1) +
                   ' should be greater than or equal to zero. ')
               });
             }
@@ -130,12 +129,11 @@ export class NumericInputValidationService {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
-            if (a < 0 && customizationArgs.input.value) {
+            if (a < 0 && customizationArgs.placeholder.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' upper bound of the range ' +
-                  //(i + 1) +
                   ' should be greater than or equal to zero. ')
               });
             }
@@ -151,12 +149,11 @@ export class NumericInputValidationService {
           case 'IsLessThan':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
-            if (x < 0 && customizationArgs.input.value) {
+            if (x < 0 && customizationArgs.placeholder.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' input ' +
-                  //(i + 1) +
                   ' should be greater than or equal to zero. ')
               });
             }
@@ -164,12 +161,11 @@ export class NumericInputValidationService {
           case 'IsLessThanOrEqualTo':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
-            if (x <= 0 && customizationArgs.input.value) {
+            if (x <= 0 && customizationArgs.placeholder.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' input ' +
-                  //(i + 1) +
                   ' should be greater than or equal to zero. ')
               });
             }
@@ -178,12 +174,11 @@ export class NumericInputValidationService {
             var x = (<number>rule.inputs.x);
             var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-            if ((x + tol) < 0 && customizationArgs.input.value) {
+            if ((x + tol) < 0 && customizationArgs.placeholder.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
                   'Rule ' + (j + 1) + ' Upper bound of the tolerance range ' +
-                  //(i + 1) +
                   ' should be greater than or equal to zero. ')
               });
             }

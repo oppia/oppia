@@ -415,17 +415,11 @@ export interface NumericInputCustomizationArgsBackendDict {
   placeholder: {
     value: boolean;
   };
-  input: {
-    value: boolean;
-  }
 }
 export interface NumericInputCustomizationArgs {
   placeholder: {
     value: boolean;
   };
-  input: {
-    value: boolean;
-  }
 }
 
 

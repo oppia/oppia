@@ -116,7 +116,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
                 # Converting the answer groups depends on getting an
-                # exploration state of v44, because we need to add a
+                # exploration state of v45, because we need to add a
                 # customization_arg for numeric-input interaction to disable
                 # the ability of user to enter input less than zero.
                 # Since we do not yet support passing an exploration state of a

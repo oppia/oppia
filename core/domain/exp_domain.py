@@ -1841,19 +1841,6 @@ class Exploration(python_utils.OBJECT):
                 })
 
         return states_dict
-        """for state_dict in states_dict.values():
-            if state_dict['interaction']['id'] == 'NumericInput':
-                pdb.set_trace()
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                pdb.set_trace()
-                customization_args.update({
-                    'placeholder': {
-                        'value': True
-                    }
-                })
-        pdb.set_trace()
-        return states_dict"""
 
     @classmethod
     def update_states_from_model(

@@ -358,9 +358,6 @@ describe('Interaction object factory', () => {
       customization_args: {
         placeholder: {
           value: true
-        },
-        input: {
-          value: false
         }
       },
       default_outcome: defaultOutcomeDict,
@@ -370,16 +367,8 @@ describe('Interaction object factory', () => {
     });
 
     expect(testInteraction.customizationArgs).toEqual({
-      placeholder: true,/*{
-        value: {
-          content_id: 'ca_placeholder_0',
-          unicode_str: 'Input should be greater than zero.'
-        }*/
-        //value: new SubtitledUnicode(
-          //'Input should be greater than zero.', 'ca_placeholder_0')
-      //},
-      input: {
-        value: false
+      placeholder: {
+        value: true
       }
     });
   });
@@ -389,12 +378,7 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {
-        input: false,
-        placeholder: {
-          value: true
-        }
-      },
+      customization_args: {},
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
