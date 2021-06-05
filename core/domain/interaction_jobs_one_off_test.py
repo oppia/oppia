@@ -1290,7 +1290,7 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
-        """Checks output pairs are produced only for
+        """Checks EMAIL_DATA and SUCCESS are produced only for
         desired interactions.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -1340,8 +1340,66 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
             u'[u\'EMAIL_DATA\', [u"(u\'albert@example.com\', \'exp_id0\')"]]')]
         self.assertEqual(actual_output, expected_output)
 
+    def test_empty_when_owner_ids_is_empty(self):
+        """Checks EMPTY and SUCCESS is produced when owner ids is set
+        empty.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1'])
+        state1 = exploration.states['State1']
+        state1.update_interaction_id('LogicProof')
+        customization_args_dict1 = {
+            'question': {
+                'value': {
+                    'assumptions': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'results': [{
+                        'top_kind_name': 'variable',
+                        'top_operator_name': 'p',
+                        'arguments': [],
+                        'dummies': []
+                    }],
+                    'default_proof_string': ''
+                }
+            },
+        }
+
+        state1.update_interaction_customization_args(customization_args_dict1)
+        exp_services.save_new_exploration(self.user_id, exploration)
+
+        self.set_admins([self.USER_NAME])
+
+        owner = user_services.get_user_actions_info(self.user_id)
+        rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
+        rights_manager.release_ownership_of_exploration(
+            owner, self.VALID_EXP_ID)
+
+        # Start LogicProofInteractionOneOffJob job on sample exploration.
+        job_id = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.create_new())
+        interaction_jobs_one_off.LogicProofInteractionOneOffJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        actual_output = (
+            interaction_jobs_one_off
+            .LogicProofInteractionOneOffJob.get_output(job_id))
+        expected_output = [(u'[u\'EMPTY\', [u\'exp_id0\']]'), (
+            u'[u\'SUCCESS\', 1]')]
+
+        self.assertEqual(actual_output, expected_output)
+
     def test_missing_rights_when_exploration_rights_is_none(self):
-        """Test that MISSING_RIGHTS is yield when exploration rights is none."""
+        """Checks MISSING_RIGHTS is produced when exploration rights is
+        none.
+        """
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -1400,7 +1458,7 @@ class LogicProofInteractionOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
     def test_success_when_interaction_id_is_not_logicproof(self):
-        """Test that SUCCESS is yield when interaction id is not logicProof."""
+        """Checks SUCCESS is produced when interaction id is not logicProof."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
