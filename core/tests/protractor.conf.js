@@ -328,13 +328,11 @@ exports.config = {
     var vidPath = '';
     // Enable ALL_VIDEOS if you want success videos to be saved.
     const ALL_VIDEOS = false;
-    
-    // Use OPPIA_SCREENSHOTS=1
 
     // Only running video recorder on Github Actions, since running it on
     // CicleCI causes RAM issues (meaning very high flakiness).
 
-    if (process.env.GITHUB_ACTIONS && process.env.OPPIA_SCREENSHOTS == 1) {
+    if (process.env.GITHUB_ACTIONS && process.env.OPPIA_VIDEOS == 1) {
       jasmine.getEnv().addReporter({
         specStarted: function(result){
           let ffmpegArgs = [
