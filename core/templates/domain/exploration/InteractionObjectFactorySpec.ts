@@ -35,7 +35,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
-fdescribe('Interaction object factory', () => {
+describe('Interaction object factory', () => {
   let iof = null;
   let oof = null;
   let agof = null;
@@ -355,22 +355,14 @@ fdescribe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {
-        /*placeholder: {
-          value: true
-        }*/
-      },
+      customization_args: {},
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({
-      /*placeholder: {
-        value: true
-      }*/
-    });
+    expect(testInteraction.customizationArgs).toEqual({});
   });
 
   it('should correctly set customization arguments for ' +
