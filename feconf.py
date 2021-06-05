@@ -1278,6 +1278,7 @@ EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
     },
+    # TODO(#12991): Remove this once we migrate the data.
     'deprecated_values': {
         'new_status': ['publicized']
     }
