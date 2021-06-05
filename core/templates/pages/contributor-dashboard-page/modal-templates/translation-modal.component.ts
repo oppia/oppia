@@ -96,7 +96,7 @@ export class TranslationModalComponent {
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
   hasImgCopyError = false;
-  triedToCopyText = false;
+  triedToCopyParagraph = false;
   hasImgTextError = false;
   incompleteTranslationError = false;
 
@@ -142,9 +142,9 @@ export class TranslationModalComponent {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        // If this is made true, then the translation can not be validated
-        // properly since there can be complex extensions in the translatable
-        // text as complex extensions are not hidden in the exploration editor.
+        // If this is made true, then the translation cannot be validated
+        // properly since contributors will not be able to view and translate
+        // complex extensions.
         hide_complex_extensions: false,
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection: (
@@ -162,17 +162,17 @@ export class TranslationModalComponent {
   }
 
   onContentClick(event: MouseEvent): boolean | void {
-    if (this.validateParagraphCopy(event)) {
-      return this.triedToCopyText = true;
+    if (this.userTriedToCopyParagraph(event)) {
+      return this.triedToCopyParagraph = true;
     }
-    this.triedToCopyText = false;
+    this.triedToCopyParagraph = false;
     if (this.isCopyModeActive()) {
       event.stopPropagation();
     }
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
 
-  validateParagraphCopy($event: MouseEvent): boolean {
+  userTriedToCopyParagraph($event: MouseEvent): boolean {
     // Mathematical equations are also wrapped by <p> elements.
     // Hence, math elements should be allowed to be copied.
     // See issue #11683.
@@ -182,9 +182,7 @@ export class TranslationModalComponent {
         target.children) : [];
     const mathElementsIncluded = paragraphChildrenElements.some(
       child => child.localName === 'oppia-noninteractive-math');
-    const triedToTextCopy = target.localName === 'p' && !(
-      mathElementsIncluded);
-    return triedToTextCopy;
+    return target.localName === 'p' && !mathElementsIncluded;
   }
 
   isCopyModeActive(): boolean {
@@ -255,7 +253,7 @@ export class TranslationModalComponent {
   copiedAllElements(
       originalElements: string[],
       translatedElements: string[]): boolean {
-    const hasMatchingTranslatedElement = (element) => (
+    const hasMatchingTranslatedElement = element => (
       translatedElements.includes(element));
     return originalElements.every(hasMatchingTranslatedElement);
   }
@@ -266,7 +264,7 @@ export class TranslationModalComponent {
     if (originalElements.length === 0) {
       return false;
     }
-    const hasMatchingTranslatedElement = (element) => (
+    const hasMatchingTranslatedElement = element => (
       translatedElements.includes(element) && originalElements.length > 0);
     return originalElements.some(hasMatchingTranslatedElement);
   }
@@ -275,9 +273,9 @@ export class TranslationModalComponent {
       originalElements: HTMLElement[],
       translatedElements: HTMLElement[]): boolean {
     const filteredOriginalElements = originalElements.filter(
-      (element: HTMLElement) => element.nodeType === Node.ELEMENT_NODE);
+      element => element.nodeType === Node.ELEMENT_NODE);
     const filteredTranslatedElements = translatedElements.filter(
-      (element: HTMLElement) => element.nodeType === Node.ELEMENT_NODE);
+      element => element.nodeType === Node.ELEMENT_NODE);
 
     if (filteredOriginalElements.length !== filteredTranslatedElements.length) {
       return false;
@@ -337,6 +335,12 @@ export class TranslationModalComponent {
       this.loadingData) {
       return;
     }
+
+    this.hasImgCopyError = false;
+    this.triedToCopyParagraph = false;
+    this.hasImgTextError = false;
+    this.incompleteTranslationError = false;
+
     if (!this.uploadingTranslation && !this.loadingData) {
       this.siteAnalyticsService
         .registerContributorDashboardSubmitSuggestionEvent('Translation');

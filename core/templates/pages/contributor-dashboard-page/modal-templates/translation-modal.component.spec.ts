@@ -208,9 +208,9 @@ describe('Translation Modal Component', () => {
   });
 
   describe('when clicking on the translatable content', () => {
-    let nonParagraphTarget: HTMLElement;
-    let paragraphTarget: HTMLElement;
-    let mathTarget: HTMLElement;
+    const nonParagraphTarget: HTMLElement = document.createElement('div');
+    const paragraphTarget: HTMLElement = document.createElement('p');
+    const mathTarget: HTMLElement = document.createElement('oppia-noninteractive-math');
     let broadcastSpy: jasmine.Spy<(target: HTMLElement) => void>;
     let propagationSpy: jasmine.Spy<() => void>;
     beforeEach(fakeAsync(() => {
@@ -220,9 +220,6 @@ describe('Translation Modal Component', () => {
         ckEditorCopyContentService, 'broadcastCopy').and.stub();
 
       component.ngOnInit();
-      nonParagraphTarget = document.createElement('div');
-      paragraphTarget = document.createElement('p');
-      mathTarget = document.createElement('oppia-noninteractive-math');
       nonParagraphTarget.onclick = function(this, ev) {
         propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
         component.onContentClick(ev);
