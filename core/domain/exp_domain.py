@@ -968,87 +968,89 @@ class Exploration(python_utils.OBJECT):
                             'but it does not exist in this exploration'
                             % param_change.name)
 
-        # Check if first state is a checkpoint or not.
-        if not self.states[self.init_state_name].card_is_checkpoint:
-            raise utils.ValidationError(
-                'Expected card_is_checkpoint of first state to be True'
-                ' but found it to be %s'
-                % (self.states[self.init_state_name].card_is_checkpoint)
-            )
-
-        # Check if terminal states are checkpoints.
-        for state_name, state in self.states.items():
-            interaction = state.interaction
-            if interaction.is_terminal:
-                if state_name != self.init_state_name:
-                    if self.states[state_name].card_is_checkpoint:
-                        raise utils.ValidationError(
-                            'Expected card_is_checkpoint of terminal state to '
-                            'be False but found it to be %s'
-                            % self.states[state_name].card_is_checkpoint
-                        )
-
-        # Check if checkpoint count is between 1 and 8, inclusive.
-        checkpoint_count = 0
-        for state_name, state in self.states.items():
-            if state.card_is_checkpoint:
-                checkpoint_count = checkpoint_count + 1
-        if not 1 <= checkpoint_count <= 8:
-            raise utils.ValidationError(
-                'Expected checkpoint count to be between 1 and 8 inclusive '
-                'but found it to be %s'
-                % checkpoint_count
-            )
-
-        # Check if a state marked as a checkpoint is bypassable.
-        non_initial_checkpoint_state_names = []
-        for state_name, state in self.states.items():
-            if state_name != self.init_state_name and state.card_is_checkpoint:
-                non_initial_checkpoint_state_names.append(state_name)
-
-        # For every non-initial checkpoint state we remove it from the states
-        # dict. Then we check if we can reach a terminal state after removing
-        # the state with checkpoint. As soon as we find a terminal state, we
-        # break out of the loop and raise a validation error. Since, we reached
-        # a terminal state, this implies that the user was not required to go
-        # through the checkpoint. Hence, the checkpoint is bypassable.
-        for state_name_to_exclude in non_initial_checkpoint_state_names:
-            new_states = copy.deepcopy(self.states)
-            new_states.pop(state_name_to_exclude)
-            processed_state_names = set()
-            curr_queue = [self.init_state_name]
-            excluded_state_is_bypassable = False
-            while curr_queue:
-                if curr_queue[0] == state_name_to_exclude:
-                    curr_queue.pop(0)
-                    continue
-                curr_state_name = curr_queue[0]
-                curr_queue = curr_queue[1:]
-                if not curr_state_name in processed_state_names:
-                    processed_state_names.add(curr_state_name)
-                    curr_state = new_states[curr_state_name]
-
-                    # We do not need to check if the current state is terminal
-                    # or not before getting all outcomes, as when we find a
-                    # terminal state in an outcome, we break out of the for loop
-                    # and raise a validation error.
-                    all_outcomes = (
-                        curr_state.interaction.get_all_outcomes())
-                    for outcome in all_outcomes:
-                        dest_state = outcome.dest
-                        if self.states[dest_state].interaction.is_terminal:
-                            excluded_state_is_bypassable = True
-                            break
-                        if (dest_state not in curr_queue and
-                                dest_state not in processed_state_names):
-                            curr_queue.append(dest_state)
-                if excluded_state_is_bypassable:
-                    raise utils.ValidationError(
-                        'Cannot make %s a checkpoint as it is bypassable'
-                        % state_name_to_exclude)
-
         if strict:
             warnings_list = []
+
+            # Check if first state is a checkpoint or not.
+            if not self.states[self.init_state_name].card_is_checkpoint:
+                raise utils.ValidationError(
+                    'Expected card_is_checkpoint of first state to be True'
+                    ' but found it to be %s'
+                    % (self.states[self.init_state_name].card_is_checkpoint)
+                )
+
+            # Check if terminal states are checkpoints.
+            for state_name, state in self.states.items():
+                interaction = state.interaction
+                if interaction.is_terminal:
+                    if state_name != self.init_state_name:
+                        if self.states[state_name].card_is_checkpoint:
+                            raise utils.ValidationError(
+                                'Expected card_is_checkpoint of terminal state '
+                                'to be False but found it to be %s'
+                                % self.states[state_name].card_is_checkpoint
+                            )
+
+            # Check if checkpoint count is between 1 and 8, inclusive.
+            checkpoint_count = 0
+            for state_name, state in self.states.items():
+                if state.card_is_checkpoint:
+                    checkpoint_count = checkpoint_count + 1
+            if not 1 <= checkpoint_count <= 8:
+                raise utils.ValidationError(
+                    'Expected checkpoint count to be between 1 and 8 inclusive '
+                    'but found it to be %s'
+                    % checkpoint_count
+                )
+
+            # Check if a state marked as a checkpoint is bypassable.
+            non_initial_checkpoint_state_names = []
+            for state_name, state in self.states.items():
+                if (state_name != self.init_state_name
+                        and state.card_is_checkpoint):
+                    non_initial_checkpoint_state_names.append(state_name)
+
+            # For every non-initial checkpoint state we remove it from the
+            # states dict. Then we check if we can reach a terminal state after
+            # removing the state with checkpoint. As soon as we find a terminal
+            # state, we break out of the loop and raise a validation error.
+            # Since, we reached a terminal state, this implies that the user was
+            # not required to go through the checkpoint. Hence, the checkpoint
+            # is bypassable.
+            for state_name_to_exclude in non_initial_checkpoint_state_names:
+                new_states = copy.deepcopy(self.states)
+                new_states.pop(state_name_to_exclude)
+                processed_state_names = set()
+                curr_queue = [self.init_state_name]
+                excluded_state_is_bypassable = False
+                while curr_queue:
+                    if curr_queue[0] == state_name_to_exclude:
+                        curr_queue.pop(0)
+                        continue
+                    curr_state_name = curr_queue[0]
+                    curr_queue = curr_queue[1:]
+                    if not curr_state_name in processed_state_names:
+                        processed_state_names.add(curr_state_name)
+                        curr_state = new_states[curr_state_name]
+
+                        # We do not need to check if the current state is
+                        # terminal or not before getting all outcomes, as when
+                        # we find a terminal state in an outcome, we break out
+                        # of the for loop and raise a validation error.
+                        all_outcomes = (
+                            curr_state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            dest_state = outcome.dest
+                            if self.states[dest_state].interaction.is_terminal:
+                                excluded_state_is_bypassable = True
+                                break
+                            if (dest_state not in curr_queue and
+                                    dest_state not in processed_state_names):
+                                curr_queue.append(dest_state)
+                    if excluded_state_is_bypassable:
+                        raise utils.ValidationError(
+                            'Cannot make %s a checkpoint as it is bypassable'
+                            % state_name_to_exclude)
 
             try:
                 self._verify_all_states_reachable()
