@@ -39,7 +39,7 @@ describe('Question player engine service ', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
-  let stateCardObjectFactory: StateCardObjectFactory
+  let stateCardObjectFactory: StateCardObjectFactory;
 
   beforeEach(() => {
     singleQuestionBackendDict = {
