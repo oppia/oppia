@@ -107,7 +107,6 @@ interface VmidSharedSecretKeyMapping {
 
 interface ConfigPropertyValues {
   'always_ask_learners_for_answer_details': boolean,
-  'classroom_page_is_accessible': boolean,
   'classroom_pages_data': ClassroomPageData,
   'classroom_promos_are_enabled': boolean,
   'contributor_can_suggest_questions': boolean,

@@ -46,15 +46,8 @@ class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
-        config_property = config_domain.Registry.get_config_property(
-            'classroom_page_is_accessible')
-        config_property.set_value('committer_id', True)
         response = self.get_html_response('/learn/math')
         self.assertIn('<classroom-page></classroom-page>', response)
-        config_property.set_value('committer_id', False)
-
-    def test_get_fails_when_classroom_page_is_accessible_not_enabled(self):
-        self.get_html_response('/learn/math', expected_status_int=404)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):

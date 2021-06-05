@@ -408,10 +408,6 @@ ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
     'Always ask learners for answer details. For testing -- do not use',
     False)
 
-CLASSROOM_PAGE_IS_ACCESSIBLE = ConfigProperty(
-    'classroom_page_is_accessible', BOOL_SCHEMA,
-    'Make classroom page accessible.', False)
-
 CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
     'classroom_promos_are_enabled', BOOL_SCHEMA,
     'Show classroom promos.', False)
