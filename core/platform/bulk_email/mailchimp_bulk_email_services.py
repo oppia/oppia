@@ -105,6 +105,11 @@ def _create_user_in_mailchimp_db(user_email):
         error_message = ast.literal_eval(python_utils.UNICODE(error))
         # This is the specific error message returned for the case where the
         # user was permanently deleted from the Mailchimp database earlier.
+        # This was found by experimenting with the MailChimp API. Note that the
+        # error reference
+        # (https://mailchimp.com/developer/marketing/docs/errors/) is not
+        # comprehensive, since, under status 400, they only list a subset of the
+        # common error titles.
         if error_message['title'] == 'Forgotten Email Not Subscribed':
             return False
         raise Exception(error_message['detail'])

@@ -192,10 +192,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         """Tests request without csrf_token results in 401 error."""
 
         self.post_json(
-            '/community-library/any', payload={}, expected_status_int=401)
+            '/community-library/any', data={}, expected_status_int=401)
 
         self.put_json(
-            '/community-library/any', payload={}, expected_status_int=401)
+            '/community-library/any', data={}, expected_status_int=401)
 
     def test_requests_for_invalid_paths(self):
         """Test that requests for invalid paths result in a 404 error."""
@@ -209,11 +209,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             '/community-library/data/extra', expected_status_int=404)
 
         self.post_json(
-            '/community-library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', data={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.put_json(
-            '/community-library/extra', payload={}, csrf_token=csrf_token,
+            '/community-library/extra', data={}, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.delete_json('/community-library/data', expected_status_int=404)
