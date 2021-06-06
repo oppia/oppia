@@ -30,7 +30,7 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { of } from 'rxjs';
-import { UrlService } from 'services/contextual/url.service';
+import { UrlParamsType, UrlService } from 'services/contextual/url.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
@@ -94,10 +94,6 @@ class MockWindowRef {
   get nativeWindow() {
     return this._window;
   }
-}
-
-interface UrlParamsType {
-  [param: string]: string
 }
 
 class MockUrlService {
