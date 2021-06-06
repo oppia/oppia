@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -58,12 +58,41 @@ export class NoninteractiveImage implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
+    private changeDetectorRef: ChangeDetectorRef,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
     private svgSanitizerService: SvgSanitizerService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  private _loadBlobImage(url: string): void {
+    const img = new Image();
+    var c = document.createElement('canvas');
+    var ctx = c.getContext('2d');
+    img.onload = (e) => {
+      c.width = (e.target as HTMLImageElement).naturalWidth;
+      c.height = (e.target as HTMLImageElement).naturalHeight;
+      ctx.drawImage((e.target as HTMLImageElement), 0, 0);
+      c.toBlob((imgBlob) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imgBlob);
+        reader.onloadend = () => {
+          if (imgBlob.type === 'image/svg+xml') {
+            this.imageUrl = (
+              this.svgSanitizerService.getTrustedSvgResourceUrl(
+                reader.result as string
+              )
+            );
+          } else {
+            this.imageUrl = reader.result;
+          }
+          this.changeDetectorRef.detectChanges();
+        };
+      }, 'image/png');
+    };
+    img.src = url;
+  }
 
   ngOnInit(): void {
     this.filepath = this.htmlEscaperService.escapedJsonToObj(
@@ -111,25 +140,7 @@ export class NoninteractiveImage implements OnInit {
             this.imageLocalStorageService.isInStorage(this.filepath))) {
           const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
             this.filepath);
-          this.assetsBackendApiService.getBlobDataFromBlobUrl$(
-            imageUrl
-          ).subscribe(
-            imgBlob => {
-              const reader = new FileReader();
-              reader.readAsDataURL(imgBlob);
-              reader.onloadend = () => {
-                if (imgBlob.type === 'image/svg+xml') {
-                  this.imageUrl = (
-                    this.svgSanitizerService.getTrustedSvgResourceUrl(
-                      reader.result as string
-                    )
-                  );
-                } else {
-                  this.imageUrl = reader.result;
-                }
-              };
-            }
-          );
+          this._loadBlobImage(imageUrl);
         } else {
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
             this.contextService.getEntityType(),
@@ -165,7 +176,11 @@ export class NoninteractiveImage implements OnInit {
       this.filepath).then(objectUrl => {
       this.isTryAgainShown = false;
       this.isLoadingIndicatorShown = false;
-      this.imageUrl = objectUrl;
+      if (objectUrl.startsWith('blob:')) {
+        this._loadBlobImage(objectUrl);
+      } else {
+        this.imageUrl = objectUrl;
+      }
     }, () => {
       this.isTryAgainShown = true;
       this.isLoadingIndicatorShown = false;
