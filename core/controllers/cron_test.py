@@ -65,9 +65,9 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CronJobTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
 
@@ -449,9 +449,9 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         super(
             CronMailReviewersContributorDashboardSuggestionsHandlerTests,
             self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
@@ -658,10 +658,10 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         super(
             CronMailAdminContributorDashboardBottlenecksHandlerTests,
             self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         # This sets the role of the user to admin.
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)

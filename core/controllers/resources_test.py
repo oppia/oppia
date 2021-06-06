@@ -137,9 +137,9 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_image_upload_and_download(self):
         """Test image uploading and downloading."""
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')

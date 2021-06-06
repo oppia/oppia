@@ -59,7 +59,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
@@ -96,7 +96,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'status': rights_domain.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Change title and category.
         exp_services.update_exploration(
@@ -126,7 +126,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 
     def test_library_handler_for_created_explorations(self):
         """Test the library data handler for manually created explorations."""
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
@@ -136,7 +136,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'is_super_admin': False,
             'activity_list': [],
             'user_email': self.ADMIN_EMAIL,
-            'username': self.ADMIN_USERNAME,
+            'username': self.CURRICULUM_ADMIN_USERNAME,
             'search_cursor': None,
         }, response_dict)
 

@@ -52,7 +52,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -66,7 +66,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -2002,7 +2002,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',

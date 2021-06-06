@@ -37,7 +37,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
     def setUp(self):
         """Completes the sign-up process for the various users."""
         super(BaseTopicsAndSkillsDashboardTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -46,7 +46,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(

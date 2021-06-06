@@ -1541,7 +1541,7 @@ class GenericTestBase(AppEngineTestBase):
     ADMIN_EMAIL = 'admin@example.com'
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
-    ADMIN_USERNAME = 'adm'
+    CURRICULUM_ADMIN_USERNAME = 'adm'
     MODERATOR_EMAIL = 'moderator@example.com'
     MODERATOR_USERNAME = 'moderator'
     OWNER_EMAIL = 'owner@example.com'
@@ -2013,13 +2013,13 @@ title: Title
                 'topic_id': topic_id
             }, csrf_token=self.get_new_csrf_token())
 
-    def set_curriculum_admins(self, admin_usernames):
+    def set_curriculum_admins(self, curriculum_admin_usernames):
         """Sets role of given users as ADMIN.
 
         Args:
-            admin_usernames: list(str). List of usernames.
+            curriculum_admin_usernames: list(str). List of usernames.
         """
-        for name in admin_usernames:
+        for name in curriculum_admin_usernames:
             self.add_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
     def set_topic_managers(self, topic_manager_usernames, topic_id):

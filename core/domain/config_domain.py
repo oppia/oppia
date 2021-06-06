@@ -172,7 +172,7 @@ class ConfigProperty(python_utils.OBJECT):
     - about_page_youtube_video_id.
     - admin_email_address.
     - admin_ids.
-    - admin_usernames.
+    - curriculum_admin_usernames.
     - allow_yaml_file_upload.
     - banned_usernames.
     - banner_alt_text.

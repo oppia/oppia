@@ -94,7 +94,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(AdminIntegrationTest, self).setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
@@ -265,7 +265,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_load_new_structures_data(self):
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -301,7 +301,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_generate_dummy_skill_and_questions_data(self):
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -321,7 +321,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         topic_id = 'topic'
         story_id = 'story'
@@ -395,7 +395,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_regenerate_missing_exploration_stats_action(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.save_new_default_exploration('ID', 'owner_id')
 
@@ -1055,7 +1055,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with grant_super_admin_privileges_stub as call_counter:
             response = self.put_json(
                 '/adminsuperadminhandler',
-                {'username': self.ADMIN_USERNAME},
+                {'username': self.CURRICULUM_ADMIN_USERNAME},
                 csrf_token=self.get_new_csrf_token(),
                 expected_status_int=200)
 
@@ -1071,7 +1071,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with grant_super_admin_privileges_stub as call_counter:
             response = self.put_json(
                 '/adminsuperadminhandler',
-                {'username': self.ADMIN_USERNAME},
+                {'username': self.CURRICULUM_ADMIN_USERNAME},
                 csrf_token=self.get_new_csrf_token(),
                 expected_status_int=401)
 
@@ -1107,7 +1107,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with revoke_super_admin_privileges_stub as call_counter:
             response = self.delete_json(
                 '/adminsuperadminhandler',
-                params={'username': self.ADMIN_USERNAME},
+                params={'username': self.CURRICULUM_ADMIN_USERNAME},
                 expected_status_int=200)
 
         self.assertEqual(call_counter.times_called, 1)
@@ -1122,7 +1122,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         with revoke_super_admin_privileges_stub as call_counter:
             response = self.delete_json(
                 '/adminsuperadminhandler',
-                params={'username': self.ADMIN_USERNAME},
+                params={'username': self.CURRICULUM_ADMIN_USERNAME},
                 expected_status_int=401)
 
         self.assertEqual(call_counter.times_called, 0)
@@ -1164,7 +1164,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(GenerateDummyExplorationsTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_generate_count_greater_than_publish_count(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1280,8 +1280,8 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(AdminRoleHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_view_and_update_role(self):
         user_email = 'user1@example.com'
@@ -1438,7 +1438,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
         super(DataExtractionQueryHandlerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_valid_exploration(
@@ -1577,7 +1577,7 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         result_collections = search_services.search_collections(
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, ['0'])
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
@@ -1599,7 +1599,7 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SendDummyMailTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_send_dummy_mail(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1789,7 +1789,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AddContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -2044,7 +2044,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RemoveContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -2334,7 +2334,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributorUsersListHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -2436,7 +2436,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionRightsDataHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
@@ -2497,7 +2497,7 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MemoryCacheAdminHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_get_memory_cache_data(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -2530,7 +2530,7 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(NumberOfDeletionRequestsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
     def test_get_with_no_deletion_request_returns_zero(self):
@@ -2554,7 +2554,7 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(VerifyUserModelsDeletedHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
@@ -2582,7 +2582,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super(DeleteUserHandlerTest, self).setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(
             feconf.SYSTEM_EMAIL_ADDRESS)

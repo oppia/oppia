@@ -47,7 +47,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
         super(SkillModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -58,7 +58,7 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
                 constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
@@ -298,9 +298,9 @@ class SkillSnapshotMetadataModelValidatorTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
@@ -531,9 +531,9 @@ class SkillSnapshotContentModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
@@ -688,11 +688,11 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         super(SkillCommitLogEntryModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
@@ -968,11 +968,11 @@ class SkillSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
         super(SkillSummaryModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),

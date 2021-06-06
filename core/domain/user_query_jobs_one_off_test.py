@@ -187,7 +187,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             self.user_g_id)
         user_contribution_model.delete()
 
-        # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
+        # Set tmpsuperadm1n as admin in CURRICULUM_ADMIN_USERNAMES config property.
         self.set_curriculum_admins(['tmpsuperadm1n'])
 
     def test_predicate_functions(self):

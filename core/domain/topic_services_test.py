@@ -88,7 +88,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -97,7 +97,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
@@ -577,7 +577,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
-        self.set_moderators([self.ADMIN_USERNAME])
+        self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
         rights_manager.unpublish_exploration(self.user_admin, 'exp_id')

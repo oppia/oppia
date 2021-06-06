@@ -100,8 +100,8 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))

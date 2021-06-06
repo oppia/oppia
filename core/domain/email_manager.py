@@ -1381,7 +1381,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1394,7 +1394,7 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             continue
         else:
             email_body = email_body_template % (
-                admin_usernames[index], feconf.OPPIA_SITE_URL,
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
                 feconf.CONTRIBUTOR_DASHBOARD_URL,
                 suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
                 feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
@@ -1501,7 +1501,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
 
     # Get the emails and usernames of the admins.
     admin_user_settings = user_services.get_users_settings(admin_ids)
-    admin_usernames, admin_emails = list(python_utils.ZIP(*[
+    curriculum_admin_usernames, admin_emails = list(python_utils.ZIP(*[
         (admin_user_setting.username, admin_user_setting.email)
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
@@ -1514,7 +1514,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             continue
         else:
             email_body = email_body_template % (
-                admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
                 suggestion_types_needing_reviewers_html)
 
             _send_email(

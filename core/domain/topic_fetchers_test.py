@@ -67,7 +67,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             description='Description 3')
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -76,7 +76,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
 
         self.topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_topic_managers(
             [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)

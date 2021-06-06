@@ -60,9 +60,9 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         topic_id_1 = topic_fetchers.get_new_topic_id()

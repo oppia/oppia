@@ -40,7 +40,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         super(BaseTopicEditorControllerTests, self).setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
@@ -48,7 +48,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(
             self.NEW_USER_EMAIL)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)

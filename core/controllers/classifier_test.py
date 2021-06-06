@@ -54,7 +54,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         with python_utils.open_file(yaml_path, 'r') as yaml_file:
             self.yaml_content = yaml_file.read()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup('moderator@example.com', 'mod')
 
         assets_list = []

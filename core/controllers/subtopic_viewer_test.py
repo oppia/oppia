@@ -31,9 +31,9 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(BaseSubtopicViewerControllerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.topic_id = 'topic_id'
         self.subtopic_id_1 = 1

@@ -34,7 +34,7 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseCollectionEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -43,7 +43,7 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.admin = user_services.get_user_actions_info(self.admin_id)
@@ -384,7 +384,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
 
     def test_publish_unpublish_collection(self):
         self.set_collection_editors([self.OWNER_USERNAME])
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         # Login as owner and publish a collection with a public exploration.
         self.login(self.OWNER_EMAIL)

@@ -262,9 +262,9 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             owner = user_services.get_user_actions_info(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
     def test_recommendation_categories_and_matrix_headers_match(self):

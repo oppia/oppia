@@ -343,7 +343,7 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -356,7 +356,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_for_featured_explorations(self):
         """Note that both EXP_ID_1 and EXP_ID_2 are public. However, only
@@ -594,7 +594,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
@@ -626,7 +626,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_8)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_9)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_at_most_eight_top_rated_explorations(self):
         """Note that at most 8 explorations should be returned."""
@@ -753,7 +753,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         super(
             RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -773,7 +773,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
 
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_for_recently_published_explorations(self):
         """Tests for recently published explorations."""

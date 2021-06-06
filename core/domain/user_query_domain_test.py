@@ -32,7 +32,7 @@ class UserQueryTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserQueryTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.user_query_params = user_query_domain.UserQueryParams(
             inactive_in_last_n_days=20
