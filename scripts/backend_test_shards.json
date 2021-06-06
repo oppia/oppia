@@ -108,6 +108,8 @@
         "core.domain.exp_services_test"
     ],
     "4": [
+        "core.domain.beam_job_domain_test",
+        "core.domain.beam_job_services_test",
         "core.domain.subtopic_validators_test",
         "core.domain.skill_jobs_one_off_test",
         "core.domain.email_validators_test",
@@ -204,6 +206,7 @@
         "jobs.base_jobs_test",
         "jobs.decorators.validation_decorators_test",
         "jobs.io.stub_io_test",
+        "jobs.io.ndb_io_test",
         "jobs.job_options_test",
         "jobs.job_test_utils_test",
         "jobs.job_utils_test",
