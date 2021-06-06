@@ -138,7 +138,6 @@
         "core.domain.translatable_object_registry_test",
         "core.domain.recommendations_validators_test",
         "core.domain.auth_validators_test",
-        "core.domain.stats_jobs_one_off_test",
         "core.domain.image_services_test",
         "core.domain.takeout_service_test",
         "core.domain.activity_jobs_one_off_test"
@@ -182,7 +181,6 @@
         "core.domain.calculation_registry_test",
         "core.domain.question_fetchers_test",
         "core.domain.exp_domain_test",
-        "core.domain.stats_jobs_continuous_test",
         "core.domain.customization_args_util_test",
         "core.domain.auth_domain_test",
         "core.domain.story_jobs_one_off_test",

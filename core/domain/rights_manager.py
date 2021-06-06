@@ -29,7 +29,6 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
