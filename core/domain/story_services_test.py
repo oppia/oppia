@@ -53,11 +53,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         super(StoryServicesUnitTests, self).setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(

@@ -51,10 +51,10 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
     def setUp(self):
         super(
             ExplorationOpportunitySummaryModelRegenerationJobTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -416,9 +416,9 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SkillOpportunityModelRegenerationJobTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.skill_id_1 = 'skill_1'
         self.skill_desc_1 = 'skill 1'

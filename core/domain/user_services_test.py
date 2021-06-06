@@ -1233,8 +1233,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     def setUp(self):
         super(UpdateContributionMsecTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)

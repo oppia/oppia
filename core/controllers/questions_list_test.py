@@ -34,8 +34,8 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
     def setUp(self):
         """Completes the sign-up process for the various users."""
         super(BaseQuestionsListControllerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -77,7 +77,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             question_services.create_new_question_skill_link(
                 self.admin_id, question_id, self.skill_id_2, 0.3)
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
             json_response = self.get_json(
                 '%s/%s,%s?cursor=' % (
@@ -149,7 +149,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
 
     def test_get_question_count_succeeds(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question_id_1 = question_services.get_new_question_id()
 
@@ -190,7 +190,7 @@ class QuestionCountDataHandlerTests(BaseQuestionsListControllerTests):
         self.assertEqual(json_response['total_question_count'], 1)
 
     def test_get_question_count_when_no_question_is_assigned_to_skill(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         json_response = self.get_json(
             '%s/%s' % (feconf.QUESTION_COUNT_URL_PREFIX, self.skill_id))
         self.assertEqual(json_response['total_question_count'], 0)

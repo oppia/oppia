@@ -272,7 +272,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         """
 
         super(LibraryGroupsTest, self).setUp()
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         self.post_json(
@@ -343,9 +343,9 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
@@ -594,12 +594,12 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
@@ -753,9 +753,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         super(
             RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.get_user_actions_info(self.albert_id)
 

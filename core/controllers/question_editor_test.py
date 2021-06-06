@@ -42,9 +42,9 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.topic_manager_id = self.get_user_id_from_email(
             self.TOPIC_MANAGER_EMAIL)
         self.new_user_id = self.get_user_id_from_email(
@@ -109,7 +109,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_skill_id_returns_404(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_id = 'abc123456789'
         self.post_json(
@@ -119,7 +119,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_no_skill_ids_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.NEW_QUESTION_URL, {},
@@ -127,7 +127,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_list_of_skill_ids_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_ids = [1, 2]
         self.post_json(
@@ -137,7 +137,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_type_of_skill_ids_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         incorrect_skill_id = 1
         self.post_json(
@@ -147,7 +147,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_question_id_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = 'abc123456789'
@@ -160,7 +160,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_question_schema_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         del question_dict['question_state_data']['content']
@@ -173,7 +173,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_no_skill_difficulty_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -186,7 +186,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_incorrect_version_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['version'] = 1
@@ -198,7 +198,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_wrong_skill_difficulty_length_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -212,7 +212,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_invalid_skill_difficulty_type_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -226,7 +226,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_invalid_skill_difficulty_value_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -240,7 +240,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_admin_email_allows_question_creation(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -280,7 +280,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_invalid_question_returns_400_status(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -294,7 +294,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_post_with_too_many_skills_returns_400(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         skill_ids = [1, 2, 3, 4]
         self.post_json(
@@ -305,7 +305,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_post_with_valid_images(self):
         """Test question creation with valid images."""
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         filename = 'img.png'
         question_dict = self.question.to_dict()
@@ -343,7 +343,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_post_with_invalid_images(self):
         """Test question creation with invalid images."""
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         question_dict = self.question.to_dict()
         question_dict['id'] = None
@@ -427,7 +427,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.5])
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s/%s' % (
@@ -475,7 +475,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_put_with_invalid_input_throws_error(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s/%s' % (
@@ -548,7 +548,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
 
     def test_get_can_not_access_handler_with_invalid_question_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'invalid_question_id'),
@@ -584,7 +584,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_get_with_admin_email_allows_question_fetching(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         response_dict = self.get_json('%s/%s' % (
             feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
         self.assertEqual(
@@ -637,7 +637,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.logout()
 
     def test_delete_with_incorrect_question_id_returns_404_status(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'abc123456789'),
@@ -645,7 +645,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_delete_with_admin_email_allows_question_deletion(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
@@ -665,7 +665,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         payload['commit_message'] = (
             'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_json = self.put_json(
             '%s/%s' % (
@@ -688,7 +688,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_json = self.put_json(
             '%s/%s' % (
@@ -769,7 +769,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = 'update question data'
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s/%s' % (

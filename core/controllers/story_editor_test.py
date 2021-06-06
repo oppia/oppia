@@ -30,10 +30,10 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
     def setUp(self):
         """Completes the sign-up process for the various users."""
         super(BaseStoryEditorControllerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -53,7 +53,7 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 class StoryPublicationTests(BaseStoryEditorControllerTests):
 
     def test_put_can_not_publish_story_with_invalid_story_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
         csrf_token = self.get_new_csrf_token()
@@ -79,7 +79,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
     def test_put_can_not_publish_story_with_invalid_new_story_status_value(
             self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -92,7 +92,7 @@ class StoryPublicationTests(BaseStoryEditorControllerTests):
 
     def test_story_publish_and_unpublish(self):
         # Check that admins can publish a story.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -129,7 +129,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
     def test_validation_error_messages(self):
         # Check that admins can publish a story.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
             '0', self.admin_id, title='Title 1',
             category='Mathematics', language_code='en',
@@ -154,7 +154,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 
     def test_invalid_input_exception_when_no_exp_ids_passed(self):
         # Check that admins can publish a story.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
             '%s/%s' % (
                 feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
@@ -165,7 +165,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_can_not_access_story_editor_page_with_invalid_story_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
 
@@ -186,7 +186,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_can_not_get_access_story_handler_with_invalid_story_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
 
@@ -206,7 +206,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_can_not_get_access_story_handler_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
         self.save_new_story(new_story_id, self.admin_id, self.topic_id)
@@ -233,7 +233,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_put_can_not_access_story_handler_with_invalid_story_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         change_cmd = {
             'version': 1,
@@ -266,7 +266,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_put_can_not_access_story_handler_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         change_cmd = {
             'version': 1,
@@ -305,7 +305,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_put_can_not_access_story_handler_with_no_commit_message(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         change_cmd = {
             'version': 1,
@@ -331,7 +331,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_put_fails_with_long_commit_message(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         change_cmd = {
             'version': 1,
@@ -358,7 +358,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_delete_can_not_access_story_handler_with_invalid_story_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.delete_json(
             '%s/%s' % (
@@ -368,7 +368,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_delete_can_not_access_story_handler_with_invalid_topic_id(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         new_story_id = story_services.get_new_story_id()
         self.save_new_story(new_story_id, self.admin_id, 'invalid_topic_id')
         self.delete_json(
@@ -390,7 +390,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         # Check that admins can access and edit in the editor
         # page.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '%s/%s' % (
                 feconf.STORY_EDITOR_URL_PREFIX, self.story_id))
@@ -406,7 +406,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
         # Check that admins can access the editable story data.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
             '0', self.admin_id, title='Title 1',
             category='Mathematics', language_code='en',
@@ -457,7 +457,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 'new_value': 'New Description'
             }]
         }
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
@@ -485,7 +485,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             'You must be logged in to access this resource.')
 
     def test_admins_can_delete_story(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.story_id),
@@ -502,7 +502,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.logout()
 
     def test_put_can_not_access_story_handler_with_no_payload_version(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         change_cmd = {
             'version': None,
@@ -530,7 +530,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
     def test_put_can_not_access_story_handler_with_mismatch_of_story_versions(
             self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         change_cmd = {
             'version': 2,
@@ -568,7 +568,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 'new_value': 0
             }]
         }
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(

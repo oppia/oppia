@@ -91,12 +91,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
     def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
+        """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super(AdminIntegrationTest, self).setUp()
         self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
@@ -109,14 +109,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
         # Login as an admin.
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.get_html_response('/admin')
         self.logout()
 
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         new_config_value = False
 
@@ -146,7 +146,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_reload_exploration_in_production_mode(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
@@ -162,7 +162,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_load_new_structures_data_in_production_mode(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
@@ -176,7 +176,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_admins_cannot_load_new_structures_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         assert_raises_regexp = self.assertRaisesRegexp(
             Exception, 'User does not have enough rights to generate data.')
@@ -188,7 +188,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_generate_dummy_skill_data_in_production_mode(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
@@ -202,7 +202,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_admins_cannot_generate_dummy_skill_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         assert_raises_regexp = self.assertRaisesRegexp(
             Exception, 'User does not have enough rights to generate data.')
@@ -214,7 +214,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_reload_collection_in_production_mode(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
@@ -236,7 +236,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         collection_services.load_demo('0')
@@ -266,7 +266,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_load_new_structures_data(self):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/adminhandler', {
@@ -302,7 +302,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_generate_dummy_skill_and_questions_data(self):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/adminhandler', {
@@ -369,7 +369,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         old_creation_time = all_opportunity_models[0].created_on
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         result = self.post_json(
@@ -403,7 +403,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             exp_services.regenerate_missing_stats_for_exploration('ID'), (
                 [], [], 1, 1))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         result = self.post_json(
@@ -421,7 +421,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             })
 
     def test_admin_topics_csv_download_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_custom_response(
             '/admintopicscsvdownloadhandler', 'text/csv')
 
@@ -440,7 +440,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_job_output_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         self.save_new_valid_exploration('exp_id', self.admin_id)
 
@@ -471,7 +471,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         config_services.set_property(self.admin_id, 'promo_bar_enabled', True)
@@ -493,7 +493,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_start_new_one_off_job(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -517,7 +517,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cancel_one_off_job(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id)
@@ -547,7 +547,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_start_computation(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
@@ -581,7 +581,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stop_computation_with_running_jobs(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
@@ -617,7 +617,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stop_computation_with_finished_jobs(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
@@ -654,7 +654,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_stop_computation_with_stopped_jobs(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
@@ -696,7 +696,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_upload_topic_similarities(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         self.assertEqual(recommendations_services.get_topic_similarity(
@@ -727,7 +727,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_handler_includes_all_feature_flags(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         feature = platform_parameter_registry.Registry.create_feature_flag(
             PARAM_NAMES.test_feature_1, 'feature for test.', FEATURE_STAGES.dev)
 
@@ -747,7 +747,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_with_flag_changes_updates_feature_flags(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
@@ -791,7 +791,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_post_flag_changes_correctly_updates_flags_returned_by_getter(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
@@ -836,7 +836,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_invalid_rules_returns_400(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
@@ -880,7 +880,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_unknown_feature_name_returns_400(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         new_rule_dicts = [
@@ -918,7 +918,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_update_flag_rules_with_feature_name_of_non_string_type_returns_400(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
@@ -939,7 +939,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_update_flag_rules_with_message_of_non_string_type_returns_400(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
@@ -959,7 +959,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_rules_of_non_list_type_returns_400(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
@@ -980,7 +980,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_update_flag_rules_with_rules_of_non_list_of_dict_type_returns_400(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         response = self.post_json(
@@ -1000,7 +1000,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_update_flag_rules_with_unexpected_exception_returns_500(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         feature = platform_parameter_registry.Registry.create_feature_flag(
@@ -1063,7 +1063,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertNotIn('error', response)
 
     def test_grant_super_admin_privileges_requires_system_default_admin(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         grant_super_admin_privileges_stub = self.swap_with_call_counter(
             firebase_auth_services, 'grant_super_admin_privileges')
@@ -1114,7 +1114,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertNotIn('error', response)
 
     def test_revoke_super_admin_privileges_requires_system_default_admin(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         revoke_super_admin_privileges_stub = self.swap_with_call_counter(
             firebase_auth_services, 'revoke_super_admin_privileges')
@@ -1164,10 +1164,10 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(GenerateDummyExplorationsTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_generate_count_greater_than_publish_count(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/adminhandler', {
@@ -1181,7 +1181,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 3)
 
     def test_generate_count_equal_to_publish_count(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             '/adminhandler', {
@@ -1195,7 +1195,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 2)
 
     def test_generate_count_less_than_publish_count(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
@@ -1211,7 +1211,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 0)
 
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_generate(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         with self.assertRaisesRegexp(
@@ -1231,7 +1231,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_handler_raises_error_with_non_int_num_dummy_exps_to_publish(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         with self.assertRaisesRegexp(
@@ -1251,7 +1251,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_generate_dummy_explorations_in_prod_mode(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
@@ -1278,9 +1278,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
 
     def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
+        """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super(AdminRoleHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_view_and_update_role(self):
@@ -1289,7 +1289,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         self.signup(user_email, username)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         # Check normal user has expected role. Viewing by username.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -1319,7 +1319,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
     def test_invalid_username_in_filter_criterion_and_update_role(self):
         username = 'myinvaliduser'
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Trying to view role of non-existent user.
         self.get_json(
@@ -1336,7 +1336,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
     def test_cannot_view_role_with_invalid_view_filter_criterion(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'filter_criterion': 'invalid', 'username': 'user1'},
@@ -1363,7 +1363,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             subtopics=[subtopic_1], next_subtopic_id=2)
         self.set_topic_managers([username], topic_id)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -1393,7 +1393,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         username = 'user1'
 
         self.signup(user_email, username)
-        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -1403,7 +1403,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
@@ -1436,9 +1436,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp'
 
     def setUp(self):
-        """Complete the signup process for self.ADMIN_EMAIL."""
+        """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super(DataExtractionQueryHandlerTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_valid_exploration(
@@ -1461,7 +1461,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
                 'a_session_id_val', 1.0))
 
     def test_data_extraction_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Test that it returns all answers when 'num_answers' is 0.
         payload = {
@@ -1493,7 +1493,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
 
     def test_handler_when_exp_version_is_not_int_throws_exception(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         # Test that it returns all answers when 'num_answers' is 0.
         payload = {
@@ -1512,7 +1512,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             response['error'], 'Version a cannot be converted to int.')
 
     def test_that_handler_raises_exception(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         payload = {
             'exp_id': self.EXP_ID,
             'exp_version': self.exploration.version,
@@ -1529,7 +1529,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'Exploration \'exp\' does not have \'state name\' state.')
 
     def test_handler_raises_error_with_invalid_exploration_id(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         payload = {
             'exp_id': 'invalid_exp_id',
             'state_name': 'state name',
@@ -1547,7 +1547,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'found.')
 
     def test_handler_raises_error_with_invalid_exploration_version(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         payload = {
             'exp_id': self.EXP_ID,
             'state_name': 'state name',
@@ -1577,8 +1577,8 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         result_collections = search_services.search_collections(
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, ['0'])
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
@@ -1599,10 +1599,10 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SendDummyMailTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_send_dummy_mail(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
@@ -1627,8 +1627,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UpdateUsernameHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.OLD_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.OLD_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
     def test_update_username_with_none_new_username(self):
         csrf_token = self.get_new_csrf_token()
@@ -1729,7 +1729,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Username already taken.')
 
     def test_update_username(self):
-        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(
@@ -1741,7 +1741,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(user_services.get_username(user_id), self.NEW_USERNAME)
 
     def test_update_username_creates_audit_model(self):
-        user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         creation_time_in_millisecs = utils.get_current_time_in_millisecs()
@@ -1789,7 +1789,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AddContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -1802,7 +1802,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL)
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
@@ -1820,7 +1820,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -1834,7 +1834,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.translation_reviewer_id, language_code='hi'))
 
     def test_add_translation_reviewer_in_invalid_language_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
@@ -1848,7 +1848,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid language_code: invalid')
 
     def test_assigning_same_language_for_translation_review_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertFalse(
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
@@ -1879,7 +1879,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -1897,7 +1897,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             '/addcontributionrightshandler', {
@@ -1917,7 +1917,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             '/addcontributionrightshandler', {
@@ -1945,7 +1945,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -1961,7 +1961,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             '/addcontributionrightshandler', {
@@ -1985,7 +1985,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         self.post_json(
@@ -2001,7 +2001,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
             '/addcontributionrightshandler', {
@@ -2022,7 +2022,7 @@ class AddContributionRightsHandlerTest(test_utils.GenericTestBase):
             'User question already has rights to submit question.')
 
     def test_add_reviewer_for_invalid_category_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.post_json(
@@ -2044,7 +2044,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RemoveContributionRightsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -2057,7 +2057,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL)
 
     def test_add_reviewer_without_username_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -2068,7 +2068,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['error'], 'Missing username param')
 
     def test_add_reviewer_with_invalid_username_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -2090,7 +2090,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -2105,7 +2105,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.translation_reviewer_id, language_code='hi'))
 
     def test_remove_translation_reviewer_in_invalid_language_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -2123,7 +2123,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '/removecontributionrightshandler', {
@@ -2148,7 +2148,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_voiceover_applications(
                 self.voiceover_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         self.put_json(
@@ -2163,7 +2163,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             self.translation_reviewer_id, language_code='hi'))
 
     def test_remove_voiceover_reviewer_in_invalid_language_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
@@ -2181,7 +2181,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(
             user_services.can_review_voiceover_applications(
                 self.translation_reviewer_id, language_code='hi'))
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '/removecontributionrightshandler', {
@@ -2201,7 +2201,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/removecontributionrightshandler', {
@@ -2217,7 +2217,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_review_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '/removecontributionrightshandler', {
@@ -2235,7 +2235,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertTrue(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/removecontributionrightshandler', {
@@ -2251,7 +2251,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(user_services.can_submit_question_suggestions(
             self.question_reviewer_id))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '/removecontributionrightshandler', {
@@ -2265,7 +2265,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             'question does not have rights to submit question.')
 
     def test_remove_reviewer_for_invalid_category_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '/removecontributionrightshandler', {
@@ -2278,7 +2278,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             response['error'], 'Invalid category: invalid')
 
     def test_remove_reviewer_for_invalid_removal_type_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '/removecontributionrightshandler', {
@@ -2307,7 +2307,7 @@ class RemoveContributionRightsHandlerTest(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translation_reviewer_id, language_code='hi'))
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/removecontributionrightshandler', {
@@ -2334,7 +2334,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributorUsersListHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')
@@ -2347,7 +2347,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
             self.QUESTION_REVIEWER_EMAIL)
 
     def test_check_contribution_reviewer_by_translation_reviewer_role(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_translation_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(
@@ -2363,7 +2363,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('voiceartist' in response['usernames'])
 
     def test_check_contribution_reviewer_by_voiceover_reviewer_role(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_voiceover_in_language(
             self.translation_reviewer_id, 'hi')
         user_services.allow_user_to_review_voiceover_in_language(
@@ -2379,7 +2379,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('voiceartist' in response['usernames'])
 
     def test_check_contribution_reviewer_by_question_reviewer_role(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         user_services.allow_user_to_review_question(self.voiceover_reviewer_id)
         response = self.get_json(
@@ -2392,7 +2392,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
         self.assertTrue('voiceartist' in response['usernames'])
 
     def test_check_contributor_user_by_question_submitter_role(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         user_services.allow_user_to_submit_question(self.question_reviewer_id)
         user_services.allow_user_to_submit_question(self.voiceover_reviewer_id)
         response = self.get_json(
@@ -2406,7 +2406,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def test_check_contribution_reviewer_with_invalid_language_code_raise_error(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/getcontributorusershandler', params={
                 'category': 'voiceover',
@@ -2418,7 +2418,7 @@ class ContributorUsersListHandlerTest(test_utils.GenericTestBase):
 
     def test_check_contribution_reviewer_with_invalid_category_raise_error(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/getcontributorusershandler', params={
                 'category': 'invalid',
@@ -2436,13 +2436,13 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionRightsDataHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
 
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
     def test_check_contribution_reviewer_rights(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/contributionrightsdatahandler', params={
                 'username': 'reviewer'
@@ -2473,7 +2473,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['can_submit_questions'], True)
 
     def test_check_contribution_reviewer_rights_invalid_username(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/contributionrightsdatahandler', params={
                 'username': 'invalid'
@@ -2483,7 +2483,7 @@ class ContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_check_contribution_reviewer_rights_without_username(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/contributionrightsdatahandler', params={},
             expected_status_int=400)
@@ -2497,10 +2497,10 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(MemoryCacheAdminHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
     def test_get_memory_cache_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         response = self.get_json(
             '/memorycacheadminhandler')
         self.assertEqual(
@@ -2510,7 +2510,7 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['total_keys_stored'], 1)
 
     def test_flush_memory_cache(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
             '/memorycacheadminhandler')
@@ -2530,8 +2530,8 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(NumberOfDeletionRequestsHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
     def test_get_with_no_deletion_request_returns_zero(self):
         response = self.get_json('/numberofdeletionrequestshandler')
@@ -2554,9 +2554,9 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(VerifyUserModelsDeletedHandlerTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
     def test_get_without_user_id_raises_error(self):
         self.get_json(

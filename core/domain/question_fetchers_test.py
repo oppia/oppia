@@ -36,9 +36,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(QuestionFetchersUnitTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 

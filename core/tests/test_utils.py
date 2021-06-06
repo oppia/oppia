@@ -1538,7 +1538,7 @@ class GenericTestBase(AppEngineTestBase):
 
     # Dummy strings representing user attributes. Note that it is up to the
     # individual test to actually register these users as editors, admins, etc.
-    ADMIN_EMAIL = 'admin@example.com'
+    CURRICULUM_ADMIN_EMAIL = 'admin@example.com'
     # Usernames containing the string 'admin' are reserved, so we use 'adm'
     # instead.
     CURRICULUM_ADMIN_USERNAME = 'adm'

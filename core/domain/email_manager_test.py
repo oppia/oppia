@@ -52,12 +52,12 @@ class FailedMLTest(test_utils.EmailTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_property = config_domain.Registry.get_config_property(
             'notification_user_ids_for_failed_tasks')
         config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(self.ADMIN_EMAIL)])
+            'committer_id', [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
 
     def test_send_failed_ml_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -65,7 +65,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
-            messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
+            messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL)
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
@@ -77,7 +77,7 @@ class FailedMLTest(test_utils.EmailTestBase):
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
-            messages = self._get_sent_email_messages(self.ADMIN_EMAIL)
+            messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL)
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
 
@@ -169,8 +169,8 @@ class EmailRightsTest(test_utils.GenericTestBase):
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
     def test_sender_id_validation(self):
@@ -584,8 +584,8 @@ class SignupEmailTests(test_utils.EmailTestBase):
     def setUp(self):
         super(SignupEmailTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.new_footer = (
@@ -950,8 +950,8 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.new_footer = (
@@ -5751,7 +5751,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
 
     def setUp(self):
         super(ContributionReviewerEmailTest, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
         self.signup(self.QUESTION_REVIEWER_EMAIL, 'question')

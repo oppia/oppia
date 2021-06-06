@@ -34,14 +34,14 @@ class BaseCollectionEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseCollectionEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -357,7 +357,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.logout()
 
         # Login as admin and try to unpublish the collection.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         # Raises error as version is None.
@@ -404,7 +404,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.logout()
 
         # Login as admin and unpublish the collection.
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.put_json(
             '/collection_editor_handler/unpublish/%s' % collection_id,

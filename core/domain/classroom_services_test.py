@@ -29,8 +29,8 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ClassroomServicesTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME, self.CURRICULUM_ADMIN_USERNAME])
 
     def test_can_get_classroom_by_url_fragment(self):

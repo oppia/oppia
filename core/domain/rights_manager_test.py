@@ -41,7 +41,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
         self.signup('f@example.com', 'F')
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -50,7 +50,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_d = self.get_user_id_from_email('d@example.com')
         self.user_id_e = self.get_user_id_from_email('e@example.com')
         self.user_id_f = self.get_user_id_from_email('f@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
 
@@ -67,7 +67,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -767,7 +767,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.signup('c@example.com', 'C')
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -775,7 +775,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_id_c = self.get_user_id_from_email('c@example.com')
         self.user_id_d = self.get_user_id_from_email('d@example.com')
         self.user_id_e = self.get_user_id_from_email('e@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -790,7 +790,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'
@@ -1351,10 +1351,10 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     def setUp(self):
         super(CheckCanReleaseOwnershipTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.save_new_valid_exploration(
@@ -1395,9 +1395,9 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
     def setUp(self):
         super(CheckCanUnpublishActivityTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])

@@ -44,10 +44,10 @@ class RoleQueryAuditModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(RoleQueryAuditModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(USER_EMAIL, USER_NAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
         admin_model.role = feconf.ROLE_ID_CURRICULUM_ADMIN
@@ -140,10 +140,10 @@ class UsernameChangeAuditModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(UsernameChangeAuditModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(USER_EMAIL, USER_NAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
         admin_model.role = feconf.ROLE_ID_CURRICULUM_ADMIN

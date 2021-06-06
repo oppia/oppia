@@ -36,8 +36,8 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(ConfigPropertyModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.model_instance = config_models.ConfigPropertyModel(
             id='config_model', value='c')
         self.model_instance.commit(feconf.SYSTEM_COMMITTER_ID, [])
@@ -127,8 +127,8 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
     def setUp(self):
         super(ConfigPropertySnapshotMetadataModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.config_model = config_models.ConfigPropertyModel(
             id='config_model', value='c')
@@ -293,8 +293,8 @@ class ConfigPropertySnapshotContentModelValidatorTests(
     def setUp(self):
         super(ConfigPropertySnapshotContentModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.config_model = config_models.ConfigPropertyModel(
             id='config_model', value='c')
@@ -401,8 +401,8 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
     def setUp(self):
         super(PlatformParameterModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.parameter_model = config_models.PlatformParameterModel.create(
             param_name='parameter_model_1',
             rule_dicts=[
@@ -492,8 +492,8 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
         super(
             PlatformParameterSnapshotMetadataModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.parameter_model = config_models.PlatformParameterModel.create(
             param_name='parameter_model_1',
@@ -658,8 +658,8 @@ class PlatformParameterSnapshotContentModelValidatorTests(
         super(
             PlatformParameterSnapshotContentModelValidatorTests, self).setUp()
 
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         self.parameter_model = config_models.PlatformParameterModel.create(
             param_name='parameter_model_1',

@@ -65,8 +65,8 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(CronJobTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main_cron.app))
@@ -85,7 +85,7 @@ class CronJobTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
     def test_send_mail_to_admin_on_job_success(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         with self.testapp_swap, self.send_mail_to_admin_swap:
             self.get_html_response('/cron/mail/admin/job_status')
@@ -97,7 +97,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_send_mail_to_admin_on_job_failure(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(
@@ -131,7 +131,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cron_dashboard_stats_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
@@ -149,7 +149,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cron_user_deletion_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
@@ -167,7 +167,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cron_fully_complete_user_deletion_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
@@ -186,7 +186,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cron_exploration_recommendations_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
@@ -204,7 +204,7 @@ class CronJobTests(test_utils.GenericTestBase):
             all_jobs[0].job_type, 'ExplorationRecommendationsOneOffJob')
 
     def test_cron_activity_search_rank_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
@@ -231,7 +231,7 @@ class CronJobTests(test_utils.GenericTestBase):
         recency_msec_swap = self.swap(
             jobs, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(
@@ -275,7 +275,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         job_id = cron_services.MapReduceStateModelsCleanupManager.create_new()
         cron_services.MapReduceStateModelsCleanupManager.enqueue(job_id)
@@ -308,7 +308,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
 
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         job_id = cron_services.JobModelsCleanupManager.create_new()
         cron_services.JobModelsCleanupManager.enqueue(job_id)
@@ -331,8 +331,8 @@ class CronJobTests(test_utils.GenericTestBase):
         )
 
     def test_run_cron_to_hard_delete_models_marked_as_deleted(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         completed_activities_model = user_models.CompletedActivitiesModel(
             id=admin_user_id,
@@ -352,8 +352,8 @@ class CronJobTests(test_utils.GenericTestBase):
             user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
 
     def test_run_cron_to_hard_delete_versioned_models_marked_as_deleted(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         with self.mock_datetime_utcnow(
             datetime.datetime.utcnow() - self.NINE_WEEKS):
@@ -368,8 +368,8 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
     def test_run_cron_to_mark_old_models_as_deleted(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         user_query_model = user_models.UserQueryModel(
             id='query_id',
@@ -449,8 +449,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         super(
             CronMailReviewersContributorDashboardSuggestionsHandlerTests,
             self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -480,7 +480,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.reviewer_ids = []
 
     def test_email_not_sent_if_sending_reviewer_emails_is_not_enabled(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', False)
@@ -499,7 +499,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.logout()
 
     def test_email_not_sent_if_sending_emails_is_not_enabled(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
@@ -518,7 +518,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.logout()
 
     def test_email_sent_to_reviewer_if_sending_reviewer_emails_is_enabled(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
@@ -540,7 +540,7 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             self.expected_reviewable_suggestion_email_info)
 
     def test_email_not_sent_if_reviewer_ids_is_empty(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'contributor_dashboard_reviewer_emails_is_enabled', True)
@@ -658,8 +658,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         super(
             CronMailAdminContributorDashboardBottlenecksHandlerTests,
             self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         # This sets the role of the user to admin.
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -696,7 +696,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.reviewable_suggestion_email_infos = []
 
     def test_email_not_sent_if_sending_emails_is_disabled(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', True)
@@ -726,7 +726,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_email_not_sent_if_notifying_admins_reviewers_needed_is_disabled(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', False)
@@ -746,7 +746,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_email_not_sent_if_notifying_admins_about_suggestions_is_disabled(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', False)
@@ -766,7 +766,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_email_sent_to_admin_if_sending_admin_need_reviewers_emails_enabled(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'enable_admin_notifications_for_reviewer_shortage', True)
@@ -787,7 +787,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_email_sent_to_admin_if_notifying_admins_about_suggestions_enabled(
             self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         config_services.set_property(
             'committer_id',
             'notify_admins_suggestions_waiting_too_long_is_enabled', True)

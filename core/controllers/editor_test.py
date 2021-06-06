@@ -52,7 +52,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
         super(BaseEditorControllerTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -61,7 +61,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.voice_artist_id = self.get_user_id_from_email(
             self.VOICE_ARTIST_EMAIL)
@@ -242,7 +242,7 @@ class EditorTests(BaseEditorControllerTests):
         self.logout()
 
     def test_publish_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(
@@ -1112,7 +1112,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.delete_json(
             '/createhandler/data/%s' % published_exp_id,
             expected_status_int=200)
@@ -1158,7 +1158,7 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
                 exp_id)
             exp_services.save_new_exploration(self.admin_id, exploration)
 
-            self.login(self.ADMIN_EMAIL)
+            self.login(self.CURRICULUM_ADMIN_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
@@ -2002,8 +2002,8 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
-        self.signup(self.ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
@@ -2938,7 +2938,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
         self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
-        self.login(self.ADMIN_EMAIL)
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
