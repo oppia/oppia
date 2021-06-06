@@ -30,7 +30,7 @@ import apache_beam as beam
     [models.NAMES.base_model, models.NAMES.exploration])
 
 
-class ValidateExplorationCommitCmdsSchemaTests(
+class ValidateExplorationSnapshotMetadataModelTests(
         job_test_utils.PipelinedTestBase):
 
     def test_validate_change_domain_implemented(self):
@@ -248,4 +248,80 @@ class ValidateExplorationCommitCmdsSchemaTests(
                 },
                 'Value for property_name in cmd edit_state_property: '
                 'invalid is not allowed')
+        ])
+
+
+class ValidateExplorationRightsSnapshotMetadataModelTests(
+    job_test_utils.PipelinedTestBase):
+    pass
+    # write test which test the rights model here
+
+class ValidateExplorationCommitLogEntryModelTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_validate_rights_model(self):
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+            id='rights_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test-type',
+            user_id='',
+            exploration_id='123',
+            post_commit_status='private',
+            commit_cmds=[{'cmd': 'create_new'}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationCommitLogEntryModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validate_exploration_model(self):
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+            id='exploration_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test-type',
+            user_id='',
+            exploration_id='123',
+            post_commit_status='private',
+            commit_cmds=[{
+                'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationCommitLogEntryModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validate_other_model(self):
+        invalid_commit_cmd_model = exp_models.ExplorationCommitLogEntryModel(
+            id='model_id123',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            commit_type='test-type',
+            user_id='',
+            exploration_id='123',
+            post_commit_status='private',
+            commit_cmds=[{
+                'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationCommitLogEntryModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
         ])

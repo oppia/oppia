@@ -19,7 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from jobs import job_utils
 from core.domain import exp_domain
+from core.domain import rights_domain
 from core.platform import models
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
@@ -30,7 +32,7 @@ from jobs.transforms import base_validation
 @validation_decorators.AuditsExisting(
     exp_models.ExplorationSnapshotMetadataModel,
     exp_models.ExplorationCommitLogEntryModel)
-class ValidateExplorationCommitCmdsSchema(
+class ValidateExplorationSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for exploration models """
 
@@ -45,3 +47,42 @@ class ValidateExplorationCommitCmdsSchema(
             changes made by commit commands of the model.
         """
         return exp_domain.ExplorationChange
+
+
+class ValidateExplorationRightsSnapshotMetadataModel(
+    base_validation.BaseValidateCommitCmdsSchema):
+
+    def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
+        """Returns a Change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            change_domain.BaseChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        return rights_domain.ExplorationRightsChange
+
+
+class ValidateExplorationCommitLogEntryModel(
+    base_validation.BaseValidateCommitCmdsSchema):
+    """Docstr here. """
+
+    def _get_change_domain_class(self, input_model):
+        """Returns a Change domain class.
+
+        Args:
+            input_model: datastore_services.Model. Entity to validate.
+
+        Returns:
+            change_domain.BaseChange. A domain object class for the
+            changes made by commit commands of the model.
+        """
+        model = job_utils.clone_model(input_model)
+        if model.id.startswith('rights'):
+            return rights_domain.ExplorationRightsChange
+        elif model.id.startswith('exploration'):
+            return exp_domain.ExplorationChange
+        else:
+            return None
