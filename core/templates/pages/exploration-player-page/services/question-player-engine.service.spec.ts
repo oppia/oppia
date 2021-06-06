@@ -411,7 +411,7 @@ describe('Question player engine service ', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    
+
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     contextService = TestBed.inject(ContextService);
