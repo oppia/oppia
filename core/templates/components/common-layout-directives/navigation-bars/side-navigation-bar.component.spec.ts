@@ -46,8 +46,7 @@ describe('Side Navigation Bar Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientModule,
-        TranslateModule.forRoot()
+        HttpClientModule
       ],
       declarations: [
         SideNavigationBarComponent,
