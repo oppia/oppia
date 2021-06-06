@@ -67,7 +67,7 @@ describe('Oppia CodeMirror Component', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     spyOnProperty(
-      component, 'CodeMirrorInstance', 'get').and.returnValue({
+      component, 'getCodeMirrorInstance', 'get').and.returnValue({
       editor: () => {
         return { setValue: editSetValueSpy };
       },
@@ -105,7 +105,7 @@ describe('Oppia CodeMirror Component', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     spyOnProperty(
-      component, 'CodeMirrorInstance', 'get').and.returnValue({
+      component, 'getCodeMirrorInstance', 'get').and.returnValue({
       editor: () => {
         return { setValue: editSetValueSpy };
       },

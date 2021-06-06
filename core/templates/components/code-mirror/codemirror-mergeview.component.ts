@@ -36,7 +36,7 @@ export class CodemirrorMergeviewComponent implements
   // to cater this we are checking it be to not undefined.
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
 
-  get CodeMirrorInstance(): CodeMirror.MergeView.MergeViewEditor {
+  get getCodeMirrorInstance(): CodeMirror.MergeView.MergeViewEditor {
     return this.codeMirrorInstance;
   }
 
@@ -73,7 +73,7 @@ export class CodemirrorMergeviewComponent implements
     if (changes.leftValue &&
       changes.leftValue.currentValue !==
       changes.leftValue.previousValue &&
-      this.CodeMirrorInstance) {
+      this.getCodeMirrorInstance) {
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
@@ -86,7 +86,7 @@ export class CodemirrorMergeviewComponent implements
     if (changes.rightValue &&
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue &&
-      this.CodeMirrorInstance) {
+      this.getCodeMirrorInstance) {
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
