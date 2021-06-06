@@ -30,7 +30,7 @@ require(
 require(
   'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
-  'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
+  'pages/topic-editor-page/questions-tab/topic-questions-tab.component.ts');
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
