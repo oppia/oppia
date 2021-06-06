@@ -585,33 +585,33 @@ describe('Graph Layout Service', () => {
       }
     };
 
-    let graphWidthUpperBoundPixel = sgls.getGraphWidth(
+    let graphWidthUpperBoundInPixel = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-    let graphHeightPixel = sgls.getGraphHeight(nodeData);
+    let graphHeightInPixel = sgls.getGraphHeight(nodeData);
 
     // 10.5 is a rough upper bound for the width of a single letter in pixels,
     // used as a scaling factor to determine width of graph nodes.
-    expect(graphWidthUpperBoundPixel).toBe(
+    expect(graphWidthUpperBoundInPixel).toBe(
       AppConstants.MAX_NODES_PER_ROW * AppConstants.MAX_NODE_LABEL_LENGTH * 10.5
     );
-    // Here, graphHeightPixel = 70 * (maxDepth + 1), here maxDepth is 2.
-    expect(graphHeightPixel).toBe(210);
+    // Here, graphHeightInPixel = 70 * (maxDepth + 1), here maxDepth is 2.
+    expect(graphHeightInPixel).toBe(210);
   });
 
   it('should get graph width and height when nodes' +
     ' overflow to next row', () => {
-    let graphWidthPixel = sgls.getGraphWidth(
+    let graphWidthInPixel = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-    let graphHeightPixel = sgls.getGraphHeight(nodeData1);
+    let graphHeightInPixel = sgls.getGraphHeight(nodeData1);
 
     // 10.5 is a rough upper bound for the width of a single letter in pixels,
     // used as a scaling factor to determine width of graph nodes.
-    expect(graphWidthPixel).toBe(
+    expect(graphWidthInPixel).toBe(
       AppConstants.MAX_NODES_PER_ROW * AppConstants.MAX_NODE_LABEL_LENGTH * 10.5
     );
 
-    // Here, graphHeightPixel = 70 * (maxDepth + 1), here maxDepth is 5.
-    expect(graphHeightPixel).toBe(420);
+    // Here, graphHeightInPixel = 70 * (maxDepth + 1), here maxDepth is 5.
+    expect(graphHeightInPixel).toBe(420);
   });
 
 
@@ -1019,21 +1019,21 @@ describe('Graph Layout Service', () => {
       }
     };
 
-    let actualGraphBoundariesPixel1 = sgls.getGraphBoundaries(
+    let actualGraphBoundariesInPixel1 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel1);
-    let actualGraphBoundariesPixel2 = sgls.getGraphBoundaries(
+    let actualGraphBoundariesInPixel2 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel2);
-    let actualGraphBoundariesPixel3 = sgls.getGraphBoundaries(
+    let actualGraphBoundariesInPixel3 = sgls.getGraphBoundaries(
       nodeDataWithPositionValueInPixel3);
 
     // The width of graph is calculated as difference between left and right
     // edge.
-    let actualWidthPixel1 = actualGraphBoundariesPixel1.right -
-      actualGraphBoundariesPixel1.left;
-    let actualWidthPixel2 = actualGraphBoundariesPixel2.right -
-      actualGraphBoundariesPixel2.left;
-    let actualWidthPixel3 = actualGraphBoundariesPixel3.right -
-      actualGraphBoundariesPixel3.left;
+    let actualWidthInPixel1 = actualGraphBoundariesInPixel1.right -
+      actualGraphBoundariesInPixel1.left;
+    let actualWidthInPixel2 = actualGraphBoundariesInPixel2.right -
+      actualGraphBoundariesInPixel2.left;
+    let actualWidthInPixel3 = actualGraphBoundariesInPixel3.right -
+      actualGraphBoundariesInPixel3.left;
 
     // This is the maximum upper bound for graph width taking padding fraction
     // into consideration. First we calculate the x0 of the rightmost node.
@@ -1050,27 +1050,27 @@ describe('Graph Layout Service', () => {
     // 126 = 601.925.
     // Now, if we calculate the leftEdge of leftMostState (here State1), we'll
     // get 40.675000000000004. So width = 601.925 - 40.675000000000004 = 561.25.
-    let widthUpperBoundPixels = 561.25;
+    let widthUpperBoundInPixels = 561.25;
 
     // The height of graph calculated as difference b/w bottom and right top.
-    let actualHeightPixel1 = actualGraphBoundariesPixel1.bottom -
-    actualGraphBoundariesPixel1.top;
-    let actualHeightPixel2 = actualGraphBoundariesPixel2.bottom -
-      actualGraphBoundariesPixel2.top;
-    let actualHeightPixel3 = actualGraphBoundariesPixel3.bottom -
-      actualGraphBoundariesPixel3.top;
+    let actualHeightInPixel1 = actualGraphBoundariesInPixel1.bottom -
+    actualGraphBoundariesInPixel1.top;
+    let actualHeightInPixel2 = actualGraphBoundariesInPixel2.bottom -
+      actualGraphBoundariesInPixel2.top;
+    let actualHeightInPixel3 = actualGraphBoundariesInPixel3.bottom -
+      actualGraphBoundariesInPixel3.top;
 
     // Here, we see that for 3 nodes the graph width is less than
     // the upper bound, for  4 nodes the graph width is equal to the
     // upper bound and the width becomes constant for nodes > 4.
-    expect(actualWidthPixel1).toBeLessThan(actualWidthPixel2);
-    expect(actualWidthPixel2).toEqual(widthUpperBoundPixels);
-    expect(actualWidthPixel3).toEqual(widthUpperBoundPixels);
+    expect(actualWidthInPixel1).toBeLessThan(actualWidthInPixel2);
+    expect(actualWidthInPixel2).toEqual(widthUpperBoundInPixels);
+    expect(actualWidthInPixel3).toEqual(widthUpperBoundInPixels);
 
     // As height does not have an upper bound, it increases as a node overflows
     // to the next row.
-    expect(actualHeightPixel1).toEqual(actualHeightPixel2);
-    expect(actualHeightPixel2).toBeLessThan(actualHeightPixel3);
+    expect(actualHeightInPixel1).toEqual(actualHeightInPixel2);
+    expect(actualHeightInPixel2).toBeLessThan(actualHeightInPixel3);
   });
 
   it('should return graph boundaries with height equal to' +
@@ -1133,11 +1133,11 @@ describe('Graph Layout Service', () => {
         reachableFromEnd: false
       }
     };
-    let graphWidthUpperBoundPixel = sgls.getGraphWidth(
+    let graphWidthUpperBoundInPixel = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-    let graphHeightPixel = sgls.getGraphHeight(nodeData);
+    let graphHeightInPixel = sgls.getGraphHeight(nodeData);
     let nodeDataWithPositionValueInPixel = sgls.modifyPositionValues(
-      nodeData, graphWidthUpperBoundPixel, graphHeightPixel);
+      nodeData, graphWidthUpperBoundInPixel, graphHeightInPixel);
 
     // The expectedGraphBoundaries are calculated from the x0 and y0 values from
     // nodeDataWithPositionValueInPixel, where leftEdge is
@@ -1156,7 +1156,7 @@ describe('Graph Layout Service', () => {
     let expectedHeight = expectedGraphBoundaries.bottom -
       expectedGraphBoundaries.top;
 
-    expect(expectedHeight).toBeLessThanOrEqual(graphHeightPixel);
+    expect(expectedHeight).toBeLessThanOrEqual(graphHeightInPixel);
     expect(sgls.getGraphBoundaries(nodeDataWithPositionValueInPixel))
       .toEqual(expectedGraphBoundaries);
   });
@@ -1305,17 +1305,17 @@ describe('Graph Layout Service', () => {
       }
     };
 
-    let graphWidthUpperBoundPixel = sgls.getGraphWidth(
+    let graphWidthUpperBoundInPixel = sgls.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
-    let graphHeightPixel = sgls.getGraphHeight(nodeData);
+    let graphHeightInPixel = sgls.getGraphHeight(nodeData);
 
     // Here, modifiedNodeData is nodeData with position values in pixels.
     // For ex, nodeData.State1.x0 = 0.07250000000000001 which is expressed
     // in fraction of graph width. It can be converted to pixels by multiplying
     // with graph width. So, modifiedNodeDate.State1.x0 = 0.07250000000000001 *
-    // graphWidthUpperBoundPixel (630) = 47.675000000000004.
+    // graphWidthUpperBoundInPixel (630) = 47.675000000000004.
     let modifiedNodeData = sgls.modifyPositionValues(
-      nodeData, graphWidthUpperBoundPixel, graphHeightPixel);
+      nodeData, graphWidthUpperBoundInPixel, graphHeightInPixel);
 
     // The expectedPositionValues are calculated similarly as given above.
     let expectedPositionValues = {
