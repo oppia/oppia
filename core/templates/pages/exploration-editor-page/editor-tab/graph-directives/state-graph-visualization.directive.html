@@ -116,9 +116,12 @@ with the same id on the page. -->
                     aria-label="Switch to <[getNodeTitle(node)]> Card">
               </rect>
               <title><[getNodeTitle(node)]></title>
-              <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
-                <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
-                <tspan ng-attr-x="<[node.xLabel]>" dy="1em" class="oppia-box-fill"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
+              <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>">
+                <tspan ng-if="isCheckpoint(node.id)" alignment-baseline="central">&#11088;</tspan>
+                <tspan class="protractor-test-node-label">
+                  <tspan alignment-baseline="central"><[getTruncatedLabel(node.label)]></tspan>
+                  <tspan ng-attr-x="<[node.xLabel]>" dy="1em" class="oppia-box-fill"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
+                </tspan>
               </text>
               <g ng-if="getNodeErrorMessage(node.label) && (showWarningSign || showTranslationWarnings)">
                 <rect ng-click="onClickFunction(node.id)" class="clickable oppia-error-message-fill"
