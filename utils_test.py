@@ -651,3 +651,18 @@ class UtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
         self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])
+
+    def test_convert_png_data_url_to_binary(self):
+        image_data_url = '%s%s' % (
+            utils.PNG_DATA_URL_PREFIX,
+            python_utils.url_quote(base64.b64encode('test123')))
+
+        self.assertEqual(
+            utils.convert_png_data_url_to_binary(image_data_url), 'test123')
+
+    def test_convert_png_data_url_to_binary_raises_if_prefix_is_missing(self):
+        image_data_url = python_utils.url_quote(base64.b64encode('test123'))
+
+        self.assertRaisesRegexp(
+            Exception, 'The given string does not represent a PNG data URL.',
+            lambda: utils.convert_png_data_url_to_binary(image_data_url))

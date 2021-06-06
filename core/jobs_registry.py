@@ -38,21 +38,12 @@ from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
-from core.domain import user_jobs_one_off
 import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
-    activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
-    activity_jobs_one_off.AddContentUserIdsContentJob,
-    activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
-    activity_jobs_one_off.AuditContributorsOneOffJob,
-    activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
-    activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
-    activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
     auth_jobs_one_off.SyncFirebaseAccountsOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
@@ -99,9 +90,7 @@ ONE_OFF_JOB_MANAGERS = [
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
     question_jobs_one_off.QuestionSnapshotsMigrationAuditJob,
     question_jobs_one_off.QuestionSnapshotsMigrationJob,
-    recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
-    recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     skill_jobs_one_off.MissingSkillMigrationOneOffJob,
@@ -131,28 +120,6 @@ ONE_OFF_JOB_MANAGERS = [
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
-    user_jobs_one_off.CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob,
-    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    user_jobs_one_off.LongUserBiosOneOffJob,
-    user_jobs_one_off.UserContributionsOneOffJob,
-    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
-    user_jobs_one_off.UserLastExplorationActivityOneOffJob,
-    user_jobs_one_off.UsernameLengthAuditOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.RemoveActivityIDsOneOffJob,
-    user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob,
-    user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
-    user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
-    user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
-    user_jobs_one_off.DiscardOldDraftsOneOffJob,
-    user_jobs_one_off.ProfilePictureAuditOneOffJob,
-    user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
-    user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
-    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob,
-    user_jobs_one_off.UserRolesPopulationOneOffJob,
-    user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
-    user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
-    user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

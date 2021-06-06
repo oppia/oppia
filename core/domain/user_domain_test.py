@@ -391,6 +391,14 @@ class UserContributionsTests(test_utils.GenericTestBase):
             user_services.create_user_contributions(
                 feconf.MIGRATION_BOT_USER_ID, [], []))
 
+    def test_update_user_contributions(self):
+        user_services.update_user_contributions(self.owner_id, ['e1'], ['e2'])
+
+        contributions = user_services.get_user_contributions(self.owner_id)
+        self.assertEqual(contributions.user_id, self.owner_id)
+        self.assertEqual(contributions.created_exploration_ids, ['e1'])
+        self.assertEqual(contributions.edited_exploration_ids, ['e2'])
+
     def test_cannot_create_user_contributions_with_existing_user_id(self):
         with self.assertRaisesRegexp(
             Exception,
