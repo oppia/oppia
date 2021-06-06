@@ -59,7 +59,7 @@ class LearnerDashboardHandler(base.BaseHandler):
         """Handles GET requests."""
         (
             learner_progress, number_of_nonexistent_activities,
-            completed_to_incomplete_collections) = (
+            username, completed_to_incomplete_activities) = (
                 learner_progress_services.get_activity_progress(self.user_id))
 
         completed_exp_summary_dicts = (
@@ -76,6 +76,17 @@ class LearnerDashboardHandler(base.BaseHandler):
         incomplete_collection_summary_dicts = (
             learner_progress_services.get_collection_summary_dicts(
                 learner_progress.incomplete_collection_summaries))
+
+        completed_story_summary_dicts = (
+            learner_progress_services.get_story_summary_dicts(
+                self.user_id, learner_progress.completed_story_summaries))
+
+        learnt_topic_summary_dicts = (
+            learner_progress_services.get_topic_summary_dicts(
+                self.user_id, learner_progress.learnt_topic_summaries))
+        partially_learnt_topic_summary_dicts = (
+            learner_progress_services.get_topic_summary_dicts(
+                self.user_id, learner_progress.partially_learnt_topic_summaries))
 
         exploration_playlist_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
@@ -114,14 +125,22 @@ class LearnerDashboardHandler(base.BaseHandler):
         self.values.update({
             'completed_explorations_list': completed_exp_summary_dicts,
             'completed_collections_list': completed_collection_summary_dicts,
+            'completed_stories_list': completed_story_summary_dicts,
+            'learnt_topics_list': learnt_topic_summary_dicts,
             'incomplete_explorations_list': incomplete_exp_summary_dicts,
             'incomplete_collections_list': incomplete_collection_summary_dicts,
+            'partially_learnt_topics_list': partially_learnt_topic_summary_dicts,
             'exploration_playlist': exploration_playlist_summary_dicts,
             'collection_playlist': collection_playlist_summary_dicts,
+            'username': username,
             'number_of_nonexistent_activities': (
                 number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
-                completed_to_incomplete_collections),
+                completed_to_incomplete_activities.completed_to_incomplete_collections),
+            'completed_to_incomplete_stories': (
+                completed_to_incomplete_activities.completed_to_incomplete_stories),
+            'learnt_to_partially_learnt_topics': (
+                completed_to_incomplete_activities.learnt_to_partially_learnt_topics),
             'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list

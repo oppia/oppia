@@ -26,6 +26,14 @@ import {
   CollectionSummaryBackendDict,
 } from 'domain/collection/collection-summary.model';
 import {
+  StorySummary,
+  StorySummaryBackendDict
+} from 'domain/story/story-summary.model';
+import {
+  TopicSummary,
+  TopicSummaryBackendDict
+} from 'domain/topic/topic-summary.model';
+import {
   FeedbackThreadSummary,
   FeedbackThreadSummaryBackendDict
 } from 'domain/feedback_thread/feedback-thread-summary.model';
@@ -50,11 +58,17 @@ interface LearnerDashboardDataBackendDict {
   'completed_collections_list': CollectionSummaryBackendDict[];
   'incomplete_collections_list': CollectionSummaryBackendDict[];
   'collection_playlist': CollectionSummaryBackendDict[];
+  'completed_stories_list': StorySummaryBackendDict[];
+  'learnt_topics_list': TopicSummaryBackendDict[];
+  'partially_learnt_topics_list': TopicSummaryBackendDict[];
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];
+  'completed_to_incomplete_stories': string[];
+  'learnt_to_partially_learnt_topics': string[];
   'number_of_nonexistent_activities': NonExistentActivitiesBackendDict;
   'subscription_list': CreatorSummaryBackendDict[];
+  'username': string
 }
 
 interface LearnerDashboardData {
@@ -64,11 +78,17 @@ interface LearnerDashboardData {
   completedCollectionsList: CollectionSummary[];
   incompleteCollectionsList: CollectionSummary[];
   collectionPlaylist: CollectionSummary[];
+  completedStoriesList: StorySummary[];
+  learntTopicsList: TopicSummary[];
+  partiallyLearntTopicsList: TopicSummary[];
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
   completedToIncompleteCollections: string[];
+  completedToIncompleteStories: string[];
+  learntToPartiallyLearntTopics: string[];
   numberOfNonexistentActivities: NonExistentActivities;
   subscriptionList: ProfileSummary[];
+  username: string;
 }
 
 interface AddMessagePayload {
@@ -117,6 +137,18 @@ export class LearnerDashboardBackendApiService {
             dashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
+          completedStoriesList: (
+            dashboardData.completed_stories_list.map(
+              storySummary => StorySummary
+                .createFromBackendDict(storySummary))),
+          learntTopicsList: (
+            dashboardData.learnt_topics_list.map(
+              topicSummary => TopicSummary
+                .createFromBackendDict(topicSummary))),
+          partiallyLearntTopicsList: (
+            dashboardData.partially_learnt_topics_list.map(
+              topicSummary => TopicSummary
+                .createFromBackendDict(topicSummary))),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
@@ -124,13 +156,18 @@ export class LearnerDashboardBackendApiService {
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             dashboardData.completed_to_incomplete_collections),
+          completedToIncompleteStories: (
+            dashboardData.completed_to_incomplete_stories),
+          learntToPartiallyLearntTopics: (
+            dashboardData.learnt_to_partially_learnt_topics),
           numberOfNonexistentActivities: (
             NonExistentActivities.createFromBackendDict(
               dashboardData.number_of_nonexistent_activities)),
           subscriptionList: (
             dashboardData.subscription_list.map(
               profileSummary => ProfileSummary
-                .createFromCreatorBackendDict(profileSummary)))
+                .createFromCreatorBackendDict(profileSummary))),
+          username: dashboardData.username
         });
       }, errorResponse => {
         reject(errorResponse.status);

@@ -29,15 +29,21 @@ class LearnerProgressUnitTests(test_utils.GenericTestBase):
     def test_initialization(self):
         """Tests init method."""
         user_learner_progress = (learner_progress_domain.LearnerProgress(
-            [], [], [], [], [], []))
+            [], [], [], [], [], [], [], [], []))
 
         self.assertEqual(
             user_learner_progress.incomplete_exp_summaries, [])
         self.assertEqual(
             user_learner_progress.incomplete_collection_summaries, [])
+        self.assertEqual(
+            user_learner_progress.partially_learnt_topic_summaries, [])
         self.assertEqual(user_learner_progress.completed_exp_summaries, [])
         self.assertEqual(
             user_learner_progress.completed_collection_summaries, [])
+        self.assertEqual(
+            user_learner_progress.completed_story_summaries, [])
+        self.assertEqual(
+            user_learner_progress.learnt_topic_summaries, [])
         self.assertEqual(
             user_learner_progress.exploration_playlist_summaries, [])
         self.assertEqual(
@@ -50,17 +56,23 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         incomplete_exp_ids = ['0']
         incomplete_coll_ids = ['1']
-        completed_exp_ids = ['2']
-        completed_coll_ids = ['3']
-        exploration_playlist_ids = ['4']
-        collection_playlist_ids = ['5']
+        partially_learnt_topic_ids = ['3']
+        completed_exp_ids = ['4']
+        completed_coll_ids = ['5']
+        completed_story_ids = ['6']
+        learnt_topic_ids = ['7']
+        exploration_playlist_ids = ['8']
+        collection_playlist_ids = ['9']
 
         observed_activity_ids_in_learner_dashboard = (
             learner_progress_domain.ActivityIdsInLearnerDashboard(
                 completed_exp_ids,
                 completed_coll_ids,
+                completed_story_ids,
+                learnt_topic_ids,
                 incomplete_exp_ids,
                 incomplete_coll_ids,
+                partially_learnt_topic_ids,
                 exploration_playlist_ids,
                 collection_playlist_ids))
         to_dict_result = observed_activity_ids_in_learner_dashboard.to_dict()
@@ -70,9 +82,15 @@ class ActivityIdsInLearnerDashboardUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             to_dict_result['completed_collection_ids'], completed_coll_ids)
         self.assertEqual(
+            to_dict_result['completed_story_ids'], completed_story_ids)
+        self.assertEqual(
+            to_dict_result['learnt_topic_ids'], learnt_topic_ids)
+        self.assertEqual(
             to_dict_result['incomplete_exploration_ids'], incomplete_exp_ids)
         self.assertEqual(
             to_dict_result['incomplete_collection_ids'], incomplete_coll_ids)
+        self.assertEqual(
+            to_dict_result['partially_learnt_topic_ids'], partially_learnt_topic_ids)
         self.assertEqual(
             to_dict_result['exploration_playlist_ids'],
             exploration_playlist_ids)

@@ -42,6 +42,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 import feconf
 import utils
@@ -588,6 +589,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         state_name = self.payload.get('state_name')
         user_id = self.user_id
         collection_id = self.payload.get('collection_id')
+        story_id =  exp_services.get_story_id_linked_to_exploration(exploration_id)
 
         if user_id:
             learner_progress_services.mark_exploration_as_incomplete(
@@ -596,6 +598,13 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         if user_id and collection_id:
             learner_progress_services.mark_collection_as_incomplete(
                 user_id, collection_id)
+
+        if user_id and story_id:
+            story = story_fetchers.get_story_by_id(story_id)
+            learner_progress_services.mark_story_as_incomplete(
+                user_id, story.id)
+            learner_progress_services.mark_topic_as_partially_learnt(
+                user_id, story.corresponding_topic_id)
 
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
@@ -615,11 +624,12 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_dashboard
     def delete(self, activity_type, activity_id):
-        """Removes exploration or collection from incomplete list.
+        """Removes exploration, collection, story or topic from incomplete
+            list.
 
         Args:
             activity_type: str. The activity type. Currently, it can take values
-                "exploration" or "collection".
+                "exploration", "collection", "story" or "topic".
             activity_id: str. The ID of the activity to be deleted.
         """
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
@@ -627,6 +637,12 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
                 self.user_id, activity_id)
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
             learner_progress_services.remove_collection_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_STORY:
+            learner_progress_services.remove_story_from_incomplete_list(
+                self.user_id, activity_id)
+        elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
+            learner_progress_services.remove_topic_from_partially_learnt_list(
                 self.user_id, activity_id)
 
         self.render_json(self.values)

@@ -168,7 +168,7 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes);
+            storyDict.url_fragment, allNodes, null, null);
         });
     let additionalStories =
         topicDataDict.additional_story_dicts.map(storyDict => {
@@ -181,7 +181,7 @@ export class ReadOnlyTopicObjectFactory {
             storyDict.id, storyDict.title, storyDict.node_titles,
             storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
             storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes);
+            storyDict.url_fragment, allNodes, null, null);
         });
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,

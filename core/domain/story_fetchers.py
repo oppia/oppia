@@ -333,6 +333,24 @@ def get_completed_node_ids(user_id, story_id):
     return progress_model.completed_node_ids if progress_model else []
 
 
+def get_completed_node_titles(user_id, story_id):
+    """Returns the titles of the nodes completed in the story.
+
+    Args:
+        user_id: str. ID of the given user.
+        story_id: str. ID of the story.
+
+    Returns:
+        list(str). List of the node titles completed in story.
+    """
+
+    completed_nodes = get_completed_nodes_in_story(user_id, story_id)
+
+    completed_node_titles = [node.title for node in completed_nodes]
+
+    return completed_node_titles
+
+
 def get_node_index_by_story_id_and_node_id(story_id, node_id):
     """Returns the index of the story node with the given story id
     and node id.

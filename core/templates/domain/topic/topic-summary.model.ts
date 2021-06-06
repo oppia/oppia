@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { DegreesOfMastery } from 'domain/topic_viewer/read-only-topic-object.factory';
+import { SubtopicBackendDict, Subtopic, SkillIdToDescriptionMap } from './subtopic.model';
+
 /**
  * @fileoverview Frontend Model for topic summary.
  */
@@ -37,6 +40,11 @@ export interface TopicSummaryBackendDict {
   'can_edit_topic'?: boolean;
   'is_published'?: boolean;
   'classroom'?: string;
+  // These properties are optional because they are only present in the
+  // topic summary dict of learner dashboard page.
+  'degrees_of_mastery'?: DegreesOfMastery;
+  'skill_descriptions'?: SkillIdToDescriptionMap;
+  'subtopics'?: SubtopicBackendDict[];
   'url_fragment': string;
 }
 
@@ -60,10 +68,20 @@ export class TopicSummary {
       public classroom: string,
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
+      public degreesOfMastery: DegreesOfMastery,
+      public skillDescription: SkillIdToDescriptionMap,
+      public subtopic: Subtopic[],
       public urlFragment: string) { }
 
   static createFromBackendDict(
       topicSummaryBackendDict: TopicSummaryBackendDict): TopicSummary {
+    let subtopics = null;
+    if (topicSummaryBackendDict.subtopics) {
+      subtopics = topicSummaryBackendDict.subtopics.map(subtopic => {
+        return Subtopic.create(
+          subtopic, topicSummaryBackendDict.skill_descriptions);
+      });
+    }
     return new TopicSummary(
       topicSummaryBackendDict.id,
       topicSummaryBackendDict.name,
@@ -83,6 +101,9 @@ export class TopicSummary {
       topicSummaryBackendDict.classroom,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
+      topicSummaryBackendDict.degrees_of_mastery,
+      topicSummaryBackendDict.skill_descriptions,
+      subtopics,
       topicSummaryBackendDict.url_fragment);
   }
 
@@ -152,6 +173,18 @@ export class TopicSummary {
 
   getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
+  }
+
+  getDegreesOfMastery(): DegreesOfMastery {
+    return this.degreesOfMastery;
+  }
+
+  getSkillDescription(): SkillIdToDescriptionMap {
+    return this.skillDescription;
+  }
+
+  getSubtopic(): Subtopic[] {
+    return this.subtopic;
   }
 
   isTopicPublished(): boolean {

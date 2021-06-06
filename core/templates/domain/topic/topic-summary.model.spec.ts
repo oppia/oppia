@@ -17,11 +17,21 @@
  */
 
 import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { Subtopic } from './subtopic.model';
 
 describe('Topic summary model', () => {
   let _sampleTopicSummary: TopicSummary = null;
 
   beforeEach(() => {
+    let subtopic = {
+      skill_ids: ['skill_id_2'],
+      id: 1,
+      title: 'subtopic_name',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      url_fragment: 'subtopic-name'
+    };
+
     let sampleTopicSummaryBackendDict = {
       id: 'sample_topic_id',
       name: 'Topic Name',
@@ -40,7 +50,16 @@ describe('Topic summary model', () => {
       url_fragment: 'topic-name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      is_published: false
+      is_published: false,
+      subtopics: [subtopic],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
     };
     _sampleTopicSummary = TopicSummary.createFromBackendDict(
       sampleTopicSummaryBackendDict);
@@ -65,5 +84,21 @@ describe('Topic summary model', () => {
     expect(_sampleTopicSummary.getThumbnailFilename()).toEqual('image.svg');
     expect(_sampleTopicSummary.getThumbnailBgColor()).toEqual('#C6DCDA');
     expect(_sampleTopicSummary.isTopicPublished()).toBeFalse();
+    expect(_sampleTopicSummary.getDegreesOfMastery()).toEqual({
+      skill_id_1: 0.5,
+      skill_id_2: 0.3
+    });
+    expect(_sampleTopicSummary.getSkillDescription()).toEqual({
+      skill_id_1: 'Skill Description 1',
+      skill_id_2: 'Skill Description 2'
+    });
+    expect(_sampleTopicSummary.getSubtopic()).toEqual([Subtopic.create({
+      skill_ids: ['skill_id_2'],
+      id: 1,
+      title: 'subtopic_name',
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#F8BF74',
+      url_fragment: 'subtopic-name'
+    }, _sampleTopicSummary.skillDescription)]);
   });
 });

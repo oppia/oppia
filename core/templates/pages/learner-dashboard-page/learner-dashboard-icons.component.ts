@@ -118,6 +118,14 @@ export class LearnerDashboardIconsComponent implements OnInit {
         return (
           this.learnerDashboardActivityIds.belongsToCompletedCollections(
             this.activityId));
+      } else if (activityType === constants.ACTIVITY_TYPE_STORY) {
+        return (
+          this.learnerDashboardActivityIds.belongsToCompletedStories(
+            this.activityId));
+      } else if (activityType === constants.ACTIVITY_TYPE_LEARN_TOPIC) {
+        return (
+          this.learnerDashboardActivityIds.belongsToLearntTopics(
+            this.activityId));
       }
     }
   }
@@ -132,6 +140,10 @@ export class LearnerDashboardIconsComponent implements OnInit {
       } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
         return (
           this.learnerDashboardActivityIds.belongsToIncompleteCollections(
+            this.activityId));
+      } else if (activityType === constants.ACTIVITY_TYPE_LEARN_TOPIC) {
+        return (
+          this.learnerDashboardActivityIds.belongsToPartiallyLearntTopics(
             this.activityId));
       }
     }

@@ -31,7 +31,11 @@ export interface StorySummaryBackendDict {
   'story_is_published': boolean;
   'completed_node_titles': string[],
   'url_fragment': string,
-  'all_node_dicts': StoryNodeBackendDict[]
+  'all_node_dicts': StoryNodeBackendDict[],
+  // This property is optional because it is only present in the
+  // story summary dict of learner dashboard page.
+  'topic_url_fragment'?: string,
+  'classroom_url_fragment'?: string
 }
 
 export class StorySummary {
@@ -45,7 +49,9 @@ export class StorySummary {
     private _storyIsPublished: boolean,
     private _completedNodeTitles: string[],
     private _urlFragment: string,
-    private _allNodes: StoryNode[]
+    private _allNodes: StoryNode[],
+    private _topicUrlFragment: string,
+    private _classroomUrlFragment: string
   ) {}
 
   getId(): string {
@@ -88,6 +94,14 @@ export class StorySummary {
     return this._allNodes;
   }
 
+  getTopicUrlFragment(): string {
+    return this._topicUrlFragment;
+  }
+
+  getClassroomUrlFragment(): string {
+    return this._classroomUrlFragment;
+  }
+
   static createFromBackendDict(
       storySummaryBackendDict: StorySummaryBackendDict): StorySummary {
     let allNodes = (
@@ -105,7 +119,9 @@ export class StorySummary {
       storySummaryBackendDict.story_is_published,
       storySummaryBackendDict.completed_node_titles,
       storySummaryBackendDict.url_fragment,
-      allNodes
+      allNodes,
+      storySummaryBackendDict.topic_url_fragment,
+      storySummaryBackendDict.classroom_url_fragment
     );
   }
 }
