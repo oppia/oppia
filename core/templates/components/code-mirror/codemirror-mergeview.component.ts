@@ -78,7 +78,7 @@ export class CodemirrorMergeviewComponent implements
         throw new Error('Left pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.codeMirrorInstance.editor().setValue(
+        this.getCodeMirrorInstance.editor().setValue(
           changes.leftValue.currentValue);
       });
     }
@@ -91,7 +91,7 @@ export class CodemirrorMergeviewComponent implements
         throw new Error('Right pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.codeMirrorInstance.rightOriginal().setValue(
+        this.getCodeMirrorInstance.rightOriginal().setValue(
           changes.rightValue.currentValue);
       });
     }
