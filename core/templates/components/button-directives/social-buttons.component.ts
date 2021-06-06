@@ -16,31 +16,20 @@
  * @fileoverview Component for the social buttons displayed in the footer.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 
 @Component({
   selector: 'oppia-social-buttons',
   templateUrl: './social-buttons.component.html',
   styleUrls: []
 })
-export class SocialButtonsComponent implements OnInit {
+export class SocialButtonsComponent {
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
-    private translateService: TranslateService,
     private urlInterpolationService: UrlInterpolationService) {
-    this.translateService.use('en');
-  }
-  ngOnInit(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => this.translateService.use(code));
   }
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);

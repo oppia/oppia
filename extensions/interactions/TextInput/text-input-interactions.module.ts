@@ -26,12 +26,14 @@ import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { InteractiveTextInputComponent } from './directives/oppia-interactive-text-input.component';
 import { ResponseTextInputComponent } from './directives/oppia-response-text-input.component';
 import { ShortResponseTextInputComponent } from './directives/oppia-short-response-text-input.component';
+import { TranslateModule } from '@ngx-translate/core';
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     SharedFormsModule,
-    SharedPipesModule
+    SharedPipesModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveTextInputComponent,

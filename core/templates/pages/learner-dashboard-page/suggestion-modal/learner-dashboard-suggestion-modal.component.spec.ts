@@ -17,18 +17,12 @@
  * @fileoverview Unit tests for LearnerDashboardSuggestionModalComponent.
  */
 
-import { Component, Directive, Pipe } from '@angular/core';
+import { Component, Directive } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
 
 let MockAngularHtmlBindWrapperDirective = function(
     options: Component): Directive {

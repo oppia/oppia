@@ -23,16 +23,9 @@ import { CollectionCreationService } from 'components/entity-creation-services/c
 import { CreateActivityModalComponent } from './create-activity-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Pipe } from '@angular/core';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {

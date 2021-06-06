@@ -28,7 +28,6 @@ import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
@@ -38,6 +37,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockContentTranslationLanguageService {
   getCurrentContentLanguageCode() {
@@ -64,11 +64,15 @@ describe('Content language selector component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, HttpClientTestingModule, NgbModule],
+      imports: [
+        FormsModule,
+        HttpClientTestingModule,
+        NgbModule
+      ],
       declarations: [
         ContentLanguageSelectorComponent,
-        SwitchContentLanguageRefreshRequiredModalComponent,
-        TranslatePipe
+        MockTranslatePipe,
+        SwitchContentLanguageRefreshRequiredModalComponent
       ],
       providers: [{
         provide: ContentTranslationLanguageService,

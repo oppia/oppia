@@ -45,13 +45,7 @@ import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/su
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {

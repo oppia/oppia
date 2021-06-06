@@ -28,6 +28,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { InteractiveCodeReplComponent } from './directives/oppia-interactive-code-repl.component';
 import { DirectivesModule } from 'directives/directives.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { TranslateModule } from '@ngx-translate/core';
 import { ResponseCodeReplComponent } from './directives/oppia-response-code-repl.component';
 import { ShortResponseCodeRepl } from './directives/oppia-short-response-code-repl.component';
 
@@ -40,7 +41,8 @@ import { ShortResponseCodeRepl } from './directives/oppia-short-response-code-re
     DirectivesModule,
     FormsModule,
     MatButtonModule,
-    SharedPipesModule
+    SharedPipesModule,
+    TranslateModule,
   ],
   declarations: [
     InteractiveCodeReplComponent,

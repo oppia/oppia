@@ -17,21 +17,14 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, Pipe } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { StoryPreviewTabComponent } from './story-preview-tab.component';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
-
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockStoryEditorNavigationService {
   activeTab: 'story_preview';
