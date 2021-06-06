@@ -45,13 +45,14 @@ module.exports = {
     return {
       [selector]: function(node) {
         var args = node.arguments;
-        // In angular, components function take 2 arguments and type of last
-        // arguments is always an ArrayExpression.
+        // In angular JS, components function take 2 arguments and type of last
+        // arguments is an ArrayExpression, if arguments doesn't follow this
+        // pattern we ignore such nodes.
         if (args.length !== 2 || args[1].type !== 'ArrayExpression') {
           return;
         }
-        // Removing last element as because its type is FunctionExpression
-        // storing all literal type elements in dependenciesLiteralNodes.
+        // Storing all literal type elements in dependenciesLiteralNodes because
+        // we have to check sorted pattern only in literal type element.
         var dependenciesLiteralNodes = args[1].elements.slice(0, -1);
 
         var dependenciesLiterals = [];
