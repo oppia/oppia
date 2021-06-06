@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import rights_domain
 from core.platform import models
 from jobs import job_test_utils
 from jobs.transforms import exp_validation
@@ -49,7 +50,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -69,7 +70,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -94,7 +95,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -123,7 +124,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -159,7 +160,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -195,7 +196,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -233,7 +234,7 @@ class ValidateExplorationSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitCmdsSchema())
+                exp_validation.ValidateExplorationSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -253,8 +254,204 @@ class ValidateExplorationSnapshotMetadataModelTests(
 
 class ValidateExplorationRightsSnapshotMetadataModelTests(
     job_test_utils.PipelinedTestBase):
-    pass
-    # write test which test the rights model here
+
+    def test_exploration_rights_change_object_with_missing_cmd(self):
+        invalid_commit_cmd_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='model_id-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{'invalid': 'data'}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                {'invalid': 'data'},
+                'Missing cmd key in change dict')
+        ])
+
+    def test_exploration_rights_change_object_with_invalid_cmd(self):
+        invalid_commit_cmd_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='model_id-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{'cmd': 'invalid'}])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                {'cmd': 'invalid'},
+                'Command invalid is not allowed')
+        ])
+
+    def test_exploration_rights_change_object_with_missing_attribute_in_cmd(
+        self):
+        invalid_commit_cmd_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='model_id-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            }])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                {
+                    'cmd': 'change_role',
+                    'assignee_id': 'assignee_id',
+                },
+                'The following required attributes are missing: '
+                'new_role, old_role')
+        ])
+
+    def test_exploration_rights_change_object_with_extra_attribute_in_cmd(
+        self):
+        invalid_commit_cmd_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='model_id-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{
+                'cmd': 'change_private_viewability',
+                'old_viewable_if_private': 'old_viewable_if_private',
+                'new_viewable_if_private': 'new_viewable_if_private',
+                'invalid': 'invalid'
+            }])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                {
+                    'cmd': 'change_private_viewability',
+                    'old_viewable_if_private': 'old_viewable_if_private',
+                    'new_viewable_if_private': 'new_viewable_if_private',
+                    'invalid': 'invalid'
+                },
+                'The following extra attributes are present: invalid')
+        ])
+
+    def test_exploration_rights_change_object_with_invalid_role(
+        self):
+        invalid_commit_cmd_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='model_id-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': rights_domain.ROLE_OWNER,
+                'new_role': 'invalid',
+            }])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                {
+                    'cmd': 'change_role',
+                    'assignee_id': 'assignee_id',
+                    'old_role': rights_domain.ROLE_OWNER,
+                    'new_role': 'invalid',
+                },
+                'Value for new_role in cmd change_role: '
+                'invalid is not allowed')
+        ])
+
+    def test_exploration_rights_change_object_with_invalid_status(
+        self):
+        invalid_commit_cmd_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='model_id-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_cmds=[{
+                'cmd': 'change_exploration_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': 'invalid'
+            }])
+        )
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_commit_cmd_model])
+            | beam.ParDo(
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
+                ))
+        )
+
+        self.assert_pcoll_equal(output, [
+            base_validation_errors.CommitCmdsValidateError(
+                invalid_commit_cmd_model,
+                {
+                'cmd': 'change_exploration_status',
+                'old_status': rights_domain.ACTIVITY_STATUS_PRIVATE,
+                'new_status': 'invalid'
+                },
+                'Value for new_status in cmd change_exploration_status: '
+                'invalid is not allowed')
+        ])
+
 
 class ValidateExplorationCommitLogEntryModelTests(
         job_test_utils.PipelinedTestBase):
