@@ -746,11 +746,11 @@ describe('Question player engine service ', () => {
         stateCardObjectFactory, 'createNewCard').and.returnValue(sampleCard);
 
       expect(createNewCardSpy).toHaveBeenCalledTimes(0);
-      
+
       // Submitting answer to the first question.
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
-      
+
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId1');
       expect(createNewCardSpy).toHaveBeenCalledTimes(1);
