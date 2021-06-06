@@ -3583,7 +3583,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         super(DecoratorForUpdatingSuggestionTests, self).setUp()
         self.signup(self.author_email, self.author_username)
         self.signup(self.user_email, self.username)
-        self.signup(self.curriculum_admin_email, self.admin_username)
+        self.signup(self.curriculum_admin_email, self.curriculum_admin_username)
         self.signup(self.hi_language_reviewer, 'reviewer1')
         self.signup(self.en_language_reviewer, 'reviewer2')
         self.author_id = self.get_user_id_from_email(self.author_email)
