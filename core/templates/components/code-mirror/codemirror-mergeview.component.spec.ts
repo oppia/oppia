@@ -22,8 +22,7 @@ import CodeMirror from 'node_modules/@types/codemirror';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CodemirrorMergeviewComponent } from './codemirror-mergeview.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Oppia CodeMirror Component', () => {
+describe('Oppia CodeMirror Component', () => {
   let component: CodemirrorMergeviewComponent;
   let fixture: ComponentFixture<CodemirrorMergeviewComponent>;
   let windowRef: WindowRef;
