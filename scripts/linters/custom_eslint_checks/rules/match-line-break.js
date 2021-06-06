@@ -72,7 +72,8 @@ module.exports = {
         }
         var returnDictProp = functionNode.body.body[0].argument.properties;
         returnDictProp.forEach(function(property) {
-          if (property.key.name === 'controller') {
+          if (property.key.name === 'controller' && (
+            property.value.type === 'ArrayExpression')) {
             var lenPropElements = property.value.elements.length;
             var controllerFun = property.value.elements[lenPropElements - 1];
             var controllerArg = (
