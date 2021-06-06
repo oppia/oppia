@@ -26,13 +26,15 @@ import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
 import { ResponseLogicProofComponent } from './directives/oppia-response-logic-proof.component';
 import { ShortResponseLogicProofComponent } from './directives/oppia-short-response-logic-proof.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
     SharedPipesModule,
-    CodeMirrorModule
+    CodeMirrorModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveLogicProofComponent,
