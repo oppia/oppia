@@ -94,14 +94,14 @@ describe('Voiceover upload features', function() {
       await explorationEditorTranslationTab.deleteAudioRecord();
       await explorationEditorPage.saveChanges(
         'Adds audio file in translation tab.');
+      browser.manage().logs().get('browser').then(function(browserLog) {
+        // browserLogs is an array of objects with level and message fields
+        console.log('log: ' + require('util').inspect(browserLog));
+      });
       await workflow.publishExploration();
     });
 
   afterEach(async function() {
-    browser.manage().logs().get('browser').then(function(browserLog) {
-      // browserLogs is an array of objects with level and message fields
-      console.log('log: ' + require('util').inspect(browserLog));
-    });
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
       '(Bad Request)', {status_code: 400,
