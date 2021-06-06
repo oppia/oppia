@@ -1350,7 +1350,18 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         username = 'user1'
 
         self.signup(user_email, username)
-        self.set_topic_managers([username])
+
+        topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.set_topic_managers([username], topic_id)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 

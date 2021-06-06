@@ -49,7 +49,6 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             self.NEW_USER_EMAIL)
 
         self.set_curriculum_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)
@@ -82,6 +81,7 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         new_config_value = [{

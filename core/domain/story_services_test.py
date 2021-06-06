@@ -94,7 +94,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.story = story_fetchers.get_story_by_id(self.STORY_ID)
 
         self.set_curriculum_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.TOPIC_ID)
         self.user_a = user_services.get_user_actions_info(self.user_id_a)
         self.user_b = user_services.get_user_actions_info(self.user_id_b)
         self.user_admin = user_services.get_user_actions_info(

@@ -792,8 +792,6 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(manager1_email, 'manager1')
         self.signup(manager2_email, 'manager2')
 
-        self.set_topic_managers(['manager1', 'manager2'])
-
         self.manager1_id = self.get_user_id_from_email(manager1_email)
         self.manager2_id = self.get_user_id_from_email(manager2_email)
 
@@ -861,6 +859,11 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
             self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
         topic_services.assign_role(
             self.admin, self.manager2, topic_domain.ROLE_MANAGER, '1')
+
+        self.set_topic_managers(['manager1'], '0')
+        self.set_topic_managers(['manager2'], '1')
+        self.manager1 = user_services.get_user_actions_info(self.manager1_id)
+        self.manager2 = user_services.get_user_actions_info(self.manager2_id)
 
         self.model_instance_0 = topic_models.TopicRightsModel.get_by_id('0')
         self.model_instance_1 = topic_models.TopicRightsModel.get_by_id('1')

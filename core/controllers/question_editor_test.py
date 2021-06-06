@@ -23,6 +23,8 @@ from constants import constants
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -51,7 +53,18 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
             self.EDITOR_EMAIL)
 
         self.set_curriculum_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
 
         self.topic_manager = user_services.get_user_actions_info(
             self.topic_manager_id)

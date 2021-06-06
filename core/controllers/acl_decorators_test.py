@@ -69,10 +69,10 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PlayExplorationDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -103,8 +103,8 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_play_exploration/%s' % self.private_exp_id,
                 expected_status_int=404)
 
-    def test_admin_can_access_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_access_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id)
@@ -148,10 +148,10 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
     def setUp(self):
         super(PlayCollectionDecoratorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -183,8 +183,8 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_play_collection/%s' % self.private_col_id,
                 expected_status_int=404)
 
-    def test_admin_can_access_private_collection(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_access_private_collection(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_collection/%s' % self.private_col_id)
@@ -422,13 +422,6 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['success'], True)
         self.logout()
 
-    def test_admins_can_create_collection(self):
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/create')
-        self.assertEqual(response['success'], True)
-        self.logout()
-
 
 class AccessCreatorDashboardTests(test_utils.GenericTestBase):
     """Tests for can_access_creator_dashboard decorator."""
@@ -571,8 +564,8 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
                 % (self.published_exp_id))
         self.logout()
 
-    def test_admin_can_comment_on_feeback_for_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_comment_on_feeback_for_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
@@ -654,8 +647,8 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_create_feedback_thread/%s' % self.published_exp_id)
         self.logout()
 
-    def test_admin_can_create_feeback_for_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_create_feeback_for_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s' % self.private_exp_id)
@@ -751,8 +744,8 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/%s' % self.public_exp_thread_id)
         self.logout()
 
-    def test_admin_can_view_feeback_for_private_exploration(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_view_feeback_for_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id)
@@ -856,9 +849,9 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(AccessModeratorPageTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -870,8 +863,8 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
-    def test_admin_can_access_moderator_page(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_access_moderator_page(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -960,9 +953,9 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SendModeratorEmailsTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
-        self.set_curriculum_admins([self.ADMIN_USERNAME])
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -974,8 +967,8 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
-    def test_admin_can_send_moderator_emails(self):
-        self.login(self.ADMIN_EMAIL)
+    def test_moderator_can_send_moderator_emails(self):
+        self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -1935,13 +1928,11 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_topic/<topic_id>', self.MockHandler)],
@@ -1954,8 +1945,9 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-        topic_services.assign_role(
-            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+        self.set_topic_managers([self.manager_username], self.topic_id)
+        self.manager = user_services.get_user_actions_info(self.manager_id)
 
     def test_can_not_edit_topic_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -2049,11 +2041,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_topic_manager_can_edit_story(self):
         self.signup(self.manager_email, self.manager_username)
-        self.set_topic_managers([self.manager_username])
-        manager_id = self.get_user_id_from_email(self.manager_email)
-        manager = user_services.get_user_actions_info(manager_id)
-        topic_services.assign_role(
-            self.admin, manager, topic_domain.ROLE_MANAGER, self.topic_id)
+        self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2093,12 +2081,10 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.admin = user_services.get_user_actions_info(self.admin_id)
-        self.manager = user_services.get_user_actions_info(self.manager_id)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -2113,8 +2099,9 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
-        topic_services.assign_role(
-            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+        self.set_topic_managers([self.manager_username], self.topic_id)
+        self.manager = user_services.get_user_actions_info(self.manager_id)
 
     def test_can_not_add_story_to_topic_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -2940,7 +2927,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins(
             [self.ADMIN_USERNAME, self.second_admin_username])
-        self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.second_admin_id = self.get_user_id_from_email(
@@ -2948,6 +2934,18 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.manager = user_services.get_user_actions_info(self.manager_id)
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
+        self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_edit_skill/<skill_id>', self.MockHandler)],
@@ -3015,14 +3013,26 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 
         self.set_curriculum_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([user_services.get_username(self.user_id_a)])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email('a@example.com')
         self.question_id = 'question_id'
+
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1')
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_1], next_subtopic_id=2)
         self.save_new_question(
             self.question_id, self.owner_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
+        self.set_topic_managers(
+            [user_services.get_username(self.user_id_a)], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -3585,7 +3595,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.author = user_services.get_user_actions_info(self.author_id)
         user_services.add_user_role(
-            self.admin_id, feconf.ROLE_ID_CROLE_ID_CURRICULUM_ADMIN)
+            self.admin_id, feconf.ROLE_ID_CURRICULUM_ADMIN)
         user_services.allow_user_to_review_translation_in_language(
             self.hi_language_reviewer_id, 'hi')
         user_services.allow_user_to_review_translation_in_language(

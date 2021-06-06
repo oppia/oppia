@@ -1998,17 +1998,19 @@ title: Title
                 },
             }, csrf_token=self.get_new_csrf_token())
 
-    def add_user_role(self, username, user_role):
+    def add_user_role(self, username, user_role, topic_id=None):
         """Sets the given role for this user.
 
         Args:
             username: str. Username of the given user.
             user_role: str. Role of the given user.
+            topic_id: str. The topic Id, none by default.
         """
         with self.super_admin_context():
             self.put_json('/adminrolehandler', {
                 'username': username,
                 'role': user_role,
+                'topic_id': topic_id
             }, csrf_token=self.get_new_csrf_token())
 
     def set_curriculum_admins(self, admin_usernames):
@@ -2020,14 +2022,16 @@ title: Title
         for name in admin_usernames:
             self.add_user_role(name, feconf.ROLE_ID_CURRICULUM_ADMIN)
 
-    def set_topic_managers(self, topic_manager_usernames):
+    def set_topic_managers(self, topic_manager_usernames, topic_id):
         """Sets role of given users as TOPIC_MANAGER.
 
         Args:
             topic_manager_usernames: list(str). List of usernames.
+            topic_id: str. The topic Id.
         """
         for name in topic_manager_usernames:
-            self.add_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
+            self.add_user_role(
+                name, feconf.ROLE_ID_TOPIC_MANAGER, topic_id=topic_id)
 
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
@@ -2038,7 +2042,7 @@ title: Title
         for name in moderator_usernames:
             self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def mark_users_banned(self, banned_username):
+    def mark_user_banned(self, banned_username):
         """Marks a user banned.
 
         Args:
