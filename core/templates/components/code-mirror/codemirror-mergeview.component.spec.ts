@@ -50,6 +50,8 @@ fdescribe('Oppia CodeMirror Component', () => {
   });
 
   it('should call merge view', () => {
+    let codeMirrorInstance = component.getCodeMirrorInstance;
+    expect(codeMirrorInstance).toBe(undefined);
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
     const mergeView = (element: HTMLElement): void => {
