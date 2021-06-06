@@ -23,7 +23,7 @@ export interface SkillRightsBackendDict {
 
 export class SkillRights {
   // The skillId is null for an interstitial SkillRights object
-  // Check function createInterstitialSkillRights() for reference
+  // Check function createInterstitialSkillRights() for reference.
   _skillId: string | null;
   _canEditSkillDescription: boolean;
 

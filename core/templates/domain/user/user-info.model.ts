@@ -36,7 +36,7 @@ export class UserInfo {
   _canCreateCollections: boolean;
   // The default value of the following three properties of userInfo
   // should be null, these default values are used when the user is
-  // not logged in. Check function createDefault() for reference
+  // not logged in. Check function createDefault() for reference.
   _preferredSiteLanguageCode: string | null;
   _username: string | null;
   _email: string | null;
