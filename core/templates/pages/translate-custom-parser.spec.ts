@@ -61,23 +61,20 @@ describe('Translate Custom Parser', () => {
       .toEqual(params.text);
   });
 
+  it ('should handle cases when params is not defined', () => {
+    expect(translateCustomParser.interpolate('<[ KEY ]>', null))
+      .toEqual('<[ KEY ]>');
+  });
 
-  it('should interpolate with backup language', () => {
-    spyOn(translateCustomParser.messageFormat, 'compile').and.callFake(
-      (interpolate: string, langCode) => {
-        return (params) => {
-          if (langCode === 'es') {
-            throw new Error(
-              'language and interpolation parameters are not compatible');
-          }
-          return 'Please select one or more choices.';
-        };
-      });
-    expect(translateCustomParser.interpolate(
-      '{minChoiceNumber, plural, one{Please select one or more choices.}' +
-      'other{Please select # or more choices.}}', {
-        minChoiceNumber: 1, messageFormat: true }))
-      .toEqual('Please select one or more choices.');
+  it('should handle cases where messageFormat has value other than true',
+    () => {
+      expect(translateCustomParser.interpolate(
+        '<[ testName ]>', { testName: 'test_name', messageFormat: 2 }))
+        .toEqual('test_name');
+    });
+
+  it('should test getters', () => {
+    expect(translateCustomParser.messageFormat).toBeDefined();
   });
 
   it('should get value', () => {
