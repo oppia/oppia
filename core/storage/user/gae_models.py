@@ -375,8 +375,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
     # IDs of all the stories completed by the user.
     story_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    # IDs of all the topics learnt by the user.
+    # IDs of all the topics learnt by the user (i.e. the topics in which the
+    # learner has completed all the stories).
     learnt_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics learnt by the user(i.e. the topics in which the
+    # learner has completed all the subtopics).
+    mastered_topic_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -396,7 +401,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED
+            'learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'mastered_topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -462,8 +468,13 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     # IDs of all the stories partially completed by the user.
     story_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    # IDs of all the topics partially learnt by the user.
+    # IDs of all the topics partially learnt by the user(i.e. the topics in
+    # which the learner has not completed all the stories).
     partially_learnt_topic_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of all the topics partially mastered by the user(i.e. the topics in
+    # which the learner has not completed all the subtopics).
+    partially_mastered_topic_id = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -483,7 +494,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED
+            'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'partially_mastered_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

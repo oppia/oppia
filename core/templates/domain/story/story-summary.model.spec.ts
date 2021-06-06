@@ -48,7 +48,8 @@ describe('Story summary model', () => {
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment',
       all_node_dicts: [nodeDict],
-      topic_url_fragment: 'topic-one'
+      topic_url_fragment: 'topic-one',
+      classroom_url_fragment: 'math'
     };
     _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -83,5 +84,6 @@ describe('Story summary model', () => {
       })
     ]);
     expect(_sampleStorySummary.getTopicUrlFragment()).toEqual('topic-one');
+    expect(_sampleStorySummary.getClassroomUrlFragment()).toEqual('math');
   });
 });

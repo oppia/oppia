@@ -622,12 +622,13 @@ class IncompleteActivities(python_utils.OBJECT):
 
     def __init__(
             self, user_id, exploration_ids, collection_ids, story_ids,
-            partially_learnt_topic_ids):
+            partially_learnt_topic_ids, partially_mastered_topic_id=None):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
         self.story_ids = story_ids
         self.partially_learnt_topic_ids = partially_learnt_topic_ids
+        self.partially_mastered_topic_id = partially_mastered_topic_id
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of incomplete exploration ids."""
@@ -675,12 +676,13 @@ class CompletedActivities(python_utils.OBJECT):
 
     def __init__(
             self, user_id, exploration_ids, collection_ids, story_ids,
-            learnt_topic_ids):
+            learnt_topic_ids, mastered_topic_ids=None):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
         self.story_ids = story_ids
         self.learnt_topic_ids = learnt_topic_ids
+        self.mastered_topic_ids = mastered_topic_ids
 
     def add_exploration_id(self, exploration_id):
         """Adds the exploration id to the list of completed exploration ids."""
