@@ -56,7 +56,6 @@ describe('Voiceover upload features', function() {
 
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
-    await explorationEditorSettingsTab.setCategory('Languages');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
       'Upload an translation audio file.');
@@ -73,59 +72,6 @@ describe('Voiceover upload features', function() {
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
     await explorationEditorPage.navigateToTranslationTab();
   });
-
-  it('should upload an audio file', async function() {
-    await explorationEditorTranslationTab.openUploadAudioModal();
-    await explorationEditorTranslationTab.uploadAudio(
-      '../data/cafe.mp3');
-
-    var playClick = (
-      await explorationEditorTranslationTab.playOrPauseAudioFile());
-    expect(playClick).toBe(true);
-
-    var pauseClick = (
-      await explorationEditorTranslationTab.playOrPauseAudioFile());
-    expect(pauseClick).toBe(false);
-  });
-
-  it('should not let upload a non audio file', async function() {
-    await explorationEditorTranslationTab.openUploadAudioModal();
-    await explorationEditorTranslationTab.expectWrongFileType(
-      '../data/img.png');
-    await explorationEditorTranslationTab
-      .expectSaveUploadedAudioButtonToBeDisabled();
-    await explorationEditorTranslationTab.closeUploadAudioModal();
-  });
-
-  it('should not let upload a five minutes longer audio', async function() {
-    await explorationEditorTranslationTab.openUploadAudioModal();
-    await explorationEditorTranslationTab.expectAudioOverFiveMinutes(
-      '../data/cafe-over-five-minutes.mp3');
-    await explorationEditorTranslationTab
-      .expectSaveUploadedAudioButtonToBeDisabled();
-    await explorationEditorTranslationTab.closeUploadAudioModal();
-    await explorationEditorTranslationTab.deleteAudioRecord();
-  });
-
-  it('should upload recorded audio and play after logging out',
-    async function() {
-      await explorationEditorTranslationTab.addAudioRecord();
-      await explorationEditorTranslationTab.stopAudioRecord();
-      await explorationEditorTranslationTab.confirmAudioRecord();
-      await explorationEditorTranslationTab.playAudioRecord();
-      await browser.refresh();
-      await explorationEditorTranslationTab.playAudioRecord();
-
-      // Try after logging out.
-      await users.logout();
-      await users.login(TEST_EMAIL);
-      await creatorDashboardPage.get();
-      await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
-
-      await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.playAudioRecord();
-      await explorationEditorTranslationTab.deleteAudioRecord();
-    });
 
   it('should upload audio file from path and play after logout',
     async function() {
@@ -152,6 +98,10 @@ describe('Voiceover upload features', function() {
     });
 
   afterEach(async function() {
+    browser.manage().logs().get('browser').then(function(browserLog) {
+      // browserLogs is an array of objects with level and message fields
+      console.log('log: ' + require('util').inspect(browserLog));
+    });
     await general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 400' +
       '(Bad Request)', {status_code: 400,

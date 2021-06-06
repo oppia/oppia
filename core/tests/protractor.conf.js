@@ -294,7 +294,7 @@ exports.config = {
     },
     loggingPrefs: {
       driver: 'INFO',
-      browser: 'INFO'
+      browser: 'ALL'
     }
   },
 
