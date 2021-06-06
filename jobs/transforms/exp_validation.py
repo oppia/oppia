@@ -19,10 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs import job_utils
 from core.domain import exp_domain
 from core.domain import rights_domain
 from core.platform import models
+from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
 
@@ -30,8 +30,7 @@ from jobs.transforms import base_validation
 
 
 @validation_decorators.AuditsExisting(
-    exp_models.ExplorationSnapshotMetadataModel,
-    exp_models.ExplorationCommitLogEntryModel)
+    exp_models.ExplorationSnapshotMetadataModel)
 class ValidateExplorationSnapshotMetadataModel(
         base_validation.BaseValidateCommitCmdsSchema):
     """Overrides _get_change_domain_class for exploration models """
@@ -49,8 +48,11 @@ class ValidateExplorationSnapshotMetadataModel(
         return exp_domain.ExplorationChange
 
 
+@validation_decorators.AuditsExisting(
+    exp_models.ExplorationRightsSnapshotMetadataModel)
 class ValidateExplorationRightsSnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema):
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for exploration models """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
         """Returns a Change domain class.
@@ -65,9 +67,11 @@ class ValidateExplorationRightsSnapshotMetadataModel(
         return rights_domain.ExplorationRightsChange
 
 
+@validation_decorators.AuditsExisting(
+    exp_models.ExplorationCommitLogEntryModel)
 class ValidateExplorationCommitLogEntryModel(
-    base_validation.BaseValidateCommitCmdsSchema):
-    """Docstr here. """
+        base_validation.BaseValidateCommitCmdsSchema):
+    """Overrides _get_change_domain_class for exploration models """
 
     def _get_change_domain_class(self, input_model):
         """Returns a Change domain class.
