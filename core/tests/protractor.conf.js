@@ -367,6 +367,12 @@ exports.config = {
         },
       });
     }
+    else {
+      console.log(
+        'Videos will not be recorded for this suite either because videos' +
+        ' have been disabled for it (using environment variables) or' +
+        ' because it\'s on CircleCI');
+    }
 
     // Screenshots will only run on CircleCI, since we don't have videos here.
     // We don't need these on Github Actions since we have videos. 

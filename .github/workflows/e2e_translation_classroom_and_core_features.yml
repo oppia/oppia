@@ -38,12 +38,18 @@ jobs:
       - name: Run Exploration Translation Tab E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env
+        env: 
+          OPPIA_VIDEOS: 0
       - name: Run Classroom Page E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPage" --prod_env
+        env: 
+          OPPIA_VIDEOS: 0
       - name: Run Core Editor And Player E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="coreEditorAndPlayerFeatures" --prod_env
+        env: 
+          OPPIA_VIDEOS: 0
       - name: Uploading protractor-video as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
