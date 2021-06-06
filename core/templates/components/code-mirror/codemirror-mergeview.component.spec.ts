@@ -51,12 +51,12 @@ describe('Oppia CodeMirror Component', () => {
   it('should call merge view', () => {
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
-    const mergeView = (...args: unknown[]): void => {
+    const mergeView = (element: HTMLElement): void => {
       mergeViewCalled = true;
     };
     const mockCodeMirror: typeof CodeMirror = {
       MergeView: mergeView
-    } as unknown as typeof CodeMirror;
+    } as typeof CodeMirror;
     window.CodeMirror = mockCodeMirror;
     component.ngAfterViewInit();
     expect(mergeViewCalled).toBe(true);
@@ -66,14 +66,15 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    component.codeMirrorInstance = {
+    spyOnProperty(
+      component, 'CodeMirrorInstance', 'get').and.returnValue({
       editor: () => {
-        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
+        return { setValue: editSetValueSpy };
       },
       rightOriginal: () => {
-        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+        return { setValue: rightOrgSetValueSpy };
       }
-    } as unknown as CodeMirror.MergeView.MergeViewEditor;
+    });
     let changes: SimpleChanges = {
       leftValue: {
         currentValue: undefined,
@@ -103,14 +104,15 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    component.codeMirrorInstance = {
+    spyOnProperty(
+      component, 'CodeMirrorInstance', 'get').and.returnValue({
       editor: () => {
-        return {setValue: editSetValueSpy} as unknown as CodeMirror.Editor;
+        return { setValue: editSetValueSpy };
       },
       rightOriginal: () => {
-        return {setValue: rightOrgSetValueSpy} as unknown as CodeMirror.Editor;
+        return { setValue: rightOrgSetValueSpy };
       }
-    } as unknown as CodeMirror.MergeView.MergeViewEditor;
+    });
     const changes: SimpleChanges = {
       leftValue: {
         currentValue: 'A',
