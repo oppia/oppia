@@ -3662,15 +3662,13 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             },
             'change to state 1')
 
-        translation_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[0]
-        question_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', 'skill_123')])[0]
-        edit_state_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[1]
+        translation_suggestion = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)[0]
+        question_suggestion = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_ADD_QUESTION)[0]
+        edit_state_suggestion = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)[0]
+
         self.translation_suggestion_id = translation_suggestion.suggestion_id
         self.question_suggestion_id = question_suggestion.suggestion_id
         self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
