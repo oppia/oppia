@@ -27,7 +27,7 @@ module.exports = {
       description: (
         'Lint check to ensure that  the line breaks between the dependencies' +
         ' listed in the controller of a directive or service exactly' +
-        'match those between the arguments of the controller function'),
+        ' match those between the arguments of the controller function'),
       category: 'Stylistic Issues',
       recommended: true,
     },
@@ -42,29 +42,29 @@ module.exports = {
   },
 
   create: function(context) {
-    var getDepLiteralLines = function(controllerArg, nameIn) {
-      var con = {};
+    var getDependenciesLiteralLines = function(controllerArg, nameIn) {
+      var dependencyToLineIndex = {};
       var startLine = 1000000;
       controllerArg.forEach(function(Literal) {
         var lineNo = Literal.loc.start.line;
         if (startLine > lineNo) {
           startLine = lineNo;
         }
-        con[Literal[nameIn]] = lineNo - startLine;
+        dependencyToLineIndex[Literal[nameIn]] = lineNo - startLine;
       });
-      return con;
+      return dependencyToLineIndex;
     };
+
     return {
       'CallExpression[callee.property.name=directive]': function(node) {
         var arg = node.arguments;
         // In angular, components function take 2 arguments and type of last
-        // arguments is an ArrayExpression.
+        // arguments is an ArrayExpression, if arguments doesn't follow this
+        // pattern we ignore such nodes.
         if (arg.length !== 2 || arg[1].type !== 'ArrayExpression') {
           return;
         }
         var lengthOfElements = arg[1].elements.length;
-        // Storing function() in functionNode by taking last
-        // element as because its type is FunctionExpression.
         var functionNode = arg[1].elements[lengthOfElements - 1];
         if ((functionNode.body.body[0].type !== 'ReturnStatement') || (
           functionNode.body.body[0].argument.type !== 'ObjectExpression')) {
@@ -78,9 +78,10 @@ module.exports = {
             var controllerFun = property.value.elements[lenPropElements - 1];
             var controllerArg = (
               property.value.elements.slice(0, lenPropElements - 1));
-            var literalLines = getDepLiteralLines(controllerArg, 'value');
+            var literalLines = (
+              getDependenciesLiteralLines(controllerArg, 'value'));
             var funcParamsLine = (
-              getDepLiteralLines(controllerFun.params, 'name'));
+              getDependenciesLiteralLines(controllerFun.params, 'name'));
             if (
               JSON.stringify(literalLines) !== JSON.stringify(funcParamsLine)) {
               context.report({
