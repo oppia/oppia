@@ -719,6 +719,37 @@ describe('Question player engine service ', () => {
         .toHaveBeenCalledWith('Question name should not be empty.');
     });
 
+    it('should update the current index when a card is added', () => {
+      let successCallback = jasmine.createSpy('success');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let answer = 'answer';
+      let interactionRulesService: InteractionRulesService;
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory
+          .createNew('default', '', '', []), 1, 0, 'default_outcome'
+      );
+      answerClassificationResult.outcome.labelledAsCorrect = true;
+
+      spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      spyOn(expressionInterpolationService, 'processHtml')
+        .and.callFake((html, envs) => html);
+
+      questionPlayerEngineService.init(
+        multipleQuestionsBackendDict, successHandler, failHandler);
+      questionPlayerEngineService.submitAnswer(
+        answer, interactionRulesService, successCallback);
+
+      expect(questionPlayerEngineService.getCurrentIndex()).toBe(0);
+
+      questionPlayerEngineService.recordNewCardAdded();
+
+      expect(questionPlayerEngineService.getCurrentIndex()).toBe(1);
+    });
+
     it('should not create next card if the existing ' +
       'card is the last one', () => {
       let successCallback = jasmine.createSpy('success');
