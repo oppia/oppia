@@ -108,13 +108,6 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'A user cannot be both a voice artist and a viewer.'):
             self.activity_rights.validate()
 
-    def test_cannot_update_activity_first_published_msec_for_invalid_activity(
-            self):
-        with self.assertRaisesRegexp(
-            Exception, 'Cannot get activity rights for unknown activity type'):
-            rights_manager.update_activity_first_published_msec(
-                'invalid_activity', 'activity_id', 0.0)
-
     def test_check_cannot_access_activity_with_no_activity_rights(self):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.owner, None))

@@ -155,33 +155,6 @@ def _update_activity_summary(activity_type, activity_rights):
         _update_collection_summary(activity_rights)
 
 
-def update_activity_first_published_msec(
-        activity_type, activity_id, first_published_msec):
-    """Updates the first_published_msec field for the given activity.
-
-    The caller is responsible for ensuring that this value is not already
-    set before updating it.
-
-    Args:
-        activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
-        activity_id: str. ID of the activity.
-        first_published_msec: float. First publication time in milliseconds
-            since the Epoch.
-    """
-    activity_rights = _get_activity_rights(activity_type, activity_id)
-    commit_cmds = [{
-        'cmd': rights_domain.CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-        'old_first_published_msec': activity_rights.first_published_msec,
-        'new_first_published_msec': first_published_msec
-    }]
-    activity_rights.first_published_msec = first_published_msec
-    _save_activity_rights(
-        feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
-        'set first published time in msec', commit_cmds)
-
-
 def create_new_exploration_rights(exploration_id, committer_id):
     """Creates a new exploration rights object and saves it to the datastore.
     Subscribes the committer to the new exploration.
