@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the question player engine service.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed} from '@angular/core/testing';
 import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -407,6 +408,10 @@ describe('Question player engine service ', () => {
   });
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     contextService = TestBed.inject(ContextService);
