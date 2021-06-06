@@ -714,39 +714,8 @@ describe('Question player engine service ', () => {
         .toHaveBeenCalledWith('Question name should not be empty.');
     });
 
-    it('should update the current index when a card is added', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory
-          .createNew('default', '', '', []), 1, 0, 'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml')
-        .and.callFake((html, envs) => html);
-
-      questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
-      questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
-
-      expect(questionPlayerEngineService.getCurrentIndex()).toBe(0);
-
-      questionPlayerEngineService.recordNewCardAdded();
-
-      expect(questionPlayerEngineService.getCurrentIndex()).toBe(1);
-    });
-
-    it('should create next question if the existing ' +
-      'question is not the last one', () => {
+    it('should not create next card if the existing ' +
+      'card is the last one', () => {
       let successCallback = jasmine.createSpy('success');
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -759,6 +728,7 @@ describe('Question player engine service ', () => {
       let sampleCard = stateCardObjectFactory.createNewCard(
         'Card 1', 'Content html', 'Interaction text', null,
         null, null, 'content_id');
+
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
@@ -768,48 +738,42 @@ describe('Question player engine service ', () => {
       spyOn(focusManagerService, 'generateFocusLabel')
         .and.returnValue('focusLabel');
 
+      // We are using a stub backend dict which consists of three questions.
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, successHandler, failHandler);
 
       let createNewCardSpy = spyOn(
         stateCardObjectFactory, 'createNewCard').and.returnValue(sampleCard);
 
+      expect(createNewCardSpy).toHaveBeenCalledTimes(0);
+      
+      // Submitting answer to the first question.
+      questionPlayerEngineService.submitAnswer(
+        answer, interactionRulesService, successCallback);
+      
+      expect(
+        questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId1');
+      expect(createNewCardSpy).toHaveBeenCalledTimes(1);
+
+      questionPlayerEngineService.recordNewCardAdded();
+      // Submitting answer to the second question.
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
 
-      expect(createNewCardSpy).toHaveBeenCalled();
-    });
+      expect(
+        questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId2');
+      expect(createNewCardSpy).toHaveBeenCalledTimes(2);
 
-    it('should not create next question if the existing ' +
-      'question is the last one', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
-      let answerClassificationResult = new AnswerClassificationResult(
-        outcomeObjectFactory
-          .createNew('default', '', '', []), 1, 0, 'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      spyOn(answerClassificationService, 'getMatchingClassificationResult')
-        .and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml')
-        .and.callFake((html, envs) => html);
-      spyOn(focusManagerService, 'generateFocusLabel')
-        .and.returnValue('focusLabel');
-
-      questionPlayerEngineService.init(
-        [singleQuestionBackendDict], successHandler, failHandler);
-
-      let createNewCardSpy = spyOn(
-        stateCardObjectFactory, 'createNewCard').and.returnValue(null);
-
+      questionPlayerEngineService.recordNewCardAdded();
+      // Submitting answer to the last question.
       questionPlayerEngineService.submitAnswer(
         answer, interactionRulesService, successCallback);
 
-      expect(createNewCardSpy).not.toHaveBeenCalled();
+      expect(
+        questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId3');
+      // Please note that after submitting answer to the final question new
+      // card was not created, hence createNewCardSpy was not called.
+      expect(createNewCardSpy).toHaveBeenCalledTimes(2);
     });
   });
 });
