@@ -671,7 +671,7 @@ def build_using_webpack(config_path):
 
     python_utils.PRINT('Building webpack')
     managed_webpack_compiler = servers.managed_webpack_compiler(
-        config_path=config_path, max_old_space_size=4096409640964096)
+        config_path=config_path, max_old_space_size=4096)
     with managed_webpack_compiler as p:
         p.wait()
 
