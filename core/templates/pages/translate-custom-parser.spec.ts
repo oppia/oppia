@@ -25,7 +25,6 @@ import { TranslateCustomParser } from './translate-custom-parser';
 describe('Translate Custom Parser', () => {
   let translateCustomParser: TranslateCustomParser;
   let translateDefaultParser: TranslateDefaultParser;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -47,9 +46,8 @@ describe('Translate Custom Parser', () => {
 
   beforeEach(() => {
     translateDefaultParser = TestBed.inject(TranslateDefaultParser);
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     translateCustomParser = new TranslateCustomParser(
-      translateDefaultParser, i18nLanguageCodeService);
+      translateDefaultParser);
   });
 
   it('should interpolate with preferred language', () => {
@@ -63,25 +61,20 @@ describe('Translate Custom Parser', () => {
       .toEqual(params.text);
   });
 
+  it ('should handle cases when params is not defined', () => {
+    expect(translateCustomParser.interpolate('<[ KEY ]>', null))
+      .toEqual('<[ KEY ]>');
+  });
 
-  it('should interpolate with backup language', () => {
-    spyOn(translateCustomParser.messageFormat, 'compile').and.callFake(
-      (interpolate: string, langCode) => {
-        return (params) => {
-          if (langCode === 'es') {
-            throw new Error(
-              'language and interpolation parameters are not compatible');
-          }
-          return 'Please select one or more choices.';
-        };
-      });
-    spyOn(i18nLanguageCodeService, 'getCurrentI18nLanguageCode')
-      .and.returnValue('es');
-    expect(translateCustomParser.interpolate(
-      '{minChoiceNumber, plural, one{Please select one or more choices.}' +
-      'other{Please select # or more choices.}}', {
-        minChoiceNumber: 1, messageFormat: true }))
-      .toEqual('Please select one or more choices.');
+  it('should handle cases where messageFormat has value other than true',
+    () => {
+      expect(translateCustomParser.interpolate(
+        '<[ testName ]>', { testName: 'test_name', messageFormat: 2 }))
+        .toEqual('test_name');
+    });
+
+  it('should test getters', () => {
+    expect(translateCustomParser.messageFormat).toBeDefined();
   });
 
   it('should get value', () => {

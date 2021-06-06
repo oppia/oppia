@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { FormsModule } from '@angular/forms';
@@ -35,13 +35,14 @@ import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultPar
 import { SharedFormsModule } from './forms/shared-forms.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+
 
 // Components.
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
-import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { StateSkillEditorComponent } from 'components/state-editor/state-skill-editor/state-skill-editor.component';
 import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
@@ -74,6 +75,9 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
+import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 
 
 // Directives.
@@ -93,16 +97,18 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
 
 // Miscellaneous.
 import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
 import { TranslateCacheFactory } from 'pages/translate-cache.factory';
 import { TranslateCustomParser } from 'pages/translate-custom-parser';
-import { MissingTranslationCustomHandler } from 'pages/missing-translations-handler';
+import { MissingTranslationCustomHandler } from 'pages/missing-translation-custom-handler';
 import constants from 'assets/constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 const toastrConfig = {
   allowHtml: false,
@@ -123,24 +129,28 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CommonElementsModule,
     CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
+    NgbNavModule,
     NgbModalModule,
+    NgbPopoverModule,
     FormsModule,
+    RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
     /**
-     * The Translate Module will look for translations in the following pattern:
+     * The Translate Module will look for translations in the following order:
      * 1. Look for translation in primary language (fetched from backend)
      * 2. Look for translation in default language (fetched from backend)
-     * 3. Look for translation presnt in AppConstants.ts (
+     * 3. Look for translation present in AppConstants.ts (
      *    used until translations after fetched from backend)
-     * 4. shows the key itself, if the translation is not found.
+     * 4. shows the key, if the translation is not found.
      */
     TranslateModule.forRoot({
       defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
@@ -159,11 +169,6 @@ const toastrConfig = {
         deps: [TranslateDefaultParser, I18nLanguageCodeService]
       }
     }),
-    /**
-     * The cookie shares a common name with angular-translate's cookie.
-     * This way, we have a single source of truth for both frameworks.
-     * The cookie will expire after 24 hrs.
-     */
     TranslateCacheModule.forRoot({
       cacheService: {
         provide: TranslateCacheService,
@@ -172,7 +177,7 @@ const toastrConfig = {
       },
       cacheName: 'NG_TRANSLATE_LANG_KEY',
       cacheMechanism: 'Cookie',
-      cookieExpiry: 1
+      cookieExpiry: 30
     }),
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
@@ -198,13 +203,15 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
     LoadingMessageComponent,
-    LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -248,7 +255,7 @@ const toastrConfig = {
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingMessageComponent,
-    LoadingDotsComponent, SocialButtonsComponent,
+    SocialButtonsComponent,
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
@@ -258,7 +265,10 @@ const toastrConfig = {
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    I18nLanguageSelectorComponent,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
@@ -273,12 +283,15 @@ const toastrConfig = {
 
   exports: [
     // Modules.
+    CommonElementsModule,
     CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    NgbNavModule,
+    RichTextComponentsModule,
     NgbModalModule,
     ObjectComponentsModule,
     SharedFormsModule,
@@ -296,10 +309,13 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
+    InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
     FilterForMatchingSubstringPipe,
     LimitToPipe,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
@@ -325,7 +341,6 @@ const toastrConfig = {
     TruncatePipe,
     SummarizeNonnegativeNumberPipe,
     SortByPipe,
-    LoadingDotsComponent,
     LearnerDashboardIconsComponent
   ],
 })

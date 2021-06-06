@@ -33,18 +33,16 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
 
 @NgModule({
   imports: [
-    CommonModule,
     BrowserModule,
+    CommonModule,
     CustomFormsComponentsModule,
     DynamicContentModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
     NgbModalModule,
-    FormsModule,
     SharedPipesModule,
-    TranslateModule,
-    CustomFormsComponentsModule
+    TranslateModule
   ],
   declarations: [
     AudioSliderComponent,

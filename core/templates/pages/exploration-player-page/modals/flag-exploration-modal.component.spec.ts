@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for FlagExplorationModalComponent.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -24,6 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { FlagExplorationModalComponent } from './flag-exploration-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Flag Exploration modal', () => {
   let component: FlagExplorationModalComponent;
@@ -41,12 +43,14 @@ describe('Flag Exploration modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         SharedPipesModule,
         TranslateModule.forRoot(),
         FormsModule
       ],
       declarations: [
-        FlagExplorationModalComponent
+        FlagExplorationModalComponent,
+        MockTranslatePipe
       ],
       providers: [
         NgbActiveModal,
