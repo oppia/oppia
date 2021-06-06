@@ -319,8 +319,8 @@ var AdminPage = function() {
   };
 
   this.expectNumberOfRunningOneOffJobs = async function(count) {
-    await waitFor.visibilityOf(element(
-      by.css('.protractor-test-unfinished-one-off-jobs-id')),
+    await waitFor.visibilityOf(
+      element(by.css('.protractor-test-unfinished-one-off-jobs-id')),
     'Unfinished jobs taking too long to appear.');
     var len = await element.all(by.css(
       '.protractor-test-unfinished-one-off-jobs-id')).count();

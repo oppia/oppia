@@ -327,7 +327,7 @@ exports.config = {
     var spw = null;
     var vidPath = '';
     // Enable ALL_VIDEOS if you want success videos to be saved.
-    const ALL_VIDEOS = true;
+    const ALL_VIDEOS = false;
 
     // Only running video recorder on Github Actions, since running it on
     // CicleCI causes RAM issues (meaning very high flakiness).
