@@ -93,7 +93,7 @@
                                         [bg-color]="story.getThumbnailBgColor()"
                                         (update-bg-color)="updateStoryThumbnailBgColor($event)"
                                         [allowed-bg-colors]="allowedBgColors"
-                                        aspect-ratio="4:3"
+                                        [aspect-ratio]="'4:3'"
                                         [preview-title]="editableTitle"
                                         [preview-description]="editableDescription">
               </oppia-thumbnail-uploader>
@@ -153,7 +153,7 @@
           </div>
           <div ng-if="storyPreviewCardIsShown">
             <oppia-preview-thumbnail [name]="editableTitle"
-                                     aspect-ratio="16:9"
+                                     [aspect-ratio]="'16:9'"
                                      [description]="editableDescription"
                                      [filename]="story.getThumbnailFilename()"
                                      [thumbnail-bg-color]="story.getThumbnailBgColor()"
