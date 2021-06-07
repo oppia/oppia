@@ -51,8 +51,6 @@ module.exports = {
         if (args.length !== 2 || args[1].type !== 'ArrayExpression') {
           return;
         }
-        // Storing all literal type elements in dependenciesLiteralNodes because
-        // we have to check sorted pattern only in literal type element.
         var dependenciesLiteralNodes = args[1].elements.slice(0, -1);
 
         var dependenciesLiterals = [];
