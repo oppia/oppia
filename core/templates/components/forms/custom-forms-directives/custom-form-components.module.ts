@@ -27,6 +27,7 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { MaterialModule } from 'components/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ImageUploaderComponent } from './image-uploader.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -37,7 +38,8 @@ import { ImageUploaderComponent } from './image-uploader.component';
     NgbTooltipModule,
     NgbModalModule,
     FormsModule,
-    SharedPipesModule
+    SharedPipesModule,
+    TranslateModule,
   ],
   declarations: [
     ImageUploaderComponent

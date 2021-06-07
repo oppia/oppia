@@ -19,8 +19,8 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SideNavigationBarComponent } from './side-navigation-bar.component';
 
 describe('Side Navigation Bar Component', () => {
@@ -50,7 +50,7 @@ describe('Side Navigation Bar Component', () => {
       ],
       declarations: [
         SideNavigationBarComponent,
-        TranslatePipe
+        MockTranslatePipe
       ],
       providers: [
         {
