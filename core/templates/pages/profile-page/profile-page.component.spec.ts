@@ -40,8 +40,7 @@ class MockTranslatePipe {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Profile page', () => {
+describe('Profile page', () => {
   let fixture: ComponentFixture<ProfilePageComponent>;
   let componentInstance: ProfilePageComponent;
   let userService: UserService;
@@ -293,14 +292,107 @@ fdescribe('Profile page', () => {
       ' publishes a new exploration.');
   }));
 
-  // it('should get explorations to display when edited explorations are empty',
-  //   () => {
-  //     expect(componentInstance.getExplorationsToDisplay()).toEqual(
-  //       profileData.editedExpSummaries);
-  //   });
+  it('should get explorations to display when edited explorations are empty',
+    fakeAsync(() => {
+      let profileDataLocal = UserProfile.createFromBackendDict({
+        username: '',
+        username_of_viewed_profile: 'username1',
+        user_bio: 'User bio',
+        user_impact_score: 100,
+        profile_is_of_current_user: false,
+        is_user_visiting_own_profile: false,
+        created_exp_summary_dicts: [{
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title'
+        }],
+        is_already_subscribed: false,
+        first_contribution_msec: null,
+        edited_exp_summary_dicts: [],
+        subject_interests: [],
+        profile_picture_data_url: 'image',
+      });
+      spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
+        .and.returnValue(Promise.resolve(profileDataLocal));
+      componentInstance.ngOnInit();
+      tick();
+      expect(componentInstance.getExplorationsToDisplay()).toEqual([]);
+    }));
+
+  it('should get explorations to display',
+    fakeAsync(() => {
+      let profileDataLocal = UserProfile.createFromBackendDict({
+        username: '',
+        username_of_viewed_profile: 'username1',
+        user_bio: 'User bio',
+        user_impact_score: 100,
+        profile_is_of_current_user: false,
+        is_user_visiting_own_profile: false,
+        created_exp_summary_dicts: [],
+        is_already_subscribed: false,
+        first_contribution_msec: null,
+        edited_exp_summary_dicts: [],
+        subject_interests: [],
+        profile_picture_data_url: 'image',
+      });
+
+      for (let i = 0; i < 5; i++) {
+        profileDataLocal.editedExpSummaries.push(
+          LearnerExplorationSummary.createFromBackendDict({
+            last_updated_msec: 1591296737470.528,
+            community_owned: false,
+            objective: 'Test Objective',
+            id: '44LKoKLlIbGe',
+            num_views: 10,
+            thumbnail_icon_url: '/subjects/Algebra.svg',
+            human_readable_contributors_summary: {},
+            language_code: 'en',
+            thumbnail_bg_color: '#cd672b',
+            created_on_msec: 1591296635736.666,
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 1,
+              4: 0,
+              5: 0
+            },
+            status: 'public',
+            tags: [],
+            activity_type: 'exploration',
+            category: 'Algebra',
+            title: 'Test Title'
+          }));
+      }
+
+
+      spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
+        .and.returnValue(Promise.resolve(profileDataLocal));
+      componentInstance.ngOnInit();
+      tick();
+      expect(componentInstance.getExplorationsToDisplay().length).toEqual(5);
+    }));
 
   it('should go back and forth between pages', fakeAsync(() => {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       profileData.editedExpSummaries.push(
         LearnerExplorationSummary.createFromBackendDict({
           last_updated_msec: 1591296737470.528,
@@ -327,6 +419,136 @@ fdescribe('Profile page', () => {
           title: 'Test Title'
         }));
     }
+
+    profileData.editedExpSummaries.push(
+      LearnerExplorationSummary.createFromBackendDict({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 10,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 1,
+          3: 1,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }));
+
+    profileData.editedExpSummaries.push(
+      LearnerExplorationSummary.createFromBackendDict({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 10,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 1,
+          3: 2,
+          4: 0,
+          5: 0
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }));
+
+    profileData.editedExpSummaries.push(
+      LearnerExplorationSummary.createFromBackendDict({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 10,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 2,
+          4: 0,
+          5: 1
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }));
+
+    profileData.editedExpSummaries.push(
+      LearnerExplorationSummary.createFromBackendDict({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 12,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 2,
+          4: 0,
+          5: 1
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }));
+
+    profileData.editedExpSummaries.push(
+      LearnerExplorationSummary.createFromBackendDict({
+        last_updated_msec: 1591296737470.528,
+        community_owned: false,
+        objective: 'Test Objective',
+        id: '44LKoKLlIbGe',
+        num_views: 8,
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        human_readable_contributors_summary: {},
+        language_code: 'en',
+        thumbnail_bg_color: '#cd672b',
+        created_on_msec: 1591296635736.666,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 2,
+          4: 0,
+          5: 1
+        },
+        status: 'public',
+        tags: [],
+        activity_type: 'exploration',
+        category: 'Algebra',
+        title: 'Test Title'
+      }));
 
     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
       .and.returnValue(Promise.resolve(profileData));
@@ -358,216 +580,4 @@ fdescribe('Profile page', () => {
     expect(loggerService.error).toHaveBeenCalledWith(
       'Error: cannot decrement page');
   }));
-  // });
-  // });
-
-  // describe('when changing pages', () => {
-  //   let profileData = {
-  //     username: '',
-  //     username_of_viewed_profile: 'username1',
-  //     user_bio: 'User bio',
-  //     user_impact_score: 100,
-  //     created_exp_summary_dicts: new Array(7).fill({
-  //       last_updated_msec: 1591296737470.528,
-  //       community_owned: false,
-  //       objective: 'Test Objective',
-  //       id: '44LKoKLlIbGe',
-  //       num_views: 10,
-  //       thumbnail_icon_url: '/subjects/Algebra.svg',
-  //       human_readable_contributors_summary: {},
-  //       language_code: 'en',
-  //       thumbnail_bg_color: '#cd672b',
-  //       created_on_msec: 1591296635736.666,
-  //       ratings: {
-  //         1: 0,
-  //         2: 0,
-  //         3: 1,
-  //         4: 0,
-  //         5: 0
-  //       },
-  //       status: 'public',
-  //       tags: [],
-  //       activity_type: 'exploration',
-  //       category: 'Algebra',
-  //       title: 'Test Title'
-  //     }),
-  //     edited_exp_summary_dicts: []
-  //   };
-
-  //   beforeEach(() => {
-  //     for (let i = 0; i < 11; i++) {
-  //       profileData.edited_exp_summary_dicts.push({
-  //         last_updated_msec: 1591296737470.528,
-  //         community_owned: false,
-  //         objective: 'Test Objective',
-  //         id: '44LKoKLlIbGe',
-  //         num_views: 10,
-  //         thumbnail_icon_url: '/subjects/Algebra.svg',
-  //         human_readable_contributors_summary: {},
-  //         language_code: 'en',
-  //         thumbnail_bg_color: '#cd672b',
-  //         created_on_msec: 1591296635736.666,
-  //         ratings: {
-  //           1: 0,
-  //           2: 0,
-  //           3: 1,
-  //           4: 0,
-  //           5: 0
-  //         },
-  //         status: 'public',
-  //         tags: [],
-  //         activity_type: 'exploration',
-  //         category: 'Algebra',
-  //         title: 'Test Title'
-  //       });
-  //     }
-
-  //     profileData.edited_exp_summary_dicts[7].ratings = {
-  //       1: 1,
-  //       2: 0,
-  //       3: 0,
-  //       4: 0,
-  //       5: 0
-  //     };
-  //     profileData.edited_exp_summary_dicts[8].ratings = {
-  //       1: 0,
-  //       2: 0,
-  //       3: 0,
-  //       4: 1,
-  //       5: 0
-  //     };
-  //     profileData.edited_exp_summary_dicts[9].num_views = 5;
-  //     profileData.edited_exp_summary_dicts[10].num_views = 15;
-
-  //     spyOn(
-  //       profilePageBackendApiService,
-  //       'fetchProfileDataAsync').and.returnValue(Promise.resolve(
-  //       UserProfile.createFromBackendDict(
-  //         profileData as UserProfileBackendDict)));
-  //     componentInstance.ngOnInit();
-  //   });
-
-  //   it('should go back and forth between pages', () => {
-  //     expect(componentInstance.currentPageNumber).toBe(0);
-  //     componentInstance.goToNextPage();
-
-  //     expect(componentInstance.currentPageNumber).toBe(1);
-  //     expect(componentInstance.startingExplorationNumber).toBe(7);
-  //     expect(componentInstance.endingExplorationNumber).toBe(11);
-
-  //     spyOn(loggerService, 'error');
-  //     componentInstance.goToNextPage();
-
-  //     expect(loggerService.error).toHaveBeenCalledWith(
-  //       'Error: Cannot increment page');
-
-  //     componentInstance.goToPreviousPage();
-
-  //     expect(componentInstance.currentPageNumber).toBe(0);
-  //     expect(componentInstance.startingExplorationNumber).toBe(1);
-  //     expect(componentInstance.endingExplorationNumber).toBe(6);
-
-  //     componentInstance.goToPreviousPage();
-
-  //     expect(componentInstance.currentPageNumber).toBe(0);
-  //     expect(loggerService.error).toHaveBeenCalledWith(
-  //       'Error: cannot decrement page');
-  //   });
-  // });
-
-  // describe('when user is not logged in', () => {
-  //   let profileData = {
-  //     username: '',
-  //     username_of_viewed_profile: 'username1',
-  //     user_bio: 'User bio',
-  //     user_impact_score: 100,
-  //     created_exp_summary_dicts: [],
-  //     edited_exp_summary_dicts: []
-  //   };
-
-  //   beforeEach(() => {
-  //     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync').and
-  //       .returnValue(Promise.resolve(
-  //         UserProfile.createFromBackendDict(
-  //         profileData as UserProfileBackendDict)));
-  //     componentInstance.ngOnInit();
-  //   });
-
-  //   it('should not change subscription status and change to login page',
-  //     () => {
-  //       let loginUrl = 'login-url';
-  //       spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-  //         Promise.resolve(loginUrl));
-
-  //       componentInstance.changeSubscriptionStatus();
-
-  //       expect(mockWindowRef.nativeWindow.location.href).toBe(loginUrl);
-  //     });
-
-  //   it('should not change subscription status and reload the page when login' +
-  //     ' page is not provided', () => {
-  //     spyOn(mockWindowRef.nativeWindow.location, 'reload');
-  //     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-  //       Promise.resolve(null));
-
-  //     componentInstance.changeSubscriptionStatus();
-
-  //     expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
-  //   });
-
-  //   it('should update subscription button text to warn user to log in',
-  //     () => {
-  //       componentInstance.updateSubscriptionButtonPopoverText();
-  //       expect(componentInstance.subscriptionButtonPopoverText).toBe(
-  //         'Log in or sign up to subscribe to your favorite creators.');
-  //     });
-
-  //   it('should get explorations to display when edited explorations are empty',
-  //     () => {
-  //       expect(componentInstance.getExplorationsToDisplay()).toEqual([]);
-  //     });
-  // });
-
-  // describe('when user is logged in', () => {
-  //   let profileData = {
-  //     username: 'username1',
-  //     username_of_viewed_profile: 'username1',
-  //     user_bio: 'User bio',
-  //     user_impact_score: 100,
-  //     created_exp_summary_dicts: [],
-  //     edited_exp_summary_dicts: [],
-  //     is_already_subscribed: false
-  //   };
-
-  //   beforeEach(() => {
-  //     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync').and
-  //       .returnValue(Promise.resolve(
-  //         UserProfile.createFromBackendDict(
-  //           profileData as UserProfileBackendDict)));
-  //     componentInstance.ngOnInit();
-  //   });
-
-  //   it('should subscribe and unsubscribe from a profile', () => {
-  //     expect(componentInstance.isAlreadySubscribed).toBe(false);
-  //     spyOn(profilePageBackendApiService, 'subscribeAsync').and
-  //       .returnValue(Promise.resolve());
-  //     componentInstance.changeSubscriptionStatus();
-
-  //     expect(componentInstance.isAlreadySubscribed).toBe(true);
-  //     expect(componentInstance.subscriptionButtonPopoverText).toBe(
-  //       'Unsubscribe to stop receiving email notifications regarding new' +
-  //       ' explorations published by ' + profileData.username_of_viewed_profile +
-  //       '.');
-
-  //     spyOn(profilePageBackendApiService, 'unsubscribeAsync').and
-  //       .returnValue(Promise.resolve());
-  //     componentInstance.changeSubscriptionStatus();
-
-  //     expect(componentInstance.isAlreadySubscribed).toBe(false);
-  //     expect(componentInstance.subscriptionButtonPopoverText).toBe(
-  //       'Receive email notifications, whenever ' +
-  //       profileData.username_of_viewed_profile +
-  //       ' publishes a new exploration.');
-  //   });
-  // });
 });
