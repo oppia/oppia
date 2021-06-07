@@ -31,10 +31,7 @@
       <a [href]="getStoryLink()" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storySummary.getTitle() }} </a>
     </strong>
     <span class="oppia-chapters-count">
-      <!-- <span [innerHTMl]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate"
-            translate-values="{count: $ctrl.nodeCount}"
-            translate-interpolation="messageformat">
-      </span> -->
+      <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
     </span>
   </div>
   <div class="story-details">
