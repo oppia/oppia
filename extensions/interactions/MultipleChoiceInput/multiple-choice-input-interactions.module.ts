@@ -25,12 +25,14 @@ import { DynamicContentModule } from 'components/angular-html-bind/dynamic-conte
 import { InteractiveMultipleChoiceInputComponent } from './directives/oppia-interactive-multiple-choice-input.component';
 import { ResponseMultipleChoiceInputComponent } from './directives/oppia-response-multiple-choice-input.component';
 import { ShortResponseMultipleChoiceInputComponent } from './directives/oppia-short-response-multiple-choice-input.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    DynamicContentModule
+    DynamicContentModule,
+    TranslateModule
   ],
   declarations: [
     InteractiveMultipleChoiceInputComponent,
