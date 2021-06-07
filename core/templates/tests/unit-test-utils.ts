@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, NgModule, NgZone, PlatformRef, Type } from '@angular/core';
+import { Component, NgModule, NgZone, Pipe, PlatformRef, Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { BrowserModule } from '@angular/platform-browser';
@@ -159,3 +159,10 @@ export const setupAndGetUpgradedComponentAsync = async(
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(
     () => multiTrim(element.textContent));
 };
+
+@Pipe({name: 'translate'})
+export class MockTranslatePipe {
+  transform(value: string, params: Object | undefined): string {
+    return value;
+  }
+}
