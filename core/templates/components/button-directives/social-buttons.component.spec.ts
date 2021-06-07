@@ -21,7 +21,7 @@ import { SocialButtonsComponent } from './social-buttons.component';
  * @fileoverview Unit tests for SocialButtonsComponent
  */
 
-fdescribe('SocialButtonsComponent', () => {
+describe('SocialButtonsComponent', () => {
   let component: SocialButtonsComponent;
   let fixture: ComponentFixture<SocialButtonsComponent>;
   let urlInterpolationService: UrlInterpolationService;
