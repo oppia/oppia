@@ -84,11 +84,6 @@
 /buf.gen.yaml @oppia/ml
 
 
-# App Feedback Reporting project
-# TODO(#12736): Restore code ownership for @BenHenning after 2021-05-24.
-/core/domain/app_feedback_report_*.py @vinitamurthi
-
-
 # Audio and Translation team.
 /core/controllers/voice_artist*.py @DubeySandeep
 /core/templates/pages/exploration-editor-page/translation-tab/ @DubeySandeep
@@ -335,10 +330,8 @@
 /core/domain/event_services*.py @brianrodri
 /core/domain/improvements_domain*.py @brianrodri
 /core/domain/improvements_services*.py @brianrodri
-/core/domain/improvements_validators*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
-/core/domain/statistics_validators*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
@@ -392,7 +385,6 @@
 /core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
 /core/domain/rights_domain*.py @aks681
-/core/domain/subtopic_validators*.py @vojtechjelinek
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -466,13 +458,9 @@
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/tasks*.py @aks681
-/core/domain/audit_validators*.py @vojtechjelinek
-/core/domain/base_model_validators*.py @vojtechjelinek
 /core/domain/beam_job*.py @brianrodri
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
-/core/domain/job_validators*.py @vojtechjelinek
-/core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/jobs*.py @brianrodri
 /core/platform/ @brianrodri
 /core/templates/App*.ts @srijanreddy98

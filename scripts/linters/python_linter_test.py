@@ -39,14 +39,6 @@ INVALID_PYTHON3_FILEPATH = os.path.join(
 INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
 
-INVALID_JOBS_ONE_OFF_FILEPATHS = [
-    'scripts/linters/test_files/invalid_duplicate_jobs_one_off.py']
-VALID_JOBS_ONE_OFF_FILEPATHS = [
-    'scripts/linters/test_files/valid_jobs_one_off.py']
-INVALID_PROD_VALIDATION_JOBS_ONE_OFF_FILEPATHS = [
-    'scripts/linters/test_files/invalid_duplicate_prod_validation_jobs_one_off'
-    '.py', 'scripts/linters/test_files/invalid_prod_validation_jobs_one_off.py']
-
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
