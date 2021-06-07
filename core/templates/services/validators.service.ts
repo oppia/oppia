@@ -121,7 +121,7 @@ export class ValidatorsService {
   }
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
     if (!input) {
-      return true;
+      return false;
     }
     if (input.length > constants.MAX_REVIEW_MESSAGE_LENGTH && showWarnings) {
       this.alerts.addWarning(
