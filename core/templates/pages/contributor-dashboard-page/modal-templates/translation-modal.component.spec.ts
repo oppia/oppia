@@ -332,7 +332,7 @@ describe('Translation Modal Component', () => {
       component.activeWrittenTranslation.html = 'texto1';
     }));
 
-    it('should remove paragraph copy erro', fakeAsync(() => {
+    it('should remove paragraph copy error', fakeAsync(() => {
       component.hadCopyParagraphError = true;
       component.suggestTranslatedText();
 
