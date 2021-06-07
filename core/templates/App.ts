@@ -412,7 +412,6 @@ angular.module('oppia').config([
       .translations('en', DEFAULT_TRANSLATIONS)
       .fallbackLanguage('en')
       .determinePreferredLanguage()
-      .useCookieStorage()
       // The messageformat interpolation method is necessary for pluralization.
       // Is optional and should be passed as argument to the translate call. See
       // https://angular-translate.github.io/docs/#/guide/14_pluralization

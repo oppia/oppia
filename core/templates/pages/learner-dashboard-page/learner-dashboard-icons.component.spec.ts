@@ -24,17 +24,11 @@ import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashbo
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
 
 import { LearnerDashboardIconsComponent } from './learner-dashboard-icons.component';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Learner Dashboard Icons Component', () => {
   let component: LearnerDashboardIconsComponent;

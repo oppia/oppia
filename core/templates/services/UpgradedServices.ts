@@ -480,8 +480,6 @@ import { TopicsAndSkillsDashboardPageService } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { TranslationsBackendApiService } from
-  'services/translations-backend-api.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -1146,15 +1144,11 @@ export class UpgradedServices {
       new TopicViewerBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['TranslationsBackendApiService'] =
-      new TranslationsBackendApiService(
-        upgradedServices['HttpClient']);
     upgradedServices['UserBackendApiService'] =
       new UserBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['WindowRef'],
-        upgradedServices['Title']
-      );
+        upgradedServices['Title']);
     upgradedServices['UserService'] = new UserService(
       upgradedServices['UrlInterpolationService'],
       upgradedServices['UrlService'],
