@@ -218,6 +218,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
+    get_redirect_route(r'/adminsessionhandler', admin.AdminSessionHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),

@@ -58,6 +58,7 @@ from core.domain import wipeout_service
 import feconf
 import python_utils
 import utils
+import webapp2
 
 
 class AdminPage(base.BaseHandler):
@@ -69,6 +70,16 @@ class AdminPage(base.BaseHandler):
 
         self.render_template('admin-page.mainpage.html')
 
+
+class AdminSessionHandler(webapp2.RequestHandler):
+    """Handler for creating and registering the user"""
+
+    def get(self, request, response):
+        auth_services.establish_auth_session(self.request, self.response)
+        auth_claims = auth_services.get_auth_claims_from_request(request)
+        user_id = user_services.create_new_user(
+            auth_claims.auth_id, auth_claims.email)
+        # initiate the test data
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
