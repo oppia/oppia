@@ -27,7 +27,9 @@ from core import jobs
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import image_services
+from core.domain import learner_progress_services
 from core.domain import rights_manager
+from core.domain import story_fetchers
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -148,6 +150,105 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the reduce function for this job."""
         if int(userbio_length) > 500:
             yield (userbio_length, stringified_usernames)
+
+
+class PopulateStoriesAndTopicsInIncompleteActivtiesOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate the story_ids and partially_learnt_topic_ids
+    in Incomplete Activities Model."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.IncompleteActivitiesModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        incomplete_exploration_ids = (
+            learner_progress_services.get_all_incomplete_exp_ids(user_id))
+        completed_exploration_ids = (
+            learner_progress_services.get_all_completed_exp_ids(user_id))
+
+        for exp_id in incomplete_exploration_ids:
+            story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
+            story = story_fetchers.get_story_by_id(story_id)
+            if story_id:
+                if story_id not in item.story_ids:
+                    item.story_ids.append(story_id)
+                    if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
+                        item.partially_learnt_topic_ids.append(
+                            story.corresponding_topic_id)
+
+        for exp_id in completed_exploration_ids:
+            story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
+            if story_id and story_id not in item.story_ids:
+                story = story_fetchers.get_story_by_id(story_id)
+                completed_nodes = story_fetchers.get_completed_nodes_in_story(
+                    user_id, story_id)
+                ordered_nodes = story.story_contents.get_ordered_nodes()
+
+                if len(completed_nodes) != len(ordered_nodes):
+                    item.story_ids.append(story_id)
+                    if story.corresponding_topic_id not in item.learnt_topic_ids: # pylint: disable=line-too-long
+                        item.learnt_topic_ids.append(
+                            story.corresponding_topic_id)
+
+        item.update_timestamps()
+        item.put()
+
+        yield (
+            'Successfully added story_ids and topic_ids '
+            'to the story_ids and partially_learnt_topic_ids field '
+            'of IncompleteActivitiesModel for the user: %s' % (user_id), 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class PopulateStoriesAndTopicsInCompletedActivtiesOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate the story_ids and learnt_topic_ids
+    in Completed Activities Model."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.CompletedActivitiesModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        completed_exploration_ids = (
+            learner_progress_services.get_all_completed_exp_ids(user_id))
+
+        for exp_id in completed_exploration_ids:
+            story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
+            if story_id and story_id not in item.story_ids:
+                story = story_fetchers.get_story_by_id(story_id)
+                completed_nodes = story_fetchers.get_completed_nodes_in_story(
+                    user_id, story_id)
+                ordered_nodes = story.story_contents.get_ordered_nodes()
+
+                if len(completed_nodes) == len(ordered_nodes):
+                    item.story_ids.append(story_id)
+                    if story.corresponding_topic_id not in item.learnt_topic_ids: # pylint: disable=line-too-long
+                        item.learnt_topic_ids.append(
+                            story.corresponding_topic_id)
+
+        item.update_timestamps()
+        item.put()
+
+        yield (
+            'Successfully added story_ids and topic_ids '
+            'to the story_ids and learnt_topic_ids field of '
+            'CompletedActivitiesModel for the user: %s' % (
+                user_id), 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
