@@ -374,6 +374,7 @@ export class TranslationModalComponent {
   }
 }
 
+
 angular.module('oppia').directive(
   'oppiaTranslationModal', downgradeComponent(
     {component: TranslationModalComponent}));
