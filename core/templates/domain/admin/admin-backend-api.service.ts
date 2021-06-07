@@ -54,7 +54,7 @@ interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
-interface ConfigPropertiesBackendResponse {
+export interface ConfigPropertiesBackendResponse {
   [property: string]: Object;
 }
 

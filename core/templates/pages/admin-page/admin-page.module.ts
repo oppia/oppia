@@ -36,17 +36,20 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
+import { AdminConfigTabComponent } from './config-tab/admin-config-tab.component';
 
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    SharedFormsModule
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
+    AdminConfigTabComponent,
     AdminFeaturesTabComponent,
     AdminJobsTabComponent,
     AdminNavbarComponent,
@@ -56,6 +59,7 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
+    AdminConfigTabComponent,
     AdminFeaturesTabComponent,
     AdminJobsTabComponent,
     AdminNavbarComponent,
@@ -83,6 +87,7 @@ class AdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { SharedFormsModule } from 'components/forms/shared-forms.module';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
