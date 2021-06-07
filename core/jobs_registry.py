@@ -40,9 +40,6 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
-    activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
-    activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
     collection_jobs_one_off.RemoveCollectionModelNodesOneOffJob,
