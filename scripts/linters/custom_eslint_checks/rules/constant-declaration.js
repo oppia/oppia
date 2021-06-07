@@ -44,7 +44,8 @@ module.exports = {
     var args;
     var fileName = context.getFilename();
     var selector = (
-      'CallExpression[callee.property.name=constant][callee.object.callee.object.name=angular]');
+      'CallExpression[callee.property.name=constant]' +
+      '[callee.object.callee.object.name=angular]');
     return {
       [selector]: function(node) {
         if (!fileName.endsWith('.constants.ajs.ts')) {
@@ -56,8 +57,7 @@ module.exports = {
         args = node.arguments[0].value;
         if (!constantsDeclarations.includes(args)) {
           constantsDeclarations.push(args);
-        }
-        else {
+        } else {
           context.report ({
             node: node.arguments[0],
             messageId: 'multipleConstant'

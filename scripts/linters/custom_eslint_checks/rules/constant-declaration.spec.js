@@ -28,29 +28,28 @@ ruleTester.run('constant-declaration', rule, {
     `angular.module('oppia').constant(
     'DEFAULT_SKILL', QuestionsListConstants.MODE_SELECT_SKILL);
     angular.module('oppia').constant(
-    'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_SKILL);`
+    'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_SKILL);`,
+    filename: 'foo/bar.constants.ajs.ts'
   }
   ],
 
   invalid: [
-    // {
-    //   code:
-    //   `angular.module('oppia').constant(
-    //   'DEFAULT_SKILL_DIFFICULTY', QuestionsListConstants.DEFAULT_SKILL_DIFFIC);
-    // angular.module('oppia').constant(
-    //   'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULTY);
-    // angular.module('oppia').constant(
-    //   'DEFAULT_SKILL', QuestionsListConstants.MODE_SELECT_SKILL);`,
-    //   errors: [{
-    //     message: 'constant is used in non constant file.',
-    //   }],
-    // },
+    {
+      code:
+      `angular.module('oppia').constant(
+      'DEFAULT_SKILL_DIFFICULTY', QuestionListConstants.DEFAULT_SKILL_DIFFIC);`,
+      filename: 'foo/bar.js',
+      errors: [{
+        message: 'constant is used in non constant file.',
+      }],
+    },
     {
       code:
       `angular.module('oppia').constant(
       'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULT);
       angular.module('oppia').constant(
       'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_DIFFICULT);`,
+      filename: 'foo/bar.constants.ajs.ts',
       errors: [{
         message: 'There are two constants in this file.',
       }],
