@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for error page.
  */
-import { Pipe, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, TestBed, ComponentFixture } from '@angular/core/testing';
 
 import { ErrorPageComponent } from './error-page.component';
@@ -23,22 +23,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { PageTitleService } from 'services/page-title.service';
-import { TranslateService } from 'services/translate.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
@@ -65,7 +50,6 @@ describe('Error page', () => {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
-        { provide: TranslateService, useClass: MockTranslateService },
         UrlInterpolationService,
         PageTitleService
       ],

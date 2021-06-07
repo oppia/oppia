@@ -342,8 +342,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { TranslateService } from 'services/translate.service';
-import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
@@ -711,8 +709,6 @@ export const angularServices: [string, Type<{}>][] = [
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
-  ['TranslateService', TranslateService],
-  ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],
   ['TranslationTabActiveContentIdService',
