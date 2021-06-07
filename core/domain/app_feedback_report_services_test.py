@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import types
 
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
@@ -85,6 +86,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'automatically_update_topics': False,
         'account_is_profile_admin': False
     }
+    WEB_PLATFORM_VERSION = '3.0.8'
     WEB_REPORT_INFO = {
         'user_feedback_other_text_input': 'add an admin'
     }
@@ -222,6 +224,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.android_report_model.ticket_id, None)
         self.assertEqual(self.android_report_model.scrubbed_by, None)
 
+    def test_get_web_report_raises_error(self):
+        mock_web_report_model = self.android_report_obj
+        mock_web_report_model.platform = self.PLATFORM_WEB
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Web app feedback report domain objects must be defined.'):
+            app_feedback_report_services.get_report_from_model(
+                mock_web_report_model)
+
     def test_get_report_from_model_has_same_user_supplied_feedback_info(self):
         user_supplied_feedback = self.android_report_obj.user_supplied_feedback
 
@@ -305,7 +317,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_context.logcat_logs,
             self.android_report_model.android_report_info['logcat_logs'])
 
-    def test_save_report_and_get_from_model_has_new_info(self):
+    def test_save_android_report_and_get_from_model_has_new_info(self):
         self.assertIsNone(self.android_report_obj.scrubbed_by)
 
         # Add a user in the scrubbed_by field and verify that the updated model
@@ -320,6 +332,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 scrubbed_report_models[0]))
 
         self.assertEqual(scrubbed_report_obj.scrubbed_by, self.user_id)
+
+    def test_save_web_report_raises_exception(self):
+        mock_web_report_obj = self.android_report_obj
+        mock_web_report_obj.platform = self.PLATFORM_WEB
+
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'Web report domain objects have not been defined.'):
+            app_feedback_report_services.save_feedback_report_to_storage(
+                mock_web_report_obj)
 
     def test_get_ticket_from_model_has_same_ticket_info(self):
         self.assertEqual(
@@ -816,6 +838,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             new_all_reports_stats_model.daily_param_stats,
             old_all_reports_stats_model.daily_param_stats)
 
+    def test_reassign_web_ticket_raises_error(self):
+        mock_web_report_obj = self.android_report_obj
+        mock_web_report_obj.platform = self.PLATFORM_WEB
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Assigning web reports to tickets has not been implemented yet.'):
+            app_feedback_report_services.reassign_ticket(
+                mock_web_report_obj, None)
+
     def test_scrub_android_report_removes_info(self):
         app_feedback_report_services.scrub_single_app_feedback_report(
             self.android_report_obj, self.user_id)
@@ -937,6 +969,188 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         # Check that the originally-scrubbed model is still valid.
         self._verify_report_is_scrubbed(
             scrubbed_android_model, self.user_id)
+
+    def test_get_report_type_from_string_returns_expected_report_type(self):
+        for report_type in constants.REPORT_TYPE:
+            self.assertEqual(
+                app_feedback_report_services._get_report_type_from_string(
+                    report_type.name), report_type)
+
+    def test_get_report_type_from_string_with_invalid_string_raises_error(self):
+        invalid_report_type = 'invalid_report_type'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given report type %s is invalid.' % invalid_report_type):
+            app_feedback_report_services._get_report_type_from_string(
+                invalid_report_type)
+
+    def test_get_category_from_string_returns_expected_category(self):
+        for category in constants.ALLOWED_CATEGORIES:
+            self.assertEqual(
+                app_feedback_report_services._get_category_from_string(
+                    category.name),category)
+
+    def test_get_category_from_string_with_invalid_string_raises_error(self):
+        invalid_category = 'invalid_category'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given category %s is invalid.' % invalid_category):
+            app_feedback_report_services._get_category_from_string(
+                invalid_category)
+
+    def test_get_android_text_size_from_string_returns_expected_text_size(self):
+        for text_size in constants.ALLOWED_ANDROID_TEXT_SIZES:
+            if text_size != constants.ANDROID_TEXT_SIZE.text_size_unspecified:
+                self.assertEqual(
+                    app_feedback_report_services._get_android_text_size_from_string( # pylint: disable=line-too-long
+                        text_size.name), text_size)
+
+    def test_get_android_text_size_from_string_with_unspecified_throws_error(
+            self):
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given Android app text size text_size_unspecified is invalid'):
+                app_feedback_report_services._get_android_text_size_from_string(
+                    constants.ANDROID_TEXT_SIZE.text_size_unspecified.name)
+
+    def test_get_android_text_size_from_string_with_invalid_string_raises_error(
+            self):
+        invalid_text_size = 'invalid_text_size'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given Android app text size %s is invalid.' % (
+                invalid_text_size)):
+            app_feedback_report_services._get_android_text_size_from_string(
+                invalid_text_size)
+
+    def test_get_entry_point_from_json_returns_expected_entry_point_obj(self):
+        entry_point_json = {
+            'entry_point_name': '',
+            'entry_point_topic_id': 'topic_id',
+            'entry_point_story_id': 'story_id',
+            'entry_point_exploration_id': 'exploration_id',
+            'entry_point_subtopic_id': 'subtopic_id'
+        }
+
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.navigation_drawer.name)
+        navigation_drawer_obj = (
+            app_feedback_report_services._get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                navigation_drawer_obj,
+                app_feedback_report_domain.NavigationDrawerEntryPoint))
+                
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.lesson_player.name)
+        lesson_player_obj = (
+            app_feedback_report_services._get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                lesson_player_obj,
+                app_feedback_report_domain.LessonPlayerEntryPoint))
+                
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.revision_card.name)
+        revision_card_obj = (
+            app_feedback_report_services._get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                revision_card_obj,
+                app_feedback_report_domain.RevisionCardEntryPoint))
+                
+        entry_point_json['entry_point_name'] = (
+            constants.ENTRY_POINT.crash.name)
+        crash_obj = (
+            app_feedback_report_services._get_entry_point_from_json(
+                entry_point_json))
+        self.assertTrue(
+            isinstance(
+                crash_obj, app_feedback_report_domain.CrashEntryPoint))
+
+    def test_get_entry_point_from_json_with_invalid_json_raises_error(
+            self):
+        invalid_json = {
+            'entry_point_name': 'invalid_entry_point_name'
+        }
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given entry point %s is invalid.' % (
+                'invalid_entry_point_name')):
+            app_feedback_report_services._get_entry_point_from_json(
+                invalid_json)
+
+    def test_get_android_network_type_from_string_returns_expected_network_type(
+            self):
+        for network_type in constants.ANDROID_NETWORK_TYPES:
+            self.assertEqual(
+                app_feedback_report_services._get_android_network_type_from_string( # pylint: disable=line-too-long
+                    network_type.name), network_type)
+
+    def test_get_android_network_type_from_string_invalid_string_raises_error(
+            self):
+        invalid_network_type = 'invalid_text_size'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The given Android network type %s is invalid.' % (
+                invalid_network_type)):
+            app_feedback_report_services._get_android_network_type_from_string(
+                invalid_network_type)
+
+    def test_store_incoming_report_stats_with_web_platform_raises_error(self):
+        mock_web_report_obj = self.android_report_obj
+        mock_web_report_obj.platform = constants.PLATFORM_CHOICE_WEB
+        
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Stats aggregation for incoming web reports have not been '
+            'implemented yet.'):
+            app_feedback_report_services.store_incoming_report_stats(
+                mock_web_report_obj)
+
+    def test_reassign_report_with_invalid_stats_model_raises_error(
+            self):
+        # Set an invalid ticket_id so that the stats model calculates an invalid
+        # id for this ticket's stats model.
+        self.android_report_obj.ticket_id = 'invalid_id'
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'The report has an invalid ticket id.'):
+            app_feedback_report_services.reassign_ticket(
+                self.android_report_obj, None)
+
+    def test_calculate_new_stats_count_for_parameter_adds_new_stats_val_to_dict(
+            self):
+        stats_map = {
+            'parameter_name': {
+                'value_1': 1
+            }
+        }
+        delta = 1
+
+        new_stats_map = (
+            app_feedback_report_services._calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
+                stats_map, 'value_2', delta))
+
+        self.assertEqual(new_stats_map['value_2'], delta)
+
+    def test_calculate_new_stats_count_with_invalid_delta_raises_error(self):
+        stats_map = {
+            'parameter_name': {
+                'current_value': 1
+            }
+        }
+        delta = -1
+
+        with self.assertRaisesRegexp(
+            utils.InvalidInputException,
+            'Cannot decrement a count for a parameter value that does '
+            'not exist'):
+            app_feedback_report_services._calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
+                stats_map, 'value_2', delta)
 
     def _verify_report_is_scrubbed(self, model_entity, scrubber):
         """Verifies the report model is scrubbed."""

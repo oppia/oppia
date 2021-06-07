@@ -118,15 +118,11 @@ def _get_report_type_from_string(report_type_name):
     Returns:
         REPORT_TYPE. The enum representing this report type.
     """
-    if report_type_name == constants.REPORT_TYPE.suggestion.name:
-        return constants.REPORT_TYPE.suggestion
-    elif report_type_name == constants.REPORT_TYPE.issue.name:
-        return constants.REPORT_TYPE.issue
-    elif report_type_name == constants.REPORT_TYPE.crash.name:
-        return constants.REPORT_TYPE.crash
-    else:
-        raise utils.InvalidInputException(
-            'The given report type %s is invalid.' % report_type_name)
+    for report_type in constants.ALLOWED_REPORT_TYPES:
+        if report_type_name == report_type.name:
+            return report_type
+    raise utils.InvalidInputException(
+        'The given report type %s is invalid.' % report_type_name)
 
 
 def _get_category_from_string(category_name):
@@ -138,41 +134,11 @@ def _get_category_from_string(category_name):
     Returns:
         CATEGORY. The enum representing this category.
     """
-    category = None
-    if category_name == constants.CATEGORY.feature_suggestion.name:
-        category = constants.CATEGORY.feature_suggestion
-    elif category_name == constants.CATEGORY.language_suggestion.name:
-        category = constants.CATEGORY.language_suggestion
-    elif category_name == constants.CATEGORY.other_suggestion.name:
-        category = constants.CATEGORY.other_suggestion
-    elif category_name == constants.CATEGORY.lesson_question_issue.name:
-        category = constants.CATEGORY.lesson_question_issue
-    elif category_name == constants.CATEGORY.language_general_issue.name:
-        category = constants.CATEGORY.language_general_issue
-    elif category_name == constants.CATEGORY.language_audio_issue.name:
-        category = constants.CATEGORY.language_audio_issue
-    elif category_name == constants.CATEGORY.language_text_issue.name:
-        category = constants.CATEGORY.language_text_issue
-    elif category_name == constants.CATEGORY.topics_issue.name:
-        category = constants.CATEGORY.topics_issue
-    elif category_name == constants.CATEGORY.profile_issue.name:
-        category = constants.CATEGORY.profile_issue
-    elif category_name == constants.CATEGORY.other_issue.name:
-        category = constants.CATEGORY.other_issue
-    elif category_name == constants.CATEGORY.lesson_player_crash.name:
-        category = constants.CATEGORY.lesson_player_crash
-    elif category_name == constants.CATEGORY.practice_questions_crash.name:
-        category = constants.CATEGORY.practice_questions_crash
-    elif category_name == constants.CATEGORY.options_page_crash.name:
-        category = constants.CATEGORY.options_page_crash
-    elif category_name == constants.CATEGORY.profile_page_crash.name:
-        category = constants.CATEGORY.profile_page_crash
-    elif category_name == constants.CATEGORY.other_crash.name:
-        category = constants.CATEGORY.other_crash
-    else:
-        raise utils.InvalidInputException(
-            'The given category %s is invalid.' % category_name)
-    return category
+    for category_type in constants.ALLOWED_CATEGORIES:
+        if category_name == category_type.name:
+            return category_type
+    raise utils.InvalidInputException(
+        'The given category %s is invalid.' % category_name)
 
 
 def _get_android_text_size_from_string(text_size_name):
@@ -184,18 +150,11 @@ def _get_android_text_size_from_string(text_size_name):
     Returns:
         ANDROID_TEXT_SIZE. The enum representing the text size.
     """
-    if text_size_name == constants.ANDROID_TEXT_SIZE.small_text_size.name:
-        return constants.ANDROID_TEXT_SIZE.small_text_size
-    elif text_size_name == constants.ANDROID_TEXT_SIZE.medium_text_size.name:
-        return constants.ANDROID_TEXT_SIZE.medium_text_size
-    elif text_size_name == constants.ANDROID_TEXT_SIZE.large_text_size.name:
-        return constants.ANDROID_TEXT_SIZE.large_text_size
-    elif text_size_name == (
-            constants.ANDROID_TEXT_SIZE.extra_large_text_size.name):
-        return constants.ANDROID_TEXT_SIZE.extra_large_text_size
-    else:
-        raise utils.InvalidInputException(
-            'The given Android app text size %s is invalid.' % text_size_name)
+    for text_size_type in constants.ALLOWED_ANDROID_TEXT_SIZES:
+        if text_size_name == text_size_type.name:
+            return text_size_type
+    raise utils.InvalidInputException(
+        'The given Android app text size %s is invalid.' % text_size_name)
 
 
 def _get_entry_point_from_json(entry_point_json):
@@ -238,15 +197,11 @@ def _get_android_network_type_from_string(network_type_name):
     Returns:
         ANDROID_NETWORK_TYPE. The enum representing the network type.
     """
-    if network_type_name == constants.ANDROID_NETWORK_TYPES.wifi.name:
-        return constants.ANDROID_NETWORK_TYPES.wifi
-    elif network_type_name == constants.ANDROID_NETWORK_TYPES.cellular.name:
-        return constants.ANDROID_NETWORK_TYPES.cellular
-    elif network_type_name == constants.ANDROID_NETWORK_TYPES.none.name:
-        return constants.ANDROID_NETWORK_TYPES.none
-    else:
-        raise utils.InvalidInputException(
-            'The given Android network type %s is invalid.' % network_type_name)
+    for network_type in constants.ALLOWED_ANDROID_NETWORK_TYPES:
+        if network_type_name == network_type.name:
+            return network_type
+    raise utils.InvalidInputException(
+        'The given Android network type %s is invalid.' % network_type_name)
 
 
 def store_incoming_report_stats(report_obj):
@@ -399,16 +354,16 @@ def _calculate_new_stats_count_for_parameter(
         int. The new report count to put into the stats dict for a single
         parameter value.
     """
-    if not current_stats_map[current_value]:
-        # The stats did not previously have this value.
+    if current_stats_map.has_key(current_value):
+        current_stats_map[current_value] += delta
+    else:
+        # The stats did not previously have this parameter value.
         if delta < 0:
             raise utils.InvalidInputException(
                 'Cannot decrement a count for a parameter value that does not '
                 'exist for this stats model.')
         # Update the stats so that it now contains this new value.
         current_stats_map[current_value] = 1
-    else:
-        current_stats_map[current_value] += delta
     return current_stats_map
 
 
@@ -536,12 +491,16 @@ def _get_android_report_from_model(android_report_model):
             report_info_dict['build_fingerprint'],
             _get_android_network_type_from_string(
                 report_info_dict['network_type'])))
-    entry_point = _get_entry_point_from_model(
-        android_report_model.entry_point,
-        android_report_model.entry_point_topic_id,
-        android_report_model.entry_point_story_id,
-        android_report_model.entry_point_exploration_id,
-        android_report_model.entry_point_subtopic_id)
+    entry_point = _get_entry_point_from_json(
+        {
+            'entry_point_name': android_report_model.entry_point,
+            'entry_point_topic_id': android_report_model.entry_point_topic_id,
+            'entry_point_story_id': android_report_model.entry_point_story_id,
+            'entry_point_exploration_id': (
+                android_report_model.entry_point_exploration_id),
+            'entry_point_subtopic_id': (
+                android_report_model.entry_point_subtopic_id)
+        })
     app_context = app_feedback_report_domain.AndroidAppContext(
         entry_point, android_report_model.text_language_code,
         android_report_model.audio_language_code,
@@ -557,43 +516,6 @@ def _get_android_report_from_model(android_report_model):
         android_report_model.local_timezone_offset_hrs,
         android_report_model.ticket_id, android_report_model.scrubbed_by,
         user_supplied_feedback, device_system_context, app_context)
-
-
-def _get_entry_point_from_model(
-        entry_point_name, topic_id, story_id, exploration_id, subtopic_id):
-    """Creates a domain object that represents an entry point to the feedback
-    reporting feature.
-
-    Args:
-        entry_point_name: str. The name of the entry point that corresponds to
-            an ENTRY_POINT enum.
-        topic_id: str|None. The ID of the topic that is being played when the
-            report was initiated or None if the entry point is not from a topic.
-        story_id: str|None. The ID of the story that is being played when the
-            report was initiated or None if the entry point is not from a story.
-        exploration_id: str|None. The ID of the exploration that is being played
-            when the report was initiated or None if there was no active
-            exploration when the report was started.
-        subtopic_id: int|None. The ID of the subtopic that is being played when
-            the report was initiated or None if there was no active subtopic
-            when the report was started.
-
-    Returns:
-        AppFeedbackReport. The corresponding AppFeedbackReport domain object.
-    """
-    if entry_point_name == constants.ENTRY_POINT.navigation_drawer.name:
-        return app_feedback_report_domain.NavigationDrawerEntryPoint()
-    elif entry_point_name == constants.ENTRY_POINT.lesson_player.name:
-        return app_feedback_report_domain.LessonPlayerEntryPoint(
-            topic_id, story_id, exploration_id)
-    elif entry_point_name == constants.ENTRY_POINT.revision_card.name:
-        return app_feedback_report_domain.RevisionCardEntryPoint(
-            topic_id, subtopic_id)
-    elif entry_point_name == constants.ENTRY_POINT.crash.name:
-        return app_feedback_report_domain.CrashEntryPoint()
-    else:
-        raise utils.InvalidInputException(
-            'Received unexpected entry point type %r.' % entry_point_name)
 
 
 def scrub_all_unscrubbed_expiring_reports(scrubbed_by):
@@ -701,7 +623,8 @@ def save_feedback_report_to_storage(report, new_incoming_report=False):
     if report.platform == PLATFORM_ANDROID:
         model_entity.android_report_info = report_info_json
     else:
-        model_entity.web_report_info = report_info_json
+        raise utils.InvalidInputException(
+            'Web report domain objects have not been defined.')
 
     model_entity.scrubbed_by = report.scrubbed_by
     model_entity.update_timestamps()
@@ -745,6 +668,9 @@ def reassign_ticket(report, new_ticket):
         ticket_model = (
             app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
                 old_ticket_id))
+        if ticket_model is None:
+            raise utils.InvalidInputException(
+                'The report has an invalid ticket id.')
         ticket_obj = get_ticket_from_model(ticket_model)
         ticket_obj.reports.remove(report)
         if ticket_obj.newest_report_creation_timestamp == (

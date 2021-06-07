@@ -138,8 +138,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 crash_entry_point, LANGUAGE_LOCALE_CODE_ENGLISH,
                 LANGUAGE_LOCALE_CODE_ENGLISH))
         self.web_report_obj = app_feedback_report_domain.AppFeedbackReport(
-            self.android_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
-            PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP, 0, TICKET_ID, None,
+            self.web_report_id, ANDROID_REPORT_INFO_SCHEMA_VERSION,
+            PLATFORM_WEB, REPORT_SUBMITTED_TIMESTAMP, 0, TICKET_ID, None,
             web_user_supplied_feedback, device_system_context, app_context)
 
     def test_to_dict_android_report(self):
@@ -203,7 +203,6 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_report_web_schema_version_less_than_minimum_validation_fails(
             self):
-        self.web_report_obj.platform = PLATFORM_WEB
         self.web_report_obj.schema_version = (
             feconf.MINIMUM_WEB_REPORT_SCHEMA_VERSION - 1)
         self._assert_validation_error(
@@ -213,7 +212,6 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def test_report_web_schema_version_greater_than_current_validation_fails(
             self):
-        self.web_report_obj.platform = PLATFORM_WEB
         self.web_report_obj.schema_version = (
             feconf.CURRENT_ANDROID_REPORT_SCHEMA_VERSION + 1)
         self._assert_validation_error(
@@ -231,6 +229,37 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             self.android_report_obj,
             'The scrubbed_by user id u\'invalid_user\' is invalid')
 
+    def test_report_scrubber_id_is_not_string_validation_fails(self):
+        self.android_report_obj.scrubbed_by = 123
+        self._assert_validation_error(
+            self.android_report_obj,
+            'The scrubbed_by user must be a string')
+
+    def test_report_timezone_offset_is_invalid_validation_fails(self):
+        self.android_report_obj.local_timezone_offset_hrs = (
+            constants.TIMEZONE_MINIMUM_OFFSET - 1)
+        self._assert_validation_error(
+            self.android_report_obj,
+            'Expected local timezone offset to be in')
+
+    def test_android_report_system_context_invalid_type_validation_fails(self):
+        self.android_report_obj.device_system_context = None
+        self._assert_validation_error(
+            self.android_report_obj,
+            'Expected device and system context to be of type '
+            'AndroidDeviceSystemContext')
+
+    def test_web_report_system_context_raises_not_implemented_error(self):
+        self._assert_not_implemented_error(
+            self.web_report_obj,
+            'Subclasses of DeviceSystemContext for web systems should '
+            'implement domain validation.')
+
+    def test_report_invalid_platform_fails_validation(self):
+        self.android_report_obj.platform = None
+        self._assert_validation_error(
+            self.android_report_obj, 'No platform supplied.')
+
     def _assert_validation_error(
             self, report_obj, expected_error_substring):
         """Checks that the feedback report passes validation.
@@ -242,6 +271,19 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
         """
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
+            report_obj.validate()
+
+    def _assert_not_implemented_error(
+            self, report_obj, expected_error_substring):
+        """Checks that the feedback report passes validation.
+
+        Args:
+            report_obj: AppFeedbackReport. The domain object to validate.
+            expected_error_substring: str. String that should be a substring
+                of the expected error message.
+        """
+        with self.assertRaisesRegexp(
+            NotImplementedError, expected_error_substring):
             report_obj.validate()
 
 
@@ -310,6 +352,46 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.user_supplied_feedback,
             'requires text input in the report.')
+
+    def test_validation_text_input_is_none_with_only_text_input_allowed_fails(
+            self):
+        self.user_supplied_feedback.report_type = REPORT_TYPE_SUGGESTION
+        self.user_supplied_feedback.category = CATEGORY_SUGGESTION_OTHER
+        self.user_supplied_feedback.user_feedback_selected_items = None
+        self.user_supplied_feedback.user_feedback_other_text_input = None
+        self._assert_validation_error(
+            self.user_supplied_feedback,
+            'requires text input provided by the user.')
+
+    def test_validation_invalid_selected_item_for_category_fails(self):
+        self.user_supplied_feedback.report_type = REPORT_TYPE_ISSUE
+        self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
+        self.user_supplied_feedback.user_feedback_selected_items = (
+            [123])
+        self.user_supplied_feedback.user_feedback_other_text_input = None
+        self._assert_validation_error(
+            self.user_supplied_feedback,
+            'Invalid option 123 selected by user.')
+
+    def test_validation_text_input_invalid_with_only_text_input_allowed_fails(
+            self):
+        self.user_supplied_feedback.report_type = REPORT_TYPE_SUGGESTION
+        self.user_supplied_feedback.category = CATEGORY_SUGGESTION_OTHER
+        self.user_supplied_feedback.user_feedback_selected_items = None
+        self.user_supplied_feedback.user_feedback_other_text_input = 123
+        self._assert_validation_error(
+            self.user_supplied_feedback,
+            'Invalid input text, must be a string')
+
+    def test_report_type_is_none_fails_validation(self):
+        self.user_supplied_feedback.report_type = None
+        self._assert_validation_error(
+            self.user_supplied_feedback, 'No report_type supplied.')
+
+    def test_report_category_is_none_fails_validation(self):
+        self.user_supplied_feedback.category = None
+        self._assert_validation_error(
+            self.user_supplied_feedback, 'No category supplied.')
 
     def _assert_validation_error(
             self, feedback_obj, expected_error_substring):
@@ -450,6 +532,18 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             self.device_system_context,
             'device\'s language locale code is not a valid string')
 
+    def test_validation_device_model_is_none_fails(self):
+        self.device_system_context.device_model = None
+        self._assert_validation_error(
+            self.device_system_context,
+            'No device model supplied.')
+
+    def test_validation_device_model_not_a_string_fails(self):
+        self.device_system_context.device_model = 123
+        self._assert_validation_error(
+            self.device_system_context,
+            'Android device model must be an string')
+
     def test_validation_sdk_version_is_none_fails(self):
         self.device_system_context.sdk_version = None
         self._assert_validation_error(
@@ -465,6 +559,16 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
             constants.MINIMUM_ANDROID_SDK_VERSION - 1)
         self._assert_validation_error(
             self.device_system_context, 'Invalid SDK version')
+
+    def test_validation_build_fingerprint_is_none_fails(self):
+        self.device_system_context.build_fingerprint = 123
+        self._assert_validation_error(
+            self.device_system_context, 'Build fingerprint must be a string')
+
+    def test_validation_build_fingerprint_not_a_string_fails(self):
+        self.device_system_context.build_fingerprint = None
+        self._assert_validation_error(
+            self.device_system_context, 'No build fingerprint supplied.')
 
     def test_validation_network_type_is_none_fails(self):
         self.device_system_context.network_type = None
@@ -528,7 +632,21 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
-    def test_validation_invalid_name_fails(self):
+    def test_validation_name_is_none_fails(self):
+        self.entry_point.entry_point_name = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'No entry point name supplied.'):
+            self.entry_point.validate()
+
+    def test_validation_name_not_a_string_fails(self):
+        self.entry_point.entry_point_name = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Entry point name must be a string,'):
+            self.entry_point.validate()
+
+    def test_validation_name_is_invalid_fails(self):
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -556,7 +674,19 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
-    def test_validation_invalid_name_fails(self):
+    def test_validation_name_is_none_fails(self):
+        self.entry_point.entry_point_name = None
+        self._assert_validation_error(
+            self.entry_point,
+            'No entry point name supplied.')
+
+    def test_validation_name_not_a_string_fails(self):
+        self.entry_point.entry_point_name = 123
+        self._assert_validation_error(
+            self.entry_point,
+            'Entry point name must be a string,')
+
+    def test_validation_name_is_invalid_fails(self):
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
         self._assert_validation_error(
             self.entry_point,
@@ -583,6 +713,14 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             self.entry_point,
             'Exploration with id invalid_exploration is not part of story '
             'with id')
+
+    def test_validation_exploration_id_not_a_stringfails(self):
+        self.entry_point.topic_id = 'valid_topic1'
+        self.entry_point.story_id = 'valid_story1'
+        self.entry_point.exploration_id = 123
+        self._assert_validation_error(
+            self.entry_point,
+            'Exploration id should be a string')
 
     def _assert_validation_error(
             self, entry_point_obj, expected_error_substring):
@@ -617,7 +755,19 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
-    def test_validation_invalid_name_fails(self):
+    def test_validation_name_is_none_fails(self):
+        self.entry_point.entry_point_name = None
+        self._assert_validation_error(
+            self.entry_point,
+            'No entry point name supplied.')
+
+    def test_validation_name_not_a_string_fails(self):
+        self.entry_point.entry_point_name = 123
+        self._assert_validation_error(
+            self.entry_point,
+            'Entry point name must be a string,')
+
+    def test_validation_name_is_invalid_fails(self):
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
         self._assert_validation_error(
             self.entry_point,
@@ -666,7 +816,21 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.entry_point.to_dict())
 
-    def test_validation_invalid_name_fails(self):
+    def test_validation_name_is_none_fails(self):
+        self.entry_point.entry_point_name = None
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'No entry point name supplied.'):
+            self.entry_point.validate()
+
+    def test_validation_name_not_a_string_fails(self):
+        self.entry_point.entry_point_name = 123
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Entry point name must be a string,'):
+            self.entry_point.validate()
+
+    def test_validation_name_is_invalid_fails(self):
         self.entry_point.entry_point_name = 'invalid_entry_point_name'
         with self.assertRaisesRegexp(
             utils.ValidationError,
@@ -735,10 +899,67 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.app_context.to_dict())
 
-    def test_validation_invalid_text_size_fails(self):
+    def test_validation_text_size_is_none_fails(self):
+        self.app_context.text_size = None
+        self._assert_validation_error(
+            self.app_context, 'No text size supplied.')
+
+    def test_validation_text_size_is_invalid_fails(self):
         self.app_context.text_size = 'invalid_text_size'
         self._assert_validation_error(
             self.app_context, 'App text size should be one of')
+
+    def test_validation_text_language_code_is_none_fails(self):
+        self.app_context.text_language_code = None
+        self._assert_validation_error(
+            self.app_context, 'No app text language code supplied.')
+
+    def test_validation_audio_language_code_is_none_fails(self):
+        self.app_context.audio_language_code = None
+        self._assert_validation_error(
+            self.app_context, 'No app audio language code supplied.')
+
+    def test_validation_text_language_code_is_not_a_string_fails(self):
+        self.app_context.text_language_code = 123
+        self._assert_validation_error(
+            self.app_context,
+            'Expected the app\'s text language code to be a string')
+
+    def test_validation_audio_language_code_is_not_a_string_fails(self):
+        self.app_context.audio_language_code = 123
+        self._assert_validation_error(
+            self.app_context,
+            'Expected the app\'s audio language code to be a string')
+
+    def test_validation_text_language_code_does_not_match_fails(self):
+        self.app_context.text_language_code = 'invalid string regex'
+        self._assert_validation_error(
+            self.app_context,
+            'The app\'s text language code is not a valid string')
+
+    def test_validation_audio_language_code_does_not_match_fails(self):
+        self.app_context.audio_language_code = 'invalid string regex'
+        self._assert_validation_error(
+            self.app_context,
+            'The app\'s audio language code is not a valid string')
+
+    def test_validation_only_allow_wifi_downloads_is_none_fails(self):
+        self.app_context.only_allows_wifi_download_and_update = None
+        self._assert_validation_error(
+            self.app_context,
+            'only_allows_wifi_download_and_update field should be a boolean')
+
+    def test_validation_automatically_update_topics_is_none_fails(self):
+        self.app_context.automatically_update_topics = None
+        self._assert_validation_error(
+            self.app_context,
+            'automatically_update_topics field should be a boolean')
+
+    def test_validation_account_is_profile_admin_is_none_fails(self):
+        self.app_context.account_is_profile_admin = None
+        self._assert_validation_error(
+            self.app_context,
+            'account_is_profile_admin field should be a boolean')
 
     def test_validation_event_logs_is_none_fails(self):
         self.app_context.event_logs = None
@@ -819,11 +1040,50 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_dict, self.ticket_obj.to_dict())
 
+    def test_validation_ticket_id_not_a_string_fails(self):
+        self.ticket_obj.ticket_id = 123
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The ticket id should be a string')
+
     def test_validation_invalid_ticket_id_fails(self):
         self.ticket_obj.ticket_id = 'invalid_ticket_id'
         self._assert_validation_error(
             self.ticket_obj,
             'The ticket id %s is invalid' % 'invalid_ticket_id')
+
+    def test_validation_ticket_name_is_none_fails(self):
+        self.ticket_obj.ticket_name = None
+        self._assert_validation_error(
+            self.ticket_obj,
+            'No ticket name supplied.')
+
+    def test_validation_ticket_name_is_not_a_string_fails(self):
+        self.ticket_obj.ticket_name = 123
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The ticket name should be a string')
+
+    def test_validation_ticket_name_too_long_fails(self):
+        long_name = 'too long'
+        for i in range(constants.MAXIMUM_TICKET_NAME_LENGTH):
+            long_name += 'x'
+        self.ticket_obj.ticket_name = long_name
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The ticket name is too long, has %d characters' % len(long_name))
+
+    def test_validation_report_ids_is_none_fails(self):
+        self.ticket_obj.reports = None
+        self._assert_validation_error(
+            self.ticket_obj,
+            'No reports list supplied.')
+
+    def test_validation_report_ids_not_a_list_fails(self):
+        self.ticket_obj.reports = 123
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The reports list should be a list')
 
     def test_validation_invalid_report_ids_fails(self):
         self.ticket_obj.reports = ['invalid_report_id']
@@ -837,11 +1097,23 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
             self.ticket_obj,
             'The Github issue number name must be a positive integer')
 
+    def test_validation_github_repo_name_not_a_string_fails(self):
+        self.ticket_obj.github_issue_repo_name = 123
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The Github repo name should be a string')
+
     def test_validation_invalid_github_repo_name_fails(self):
         self.ticket_obj.github_issue_repo_name = 'invalid_repo_name'
         self._assert_validation_error(
             self.ticket_obj,
             'The Github repo %s is invalid' % 'invalid_repo_name')
+
+    def test_validation_archived_is_not_boolean_fails(self):
+        self.ticket_obj.archived = 123
+        self._assert_validation_error(
+            self.ticket_obj,
+            'The ticket archived status must be a boolean')
 
     def _assert_validation_error(
             self, ticket_obj, expected_error_substring):
@@ -942,12 +1214,34 @@ class AppFeedbackReportStatsDomainTests(test_utils.GenericTestBase):
         }
         self.assertDictEqual(expected_dict, self.stats_obj.to_dict())
 
+    def test_validation_stats_id_is_not_a_string_fails(self):
+        self.stats_obj.stats_id = 123
+        self._assert_validation_error(
+            self.stats_obj, 'The stats id should be a string')
+
     def test_validation_invalid_id_fails(self):
         self.stats_obj.stats_id = 'invalid_stats_id'
         self._assert_validation_error(
             self.stats_obj, 'The stats id %s is invalid' % 'invalid_stats_id')
 
-    def test_validation_invalid_stats_fails(self):
+    def test_validation_total_reports_submitted_is_not_an_int_fails(self):
+        self.stats_obj.total_reports_submitted = 'wrong type'
+        self._assert_validation_error(
+            self.stats_obj,
+            'The total number of submitted reports should be an int')
+
+    def test_validation_total_reports_submitted_is_less_than_1_fails(self):
+        self.stats_obj.total_reports_submitted = 0
+        self._assert_validation_error(
+            self.stats_obj,
+            'The total number of submitted reports should be a positive int')
+
+    def test_validation_daily_param_stats_is_not_a_dict_fails(self):
+        self.stats_obj.daily_param_stats = 123
+        self._assert_validation_error(
+            self.stats_obj, 'The param stats should be a dict')
+
+    def test_validation_invalid_daily_param_stats_fails(self):
         self.stats_obj.daily_param_stats = {
             'invalid_stat_name':
             app_feedback_report_domain.ReportStatsParameterValueCounts(

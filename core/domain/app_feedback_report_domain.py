@@ -398,7 +398,7 @@ class UserSuppliedFeedback(python_utils.OBJECT):
                 ' %r.' % (category, other_input))
         if not isinstance(other_input, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Invalid input text must be a string, received: %r.' % (
+                'Invalid input text, must be a string, received: %r.' % (
                     other_input))
 
     @classmethod
@@ -1236,8 +1236,6 @@ class AppFeedbackReportTicket(python_utils.OBJECT):
         Raises:
             ValidationError. The id is an invalid format.
         """
-        if ticket_id is None:
-            raise utils.ValidationError('No ticket ID supplied.')
         if not isinstance(ticket_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'The ticket id should be a string, received: %s' % (
@@ -1395,8 +1393,6 @@ class AppFeedbackReportDailyStats(python_utils.OBJECT):
         Raises:
             ValidationError. The id is an invalid format.
         """
-        if stats_id is None:
-            raise utils.ValidationError('No stats ID supplied.')
         if not isinstance(stats_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'The stats id should be a string, received: %r' % stats_id)

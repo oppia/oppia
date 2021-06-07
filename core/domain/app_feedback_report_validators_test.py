@@ -892,6 +892,35 @@ class AppFeedbackReportStatsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_model_stats_tracking_date_greater_than_current_datetime_fails(
+            self):
+        invalid_datetime = (
+            datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        entity_id = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(
+                self.PLATFORM_ANDROID, self.TICKET_ID, invalid_datetime.date()))
+        app_feedback_report_models.AppFeedbackReportStatsModel.create(
+            entity_id=entity_id,
+            platform=self.PLATFORM_ANDROID,
+            ticket_id=self.TICKET_ID,
+            stats_tracking_date=invalid_datetime.date(),
+            total_reports_submitted=self.TOTAL_REPORTS_SUBMITTED,
+            daily_param_stats=self.DAILY_STATS)
+        model_entity = (
+            app_feedback_report_models.AppFeedbackReportStatsModel.get_by_id(
+                entity_id))
+
+        expected_output = self.expected_successful_validation_output
+        expected_output.append(
+            (
+                u'[u\'failed validation check for stats_tracking_date '
+                'datetime check of AppFeedbackReportStatsModel\', [u\'Entity '
+                'id %s: The stats_tracking_date field has a value %s which '
+                'is greater than the time when the job was run\']]') % (
+                    model_entity.id, model_entity.stats_tracking_date))
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
     def test_model_validation_with_invalid_external_references_ids_fails(self):
         entity_id = (
             app_feedback_report_models.AppFeedbackReportStatsModel.calculate_id(

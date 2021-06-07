@@ -25,6 +25,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -90,6 +91,28 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
         }
 
     def test_incoming_report_saves_to_storage(self):
+        self._post_json_with_test_headers(self.payload)
+
+        all_reports = (
+            app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
+        self.assertEqual(len(all_reports), 1)
+        report_model = all_reports[0]
+
+        self.assertEqual(report_model.platform, 'android')
+        self.assertEqual(
+            report_model.submitted_on,
+            datetime.datetime.fromtimestamp(1615519337))
+
+    def test_incoming_report_with_no_report_raises_error(self):
+        self._post_json_with_test_headers({}, expected_status=500)
+
+    def test_incoming_report_with_invalid_headers_raises_exception(self):
+        # Send a request without headers to act as "incorrect headers".
+        self.post_json(
+            feconf.INCOMING_APP_FEEDBACK_REPORT_URL, self.payload,
+            csrf_token=self.get_new_csrf_token(), expected_status_int=500)
+
+    def _post_json_with_test_headers(self, payload, expected_status=200):
         # Use str-type representations of the valid authentication values since
         # webapp requires the header values to be str-types, so they must have
         # parity for the tests correctly check these fields.
@@ -105,21 +128,7 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                         ANDROID_APP_VERSION_CODE_STRING):
                         self.post_json(
                             feconf.INCOMING_APP_FEEDBACK_REPORT_URL,
-                            self.payload, headers=self.headers,
-                            csrf_token=self.get_new_csrf_token())
+                            payload, headers=self.headers,
+                            csrf_token=self.get_new_csrf_token(),
+                            expected_status_int=expected_status)
 
-        all_reports = (
-            app_feedback_report_models.AppFeedbackReportModel.get_all().fetch())
-        self.assertEqual(len(all_reports), 1)
-        report_model = all_reports[0]
-
-        self.assertEqual(report_model.platform, 'android')
-        self.assertEqual(
-            report_model.submitted_on,
-            datetime.datetime.fromtimestamp(1615519337))
-
-    def test_incoming_report_with_invalid_headers_raises_exception(self):
-        # Send a request without headers to act as "incorrect headers".
-        self.post_json(
-            feconf.INCOMING_APP_FEEDBACK_REPORT_URL, self.payload,
-            csrf_token=self.get_new_csrf_token(), expected_status_int=500)
