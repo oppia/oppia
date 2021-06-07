@@ -923,9 +923,11 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
     def test_cannot_get_unresolved_answers_with_no_state_name(self):
         self.login(self.OWNER_EMAIL)
 
-        self.get_json(
+        response = self.get_json(
             '/createhandler/get_top_unresolved_answers/%s' % self.exp_id,
-            expected_status_int=404)
+            expected_status_int=200)
+
+        self.assertEqual(response['unresolved_answers'], [])
 
         self.logout()
 
@@ -2695,7 +2697,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(state_stats['answers'], {'Introduction': []})
+        self.assertEqual(state_stats['answers'], {})
 
     def test_get_returns_assigned_interaction_ids_of_exploration_states(self):
         with self.login_context(self.OWNER_EMAIL) as owner_id:
@@ -2708,9 +2710,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(
-            state_stats['interaction_ids'],
-            {'A': 'FractionInput', 'B': 'TextInput', 'End': 'EndExploration'})
+        self.assertEqual(state_stats['interaction_ids'], {})
 
 
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
