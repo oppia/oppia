@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,33 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Translations backend api service.
+ * @fileoverview A data service that stores the card is checkpoint value.
  */
-
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-export interface TranslationsDict {
-  [translation: string]: string;
-}
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TranslationsBackendApiService {
-  private prefix = '/assets/i18n/';
-  private suffix = '.json';
-
-  constructor(private http: HttpClient) {}
-
-  async fetchTranslationsAsync(languageCode: string):
-  Promise<TranslationsDict> {
-    return this.http.get<TranslationsDict>(
-      `${this.prefix}${languageCode}${this.suffix}`).toPromise();
+export class StateCardIsCheckpointService extends
+  StatePropertyService<boolean> {
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveCardIsCheckpoint';
   }
 }
 
 angular.module('oppia').factory(
-  'TranslationsBackendApiService',
-  downgradeInjectable(TranslationsBackendApiService));
+  'StateCardIsCheckpointService', downgradeInjectable(
+    StateCardIsCheckpointService));

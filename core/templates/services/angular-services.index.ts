@@ -39,6 +39,7 @@ import { SkillCreationService } from 'components/entity-creation-services/skill-
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { ProfileLinkImageBackendApiService } from 'components/profile-link-directives/profile-link-image-backend-api.service';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
+import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
 import { StateLinkedSkillIdService } from 'components/state-editor/state-editor-properties-services/state-skill.service';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -342,12 +343,11 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { TranslateService } from 'services/translate.service';
-import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { SvgFileFetcherBackendApiService } from 'objects/templates/svg-file-fetcher-backend-api.service';
 import { LearnerViewRatingService } from 'pages/exploration-player-page/services/learner-view-rating.service';
 import { LearnerViewRatingBackendApiService } from 'pages/exploration-player-page/services/learner-view-rating-backend-api.service';
 import { LearnerLocalNavBackendApiService } from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
@@ -642,6 +642,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],
+  ['StateCardIsCheckpointService', StateCardIsCheckpointService],
   ['StateCardObjectFactory', StateCardObjectFactory],
   ['StateClassifierMappingService', StateClassifierMappingService],
   ['StateContentService', StateContentService],
@@ -687,6 +688,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionModalService', SuggestionModalService],
   ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
+  ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
@@ -703,8 +705,6 @@ export const angularServices: [string, Type<{}>][] = [
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
-  ['TranslateService', TranslateService],
-  ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslateTextService', TranslateTextService],
   ['TranslateTextBackendApiService', TranslateTextBackendApiService],
   ['TranslationTabActiveContentIdService',

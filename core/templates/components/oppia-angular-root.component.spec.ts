@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the OppiaAngularRootComponent.
  */
 
+import { TranslateService } from '@ngx-translate/core';
+import { TranslateCacheService } from 'ngx-translate-cache';
+
 import { ComponentFixture, TestBed, async} from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -31,9 +34,24 @@ describe('OppiaAngularRootComponent', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule
+      ],
       declarations: [OppiaAngularRootComponent],
-      providers: [{provide: AngularFireAuth, useValue: null}],
+      providers: [
+        {
+          provide: AngularFireAuth,
+          useValue: null
+        },
+        {
+          provide: TranslateCacheService,
+          useValue: null
+        },
+        {
+          provide: TranslateService,
+          useValue: null
+        }
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(OppiaAngularRootComponent);

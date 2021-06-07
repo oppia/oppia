@@ -32,75 +32,77 @@ import { AppConstants } from 'app.constants';
    templateUrl: './create-activity-button.component.html',
  })
 export class CreateActivityButtonComponent implements OnInit {
-   creationInProgress: boolean = false;
-   canCreateCollections: boolean = false;
-   allowYamlFileUpload: boolean = false;
-   userIsLoggedIn: boolean = false;
+  creationInProgress: boolean = false;
+  canCreateCollections: boolean = false;
+  allowYamlFileUpload: boolean = false;
+  userIsLoggedIn: boolean = false;
 
-   constructor(
-     private userService: UserService,
-     private siteAnalyticsService: SiteAnalyticsService,
-     private urlService: UrlService,
-     private explorationCreationService: ExplorationCreationService,
-     private ngbModal: NgbModal,
-     private windowRef: WindowRef
-   ) {}
+  constructor(
+    private userService: UserService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlService: UrlService,
+    private explorationCreationService: ExplorationCreationService,
+    private ngbModal: NgbModal,
+    private windowRef: WindowRef
+  ) {}
 
-   onRedirectToLogin(destinationUrl: string): boolean {
-     this.siteAnalyticsService.registerStartLoginEvent(
-       'createActivityButton');
-     setTimeout(() => {
-       this.windowRef.nativeWindow.location.href = destinationUrl;
-     }, 150);
-     return false;
-   }
+  onRedirectToLogin(destinationUrl: string): boolean {
+    this.siteAnalyticsService.registerStartLoginEvent(
+      'createActivityButton');
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = destinationUrl;
+    }, 150);
+    return false;
+  }
 
-   initCreationProcess(): void {
-     // Without this, the modal keeps reopening when the window is
-     // resized.
-     if (this.creationInProgress) {
-       return;
-     }
+  initCreationProcess(): void {
+    // Without this, the modal keeps reopening when the window is
+    // resized.
+    if (this.creationInProgress) {
+      return;
+    }
 
-     this.creationInProgress = true;
+    this.creationInProgress = true;
 
-     if (!this.canCreateCollections) {
-       this.explorationCreationService.createNewExploration();
-     } else if (this.urlService.getPathname() !== '/creator-dashboard') {
-       this.windowRef.nativeWindow.location.replace(
-         '/creator-dashboard?mode=create');
-     } else {
-       this.ngbModal.open(
-         CreateActivityModalComponent,
-         {backdrop: true}
-       ).result.then(() => {}, () => {
-         this.creationInProgress = false;
-       });
-     }
-   }
+    if (!this.canCreateCollections) {
+      this.explorationCreationService.createNewExploration();
+    } else if (this.urlService.getPathname() !== '/creator-dashboard') {
+      this.windowRef.nativeWindow.location.replace(
+        '/creator-dashboard?mode=create');
+    } else {
+      this.ngbModal.open(
+        CreateActivityModalComponent,
+        {backdrop: true}
+      ).result.then(() => {}, () => {
+        this.creationInProgress = false;
+      });
+    }
+  }
 
-   showUploadExplorationModal(): void {
-     this.explorationCreationService.showUploadExplorationModal();
-   }
-   ngOnInit(): void {
-     this.creationInProgress = false;
-     this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
+  showUploadExplorationModal(): void {
+    this.explorationCreationService.showUploadExplorationModal();
+  }
 
-     this.userService.getUserInfoAsync().then((userInfo) => {
-       this.canCreateCollections = userInfo.canCreateCollections();
-       this.userIsLoggedIn = userInfo.isLoggedIn();
-     });
-     // If the user clicked on a 'create' button to get to the dashboard,
-     // open the create modal immediately (or redirect to the exploration
-     // editor if the create modal does not need to be shown).
-     if (this.urlService.getUrlParams().mode === 'create') {
-       if (!this.canCreateCollections) {
-         this.explorationCreationService.createNewExploration();
-       } else {
-         this.initCreationProcess();
-       }
-     }
-   }
+  ngOnInit(): void {
+    this.creationInProgress = false;
+    this.allowYamlFileUpload = AppConstants.ALLOW_YAML_FILE_UPLOAD;
+
+    this.userService.getUserInfoAsync().then(userInfo => {
+      this.canCreateCollections = userInfo.canCreateCollections();
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+
+      // If the user clicked on a 'create' button to get to the dashboard,
+      // open the create modal immediately (or redirect to the exploration
+      // editor if the create modal does not need to be shown).
+      if (this.urlService.getUrlParams().mode === 'create') {
+        if (!this.canCreateCollections) {
+          this.explorationCreationService.createNewExploration();
+        } else {
+          this.initCreationProcess();
+        }
+      }
+    });
+  }
 }
 angular.module('oppia').directive(
   'oppiaCreateActivityButton', downgradeComponent(
