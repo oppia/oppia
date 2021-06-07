@@ -37,6 +37,7 @@ var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
+const { browser } = require('protractor');
 
 var ExplorationEditorPage = function() {
   /*
@@ -222,14 +223,7 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
-    await waitFor.visibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to appear after saving changes');
-    // This is necessary to give the page time to record the changes,
-    // so that it does not attempt to stop the user leaving.
-    await waitFor.invisibilityOf(
-      toastSuccessElement,
-      'Toast message is taking too long to disappear after saving changes');
+    await browser.wait(waitFor.DEFAULT_WAIT_TIME_MSECS);
   };
 
   this.discardChanges = async function() {
