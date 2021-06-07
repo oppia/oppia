@@ -42,7 +42,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
-from core.domain import topic_fetchers
 from core.domain import user_services
 import feconf
 import utils
@@ -589,7 +588,8 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         state_name = self.payload.get('state_name')
         user_id = self.user_id
         collection_id = self.payload.get('collection_id')
-        story_id =  exp_services.get_story_id_linked_to_exploration(exploration_id)
+        story_id = exp_services.get_story_id_linked_to_exploration(
+            exploration_id)
 
         if user_id:
             learner_progress_services.mark_exploration_as_incomplete(

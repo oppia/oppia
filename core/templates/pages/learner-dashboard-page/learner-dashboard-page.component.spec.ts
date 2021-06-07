@@ -46,6 +46,8 @@ import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { TopicSummary } from 'domain/topic/topic-summary.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -226,9 +228,15 @@ describe('Learner dashboard page', () => {
   let learnerDashboardData = {
     completed_explorations_list: [],
     completed_collections_list: [],
+    completed_stories_list: [],
+    learnt_topic_list: [],
     incomplete_explorations_list: [],
     incomplete_collections_list: [],
+    partially_learnt_topics_list: [],
     subscription_list: subscriptionsList,
+    completed_to_incomplete_collections: [],
+    completed_to_incomplete_stories: [],
+    learnt_to_partially_learnt_topics: [],
     number_of_nonexistent_activities: {
       incomplete_explorations: 0,
       incomplete_collections: 0,
@@ -237,7 +245,6 @@ describe('Learner dashboard page', () => {
       exploration_playlist: 0,
       collection_playlist: 0
     },
-    completed_to_incomplete_collections: [],
     thread_summaries: threadSummaryList,
     number_of_unread_threads: 10,
     exploration_playlist: [],
@@ -410,6 +417,18 @@ describe('Learner dashboard page', () => {
             learnerDashboardData.incomplete_collections_list.map(
               collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))),
+          completedStoriesList: (
+            learnerDashboardData.completed_stories_list.map(
+              storySummary => StorySummary.createFromBackendDict(
+                storySummary))),
+          learntTopicsList: (
+            learnerDashboardData.learnt_topic_list.map(
+              topicSummary => TopicSummary.createFromBackendDict(
+                topicSummary))),
+          partiallyLearntTopicsList: (
+            learnerDashboardData.partially_learnt_topics_list.map(
+              topicSummary => TopicSummary.createFromBackendDict(
+                topicSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary
@@ -421,6 +440,10 @@ describe('Learner dashboard page', () => {
                 .createFromBackendDict(threadSummary))),
           completedToIncompleteCollections: (
             learnerDashboardData.completed_to_incomplete_collections),
+          completedToIncompleteStories: (
+            learnerDashboardData.completed_to_incomplete_stories),
+          learntToPartiallyLearntTopics: (
+            learnerDashboardData.learnt_to_partially_learnt_topics),
           numberOfNonexistentActivities: (
             NonExistentActivities.createFromBackendDict(
               learnerDashboardData.number_of_nonexistent_activities)),

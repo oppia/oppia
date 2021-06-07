@@ -31,7 +31,6 @@ from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_fetchers
 from core.domain import user_domain
-from core.domain import user_services
 from core.platform import models
 import utils
 
@@ -141,7 +140,8 @@ def _save_incomplete_activities(incomplete_activities):
         collection_ids=(
             incomplete_activities.collection_ids),
         story_ids=incomplete_activities.story_ids,
-        partially_learnt_topic_ids=incomplete_activities.partially_learnt_topic_ids)
+        partially_learnt_topic_ids=(
+            incomplete_activities.partially_learnt_topic_ids))
 
     incomplete_activities_model.update_timestamps()
     incomplete_activities_model.put()
@@ -385,8 +385,8 @@ def mark_story_as_incomplete(user_id, story_id):
 def mark_topic_as_partially_learnt(user_id, topic_id):
     """Adds the topic id to the partially learnt list of the user unless the
     topic has been already learnt by the user. If the topic is already
-    present in the partially learnt list, just the details associated with it are
-    updated.
+    present in the partially learnt list, just the details associated with it
+    are updated.
 
     Args:
         user_id: str. The id of the user who partially learnt the topic.
@@ -752,7 +752,8 @@ def _remove_activity_ids_from_incomplete_list(
         user_id: str. The id of the user.
         exploration_ids: list(str). The ids of the explorations to be removed.
         collection_ids: list(str). The ids of the collections to be removed.
-        partially_learnt_topic_ids: list(str). The ids of the topics to be removed.
+        partially_learnt_topic_ids: list(str). The ids of the topics to be
+            removed.
     """
     incomplete_activities_model = (
         user_models.IncompleteActivitiesModel.get(
@@ -1510,7 +1511,8 @@ def get_learner_dashboard_activities(user_id):
             learner_progress_models[1][0])
         incomplete_exploration_ids = incomplete_activities.exploration_ids
         incomplete_collection_ids = incomplete_activities.collection_ids
-        partially_learnt_topic_ids = incomplete_activities.partially_learnt_topic_ids
+        partially_learnt_topic_ids = (
+            incomplete_activities.partially_learnt_topic_ids)
     else:
         incomplete_exploration_ids = []
         incomplete_collection_ids = []
@@ -1545,7 +1547,7 @@ def get_activity_progress(user_id):
         user_id: str. The id of the learner.
 
     Returns:
-        (LearnerProgress, dict, CompletedToIncompleteActivities).
+        (LearnerProgress, dict).
         The first return value is the learner progress domain object
         corresponding to the particular learner. The second return value
         is the numbers of the activities that are no longer present.
@@ -1554,19 +1556,16 @@ def get_activity_progress(user_id):
                 explorations no longer present.
             - incomplete_collections: int. The number of incomplete collections
                 no longer present.
-            - partially_learnt_topics: int. The number of partially learnt topics
-                no longer present.
+            - partially_learnt_topics: int. The number of partially learnt
+                topics no longer present.
             - completed_explorations: int. The number of completed explorations
                 no longer present.
-            - completed_collections: int. The number of completed collections no
-                longer present.
+            - completed_collections: int. The number of completed collections
+                no longer present.
             - completed_stories: int. The number of completed stories no
                 longer present.
             - learnt_topics: int. The number of learnt topics no
                 longer present.
-        The third return value is the user's username.
-        The fourth return value is the Completed to Incomplete Activities
-        domain object corresponding to the particular learner.
     """
     activity_ids_in_learner_dashboard = (
         get_learner_dashboard_activities(user_id))
@@ -1749,17 +1748,10 @@ def get_activity_progress(user_id):
         filtered_completed_story_summaries,
         filtered_learnt_topic_summaries,
         filtered_exp_playlist_summaries,
-        filtered_collection_playlist_summaries)
-
-    username = user_services.get_username(user_id)
-
-    completed_to_incomplete_activities = (
-        learner_progress_domain.CompletedToIncompleteActivities(
-            completed_to_incomplete_collection_titles,
-            completed_to_incomplete_story_titles,
-            learnt_to_partially_learnt_topic_titles))
+        filtered_collection_playlist_summaries,
+        completed_to_incomplete_collection_titles,
+        completed_to_incomplete_story_titles,
+        learnt_to_partially_learnt_topic_titles)
 
     return (
-        learner_progress, number_of_nonexistent_activities,
-        username,
-        completed_to_incomplete_activities)
+        learner_progress, number_of_nonexistent_activities)

@@ -1163,8 +1163,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # has been moved to the incomplete section.
         self.assertEqual(len(incomplete_collection_summaries), 2)
         self.assertEqual(incomplete_collection_summaries[1].title, 'Bridges')
-        # Check that the dashboard has recorded the change in the collection.
-        self.assertEqual(activity_progress[2], self.USER_USERNAME)
 
         # Now suppose the user has completed the collection. It should be added
         # back to the completed section.

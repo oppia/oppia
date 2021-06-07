@@ -23,12 +23,8 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -116,57 +112,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             response['completed_collections_list'][0]['id'], self.COL_ID_1)
         self.logout()
 
-    def test_can_see_completed_stories(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['completed_stories_list']), 0)
-
-        self.STORY_ID = story_services.get_new_story_id()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-
-        self.save_new_topic(
-            self.TOPIC_ID, self.owner_id, name='Topic',
-            abbreviated_name='topic-one', url_fragment='topic-one',
-            description='A new topic',
-            canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=['skill_4'], subtopics=[],
-            next_subtopic_id=0)
-        self.save_new_story(self.STORY_ID, self.owner_id, self.TOPIC_ID)
-        topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID, self.STORY_ID)
-
-        learner_progress_services.mark_story_as_completed(
-            self.viewer_id, self.STORY_ID)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['completed_stories_list']), 1)
-        self.assertEqual(
-            response['completed_stories_list'][0]['id'], self.STORY_ID)
-        self.logout()
-
-    def test_can_see_learnt_topics(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['learnt_topics_list']), 0)
-
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            self.TOPIC_ID, self.owner_id, name='Topic',
-            abbreviated_name='topic-one', url_fragment='topic-one',
-            description='A new topic',
-            canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=['skill_4'], subtopics=[],
-            next_subtopic_id=0)
-
-        learner_progress_services.mark_topic_as_learnt(
-            self.viewer_id, self.TOPIC_ID)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['learnt_topics_list']), 1)
-        self.assertEqual(
-            response['learnt_topics_list'][0]['id'], self.TOPIC_ID)
-        self.logout()
-
     def test_can_see_incomplete_explorations(self):
         self.login(self.VIEWER_EMAIL)
 
@@ -204,29 +149,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(response['incomplete_collections_list']), 1)
         self.assertEqual(
             response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
-        self.logout()
-
-    def test_can_see_partially_learnt_topics(self):
-        self.login(self.VIEWER_EMAIL)
-
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['partially_learnt_topics_list']), 0)
-
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            self.TOPIC_ID, self.owner_id, name='Topic',
-            abbreviated_name='topic-one', url_fragment='topic-one',
-            description='A new topic',
-            canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=['skill_4'], subtopics=[],
-            next_subtopic_id=0)
-
-        learner_progress_services.mark_topic_as_partially_learnt(
-            self.viewer_id, self.TOPIC_ID)
-        response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
-        self.assertEqual(len(response['partially_learnt_topics_list']), 1)
-        self.assertEqual(
-            response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID)
         self.logout()
 
     def test_can_see_exploration_playlist(self):

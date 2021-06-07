@@ -495,7 +495,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
             'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'partially_mastered_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'partially_mastered_topic_id': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
 
     @classmethod

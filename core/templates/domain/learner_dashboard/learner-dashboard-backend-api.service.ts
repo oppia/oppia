@@ -68,7 +68,6 @@ interface LearnerDashboardDataBackendDict {
   'learnt_to_partially_learnt_topics': string[];
   'number_of_nonexistent_activities': NonExistentActivitiesBackendDict;
   'subscription_list': CreatorSummaryBackendDict[];
-  'username': string
 }
 
 interface LearnerDashboardData {
@@ -88,7 +87,6 @@ interface LearnerDashboardData {
   learntToPartiallyLearntTopics: string[];
   numberOfNonexistentActivities: NonExistentActivities;
   subscriptionList: ProfileSummary[];
-  username: string;
 }
 
 interface AddMessagePayload {
@@ -166,8 +164,7 @@ export class LearnerDashboardBackendApiService {
           subscriptionList: (
             dashboardData.subscription_list.map(
               profileSummary => ProfileSummary
-                .createFromCreatorBackendDict(profileSummary))),
-          username: dashboardData.username
+                .createFromCreatorBackendDict(profileSummary)))
         });
       }, errorResponse => {
         reject(errorResponse.status);

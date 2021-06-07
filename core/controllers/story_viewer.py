@@ -213,7 +213,8 @@ class StoryProgressHandler(base.BaseHandler):
             learner_progress_services.mark_story_as_completed(
                 self.user_id, story_id)
             completed_story_ids = (
-                learner_progress_services.get_all_completed_story_ids(self.user_id))
+                learner_progress_services.get_all_completed_story_ids(
+                    self.user_id))
             story_ids_in_topic = []
             for story in topic.canonical_story_references:
                 story_ids_in_topic.append(story.story_id)
@@ -223,11 +224,11 @@ class StoryProgressHandler(base.BaseHandler):
 
             if not is_topic_completed:
                 learner_progress_services.mark_topic_as_partially_learnt(
-                self.user_id, topic.id)
+                    self.user_id, topic.id)
             else:
                 learner_progress_services.mark_topic_as_learnt(
                     self.user_id, topic.id)
-    
+
         else:
             learner_progress_services.mark_story_as_incomplete(
                 self.user_id, story.id)
