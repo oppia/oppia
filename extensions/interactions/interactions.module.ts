@@ -28,6 +28,12 @@ import { FractionInputInteractionModule } from './FractionInput/fraction-input-i
 import { GraphInputInteractionModule } from './GraphInput/graph-input-interactions.module';
 import { ImageClickInputInteractionModule } from './ImageClickInput/image-click-input-interactions.module';
 import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.module';
+import { InteractiveMapInteractionModule } from './InteractiveMap/interactive-map-interactions.module';
+import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactions.module';
+import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
+import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
+import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -38,7 +44,13 @@ import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.mod
     ContinueExtensionsModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
-    ImageClickInputInteractionModule
+    ImageClickInputInteractionModule,
+    InteractiveMapInteractionModule,
+    LogicProofInteractionModule,
+    MultipleChoiceInputInteractionModule,
+    SetInputInteractionModule,
+    TextInputInteractionModule,
+    TranslateModule
   ],
   declarations: [],
   entryComponents: [],
@@ -48,7 +60,12 @@ import { CodeReplInteractionModule } from './CodeRepl/code-repl-interactions.mod
     ContinueExtensionsModule,
     FractionInputInteractionModule,
     GraphInputInteractionModule,
-    ImageClickInputInteractionModule
+    ImageClickInputInteractionModule,
+    InteractiveMapInteractionModule,
+    LogicProofInteractionModule,
+    MultipleChoiceInputInteractionModule,
+    SetInputInteractionModule,
+    TextInputInteractionModule
   ],
 })
 export class InteractionExtensionsModule { }

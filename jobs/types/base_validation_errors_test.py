@@ -84,6 +84,17 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
         self.assertEqual(
             error.message, 'FooError in BaseModel(id=\'123\'): foo')
 
+    def test_stdout(self):
+        error = FooError(self.model)
+
+        self.assertEqual(error.stdout, '')
+
+    def test_stderr(self):
+        error = FooError(self.model)
+
+        self.assertEqual(
+            error.stderr, 'FooError in BaseModel(id=\'123\'): foo')
+
     def test_message_raises_not_implemented_error_if_not_assigned_a_value(self):
         class ErrorWithoutMessage(base_validation_errors.BaseAuditError):
             """Subclass that does not assign a value to self.message."""

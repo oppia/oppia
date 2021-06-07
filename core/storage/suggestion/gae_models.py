@@ -269,13 +269,15 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+    def get_translation_suggestions_in_review_with_exp_id(
+            cls, exp_id, language_code):
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
         Args:
             exp_id: str. Exploration ID matching the target ID of the
                 translation suggestions.
+            language_code: str. Language code.
 
         Returns:
             list(SuggestionModel). A list of translation suggestions in review
@@ -285,6 +287,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return (
             cls.get_all()
             .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.language_code == language_code)
             .filter(
                 cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
             .filter(cls.target_id == exp_id)
@@ -397,12 +400,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
                     feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_in_review_suggestions_of_suggestion_type(
-            cls, suggestion_type, user_id):
-        """Gets all suggestions of suggestion_type which are in review.
+    def get_in_review_translation_suggestions(cls, user_id, language_codes):
+        """Gets all translation suggestions which are in review.
 
         Args:
-            suggestion_type: str. The type of suggestion to query for.
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own suggestions, suggestions
+                authored by the user will be excluded.
+            language_codes: list(str). The list of language codes.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are of the given
+            type, which are in review, but not created by the given user.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(
+                cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.author_id != user_id)
+            .filter(cls.language_code.IN(language_codes))
+            .fetch(feconf.DEFAULT_QUERY_LIMIT))
+
+    @classmethod
+    def get_in_review_question_suggestions(cls, user_id):
+        """Gets all question suggestions which are in review.
+
+        Args:
             user_id: str. The id of the user trying to make this query.
                 As a user cannot review their own suggestions, suggestions
                 authored by the user will be excluded.
@@ -411,9 +435,12 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions that are of the given
             type, which are in review, but not created by the given user.
         """
-        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
-            cls.suggestion_type == suggestion_type).filter(
-                cls.author_id != user_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
+            .filter(cls.author_id != user_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT))
 
     @classmethod
     def get_question_suggestions_waiting_longest_for_review(cls):

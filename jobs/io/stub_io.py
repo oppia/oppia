@@ -24,10 +24,13 @@ import pickle
 import threading
 import xmlrpc.client
 
+from core.platform import models
 from jobs import job_utils
 import python_utils
 
 import apache_beam as beam
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class DatastoreioStub(python_utils.OBJECT):
@@ -66,8 +69,7 @@ class DatastoreioStub(python_utils.OBJECT):
 
         self._server_port = self._server.server_address[1]
         self._server_context_is_acquired = False
-        self._models = {}
-        self._models_lock = threading.Lock()
+        self._datastore_lock = threading.Lock()
         self._write_was_called = False
         self._delete_was_called = False
 
@@ -84,41 +86,16 @@ class DatastoreioStub(python_utils.OBJECT):
             thread.join()
             self._server_context_is_acquired = False
 
-    def get_everything(self):
-        """Returns all models currently stored in the stub.
-
-        Returns:
-            list(Model). All of the models in the stub.
-        """
-        with self._models_lock:
-            return list(self._models.values())
-
-    def put_multi(self, models):
-        """Puts the input models into the stub.
-
-        Args:
-            models: list(Model). The NDB models to put into the stub.
-        """
-        with self._models_lock:
-            self._models.update({model.key: model for model in models})
-
-    def delete_multi(self, models):
-        """Deletes the models from the stub, if they exist.
-
-        Args:
-            models: list(Model). The models to delete from the stub.
-        """
-        with self._models_lock:
-            for model in models:
-                self._models.pop(model.key, None)
-
-    def ReadFromDatastore(self): # pylint: disable=invalid-name
+    def ReadFromDatastore(self, query): # pylint: disable=invalid-name
         """Returns a PTransform which returns all models from the stub.
 
         NOTE: The name is in UpperCamelCase because that's the same name used by
         the real datastoreio module. Keeping the same name allows us to reduce
         the diffs we'll need to implement when we're ready to use the real
         module in Python 3.
+
+        Args:
+            query: beam_datastore_types.Query. The model query to respect.
 
         Returns:
             PTransform. A PTransform which returns all models in the stub.
@@ -128,9 +105,9 @@ class DatastoreioStub(python_utils.OBJECT):
             raise RuntimeError(
                 'Cannot read from datastore after a mutation has occurred')
 
-        return _ReadFromDatastore(self._server_port)
+        return _ReadFromDatastore(query, self._server_port)
 
-    def WriteToDatastore(self): # pylint: disable=invalid-name
+    def WriteToDatastore(self, unused_project_id): # pylint: disable=invalid-name
         """Returns a PTransform which writes models to the stub.
 
         NOTE: The name is in UpperCamelCase because that's the same name used by
@@ -143,14 +120,11 @@ class DatastoreioStub(python_utils.OBJECT):
             it receives as input into the datastore.
         """
         self._assert_server_context_is_acquired()
-        if self._write_was_called:
-            raise RuntimeError(
-                'At most one WriteToDatastore may be executed in a pipeline')
 
         self._write_was_called = True
         return _WriteToDatastore(self._server_port)
 
-    def DeleteFromDatastore(self): # pylint: disable=invalid-name
+    def DeleteFromDatastore(self, unused_project_id): # pylint: disable=invalid-name
         """Returns a PTransform which deletes models from the stub.
 
         NOTE: The name is in UpperCamelCase because that's the same name used by
@@ -163,12 +137,71 @@ class DatastoreioStub(python_utils.OBJECT):
             it receives as input from the datastore.
         """
         self._assert_server_context_is_acquired()
-        if self._delete_was_called:
-            raise RuntimeError(
-                'At most one DeleteFromDatastore may be executed in a pipeline')
 
         self._delete_was_called = True
         return _DeleteFromDatastore(self._server_port)
+
+    def _read_from_datastore_handler(self, pickled_query):
+        """XML-RPC handler for a ReadFromDatastore request.
+
+        Args:
+            pickled_query: str. The encoded Apache Beam query to respect.
+
+        Returns:
+            str. The list of all models encoded as a pickled list of Apache Beam
+            entities.
+        """
+        with self._datastore_lock:
+            # TODO(#11475): This is very wasteful and inefficient, but good
+            # enough for unit tests and local development. When we move to Cloud
+            # NDB we'll have the genuine datastoreio module, and we'll be able
+            # to delete this code entirely, so it's OK to depend on this
+            # implementation until then.
+            ndb_models = list(datastore_services.query_everything().iter())
+
+        beam_query = pickle.loads(pickled_query)
+        job_utils.apply_query_to_models(beam_query, ndb_models)
+
+        return pickle.dumps([
+            job_utils.get_beam_entity_from_ndb_model(model)
+            for model in ndb_models
+        ])
+
+    def _write_to_datastore_handler(self, pickled_beam_entities):
+        """XML-RPC handler for a WriteToDatastore request.
+
+        IMPORTANT: This operation must be idempotent!
+
+        Args:
+            pickled_beam_entities: str. The list of models to put into the
+                datastore, encoded as a pickled list of Apache Beam entities.
+        """
+        ndb_models_to_put = [
+            job_utils.get_ndb_model_from_beam_entity(model)
+            for model in pickle.loads(pickled_beam_entities)
+        ]
+
+        datastore_services.update_timestamps_multi(
+            # The caller is responsible for updating timestamps, not the stub.
+            ndb_models_to_put, update_last_updated_time=False)
+
+        with self._datastore_lock:
+            datastore_services.put_multi(ndb_models_to_put)
+
+    def _delete_from_datastore_handler(self, pickled_beam_keys):
+        """XML-RPC handler for a DeleteFromDatastore request.
+
+        IMPORTANT: This operation must be idempotent!
+
+        Args:
+            pickled_beam_keys: str. The list of keys to delete from the
+                datastore, encoded as a pickled list of Apache Beam keys.
+        """
+        ndb_keys_to_delete = [
+            job_utils.get_ndb_key_from_beam_key(key)
+            for key in pickle.loads(pickled_beam_keys)
+        ]
+        datastore_services.delete_multi(ndb_keys_to_delete)
 
     def _assert_server_context_is_acquired(self):
         """Asserts that context() is currently acquired.
@@ -178,45 +211,7 @@ class DatastoreioStub(python_utils.OBJECT):
         """
         if not self._server_context_is_acquired:
             raise RuntimeError(
-                'Must acquire context() before using datastore operations')
-
-    def _read_from_datastore_handler(self):
-        """XML-RPC handler for a ReadFromDatastore request.
-
-        Returns:
-            str. The list of all models encoded as a pickled list of Apache Beam
-            entities.
-        """
-        return pickle.dumps([
-            job_utils.get_beam_entity_from_model(m)
-            for m in self.get_everything()
-        ])
-
-    def _write_to_datastore_handler(self, pickled_models):
-        """XML-RPC handler for a WriteToDatastore request.
-
-        IMPORTANT: This operation must be idempotent!
-
-        Args:
-            pickled_models: str. The list of models to put into the datastore,
-                encoded as a pickled list of Apache Beam entities.
-        """
-        self.put_multi(
-            job_utils.get_model_from_beam_entity(m)
-            for m in pickle.loads(pickled_models))
-
-    def _delete_from_datastore_handler(self, pickled_models):
-        """XML-RPC handler for a DeleteFromDatastore request.
-
-        IMPORTANT: This operation must be idempotent!
-
-        Args:
-            pickled_models: str. The list of models to delete from the
-                datastore, encoded as a pickled list of Apache Beam entities.
-        """
-        self.delete_multi(
-            job_utils.get_model_from_beam_entity(m)
-            for m in pickle.loads(pickled_models))
+                'Must enter context() before using datastore operations')
 
 
 class _DatastoreioTransform(beam.PTransform):
@@ -245,22 +240,32 @@ class _DatastoreioTransform(beam.PTransform):
 class _ReadFromDatastore(_DatastoreioTransform):
     """Stub implementation of Apache Beam's ReadFromDatastore PTransform."""
 
-    def expand(self, pcoll):
+    def __init__(self, query, port):
+        """Initializes a new ReadFromDatastore operation.
+
+        Args:
+            query: beam_datastore_types.Query. The model query to respect.
+            port: int. The port number of the XML-RPC server to which datastore
+                operation requests are sent to.
+        """
+        super(_ReadFromDatastore, self).__init__(port)
+        self._query = pickle.dumps(query)
+
+    def expand(self, pbegin):
         """Returns models from storage using the ReadFromDatastore endpoint.
 
         Args:
-            pcoll: PCollection. The source PCollection to attach the fetched
-                models onto.
+            pbegin: PValue. The first PValue of the pipeline to attach to.
 
         Returns:
             PCollection. The PCollection of models.
         """
+        beam_entities = (
+            pickle.loads(self.server_proxy.ReadFromDatastore(self._query)))
+
         return (
-            pcoll
-            | 'Get models from the ReadFromDatastore endpoint' >> beam.Create(
-                pickle.loads(self.server_proxy.ReadFromDatastore()))
-            | 'Convert the Apache Beam entities into NDB models' >> beam.Map(
-                job_utils.get_model_from_beam_entity)
+            pbegin.pipeline
+            | 'Return ReadFromDatastore response' >> beam.Create(beam_entities)
         )
 
 
@@ -279,48 +284,43 @@ class _WriteToDatastore(_DatastoreioTransform):
         """
         return (
             model_pcoll
-            | 'Create Apache Beam entities for put operation' >> beam.Map(
-                job_utils.get_beam_entity_from_model)
             | 'Gather entities to put in a list' >> beam.combiners.ToList()
-            | 'Encode the list of entities to put using pickle' >> beam.Map(
-                pickle.dumps)
+            | 'Encode the list of entities to put using pickle' >> (
+                beam.Map(pickle.dumps))
             | 'Callout to the WriteToDatastore endpoint' >> beam.ParDo(
                 # NOTE: We need to use this lambda because
                 # ServerProxy.WriteToDatastore is not a real function.
                 # server_proxy transforms it into an RPC request using Python
                 # "magic". Apache Beam requires a genuine function, however, so
                 # we pass a lambda to satisfy it.
-                lambda pickled_models: self.server_proxy.WriteToDatastore( # pylint: disable=unnecessary-lambda
-                    pickled_models))
+                lambda pickled_beam_entities: ( # pylint: disable=unnecessary-lambda
+                    self.server_proxy.WriteToDatastore(pickled_beam_entities)))
         )
 
 
 class _DeleteFromDatastore(_DatastoreioTransform):
     """Stub implementation of Apache Beam's DeleteFromDatastore PTransform."""
 
-    def expand(self, model_pcoll):
+    def expand(self, model_key_pcoll):
         """Deletes models from storage using the DeleteFromDatastore endpoint.
 
         Args:
-            model_pcoll: PCollection. The collection of models to delete from
-                storage.
+            model_key_pcoll: PCollection. The keys to delete.
 
         Returns:
             PCollection. An empty PCollection.
         """
         return (
-            model_pcoll
-            | 'Create Apache Beam entities for delete operation' >> beam.Map(
-                job_utils.get_beam_entity_from_model)
-            | 'Gather entities to delete in a list' >> beam.combiners.ToList()
-            | 'Encode the list of entities to delete using pickle' >> beam.Map(
-                pickle.dumps)
+            model_key_pcoll
+            | 'Gather keys to delete in a list' >> beam.combiners.ToList()
+            | 'Encode the list of keys to delete using pickle' >> (
+                beam.Map(pickle.dumps))
             | 'Callout to the DeleteFromDatastore endpoint' >> beam.ParDo(
                 # NOTE: We need to use this lambda because
                 # ServerProxy.DeleteFromDatastore is not a real function.
                 # server_proxy transforms it into an RPC request using Python
                 # "magic". Apache Beam requires a genuine function, however, so
                 # we pass a lambda to satisfy it.
-                lambda pickled_models: self.server_proxy.DeleteFromDatastore( # pylint: disable=unnecessary-lambda
-                    pickled_models))
+                lambda pickled_beam_keys: ( # pylint: disable=unnecessary-lambda
+                    self.server_proxy.DeleteFromDatastore(pickled_beam_keys)))
         )

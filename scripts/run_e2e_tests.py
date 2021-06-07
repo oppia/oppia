@@ -31,8 +31,6 @@ from scripts import install_third_party_libs
 from scripts import servers
 
 MAX_RETRY_COUNT = 3
-RERUN_NON_FLAKY = True
-
 OPPIA_SERVER_PORT = 8181
 GOOGLE_APP_ENGINE_PORT = 9001
 ELASTICSEARCH_SERVER_PORT = 9200
@@ -106,6 +104,58 @@ _PARSER.add_argument(
     '--source_maps',
     help='Build webpack with source maps.',
     action='store_true')
+
+
+# Never rerun failing tests, even when they match a known flake.
+RERUN_POLICY_NEVER = 'never'
+# Only rerun failing tests when they match a known flake.
+RERUN_POLICY_KNOWN_FLAKES = 'known flakes'
+# Always rerun failing tests, even when they don't match a known flake.
+RERUN_POLICY_ALWAYS = 'always'
+
+RERUN_POLICIES = {
+    'accessibility': RERUN_POLICY_KNOWN_FLAKES,
+    'additionaleditorfeatures': RERUN_POLICY_ALWAYS,
+    'additionalplayerfeatures': RERUN_POLICY_ALWAYS,
+    'adminpage': RERUN_POLICY_KNOWN_FLAKES,
+    'classroompage': RERUN_POLICY_NEVER,
+    'classroompagefileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'collections': RERUN_POLICY_NEVER,
+    'contributordashboard': RERUN_POLICY_ALWAYS,
+    'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'creatordashboard': RERUN_POLICY_ALWAYS,
+    'emaildashboard': RERUN_POLICY_ALWAYS,
+    'embedding': RERUN_POLICY_ALWAYS,
+    'explorationfeedbacktab': RERUN_POLICY_NEVER,
+    'explorationhistorytab': RERUN_POLICY_ALWAYS,
+    'explorationimprovementstab': RERUN_POLICY_ALWAYS,
+    'explorationstatisticstab': RERUN_POLICY_KNOWN_FLAKES,
+    'explorationtranslationtab': RERUN_POLICY_ALWAYS,
+    'extensions': RERUN_POLICY_ALWAYS,
+    'featuregating': RERUN_POLICY_ALWAYS,
+    'fileuploadextensions': RERUN_POLICY_NEVER,
+    'fileuploadfeatures': RERUN_POLICY_ALWAYS,
+    'learner': RERUN_POLICY_ALWAYS,
+    'learnerdashboard': RERUN_POLICY_KNOWN_FLAKES,
+    'library': RERUN_POLICY_ALWAYS,
+    'navigation': RERUN_POLICY_NEVER,
+    'playvoiceovers': RERUN_POLICY_ALWAYS,
+    'preferences': RERUN_POLICY_KNOWN_FLAKES,
+    'profilefeatures': RERUN_POLICY_NEVER,
+    'profilemenu': RERUN_POLICY_NEVER,
+    'publication': RERUN_POLICY_KNOWN_FLAKES,
+    'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
+    'subscriptions': RERUN_POLICY_KNOWN_FLAKES,
+    'topicandstoryeditor': RERUN_POLICY_ALWAYS,
+    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
+    'topicandstoryviewer': RERUN_POLICY_ALWAYS,
+    'topicsandskillsdashboard': RERUN_POLICY_ALWAYS,
+    'users': RERUN_POLICY_KNOWN_FLAKES,
+    'wipeout': RERUN_POLICY_ALWAYS,
+    # The suite name is `full` when no --suite argument is passed. This
+    # indicates that all the tests should be run.
+    'full': RERUN_POLICY_NEVER,
+}
 
 
 def is_oppia_server_already_running():
@@ -260,11 +310,11 @@ def run_tests(args):
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
+    policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
         for attempt_num in python_utils.RANGE(1, MAX_RETRY_COUNT + 1):
             python_utils.PRINT('***Attempt %d.***' % attempt_num)
-
             output, return_code = run_tests(parsed_args)
 
             if not flake_checker.check_if_on_ci():
@@ -277,11 +327,12 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
+            # Check whether we should rerun based on this suite's policy.
             test_is_flaky = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
-            if not test_is_flaky and not RERUN_NON_FLAKY:
-                # Don't rerun if the test was non-flaky and we are not rerunning
-                # non-flaky tests.
+            if policy == RERUN_POLICY_NEVER:
+                break
+            if policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
                 break
 
     sys.exit(return_code)

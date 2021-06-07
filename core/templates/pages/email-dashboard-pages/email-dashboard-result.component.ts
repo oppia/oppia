@@ -79,7 +79,7 @@ angular.module('oppia').component('emailDashboardResultPage', {
             $timeout(function() {
               WindowRef.nativeWindow.location.href = EMAIL_DASHBOARD_PAGE;
             }, 4000);
-          })['catch'](function() {
+          }).catch(function() {
             ctrl.errorHasOccurred = true;
             ctrl.submitIsInProgress = false;
           });

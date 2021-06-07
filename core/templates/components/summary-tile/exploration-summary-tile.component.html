@@ -52,11 +52,11 @@
           </span>
         </li>
         <li>
-          <span *ngIf="getLastUpdatedDatetime()">
+          <span *ngIf="lastUpdatedDateTime">
             <span class="oppia-icon-accessibility-label">Last Updated</span>
-            {{ getLastUpdatedDatetime() }}
+            {{ lastUpdatedDateTime }}
           </span>
-          <span *ngIf="!getLastUpdatedDatetime()" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+          <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
           </span>
         </li>
       </ul>
