@@ -32,8 +32,6 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import skill_jobs_one_off
-from core.domain import stats_jobs_continuous
-from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
@@ -76,17 +74,6 @@ ONE_OFF_JOB_MANAGERS = [
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     skill_jobs_one_off.MissingSkillMigrationOneOffJob,
-    stats_jobs_one_off.ExplorationMissingStatsAudit,
-    stats_jobs_one_off.RecomputeStatisticsOneOffJob,
-    stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
-    stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob,
-    stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob,
-    stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob,
-    stats_jobs_one_off.StatisticsAuditV1,
-    stats_jobs_one_off.StatisticsAuditV2,
-    stats_jobs_one_off.StatisticsAudit,
-    stats_jobs_one_off.StatisticsCustomizationArgsAudit,
-    stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
     story_jobs_one_off.DescriptionLengthAuditOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryExplorationsAuditOneOffJob,
@@ -254,7 +241,6 @@ AUDIT_JOB_MANAGERS = [
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
-    stats_jobs_continuous.InteractionAnswerSummariesAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,
 ]

@@ -29,6 +29,7 @@ from core.domain import subscription_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import utils
 
 datastore_services = models.Registry.import_datastore_services()
@@ -152,6 +153,33 @@ def _update_activity_summary(activity_type, activity_rights):
         _update_exploration_summary(activity_rights)
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         _update_collection_summary(activity_rights)
+
+
+def update_activity_first_published_msec(
+        activity_type, activity_id, first_published_msec):
+    """Updates the first_published_msec field for the given activity.
+
+    The caller is responsible for ensuring that this value is not already
+    set before updating it.
+
+    Args:
+        activity_type: str. The type of activity. Possible values:
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
+        activity_id: str. ID of the activity.
+        first_published_msec: float. First publication time in milliseconds
+            since the Epoch.
+    """
+    activity_rights = _get_activity_rights(activity_type, activity_id)
+    commit_cmds = [{
+        'cmd': rights_domain.CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+        'old_first_published_msec': activity_rights.first_published_msec,
+        'new_first_published_msec': first_published_msec
+    }]
+    activity_rights.first_published_msec = first_published_msec
+    _save_activity_rights(
+        feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
+        'set first published time in msec', commit_cmds)
 
 
 def create_new_exploration_rights(exploration_id, committer_id):
@@ -418,7 +446,7 @@ def is_collection_public(collection_id):
     return collection_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC
 
 
-def get_activity_rights(activity_type, activity_id):
+def _get_activity_rights(activity_type, activity_id):
     """Retrieves the rights object for the given activity
     based on its type.
 
@@ -723,7 +751,7 @@ def _assign_role(
         Exception. The role is invalid.
     """
     committer_id = committer.user_id
-    activity_rights = get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_modify_activity_roles(committer, activity_rights):
         logging.error(
@@ -843,7 +871,7 @@ def _deassign_role(committer, removed_user_id, activity_id, activity_type):
         Exception. This user does not have any role for the given activity.
     """
     committer_id = committer.user_id
-    activity_rights = get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_modify_activity_roles(committer, activity_rights):
         logging.error(
@@ -905,7 +933,7 @@ def _release_ownership_of_activity(committer, activity_id, activity_type):
         Exception. The committer does not have release rights.
     """
     committer_id = committer.user_id
-    activity_rights = get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_release_ownership(committer, activity_rights):
         logging.error(
@@ -941,7 +969,7 @@ def _change_activity_status(
         new_status: str. The new status of the activity.
         commit_message: str. The human-written commit message for this change.
     """
-    activity_rights = get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(activity_type, activity_id)
     old_status = activity_rights.status
     activity_rights.status = new_status
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
@@ -981,7 +1009,7 @@ def _publish_activity(committer, activity_id, activity_type):
             activity.
     """
     committer_id = committer.user_id
-    activity_rights = get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_publish_activity(committer, activity_rights):
         logging.error(
@@ -1013,7 +1041,7 @@ def _unpublish_activity(committer, activity_id, activity_type):
             activity.
     """
     committer_id = committer.user_id
-    activity_rights = get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(activity_type, activity_id)
 
     if not check_can_unpublish_activity(committer, activity_rights):
         logging.error(

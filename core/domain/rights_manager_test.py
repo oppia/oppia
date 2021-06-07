@@ -69,11 +69,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.system_user = user_services.get_system_user()
         self.login(self.ADMIN_EMAIL)
 
-    def test_get_activity_rights_with_invalid_activity_raises_error(self):
-        self.assertRaisesRegexp(
-            Exception, 'unknown activity type',
-            lambda: rights_manager.get_activity_rights('bad_type', '123'))
-
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
 
