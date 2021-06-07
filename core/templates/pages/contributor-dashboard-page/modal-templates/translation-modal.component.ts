@@ -228,7 +228,7 @@ export class TranslationModalComponent {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
       // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
-      // img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">
+      // img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
         const attribute = element.attributes[type].value;
