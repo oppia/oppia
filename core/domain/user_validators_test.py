@@ -208,21 +208,23 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
         profile_user_settings_model = user_models.UserSettingsModel.get_by_id(
             profile_user_id)
         self.assertEqual(
-            profile_user_settings_model.role, feconf.ROLE_ID_MOBILE_LEARNER)
+            profile_user_settings_model.roles, [feconf.ROLE_ID_MOBILE_LEARNER])
 
-        profile_user_settings_model.role = feconf.ROLE_ID_MODERATOR
+        profile_user_settings_model.roles = [
+            feconf.ROLE_ID_MOBILE_LEARNER, feconf.ROLE_ID_MODERATOR]
 
         profile_user_settings_model.update_timestamps()
         profile_user_settings_model.put()
 
         expected_output = [
             (
-                u'[u\'failed validation check for profile user role check '
+                u'[u\'failed validation check for profile user roles check '
                 'of UserSettingsModel\', '
-                '[u\'Entity id %s: A profile user should have learner role, '
-                'found %s\']]'
+                '[u\'Entity id %s: A profile user should only have learner '
+                'role, found %s\']]'
             ) % (
-                profile_user_settings_model.id, feconf.ROLE_ID_MODERATOR),
+                profile_user_settings_model.id, [
+                    feconf.ROLE_ID_MOBILE_LEARNER, feconf.ROLE_ID_MODERATOR]),
             u'[u\'fully-validated UserSettingsModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -2220,7 +2222,12 @@ class CollectionProgressModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
     def test_private_collection(self):
-        rights_manager.unpublish_collection(self.owner, 'col')
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        moderator = user_services.get_user_actions_info(moderator_id)
+        rights_manager.unpublish_collection(moderator, 'col')
+
         expected_output = [
             (
                 u'[u\'failed validation check for public collection check '
@@ -3029,8 +3036,6 @@ class PendingDeletionRequestModelValidatorTests(test_utils.AuditJobsTestBase):
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        user_services.add_user_role(
-            self.user_id, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_actions = user_services.get_user_actions_info(self.user_id)
 
         wipeout_service.pre_delete_user(self.user_id)

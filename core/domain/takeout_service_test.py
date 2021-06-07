@@ -155,7 +155,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE,
+            roles=[self.USER_1_ROLE],
             username=self.GENERIC_USERNAME,
             normalized_username=self.GENERIC_USERNAME,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -177,7 +177,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.PROFILE_1_ROLE,
+            roles=[self.PROFILE_1_ROLE],
             username=None,
             normalized_username=None,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -202,12 +202,12 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE
+            roles=[self.USER_1_ROLE]
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.PROFILE_1_ROLE
+            roles=[self.PROFILE_1_ROLE]
         ).put()
 
     def test_export_data_for_profile_user_trivial_raises_error(self):
@@ -547,7 +547,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE,
+            roles=[self.USER_1_ROLE],
             username=self.GENERIC_USERNAME,
             normalized_username=self.GENERIC_USERNAME,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -570,7 +570,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.PROFILE_1_ROLE,
+            roles=[self.PROFILE_1_ROLE],
             username=None,
             normalized_username=None,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -763,12 +763,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE
+            roles=[self.USER_1_ROLE]
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_ID_1,
             email=self.USER_1_EMAIL,
-            role=self.PROFILE_1_ROLE
+            roles=[self.PROFILE_1_ROLE]
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 

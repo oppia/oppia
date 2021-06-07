@@ -141,12 +141,12 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
             email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
             email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         collection_models.CollectionRightsModel(
             id=self.COLLECTION_ID_1,
@@ -560,12 +560,12 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
             email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
             email='some_other@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
         ).put()
 
     def test_get_deletion_policy(self):

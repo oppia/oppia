@@ -855,13 +855,9 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
 
-        topic_services.assign_role(
-            self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
-        topic_services.assign_role(
-            self.admin, self.manager2, topic_domain.ROLE_MANAGER, '1')
-
         self.set_topic_managers(['manager1'], '0')
         self.set_topic_managers(['manager2'], '1')
+
         self.manager1 = user_services.get_user_actions_info(self.manager1_id)
         self.manager2 = user_services.get_user_actions_info(self.manager2_id)
 

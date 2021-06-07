@@ -99,7 +99,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
-        self.assertEqual(self.owner.role, feconf.ROLE_ID_FULL_USER)
+        self.assertEqual(self.owner.roles, [feconf.ROLE_ID_FULL_USER])
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -193,14 +193,14 @@ class UserSettingsTests(test_utils.GenericTestBase):
             self.user_settings.validate()
 
     def test_validate_non_str_role_raises_exception(self):
-        self.user_settings.role = 0
+        self.user_settings.roles = [0]
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected role to be a string'
+            utils.ValidationError, 'Expected roles to be a string'
         ):
             self.user_settings.validate()
 
     def test_validate_invalid_role_name_raises_exception(self):
-        self.user_settings.role = 'invalid_role'
+        self.user_settings.roles = ['invalid_role']
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Role invalid_role does not exist.'):
             self.user_settings.validate()

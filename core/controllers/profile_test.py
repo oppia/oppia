@@ -916,7 +916,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
-            role=user_settings.role,
+            roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
@@ -980,7 +980,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=user_settings.user_id,
             email=user_settings.email,
-            role=user_settings.role,
+            roles=user_settings.roles,
             username=user_settings.username,
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,

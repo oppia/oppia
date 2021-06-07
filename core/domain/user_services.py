@@ -153,7 +153,10 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
             result.append(user_domain.UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
-                roles=[feconf.ROLE_ID_CURRICULUM_ADMIN],
+                roles=[
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_CURRICULUM_ADMIN,
+                    feconf.ROLE_ID_MODERATOR],
                 banned= False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()

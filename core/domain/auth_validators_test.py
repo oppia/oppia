@@ -63,7 +63,7 @@ class AuthValidatorTestBase(test_utils.AuditJobsTestBase):
 
         user_models.UserSettingsModel(
             id=user_id, email=user_email,
-            role=feconf.ROLE_ID_FULL_USER).put()
+            roles=[feconf.ROLE_ID_FULL_USER]).put()
 
         if full_user:
             parent_user_id = None
@@ -71,7 +71,7 @@ class AuthValidatorTestBase(test_utils.AuditJobsTestBase):
             parent_user_id = user_models.UserSettingsModel.get_new_id()
             user_models.UserSettingsModel(
                 id=parent_user_id, email='parent@test.com',
-                role=feconf.ROLE_ID_FULL_USER).put()
+                roles=[feconf.ROLE_ID_FULL_USER]).put()
 
         if auth_provider_id == feconf.GAE_AUTH_PROVIDER_ID:
             auth_models.UserIdentifiersModel(

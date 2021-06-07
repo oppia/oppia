@@ -76,14 +76,14 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
             email=self.USER_2_EMAIL,
-            role=[],
+            roles=[],
             banned=True,
             deleted=True
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
             email=self.USER_3_EMAIL,
-            role=self.USER_3_ROLE,
+            roles=[self.USER_3_ROLE],
             username=self.GENERIC_USERNAME,
             normalized_username=self.GENERIC_USERNAME,
             last_agreed_to_terms=self.GENERIC_DATE,
@@ -183,7 +183,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': 'user@example.com',
-            'role': feconf.ROLE_ID_CURRICULUM_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
@@ -210,7 +210,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': self.USER_3_EMAIL,
-            'role': feconf.ROLE_ID_CURRICULUM_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
             'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
@@ -2363,7 +2363,6 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         user_models.PendingDeletionRequestModel(
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
-            role=self.USER_1_ROLE,
         ).put()
 
     def test_get_deletion_policy(self):

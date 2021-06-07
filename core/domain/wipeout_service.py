@@ -70,7 +70,6 @@ def get_pending_deletion_request(user_id):
     return wipeout_domain.PendingDeletionRequest(
         pending_deletion_request_model.id,
         pending_deletion_request_model.email,
-        pending_deletion_request_model.role,
         pending_deletion_request_model.normalized_long_term_username,
         pending_deletion_request_model.deletion_complete,
         pending_deletion_request_model.pseudonymizable_entity_mappings
@@ -107,7 +106,6 @@ def save_pending_deletion_requests(pending_deletion_requests):
             'email': deletion_request.email,
             'normalized_long_term_username': (
                 deletion_request.normalized_long_term_username),
-            'role': deletion_request.role,
             'deletion_complete': deletion_request.deletion_complete,
             'pseudonymizable_entity_mappings': (
                 deletion_request.pseudonymizable_entity_mappings)
@@ -156,8 +154,7 @@ def pre_delete_user(user_id):
         pending_deletion_requests.append(
             wipeout_domain.PendingDeletionRequest.create_default(
                 profile_id,
-                profile_user_settings.email,
-                profile_user_settings.role
+                profile_user_settings.email
             )
         )
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_settings.roles:
@@ -185,7 +182,6 @@ def pre_delete_user(user_id):
         wipeout_domain.PendingDeletionRequest.create_default(
             user_id,
             user_settings.email,
-            user_settings.role,
             normalized_long_term_username=normalized_long_term_username
         )
     )
@@ -263,14 +259,14 @@ def _delete_models_with_delete_at_end_policy(user_id):
 
 def delete_user(pending_deletion_request):
     """Delete all the models for user specified in pending_deletion_request
-    on the basis of the user role specified in the request.
+    on the basis of the user role.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending deletion
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_role = pending_deletion_request.role
+    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -279,7 +275,7 @@ def delete_user(pending_deletion_request):
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.feedback)
     _delete_models(user_id, models.NAMES.improvements)
-    if user_role != feconf.ROLE_ID_MOBILE_LEARNER:
+    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
         _pseudonymize_app_feedback_report_models(pending_deletion_request)

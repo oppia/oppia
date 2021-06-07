@@ -232,7 +232,7 @@ class UserSettingsModel(base_models.BaseModel):
         user = UserSettingsModel.get(user_id)
         return {
             'email': user.email,
-            'role': user.role,
+            'roles': user.roles,
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms_msec': (
@@ -2492,9 +2492,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     # known on the Oppia site.
     normalized_long_term_username = (
         datastore_services.StringProperty(indexed=True))
-    # Role of the user. Needed to decide which storage models have to be deleted
-    # for it.
-    role = datastore_services.StringProperty(required=True, indexed=True)
+
     # Whether the deletion is completed.
     deletion_complete = (
         datastore_services.BooleanProperty(default=False, indexed=True))

@@ -2539,11 +2539,9 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
 
     def test_get_with_two_deletion_request_returns_two(self):
         user_models.PendingDeletionRequestModel(
-            id='id1', email='id1@email.com', role='role'
-        ).put()
+            id='id1', email='id1@email.com').put()
         user_models.PendingDeletionRequestModel(
-            id='id2', email='id2@email.com', role='role'
-        ).put()
+            id='id2', email='id2@email.com').put()
 
         response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 2)

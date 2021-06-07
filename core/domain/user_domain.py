@@ -198,6 +198,12 @@ class UserSettings(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Roles contains duplicate values: %s' % self.roles)
             for role in self.roles:
+                if not isinstance(role, python_utils.BASESTRING):
+                    raise utils.ValidationError(
+                        'Expected roles to be a string, received %s' %
+                        self.pin
+                    )
+
                 if role not in feconf.ALLOWED_USER_ROLES:
                     raise utils.ValidationError(
                         'Role %s does not exist.' % role)

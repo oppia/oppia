@@ -425,10 +425,10 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
     def setUp(self):
         super(OneOffExplorationFirstPublishedJobTests, self).setUp()
 
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.moderator = user_services.get_user_actions_info(self.moderator_id)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -457,7 +457,7 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
