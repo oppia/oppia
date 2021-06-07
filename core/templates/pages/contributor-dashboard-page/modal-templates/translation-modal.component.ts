@@ -96,9 +96,9 @@ export class TranslationModalComponent {
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
   hasImgCopyError = false;
-  hadCopyParagraphError = false;
+  triedToCopyParagraph = false;
   hasImgTextError = false;
-  hasIncompleteTranslationError = false;
+  incompleteTranslationError = false;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -162,17 +162,17 @@ export class TranslationModalComponent {
   }
 
   onContentClick(event: MouseEvent): boolean | void {
-    if (this.triedToCopyParagraph(event)) {
-      return this.hadCopyParagraphError = true;
+    if (this.userTriedToCopyParagraph(event)) {
+      return this.triedToCopyParagraph = true;
     }
-    this.hadCopyParagraphError = false;
+    this.triedToCopyParagraph = false;
     if (this.isCopyModeActive()) {
       event.stopPropagation();
     }
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
 
-  triedToCopyParagraph($event: MouseEvent): boolean {
+  userTriedToCopyParagraph($event: MouseEvent): boolean {
     // Mathematical equations are also wrapped by <p> elements.
     // Hence, math elements should be allowed to be copied.
     // See issue #11683.
@@ -228,7 +228,7 @@ export class TranslationModalComponent {
       // A sample element would be as <oppia-noninteractive-image alt-with-value
       // ="&amp;quot;Image description&amp;quot;" caption-with-value=
       // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
-      // img_20210129_21055_zbv0mdty94_height_54_width_490.png&amp;quot;">
+      // img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;">
       // </oppia-noninteractive-image>
       if (element.localName === 'oppia-noninteractive-image') {
         const attribute = element.attributes[type].value;
@@ -327,18 +327,19 @@ export class TranslationModalComponent {
     this.hasImgCopyError = translationError.hasUncopiedImgs;
     this.hasImgTextError = translationError.hasDuplicateAltTexts ||
       translationError.hasDuplicateDescriptions;
-    this.hasIncompleteTranslationError = translationError.
+    this.incompleteTranslationError = translationError.
       hasUntranslatedElements;
 
     if (this.hasImgCopyError || this.hasImgTextError ||
-      this.hasIncompleteTranslationError || this.uploadingTranslation ||
+      this.incompleteTranslationError || this.uploadingTranslation ||
       this.loadingData) {
       return;
     }
 
-    if (this.hadCopyParagraphError) {
-      this.hadCopyParagraphError = false;
-    }
+    this.hasImgCopyError = false;
+    this.triedToCopyParagraph = false;
+    this.hasImgTextError = false;
+    this.incompleteTranslationError = false;
 
     if (!this.uploadingTranslation && !this.loadingData) {
       this.siteAnalyticsService
