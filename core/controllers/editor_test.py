@@ -982,6 +982,18 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_get_learner_answer_statistics_for_state(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(exp_id, owner_id)
+
+        response = self.get_json(
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                exp_id, exploration.init_state_name))
+
+        self.assertEqual(response['visualizations_info'], [])
+
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
