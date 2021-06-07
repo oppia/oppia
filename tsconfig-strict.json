@@ -187,8 +187,6 @@
     "core/templates/services/schema-form-submitted.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
-    "core/templates/services/translations-backend-api.service.ts",
-    "core/templates/services/translations-backend-api.service.spec.ts",
     "extensions/classifiers/count-vectorizer.service.ts",
     "extensions/classifiers/count-vectorizer.service.spec.ts",
     "extensions/classifiers/winnowing-preprocessing.service.ts",
