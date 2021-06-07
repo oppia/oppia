@@ -51,13 +51,13 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    '$rootScope', '$timeout', 'CsrfTokenService', 'FocusManagerService',
+    '$rootScope', '$timeout', 'FocusManagerService',
     'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
     'UserService', 'WindowRef', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
-        $rootScope, $timeout, CsrfTokenService, FocusManagerService,
+        $rootScope, $timeout, FocusManagerService,
         LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
         UserService, WindowRef, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
@@ -114,7 +114,6 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewQuestions = false;
         ctrl.defaultHeaderVisible = true;
 
-        CsrfTokenService.initializeToken();
         WindowRef.nativeWindow.addEventListener('scroll', function() {
           ctrl.scrollFunction();
         });
