@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
-from core.domain import auth_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
@@ -41,7 +40,9 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    auth_jobs_one_off.SyncFirebaseAccountsOneOffJob,
+    activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
+    activity_jobs_one_off.SnapshotMetadataCommitMsgAuditOneOffJob,
+    activity_jobs_one_off.SnapshotMetadataCommitMsgShrinkOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
     collection_jobs_one_off.RemoveCollectionModelNodesOneOffJob,
