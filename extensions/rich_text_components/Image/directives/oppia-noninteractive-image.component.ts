@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -58,7 +58,6 @@ export class NoninteractiveImage implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
-    private changeDetectorRef: ChangeDetectorRef,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
@@ -67,15 +66,10 @@ export class NoninteractiveImage implements OnInit {
   ) {}
 
   private _loadBlobImage(url: string): void {
-    const img = new Image();
-    var c = document.createElement('canvas');
-    var ctx = c.getContext('2d');
-    img.onload = (e) => {
-      c.width = (e.target as HTMLImageElement).naturalWidth;
-      c.height = (e.target as HTMLImageElement).naturalHeight;
-      ctx.drawImage((e.target as HTMLImageElement), 0, 0);
-      c.toBlob((imgBlob) => {
+    this.assetsBackendApiService.getBlobDataFromBlobUrl$(url).subscribe(
+      res => {
         const reader = new FileReader();
+        const imgBlob = res;
         reader.readAsDataURL(imgBlob);
         reader.onloadend = () => {
           if (imgBlob.type === 'image/svg+xml') {
@@ -87,11 +81,9 @@ export class NoninteractiveImage implements OnInit {
           } else {
             this.imageUrl = reader.result;
           }
-          this.changeDetectorRef.detectChanges();
         };
-      }, 'image/png');
-    };
-    img.src = url;
+      }
+    );
   }
 
   ngOnInit(): void {

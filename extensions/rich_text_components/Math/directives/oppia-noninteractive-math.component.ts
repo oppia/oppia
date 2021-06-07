@@ -21,6 +21,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -28,6 +29,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 export interface MathExpression {
   'raw_latex': string;
@@ -47,15 +49,37 @@ interface ImageContainerStyle {
 export class NoninteractiveMath implements OnInit {
   @Input() mathContentWithValue: string;
   imageContainerStyle: ImageContainerStyle;
-  imageUrl: string;
+  imageUrl: string | SafeResourceUrl;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imagePreloaderService: ImagePreloaderService
+    private imagePreloaderService: ImagePreloaderService,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
+
+  private _loadBlobImage(url: string): void {
+    this.assetsBackendApiService.getBlobDataFromBlobUrl$(url).subscribe(
+      res => {
+        const reader = new FileReader();
+        const imgBlob = res;
+        reader.readAsDataURL(imgBlob);
+        reader.onloadend = () => {
+          if (imgBlob.type === 'image/svg+xml') {
+            this.imageUrl = (
+              this.svgSanitizerService.getTrustedSvgResourceUrl(
+                reader.result as string
+              )
+            );
+          } else {
+            this.imageUrl = reader.result;
+          }
+        };
+      }
+    );
+  }
 
   ngOnInit(): void {
     const mathExpressionContent = this.htmlEscaperService.escapedJsonToObj(
@@ -84,7 +108,13 @@ export class NoninteractiveMath implements OnInit {
       this.imagePreloaderService.getImageUrlAsync(
         mathExpressionContent.svg_filename
       ).then(
-        objectUrl => this.imageUrl = objectUrl
+        objectUrl => {
+          if (objectUrl.startsWith('blob:')) {
+            this._loadBlobImage(objectUrl);
+          } else {
+            this.imageUrl = objectUrl;
+          }
+        }
       );
     } else {
       // This is the case when user is not in the exploration player. We
@@ -102,13 +132,23 @@ export class NoninteractiveMath implements OnInit {
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
             this.imageLocalStorageService.isInStorage(
               mathExpressionContent.svg_filename))) {
-          this.imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
+          const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
             mathExpressionContent.svg_filename);
+          if (imageUrl.startsWith('blob:')) {
+            this._loadBlobImage(imageUrl);
+          } else {
+            this.imageUrl = imageUrl;
+          }
         } else {
-          this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+          const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
             this.contextService.getEntityType(),
             this.contextService.getEntityId(),
             mathExpressionContent.svg_filename);
+          if (imageUrl.startsWith('blob:')) {
+            this._loadBlobImage(imageUrl);
+          } else {
+            this.imageUrl = imageUrl;
+          }
         }
       } catch (e) {
         const additionalInfo = (
