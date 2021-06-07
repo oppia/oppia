@@ -142,9 +142,9 @@ angular.module('oppia').directive('adminRolesTab', [
             formResponse.category, formResponse.username,
             formResponse.languageCode
           ).then(() => {
-            ctrl.setStatusMessage(
-              'Successfully added "' + formResponse.username + '" as ' +
-              formResponse.category + ' reviewer.');
+            ctrl.setStatusMessage(              
+              'Allowed "' + formResponse.username + '" to ' +
+              formResponse.category.replace('_',' ') + ' suggestions');
             refreshFormData();
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the directive is migrated to angular.
