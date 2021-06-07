@@ -15,11 +15,10 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-import { Pipe, EventEmitter } from '@angular/core';
+import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
 import { LoaderService } from 'services/loader.service';
 import { UrlInterpolationService } from
@@ -31,19 +30,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -77,7 +65,6 @@ describe('Teach Page', () => {
             getResizeEvent: () => of(resizeEvent)
           }
         },
-        { provide: TranslateService, useClass: MockTranslateService },
         {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,
         {
