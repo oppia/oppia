@@ -165,6 +165,7 @@ class PopulateStoriesAndTopicsInIncompleteActivtiesOneOffJob(
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
+        user_id = item.id
         incomplete_exploration_ids = (
             learner_progress_services.get_all_incomplete_exp_ids(user_id))
         completed_exploration_ids = (
@@ -220,6 +221,7 @@ class PopulateStoriesAndTopicsInCompletedActivtiesOneOffJob(
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
+        user_id = item.id
         completed_exploration_ids = (
             learner_progress_services.get_all_completed_exp_ids(user_id))
 
