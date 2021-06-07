@@ -142,8 +142,7 @@ angular.module('oppia').directive('adminRolesTab', [
             formResponse.category, formResponse.username,
             formResponse.languageCode
           ).then(() => {
-            ctrl.setStatusMessage(              
-              'Allowed "' + formResponse.username + '" to ' +
+            ctrl.setStatusMessage('Allowed "' + formResponse.username + '" to ' +
               formResponse.category.replace('_',' ') + ' suggestions');
             refreshFormData();
             // TODO(#8521): Remove the use of $rootScope.$apply()
