@@ -923,9 +923,11 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
     def test_cannot_get_unresolved_answers_with_no_state_name(self):
         self.login(self.OWNER_EMAIL)
 
-        self.get_json(
+        response = self.get_json(
             '/createhandler/get_top_unresolved_answers/%s' % self.exp_id,
-            expected_status_int=404)
+            expected_status_int=200)
+
+        self.assertEqual(response['unresolved_answers'], [])
 
         self.logout()
 
@@ -979,6 +981,18 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
         self.assertRaisesRegexp(Exception, 'Bad response: 503')
 
         self.logout()
+
+    def test_get_learner_answer_statistics_for_state(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        exploration = self.save_new_valid_exploration(exp_id, owner_id)
+
+        response = self.get_json(
+            '/createhandler/state_interaction_stats/%s/%s' % (
+                exp_id, exploration.init_state_name))
+
+        self.assertEqual(response['visualizations_info'], [])
 
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
@@ -2695,7 +2709,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(state_stats['answers'], {'Introduction': []})
+        self.assertEqual(state_stats['answers'], {})
 
     def test_get_returns_assigned_interaction_ids_of_exploration_states(self):
         with self.login_context(self.OWNER_EMAIL) as owner_id:
@@ -2708,9 +2722,7 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(
-            state_stats['interaction_ids'],
-            {'A': 'FractionInput', 'B': 'TextInput', 'End': 'EndExploration'})
+        self.assertEqual(state_stats['interaction_ids'], {})
 
 
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):

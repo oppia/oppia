@@ -2129,47 +2129,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def get_model(
-            cls, exploration_id, exploration_version, state_name,
-            calculation_id):
-        """Gets entity instance corresponding to the given exploration state.
-
-        Args:
-            exploration_id: str. ID of the exploration currently being played.
-            exploration_version: int. Version of exploration.
-            state_name: str. Name of current state.
-            calculation_id: str. ID of the calculation performed.
-
-        Returns:
-            StateAnswersCalcOutputModel. Entity instance associated with the
-            given exploration state.
-        """
-        entity_id = cls._get_entity_id(
-            exploration_id, python_utils.UNICODE(exploration_version),
-            state_name, calculation_id)
-        instance = cls.get(entity_id, strict=False)
-        return instance
-
-    @classmethod
-    def _get_entity_id(
-            cls, exploration_id, exploration_version, state_name,
-            calculation_id):
-        """Returns entity_id corresponding to the given exploration state.
-
-        Args:
-            exploration_id: str. ID of the exploration currently being played.
-            exploration_version: int. Version of exploration.
-            state_name: str. Name of current state.
-            calculation_id: str. ID of the calculation performed.
-
-        Returns:
-            str. The entity ID corresponding to the given exploration state.
-        """
-        return ':'.join([
-            exploration_id, python_utils.UNICODE(exploration_version),
-            state_name, calculation_id])
-
     @staticmethod
     def get_model_association_to_user():
         """Model does not contain user data."""
