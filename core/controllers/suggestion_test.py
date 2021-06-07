@@ -1844,7 +1844,6 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
