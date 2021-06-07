@@ -1,10 +1,11 @@
 <figure>
   <div *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
     <div [style.width]="'100%'" [style.height]="imageContainerStyle.height">
-      <img *ngIf="imageUrl" [src]="imageUrl"
-         alt="{{imageAltText}}"
-         class="center-element-horizontally"
-         [ngStyle]="imageContainerStyle">
+      <img *ngIf="imageUrl"
+           [src]="imageUrl"
+           alt="{{imageAltText}}"
+           class="center-element-horizontally"
+           [ngStyle]="imageContainerStyle">
     </div>
     <figcaption class="text-center">{{imageCaption}}</figcaption>
   </div>
