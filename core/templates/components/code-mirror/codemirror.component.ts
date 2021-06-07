@@ -59,6 +59,8 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
       if (this.codemirrorComponent !== undefined) {
         this.codemirror = this.codemirrorComponent.codeMirror;
         this.onLoad.emit(this.codemirror);
+      } else {
+        throw new Error('CodeMirrorComponent not Found');
       }
     };
     setTimeout(() => runAfterViewInit(), 0);
