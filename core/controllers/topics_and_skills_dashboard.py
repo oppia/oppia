@@ -265,7 +265,11 @@ class NewTopicHandler(base.BaseHandler):
         new_topic_id = topic_fetchers.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(
             new_topic_id, name, url_fragment, description)
+        print()
+        print("default topic object")
+        print(topic)
         topic_services.save_new_topic(self.user_id, topic)
+        print("Saving of new topic is successful")
 
         try:
             file_format = image_validation_services.validate_image_and_filename(

@@ -633,6 +633,7 @@ class Topic(python_utils.OBJECT):
         Returns:
             Topic. The corresponding Topic domain object.
         """
+        print(topic_dict)
         topic = cls(
             topic_dict['id'], topic_dict['name'],
             topic_dict['abbreviated_name'],
@@ -678,6 +679,8 @@ class Topic(python_utils.OBJECT):
             Topic. The corresponding Topic domain object.
         """
         topic_dict = json.loads(json_string.decode('utf-8'))
+        print("Deserialize topic dict value....")
+        print(topic_dict)
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(
@@ -1280,7 +1283,7 @@ class Topic(python_utils.OBJECT):
         """
         self.thumbnail_bg_color = new_thumbnail_bg_color
 
-    def update_thumbnail_size_in_byts(self, new_thumbnail_size_in_bytes):
+    def update_thumbnail_size_in_bytes(self, new_thumbnail_size_in_bytes):
         """Updates the thumbnail size(in bytes) of a topic object.
 
         Args:

@@ -66,6 +66,9 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
             'Topic with URL Fragment \'%s\' already exists'
             % topic.url_fragment)
     create_new_topic_rights(topic.id, committer_id)
+    print("Inside _create_topic....")
+    print(topic.thumbnail_size_in_bytes)
+    print()
     model = topic_models.TopicModel(
         id=topic.id,
         name=topic.name,
@@ -73,6 +76,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         url_fragment=topic.url_fragment,
         thumbnail_bg_color=topic.thumbnail_bg_color,
         thumbnail_filename=topic.thumbnail_filename,
+        thumbnail_size_in_bytes=topic.thumbnail_size_in_bytes,
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
@@ -92,6 +96,9 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         page_title_fragment_for_web=topic.page_title_fragment_for_web
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    print()
+    print("Model ... ")
+    print(model)
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     topic.version += 1
     generate_topic_summary(topic.id)

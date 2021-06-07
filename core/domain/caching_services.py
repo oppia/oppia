@@ -174,10 +174,22 @@ def get_multi(namespace, sub_namespace, obj_ids):
     memcache_keys = [
         _get_memcache_key(namespace, sub_namespace, obj_id)
         for obj_id in obj_ids]
+    print("Memcache keys: ")
+    print(memcache_keys)
+    print()
+    print("object ids: ")
+    print(obj_ids)
+    print()
     values = memory_cache_services.get_multi(memcache_keys)
+    print("Value = \n ")
+    print(values)
     for obj_id, value in python_utils.ZIP(obj_ids, values):
         if value:
+            print("Current value = " + value)
+            print("")
             result_dict[obj_id] = DESERIALIZATION_FUNCTIONS[namespace](value)
+    print("result dict")
+    print(result_dict)
     return result_dict
 
 

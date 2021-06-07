@@ -247,6 +247,7 @@ class TopicModel(base_models.VersionedModel):
             'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_story_references':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
