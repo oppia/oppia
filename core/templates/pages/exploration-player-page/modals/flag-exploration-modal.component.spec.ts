@@ -24,6 +24,7 @@ import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { FlagExplorationModalComponent } from './flag-exploration-modal.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Flag Exploration modal', () => {
   let component: FlagExplorationModalComponent;
@@ -46,7 +47,8 @@ describe('Flag Exploration modal', () => {
         FormsModule
       ],
       declarations: [
-        FlagExplorationModalComponent
+        FlagExplorationModalComponent,
+        MockTranslatePipe
       ],
       providers: [
         NgbActiveModal,
