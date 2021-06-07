@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
+import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed, async, fakeAsync, tick } from
   '@angular/core/testing';
 
@@ -26,22 +26,7 @@ import { UrlInterpolationService } from
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateService } from 'services/translate.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
@@ -118,10 +103,6 @@ describe('Playbook Page', () => {
         {
           provide: SiteAnalyticsService,
           useClass: MockSiteAnalyticsService
-        },
-        {
-          provide: TranslateService,
-          useClass: MockTranslateService
         },
         UrlInterpolationService,
         {

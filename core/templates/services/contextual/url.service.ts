@@ -26,7 +26,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 // This makes the UrlParamsType like a dict whose keys and values both are
 // string.
-interface UrlParamsType {
+export interface UrlParamsType {
   [param: string]: string
 }
 

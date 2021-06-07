@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Compoenent for the Create Exploration/Collection modal.
+ * @fileoverview Component for the Create Exploration/Collection modal.
  */
 
 import { Component, OnInit } from '@angular/core';
