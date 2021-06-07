@@ -78,10 +78,10 @@ import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-e
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
+import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 
 
 // Directives.
-import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 
 
@@ -145,13 +145,13 @@ const toastrConfig = {
     SharedFormsModule,
     SharedPipesModule,
     /**
-    * The Translate Module will look for translations in the following order:
-    * 1. Look for translation in primary language (fetched from backend)
-    * 2. Look for translation in default language (fetched from backend)
-    * 3. Look for translation present in AppConstants.ts (
-    *    used until translations after fetched from backend)
-    * 4. shows the key, if the translation is not found.
-    */
+     * The Translate Module will look for translations in the following order:
+     * 1. Look for translation in primary language (fetched from backend)
+     * 2. Look for translation in default language (fetched from backend)
+     * 3. Look for translation present in AppConstants.ts (
+     *    used until translations after fetched from backend)
+     * 4. shows the key, if the translation is not found.
+     */
     TranslateModule.forRoot({
       defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
       missingTranslationHandler: {
@@ -272,6 +272,7 @@ const toastrConfig = {
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
+    StorySummaryTileComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
