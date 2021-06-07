@@ -41,7 +41,6 @@ import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.c
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
-import { AudioBarComponent } from './layout-directives/audio-bar.component';
 import { MaterialModule } from 'components/material.module';
 import { DisplayHintModalComponent } from './modals/display-hint-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from './modals/display-solution-interstitial-modal.component';
@@ -63,7 +62,6 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    AudioBarComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
@@ -79,7 +77,6 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    AudioBarComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,

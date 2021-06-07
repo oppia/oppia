@@ -97,6 +97,7 @@ import { RichTextComponentsModule } from 'rich_text_components/rich-text-compone
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 
 const toastrConfig = {
   allowHtml: false,
@@ -142,6 +143,7 @@ const toastrConfig = {
   ],
 
   declarations: [
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     AttributionGuideComponent,
@@ -194,6 +196,7 @@ const toastrConfig = {
   ],
 
   entryComponents: [
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
@@ -250,6 +253,7 @@ const toastrConfig = {
     SharedPipesModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
