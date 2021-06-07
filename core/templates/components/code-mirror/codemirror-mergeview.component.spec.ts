@@ -49,7 +49,7 @@ describe('Oppia CodeMirror Component', () => {
   });
 
   it('should call merge view', () => {
-    let codeMirrorInstance = component.getCodeMirrorInstance;
+    let codeMirrorInstance = component.codeMirrorInstance;
     expect(codeMirrorInstance).toBe(undefined);
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
@@ -68,15 +68,18 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    spyOnProperty(
-      component, 'getCodeMirrorInstance', 'get').and.returnValue({
-      editor: () => {
-        return { setValue: editSetValueSpy };
-      },
-      rightOriginal: () => {
-        return { setValue: rightOrgSetValueSpy };
-      }
-    });
+    spyOn(window.CodeMirror, 'MergeView').and.callFake(
+      (element: HTMLElement) => {
+        return <CodeMirror.MergeView.MergeViewEditor><unknown>{
+          editor: () => {
+            return { setValue: editSetValueSpy };
+          },
+          rightOriginal: () => {
+            return { setValue: rightOrgSetValueSpy };
+          }
+        };
+      });
+    component.ngAfterViewInit();
     let changes: SimpleChanges = {
       leftValue: {
         currentValue: undefined,
@@ -106,15 +109,16 @@ describe('Oppia CodeMirror Component', () => {
   it('should allow for a value of left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    spyOnProperty(
-      component, 'getCodeMirrorInstance', 'get').and.returnValue({
-      editor: () => {
-        return { setValue: editSetValueSpy };
-      },
-      rightOriginal: () => {
-        return { setValue: rightOrgSetValueSpy };
-      }
-    });
+    spyOn(window.CodeMirror, 'MergeView').and.callFake(
+      (element: HTMLElement) => <CodeMirror.MergeView.MergeViewEditor><unknown>{
+        editor: () => {
+          return { setValue: editSetValueSpy };
+        },
+        rightOriginal: () => {
+          return { setValue: rightOrgSetValueSpy };
+        }
+      });
+    component.ngAfterViewInit();
     const changes: SimpleChanges = {
       leftValue: {
         currentValue: 'A',

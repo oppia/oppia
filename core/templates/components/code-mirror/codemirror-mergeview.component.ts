@@ -36,10 +36,6 @@ export class CodemirrorMergeviewComponent implements
   // to cater this we are checking it be to not undefined.
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
 
-  get getCodeMirrorInstance(): CodeMirror.MergeView.MergeViewEditor {
-    return this.codeMirrorInstance;
-  }
-
   constructor(
     private elementRef: ElementRef,
     private ngZone: NgZone,
@@ -48,7 +44,8 @@ export class CodemirrorMergeviewComponent implements
   ngOnInit(): void {
     // Require CodeMirror.
     if (
-      (this.windowRef.nativeWindow as typeof window).CodeMirror === undefined) {
+      (this.windowRef.nativeWindow as typeof window).CodeMirror === undefined
+    ) {
       throw new Error('CodeMirror not found.');
     }
   }
@@ -73,12 +70,13 @@ export class CodemirrorMergeviewComponent implements
     if (changes.leftValue &&
       changes.leftValue.currentValue !==
       changes.leftValue.previousValue &&
-      this.getCodeMirrorInstance) {
+      this.codeMirrorInstance
+    ) {
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.getCodeMirrorInstance.editor().setValue(
+        this.codeMirrorInstance.editor().setValue(
           changes.leftValue.currentValue);
       });
     }
@@ -86,12 +84,13 @@ export class CodemirrorMergeviewComponent implements
     if (changes.rightValue &&
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue &&
-      this.getCodeMirrorInstance) {
-      if (this.rightValue === undefined) {
+      this.codeMirrorInstance) {
+      if (this.rightValue === undefined
+      ) {
         throw new Error('Right pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.getCodeMirrorInstance.rightOriginal().setValue(
+        this.codeMirrorInstance.rightOriginal().setValue(
           changes.rightValue.currentValue);
       });
     }
