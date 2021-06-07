@@ -1511,15 +1511,6 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
         self.interaction_id = interaction_id
         self.calculation_output = calculation_output
 
-    def save(self):
-        """Validate the domain object and commit it to storage."""
-        self.validate()
-        stats_models.StateAnswersCalcOutputModel.create_or_update(
-            self.exploration_id, self.exploration_version, self.state_name,
-            self.interaction_id, self.calculation_id,
-            self.calculation_output.calculation_output_type,
-            self.calculation_output.to_raw_type())
-
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before
         it is commited to storage.

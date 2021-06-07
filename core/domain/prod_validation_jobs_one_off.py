@@ -60,16 +60,6 @@ class ProdValidationAuditOneOffJobMetaClass(type):
         return super(ProdValidationAuditOneOffJobMetaClass, mcs).__new__(
             mcs, name, bases, dct)
 
-    @classmethod
-    def get_model_audit_job_names(mcs):
-        """Returns list of job names that have inherited from
-        ProdValidationAuditOneOffJob.
-
-        Returns:
-            tuple(str). The names of the one off audit jobs of this class type.
-        """
-        return sorted(mcs._MODEL_AUDIT_ONE_OFF_JOB_NAMES)
-
 
 class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
         python_utils.with_metaclass(

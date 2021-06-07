@@ -156,13 +156,6 @@ class BaseInteraction(python_utils.OBJECT):
         return result
 
     @property
-    def answer_calculation_ids(self):
-        """A set of answer calculation ids."""
-        visualizations = self.answer_visualizations
-        return set(
-            [visualization.calculation_id for visualization in visualizations])
-
-    @property
     def dependency_ids(self):
         """A copy of dependency ids of the interaction."""
         return copy.deepcopy(self._dependency_ids)
