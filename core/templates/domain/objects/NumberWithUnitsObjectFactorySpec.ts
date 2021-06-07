@@ -92,6 +92,9 @@ describe('NumberWithUnitsObjectFactory', () => {
       expect(new NumberWithUnits('real', 2.02, new Fraction(
         false, 0, 0, 1), uof.fromRawInputString(
         'Rs')).toString()).toBe('Rs 2.02');
+      expect(new NumberWithUnits('real', 2.02, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
+        '₹')).toString()).toBe('₹ 2.02');
       expect(new NumberWithUnits('real', 2, new Fraction(
         false, 0, 0, 1), uof.fromRawInputString('')).toString()).toBe('2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(
@@ -103,6 +106,9 @@ describe('NumberWithUnitsObjectFactory', () => {
       expect(new NumberWithUnits('real', 40, new Fraction(
         false, 0, 0, 1), uof.fromRawInputString(
         'Rs per hour')).toString()).toBe('Rs 40 hour^-1');
+      expect(new NumberWithUnits('real', 40, new Fraction(
+        false, 0, 0, 1), uof.fromRawInputString(
+        '₹ per hour')).toString()).toBe('₹ 40 hour^-1');
     });
 
     it('should parse valid units strings', () => {
@@ -131,6 +137,9 @@ describe('NumberWithUnitsObjectFactory', () => {
       expect(nwuof.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
         new NumberWithUnits('fraction', 0, new Fraction(
           false, 0, 2, 3), uof.fromRawInputString('Rs / hour')));
+      expect(nwuof.fromRawInputString('₹ 2 / 3 per hour')).toEqual(
+        new NumberWithUnits('fraction', 0, new Fraction(
+          false, 0, 2, 3), uof.fromRawInputString('₹ / hour')));
     });
 
     it('should throw errors for invalid number with units', () => {
@@ -143,6 +152,12 @@ describe('NumberWithUnitsObjectFactory', () => {
       expect(() => {
         nwuof.fromRawInputString('Rs 3^');
       }).toThrowError(errors.INVALID_VALUE);
+      expect(() => {
+        nwuof.fromRawInputString('₹ 3^');
+      }).toThrowError(errors.INVALID_VALUE);
+      expect(() => {
+        nwuof.fromRawInputString('₹ - $25');
+      }).toThrowError(errors.INVALID_CURRENCY );
       expect(() => {
         nwuof.fromRawInputString('3# m/s');
       }).toThrowError(errors.INVALID_VALUE);
@@ -175,6 +190,74 @@ describe('NumberWithUnitsObjectFactory', () => {
       }).toThrowError(
         'SyntaxError: In "kg / m^(2)", "^" must be ' +
         'followed by a floating-point number');
+    });
+
+    it('should create currency units', () => {
+      const createCurrencyUnitsSpy = spyOn(nwuof.unitsFactory, 'createCurrencyUnits');
+      nwuof.createCurrencyUnits();
+      expect(createCurrencyUnitsSpy).toHaveBeenCalled();
+    });
+
+    it('should create NumberWithUnits object from dict', () => {
+      let numberWithUnitsObject = {
+        type: 'dummy-type',
+        real: 1,
+        fraction: {
+          isNegative: false,
+          wholeNumber: 2,
+          numerator: 1,
+          denominator: 3
+        },
+        units: [
+          {
+            unit: 'Kg',
+            exponent: 2
+          }
+        ]
+      };
+
+      let createdNumberWithUnits = nwuof.fromDict(numberWithUnitsObject);
+      expect(createdNumberWithUnits.toDict()).toEqual(numberWithUnitsObject);
+    });
+
+    it('should convert list to math.js compatible string', () => {
+      let numberWithUnitsObjectWithRealType = new NumberWithUnits(
+        'real',
+        1,
+        new Fraction(
+          false,
+          2,
+          1,
+          3
+        ),
+        new Units([
+          {
+            unit: 'Kg',
+            exponent: 2
+          }
+        ])
+      );
+      expect(numberWithUnitsObjectWithRealType.toMathjsCompatibleString())
+        .toBe('1 Kg^2');
+
+      let numberWithUnitsObjectWithFractionType = new NumberWithUnits(
+        'fraction',
+        1,
+        new Fraction(
+          false,
+          2,
+          1,
+          3
+        ),
+        new Units([
+          {
+            unit: 'Kg',
+            exponent: 2
+          }
+        ])
+      );
+      expect(numberWithUnitsObjectWithFractionType.toMathjsCompatibleString())
+        .toBe('2 1/3 Kg^2');
     });
   });
 });
