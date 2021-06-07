@@ -227,12 +227,12 @@ describe('Topic editor state service', () => {
     }));
 
   it('should load subtopic page', fakeAsync(() => {
-    topicEditorStateService.loadSubtopicPage(1, 2);
+    topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
       SubtopicPage.createFromBackendDict(subtopicPage));
     expect(topicEditorStateService.getCachedSubtopicPages()).toHaveSize(1);
-    topicEditorStateService.loadSubtopicPage(1, 2);
+    topicEditorStateService.loadSubtopicPage('1', 2);
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
       SubtopicPage.createFromBackendDict(subtopicPage));
   }));
@@ -241,7 +241,7 @@ describe('Topic editor state service', () => {
     spyOn(mockEditableTopicBackendApiService, 'fetchSubtopicPageAsync')
       .and.returnValue(Promise.reject());
     spyOn(alertsService, 'addWarning');
-    topicEditorStateService.loadSubtopicPage(1, 2);
+    topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'There was an error when loading the topic.');
@@ -253,7 +253,7 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.getSubtopicPage()).toEqual(
       SubtopicPage.createFromBackendDict(subtopicPage));
 
-    topicEditorStateService.loadSubtopicPage(1, 2);
+    topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
     topicEditorStateService.setSubtopicPage(
       SubtopicPage.createFromBackendDict(subtopicPage));
@@ -268,9 +268,9 @@ describe('Topic editor state service', () => {
   });
 
   it('should delete subtopic page', fakeAsync(() => {
-    topicEditorStateService.loadSubtopicPage(1, 2);
+    topicEditorStateService.loadSubtopicPage('1', 2);
     tick();
-    topicEditorStateService.deleteSubtopicPage(1, 2);
+    topicEditorStateService.deleteSubtopicPage('1', 2);
   }));
 
   it('should test getters', () => {

@@ -86,7 +86,7 @@ export class TopicEditorStateService {
     this._subtopicPage = SubtopicPage.createInterstitialSubtopicPage();
   }
 
-  private _getSubtopicPageId(topicId: number, subtopicId: number): string {
+  private _getSubtopicPageId(topicId: string, subtopicId: number): string {
     if (topicId !== null && subtopicId !== null) {
       return topicId.toString() + '-' + subtopicId.toString();
     }
@@ -283,7 +283,7 @@ export class TopicEditorStateService {
    * Loads, or reloads, the subtopic page stored by this service given a
    * specified topic ID and subtopic ID.
    */
-  loadSubtopicPage(topicId: number, subtopicId: number): void {
+  loadSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
       this._subtopicPage = cloneDeep(
@@ -400,7 +400,7 @@ export class TopicEditorStateService {
     }
   }
 
-  deleteSubtopicPage(topicId: number, subtopicId: number): void {
+  deleteSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let index = this._getSubtopicPageIndex(subtopicPageId);
     let newIndex = this._newSubtopicPageIds.indexOf(subtopicPageId);
