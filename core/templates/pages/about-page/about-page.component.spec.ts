@@ -17,29 +17,14 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { Pipe } from '@angular/core';
 
 import { AboutPageComponent } from './about-page.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateService } from 'services/translate.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
 
 describe('About Page', () => {
   const siteAnalyticsService = new SiteAnalyticsService(
@@ -49,7 +34,6 @@ describe('About Page', () => {
       declarations: [AboutPageComponent,
         MockTranslatePipe],
       providers: [
-        { provide: TranslateService, useClass: MockTranslateService },
         { provide: SiteAnalyticsService, useValue: siteAnalyticsService },
         UrlInterpolationService,
         {
