@@ -91,8 +91,7 @@
         </li>
         <li [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY"
             class="nav-item oppia-clickable-navbar-element">
-          <a (mouseover)="blurNavigationLinks($event)"
-             class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
+          <a class="nav-link oppia-navbar-tab oppia-navbar-tab-content"
              href="/community-library"
              [innerHTML]="'I18N_TOPNAV_LIBRARY' | translate">
           </a>
@@ -190,8 +189,7 @@
           </ul>
         </li>
         <li *ngIf="!inClassroomPage">
-          <oppia-create-activity-button (mouseover)="blurNavigationLinks($event)"
-                                        [hidden]="!navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE">
+          <oppia-create-activity-button [hidden]="!navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE">
           </oppia-create-activity-button>
         </li>
       </ul>

@@ -258,14 +258,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.navigationService.openSubmenu(evt, menuName);
   }
 
-  blurNavigationLinks(evt: Event): void {
-    // This is required because if about submenu is in open state
-    // and when you hover on library, both will be highlighted,
-    // To avoid that, blur all the a's in nav, so that only one
-    // will be highlighted.
-    $('nav a').blur();
-  }
-
   closeSubmenu(evt: KeyboardEvent): void {
     this.navigationService.closeSubmenu(evt);
   }
