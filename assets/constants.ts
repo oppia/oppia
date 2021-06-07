@@ -5313,7 +5313,7 @@ export default {
       // eslint-disable-next-line max-len
       "In Spanish, the nouns are usually gendered. Make sure to use the correct article gender for the noun gender (el gato, la casa , las mujeres, los hombres etc.) El is usually used for masculine singular and la is usually for feminine singular. Los for masculine plural and las for feminine plural.",
       // eslint-disable-next-line max-len
-      "Try to make sure that the accents are placed correctly as it can make a big difference in meaning for the reader.",
+      "Try to make sure that the accents are placed correctly as it can make a big difference in meaning for the reader (tu = your vs. tú = informal you, si = if vs. sí = yes).",
       // eslint-disable-next-line max-len
       "Preserve punctuation and bolding. If the original content has bold text, make sure it is bold in Spanish as well. If there are bullet points, double quotes, etc., make sure that the translated content also has bullet points and double quotes."
     ],
