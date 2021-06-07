@@ -84,9 +84,9 @@ export class CodemirrorMergeviewComponent implements
     if (changes.rightValue &&
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue &&
-      this.codeMirrorInstance) {
-      if (this.rightValue === undefined
-      ) {
+      this.codeMirrorInstance
+    ) {
+      if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
