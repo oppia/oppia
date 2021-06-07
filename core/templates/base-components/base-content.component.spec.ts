@@ -23,7 +23,6 @@ import { PromoBarComponent } from 'components/common-layout-directives/common-el
 import { SideNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
 import { TopNavigationBarDirective } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { Observable, of } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
@@ -34,6 +33,7 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
 import { LoadingMessageComponent } from './loading-message.component';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
@@ -96,7 +96,7 @@ describe('Base Content Component', () => {
         PromoBarComponent,
         TopNavigationBarDirective,
         SideNavigationBarComponent,
-        TranslatePipe,
+        MockTranslatePipe,
         AlertMessageComponent,
         LimitToPipe
       ],
