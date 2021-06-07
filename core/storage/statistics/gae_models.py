@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import json
-import logging
 import sys
 
 from core.platform import models
