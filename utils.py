@@ -1123,6 +1123,8 @@ def partition(iterable, predicate=bool, enumerated=False):
         new_iterable = enumerate(iterable)
         old_predicate = predicate
         predicate = lambda pair: old_predicate(pair[1])
+    else:
+        new_iterable = iterable
     # Creates two distinct generators over the same iterable. Memory-efficient.
     true_part, false_part = itertools.tee((i, predicate(i)) for i in new_iterable)
     return (
