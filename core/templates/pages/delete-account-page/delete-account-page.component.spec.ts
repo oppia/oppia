@@ -16,72 +16,61 @@
  * @fileoverview Unit tests for delete account page.
  */
 
-import { fakeAsync, tick } from '@angular/core/testing';
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { DeleteAccountPageComponent } from './delete-account-page.component';
+import { DeleteAccountBackendApiService } from './services/delete-account-backend-api.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Delete account page', function() {
-  var $scope = null;
-  var ctrl = null;
-  var $uibModal = null;
-  var $uibModalInstance;
-  var $q = null;
-  var $httpBackend = null;
-  var windowMock = {
-    location: ''
-  };
+describe('Delete account page', () => {
+  let component: DeleteAccountPageComponent;
+  let fixture: ComponentFixture<DeleteAccountPageComponent>;
+  let deleteAccountService: DeleteAccountBackendApiService;
+  let ngbModal: NgbModal;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$window', windowMock);
-  }));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $uibModal = $injector.get('$uibModal');
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-    $q = $injector.get('$q');
-    $httpBackend = $injector.get('$httpBackend');
-
-    ctrl = $componentController('deleteAccountPage', {
-      $scope: $scope,
-      $uibModalInstance
-    });
-  }));
-
-  afterEach(function() {
-    windowMock.location = '';
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [DeleteAccountPageComponent, MockTranslatePipe],
+      providers: [
+        DeleteAccountBackendApiService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
-  it('should delete account when closing the modal', fakeAsync(() => {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+  beforeEach(() => {
+    fixture = TestBed.createComponent(DeleteAccountPageComponent);
+    component = fixture.componentInstance;
+    ngbModal = TestBed.inject(NgbModal);
+    deleteAccountService = TestBed.inject(DeleteAccountBackendApiService);
+    spyOn(deleteAccountService, 'deleteAccount').and.callThrough();
+  });
+
+  it('should open a delete account modal',
+    fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        setTimeout(opt.beforeDismiss);
+        return <NgbModalRef>({
+          result: Promise.resolve('success')
+        });
+      });
+      component.deleteAccount();
+      expect(modalSpy).toHaveBeenCalled();
+    }));
+
+  it('should do nothing when cancel button is clicked', () => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      setTimeout(opt.beforeDismiss);
+      return <NgbModalRef>({
+        result: Promise.reject('cancel')
+      });
     });
 
-    $httpBackend.expectDELETE('/delete-account-handler').respond(null);
-    ctrl.deleteAccount();
-    $httpBackend.flush();
-    tick(200);
+    component.deleteAccount();
 
-    expect(windowMock.location).toMatch('pending-account-deletion');
-  }));
-
-  it('should not delete account when dismissing the modal', function() {
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.reject()
-    });
-
-    ctrl.deleteAccount();
-    expect(windowMock.location).toBe('');
+    expect(modalSpy).toHaveBeenCalled();
   });
 });

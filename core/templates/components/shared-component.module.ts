@@ -19,60 +19,65 @@ import 'core-js/es7/reflect';
 import 'zone.js';
 
 // Modules.
-import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { AngularFireModule } from '@angular/fire';
-import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { MaterialModule } from './material.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { FormsModule } from '@angular/forms';
-import { MaterialModule } from './material.module';
-import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { NgModule } from '@angular/core';
-import { ObjectComponentsModule } from 'objects/object-components.module';
-import { SharedFormsModule } from './forms/shared-forms.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { ToastrModule } from 'ngx-toastr';
+import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
+import { SharedFormsModule } from './forms/shared-forms.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
+import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 
 // Components.
-import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
-import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
-import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
-import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
-import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
-import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
-import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
-import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
-import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
+import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
+import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
 import { LazyLoadingComponent } from './common-layout-directives/common-elements/lazy-loading.component';
-import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
-import { LoadingDotsComponent } from './common-layout-directives/common-elements/loading-dots.component';
-import { LoadingMessageComponent } from '../base-components/loading-message.component';
-import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
-import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
 import { StateSkillEditorComponent } from 'components/state-editor/state-skill-editor/state-skill-editor.component';
 import { SelectSkillModalComponent } from './skill-selector/select-skill-modal.component';
+import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
+import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
+import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
 import { ProfileLinkImageComponent } from 'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
-import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
-import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
-import { SharingLinksComponent } from './common-layout-directives/common-elements/sharing-links.component';
-import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
-import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
-import { SkillSelectorComponent } from './skill-selector/skill-selector.component';
-import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
-import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
-import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
-import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { AudioFileUploaderComponent } from './forms/custom-forms-directives/audio-file-uploader.component';
 import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { SkillMasteryViewerComponent } from './skill-mastery/skill-mastery.component';
+import { ExplorationSummaryTileComponent } from './summary-tile/exploration-summary-tile.component';
+import { CollectionSummaryTileComponent } from './summary-tile/collection-summary-tile.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
-import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
+import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
+import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
+import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
+import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
+import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
+import { SideNavigationBarComponent } from './common-layout-directives/navigation-bars/side-navigation-bar.component';
+import { AlertMessageComponent } from './common-layout-directives/common-elements/alert-message.component';
 import { WarningsAndAlertsComponent } from '../base-components/warnings-and-alerts.component';
+import { LoadingMessageComponent } from '../base-components/loading-message.component';
+import { CreateActivityButtonComponent } from './button-directives/create-activity-button.component';
+import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
+import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
+import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
+import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 
 
 // Directives.
@@ -81,31 +86,29 @@ import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-ti
 
 
 // Pipes.
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import { LimitToPipe } from 'filters/limit-to.pipe';
-import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
-import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
-import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/truncate-and-capitalize.pipe';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { TruncateAndCapitalizePipe } from 'filters/string-utility-filters/truncate-and-capitalize.pipe';
+import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-number.pipe';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { LimitToPipe } from 'filters/limit-to.pipe';
 
 
 // Services.
 import { AuthService } from 'services/auth.service';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { HttpClient } from '@angular/common/http';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-// TODO(#11462): Delete these conditional values once firebase auth is launched.
-const firebaseAuthModules = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireModule.initializeApp(AuthService.firebaseConfig),
-  AngularFireAuthModule,
-] : [];
 
-const firebaseAuthProviders = AuthService.firebaseAuthIsEnabled ? [
-  AngularFireAuth,
-  {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
-] : [
-  {provide: AngularFireAuth, useValue: null},
-];
+// Miscellaneous.
+import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
+import { TranslateCacheFactory } from 'pages/translate-cache.factory';
+import { TranslateCustomParser } from 'pages/translate-custom-parser';
+import { MissingTranslationCustomHandler } from 'pages/missing-translation-custom-handler';
+import constants from 'assets/constants';
 
 const toastrConfig = {
   allowHtml: false,
@@ -126,22 +129,64 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CommonElementsModule,
     CodeMirrorModule,
     MaterialModule,
     DirectivesModule,
     DynamicContentModule,
     NgbTooltipModule,
+    NgbNavModule,
     NgbModalModule,
+    NgbPopoverModule,
     FormsModule,
+    RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
-    ...firebaseAuthModules,
+    /**
+    * The Translate Module will look for translations in the following order:
+    * 1. Look for translation in primary language (fetched from backend)
+    * 2. Look for translation in default language (fetched from backend)
+    * 3. Look for translation present in AppConstants.ts (
+    *    used until translations after fetched from backend)
+    * 4. shows the key, if the translation is not found.
+    */
+    TranslateModule.forRoot({
+      defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslationCustomHandler
+      },
+      loader: {
+        provide: TranslateLoader,
+        useFactory: TranslateLoaderFactory.createHttpLoader,
+        deps: [HttpClient],
+      },
+      parser: {
+        provide: TranslateParser,
+        useClass: TranslateCustomParser,
+        deps: [TranslateDefaultParser, I18nLanguageCodeService]
+      }
+    }),
+    TranslateCacheModule.forRoot({
+      cacheService: {
+        provide: TranslateCacheService,
+        useFactory: TranslateCacheFactory.createTranslateCacheService,
+        deps: [TranslateService, TranslateCacheSettings]
+      },
+      cacheName: 'NG_TRANSLATE_LANG_KEY',
+      cacheMechanism: 'Cookie',
+      cookieExpiry: 30
+    }),
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
   ],
 
   providers: [
-    ...firebaseAuthProviders,
+    TranslateDefaultParser,
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
   ],
 
   declarations: [
@@ -158,13 +203,15 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
+    InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LimitToPipe,
     LoadingMessageComponent,
-    LoadingDotsComponent,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     PromoBarComponent,
@@ -189,108 +236,112 @@ const toastrConfig = {
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
     UploadActivityModalComponent,
+    PromoBarComponent,
     SortByPipe,
     LearnerDashboardIconsComponent
   ],
 
   entryComponents: [
-    AlertMessageComponent,
-    AttributionGuideComponent,
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     BackgroundBannerComponent,
-    CollectionSummaryTileComponent,
-    ContinueButtonComponent,
     CorrectnessFooterComponent,
+    ContinueButtonComponent,
+    CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
-    CreateNewSkillModalComponent,
     ExplorationSummaryTileComponent,
-    LazyLoadingComponent,
-    LoadingDotsComponent,
-    LoadingMessageComponent,
-    OnScreenKeyboardComponent,
-    ProfileLinkImageComponent,
-    ProfileLinkTextComponent,
+    CollectionSummaryTileComponent,
     SharingLinksComponent,
-    SkillMasteryViewerComponent,
+    SkillMasteryViewerComponent, AttributionGuideComponent,
+    LazyLoadingComponent, LoadingMessageComponent,
     SocialButtonsComponent,
+    OnScreenKeyboardComponent,
+    ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
-    KeyboardShortcutHelpModalComponent,
-    LearnerDashboardIconsComponent,
     OutcomeFeedbackEditorComponent,
+    InputResponsePairComponent,
+    KeyboardShortcutHelpModalComponent,
+    I18nLanguageSelectorComponent,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
-    SkillSelectorComponent,
-    StorySummaryTileComponent,
     SummaryListHeaderComponent,
-    TakeBreakModalComponent,
-    ThreadTableComponent,
     ThumbnailDisplayComponent,
-    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     UploadActivityModalComponent,
+    ThreadTableComponent,
+    TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
     WarningsAndAlertsComponent,
+    LearnerDashboardIconsComponent
   ],
 
   exports: [
     // Modules.
+    CommonElementsModule,
     CodeMirrorModule,
     DynamicContentModule,
     DirectivesModule,
     FormsModule,
     MaterialModule,
     NgbTooltipModule,
+    NgbNavModule,
+    RichTextComponentsModule,
     NgbModalModule,
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    TranslateModule,
     // Components, directives, and pipes.
-    AlertMessageComponent,
     AttributionGuideComponent,
     AudioFileUploaderComponent,
+    AlertMessageComponent,
     BackgroundBannerComponent,
-    CollectionSummaryTileComponent,
-    ContinueButtonComponent,
     CorrectnessFooterComponent,
+    ContinueButtonComponent,
+    CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
-    CreateNewSkillModalComponent,
     ExplorationSummaryTileComponent,
-    FilterForMatchingSubstringPipe,
-    FilterForMatchingSubstringPipe,
+    CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
+    InputResponsePairComponent,
     LazyLoadingComponent,
-    LearnerDashboardIconsComponent,
-    LimitToPipe,
-    LoadingDotsComponent,
     LoadingMessageComponent,
-    OnScreenKeyboardComponent,
-    OutcomeFeedbackEditorComponent,
+    FilterForMatchingSubstringPipe,
+    LimitToPipe,
+    PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
-    SelectSkillModalComponent,
+    FilterForMatchingSubstringPipe,
+    OnScreenKeyboardComponent,
+    OutcomeFeedbackEditorComponent,
+    StateSkillEditorComponent,
     SharingLinksComponent,
+    SelectSkillModalComponent,
     SideNavigationBarComponent,
+    SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
-    SortByPipe,
-    StateSkillEditorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
-    SummarizeNonnegativeNumberPipe,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    WarningsAndAlertsComponent,
+    UploadActivityModalComponent,
+    WrapTextWithEllipsisPipe,
     TruncateAndCapitalizePipe,
     TruncatePipe,
-    UploadActivityModalComponent,
-    WarningsAndAlertsComponent,
-    WrapTextWithEllipsisPipe,
+    SummarizeNonnegativeNumberPipe,
+    SortByPipe,
+    LearnerDashboardIconsComponent
   ],
 })
 
