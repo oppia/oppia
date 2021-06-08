@@ -498,7 +498,8 @@ var TopicEditorPage = function() {
 
   this.saveTopic = async function(commitMessage) {
     await action.click('Save Topic Button', saveTopicButton);
-    await commitMessageField.sendKeys(commitMessage);
+    await action.sendKeys(
+      'Commit Message Field', commitMessageField, commitMessage);
     await action.click(
       'Close Save Modal Button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(
