@@ -38,14 +38,10 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {
         headerText: '=',
-        subheaderText: '='
+        subheaderText: '=',
+        toggle: '&'
       },
-      bindToController: {
-        backButtonShown: '<'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/navigation-bars/top-navigation' +
-        '-bar.directive.html'),
+      template: require('./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$scope', '$timeout', '$translate', '$window',
@@ -142,7 +138,22 @@ angular.module('oppia').directive('topNavigationBar', [
             return SidebarStatusService.isSidebarShown();
           };
           ctrl.toggleSidebar = function() {
-            SidebarStatusService.toggleSidebar();
+            /**
+             * Note to the developer migrating this directive:
+             * The toggle function is defined in an angular
+             * component (base-content) and is passed into this angularjs
+             * directive. This was done to avoid change detection issue
+             * which comes with upgradeComponent. When this directive is
+             * migrated change detection issue will no longer be there.
+             * So, please remove this method of toggling the sidebar, instead
+             * call this.sidebarStatusService.toggleSidebar() directly from
+             * here. And remove toggleSidebar() from base content component
+             * Also remove TopNavigationBarWrapperComponent and
+             * SideNavigationBarWrapperComponent.
+             * Replace the usage of wrapper components with the original
+             * components.
+             */
+            $scope.toggle();
           };
 
           ctrl.navigateToClassroomPage = function(classroomUrl) {
@@ -263,6 +274,15 @@ angular.module('oppia').directive('topNavigationBar', [
               )
             );
 
+            // This subscription can be removed after the component is migrated.
+            ctrl.directiveSubscriptions.add(
+              SidebarStatusService.onSideBarStatusUpdate.subscribe(() => {
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
+              })
+            );
+
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
@@ -356,3 +376,23 @@ angular.module('oppia').directive('topNavigationBar', [
       ]
     };
   }]);
+
+import { Directive, Input, Output, EventEmitter, ElementRef, Injector } from '@angular/core';
+import { UpgradeComponent } from '@angular/upgrade/static';
+
+@Directive({
+  selector: 'top-navigation-bar'
+})
+export class TopNavigationBarDirective extends UpgradeComponent {
+  @Input() headerText: string;
+  @Output() headerTextChange: EventEmitter<string> = (
+    new EventEmitter());
+  @Input() subheaderText: string;
+  @Output() subheaderTextChange: EventEmitter<string> = (
+    new EventEmitter());
+  @Input() toggle: () => void;
+
+  constructor(elementRef: ElementRef, injector: Injector) {
+    super('topNavigationBar', elementRef, injector);
+  }
+}

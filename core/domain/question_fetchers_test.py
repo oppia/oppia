@@ -61,18 +61,18 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
 
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
 
     def test_get_no_questions_with_no_skill_ids(self):
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                1, [], ''))
+                1, [], 0))
         self.assertEqual(len(questions), 0)
 
     def test_get_questions_with_multi_skill_ids(self):
@@ -85,9 +85,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_2', 0.5)
 
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, ['skill_1', 'skill_2'], ''))
+                2, ['skill_1', 'skill_2'], 0))
 
         self.assertEqual(len(questions), 1)
         self.assertEqual(
