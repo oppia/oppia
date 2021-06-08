@@ -202,8 +202,8 @@ export class ImagePreloaderService {
   }
 
   private convertImageFileToSafeBase64Url(
-    imageFile: Blob,
-    callback: (src: string | ArrayBuffer | SafeResourceUrl) => void): void {
+      imageFile: Blob,
+      callback: (src: string | ArrayBuffer | SafeResourceUrl) => void): void {
     const reader = new FileReader();
     reader.onloadend = () => {
       if (imageFile.type === 'image/svg+xml') {
@@ -213,8 +213,8 @@ export class ImagePreloaderService {
       } else {
         callback(reader.result);
       }
-    }
-    reader.readAsDataURL(imageFile); 
+    };
+    reader.readAsDataURL(imageFile);
   }
 
   /**

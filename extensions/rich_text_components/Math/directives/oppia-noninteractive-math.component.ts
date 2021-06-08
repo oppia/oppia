@@ -107,7 +107,7 @@ export class NoninteractiveMath implements OnInit {
               mathExpressionContent.svg_filename))) {
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
             this.imageLocalStorageService.getRawImageData(
-              mathExpressionContent.svg_filename))
+              mathExpressionContent.svg_filename));
         } else {
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
             this.contextService.getEntityType(),

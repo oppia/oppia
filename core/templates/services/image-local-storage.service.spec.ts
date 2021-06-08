@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from './alerts.service';
 import { ImageLocalStorageService } from './image-local-storage.service';
-import { ImageUploadHelperService } from './image-upload-helper.service';
 
 
 describe('ImageLocalStorageService', () => {
@@ -28,27 +27,16 @@ describe('ImageLocalStorageService', () => {
   let imageLocalStorageService: ImageLocalStorageService = null;
   let sampleImageData = 'data:image/png;base64,xyz';
   let imageFilename = 'filename';
-  let imageUploadHelperService: ImageUploadHelperService;
-  class MockImageUploadHelperService {
-    convertImageDataToImageFile(imageData) {
-      return imageData;
-    }
-  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{
-        provide: ImageUploadHelperService,
-        useClass: MockImageUploadHelperService
-      }]
+      imports: [HttpClientTestingModule]
     });
   });
 
   beforeEach(() => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     alertsService = TestBed.inject(AlertsService);
-    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
 
   it('should delete images from localStorage correctly', () => {
