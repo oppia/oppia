@@ -17,8 +17,7 @@
  */
 
 import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed } from
-  '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LicensePageComponent } from './license-page.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
