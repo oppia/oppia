@@ -131,8 +131,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'bypass'),
-        'message': 'The use of the word "bypass" is not allowed, ' +
+        'regexp': re.compile(r'bypassSecurity'),
+        'message': 'The use of the word "bypassSecurity" is not allowed, ' +
                    'particularly with regards to bypassSecurityTrustHTML() ' +
                    'and similar functions in Angular.',
         'excluded_files': (
@@ -259,10 +259,11 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'import \{.*\} from \'lodash\''),
+        'regexp': re.compile(r'import (\{.*\}|\_) from \'lodash\''),
         'message': (
-            'Please do not use "import { someFunction } from \'lodash\'". '
-            'Use "import someFunction from \'lodash/someFunction\'" instead.'),
+            'Please do not use "import { someFunction } from \'lodash\'" and '
+            '"import _ from \'lodash\'". Use "import someFunction from '
+            '\'lodash/someFunction\'" instead.'),
         'excluded_files': (),
         'excluded_dirs': ()
     },
@@ -274,6 +275,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/pages/translate-loader.factory.ts',
+            'translate-loader.factory.spec.ts',
             'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()

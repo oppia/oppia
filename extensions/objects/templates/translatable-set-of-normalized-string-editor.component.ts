@@ -15,29 +15,52 @@
 /**
  * @fileoverview Directive for translatable set of normalized string editor.
  */
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
-require(
-  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+@Component({
+  selector: 'translatable-set-of-normalized-string-editor',
+  templateUrl: './translatable-set-of-normalized-string-editor.component.html'
+})
+export class TranslatableSetOfNormalizedStringEditorComponent {
+  @Input() value;
+  @Output() valueChanged = new EventEmitter();
+  schema: {
+    type: string;
+    items: { type: string; };
+    validators: { id: string; }[];
+  } = {
+    type: 'list',
+    items: {
+      type: 'unicode'
+    },
+    validators: [{
+      id: 'is_uniquified'
+    }]
+  };
 
-angular.module('oppia').component('translatableSetOfNormalizedStringEditor', {
-  bindings: {
-    value: '='
-  },
-  // eslint-disable-next-line max-len
-  template: require(
-    './translatable-set-of-normalized-string-editor.component.html'),
-  controller: [function() {
-    var ctrl = this;
-    ctrl.$onInit = function() {
-      ctrl.SCHEMA = {
-        type: 'list',
-        items: {
-          type: 'unicode'
-        },
-        validators: [{
-          id: 'is_uniquified'
-        }]
-      };
-    };
-  }]
-});
+  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+
+  updateValue(val: string): void {
+    if (this.value.normalizedStrSet === val) {
+      return;
+    }
+    this.value.normalizedStrSet = val;
+    this.valueChanged.emit(this.value);
+    this.changeDetectorRef.detectChanges();
+  }
+
+  getSchema(): {
+    type: string;
+    items: { type: string; };
+    validators: { id: string; }[];
+    } {
+    return this.schema;
+  }
+}
+
+angular.module('oppia').directive(
+  'translatableSetOfNormalizedStringEditor',
+  downgradeComponent({
+    component: TranslatableSetOfNormalizedStringEditorComponent
+  }) as angular.IDirectiveFactory);

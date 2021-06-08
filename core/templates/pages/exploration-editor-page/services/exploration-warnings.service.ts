@@ -33,19 +33,22 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationWarningsService', [
-  '$injector', 'ExplorationStatesService',
+  '$injector', 'ExplorationInitStateNameService', 'ExplorationStatesService',
   'GraphDataService', 'ImprovementsService',
   'ParameterMetadataService', 'SolutionValidityService',
-  'StateTopAnswersStatsService', 'STATE_ERROR_MESSAGES',
+  'StateTopAnswersStatsService', 'CHECKPOINT_ERROR_MESSAGES',
+  'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
-      $injector, ExplorationStatesService,
+      $injector, ExplorationInitStateNameService, ExplorationStatesService,
       GraphDataService, ImprovementsService,
       ParameterMetadataService, SolutionValidityService,
-      StateTopAnswersStatsService, STATE_ERROR_MESSAGES,
+      StateTopAnswersStatsService, CHECKPOINT_ERROR_MESSAGES,
+      INTERACTION_SPECS, STATE_ERROR_MESSAGES,
       UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
+    var checkpointCountWarning = '';
     var hasCriticalStateWarning = false;
 
     var _getStatesWithoutInteractionIds = function() {
@@ -207,6 +210,7 @@ angular.module('oppia').factory('ExplorationWarningsService', [
     var _updateWarningsList = function() {
       _warningsList = [];
       stateWarnings = {};
+      checkpointCountWarning = '';
       hasCriticalStateWarning = false;
 
       var _extendStateWarnings = function(stateName, newWarning) {
@@ -286,6 +290,69 @@ angular.module('oppia').factory('ExplorationWarningsService', [
           _graphData.initStateId]));
       }
 
+      var initStateName = ExplorationInitStateNameService.displayed;
+      var initState = _states.getState(initStateName);
+      if (initState && !initState.cardIsCheckpoint) {
+        _extendStateWarnings(
+          initStateName, CHECKPOINT_ERROR_MESSAGES.INIT_CARD);
+      }
+
+      var nonInitialCheckpointStateNames = [];
+      var terminalStateCount = 0;
+      _states.getStateNames().forEach(stateName => {
+        var state = _states.getState(stateName);
+        var interactionId = state.interaction.id;
+        if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
+          if (state.cardIsCheckpoint && stateName !== initStateName) {
+            _extendStateWarnings(
+              stateName, CHECKPOINT_ERROR_MESSAGES.TERMINAL_CARD);
+          }
+          terminalStateCount++;
+        }
+        if (stateName !== initStateName && state.cardIsCheckpoint) {
+          nonInitialCheckpointStateNames.push(stateName);
+        }
+      });
+
+      var checkpointCount = ExplorationStatesService.getCheckpointCount();
+      if (checkpointCount >= 9) {
+        checkpointCountWarning = CHECKPOINT_ERROR_MESSAGES.CHECKPOINT_COUNT;
+        _warningsList.push({
+          type: WARNING_TYPES.ERROR,
+          message: ('Checkpoint count has an error.')
+        });
+      }
+
+      for (var i in nonInitialCheckpointStateNames) {
+        var links = _graphData.links;
+        var newLinks = [];
+        var newNodes = _graphData.nodes;
+        delete newNodes[nonInitialCheckpointStateNames[i]];
+
+        links.forEach(edge => {
+          if (edge.source !== nonInitialCheckpointStateNames[i]) {
+            newLinks.push(edge);
+          }
+        });
+
+        var unreachableNodeNames = _getUnreachableNodeNames(
+          [_graphData.initStateId], newNodes, newLinks);
+
+        var terminalUnreachableStateCount = 0;
+        unreachableNodeNames.forEach(stateName => {
+          var interactionId = _states.getState(stateName).interaction.id;
+          if (interactionId && INTERACTION_SPECS[interactionId].is_terminal) {
+            terminalUnreachableStateCount++;
+          }
+        });
+
+        if (terminalStateCount !== terminalUnreachableStateCount) {
+          _extendStateWarnings(
+            nonInitialCheckpointStateNames[i],
+            CHECKPOINT_ERROR_MESSAGES.BYPASSABLE_CARD);
+        }
+      }
+
       if (Object.keys(stateWarnings).length) {
         var errorString = (
           Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
@@ -326,6 +393,9 @@ angular.module('oppia').factory('ExplorationWarningsService', [
       },
       getWarnings: function() {
         return _warningsList;
+      },
+      getCheckpointCountWarning: function() {
+        return checkpointCountWarning;
       },
       hasCriticalWarnings: function() {
         return hasCriticalStateWarning || _warningsList.some(function(warning) {
