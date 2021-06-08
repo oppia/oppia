@@ -251,9 +251,9 @@ class ValidateArchivedModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase)
             query_status=feconf.USER_QUERY_STATUS_ARCHIVED
         )
         output = (
-                self.pipeline
-                | beam.Create([model])
-                | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [
             user_validation_errors.ArchivedModelNotMarkedDeletedError(model)])

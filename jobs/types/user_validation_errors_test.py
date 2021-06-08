@@ -145,7 +145,7 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
 
 
 class ArchivedModelNotMarkedDeletedErrorTests(
-    base_validation_errors_test.AuditErrorsTestBase):
+        base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
         model = user_models.UserQueryModel(
@@ -159,5 +159,5 @@ class ArchivedModelNotMarkedDeletedErrorTests(
 
         self.assertEqual(
             error.message,
-            'ArchivedModelNotMarkedDeletedError in UserQueryModel(id=\'test\'): '
-            'mark archived model as deleted')
+            'ArchivedModelNotMarkedDeletedError in '
+            'UserQueryModel(id=\'test\'): mark archived model as deleted')

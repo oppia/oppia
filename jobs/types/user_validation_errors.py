@@ -65,7 +65,7 @@ class DraftChangeListLastUpdatedInvalidError(
 
 
 class ArchivedModelNotMarkedDeletedError(
-    base_validation_errors.BaseAuditError):
+        base_validation_errors.BaseAuditError):
     """Error class for models which are archived but not deleted."""
 
     def __init__(self, model):
