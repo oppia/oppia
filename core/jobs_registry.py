@@ -23,7 +23,6 @@ from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
-from core.domain import opportunity_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
 from core.domain import skill_jobs_one_off
@@ -40,14 +39,7 @@ ONE_OFF_JOB_MANAGERS = [
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExpSnapshotsMigrationJob,
-    opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
-    (
-        opportunity_jobs_one_off.
-        RenameExplorationOpportunitySummaryModelPropertiesJob),
-    opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
-    question_jobs_one_off.MissingQuestionMigrationOneOffJob,
-    question_jobs_one_off.QuestionSnapshotsMigrationAuditJob,
     question_jobs_one_off.QuestionSnapshotsMigrationJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
