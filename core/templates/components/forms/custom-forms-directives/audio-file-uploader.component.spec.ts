@@ -37,9 +37,10 @@ describe('Audio File Uploader Component', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeDefined();
-  });
+  it('should successfully instantiate the component from beforeEach block',
+    () => {
+      expect(component).toBeDefined();
+    });
 
   it('should validate files correctly', () => {
     let mockFile = new File(['foo'], 'audio.mp3', {
@@ -64,5 +65,55 @@ describe('Audio File Uploader Component', () => {
     });
     expect(component.validateUploadedFile(mockFile))
       .toEqual('This audio format does not match the filename extension.');
+    mockFile = new File(['foo'], 'video.mp4', {
+      type: 'png',
+    });
+    expect(component.validateUploadedFile(mockFile))
+      .toEqual('This file is not recognized as an audio file.');
+  });
+
+  it('should add audio file', () => {
+    let files = [
+      new File(['foo'], 'audio.mp3', {
+        type: 'audio/mpeg',
+      }),
+      new File(['bar'], 'audio.mp3', {
+        type: 'audio/mp3',
+      })
+    ];
+    component.fileInputRef.nativeElement = {
+      files: files
+    };
+    spyOn(component.fileChange, 'emit');
+
+    component.addAudio(new Event('add'));
+
+    expect(component.fileChange.emit).toHaveBeenCalledWith(files[0]);
+  });
+
+  it('should emit fileClear event if file is not valid', () => {
+    component.fileInputRef.nativeElement = {
+      files: [
+        new File(['foo'], 'audio.mp4', {
+          type: 'audio/mp4',
+        })
+      ]
+    };
+    spyOn(component.fileClear, 'emit');
+
+    component.addAudio(new Event('add'));
+
+    expect(component.fileClear.emit).toHaveBeenCalled();
+  });
+
+  it('should emit fileClear event if no file is uploaded', () => {
+    component.fileInputRef.nativeElement = {
+      files: []
+    };
+    spyOn(component.fileClear, 'emit');
+
+    component.addAudio(new Event('add'));
+
+    expect(component.fileClear.emit).toHaveBeenCalled();
   });
 });
