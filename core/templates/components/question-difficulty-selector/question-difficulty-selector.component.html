@@ -7,10 +7,14 @@
       <strong>{{ rubric.getDifficulty() }}</strong>
       <mat-list>
         <mat-list-item class="pl-0" *ngFor="let explanation of rubric.getExplanations()">
-          <div class="oppia-skill-description-label">Skill description:</div>
-          <angular-html-bind-wrapper classStr="oppia-skill-description-text"
-                                    [htmlData]="explanation">
-          </angular-html-bind-wrapper>
+          <div class="row">
+            <div class="oppia-skill-description-label row-item">Skill description:</div>
+            <div class="oppia-skill-description-container row-item">
+              <angular-html-bind-wrapper classStr="oppia-skill-description-text"
+                                        [htmlData]="explanation">
+              </angular-html-bind-wrapper>
+            </div>
+          </div>
           <div *ngIf="explanation === '' || explanation === '<p></p>'">
             <span class="oppia-placeholder">This rubric has not yet been specified</span>
           </div>
@@ -28,11 +32,25 @@
   .oppia-skill-description-label {
     display: inline;
     font-style: italic;
+    font-weight: 400;
     margin-right: 1.2rem;
     width: 9rem;
   }
 
-  .oppia-skill-description-text {
-    padding-top: 2.4rem;
+  .oppia-skill-description-container {
+    font-weight: 400;
+    margin-left: 30px;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+    justify-items: flex-start;
+    align-items: center;
+  }
+
+  .row-item {
+    display: inline;
   }
 </style>
