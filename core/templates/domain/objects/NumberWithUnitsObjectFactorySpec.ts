@@ -157,7 +157,7 @@ describe('NumberWithUnitsObjectFactory', () => {
       }).toThrowError(errors.INVALID_VALUE);
       expect(() => {
         nwuof.fromRawInputString('₹ - $25');
-      }).toThrowError(errors.INVALID_CURRENCY );
+      }).toThrowError(errors.INVALID_CURRENCY);
       expect(() => {
         nwuof.fromRawInputString('3# m/s');
       }).toThrowError(errors.INVALID_VALUE);
@@ -193,7 +193,8 @@ describe('NumberWithUnitsObjectFactory', () => {
     });
 
     it('should create currency units', () => {
-      const createCurrencyUnitsSpy = spyOn(nwuof.unitsFactory, 'createCurrencyUnits');
+      const createCurrencyUnitsSpy = spyOn(
+        nwuof.unitsFactory, 'createCurrencyUnits');
       nwuof.createCurrencyUnits();
       expect(createCurrencyUnitsSpy).toHaveBeenCalled();
     });

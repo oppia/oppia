@@ -41,7 +41,8 @@ describe('ProfileLinkImageComponent', () => {
     fixture = TestBed.createComponent(ProfileLinkImageComponent);
     component = fixture.componentInstance;
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    profileLinkImageBackendApiService = TestBed.inject(ProfileLinkImageBackendApiService)
+    profileLinkImageBackendApiService = TestBed.inject(
+      ProfileLinkImageBackendApiService);
   });
 
   it('should successfully instantiate the component from beforeEach block',

@@ -155,8 +155,8 @@ describe('Skill object factory', () => {
   it('should throw error when there is no misconception' +
     ' by the given id', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(() => skill.findMisconceptionById('55')).toThrow(
-      new Error('Could not find misconception with ID: 55'));
+    expect(() => skill.findMisconceptionById('55')).toThrowError(
+      'Could not find misconception with ID: 55');
   });
 
   it('should delete a misconception given its id', () => {
