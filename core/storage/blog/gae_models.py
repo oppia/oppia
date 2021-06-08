@@ -36,6 +36,8 @@ class BlogPostModel(base_models.BaseModel):
     The id of instances of this class has the form
         [author_id].[generated_string]
     """
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The ID of the user the blog is authored by.
     author_id = datastore_services.StringProperty(required=True)
@@ -46,8 +48,9 @@ class BlogPostModel(base_models.BaseModel):
     # The unique url fragment of the blog post.
     url_fragment = (
         datastore_services.StringProperty(indexed=True, required=True))
-    # Tags associated with the blog.
-    tags = datastore_services.StringProperty(indexed=True, required=True)
+    # Tags associated with the blog. 'repeated' property is set to true to
+    # take a list of values of underlying type(str).
+    tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog.
     thumbnail_filename = datastore_services.StringProperty(required=True)
     # Time when the blog post model was published.
@@ -77,28 +80,31 @@ class BlogPostModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is exported as one instance per user."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+        """Model is exported as multiple instances per user since there can
+        be multiple blog models relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains data corresponding to a user to export: author_id."""
+        """Model contains data corresponding to a user to export"""
         return dict(super(BlogPostModel, cls).get_export_policy(), **{
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            # We do not export the author_id because we should not
+            # export internal user ids.
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.EXPORTED,
+            'content': base_models.EXPORT_POLICY.EXPORTED,
+            'url_fragment': base_models.EXPORT_POLICY.EXPORTED,
+            'tags': base_models.EXPORT_POLICY.EXPORTED,
+            'thumbnail_filename': base_models.EXPORT_POLICY.EXPORTED,
+            'published_on': base_models.EXPORT_POLICY.EXPORTED,
+            'last_updated': base_models.EXPORT_POLICY.EXPORTED,
         })
 
     @classmethod
-    def generate_new_blog_id(cls, author_id):
-        """Generates a new blog ID which is unique.
-
-        Args:
-            author_id: str. The ID of the author.
+    def generate_new_blog_id(cls):
+        """Generates a new blog ID which is unique and is in the form of
+        random hash of 12 chars.
 
         Returns:
             str. A blog ID that is different from the IDs of all
@@ -107,12 +113,13 @@ class BlogPostModel(base_models.BaseModel):
         Raises:
             Exception. There were too many collisions with existing blog IDs
                 when attempting to generate a new blog ID.
-        """
-        for _ in python_utils.RANGE(_MAX_RETRIES):
-            blog_id = (
-                author_id + '.' +
-                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
+        """      
+
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            blog_id = utils.convert_to_hash(
+                python_utils.UNICODE(
+                    utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH)
             if not cls.get_by_id(blog_id):
                 return blog_id
         raise Exception(
@@ -205,7 +212,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     url_fragment = (
         datastore_services.StringProperty(indexed=True, required=True))
     # Tags associated with the blog.
-    tags = datastore_services.StringProperty(indexed=True, required=True)
+    tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog.
     thumbnail_filename = datastore_services.StringProperty(required=True)
     # Time when the blog model was published.
@@ -235,8 +242,9 @@ class BlogPostSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model data has already been exported as a part of the
-        BlogModel and thus does not need a separate export.
+        """Model data has already been associated as a part of the
+        BlogPostModel to the user and thus does not need a separate user
+        association.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -290,29 +298,6 @@ class BlogPostSummaryModel(base_models.BaseModel):
             created by the given user.
         """
         return cls.get_multi(blog_ids)
-
-    @classmethod
-    def export_data(cls, user_id):
-        """Exports the data from BlogPostSummaryModel into dict format for
-        Takeout.
-
-        Args:
-            user_id: str. The ID of the user whose data should be exported.
-
-        Returns:
-            dict. Dictionary of the data from BlogPostModel.
-        """
-
-        user_data = dict()
-        blog_post_summary_models = cls.get_all().filter(
-            cls.author_id == user_id).fetch()
-
-        for blog_post_summary_model in blog_post_summary_models:
-            user_data[blog_post_summary_model.id] = {
-                'summary': blog_post_summary_model.summary,
-            }
-
-        return user_data
 
 
 class BlogPostRightsModel(base_models.BaseModel):
@@ -371,9 +356,8 @@ class BlogPostRightsModel(base_models.BaseModel):
         users can edit the blog.
         """
         return (
-            base_models
-            .MODEL_ASSOCIATION_TO_USER
-            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
+            )
 
     @classmethod
     def get_export_policy(cls):

@@ -37,7 +37,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
     USER_ID = 'user_1'
     CONTENT = 'Dummy Content'
     TITLE = 'Dummy Title'
-    TAGS = 'tag1 tag2 tag3'
+    TAGS = ['tag1', 'tag2', 'tag3']
     THUMBNAIL = 'xyzabc'
 
     def setUp(self):
@@ -45,7 +45,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         super(BlogPostModelTest, self).setUp()
 
         self.blog_post_model = blog_post_models.BlogPostModel(
-            id='%s.%s' % (self.USER_ID, 'random'),
+            id='blog_one',
             author_id=self.USER_ID,
             content=self.CONTENT,
             title=self.TITLE,
@@ -84,7 +84,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                     lambda x, y: True,
                     blog_post_model_cls)):
                 blog_post_model_cls.create(
-                    'author_id.blog_id')
+                    'blog_id')
 
         # Test generate_new_blog_id method.
         with self.assertRaisesRegexp(
@@ -96,8 +96,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                 types.MethodType(
                     lambda x, y: True,
                     blog_post_model_cls)):
-                blog_post_model_cls.generate_new_blog_id(
-                    self.USER_ID)
+                blog_post_model_cls.generate_new_blog_id()
 
     def test_get_by_url_fragment(self):
         self.assertEqual(
@@ -116,7 +115,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self):
         user_data = blog_post_models.BlogPostModel.export_data(
             self.USER_ID),
-        blog_post_id = '%s.%s' % (self.USER_ID, 'random')
+        blog_post_id = 'blog_one'
         test_data = (
             {
                 blog_post_id: {
@@ -142,7 +141,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
     USER_ID = 'user_1'
     SUMMARY = 'Dummy Summary'
     TITLE = 'Dummy Title'
-    TAGS = 'tag1 tag2 tag3'
+    TAGS = ['tag1', 'tag2', 'tag3']
     THUMBNAIL = 'xyzabc'
 
     def setUp(self):
@@ -150,7 +149,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         super(BlogPostSummaryModelTest, self).setUp()
 
         self.blog_post_summary_model = blog_post_models.BlogPostSummaryModel(
-            id='%s.%s' % (self.USER_ID, 'random'),
+            id='blog_one',
             author_id=self.USER_ID,
             summary=self.SUMMARY,
             title=self.TITLE,
@@ -189,28 +188,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                     lambda x, y: True,
                     blog_post_summary_model_cls)):
                 blog_post_summary_model_cls.create(
-                    'author_id.blog_id')
-
-    def test_export_data_nontrivial(self):
-        user_data = blog_post_models.BlogPostSummaryModel.export_data(
-            self.USER_ID),
-        blog_post_summary_id = '%s.%s' % (self.USER_ID, 'random')
-        test_data = (
-            {
-                blog_post_summary_id: {
-                    'summary': self.SUMMARY,
-                }
-            },
-        )
-        self.assertEqual(user_data, test_data)
-
-    def test_export_data_trivial(self):
-        user_data = blog_post_models.BlogPostSummaryModel.export_data(
-            self.NONEXISTENT_USER_ID
-        )
-        test_data = {}
-        self.assertEqual(user_data, test_data)
-
+                    'blog_one')
 
 class BlogPostRightsModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostRightsModel class."""

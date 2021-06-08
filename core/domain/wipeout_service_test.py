@@ -4628,7 +4628,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
     CONTENT = 'Dummy Content'
     SUMMARY = 'Dummy Content'
     TITLE = 'Dummy Title'
-    TAGS = 'tag1 tag2 tag3'
+    TAGS = ['tag1', 'tag2', 'tag3']
     THUMBNAIL = 'xyzabc'
 
     def setUp(self):
