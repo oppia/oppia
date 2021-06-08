@@ -43,6 +43,7 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
