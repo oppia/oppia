@@ -34,4 +34,4 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');

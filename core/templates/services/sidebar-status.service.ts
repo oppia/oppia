@@ -36,6 +36,8 @@ export class SidebarStatusService {
     return this._toggleSidebarEventEmitter;
   }
 
+  private _onSideBarStatusUpdate: EventEmitter<boolean> = new EventEmitter();
+
   private _openSidebar(): void {
     if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {
       this.sidebarIsShown = true;
@@ -49,6 +51,7 @@ export class SidebarStatusService {
       this.sidebarIsShown = false;
       this.pendingSidebarClick = false;
       this.toggleSidebarEventEmitter.emit();
+      this._onSideBarStatusUpdate.emit(false);
     }
   }
 
@@ -74,6 +77,9 @@ export class SidebarStatusService {
     } else {
       this.pendingSidebarClick = false;
     }
+  }
+  get onSideBarStatusUpdate(): EventEmitter<boolean> {
+    return this._onSideBarStatusUpdate;
   }
 }
 

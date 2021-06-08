@@ -19,7 +19,7 @@
  */
 
 import { Subscription } from 'rxjs';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -56,6 +56,11 @@ interface KeyboardEvent {
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText: string;
   @Input() subheaderText: string;
+  @Input() toggle: () => void;
+  @Output() headerTextChange: EventEmitter<string> = (
+    new EventEmitter());
+  @Output() subheaderTextChange: EventEmitter<string> = (
+    new EventEmitter());
   isModerator: boolean;
   isAdmin: boolean;
   isTopicManager: boolean;
@@ -368,5 +373,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 }
 
 angular.module('oppia').directive(
-  'oppiaTopNavigationBar', downgradeComponent(
-    {component: TopNavigationBarComponent}));
+  'oppiaTopNavigationBar', downgradeComponent({
+    component: TopNavigationBarComponent
+  }) as angular.IDirectiveFactory);
