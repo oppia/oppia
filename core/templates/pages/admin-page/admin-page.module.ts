@@ -36,6 +36,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
+import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
 
 @NgModule({
   imports: [
@@ -49,6 +50,7 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
     AdminJobsTabComponent,
+    AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent
@@ -58,6 +60,7 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
     AdminJobsTabComponent,
+    AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent

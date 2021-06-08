@@ -39,7 +39,7 @@ EXCLUDED_DIRECTORIES = [
 # @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
-    'admin-misc-tab.directive.ts',
+    'admin-misc-tab.component.ts',
     'admin-page.directive.ts',
     'admin-roles-tab.directive.ts',
     'angular-html-bind.directive.ts',

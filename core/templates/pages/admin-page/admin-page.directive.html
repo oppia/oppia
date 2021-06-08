@@ -31,9 +31,9 @@
                    set-status-message="$ctrl.setStatusMessage">
   </admin-roles-tab>
 
-  <admin-misc-tab ng-if="$ctrl.isMiscTabOpen()"
-                  set-status-message="$ctrl.setStatusMessage">
-  </admin-misc-tab>
+  <oppia-admin-misc-tab ng-if="$ctrl.isMiscTabOpen()"
+                        (set-status-message)="$ctrl.setStatusMessage($event)">
+  </oppia-admin-misc-tab>
 </div>
 
 <div ng-if="$ctrl.inDevMode" class="oppia-dev-mode">
