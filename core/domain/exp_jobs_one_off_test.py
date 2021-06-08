@@ -28,62 +28,12 @@ from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(
-    job_models, exp_models, base_models, classifier_models, improvements_models,
-) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
-    models.NAMES.classifier, models.NAMES.improvements
-])
-
-datastore_services = models.Registry.import_datastore_services()
-search_services = models.Registry.import_search_services()
-
-
-# This mock should be used only in ExplorationContentValidationJobForCKEditor
-# and InteractionCustomizationArgsValidationJob.
-# The first job validates the html strings and produces as output the invalid
-# strings. If we do not use mock validation for rte while updating
-# states and saving exploration, the validation for subtitled html
-# in state will fail, thereby resulting in failure of job.
-# The second job validates the customization args in html and if the
-# mock is not used while updating states and saving explorations,
-# the validation for subtitled html in state will fail, thereby
-# resulting in failure of job.
-def mock_validate(unused_self):
-    pass
-
-
-def run_job_for_deleted_exp(
-        self, job_class, check_error=False,
-        error_type=None, error_msg=None, function_to_be_called=None,
-        exp_id=None):
-    """Helper function to run job for a deleted exploration and check the
-    output or error condition.
-    """
-    job_id = job_class.create_new()
-    # Check there are two jobs in the taskqueue corresponding to
-    # delete_explorations_from_user_models and
-    # delete_explorations_from_activities.
-    self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
-    job_class.enqueue(job_id)
-    self.assertEqual(
-        self.count_jobs_in_mapreduce_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-    self.process_and_flush_pending_mapreduce_tasks()
-    self.process_and_flush_pending_tasks()
-    if check_error:
-        with self.assertRaisesRegexp(error_type, error_msg):
-            function_to_be_called(exp_id)
-
-    else:
-        self.assertEqual(job_class.get_output(job_id), [])
+(exp_models, classifier_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.classifier])
 
 
 class ExplorationMigrationJobTests(test_utils.GenericTestBase):

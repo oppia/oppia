@@ -29,23 +29,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-(
-    base_models,
-    exp_models,
-    feedback_models,
-    improvements_models,
-    skill_models,
-    stats_models,
-    story_models,
-) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.exploration,
-    models.NAMES.feedback,
-    models.NAMES.improvements,
-    models.NAMES.skill,
-    models.NAMES.statistics,
-    models.NAMES.story,
-])
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):

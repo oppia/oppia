@@ -23,8 +23,6 @@ from core.platform import models
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-_LANGUAGES_TO_RESET = ['hu', 'mk', 'sv', 'tr', 'de', 'fr', 'nl', 'pt']
-
 
 class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for populating weekly dashboard stats for all registered

@@ -34,10 +34,6 @@ import utils
 transaction_services = models.Registry.import_transaction_services()
 
 
-# Counts contributions from all versions.
-VERSION_ALL = 'all'
-
-
 def _migrate_to_latest_issue_schema(exp_issue_dict):
     """Holds the responsibility of performing a step-by-step sequential update
     of an exploration issue dict based on its schema version. If the current
