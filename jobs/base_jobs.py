@@ -57,15 +57,15 @@ Dataflow service: https://cloud.google.com/dataflow.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from jobs import job_options
+from jobs.io import stub_io
 import python_utils
 
 
-class _JobMetaclass(type):
+class JobMetaclass(type):
     """Metaclass for all of Oppia's Apache Beam jobs.
 
     This class keeps track of the complete list of jobs. The list can be read
-    with the _JobMetaclass.get_all_jobs() class method.
+    with the JobMetaclass.get_all_jobs() class method.
 
     THIS CLASS IS AN IMPLEMENTATION DETAIL, DO NOT USE IT DIRECTLY. All user
     code should simply inherit from the JobBase class, found below.
@@ -74,13 +74,13 @@ class _JobMetaclass(type):
     _JOB_REGISTRY = {}
 
     def __new__(mcs, name, bases, namespace):
-        """Creates a new job class with type `_JobMetaclass`.
+        """Creates a new job class with type `JobMetaclass`.
 
         https://docs.python.org/3/reference/datamodel.html#customizing-class-creation
 
         This metaclass adds jobs to the _JOB_REGISTRY dict, keyed by name, as
         they are created. We use the registry to reject jobs with duplicate
-        names and to provide the convenient: _JobMetaclass.get_all_jobs().
+        names and to provide the convenient: JobMetaclass.get_all_jobs().
 
         We use a metaclass instead of other alternatives (like decorators or a
         manual list), because metaclasses cannot be forgotten to be used,
@@ -88,7 +88,7 @@ class _JobMetaclass(type):
         from third party linters to be enforced.
 
         Args:
-            mcs: _JobMetaclass. The metaclass.
+            mcs: JobMetaclass. The metaclass.
             name: str. The name of the class.
             bases: tuple(type). The sequence of base classes for the new class.
             namespace: dict(str: *). The namespace of the class. This is where
@@ -97,7 +97,7 @@ class _JobMetaclass(type):
         Returns:
             class. The new class instance.
         """
-        job_cls = super(_JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
+        job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
         if name in mcs._JOB_REGISTRY:
             collision = mcs._JOB_REGISTRY[name]
             raise TypeError('%s name is already used by %s.%s' % (
@@ -111,15 +111,28 @@ class _JobMetaclass(type):
         """Returns all jobs that have inherited from the JobBase class.
 
         Args:
-            mcs: _JobMetaclass. The metaclass.
+            mcs: JobMetaclass. The metaclass.
 
         Returns:
             list(class). The classes that have inherited from JobBase.
         """
         return list(mcs._JOB_REGISTRY.values())
 
+    @classmethod
+    def get_all_job_names(mcs):
+        """Returns the names of all jobs that have inherited from the JobBase
+        class.
 
-class JobBase(python_utils.with_metaclass(_JobMetaclass)):
+        Args:
+            mcs: JobMetaclass. The metaclass.
+
+        Returns:
+            list(str). The names of all classes that hae inherited from JobBase.
+        """
+        return list(mcs._JOB_REGISTRY.keys())
+
+
+class JobBase(python_utils.with_metaclass(JobMetaclass)):
     """The base class for all of Oppia's Apache Beam jobs.
 
     Example:
@@ -149,7 +162,7 @@ class JobBase(python_utils.with_metaclass(_JobMetaclass)):
             pipeline: beam.Pipeline. The pipeline that manages the job.
         """
         self.pipeline = pipeline
-        self.job_options = self.pipeline.options.view_as(job_options.JobOptions)
+        self.datastoreio_stub = stub_io.DatastoreioStub()
 
     def run(self):
         """Runs PTransforms with self.pipeline to compute/process PValues.

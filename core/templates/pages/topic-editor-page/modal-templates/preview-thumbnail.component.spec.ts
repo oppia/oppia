@@ -12,46 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
- * @fileoverview Unit tests for the preview thumbnail directive.
+ * @fileoverview Unit tests for the preview thumbnail component.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ThumbnailDisplayComponent } from 'components/forms/custom-forms-directives/thumbnail-display.component';
+import { ContextService } from 'services/context.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { PreviewThumbnailComponent } from './preview-thumbnail.component';
 
-describe('Preview Thumbnail Directive', function() {
-  beforeEach(angular.mock.module('oppia'));
+describe('Preview Thumbnail Component', function() {
+  let componentInstance: PreviewThumbnailComponent;
+  let fixture: ComponentFixture<PreviewThumbnailComponent>;
+  let imageUploadHelperService: ImageUploadHelperService;
+  let testUrl = 'test_url';
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  var ctrl = null;
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var MockContextSerivce = {
-      getEntityType: () => 'topic',
-      getEntityId: () => '1'
-    };
-    var MockImageUploadHelperService = {
-      getTrustedResourceUrlForThumbnailFilename: (
-          filename, entityType, entityId) => (
-        entityType + '/' + entityId + '/' + filename)
-    };
-
-    ctrl = $componentController('previewThumbnail', {
-      ContextService: MockContextSerivce,
-      ImageUploadHelperService: MockImageUploadHelperService,
-    });
-    ctrl.getFilename = function() {
-      return 'img.svg';
-    };
-    ctrl.$onInit();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        PreviewThumbnailComponent,
+        ThumbnailDisplayComponent
+      ],
+      providers: [
+        ImageUploadHelperService,
+        ContextService
+      ]
+    }).compileComponents();
   }));
 
-  it('should init the controller', function() {
-    expect(ctrl.editableThumbnailDataUrl).toEqual('topic/1/img.svg');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PreviewThumbnailComponent);
+    componentInstance = fixture.componentInstance;
+    imageUploadHelperService = (
+      TestBed.inject(ImageUploadHelperService) as unknown) as
+        jasmine.SpyObj<ImageUploadHelperService>;
+    spyOn(
+      imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
+      .and.returnValue(testUrl);
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeDefined();
+  });
+
+  it('should initialize', () => {
+    componentInstance.ngOnInit();
+    expect(componentInstance.editableThumbnailDataUrl).toEqual(testUrl);
   });
 });
