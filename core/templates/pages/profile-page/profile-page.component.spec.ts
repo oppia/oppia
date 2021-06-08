@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ProfilePageComponent } from './profile-page.component';
 import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserService } from 'services/user.service';
