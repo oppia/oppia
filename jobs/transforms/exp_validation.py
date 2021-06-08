@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import base_model_validators
 from core.domain import exp_domain
 from core.domain import rights_domain
 from core.platform import models
@@ -74,14 +75,17 @@ class ValidateExplorationCommitLogEntryModel(
     """Overrides _get_change_domain_class for exploration models """
 
     def _get_change_domain_class(self, input_model):
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
-            changes made by commit commands of the model.
+            ExplorationRightsChange|ExplorationChange. A domain object class for
+            the changes made by commit commands of the model.
+
+        Raises:
+            Exception. Entity id does not match regex pattern.
         """
         model = job_utils.clone_model(input_model)
         if model.id.startswith('rights'):
@@ -89,4 +93,7 @@ class ValidateExplorationCommitLogEntryModel(
         elif model.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:
-            return None
+            raise Exception(
+                'model %s Entity id %s: Entity id does not match regex '
+                'pattern' % (
+                    base_model_validators.ERROR_CATEGORY_ID_CHECK, model.id))

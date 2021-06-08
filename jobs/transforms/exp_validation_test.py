@@ -19,6 +19,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
+from core.domain import base_model_validators
 from core.domain import rights_domain
 from core.platform import models
 from jobs import job_test_utils
@@ -274,8 +277,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
-                ))
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -300,8 +302,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
-                ))
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -330,8 +331,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
-                ))
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -366,8 +366,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
-                ))
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -403,8 +402,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
-                ))
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -440,8 +438,7 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationRightsSnapshotMetadataModel(
-                ))
+                exp_validation.ValidateExplorationRightsSnapshotMetadataModel())
         )
 
         self.assert_pcoll_equal(output, [
@@ -455,6 +452,13 @@ class ValidateExplorationRightsSnapshotMetadataModelTests(
                 'Value for new_status in cmd change_exploration_status: '
                 'invalid is not allowed')
         ])
+
+
+class MockValidateExplorationCommitLogEntryModel(  # pylint: disable=too-many-ancestors
+        exp_validation.ValidateExplorationCommitLogEntryModel):
+
+    def process(self, input_model):
+        self._get_change_domain_class(input_model)
 
 
 class ValidateExplorationCommitLogEntryModelTests(
@@ -475,8 +479,7 @@ class ValidateExplorationCommitLogEntryModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitLogEntryModel(
-                ))
+                exp_validation.ValidateExplorationCommitLogEntryModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -497,8 +500,7 @@ class ValidateExplorationCommitLogEntryModelTests(
             self.pipeline
             | beam.Create([invalid_commit_cmd_model])
             | beam.ParDo(
-                exp_validation.ValidateExplorationCommitLogEntryModel(
-                ))
+                exp_validation.ValidateExplorationCommitLogEntryModel())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -515,14 +517,14 @@ class ValidateExplorationCommitLogEntryModelTests(
             commit_cmds=[{
                 'cmd': base_models.VersionedModel.CMD_DELETE_COMMIT}])
 
-        output = (
-            self.pipeline
-            | beam.Create([invalid_commit_cmd_model])
-            | beam.ParDo(
-                exp_validation.ValidateExplorationCommitLogEntryModel(
-                ))
-        )
-
-        self.assert_pcoll_equal(output, [
-            base_validation_errors.CommitCmdsNoneError(invalid_commit_cmd_model)
-        ])
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                'model %s Entity id %s: Entity id does not match regex '
+                'pattern' % (
+                    base_model_validators.ERROR_CATEGORY_ID_CHECK,
+                    invalid_commit_cmd_model.id)
+            )
+        ):
+            MockValidateExplorationCommitLogEntryModel(
+            ).process(invalid_commit_cmd_model)
