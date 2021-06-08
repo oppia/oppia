@@ -22,8 +22,10 @@ export interface SkillRightsBackendDict {
 }
 
 export class SkillRights {
-  // The '_skillId' can be null for an interstitial SkillRights object.
-  // Check function 'createInterstitialSkillRights' for reference.
+  // The '_skillId' is set to null for the interstitial object which
+  // is to be used in the Skill Editor until the 'SkillRights' object
+  // has been loaded from the backend. Check function 'loadSkill' in
+  // 'SkillEditorStateService' for reference.
   _skillId: string | null;
   _canEditSkillDescription: boolean;
 
