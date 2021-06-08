@@ -40,8 +40,6 @@ import python_utils
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
-    collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob,
-    collection_jobs_one_off.RemoveCollectionModelNodesOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExpSnapshotsMigrationJob,
