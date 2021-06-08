@@ -27,7 +27,8 @@ export interface ThreadMessageBackendDict {
   'message_id': number;
   'text': string;
   // Status and Subject for frontend instances of thread message
-  // domain objects should be null initially.
+  // domain objects should be null initially.These properties should
+  // only exist when the status or subject changes otherwise non-existent.
   'updated_status': string | null;
   'updated_subject': string | null;
 }
