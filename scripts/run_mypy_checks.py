@@ -8,8 +8,9 @@ import subprocess
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
+    'proto_files/',
     'scripts/linters/test_files/',
-    'third_party/'
+    'third_party/',
 ]
 
 # List of files who should be type-annotated but are not.
@@ -679,12 +680,12 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/third_party_size_check.py',
     'scripts/typescript_checks.py',
     'scripts/typescript_checks_test.py',
-    'utils.py',
     'utils_test.py',
 ]
 
 
 CONFIG_FILE_PATH = os.path.join('.','mypy.ini')
+MYPY_CMD = 'mypy'
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -703,14 +704,14 @@ def main(args=None):
 
     if unused_parsed_args.files:
         cmd = (
-            ['mypy', '--config-file', CONFIG_FILE_PATH] +
+            [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] +
             unused_parsed_args.files)
 
         process = subprocess.call(cmd ,stdin=subprocess.PIPE)
 
     else:
         rgx = '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES)
-        cmd = ['mypy', '--exclude',rgx , '--config-file', CONFIG_FILE_PATH, '.']
+        cmd = [MYPY_CMD, '--exclude',rgx , '--config-file', CONFIG_FILE_PATH, '.']
 
         process = subprocess.call(cmd, stdin=subprocess.PIPE)
 

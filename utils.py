@@ -32,7 +32,7 @@ import sys
 import time
 import unicodedata
 import zlib
-from typing import Any, Callable, Dict, Generator, Iterable, Iterator, List, Text, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generator, Iterable, Iterator, List, Text, Tuple, TypeVar, Union # pylint: disable=unused-import
 
 from constants import constants
 import feconf
@@ -311,7 +311,7 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    if imghdr.what(None, h=content) == 'png':
+    if imghdr.what(None, h=str(content)) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
             python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
@@ -1060,7 +1060,7 @@ class OrderedCounter(collections.Counter, collections.OrderedDict): # type: igno
 
 
 def grouper(iterable, chunk_len, fillvalue=None):
-    # type: (Iterable[T], int, Any) -> Iterable[T]
+    # type: (Iterable[T], int, Any) -> Iterable[Iterable[T]]
     """Collect data into fixed-length chunks.
 
     Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
@@ -1120,11 +1120,12 @@ def partition(iterable, predicate=bool, enumerated=False):
         themselves.
     """
     if enumerated:
-        new_iterable = enumerate(iterable)
+        new_iterable = enumerate(iterable) # type: Any
         old_predicate = predicate
         predicate = lambda pair: old_predicate(pair[1])
     else:
         new_iterable = iterable
+
     # Creates two distinct generators over the same iterable. Memory-efficient.
     true_part, false_part = itertools.tee((i, predicate(i)) for i in new_iterable)
     return (
