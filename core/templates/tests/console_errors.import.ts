@@ -33,5 +33,5 @@ require('tests/console_errors.module.ts');
 
 require('App.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require('base-components/oppia-root.directive.ts');

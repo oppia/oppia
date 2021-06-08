@@ -25,7 +25,6 @@
  */
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import 'firebase/auth';
-import 'hammerjs';
 import 'leaflet/dist/leaflet.css';
 import { ContextService } from 'services/context.service';
 require('app.constants.ajs.ts');

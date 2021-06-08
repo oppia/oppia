@@ -67,4 +67,8 @@ describe('SidebarStatusService', () => {
     sss.onDocumentClick();
     expect(sss.isSidebarShown()).toBe(false);
   });
+
+  it('should test the getters', () => {
+    expect(sss.onSideBarStatusUpdate).toBeDefined();
+  });
 });

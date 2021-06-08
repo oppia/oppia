@@ -36,5 +36,5 @@ require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.component.ts');
