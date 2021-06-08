@@ -70,7 +70,8 @@ describe('User Backend Api Service', () => {
       sampleUserInfoBackendObject);
 
     userBackendApiService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo.isCurriculumAdmin()).toBe(sampleUserInfo.isCurriculumAdmin());
+      expect(userInfo.isCurriculumAdmin()).toBe(
+        sampleUserInfo.isCurriculumAdmin());
       expect(userInfo.isSuperAdmin()).toBe(sampleUserInfo.isSuperAdmin());
       expect(userInfo.isModerator()).toBe(sampleUserInfo.isModerator());
       expect(userInfo.isTopicManager()).toBe(sampleUserInfo.isTopicManager());

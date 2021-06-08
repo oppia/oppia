@@ -57,7 +57,8 @@ class FailedMLTest(test_utils.EmailTestBase):
         config_property = config_domain.Registry.get_config_property(
             'notification_user_ids_for_failed_tasks')
         config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
+            'committer_id', [self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL)])
 
     def test_send_failed_ml_email(self):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -65,7 +66,8 @@ class FailedMLTest(test_utils.EmailTestBase):
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
-            messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL)
+            messages = (
+                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 0)
 
             # Send job failure email with mock Job ID.
@@ -77,7 +79,8 @@ class FailedMLTest(test_utils.EmailTestBase):
             expected_subject = 'Failed ML Job'
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
-            messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL)
+            messages = (
+                self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].subject, expected_subject)
 

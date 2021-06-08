@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import user_services
 from core.domain import wipeout_domain
 from core.tests import test_utils
 import utils

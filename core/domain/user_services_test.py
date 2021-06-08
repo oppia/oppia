@@ -570,10 +570,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.add_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
         user_services.add_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
-        user_services.add_user_role(user_ids[2],
-            feconf.ROLE_ID_CURRICULUM_ADMIN)
-        user_services.add_user_role(user_ids[3],
-            feconf.ROLE_ID_CURRICULUM_ADMIN)
+        user_services.add_user_role(
+            user_ids[2], feconf.ROLE_ID_CURRICULUM_ADMIN)
+        user_services.add_user_role(
+            user_ids[3], feconf.ROLE_ID_CURRICULUM_ADMIN)
 
         self.assertEqual(
             set(user_services.get_user_ids_by_role(feconf.ROLE_ID_MODERATOR)),
@@ -619,7 +619,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.add_user_role(
             user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         self.assertEqual(
-            user_services.get_user_roles_from_id(user_id),[
+            user_services.get_user_roles_from_id(user_id), [
                 feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_COLLECTION_EDITOR])
 
     def test_adding_other_roles_to_full_user_updates_roles(self):
@@ -677,38 +677,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 feconf.ROLE_ID_TOPIC_MANAGER, feconf.ROLE_ID_MODERATOR,
                 feconf.ROLE_ID_CURRICULUM_ADMIN])
         self.assertFalse(user_settings_model.banned)
-
-    def test_profile_user_settings_have_correct_roles(self):
-        auth_id = 'test_id'
-        username = 'testname'
-        user_email = 'test@email.com'
-
-        user_id = user_services.create_new_user(auth_id, user_email).user_id
-        user_services.set_username(user_id, username)
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        user_settings_model.pin = '12346'
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
-
-        profile_user_data_dict = {
-            'schema_version': 1,
-            'display_alias': 'display_alias3',
-            'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
-            'preferred_site_language_code': None,
-            'preferred_audio_language_code': None,
-            'user_id': None,
-        }
-        modifiable_user_data = user_domain.ModifiableUserData.from_raw_dict(
-            profile_user_data_dict)
-        profile_user_id = user_services.create_new_profiles(
-            auth_id, user_email, [modifiable_user_data])[0].user_id
-        profile_user_settings_model = user_models.UserSettingsModel.get_by_id(
-            profile_user_id)
-
-        self.assertEqual(
-            profile_user_settings_model.roles, [feconf.ROLE_ID_MOBILE_LEARNER])
-        self.assertFalse(profile_user_settings_model.banned)
 
     def test_profile_user_settings_have_correct_roles(self):
         auth_id = 'test_id'
@@ -1248,7 +1216,6 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.owner = user_services.get_user_actions_info(self.owner_id)
-
 
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(

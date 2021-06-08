@@ -3007,7 +3007,8 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
 

@@ -1431,11 +1431,11 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={'filter_criterion': 'username', 'username': username})
 
         self.assertEqual(
-        response_dict, {
-            'roles': [feconf.ROLE_ID_FULL_USER],
-            'banned': False,
-            'topic_ids': []
-        })
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'topic_ids': []
+            })
 
         # Check role correctly gets updated.
         csrf_token = self.get_new_csrf_token()
@@ -1531,7 +1531,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         username = 'user1'
 
         self.signup(user_email, username)
-        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
@@ -1545,13 +1545,13 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={'filter_criterion': 'username', 'username': username})
 
         self.assertEqual(
-        response_dict, {
-            'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
-            'banned': False,
-            'topic_ids': []
-        })
+            response_dict, {
+                'roles': [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                'banned': False,
+                'topic_ids': []
+            })
 
-        response = self.delete_json(
+        self.delete_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             expected_status_int=200)
@@ -2692,7 +2692,8 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
         super(VerifyUserModelsDeletedHandlerTest, self).setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        self.admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin_user_id = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
 
     def test_get_without_user_id_raises_error(self):
         self.get_json(

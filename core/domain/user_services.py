@@ -157,7 +157,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
                     feconf.ROLE_ID_MODERATOR],
-                banned= False,
+                banned=False,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
@@ -1233,6 +1233,7 @@ def add_user_role(user_id, role):
 
     _save_user_settings(user_settings)
 
+
 def remove_user_role(user_id, role):
     """Updates the roles of the user with given user_id.
 
@@ -1256,7 +1257,6 @@ def remove_user_role(user_id, role):
         username=user_settings.username)
 
     _save_user_settings(user_settings)
-
 
 
 def mark_user_for_deletion(user_id):
@@ -2192,12 +2192,22 @@ def create_login_url(return_url):
 
 
 def mark_user_banned(user_id):
+    """Marks a user banned.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
     user_settings = get_user_settings(user_id)
     user_settings.mark_banned()
     _save_user_settings(user_settings)
 
 
 def unmark_user_banned(user_id):
+    """Unmarks a banned user.
+
+    Args:
+        user_id: str. The Id of the user.
+    """
     user_auth_details = auth_services.get_user_auth_details_from_model(
         auth_models.UserAuthDetailsModel.get(user_id))
 

@@ -178,7 +178,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
         config_property = config_domain.Registry.get_config_property(
             'notification_user_ids_for_failed_tasks')
         config_property.set_value(
-            'committer_id', [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
+            'committer_id',
+            [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)])
 
         with can_send_emails_ctx, can_send_feedback_email_ctx:
             with fail_training_job:
@@ -188,7 +189,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 response_dict = self.get_json('/adminhandler')
                 response_config_properties = response_dict['config_properties']
                 expected_email_list = {
-                    'value': [self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)]}
+                    'value': [self.get_user_id_from_email(
+                        self.CURRICULUM_ADMIN_EMAIL)]}
                 sys_config_list = response_config_properties[
                     email_manager.NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.name]
                 self.assertDictContainsSubset(
@@ -214,7 +216,8 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                 expected_subject = 'Failed ML Job'
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
-                messages = self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL)
+                messages = (
+                    self._get_sent_email_messages(self.CURRICULUM_ADMIN_EMAIL))
                 self.assertEqual(len(messages), 1)
                 self.assertEqual(messages[0].subject.decode(), expected_subject)
 

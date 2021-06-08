@@ -79,7 +79,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.signup('admin2@example.com', 'adm2')
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
-        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME, 'adm2'])
         self.user_a = user_services.get_user_actions_info(self.user_id_a)

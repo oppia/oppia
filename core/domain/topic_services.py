@@ -1061,6 +1061,7 @@ def deassign_manager_role_from_topic(committer, user_id, topic_id):
         committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
         user_id: str. The ID of the user.
+        topic_id: str. The ID of the topic.
 
     Raises:
         Exception. The committer does not have rights to modify a role.

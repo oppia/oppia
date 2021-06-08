@@ -1179,7 +1179,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         ).put()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
-        moderator = user_services.get_user_actions_info(moderator)
+        moderator = user_services.get_user_actions_info(moderator_id)
 
         rights_manager.unpublish_exploration(moderator, self.EXP_ID)
 

@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import re
 
 from constants import constants
-from core.domain import role_services
 
 from core.platform import models
 import feconf
@@ -420,16 +419,23 @@ class UserSettings(python_utils.OBJECT):
                         'This username is not available.')
 
     def mark_banned(self):
+        """Marks a user banned."""
         self.banned = True
         self.roles = []
 
     def unmark_banned(self, default_role):
+        """Unmarks ban for a banned user.
+
+        Args:
+            default_role: str. The role assigned to the user after marking
+                unbanned.
+        """
         self.banned = False
         self.roles = [default_role]
 
+
 class UserActionsInfo(python_utils.OBJECT):
     """A class representing information of user actions.
-
     Attributes:
         user_id: str. The unique ID of the user.
         roles: list(str). The roles of the user.

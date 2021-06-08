@@ -357,12 +357,16 @@ SENDER_VALIDATORS = {
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_curriculum_admin,
-    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_curriculum_admin,
-    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_curriculum_admin,
-    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_curriculum_admin,
+    feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
+        user_services.is_curriculum_admin),
+    feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: (
+        user_services.is_curriculum_admin),
+    feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
+        user_services.is_curriculum_admin),
     feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_curriculum_admin,
+    feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
+        user_services.is_curriculum_admin),
     feconf.BULK_EMAIL_INTENT_TEST: user_services.is_curriculum_admin
 }
 
@@ -1514,8 +1518,8 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             continue
         else:
             email_body = email_body_template % (
-                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL, feconf.ADMIN_URL,
-                suggestion_types_needing_reviewers_html)
+                curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+                feconf.ADMIN_URL, suggestion_types_needing_reviewers_html)
 
             _send_email(
                 admin_id, feconf.SYSTEM_COMMITTER_ID,

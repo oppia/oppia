@@ -62,7 +62,8 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.user_id_admin = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.user_id_admin = (
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.skill = self.save_new_skill(
