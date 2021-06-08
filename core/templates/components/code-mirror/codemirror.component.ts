@@ -33,6 +33,7 @@ interface CodeMirrorMergeViewOptions {
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   @Input() options!: CodeMirrorMergeViewOptions;
+  // TODO(#13015): Remove use of unknown as a type
   @Input() value!: unknown;
   @Input() refresh: boolean = false;
   @Input() readOnly = false;
