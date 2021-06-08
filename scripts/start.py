@@ -135,13 +135,10 @@ def main(args=None):
             'running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER,
         ])
 
-    # TODO(#11549): Move this to top of the file.
-    import contextlib2
-
     # NOTE: The ordering of alert_on_exit() is important because we want the
     # alert to be printed _before_ the ExitStack unwinds, hence its placement as
     # the "latter" context (context managers exit in reverse-order).
-    with contextlib2.ExitStack() as stack, alert_on_exit():
+    with python_utils.ExitStack() as stack, alert_on_exit():
         # ExitStack unwinds in reverse-order, so this will be the final action.
         stack.callback(notify_about_successful_shutdown)
 

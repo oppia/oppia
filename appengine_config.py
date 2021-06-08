@@ -117,6 +117,8 @@ def monkeypatched_get_distribution(distribution_name):
     except pkg_resources.DistributionNotFound:
         if distribution_name == 'google-cloud-tasks':
             return MockDistribution('1.5.0')
+        if distribution_name == 'google-cloud-translate':
+            return MockDistribution('2.0.1')
         else:
             raise
 

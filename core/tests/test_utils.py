@@ -69,7 +69,6 @@ import python_utils
 import schema_utils
 import utils
 
-import contextlib2
 import elasticsearch
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
@@ -84,7 +83,6 @@ import webtest
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
-current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
@@ -533,7 +531,7 @@ class AuthServicesStub(python_utils.OBJECT):
         Returns:
             callable. A function that will uninstall the stub when called.
         """
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stub = cls()
 
             stack.enter_context(test.swap(
@@ -1845,7 +1843,7 @@ title: Title
         es_stub = ElasticSearchStub()
         es_stub.reset()
 
-        with contextlib2.ExitStack() as stack:
+        with python_utils.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
             stack.enter_context(self.swap(
                 elastic_search_services.ES.indices, 'create',

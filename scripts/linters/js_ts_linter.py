@@ -383,45 +383,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def _check_js_and_ts_component_name_and_count(self):
-        """This function ensures that all JS/TS files have exactly
-        one component and and that the name of the component
-        matches the filename.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        # Select JS files which need to be checked.
-        name = 'JS and TS component name and count'
-        files_to_check = [
-            filepath for filepath in self.all_filepaths if not
-            filepath.endswith('App.ts')]
-        failed = False
-        error_messages = []
-        components_to_check = ['controller', 'directive', 'factory', 'filter']
-        for filepath in files_to_check:
-            component_num = 0
-            parsed_expressions = self.parsed_expressions_in_files[filepath]
-            for component in components_to_check:
-                if component_num > 1:
-                    break
-                for expression in parsed_expressions[component]:
-                    if not expression:
-                        continue
-                    component_num += 1
-                    # Check if the number of components in each file exceeds
-                    # one.
-                    if component_num > 1:
-                        error_message = (
-                            '%s -> Please ensure that there is exactly one '
-                            'component in the file.' % (filepath))
-                        failed = True
-                        error_messages.append(error_message)
-                        break
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def _check_directive_scope(self):
         """This function checks that all directives have an explicit
         scope: {} and it should not be scope: true.
@@ -536,133 +497,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                                                     ))
                                             error_messages.append(
                                                 error_message)
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
-    def _check_sorted_dependencies(self):
-        """This function checks that the dependencies which are
-        imported in the controllers/directives/factories in JS
-        files are in following pattern: dollar imports, regular
-        imports, and constant imports, all in sorted order.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Sorted dependencies'
-        files_to_check = self.all_filepaths
-        components_to_check = ['controller', 'directive', 'factory']
-        failed = False
-        error_messages = []
-
-        for filepath in files_to_check:
-            parsed_expressions = self.parsed_expressions_in_files[filepath]
-            for component in components_to_check:
-                for expression in parsed_expressions[component]:
-                    if not expression:
-                        continue
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    if arguments[0].type == 'Literal':
-                        property_value = python_utils.UNICODE(
-                            arguments[0].value)
-                    arguments = arguments[1:]
-                    for argument in arguments:
-                        if argument.type != 'ArrayExpression':
-                            continue
-                        literal_args = []
-                        function_args = []
-                        dollar_imports = []
-                        regular_imports = []
-                        constant_imports = []
-                        elements = argument.elements
-                        for element in elements:
-                            if element.type == 'Literal':
-                                literal_args.append(
-                                    python_utils.UNICODE(
-                                        element.value))
-                            elif element.type == 'FunctionExpression':
-                                func_args = element.params
-                                for func_arg in func_args:
-                                    function_args.append(
-                                        python_utils.UNICODE(func_arg.name))
-                        for arg in function_args:
-                            if arg.startswith('$'):
-                                dollar_imports.append(arg)
-                            elif re.search('[a-z]', arg):
-                                regular_imports.append(arg)
-                            else:
-                                constant_imports.append(arg)
-                        dollar_imports.sort()
-                        regular_imports.sort()
-                        constant_imports.sort()
-                        sorted_imports = (
-                            dollar_imports + regular_imports + (
-                                constant_imports))
-                        if sorted_imports != function_args:
-                            failed = True
-                            error_message = (
-                                'Please ensure that in %s in file %s, the '
-                                'injected dependencies should be in the '
-                                'following manner: dollar imports, regular '
-                                'imports and constant imports, all in '
-                                'sorted order.'
-                                % (property_value, filepath))
-                            error_messages.append(error_message)
-                        if sorted_imports != literal_args:
-                            failed = True
-                            error_message = (
-                                'Please ensure that in %s in file %s, the '
-                                'stringfied dependencies should be in the '
-                                'following manner: dollar imports, regular '
-                                'imports and constant imports, all in '
-                                'sorted order.'
-                                % (property_value, filepath))
-                            error_messages.append(error_message)
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
-    def _match_line_breaks_in_controller_dependencies(self):
-        """This function checks whether the line breaks between the dependencies
-        listed in the controller of a directive or service exactly match those
-        between the arguments of the controller function.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Controller dependency line break'
-        files_to_check = self.all_filepaths
-        failed = False
-        error_messages = []
-
-        # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
-        pattern_to_match = (
-            r'controller.* \[(?P<stringfied_dependencies>[\S\s]*?)' +
-            r'function\((?P<function_parameters>[\S\s]*?)\)')
-
-        for filepath in files_to_check:
-            file_content = self.file_cache.read(filepath)
-            matched_patterns = re.findall(pattern_to_match, file_content)
-            for matched_pattern in matched_patterns:
-                stringfied_dependencies, function_parameters = (
-                    matched_pattern)
-                stringfied_dependencies = (
-                    stringfied_dependencies.strip().replace(
-                        '\'', '').replace(' ', ''))[:-1]
-                function_parameters = (
-                    function_parameters.strip().replace(' ', ''))
-                if stringfied_dependencies != function_parameters:
-                    failed = True
-                    error_messages.append(
-                        'Please ensure that in file %s the line breaks '
-                        'pattern between the dependencies mentioned as '
-                        'strings:\n[%s]\nand the dependencies mentioned '
-                        'as function parameters: \n(%s)\nfor the '
-                        'corresponding controller should '
-                        'exactly match.' % (
-                            filepath, stringfied_dependencies,
-                            function_parameters))
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
@@ -1021,11 +855,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
         linter_stdout = []
 
-        linter_stdout.append(self._check_js_and_ts_component_name_and_count())
         linter_stdout.append(self._check_directive_scope())
-        linter_stdout.append(self._check_sorted_dependencies())
-        linter_stdout.append(
-            self._match_line_breaks_in_controller_dependencies())
         linter_stdout.append(self._check_constants_declaration())
         linter_stdout.append(self._check_comments())
         linter_stdout.append(self._check_ts_ignore())

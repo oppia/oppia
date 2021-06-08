@@ -1,6 +1,6 @@
-<schema-based-editor schema="$ctrl.SCHEMA" local-value="$ctrl.value">
+<schema-based-editor [schema]="getSchema.bind(this)" [localValue]="value" (localValueChange)="updateValue($event)">
 </schema-based-editor>
 
 <div class="alert alert-info mt-2 mb-4">
-  <[$ctrl.PLACEHOLDER_INFO]>
+  {{ PLACEHOLDER_INFO }}
 </div>

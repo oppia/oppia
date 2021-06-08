@@ -103,7 +103,6 @@ export class LearnerDashboardActivityBackendApiService {
     modelRef.componentInstance.activityTitle = activityTitle;
     modelRef.componentInstance.activityType = activityType;
     modelRef.result.then((playlistUrl) => {
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(playlistUrl).toPromise();
       if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
@@ -133,7 +132,6 @@ export class LearnerDashboardActivityBackendApiService {
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
     await modelRef.result.then((playlistUrl) => {
-      // eslint-disable-next-line dot-notation
       this.http.delete<void>(playlistUrl).toPromise();
       this.removeActivityModalStatus = 'removed';
     }, () => {

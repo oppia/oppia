@@ -86,7 +86,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
       expect(pcevs.getAllWarnings(
@@ -110,7 +110,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);
@@ -158,7 +158,7 @@ describe('Pencil Code Editor Validation Service', () => {
       let rulesDict = rof.createNew('CodeEquals', inputBackend, {
         x: 'CodeString'
       });
-      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], '');
+      let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
         'Introduction', 'default_outcome',
         '<p>no</p>', []);

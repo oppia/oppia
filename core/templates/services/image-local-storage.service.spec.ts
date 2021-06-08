@@ -96,7 +96,7 @@ describe('ImageLocalStorageService', () => {
   it(
     'should show error message if number of stored images crosses ' +
     'limit', () => {
-      for (var i = 0; i <= 50; i++) {
+      for (let i = 0; i <= 50; i++) {
         imageLocalStorageService.saveImage('filename' + i, sampleImageData);
       }
       expect(alertsService.messages.length).toEqual(0);
