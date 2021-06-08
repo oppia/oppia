@@ -31,11 +31,13 @@ _RAND_RANGE = 127 * 127
 
 
 class BlogPostModel(base_models.BaseModel):
+
     """Model to store blog content
 
     The id of instances of this class has the form
         [author_id].[generated_string]
     """
+
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = True
 
@@ -87,7 +89,7 @@ class BlogPostModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains data corresponding to a user to export"""
+        """Model contains data corresponding to a user to export."""
         return dict(super(BlogPostModel, cls).get_export_policy(), **{
             # We do not export the author_id because we should not
             # export internal user ids.
@@ -98,7 +100,6 @@ class BlogPostModel(base_models.BaseModel):
             'tags': base_models.EXPORT_POLICY.EXPORTED,
             'thumbnail_filename': base_models.EXPORT_POLICY.EXPORTED,
             'published_on': base_models.EXPORT_POLICY.EXPORTED,
-            'last_updated': base_models.EXPORT_POLICY.EXPORTED,
         })
 
     @classmethod
@@ -113,7 +114,7 @@ class BlogPostModel(base_models.BaseModel):
         Raises:
             Exception. There were too many collisions with existing blog IDs
                 when attempting to generate a new blog ID.
-        """      
+        """
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             blog_id = utils.convert_to_hash(
@@ -356,7 +357,8 @@ class BlogPostRightsModel(base_models.BaseModel):
         users can edit the blog.
         """
         return (
-            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
+            base_models.MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS
             )
 
     @classmethod

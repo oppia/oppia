@@ -27,12 +27,12 @@ from core.platform import models
 import feconf
 
 (
-    base_models, collection_models, email_models,
+    base_models, blog_post_models, collection_models, email_models,
     exploration_models, feedback_models, topic_models,
     suggestion_models, user_models) = models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,
-         models.NAMES.suggestion, models.NAMES.user])
+        [models.NAMES.base_model, models.NAMES.blog, models.NAMES.collection,
+         models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+         models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user])
 
 
 def get_models_which_should_be_exported():

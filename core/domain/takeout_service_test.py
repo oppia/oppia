@@ -761,36 +761,30 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         report_entity.update_timestamps()
         report_entity.put()
 
-    # Set-up for BlogPostModel 
-        self.blog_post_model = blog_post_models.BlogPostModel(
+        # Set-up for BlogPostModel.
+        blog_post_models.BlogPostModel(
             id=self.BLOG_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
-            last_updated=datetime.datetime.utcnow(),
-            published_on=datetime.datetime.utcnow(),
+            last_updated=self.GENERIC_DATE,
+            published_on=self.GENERIC_DATE,
             url_fragment='sample-url-fragment',
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail'
-        )
-        self.blog_post_model.update_timestamps()
-        self.blog_post_model.put()
+        ).put()
 
-        self.blog_post_rights_model = blog_post_models.BlogPostRightsModel(
+        blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_1,
             editor_ids=[self.USER_ID_1],
             blog_is_published=True,
-        )
-        self.blog_post_rights_model.update_timestamps()
-        self.blog_post_rights_model.put()
+        ).put()
 
-        self.blog_post_rights_model_new = blog_post_models.BlogPostRightsModel(
+        blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_2,
             editor_ids=[self.USER_ID_1],
             blog_is_published=False,
-        )
-        self.blog_post_rights_model_new.update_timestamps()
-        self.blog_post_rights_model_new.put()
+        ).put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
@@ -909,10 +903,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         expected_user_data = {
             'app_feedback_report': app_feedback_report,
-            'blog_post': {},
-            'blog_post_rights': {
-                'editable_blog_post_ids': []
-            },
+            'blog_post': expected_blog_post_data,
+            'blog_post_rights': expected_blog_post_rights,
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,

@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
-import utils
 import re
 
 from core.domain import auth_services
@@ -36,6 +35,7 @@ from core.domain import wipeout_domain
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (
     app_feedback_report_models, base_models, blog_models,

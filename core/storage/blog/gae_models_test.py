@@ -181,7 +181,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         # Test create method.
         with self.assertRaisesRegexp(
             Exception, 'Blog ID conflict on creating new blog summary model.'):
-            # Swap dependent method get_by_id to simulate collision every time.
+            #  Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 blog_post_summary_model_cls, 'get_by_id',
                 types.MethodType(
@@ -189,6 +189,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                     blog_post_summary_model_cls)):
                 blog_post_summary_model_cls.create(
                     'blog_one')
+
 
 class BlogPostRightsModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostRightsModel class."""
@@ -244,6 +245,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
 
     def test_export_data_on_editor(self):
         """Test export data on user who is editor of the blog post."""
+
         blog_post_ids = (
             blog_post_models.BlogPostRightsModel.export_data(
                 self.USER_ID_NEW))
@@ -254,7 +256,8 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
 
     def test_export_data_on_uninvolved_user(self):
         """Test for empty lists when user has no editor rights on
-        existing blog posts."""
+        existing blog posts.
+        """
 
         blog_post_ids = (
             blog_post_models.BlogPostRightsModel.export_data(

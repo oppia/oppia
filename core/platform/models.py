@@ -27,14 +27,14 @@ import python_utils
 
 # Valid model names.
 NAMES = python_utils.create_enum(
-    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job', 'blog',
-    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
-    'improvements', 'job', 'opportunity', 'question', 'recommendations',
-    'skill', 'statistics', 'activity', 'audit', 'auth', 'base_model',
-    'classifier', 'collection', 'config', 'email', 'exploration', 'feedback',
-    'improvements', 'job', 'opportunity', 'question', 'recommendations',
-    'skill', 'statistics', 'story', 'subtopic', 'suggestion', 'topic',
-    'translation', 'user')
+    'activity', 'app_feedback_report', 'audit', 'base_model', 'beam_job',
+    'blog', 'classifier', 'collection', 'config', 'email', 'exploration',
+    'feedback', 'improvements', 'job', 'opportunity', 'question',
+    'recommendations', 'skill', 'statistics', 'activity', 'audit', 'auth',
+    'base_model', 'classifier', 'collection', 'config', 'email', 'exploration',
+    'feedback', 'improvements', 'job', 'opportunity', 'question',
+    'recommendations', 'skill', 'statistics', 'story', 'subtopic', 'suggestion',
+    'topic', 'translation', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
