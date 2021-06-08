@@ -339,7 +339,6 @@ export class TranslationModalComponent {
     this.hasImgCopyError = false;
     this.triedToCopyParagraph = false;
     this.hasImgTextError = false;
-    this.incompleteTranslationError = false;
 
     if (!this.uploadingTranslation && !this.loadingData) {
       this.siteAnalyticsService
