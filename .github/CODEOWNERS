@@ -301,7 +301,6 @@
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
 /core/domain/expression_parser*.py @iamprayush
-/core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
 /core/domain/object_registry*.py @iamprayush
 /core/domain/rules_registry*.py @aks681

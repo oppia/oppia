@@ -25,7 +25,6 @@ from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
-from core.domain import interaction_jobs_one_off
 from core.domain import opportunity_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
@@ -49,15 +48,6 @@ ONE_OFF_JOB_MANAGERS = [
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
     feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
-    (
-        interaction_jobs_one_off
-        .DragAndDropSortInputInteractionOneOffJob),
-    (
-        interaction_jobs_one_off
-        .InteractionCustomizationArgsValidationOneOffJob),
-    interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
-    interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
-    interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     (
         opportunity_jobs_one_off.
