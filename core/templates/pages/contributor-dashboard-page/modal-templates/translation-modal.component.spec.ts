@@ -332,6 +332,21 @@ describe('Translation Modal Component', () => {
       component.activeWrittenTranslation.html = 'texto1';
     }));
 
+    it('should remove paragraph error', fakeAsync(() => {
+      component.hadCopyParagraphError = true;
+
+      component.suggestTranslatedText();
+
+      const req = httpTestingController.expectOne(
+        '/suggestionhandler/');
+      expect(component.hadCopyParagraphError).toEqual(false);
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body.getAll('payload')[0]).toEqual(
+        JSON.stringify(expectedPayload));
+      req.flush({});
+      flushMicrotasks();
+    }));
+
     it('should correctly submit a translation suggestion', fakeAsync(() => {
       component.suggestTranslatedText();
 
