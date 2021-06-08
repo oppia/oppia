@@ -110,7 +110,6 @@ SCHEMA_REQUIRING_HANDLERS = [
     'EditableQuestionDataHandler',
     'QuebstionsListHandler',
     'QuestionCountDataHandler',
-    'AdminHandler',
     'AdminRoleHandler',
     'AdmintopicsCsvFileDownloader',
     'DataExtractionQueryHandler',
