@@ -214,7 +214,7 @@ angular.module('oppia').directive('topNavigationBar', [
 
           ctrl.$onInit = function() {
             ctrl.isModerator = null;
-            ctrl.isAdmin = null;
+            ctrl.isCurriculumAdmin = null;
             ctrl.isTopicManager = null;
             ctrl.isSuperAdmin = null;
             ctrl.userIsLoggedIn = null;
@@ -270,7 +270,7 @@ angular.module('oppia').directive('topNavigationBar', [
                   userInfo.getPreferredSiteLanguageCode());
               }
               ctrl.isModerator = userInfo.isModerator();
-              ctrl.isAdmin = userInfo.isAdmin();
+              ctrl.isCurriculumAdmin = userInfo.isCurriculumAdmin();
               ctrl.isTopicManager = userInfo.isTopicManager();
               ctrl.isSuperAdmin = userInfo.isSuperAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();

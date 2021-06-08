@@ -670,13 +670,13 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(RecentFeedbackMessagesHandlerTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.set_curriculum_admins([self.OWNER_USERNAME])
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_curriculum_admins([self.MODERATOR_USERNAME])
+        self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.exp_id = 'exp_id'
 
     def test_get_recently_posted_feedback_messages(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.MODERATOR_EMAIL)
 
         response = self.get_json(
             feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
@@ -685,14 +685,14 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(response['more'])
 
         self.save_new_valid_exploration(
-            self.exp_id, self.owner_id, title='Exploration title',
+            self.exp_id, self.moderator_id, title='Exploration title',
             category='Architecture', language_code='en')
         feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.moderator_id,
             'a subject', 'some text')
 
         feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.moderator_id,
             'new subject', 'new text')
 
         response = self.get_json(

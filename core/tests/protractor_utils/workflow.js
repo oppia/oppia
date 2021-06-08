@@ -83,10 +83,10 @@ var createExplorationAndStartTutorial = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  var isAdmin = await users.isAdmin();
+  var isCurriculumAdmin = await users.isCurriculumAdmin();
 
   await creatorDashboardPage.clickCreateActivityButton();
-  if (isAdmin) {
+  if (isCurriculumAdmin) {
     var activityCreationModal = element(
       by.css('.protractor-test-creation-modal'));
     await waitFor.visibilityOf(

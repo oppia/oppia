@@ -1737,11 +1737,10 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
-    def test_moderator_cannot_modify_roles_of_unowned_exploration(self):
+    def test_moderator_can_modify_roles_of_unowned_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id, expected_status_int=401)
+            self.get_json('/mock/%s' % self.private_exp_id)
         self.logout()
 
     def test_admin_can_modify_roles_of_any_exploration(self):

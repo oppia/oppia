@@ -128,7 +128,7 @@ describe('Teach Page', () => {
   it('should check if user is logged in or not', fakeAsync(() => {
     const UserInfoObject = {
       is_moderator: false,
-      is_admin: false,
+      is_curriculum_admin: false,
       is_super_admin: false,
       is_topic_manager: false,
       can_create_collections: true,

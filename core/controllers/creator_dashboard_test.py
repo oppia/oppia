@@ -787,7 +787,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_create_collections(self):
-        self.set_curriculum_admins([self.OWNER_USERNAME])
+        self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         collection_id = self.post_json(
@@ -805,7 +805,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_collections_list(self):
-        self.set_curriculum_admins([self.OWNER_USERNAME])
+        self.set_collection_editors([self.OWNER_USERNAME])
         self.login(self.OWNER_EMAIL)
         collection_list = self.get_json(
             feconf.CREATOR_DASHBOARD_DATA_URL)['collections_list']

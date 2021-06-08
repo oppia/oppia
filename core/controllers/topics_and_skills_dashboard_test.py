@@ -134,7 +134,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(len(json_response['topic_summary_dicts']), 1)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['can_edit_topic'],
-            False)
+            True)
         self.assertEqual(
             json_response['topic_summary_dicts'][0]['id'], self.topic_id)
         self.assertEqual(

@@ -72,7 +72,7 @@ class AppFeedbackReportModelValidatorTests(test_utils.AuditJobsTestBase):
         'text_size': 'MEDIUM_TEXT_SIZE',
         'download_and_update_only_on_wifi': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 
@@ -501,7 +501,7 @@ class AppFeedbackReportTicketModelValidatorTests(test_utils.AuditJobsTestBase):
         'text_size': 'MEDIUM_TEXT_SIZE',
         'download_and_update_only_on_wifi': True,
         'automatically_update_topics': False,
-        'is_admin': False
+        'is_curriculum_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
 

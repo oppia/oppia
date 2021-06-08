@@ -147,11 +147,11 @@ var createAdmin = async function(email, username) {
   await logout();
 };
 
-var isAdmin = async function() {
+var isCurriculumAdmin = async function() {
   return await element(by.css('.protractor-test-admin-text')).isPresent();
 };
 
-exports.isAdmin = isAdmin;
+exports.isCurriculumAdmin = isCurriculumAdmin;
 exports.login = login;
 exports.logout = logout;
 exports.createUser = createUser;

@@ -1152,7 +1152,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
             'is_moderator': False,
-            'is_admin': False,
+            'is_curriculum_admin': False,
             'is_topic_manager': False,
             'is_super_admin': False,
             'can_create_collections': False,

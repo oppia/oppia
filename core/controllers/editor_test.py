@@ -1145,28 +1145,10 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
             self.assertEqual(observed_log_messages, [
                 '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_FULL_USER, self.owner_id, exp_id),
+                ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id),
                 '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_FULL_USER, self.owner_id, exp_id)
+                ([feconf.ROLE_ID_FULL_USER], self.owner_id, exp_id)
             ])
-            self.logout()
-
-            # Checking for admin.
-            observed_log_messages = []
-            exp_id = 'unpublished_eid2'
-            exploration = exp_domain.Exploration.create_default_exploration(
-                exp_id)
-            exp_services.save_new_exploration(self.admin_id, exploration)
-
-            self.login(self.CURRICULUM_ADMIN_EMAIL)
-            self.delete_json('/createhandler/data/%s' % exp_id)
-            self.assertEqual(observed_log_messages, [
-                '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_CURRICULUM_ADMIN, self.admin_id, exp_id),
-                '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_CURRICULUM_ADMIN, self.admin_id, exp_id)
-            ])
-
             self.logout()
 
             # Checking for moderator.
@@ -1179,10 +1161,12 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             self.login(self.MODERATOR_EMAIL)
             self.delete_json('/createhandler/data/%s' % exp_id)
             self.assertEqual(observed_log_messages, [
-                '(%s) %s tried to delete exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id),
-                '(%s) %s deleted exploration %s' %
-                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id)
+                '(%s) %s tried to delete exploration %s' % (
+                    [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                    self.moderator_id, exp_id),
+                '(%s) %s deleted exploration %s' % (
+                    [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_MODERATOR],
+                    self.moderator_id, exp_id)
             ])
             self.logout()
 

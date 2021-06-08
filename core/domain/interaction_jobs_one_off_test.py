@@ -88,11 +88,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DragAndDropSortInputInteractionOneOffJobTests, self).setUp()
-
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.admin = user_services.get_user_actions_info(self.admin_id)
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -256,7 +251,8 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         )]
         self.assertEqual(actual_output, expected_output)
 
-        rights_manager.unpublish_exploration(self.admin, self.VALID_EXP_ID)
+        system_user = user_services.get_system_user()
+        rights_manager.unpublish_exploration(system_user, self.VALID_EXP_ID)
         # Start DragAndDropSortInputInteractionOneOffJob on private
         # exploration.
         job_id = (

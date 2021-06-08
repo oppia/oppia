@@ -233,7 +233,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = user_services.get_user_actions_info(self.user_id)
 
         self.values['is_moderator'] = user_services.is_moderator(self.user_id)
-        self.values['is_admin'] = user_services.is_curriculum_admin(self.user_id)
+        self.values['is_curriculum_admin'] = user_services.is_curriculum_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
         self.values['is_super_admin'] = self.current_user_is_super_admin

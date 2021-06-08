@@ -199,10 +199,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topics), 1)
 
     def test_get_all_topic_rights_of_user(self):
-        topic_services.assign_role(
-            self.user_admin, self.user_a,
-            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
-
         topic_rights = topic_fetchers.get_topic_rights_with_user(self.user_id_a)
 
         self.assertEqual(len(topic_rights), 1)
@@ -304,6 +300,6 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic_rights), 2)
         self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
-        self.assertEqual(topic_rights[0].manager_ids, [])
+        self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
         self.assertFalse(topic_rights[0].topic_is_published)
         self.assertIsNone(topic_rights[1])

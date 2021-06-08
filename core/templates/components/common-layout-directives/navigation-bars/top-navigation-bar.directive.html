@@ -181,14 +181,14 @@
             </span>
           </div>
 
-          <div class="oppia-navbar-role-indicator" ng-if="$ctrl.isAdmin || $ctrl.isModerator">
+          <div class="oppia-navbar-role-indicator" ng-if="$ctrl.isCurriculumAdmin || $ctrl.isModerator">
             <!--
              "right: 4px;" is necessary here but not in moderator to prevent 'A'
              from appearing off-center because 'A' is slightly thinner than 'M' in
              this font.
             -->
-            <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text oppia-admin-text protractor-test-admin-text">A</span>
-            <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text protract-test-moderator-text">M</span>
+            <span ng-if="$ctrl.isCurriculumAdmin" class="oppia-navbar-role-text oppia-admin-text protractor-test-admin-text">A</span>
+            <span ng-if="$ctrl.isModerator && !$ctrl.isCurriculumAdmin" class="oppia-navbar-role-text protract-test-moderator-text">M</span>
           </div>
         </div>
       </a>
@@ -227,7 +227,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a ng-if="($ctrl.isAdmin || $ctrl.isTopicManager)" ng-click="$ctrl.closeSubmenuIfNotMobile($event)"
+          <a ng-if="($ctrl.isCurriculumAdmin || $ctrl.isTopicManager)" ng-click="$ctrl.closeSubmenuIfNotMobile($event)"
              href="/topics-and-skills-dashboard" class="dropdown-item nav-link protractor-test-topics-and-skills-dashboard-link">
             <span translate="I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD"></span>
           </a>

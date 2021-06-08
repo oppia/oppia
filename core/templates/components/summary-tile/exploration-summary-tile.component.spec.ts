@@ -135,7 +135,7 @@ describe('Exploration Summary Tile Component', () => {
 
   let userInfo = {
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -144,7 +144,7 @@ describe('Exploration Summary Tile Component', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     canCreateCollections: () => true,

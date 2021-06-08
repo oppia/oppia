@@ -18,7 +18,7 @@
 
 export interface UserInfoBackendDict {
   'is_moderator': boolean;
-  'is_admin': boolean;
+  'is_curriculum_admin': boolean;
   'is_super_admin': boolean;
   'is_topic_manager': boolean;
   'can_create_collections': boolean;
@@ -30,7 +30,7 @@ export interface UserInfoBackendDict {
 
 export class UserInfo {
   _isModerator: boolean;
-  _isAdmin: boolean;
+  _isCurriculumAdmin: boolean;
   _isTopicManager: boolean;
   _isSuperAdmin: boolean;
   _canCreateCollections: boolean;
@@ -40,12 +40,12 @@ export class UserInfo {
   _isLoggedIn: boolean;
 
   constructor(
-      isModerator: boolean, isAdmin: boolean, isSuperAdmin: boolean,
+      isModerator: boolean, isCurriculumAdmin: boolean, isSuperAdmin: boolean,
       isTopicManager: boolean, canCreateCollections: boolean,
       preferredSiteLanguageCode: string, username: string,
       email: string, isLoggedIn: boolean) {
     this._isModerator = isModerator;
-    this._isAdmin = isAdmin;
+    this._isCurriculumAdmin = isCurriculumAdmin;
     this._isTopicManager = isTopicManager;
     this._isSuperAdmin = isSuperAdmin;
     this._canCreateCollections = canCreateCollections;
@@ -58,7 +58,7 @@ export class UserInfo {
   static createFromBackendDict(
       data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
-      data.is_moderator, data.is_admin, data.is_super_admin,
+      data.is_moderator, data.is_curriculum_admin, data.is_super_admin,
       data.is_topic_manager, data.can_create_collections,
       data.preferred_site_language_code, data.username,
       data.email, data.user_is_logged_in);
@@ -72,8 +72,8 @@ export class UserInfo {
     return this._isModerator;
   }
 
-  isAdmin(): boolean {
-    return this._isAdmin;
+  isCurriculumAdmin(): boolean {
+    return this._isCurriculumAdmin;
   }
 
   isTopicManager(): boolean {

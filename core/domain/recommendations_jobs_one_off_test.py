@@ -29,6 +29,7 @@ from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
 from core.domain import taskqueue_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import python_utils
@@ -94,7 +95,8 @@ class ExplorationRecommendationsOneOffJobUnitTests(
             self.assertEqual(
                 recommendations, ['exp_id_4', 'exp_id_2', 'exp_id_3'])
 
-            rights_manager.unpublish_exploration(self.admin, 'exp_id_4')
+            system_user = user_services.get_system_user()
+            rights_manager.unpublish_exploration(system_user, 'exp_id_4')
 
             self.job_class.enqueue(self.job_class.create_new())
             self.assertEqual(

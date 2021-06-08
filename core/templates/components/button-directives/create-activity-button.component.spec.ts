@@ -71,7 +71,7 @@ describe('CreateActivityButtonComponent', () => {
 
   let userInfoForCollectionCreator = {
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -80,7 +80,7 @@ describe('CreateActivityButtonComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     canCreateCollections: () => true,
@@ -92,7 +92,7 @@ describe('CreateActivityButtonComponent', () => {
 
   let userInfoForNonCollectionCreator = {
     _isModerator: true,
-    _isAdmin: false,
+    _isCurriculumAdmin: false,
     _isTopicManager: false,
     _isSuperAdmin: false,
     _canCreateCollections: true,
@@ -101,7 +101,7 @@ describe('CreateActivityButtonComponent', () => {
     _email: 'tester@example.org',
     _isLoggedIn: true,
     isModerator: () => true,
-    isAdmin: () => false,
+    isCurriculumAdmin: () => false,
     isSuperAdmin: () => false,
     isTopicManager: () => false,
     canCreateCollections: () => false,

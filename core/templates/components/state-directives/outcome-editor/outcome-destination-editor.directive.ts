@@ -187,7 +187,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               // admins/moderators for now, since the feature is still in
               // development.
               ctrl.canEditRefresherExplorationId = (
-                userInfo.isAdmin() || userInfo.isModerator());
+                userInfo.isCurriculumAdmin() || userInfo.isModerator());
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.
               $rootScope.$applyAsync();

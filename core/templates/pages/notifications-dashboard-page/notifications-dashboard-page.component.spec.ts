@@ -29,7 +29,7 @@ describe('Notifications Dasboard Page Component', () => {
   let componentInstance: NotificationsDashboardPageComponent;
   let loaderService: LoaderService;
   let responseData: NotificationsDashboardBackendDict = {
-    is_admin: true,
+    is_curriculum_admin: true,
     is_moderator: true,
     is_super_admin: true,
     is_topic_manager: false,

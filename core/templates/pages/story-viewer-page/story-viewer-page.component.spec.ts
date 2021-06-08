@@ -52,7 +52,7 @@ describe('Story Viewer Page component', () => {
   let _samplePlaythroughObject = null;
   const UserInfoObject = {
     is_moderator: false,
-    is_admin: false,
+    is_curriculum_admin: false,
     is_super_admin: false,
     is_topic_manager: false,
     can_create_collections: true,

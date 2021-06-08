@@ -218,16 +218,15 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for profile user roles check '
-                'of UserSettingsModel\', '
-                '[u\'Entity id %s: A profile user should only have learner '
-                'role, found %s\']]'
+                u'[u\'failed validation check for profile user roles check of '
+                'UserSettingsModel\', [u"Entity id %s: A profile user should '
+                'only have learner role, '
+                'found [u\'LEARNER\', u\'MODERATOR\']"]]'
             ) % (
-                profile_user_settings_model.id, [
-                    feconf.ROLE_ID_MOBILE_LEARNER, feconf.ROLE_ID_MODERATOR]),
+                profile_user_settings_model.id),
             u'[u\'fully-validated UserSettingsModel\', 3]']
         self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
+            expected_output, sort=True, literal_eval=True)
 
 
 class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
