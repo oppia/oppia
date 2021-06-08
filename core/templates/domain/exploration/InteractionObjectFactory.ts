@@ -54,6 +54,7 @@ import {
   MusicNotesInputCustomizationArgs,
   NumberWithUnitsCustomizationArgs,
   NumericExpressionInputCustomizationArgs,
+  NumericInputCustomizationArgsBackendDict,
   NumericInputCustomizationArgs,
   PencilCodeEditorCustomizationArgs,
   RatioExpressionInputCustomizationArgs,
@@ -366,6 +367,15 @@ export class InteractionObjectFactory {
       }
     };
   }
+
+  _createFromNumericInputCustomizationArgsBackendDict(
+    caBackendDict: NumericInputCustomizationArgsBackendDict
+): NumericInputCustomizationArgs {
+  const { placeholder } = caBackendDict;
+  return {
+    placeholder
+  };
+}
 
   convertFromCustomizationArgsBackendDict(
       interactionId: string,

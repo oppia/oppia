@@ -355,14 +355,22 @@ describe('Interaction object factory', () => {
     const testInteraction = iof.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
-      customization_args: {},
+      customization_args: {
+        placeholder: {
+          value: false
+        }
+      },
       default_outcome: defaultOutcomeDict,
       hints: hintsDict,
       id: 'NumericInput',
       solution: solutionDict
     });
 
-    expect(testInteraction.customizationArgs).toEqual({});
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: false
+      }
+    });
   });
 
   it('should correctly set customization arguments for ' +

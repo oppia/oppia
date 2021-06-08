@@ -538,14 +538,7 @@ var constants = {
       },
       "interaction": {
             "id": null,
-            "customization_args": {
-              "description": "Allow only input greater than or equal to zero for Number Input interaction.",
-              "name": "input",
-              "schema": {
-                "type": "bool"
-              },
-              "default_value": "false"
-            },
+            "customization_args": {},
             "answer_groups": [],
             "default_outcome": {
                 "dest": "Introduction",
