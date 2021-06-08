@@ -28,7 +28,6 @@ import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
-require('base-components/base-content.directive.ts');
 
 interface ViewedProfileUsername {
   title: string;
