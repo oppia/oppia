@@ -39,6 +39,7 @@ import { CommonElementsModule } from './common-layout-directives/common-elements
 
 
 // Components.
+import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
@@ -190,6 +191,7 @@ const toastrConfig = {
   ],
 
   declarations: [
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     AttributionGuideComponent,
@@ -242,6 +244,7 @@ const toastrConfig = {
   ],
 
   entryComponents: [
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
@@ -299,6 +302,7 @@ const toastrConfig = {
     TranslateModule,
     // Components, directives, and pipes.
     AttributionGuideComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
