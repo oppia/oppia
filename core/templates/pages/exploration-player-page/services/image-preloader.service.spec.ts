@@ -27,6 +27,7 @@ import { ImagePreloaderService } from
   'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;
@@ -45,6 +46,7 @@ describe('Image preloader service', () => {
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
   let ctms: ContentTranslationManagerService;
+  let svgSanitizerService: SvgSanitizerService;
 
 
   const initStateName = 'Introduction';
@@ -396,6 +398,7 @@ describe('Image preloader service', () => {
     contextService = TestBed.get(ContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     ctms = TestBed.get(ContentTranslationManagerService);
+    svgSanitizerService = TestBed.inject(SvgSanitizerService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
@@ -696,11 +699,13 @@ describe('Image preloader service', () => {
     // the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+    spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
 
     imagePreloaderService.getImageUrlAsync(filename1)
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
+    expect(svgSanitizerService.getTrustedSvgResourceUrl).toHaveBeenCalled();
     expect(onSuccess).toHaveBeenCalled();
     expect(onFailure).not.toHaveBeenCalled();
   }));

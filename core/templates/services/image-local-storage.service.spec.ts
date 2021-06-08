@@ -51,20 +51,6 @@ describe('ImageLocalStorageService', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
 
-  it(
-    'should call helper service function correctly when getting' +
-    ' object url', () => {
-      const imageUploaderSpy = spyOn(
-        imageUploadHelperService, 'convertImageDataToImageFile');
-      spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
-      imageLocalStorageService.saveImage(imageFilename, sampleImageData);
-      expect(
-        imageLocalStorageService.getObjectUrlForImage(imageFilename)
-      ).toBe('objectUrl');
-      expect(imageUploaderSpy).toHaveBeenCalledWith(sampleImageData);
-    }
-  );
-
   it('should delete images from localStorage correctly', () => {
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
     imageLocalStorageService.saveImage('filename 2', sampleImageData);
