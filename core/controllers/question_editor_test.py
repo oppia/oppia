@@ -407,9 +407,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
         (
-            question_summaries, merged_question_skill_links, _) = (
+            question_summaries, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    5, [self.skill_id], ''))
+                    5, [self.skill_id], 0))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.5])
@@ -438,9 +438,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 }]
             }, csrf_token=csrf_token)
         (
-            question_summaries, merged_question_skill_links, _) = (
+            question_summaries, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    5, [self.skill_id, 'skill_2'], ''))
+                    5, [self.skill_id, 'skill_2'], 0))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(len(merged_question_skill_links), 1)
         self.assertEqual(
@@ -455,9 +455,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                     'task': 'remove'
                 }]
             }, csrf_token=csrf_token)
-        question_summaries, _, _ = (
+        question_summaries, _, = (
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_2'], ''))
+                5, ['skill_2'], 0))
         self.assertEqual(len(question_summaries), 0)
         self.logout()
 
@@ -521,9 +521,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 }]
             }, csrf_token=csrf_token)
         (
-            question_summaries, merged_question_skill_links, _) = (
+            question_summaries, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    5, [self.skill_id], ''))
+                    5, [self.skill_id], 0))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(len(merged_question_skill_links), 1)
         self.assertEqual(

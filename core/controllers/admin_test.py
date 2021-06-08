@@ -284,11 +284,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             story_fetchers.get_story_by_id(story_id, strict=False))
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 10, [
                     skill_summaries[0].id, skill_summaries[1].id,
-                    skill_summaries[2].id], '')
+                    skill_summaries[2].id], 0)
         )
         self.assertEqual(len(questions), 3)
         # Testing that there are 3 hindi translation opportunities
@@ -310,9 +310,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 1)
-        questions, _, _ = (
+        questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                20, [skill_summaries[0].id], '')
+                20, [skill_summaries[0].id], 0)
         )
         self.assertEqual(len(questions), 15)
         self.logout()

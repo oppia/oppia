@@ -154,18 +154,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
-        _, merged_question_skill_links, _ = (
+        _, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.3])
 
         question_services.update_question_skill_link_difficulty(
             self.question_id, 'skill_1', 0.9)
 
-        _, merged_question_skill_links, _ = (
+        _, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                2, ['skill_1'], ''))
+                2, ['skill_1'], 0))
         self.assertEqual(
             merged_question_skill_links[0].skill_difficulties, [0.9])
 
@@ -289,15 +289,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
 
-        question_summaries, merged_question_skill_links, _ = (
+        question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_1', 'skill_2', 'skill_3'], ''))
+                5, ['skill_1', 'skill_2', 'skill_3'], 0))
 
         with self.assertRaisesRegexp(
             Exception, 'Querying linked question summaries for more than 3 '
             'skills at a time is not supported currently.'):
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], '')
+                5, ['skill_1', 'skill_2', 'skill_3', 'skill_4'], 0)
         question_ids = [summary.id for summary in question_summaries]
 
         self.assertEqual(len(question_ids), 3)
@@ -329,9 +329,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual(
                     [0.2], link_object.skill_difficulties)
 
-        question_summaries, merged_question_skill_links, _ = (
+        question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                5, ['skill_1', 'skill_3'], ''))
+                5, ['skill_1', 'skill_3'], 0))
         question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 2)
         self.assertItemsEqual(
@@ -352,9 +352,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
 
-        question_summaries, merged_question_skill_links, _ = (
+        question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                2, [], ''))
+                2, [], 0))
 
         self.assertEqual(question_summaries, [])
         self.assertEqual(merged_question_skill_links, [])
