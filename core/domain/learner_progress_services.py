@@ -30,6 +30,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
 import utils
@@ -886,14 +887,17 @@ def _get_filtered_completed_story_summaries(
             nonexistent_completed_story_ids.append(story_ids[index])
         else:
             story_id = story_summary.id
+            story = story_fetchers.get_story_by_id(story_id)
             if len(story_fetchers.get_completed_node_ids(
                     user_id, story_id)) != len(story_summary.node_titles):
                 remove_story_from_completed_list(user_id, story_id)
                 mark_story_as_incomplete(user_id, story_id)
                 completed_to_incomplete_stories.append(story_summary)
+            elif not story_services.is_story_published_and_present_in_topic(
+                    story):
+                nonexistent_completed_story_ids.append(story_ids[index])
             else:
-                filtered_completed_story_summaries.append(
-                    story_summary)
+                filtered_completed_story_summaries.append(story_summary)
 
     return (
         filtered_completed_story_summaries,
@@ -954,13 +958,15 @@ def _get_filtered_learnt_topic_summaries(
     learnt_to_partially_learnt_topics = []
     filtered_learnt_topic_summaries = []
 
-    completed_story_ids = get_all_completed_story_ids(user_id)
+    completed_story_ids = topic_services.get_stories_completed_in_topics(
+        user_id, topic_ids)
 
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is None:
             nonexistent_learnt_topic_ids.append(topic_ids[index])
         else:
             topic_id = topic_summary.id
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
             topic = topic_fetchers.get_topic_by_id(topic_id)
             story_ids_in_topic = []
             for story in topic.canonical_story_references:
@@ -971,6 +977,8 @@ def _get_filtered_learnt_topic_summaries(
                 remove_topic_from_learnt_list(user_id, topic_id)
                 mark_topic_as_partially_learnt(user_id, topic_id)
                 learnt_to_partially_learnt_topics.append(topic_summary)
+            elif not topic_rights.topic_is_published:
+                nonexistent_learnt_topic_ids.append(topic_ids[index])
             else:
                 filtered_learnt_topic_summaries.append(topic_summary)
 
@@ -1160,7 +1168,10 @@ def _get_filtered_incomplete_story_summaries(
     nonexistent_incomplete_story_ids = []
     filtered_incomplete_story_summaries = []
     for index, story_summary in enumerate(story_summaries):
+        story = story_fetchers.get_story_by_id(story_summary.story_id)
         if story_summary is None:
+            nonexistent_incomplete_story_ids.append(story_ids[index])
+        elif not story_services.is_story_published_and_present_in_topic(story):
             nonexistent_incomplete_story_ids.append(story_ids[index])
         else:
             filtered_incomplete_story_summaries.append(story_summary)
@@ -1213,7 +1224,11 @@ def _get_filtered_partially_learnt_topic_summaries(
     nonexistent_partially_learnt_topic_ids = []
     filtered_partially_learnt_topic_summaries = []
     for index, topic_summary in enumerate(topic_summaries):
+        topic_id = topic_summary.id
+        topic_rights = topic_fetchers.get_topic_rights(topic_id)
         if topic_summary is None:
+            nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
+        elif not topic_rights.topic_is_published:
             nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
         else:
             filtered_partially_learnt_topic_summaries.append(topic_summary)
