@@ -214,7 +214,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteExplorations !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentIncompleteExplorations}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentIncompleteExplorations, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -281,7 +281,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCompletedExplorations !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentCompletedExplorations}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS' | translate: {numberNonexistent: numberNonexistentCompletedExplorations, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -379,7 +379,7 @@
         <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentIncompleteCollections !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentIncompleteCollections}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentIncompleteCollections, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -441,7 +441,7 @@
           </span>
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCollectionsFromPlaylist !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentCollectionsFromPlaylist}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST' | translate: {numberNonexistent: numberNonexistentCollectionsFromPlaylist, messageFormat: true}">
             </span>
             &#9785;
           </span>
@@ -496,7 +496,7 @@
 
           <span class="oppia-learner-dashboard-nonexistent-exploration"
                 *ngIf="numberNonexistentCompletedCollections !== 0">
-            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentCompletedCollections}: messageformat">
+            <span [innerHTML]="'I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS' | translate: {numberNonexistent: numberNonexistentCompletedCollections, messageFormat: true}">
             </span>
             &#9785;
           </span>
