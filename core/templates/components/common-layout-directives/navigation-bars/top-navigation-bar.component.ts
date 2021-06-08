@@ -56,11 +56,7 @@ interface KeyboardEvent {
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText: string;
   @Input() subheaderText: string;
-  @Input() toggle: () => void;
-  @Output() headerTextChange: EventEmitter<string> = (
-    new EventEmitter());
-  @Output() subheaderTextChange: EventEmitter<string> = (
-    new EventEmitter());
+
   isModerator: boolean;
   isAdmin: boolean;
   isTopicManager: boolean;

@@ -33,7 +33,6 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
   templateUrl: './base-content.component.html'
 })
 export class BaseContentComponent {
-  @Input() backButtonShown: boolean;
   loadingMessage: string = '';
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean;
@@ -87,13 +86,6 @@ export class BaseContentComponent {
   isMainProdServer(): boolean {
     return this.windowRef.nativeWindow.location.hostname ===
       'oppiaserver.appspot.com';
-  }
-
-  /**
-   * This function can be removed after top navigation directive is migrated
-   */
-  toggleSidebar(): void {
-    this.sidebarStatusService.toggleSidebar();
   }
 
   isSidebarShown(): boolean {
