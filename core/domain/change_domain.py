@@ -75,13 +75,12 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
         raise utils.ValidationError((', ').join(error_msg_list))
 
     deprecated_values = valid_cmd_attribute_specs.get('deprecated_values')
-    if deprecated_values:
-        for attribute_name, attribute_values in deprecated_values.items():
-            actual_value = actual_cmd_attributes[attribute_name]
-            if actual_value in attribute_values:
-                raise utils.DeprecatedError(
-                    'Value for %s in cmd %s: %s is deprecated' % (
-                        attribute_name, cmd_name, actual_value))
+    for attribute_name, attribute_values in deprecated_values.items():
+        actual_value = actual_cmd_attributes[attribute_name]
+        if actual_value in attribute_values:
+            raise utils.DeprecatedError(
+                'Value for %s in cmd %s: %s is deprecated' % (
+                    attribute_name, cmd_name, actual_value))
 
     allowed_values = valid_cmd_attribute_specs.get('allowed_values')
     if not allowed_values:
@@ -112,7 +111,10 @@ class BaseChange(python_utils.OBJECT):
     # This list can be overriden by subclasses, if needed.
     ALLOWED_COMMANDS = []
 
-    # The list of deprecated commands of a change domain object.
+    # The list of deprecated commands of a change domain object. Each item
+    # is a command that has been deprecated but these commands are yet to be
+    # removed from the server data. Thus, once these commands are removed using
+    # a migration job, we can remove the command from this list.
     DEPRECATED_COMMANDS = []
 
     # This is a list of common commands which is valid for all subclasses.
