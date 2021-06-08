@@ -308,6 +308,7 @@ angular.module('oppia').directive('storyEditor', [
               StoryUpdateService.setThumbnailFilename(
                 $scope.story, newThumbnailFilename);
             }
+            $scope.$applyAsync();
           };
 
           $scope.updateStoryThumbnailBgColor = function(

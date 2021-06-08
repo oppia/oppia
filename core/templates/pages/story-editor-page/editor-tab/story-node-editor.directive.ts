@@ -201,6 +201,7 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), newThumbnailFilename);
               $scope.editableThumbnailFilename = newThumbnailFilename;
             }
+            $scope.$applyAsync();
           };
 
           $scope.updateThumbnailBgColor = function(newThumbnailBgColor) {

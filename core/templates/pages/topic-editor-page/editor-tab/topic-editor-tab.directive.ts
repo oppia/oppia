@@ -296,6 +296,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicThumbnailBgColor(
               $scope.topic, newThumbnailBgColor);
+            $scope.$applyAsync();
           };
 
           $scope.updateTopicDescription = function(newDescription) {
