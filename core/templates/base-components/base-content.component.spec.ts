@@ -21,7 +21,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
 import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component';
 import { SideNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
-import { TopNavigationBarDirective } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
+import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
 import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { Observable, of } from 'rxjs';
@@ -94,7 +94,7 @@ describe('Base Content Component', () => {
         LoadingMessageComponent,
         WarningsAndAlertsComponent,
         PromoBarComponent,
-        TopNavigationBarDirective,
+        TopNavigationBarComponent,
         SideNavigationBarComponent,
         MockTranslatePipe,
         AlertMessageComponent,
