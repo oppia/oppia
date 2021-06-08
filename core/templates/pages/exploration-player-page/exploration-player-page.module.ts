@@ -41,6 +41,7 @@ import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.c
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
+import { MaterialModule } from 'components/material.module';
 import { DisplayHintModalComponent } from './modals/display-hint-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from './modals/display-solution-interstitial-modal.component';
 import { DisplaySolutionModalComponent } from './modals/display-solution-modal.component';
@@ -53,8 +54,9 @@ import { RefresherExplorationConfirmationModal } from './modals/refresher-explor
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
-    SharedComponentsModule,
-    NgbPopoverModule
+    MaterialModule,
+    NgbPopoverModule,
+    SharedComponentsModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
