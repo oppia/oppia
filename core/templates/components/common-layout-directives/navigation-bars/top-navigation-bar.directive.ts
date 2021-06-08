@@ -274,6 +274,15 @@ angular.module('oppia').directive('topNavigationBar', [
               )
             );
 
+            // This subscription can be removed after the component is migrated.
+            ctrl.directiveSubscriptions.add(
+              SidebarStatusService.onSideBarStatusUpdate.subscribe(() => {
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
+              })
+            );
+
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
