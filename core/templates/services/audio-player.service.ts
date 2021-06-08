@@ -94,18 +94,20 @@ export class AudioPlayerService {
     if (this.isPlaying()) {
       return;
     }
-    if (this._currentTrack !== null) {
-      this._currentTrack.seek(this._lastPauseOrSeekPos);
-    }
+
     this.ngZone.runOutsideAngular(() => {
+      if (this._currentTrack !== null) {
+        this._currentTrack.seek(this._lastPauseOrSeekPos);
+      }
       interval(500).pipe(takeUntil(
         this._stopIntervalSubject)).subscribe(() => {
         this.ngZone.run(() => {
           this._updateViewEventEmitter.emit();
         });
       });
+
+      this._currentTrack.play();
     });
-    this._currentTrack.play();
   }
 
   pause(): void {
