@@ -24,8 +24,11 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { FocusOnDirective } from './focus-on.directive';
+import { HeadroomDirective } from './headroom.directive';
 import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
+import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
+import { TopNavigationBarDirective } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
 
 @NgModule({
   imports: [
@@ -35,14 +38,20 @@ import { NgInitDirective } from './ng-init.directive';
   ],
   declarations: [
     FocusOnDirective,
+    HeadroomDirective,
     MathJaxDirective,
-    NgInitDirective
+    NgInitDirective,
+    OppiaFooterDirective,
+    TopNavigationBarDirective
   ],
   entryComponents: [],
   exports: [
     FocusOnDirective,
+    HeadroomDirective,
     MathJaxDirective,
-    NgInitDirective
+    NgInitDirective,
+    OppiaFooterDirective,
+    TopNavigationBarDirective
   ],
 })
 
