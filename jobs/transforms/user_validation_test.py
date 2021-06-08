@@ -240,7 +240,8 @@ class RelationshipsOfTests(test_utils.TestBase):
             ['UserSettingsModel'])
 
 
-class ValidateArchivedModelsMarkedDeletedTests(job_test_utils.PipelinedTestBase):
+class ValidateArchivedModelsMarkedDeletedTests(
+        job_test_utils.PipelinedTestBase):
 
     def test_archived_model_not_marked_deleted(self):
         model = user_models.UserQueryModel(
