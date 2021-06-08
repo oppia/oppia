@@ -53,11 +53,11 @@ describe('Oppia CodeMirror Component', () => {
     expect(codeMirrorInstance).toBe(undefined);
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
-    const mergeView = (element: HTMLElement): void => {
+    const mockMergeView = (element: HTMLElement): void => {
       mergeViewCalled = true;
     };
     const mockCodeMirror: typeof CodeMirror = {
-      MergeView: mergeView
+      MergeView: mockMergeView
     } as typeof CodeMirror;
     window.CodeMirror = mockCodeMirror;
     component.ngAfterViewInit();
@@ -106,7 +106,7 @@ describe('Oppia CodeMirror Component', () => {
     );
   });
 
-  it('should allow for a value of left or right pane', () => {
+  it('should watch for changes and set value for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     spyOn(window.CodeMirror, 'MergeView').and.callFake(
