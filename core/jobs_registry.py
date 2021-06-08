@@ -21,10 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
-from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
-from core.domain import feedback_jobs_one_off
 from core.domain import opportunity_jobs_one_off
 from core.domain import question_jobs_one_off
 from core.domain import recommendations_jobs_one_off
@@ -40,12 +38,8 @@ import python_utils
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
-    email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExpSnapshotsMigrationJob,
-    feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
-    feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
-    feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     (
         opportunity_jobs_one_off.
