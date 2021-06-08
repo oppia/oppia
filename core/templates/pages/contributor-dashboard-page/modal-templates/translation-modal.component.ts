@@ -96,9 +96,9 @@ export class TranslationModalComponent {
   TRANSLATION_TIPS = constants.TRANSLATION_TIPS;
   activeLanguageCode: string;
   hasImgCopyError = false;
-  triedToCopyParagraph = false;
+  hadCopyParagraphError = false;
   hasImgTextError = false;
-  incompleteTranslationError = false;
+  hasIncompleteTranslationError = false;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -162,17 +162,17 @@ export class TranslationModalComponent {
   }
 
   onContentClick(event: MouseEvent): boolean | void {
-    if (this.userTriedToCopyParagraph(event)) {
-      return this.triedToCopyParagraph = true;
+    if (this.triedToCopyParagraph(event)) {
+      return this.hadCopyParagraphError = true;
     }
-    this.triedToCopyParagraph = false;
+    this.hadCopyParagraphError = false;
     if (this.isCopyModeActive()) {
       event.stopPropagation();
     }
     this.ckEditorCopyContentService.broadcastCopy(event.target as HTMLElement);
   }
 
-  userTriedToCopyParagraph($event: MouseEvent): boolean {
+  triedToCopyParagraph($event: MouseEvent): boolean {
     // Mathematical equations are also wrapped by <p> elements.
     // Hence, math elements should be allowed to be copied.
     // See issue #11683.
@@ -327,18 +327,18 @@ export class TranslationModalComponent {
     this.hasImgCopyError = translationError.hasUncopiedImgs;
     this.hasImgTextError = translationError.hasDuplicateAltTexts ||
       translationError.hasDuplicateDescriptions;
-    this.incompleteTranslationError = translationError.
+    this.hasIncompleteTranslationError = translationError.
       hasUntranslatedElements;
 
     if (this.hasImgCopyError || this.hasImgTextError ||
-      this.incompleteTranslationError || this.uploadingTranslation ||
+      this.hasIncompleteTranslationError || this.uploadingTranslation ||
       this.loadingData) {
       return;
     }
 
-    this.hasImgCopyError = false;
-    this.triedToCopyParagraph = false;
-    this.hasImgTextError = false;
+    if (this.hadCopyParagraphError) {
+      this.hadCopyParagraphError = false;
+    }
 
     if (!this.uploadingTranslation && !this.loadingData) {
       this.siteAnalyticsService
