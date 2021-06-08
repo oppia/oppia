@@ -30,16 +30,16 @@ import { UserService } from 'services/user.service';
 import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
 require('base-components/base-content.directive.ts');
 
-interface Username {
-  title: string,
-  value: string,
-  helpText: string
+interface ViewedProfileUsername {
+  title: string;
+  value: string;
+  helpText: string;
 }
 
 interface UserDisplayedStatistic {
-  title: string,
-  value: number,
-  helpText?: string
+  title: string;
+  value: number;
+  helpText?: string;
 }
 
 @Component({
@@ -48,7 +48,7 @@ interface UserDisplayedStatistic {
 })
 export class ProfilePageComponent {
   DEFAULT_PROFILE_PICTURE_URL: string = '';
-  username: Username = {
+  username: ViewedProfileUsername = {
     title: '',
     value: '',
     helpText: ''
@@ -245,8 +245,11 @@ export class ProfilePageComponent {
       this.currentPageNumber * this.PAGE_SIZE);
     this.explorationIndexEnd = (
       this.explorationIndexStart + this.PAGE_SIZE - 1);
-    for (let ind = this.explorationIndexStart;
-      ind <= this.explorationIndexEnd; ind++) {
+    for (
+      let ind = this.explorationIndexStart;
+      ind <= this.explorationIndexEnd;
+      ind++
+    ) {
       this.explorationsOnPage.push(
         this.userEditedExplorations[ind]);
       if (ind === this.userEditedExplorations.length - 1) {

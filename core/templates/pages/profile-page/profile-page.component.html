@@ -13,10 +13,12 @@
               </div>
             </div>
           </a>
-          <img *ngIf="profileIsOfCurrentUser" [src]="profilePictureDataUrl"
+          <img *ngIf="profileIsOfCurrentUser"
+               [src]="profilePictureDataUrl"
                class="oppia-profile-picture-fullsize protractor-test-profile-current-user-photo"
                alt="">
-          <img *ngIf="!profileIsOfCurrentUser" [src]="profilePictureDataUrl"
+          <img *ngIf="!profileIsOfCurrentUser"
+               [src]="profilePictureDataUrl"
                class="oppia-profile-picture-fullsize protractor-test-profile-other-user-photo"
                alt="">
         </div>
@@ -24,18 +26,22 @@
 
       <div class="oppia-profile-text">
         <h2 class="oppia-profile-username-large-screen">
-          <span placement="right" [ngbPopover]="usernameIsLong ? username.helpText : undefined"
+          <span placement="right"
+                [ngbPopover]="usernameIsLong ? username.helpText : undefined"
                 triggers="mouseenter:mouseleave">
             <strong>{{ username.value| truncate:16 }}</strong>
           </span>
         </h2>
         <h2 class="oppia-profile-username-small-screen">
-          <span placement="right" [ngbPopover]="username.helpText" triggers="mouseenter:mouseleave">
+          <span placement="right"
+                [ngbPopover]="username.helpText"
+                triggers="mouseenter:mouseleave">
             <strong>{{ username.value| truncate:11 }}</strong>
           </span>
         </h2>
 
-        <p class="oppia-profile-first-contributed" *ngIf="firstContributionMsec">
+        <p class="oppia-profile-first-contributed"
+           *ngIf="firstContributionMsec">
           Contributing since: {{ getLocaleDateString(firstContributionMsec) }}
         </p>
       </div>
@@ -43,7 +49,9 @@
 
     <div class="oppia-profile-user-stat-container-large-screen">
       <div *ngFor="let stat of userDisplayedStatistics" class="oppia-profile-user-stat">
-        <div placement="right" [ngbPopover]="stat.helpText" triggers="mouseenter:mouseleave">
+        <div placement="right"
+             [ngbPopover]="stat.helpText"
+             triggers="mouseenter:mouseleave">
           <span class="oppia-stats-value-text protractor-test-profile-{{ stat.title | lowercase }}-stat"><strong>{{ stat.value || 0 }}</strong></span>
           <span>{{ stat.title }}</span>
         </div>
@@ -75,7 +83,9 @@
     <hr class="oppia-profile-stat-container-line-small-screen">
     <div class="oppia-profile-user-stat-container-small-screen">
       <div *ngFor="let stat of userDisplayedStatistics" class="oppia-profile-user-stat">
-        <div placement="right" [ngbPopover]="stat.helpText" triggers="mouseenter:mouseleave">
+        <div placement="right"
+             [ngbPopover]="stat.helpText"
+             triggers="mouseenter:mouseleave">
           <span class="oppia-stats-value-text"><strong>{{ stat.value || 0 }}</strong></span>
           <span>{{ stat.title }}</span>
         </div>

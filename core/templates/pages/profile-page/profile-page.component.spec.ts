@@ -32,13 +32,7 @@ import { MatCardModule } from '@angular/material/card';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { LoaderService } from 'services/loader.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-
-@Pipe({ name: 'translate' })
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 describe('Profile page', () => {
   let fixture: ComponentFixture<ProfilePageComponent>;
@@ -173,23 +167,19 @@ describe('Profile page', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProfilePageComponent);
     componentInstance = fixture.componentInstance;
-    userService = TestBed.inject(UserService);
-    userService = (TestBed.inject(UserService) as unknown) as
-      jasmine.SpyObj<UserService>;
-    csrfTokenService = TestBed.inject(CsrfTokenService);
-    csrfTokenService = (csrfTokenService as unknown) as
+    userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    csrfTokenService = TestBed.inject(CsrfTokenService) as
       jasmine.SpyObj<CsrfTokenService>;
-    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
-    dateTimeFormatService = (dateTimeFormatService as unknown) as
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService) as
       jasmine.SpyObj<DateTimeFormatService>;
-    loaderService = (TestBed.inject(LoaderService) as unknown) as
+    loaderService = TestBed.inject(LoaderService) as
       jasmine.SpyObj<LoaderService>;
-    loggerService = TestBed.inject(LoggerService);
-    loggerService = (loggerService as unknown) as LoggerService;
-    mockWindowRef = (TestBed.inject(WindowRef) as unknown) as MockWindowRef;
+    loggerService = TestBed.inject(LoggerService) as
+      jasmine.SpyObj<LoggerService>;
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
     profilePageBackendApiService = (
-      TestBed.inject(ProfilePageBackendApiService) as unknown) as
-      jasmine.SpyObj<ProfilePageBackendApiService>;
+      TestBed.inject(ProfilePageBackendApiService) as
+      jasmine.SpyObj<ProfilePageBackendApiService>);
     spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
       Promise.resolve('sample-csrf-token'));
   });
@@ -197,7 +187,6 @@ describe('Profile page', () => {
   afterEach(() => {
     mockWindowRef.nativeWindow.location.href = '';
   });
-
 
   it('should initialize', fakeAsync(() => {
     spyOn(componentInstance, 'updateSubscriptionButtonPopoverText');
