@@ -1482,10 +1482,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_post_data = {
             'content': 'content sample',
             'title': 'sample title',
-            'last_updated': utils.get_time_in_millisecs(
-                self.blog_post_model.last_updated),
-            'published_on': utils.get_time_in_millisecs(
-                self.blog_post_model.published_on),
+            'last_updated': self.GENERIC_DATE,
+            'published_on': self.GENERIC_DATE,
             'url_fragment': 'sample-url-fragment',
             'tags': ['tag', 'one'],
             'thumbnail_filename': 'thumbnail'
