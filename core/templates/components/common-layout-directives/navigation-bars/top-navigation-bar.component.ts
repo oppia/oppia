@@ -19,7 +19,7 @@
  */
 
 import { Subscription } from 'rxjs';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
