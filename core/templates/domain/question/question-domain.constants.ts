@@ -32,7 +32,7 @@ export const QuestionDomainConstants = {
     '=<question_count>&fetch_by_difficulty=<fetch_by_difficulty>',
 
   QUESTIONS_LIST_URL_TEMPLATE:
-    '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>',
+    '/questions_list_handler/<comma_separated_skill_ids>?offset=<offset>',
 
   QUESTION_COUNT_URL_TEMPLATE:
     '/question_count_handler/<comma_separated_skill_ids>',
