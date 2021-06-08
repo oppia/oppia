@@ -74,12 +74,18 @@ class AdminPage(base.BaseHandler):
 class AdminSessionHandler(webapp2.RequestHandler):
     """Handler for creating and registering the user"""
 
-    def get(self, request, response):
-        auth_services.establish_auth_session(self.request, self.response)
-        auth_claims = auth_services.get_auth_claims_from_request(request)
-        user_id = user_services.create_new_user(
-            auth_claims.auth_id, auth_claims.email)
-        # initiate the test data
+    def get(self):
+        auth_claims = auth_services.get_auth_claims_from_request(self.request)
+        if auth_claims is None:
+            auth_services.establish_auth_session(self.request, self.response)
+            self.redirect(self.request.uri)
+        else:
+            user_id = user_services.create_new_user(
+                claims.auth_id, claims.email).user_id
+            user_services.set_username(user_id, 'testname')
+            user_services.update_user_role(user_id, 'ADMIN')
+            user_services.record_agreement_to_terms(user_id)
+
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
