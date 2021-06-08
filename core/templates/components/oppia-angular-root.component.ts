@@ -63,6 +63,8 @@
 
 import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
+import { TranslateService } from '@ngx-translate/core';
+import { TranslateCacheService } from 'ngx-translate-cache';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { ContextService } from 'services/context.service';
@@ -76,7 +78,6 @@ import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
-import { TranslateService } from 'services/translate.service';
 import { ServicesConstants } from 'services/services.constants';
 import 'third-party-imports/ckeditor.import.ts';
 /* eslint-disable */
@@ -98,14 +99,14 @@ import 'third-party-imports/ckeditor.import.ts';
  * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
-import { NoninteractiveCollapsible } from "rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component";
-import { NoninteractiveImage } from "rich_text_components/Image/directives/oppia-noninteractive-image.component";
-import { NoninteractiveLink } from "rich_text_components/Link/directives/oppia-noninteractive-link.component";
-import { NoninteractiveMath } from "rich_text_components/Math/directives/oppia-noninteractive-math.component";
-import { NoninteractiveSkillreview } from "rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component";
-import { NoninteractiveSvgdiagram } from "rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component";
-import { NoninteractiveTabs } from "rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component";
-import { NoninteractiveVideo } from "rich_text_components/Video/directives/oppia-noninteractive-video.component";
+import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import { NoninteractiveSvgdiagram } from 'rich_text_components/Svgdiagram/directives/oppia-noninteractive-svgdiagram.component';
+import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { HtmlEscaperService } from 'services/html-escaper.service';
  
@@ -153,6 +154,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static translateService: TranslateService;
+  static translateCacheService: TranslateCacheService;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
 
@@ -167,6 +169,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private reviewTestBackendApiService: ReviewTestBackendApiService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private translateService: TranslateService,
+    private translateCacheService: TranslateCacheService,
     private injector: Injector
   ) {
     for (const rteKey of Object.keys(ServicesConstants.RTE_COMPONENT_SPECS)) {
@@ -204,7 +207,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     OppiaAngularRootComponent.storyViewerBackendApiService = (
       this.storyViewerBackendApiService);
     OppiaAngularRootComponent.translateService = this.translateService;
-
+    OppiaAngularRootComponent.translateCacheService = (
+      this.translateCacheService);
     OppiaAngularRootComponent.injector = this.injector;
 
     // This emit triggers ajs to start its app.

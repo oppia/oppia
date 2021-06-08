@@ -30,6 +30,20 @@ class BeamJobRunModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BeamJobRunModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        """Returns a regex for the BeamJobRunResultModel id.
+
+        Args:
+            unused_item: beam_job_models.BeamJobRunResultModel. Model to
+                validate.
+
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        # Base 64 encoding of a uuid is always 22 characters long.
+        return '^[A-Za-z0-9]{22}$'
+
+    @classmethod
     def validate_job_name(cls, item):
         """Validates that the job_name field refers to an actual job.
 
@@ -62,6 +76,20 @@ class BeamJobRunResultModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BeamJobRunResultModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        """Returns a regex for the BeamJobRunResultModel id.
+
+        Args:
+            unused_item: beam_job_models.BeamJobRunResultModel. Model to
+                validate.
+
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        # Base 64 encoding of a uuid is always 22 characters long.
+        return '^[A-Za-z0-9]{22}$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         """Returns a mapping of external id to model class.
 
@@ -75,7 +103,7 @@ class BeamJobRunResultModelValidator(base_model_validators.BaseModelValidator):
         """
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'beam_job_ids', beam_job_models.BeamJobRunModel, [item.id])
+                'beam_job_ids', beam_job_models.BeamJobRunModel, [item.job_id])
         ]
 
     @classmethod
