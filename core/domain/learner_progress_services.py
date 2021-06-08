@@ -1382,8 +1382,10 @@ def get_story_summary_dicts(user_id, story_summaries):
             'url_fragment': story_summary.url_fragment,
             'story_is_published': (
                 story_services.is_story_published_and_present_in_topic(story)),
-            'completed_node_titles': story_fetchers.get_completed_node_titles(
-                user_id, story.id),
+            'completed_node_titles': [
+                node.title for node in (
+                    story_fetchers.get_completed_nodes_in_story(
+                        user_id, story.id))],
             'all_node_dicts': [
                 node.to_dict() for node in story.story_contents.nodes],
             'topic_url_fragment': topic.url_fragment,
