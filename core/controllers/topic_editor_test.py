@@ -312,10 +312,6 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         }, json_response['subtopic_page']['page_contents'])
         self.logout()
 
-        topic_services.assign_role(
-            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-            self.topic_id)
-
         # Check that topic managers can access the subtopic page.
         self.login(self.TOPIC_MANAGER_EMAIL)
         json_response = self.get_json(
@@ -792,9 +788,7 @@ class TopicEditorTests(
             }]
         }
         # Assign the topic manager to the topic.
-        topic_services.assign_role(
-            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-            self.topic_id)
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()

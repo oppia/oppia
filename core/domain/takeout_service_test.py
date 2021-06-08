@@ -811,7 +811,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         incomplete_activities_data = {}
         user_settings_data = {
             'email': 'user1@example.com',
-            'role': feconf.ROLE_ID_CURRICULUM_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
+            'banned': False,
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': None,
@@ -1277,7 +1278,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_user_settings_data = {
             'email': self.USER_1_EMAIL,
-            'role': feconf.ROLE_ID_CURRICULUM_ADMIN,
+            'roles': [feconf.ROLE_ID_CURRICULUM_ADMIN],
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
             'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
@@ -1533,7 +1534,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.set_up_non_trivial()
         profile_user_settings_data = {
             'email': self.USER_1_EMAIL,
-            'role': self.PROFILE_1_ROLE,
+            'roles': [self.PROFILE_1_ROLE],
             'username': None,
             'normalized_username': None,
             'last_agreed_to_terms_msec': self.GENERIC_DATE,

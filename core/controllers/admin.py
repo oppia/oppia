@@ -713,23 +713,22 @@ class AdminRoleHandler(base.BaseHandler):
         username = self.payload.get('username')
         role = self.payload.get('role')
         topic_id = self.payload.get('topic_id')
-        user_id = user_services.get_user_id_from_username(username)
+        user_settings = user_services.get_user_settings_from_username(username)
 
-        if user_id is None:
+        if user_settings is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
-            if feconf.ROLE_ID_TOPIC_MANAGER not in self.roles:
-                user_services.add_user_role(user_id, role)
+            if feconf.ROLE_ID_TOPIC_MANAGER not in user_settings.roles:
+                user_services.add_user_role(user_settings.user_id, role)
 
-            user = user_services.get_user_actions_info(user_id)
+            user = user_services.get_user_actions_info(user_settings.user_id)
             topic_services.assign_role(
                 user_services.get_system_user(), user,
                 topic_domain.ROLE_MANAGER, topic_id)
-
         else:
-            user_services.add_user_role(user_id, role)
+            user_services.add_user_role(user_settings.user_id, role)
 
         self.render_json({})
 

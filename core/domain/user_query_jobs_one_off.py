@@ -184,7 +184,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if (
             user_id == query_model.submitter_id or
             user_services.is_moderator(user_id) or
-            user_services.is_admin(user_id)):
+            user_services.is_curriculum_admin(user_id)):
             return
 
         query_criteria_satisfied = True

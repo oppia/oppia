@@ -160,8 +160,9 @@ class UserSettingsModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.EXPORTED,
-            'role': base_models.EXPORT_POLICY.EXPORTED,
             'last_agreed_to_terms': base_models.EXPORT_POLICY.EXPORTED,
+            'roles': base_models.EXPORT_POLICY.EXPORTED,
+            'banned': base_models.EXPORT_POLICY.EXPORTED,
             'last_logged_in': base_models.EXPORT_POLICY.EXPORTED,
             'display_alias': base_models.EXPORT_POLICY.EXPORTED,
             'user_bio': base_models.EXPORT_POLICY.EXPORTED,
@@ -192,10 +193,9 @@ class UserSettingsModel(base_models.BaseModel):
             # Pin is not exported since this is an auth mechanism.
             'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
 
-            # TODO(#12755): Change export policy for roles and banned fields to
-            # "EXPORTED" once the fields are populated in the datastore.
-            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            # The role is a deprecated field and doesn't contains any correct
+            # information related to user settings.
+            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
     @classmethod
@@ -233,6 +233,7 @@ class UserSettingsModel(base_models.BaseModel):
         return {
             'email': user.email,
             'roles': user.roles,
+            'banned': user.banned,
             'username': user.username,
             'normalized_username': user.normalized_username,
             'last_agreed_to_terms_msec': (
@@ -2545,8 +2546,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'role': base_models.EXPORT_POLICY.NOT_APPLICABLE
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
 
     @classmethod

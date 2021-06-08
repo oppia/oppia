@@ -184,9 +184,9 @@ class EmailRightsTest(test_utils.GenericTestBase):
             feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
             feconf.EMAIL_INTENT_MARKETING: (True, True, False, False),
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-                True, True, True, False),
+                True, False, True, False),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-                True, True, True, False),
+                True, False, True, False),
         }
 
         for intent in expected_validation_results:

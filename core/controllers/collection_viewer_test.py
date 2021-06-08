@@ -73,9 +73,9 @@ class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_collections_are_visible_to_admins(self):
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.login(self.MODERATOR_EMAIL)
         self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
         self.logout()

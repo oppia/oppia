@@ -1885,7 +1885,7 @@ def is_moderator(user_id):
     return feconf.ROLE_ID_MODERATOR in get_user_roles_from_id(user_id)
 
 
-def is_admin(user_id):
+def is_curriculum_admin(user_id):
     """Checks if a user with given user_id is an admin.
 
     Args:

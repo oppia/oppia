@@ -1177,7 +1177,11 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             username='username',
             first_contribution_msec=None
         ).put()
-        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        moderator = user_services.get_user_actions_info(moderator)
+
+        rights_manager.unpublish_exploration(moderator, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished
         # explorations.
