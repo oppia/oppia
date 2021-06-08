@@ -81,7 +81,7 @@ class AdminSessionHandler(webapp2.RequestHandler):
             self.redirect(self.request.uri)
         else:
             user_id = user_services.create_new_user(
-                claims.auth_id, claims.email).user_id
+                auth_claims.auth_id, auth_claims.email).user_id
             user_services.set_username(user_id, 'testname')
             user_services.update_user_role(user_id, 'ADMIN')
             user_services.record_agreement_to_terms(user_id)
