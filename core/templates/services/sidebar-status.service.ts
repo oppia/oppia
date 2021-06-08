@@ -17,7 +17,7 @@
  * hamburger-menu sidebar.
  */
 
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -29,11 +29,13 @@ export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
   private pendingSidebarClick: boolean = false;
   private sidebarIsShown: boolean = false;
+  private _onSideBarStatusUpdate: EventEmitter<boolean> = new EventEmitter();
 
   private _openSidebar(): void {
     if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {
       this.sidebarIsShown = true;
       this.pendingSidebarClick = true;
+      this._onSideBarStatusUpdate.emit(true);
     }
   }
 
@@ -41,6 +43,7 @@ export class SidebarStatusService {
     if (this.sidebarIsShown) {
       this.sidebarIsShown = false;
       this.pendingSidebarClick = false;
+      this._onSideBarStatusUpdate.emit(false);
     }
   }
 
@@ -66,6 +69,9 @@ export class SidebarStatusService {
     } else {
       this.pendingSidebarClick = false;
     }
+  }
+  get onSideBarStatusUpdate(): EventEmitter<boolean> {
+    return this._onSideBarStatusUpdate;
   }
 }
 
