@@ -222,4 +222,11 @@ describe('Edit Thumbnail Modal Component', () => {
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
   });
+
+  it('should set updated background color on closing the modal', () => {
+    component.bgColor = '#123456';
+    component.confirm();
+    expect(dismissSpy).toHaveBeenCalledWith(
+      jasmine.objectContaining({ newBgColor: '#123456' }));
+  });
 });

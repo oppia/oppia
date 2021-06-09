@@ -147,7 +147,7 @@ export class EditThumbnailModalComponent implements OnChanges {
   confirm(): void {
     this.ngbActiveModal.close({
       newThumbnailDataUrl: this.uploadedImage,
-      newBgColor: this.tempBgColor,
+      newBgColor: this.bgColor,
       openInUploadMode: this.openInUploadMode,
       dimensions: this.dimensions
     });
