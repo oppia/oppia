@@ -323,7 +323,7 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-
+  
     var spw = null;
     var vidPath = '';
     // Enable ALL_VIDEOS if you want success videos to be saved.

@@ -288,7 +288,6 @@ var AdminPage = function() {
       var oneOffJobRowsButton = oneOffJobRows.get(i).element(
         by.css('.protractor-test-one-off-jobs-start-btn'));
       await action.click('One Off Job Rows Button', oneOffJobRowsButton);
-      await waitFor.pageToFullyLoad();
     } else {
       await this._startOneOffJob(jobName, ++i);
     }
@@ -310,18 +309,14 @@ var AdminPage = function() {
         by.css('.protractor-test-one-off-jobs-stop-btn'));
       await action.click(
         'UnfinishedOffJobRowsButton', unfinishedOffJobRowsButton);
-      await waitFor.invisibilityOf(
-        statusMessage,
-        'Status message taking too long to disappear when starting job.');
+      await browser.refresh();
+      await waitFor.pageToFullyLoad();
     } else {
       await this._stopOneOffJob(jobName, ++i);
     }
   };
 
   this.expectNumberOfRunningOneOffJobs = async function(count) {
-    await waitFor.visibilityOf(
-      element(by.css('.protractor-test-unfinished-one-off-jobs-id')),
-      'Unfinished jobs taking too long to appear.');
     var len = await element.all(by.css(
       '.protractor-test-unfinished-one-off-jobs-id')).count();
     expect(len).toEqual(count);
