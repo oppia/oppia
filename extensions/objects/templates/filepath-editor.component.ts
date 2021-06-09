@@ -58,8 +58,6 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { DeviceInfoService} from 'services/contextual/device-info.service';
 import { fabric } from 'fabric';
 import Picker from 'vanilla-picker';
-import { boolean } from 'mathjs';
-import { FeedbackPopupBackendApiService } from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 const gifFrames = require('gif-frames');
 const gifshot = require('gifshot');
 
