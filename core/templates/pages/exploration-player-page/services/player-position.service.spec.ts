@@ -25,18 +25,14 @@ import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { AudioTranslationLanguageService } from
-    'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateCard } from
-    'domain/state_card/state-card.model';
+  'domain/state_card/state-card.model';
 
 describe('Player position service', () => {
   let pts = null;
   let pps: PlayerPositionService = null;
-  let scof = null;
   let onQuestionChangeSpy: jasmine.Spy;
   let subscriptions: Subscription;
-  let atls = AudioTranslationLanguageService;
 
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);

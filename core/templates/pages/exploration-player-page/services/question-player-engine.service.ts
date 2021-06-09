@@ -34,7 +34,7 @@ import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import {AudioTranslationLanguageService} from "pages/exploration-player-page/services/audio-translation-language.service";
+import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 
 @Injectable({
   providedIn: 'root'

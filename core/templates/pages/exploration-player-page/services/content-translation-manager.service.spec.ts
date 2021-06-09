@@ -27,13 +27,12 @@ import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import {StateCard} from
-    'domain/state_card/state-card.model';
+import { StateCard } from 'domain/state_card/state-card.model';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { AudioTranslationLanguageService} from "pages/exploration-player-page/services/audio-translation-language.service";
+import { AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';

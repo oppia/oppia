@@ -251,12 +251,14 @@ export class StateCard {
    *        the properties of the card's interaction.
    * @param {RecordedVoiceovers} recordedVoiceovers
    * @param {string} contentId
+   * @param {AudioTranslationLanguageService} audioTranslationLanguageService
    */
   static createNewCard(
-    stateName: string, contentHtml: string, interactionHtml: string,
-    interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-    writtenTranslations: WrittenTranslations, contentId: string,
-    audioTranslationLanguageService: AudioTranslationLanguageService): StateCard {
+      stateName: string, contentHtml: string, interactionHtml: string,
+      interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
+      writtenTranslations: WrittenTranslations, contentId: string,
+      audioTranslationLanguageService: AudioTranslationLanguageService
+      ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,
       cloneDeep(interaction), [],
