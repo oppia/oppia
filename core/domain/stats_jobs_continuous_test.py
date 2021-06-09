@@ -529,7 +529,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name':
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'new_value': {},
+                    'new_value': {
+                        'placeholder': {
+                            'value': True
+                        }
+                    },
                 })], 'Change to NumericInput')
 
             exp = exp_fetchers.get_exploration_by_id(exp_id)
@@ -713,7 +717,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name':
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                    'new_value': {},
+                    'new_value': {
+                        'placeholder': {
+                            'value': True
+                        }
+                    },
                 })], 'Change to NumericInput')
 
             # Submit an answer to the numeric interaction.
