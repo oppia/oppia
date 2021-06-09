@@ -2992,9 +2992,8 @@ def can_update_suggestion(handler):
 
         if suggestion.author_id == self.user_id:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'The user %s is not allowed to update self-created'
-                'suggestions.' % (
-                    user_services.get_email_from_user_id(self.user_id)))
+                'The user, %s is not allowed to update self-created'
+                'suggestions.' % (user_services.get_username(self.user_id)))
 
         if suggestion.suggestion_type not in (
                 feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):

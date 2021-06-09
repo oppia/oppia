@@ -3688,8 +3688,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'The user %s is not allowed to update self-created'
-            'suggestions.' % self.author_email)
+            'The user, %s is not allowed to update self-created'
+                'suggestions.' % self.author_username)
         self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self):
