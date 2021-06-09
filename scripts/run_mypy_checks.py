@@ -1,3 +1,21 @@
+# coding: utf-8
+#
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""MyPy test runner script."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -499,7 +517,9 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/answer_summarizers/models_test.py',
     'extensions/domain.py',
     'extensions/domain_test.py',
-    'extensions/interactions/AlgebraicExpressionInput/AlgebraicExpressionInput.py',
+    # A single file in two lines.
+    'extensions/interactions/AlgebraicExpressionInput/'
+    'AlgebraicExpressionInput.py',
     'extensions/interactions/CodeRepl/CodeRepl.py',
     'extensions/interactions/Continue/Continue.py',
     'extensions/interactions/DragAndDropSortInput/DragAndDropSortInput.py',
@@ -524,7 +544,9 @@ NOT_FULLY_COVERED_FILES = [
     'extensions/interactions/base_test.py',
     'extensions/issues/CyclicStateTransitions/CyclicStateTransitions.py',
     'extensions/issues/EarlyQuit/EarlyQuit.py',
-    'extensions/issues/MultipleIncorrectSubmissions/MultipleIncorrectSubmissions.py',
+    # A single file in two lines.
+    'extensions/issues/MultipleIncorrectSubmissions/'
+    'MultipleIncorrectSubmissions.py',
     'extensions/issues/base.py',
     'extensions/issues/base_test.py',
     'extensions/objects/models/objects.py',
@@ -680,11 +702,10 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/third_party_size_check.py',
     'scripts/typescript_checks.py',
     'scripts/typescript_checks_test.py',
-    'utils_test.py',
 ]
 
 
-CONFIG_FILE_PATH = os.path.join('.','mypy.ini')
+CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
 MYPY_CMD = 'mypy'
 
 _PARSER = argparse.ArgumentParser(
@@ -699,21 +720,30 @@ _PARSER.add_argument(
     nargs='+'
     )
 
+
 def main(args=None):
+    """Runs the MyPy type checks."""
     unused_parsed_args = _PARSER.parse_args(args=args)
+
+    print('Starting Mypy type checks.')
 
     if unused_parsed_args.files:
         cmd = (
             [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] +
             unused_parsed_args.files)
 
-        process = subprocess.call(cmd ,stdin=subprocess.PIPE)
-
     else:
         rgx = '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES)
-        cmd = [MYPY_CMD, '--exclude',rgx , '--config-file', CONFIG_FILE_PATH, '.']
+        cmd = [
+            MYPY_CMD, '--exclude', rgx, '--config-file', CONFIG_FILE_PATH, '.']
 
-        process = subprocess.call(cmd, stdin=subprocess.PIPE)
+    process = subprocess.call(cmd, stdin=subprocess.PIPE)
+
+    if process == 0:
+        print('Mypy type checks successful.')
+    else:
+        print('Mypy type checks unsuccessful. Please fix the errors.')
+    return process
 
 
 if __name__ == '__main__': # pragma: no cover
