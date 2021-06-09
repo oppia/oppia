@@ -3174,10 +3174,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
                     'placeholder': {
-                        'value': {
-                            'content_id': 'ca_placeholder_0',
-                            'unicode_str': ''
-                        }
+                        'value': True
                     },
                     'rows': {'value': 1}
                 },
@@ -3194,7 +3191,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'hints': [],
                 'solution': {},
-                'id': 'TextInput'
+                'id': 'NumericInput'
             },
             'next_content_id_index': 4,
             'param_changes': [],
@@ -3224,4 +3221,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['placeholder'].value.unicode_str, '')
+            cust_args['placeholder'].value, True)

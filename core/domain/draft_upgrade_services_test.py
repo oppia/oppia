@@ -176,7 +176,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'content',
-                'new_value': 'new value'
+                'new_value': 'NumericInput'
             })
         ]
         # Migrate exploration to state schema version 46.
