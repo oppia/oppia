@@ -56,6 +56,14 @@ class JobRunResultTests(test_utils.TestBase):
 
         SubclassOfJobRunResult(stdout='123', stderr=None)
 
+    def test_len_in_bytes(self):
+        result = job_run_result.JobRunResult(stdout='123', stderr='123')
+        self.assertEqual(result.len_in_bytes(), 8)
+
+    def test_len_in_bytes_of_empty_strings(self):
+        result = job_run_result.JobRunResult(stdout='', stderr='')
+        self.assertEqual(result.len_in_bytes(), 2)
+
     def test_equality(self):
         a_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         b_result = job_run_result.JobRunResult(stdout='def', stderr='456')

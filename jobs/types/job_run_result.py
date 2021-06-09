@@ -99,7 +99,7 @@ class JobRunResult(python_utils.OBJECT):
         Returns:
             int. The number of bytes encoded by the JobRunResult instance.
         """
-        length = sum(len(s.encode('utf-8') for s in (self.stdout, self.stderr)))
+        length = sum(len(s.encode('utf-8')) for s in (self.stdout, self.stderr))
         return length + 2
 
     def __repr__(self):
