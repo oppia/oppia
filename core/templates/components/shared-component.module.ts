@@ -84,6 +84,10 @@ import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templat
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
+import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
+import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
+import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
+import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
 
 
 // Directives.
@@ -231,11 +235,15 @@ const toastrConfig = {
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    HintAndSolutionButtonsComponent,
     I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
@@ -298,12 +306,16 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
+    HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     I18nLanguageSelectorComponent,
@@ -351,9 +363,13 @@ const toastrConfig = {
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    HintAndSolutionButtonsComponent,
     I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
