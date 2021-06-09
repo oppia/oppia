@@ -3675,7 +3675,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         translation_suggestion = translation_suggestions[0]
         question_suggestion = question_suggestions[0]
         edit_state_suggestion = edit_state_suggestions[0]
-        
+
         self.translation_suggestion_id = translation_suggestion.suggestion_id
         self.question_suggestion_id = question_suggestion.suggestion_id
         self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
