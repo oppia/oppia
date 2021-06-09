@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit tests for the fraction.mode.ts.
+ * @fileoverview unit tests for the fraction.model.ts.
  */
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { Fraction } from
-  'domain/objects/fraction.model';
+import { Fraction } from 'domain/objects/fraction.model';
 
 describe('Fraction', () => {
   let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
