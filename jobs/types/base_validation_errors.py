@@ -55,14 +55,6 @@ class BaseAuditError(job_run_result.JobRunResult):
         # used to annotate the _actual_ message provided by subclasses.
         self._message = (model_kind, model_id)
 
-    def __getstate__(self):
-        """Called by pickle to get the value that uniquely defines self."""
-        return self.message
-
-    def __setstate__(self, message):
-        """Called by pickle to build an instance from __getstate__'s value."""
-        self._message = message
-
     @property
     def stdout(self):
         """Returns an empty string.
@@ -124,6 +116,9 @@ class BaseAuditError(job_run_result.JobRunResult):
     def __repr__(self):
         return repr(self.message)
 
+    def __hash__(self):
+        return hash((self.__class__, self.message))
+
     def __eq__(self, other):
         return (
             self.message == other.message
@@ -134,8 +129,13 @@ class BaseAuditError(job_run_result.JobRunResult):
             not (self == other)
             if self.__class__ is other.__class__ else NotImplemented)
 
-    def __hash__(self):
-        return hash((self.__class__, self.message))
+    def __getstate__(self):
+        """Called by pickle to get the value that uniquely defines self."""
+        return self.message
+
+    def __setstate__(self, message):
+        """Called by pickle to build an instance from __getstate__'s value."""
+        self._message = message
 
 
 class InconsistentTimestampsError(BaseAuditError):
