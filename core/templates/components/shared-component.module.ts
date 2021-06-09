@@ -24,18 +24,23 @@ import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { MaterialModule } from './material.module';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { ToastrModule } from 'ngx-toastr';
-import { SharedFormsModule } from './forms/shared-forms.module';
+import { FormsModule } from '@angular/forms';
+import { MaterialModule } from './material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { SharedFormsModule } from './forms/shared-forms.module';
+import { ToastrModule } from 'ngx-toastr';
+import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
+import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
+import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 
 // Components.
+import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
@@ -72,8 +77,12 @@ import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
+import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
+import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
 
 
 // Directives.
@@ -95,7 +104,34 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 import { AuthService } from 'services/auth.service';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
-import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+import { HttpClient } from '@angular/common/http';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+
+// Miscellaneous.
+import { TranslateLoaderFactory } from 'pages/translate-loader.factory';
+import { TranslateCacheFactory } from 'pages/translate-cache.factory';
+import { TranslateCustomParser } from 'pages/translate-custom-parser';
+import { MissingTranslationCustomHandler } from 'pages/missing-translation-custom-handler';
+import constants from 'assets/constants';
+
+import { HammerGestureConfig } from '@angular/platform-browser';
+import * as hammer from 'hammerjs';
+
+
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = {
+    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
+    pinch: { enable: false },
+    rotate: { enable: false },
+  };
+
+  options = {
+    cssProps: {
+      userSelect: true
+    }
+  };
+}
 
 const toastrConfig = {
   allowHtml: false,
@@ -116,6 +152,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
     MaterialModule,
@@ -131,20 +168,63 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    /**
+     * The Translate Module will look for translations in the following order:
+     * 1. Look for translation in primary language (fetched from backend)
+     * 2. Look for translation in default language (fetched from backend)
+     * 3. Look for translation present in AppConstants.ts (
+     *    used until translations after fetched from backend)
+     * 4. shows the key, if the translation is not found.
+     */
+    TranslateModule.forRoot({
+      defaultLanguage: constants.DEFAULT_LANGUAGE_CODE,
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslationCustomHandler
+      },
+      loader: {
+        provide: TranslateLoader,
+        useFactory: TranslateLoaderFactory.createHttpLoader,
+        deps: [HttpClient],
+      },
+      parser: {
+        provide: TranslateParser,
+        useClass: TranslateCustomParser,
+        deps: [TranslateDefaultParser, I18nLanguageCodeService]
+      }
+    }),
+    TranslateCacheModule.forRoot({
+      cacheService: {
+        provide: TranslateCacheService,
+        useFactory: TranslateCacheFactory.createTranslateCacheService,
+        deps: [TranslateService, TranslateCacheSettings]
+      },
+      cacheName: 'NG_TRANSLATE_LANG_KEY',
+      cacheMechanism: 'Cookie',
+      cookieExpiry: 30
+    }),
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
   ],
 
   providers: [
+    TranslateDefaultParser,
     AngularFireAuth,
     {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
+    }
   ],
 
   declarations: [
+    AlertMessageComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -154,6 +234,7 @@ const toastrConfig = {
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
@@ -164,6 +245,7 @@ const toastrConfig = {
     PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    SideNavigationBarWrapperComponent,
     PromoBarComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
@@ -182,6 +264,7 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
@@ -192,6 +275,8 @@ const toastrConfig = {
   ],
 
   entryComponents: [
+    AlertMessageComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
@@ -202,6 +287,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    BaseContentComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingMessageComponent,
@@ -217,15 +303,18 @@ const toastrConfig = {
     OutcomeFeedbackEditorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
+    I18nLanguageSelectorComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
+    SideNavigationBarWrapperComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     LearnerDashboardIconsComponent
   ],
@@ -245,11 +334,15 @@ const toastrConfig = {
     ObjectComponentsModule,
     SharedFormsModule,
     SharedPipesModule,
+    TranslateModule,
     // Components, directives, and pipes.
+    AlertMessageComponent,
     AttributionGuideComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
@@ -257,6 +350,7 @@ const toastrConfig = {
     CreateActivityModalComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
     LoadingMessageComponent,
@@ -268,8 +362,8 @@ const toastrConfig = {
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
+    SideNavigationBarWrapperComponent,
     StateSkillEditorComponent,
-    SharingLinksComponent,
     SelectSkillModalComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
@@ -281,6 +375,7 @@ const toastrConfig = {
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,

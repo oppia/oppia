@@ -76,7 +76,7 @@ module.exports = function(config) {
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
-    reporters: ['progress', 'coverage-istanbul'],
+    reporters: ['coverage-istanbul'],
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
@@ -93,7 +93,10 @@ module.exports = function(config) {
     browserDisconnectTimeout: 60000,
     browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
-      level: 'log',
+      // To print debugging information, use `console.error`. We don't
+      // output `log` level logs to avoid printing out success messages
+      // for every passing spec.
+      level: 'error',
       format: '%b %T: %m',
       terminal: true
     },

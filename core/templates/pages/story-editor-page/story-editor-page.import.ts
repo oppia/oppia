@@ -38,7 +38,7 @@ require('pages/story-editor-page/story-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'pages/story-editor-page/chapter-editor/chapter-editor-tab.component.ts');
 require(

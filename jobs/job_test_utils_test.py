@@ -53,7 +53,7 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_empty(output)
 
         self.assertRaisesRegexp(
-            RuntimeError, 'may be called at most once',
+            RuntimeError, 'must be run in the pipeline context',
             lambda: self.assert_pcoll_empty(output))
 
     def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(self):
@@ -63,7 +63,7 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
         self.assert_pcoll_equal(output, [123])
 
         self.assertRaisesRegexp(
-            RuntimeError, 'may be called at most once',
+            RuntimeError, 'must be run in the pipeline context',
             lambda: self.assert_pcoll_equal(output, [123]))
 
     def test_create_model_sets_date_properties(self):
@@ -78,28 +78,30 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
     JOB_CLASS = mock.Mock()
 
     def setUp(self):
+        # TODO(#11475): Remove this hack. We need to set this up before calling
+        # super().setUp() because that method creates a job using JOB_CLASS.
+        self.JOB_CLASS.return_value.datastoreio_stub.context.return_value = (
+            python_utils.nullcontext())
         super(JobTestBaseTests, self).setUp()
+
+    def tearDown(self):
         self.JOB_CLASS.reset_mock()
+        super(JobTestBaseTests, self).tearDown()
 
     def test_run_job(self):
-        job_instance = self.JOB_CLASS.return_value
-
         self.run_job()
 
-        self.JOB_CLASS.assert_called_with(self.pipeline)
-        job_instance.run.assert_called()
+        self.job.run.assert_called()
 
     def test_job_output_is(self):
-        job_instance = self.JOB_CLASS.return_value
-        job_instance.run.return_value = (
+        self.job.run.return_value = (
             # NOTE: Arbitrary operations that produce a non-empty PCollection.
             self.pipeline | beam.Create([123]) | beam.Map(lambda x: x))
 
         self.assert_job_output_is([123])
 
     def test_job_output_is_empty(self):
-        job_instance = self.JOB_CLASS.return_value
-        job_instance.run.return_value = (
+        self.job.run.return_value = (
             # NOTE: Arbitrary operations that produce an empty PCollection.
             self.pipeline | beam.Create([]) | beam.Map(lambda x: x))
 
