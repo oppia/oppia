@@ -671,8 +671,8 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
     def setUp(self):
         super(RecentFeedbackMessagesHandlerTests, self).setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-        self.set_curriculum_admins([self.MODERATOR_USERNAME])
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
         self.exp_id = 'exp_id'
 
     def test_get_recently_posted_feedback_messages(self):

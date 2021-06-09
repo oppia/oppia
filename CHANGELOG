@@ -5696,7 +5696,7 @@ Dev tools:
 
 Code health:
 * Refactor learner view
-* Minimize calls to is_curriculum_admin, static site_name and feedback_url
+* Minimize calls to is_admin, static site_name and feedback_url
 * Remove 'ALTERNATE' tag on translations
 * Refactor ID generation procedure into a separate service.
 * Separate the top navigation bar into its own directive

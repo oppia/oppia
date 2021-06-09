@@ -300,12 +300,13 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
 
-    def test_moderator_cannot_edit_private_collection(self):
+    def test_moderator_can_edit_private_collection(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_collection/%s' % self.private_col_id,
-                expected_status_int=401)
+            response = self.get_json(
+                '/mock_edit_collection/%s' % self.private_col_id)
+
+        self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
 
     def test_moderator_can_edit_public_collection(self):
@@ -1091,11 +1092,12 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
-    def test_moderator_cannot_voiceover_private_exploration(self):
+    def test_moderator_can_voiceover_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_admin_can_voiceover_private_exploration(self):
@@ -1218,12 +1220,13 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.published_exp_id)
         self.logout()
 
-    def test_moderator_cannot_edit_private_exploration(self):
+    def test_moderator_can_edit_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_exploration/%s' % self.private_exp_id,
-                expected_status_int=401)
+            response = self.get_json(
+                '/mock_edit_exploration/%s' % self.private_exp_id)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
     def test_admin_can_edit_private_exploration(self):
@@ -1387,16 +1390,13 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
                 % (self.owner_id, self.published_exp_id))
         self.logout()
 
-    def test_moderator_cannot_delete_private_exploration(self):
+    def test_moderator_can_delete_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock_delete_exploration/%s' % self.private_exp_id,
-                expected_status_int=401)
-            self.assertEqual(
-                response['error'],
-                'User %s does not have permissions to delete exploration %s'
-                % (self.moderator_id, self.private_exp_id))
+                '/mock_delete_exploration/%s' % self.private_exp_id)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
 
@@ -3431,11 +3431,12 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
-    def test_moderator_cannot_save_private_exploration(self):
+    def test_moderator_can_save_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_admin_can_save_private_exploration(self):

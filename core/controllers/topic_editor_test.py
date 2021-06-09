@@ -787,8 +787,6 @@ class TopicEditorTests(
                 'subtopic_id': 2
             }]
         }
-        # Assign the topic manager to the topic.
-        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
         csrf_token = self.get_new_csrf_token()

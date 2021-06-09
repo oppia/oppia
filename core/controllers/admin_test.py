@@ -1516,13 +1516,12 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'filter_criterion': 'username', 'username': username})
-        self.assertEqual(
-            response_dict, {
-                'roles': [
-                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER],
-                'banned': False,
-                'topic_ids': [new_topic_id, topic_id]
-            })
+        self.assertFalse(response_dict['banned'])
+        self.assertItemsEqual(
+            response_dict['roles'],
+            [feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_TOPIC_MANAGER])
+        self.assertItemsEqual(
+            response_dict['topic_ids'], [new_topic_id, topic_id])
 
         self.logout()
 
