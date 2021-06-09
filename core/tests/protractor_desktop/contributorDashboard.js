@@ -77,7 +77,7 @@ describe('Contributor dashboard page', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
     const url = await browser.getCurrentUrl();
-    // e.g. http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
+    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
     const topicIdUrlPart = url.split('/')[4];
     // We have to remove the ending "#".
     const topicId = topicIdUrlPart.substring(0, topicIdUrlPart.length - 1);
