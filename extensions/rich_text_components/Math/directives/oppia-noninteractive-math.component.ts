@@ -21,6 +21,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -28,6 +29,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 export interface MathExpression {
   'raw_latex': string;
@@ -47,14 +49,15 @@ interface ImageContainerStyle {
 export class NoninteractiveMath implements OnInit {
   @Input() mathContentWithValue: string;
   imageContainerStyle: ImageContainerStyle;
-  imageUrl: string;
+  imageUrl: string | ArrayBuffer | SafeResourceUrl;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imagePreloaderService: ImagePreloaderService
+    private imagePreloaderService: ImagePreloaderService,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   ngOnInit(): void {
@@ -102,8 +105,9 @@ export class NoninteractiveMath implements OnInit {
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
             this.imageLocalStorageService.isInStorage(
               mathExpressionContent.svg_filename))) {
-          this.imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
-            mathExpressionContent.svg_filename);
+          this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+            this.imageLocalStorageService.getRawImageData(
+              mathExpressionContent.svg_filename));
         } else {
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
             this.contextService.getEntityType(),
