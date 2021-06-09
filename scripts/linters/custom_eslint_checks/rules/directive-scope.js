@@ -14,25 +14,26 @@
 
 /**
  * @fileoverview Lint check to ensure that all directives have an explicit
- * Scope: {} and scope should not set to true.
+ * scope: {} and scope should not be set to true.
  */
 
 'use strict';
 
 module.exports = {
   meta: {
-    type: 'problem',
+    type: 'suggestion',
     docs: {
       description: (
         'Lint check to ensure that all directives have an explicit Scope: {}' +
-        ' and scope should not set to true'),
-      category: 'Possible Errors',
+        ' and scope should not be set to true'),
+      category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      scopeNotFound: 'Please ensure that directive in file has a scope: {}.',
+      incorrectScopeType: (
+        'Please ensure that directive in file has a scope: {}.'),
       trueScope: (
         'Please ensure that directive in file does not have scope set to true.')
     },
@@ -63,12 +64,10 @@ module.exports = {
         var returnDictProperties = (
           controllerFunctionNode.body.body[0].argument.properties);
 
-        var scopeFound = false;
         returnDictProperties.forEach(function(property) {
           if (property.key.name !== 'scope') {
             return;
           }
-          scopeFound = true;
           if (property.value.raw === 'true') {
             context.report({
               node: node,
@@ -76,10 +75,10 @@ module.exports = {
             });
             return;
           }
-          if (scopeFound && property.value.type !== 'ObjectExpression') {
+          if (property.value.type !== 'ObjectExpression') {
             context.report({
               node: node,
-              messageId: 'scopeNotFound'
+              messageId: 'incorrectScopeType'
             });
           }
         });
