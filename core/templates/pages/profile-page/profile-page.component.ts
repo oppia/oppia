@@ -175,11 +175,11 @@ export class ProfilePageComponent {
     } else {
       if (!this.isAlreadySubscribed) {
         this.profilePageBackendApiService.subscribeAsync(
-          this.data.usernameOfViewedProfile)
-          .then(() => {
-            this.isAlreadySubscribed = true;
-            this.updateSubscriptionButtonPopoverText();
-          });
+          this.data.usernameOfViewedProfile
+        ).then(() => {
+          this.isAlreadySubscribed = true;
+          this.updateSubscriptionButtonPopoverText();
+        });
       } else {
         this.profilePageBackendApiService.unsubscribeAsync(
           this.data.usernameOfViewedProfile
@@ -214,10 +214,10 @@ export class ProfilePageComponent {
       this.loggerService.error('Error: cannot decrement page');
     } else {
       this.currentPageNumber--;
-      this.startingExplorationNumber = this.currentPageNumber *
-        this.PAGE_SIZE + 1;
-      this.endingExplorationNumber = (this.currentPageNumber + 1) *
-        this.PAGE_SIZE;
+      this.startingExplorationNumber = (
+        this.currentPageNumber * this.PAGE_SIZE + 1);
+      this.endingExplorationNumber = (
+        (this.currentPageNumber + 1) * this.PAGE_SIZE);
     }
   }
 
@@ -240,17 +240,14 @@ export class ProfilePageComponent {
     if (this.userEditedExplorations.length === 0) {
       return this.explorationsOnPage;
     }
-    this.explorationIndexStart = (
-      this.currentPageNumber * this.PAGE_SIZE);
-    this.explorationIndexEnd = (
-      this.explorationIndexStart + this.PAGE_SIZE - 1);
+    this.explorationIndexStart = this.currentPageNumber * this.PAGE_SIZE;
+    this.explorationIndexEnd = this.explorationIndexStart + this.PAGE_SIZE - 1;
     for (
       let ind = this.explorationIndexStart;
       ind <= this.explorationIndexEnd;
       ind++
     ) {
-      this.explorationsOnPage.push(
-        this.userEditedExplorations[ind]);
+      this.explorationsOnPage.push(this.userEditedExplorations[ind]);
       if (ind === this.userEditedExplorations.length - 1) {
         break;
       }
