@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard, StateCardObjectFactory } from
+import { StateCard } from
   'domain/state_card/StateCardObjectFactory';
 
 describe('Player transcript service', () => {
@@ -28,7 +28,6 @@ describe('Player transcript service', () => {
   let scof;
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
-    scof = TestBed.get(StateCardObjectFactory);
   });
 
   it('should reset the transcript correctly', () => {

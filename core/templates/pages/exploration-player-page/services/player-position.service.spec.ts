@@ -27,7 +27,7 @@ import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { AudioTranslationLanguageService } from
     'pages/exploration-player-page/services/audio-translation-language.service';
-import { StateCard, StateCardObjectFactory } from
+import { StateCard } from
   'domain/state_card/StateCardObjectFactory';
 
 describe('Player position service', () => {
@@ -41,7 +41,6 @@ describe('Player position service', () => {
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
     pps = TestBed.get(PlayerPositionService);
-    scof = TestBed.get(StateCardObjectFactory);
     onQuestionChangeSpy = jasmine.createSpy('onQuestionChangeSpy');
     subscriptions = new Subscription();
     subscriptions.add(pps.onCurrentQuestionChange.subscribe(

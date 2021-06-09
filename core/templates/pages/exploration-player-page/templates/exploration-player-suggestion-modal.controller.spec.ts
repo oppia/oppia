@@ -23,7 +23,7 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { RecordedVoiceovers } from
   'domain/exploration/recorded-voiceovers.model';
-import {StateCard, StateCardObjectFactory} from
+import { StateCard } from
     'domain/state_card/StateCardObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { WrittenTranslationsObjectFactory } from
@@ -46,7 +46,6 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var interactionObjectFactory = null;
   var playerPositionService = null;
   var playerTranscriptService = null;
-  var stateCardObjectFactory = null;
   var suggestionModalService = null;
   var writtenTranslationsObjectFactory = null;
   var audioTranslationLanguageService = null;
@@ -59,7 +58,6 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     playerPositionService = TestBed.get(PlayerPositionService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     suggestionModalService = TestBed.get(SuggestionModalService);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);

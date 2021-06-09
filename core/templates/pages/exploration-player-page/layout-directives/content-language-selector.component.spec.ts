@@ -30,7 +30,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import {StateCard, StateCardObjectFactory} from 'domain/state_card/StateCardObjectFactory';
+import {StateCard} from 'domain/state_card/StateCardObjectFactory';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from
@@ -61,7 +61,6 @@ describe('Content language selector component', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let playerTranscriptService: PlayerTranscriptService;
-  let stateCardObjectFactory: StateCardObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -90,7 +89,6 @@ describe('Content language selector component', () => {
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);
     imagePreloaderService = TestBed.get(ImagePreloaderService);

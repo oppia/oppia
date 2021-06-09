@@ -25,7 +25,7 @@ import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { StateCard } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -86,7 +86,6 @@ export class ExplorationEngineService {
      private playerTranscriptService: PlayerTranscriptService,
      private readOnlyExplorationBackendApiService:
        ReadOnlyExplorationBackendApiService,
-     private stateCardObjectFactory: StateCardObjectFactory,
      private statsReportingService: StatsReportingService,
      private urlService: UrlService
    ) {

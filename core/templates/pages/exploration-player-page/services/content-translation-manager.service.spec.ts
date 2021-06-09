@@ -27,7 +27,7 @@ import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import {StateCard, StateCardObjectFactory} from
+import {StateCard} from
     'domain/state_card/StateCardObjectFactory';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
@@ -43,7 +43,6 @@ describe('Content translation manager service', () => {
   let ehfs: ExplorationHtmlFormatterService;
   let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
-  let scof: StateCardObjectFactory;
   let suof: SubtitledUnicodeObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
   let atls: AudioTranslationLanguageService;
@@ -55,7 +54,6 @@ describe('Content translation manager service', () => {
     ehfs = TestBed.get(ExplorationHtmlFormatterService);
     iof = TestBed.get(InteractionObjectFactory);
     pts = TestBed.get(PlayerTranscriptService);
-    scof = TestBed.get(StateCardObjectFactory);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
