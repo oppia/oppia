@@ -65,47 +65,6 @@ describe('Oppia CodeMirror Component', () => {
     window.CodeMirror = originalCodeMirror;
   });
 
-  it('should not allow undefined for left or right pane', () => {
-    const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
-    const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    spyOn(window.CodeMirror, 'MergeView').and.callFake(
-      (element: HTMLElement) => {
-        return <CodeMirror.MergeView.MergeViewEditor><unknown>{
-          editor: () => {
-            return { setValue: editSetValueSpy };
-          },
-          rightOriginal: () => {
-            return { setValue: rightOrgSetValueSpy };
-          }
-        };
-      });
-    component.ngAfterViewInit();
-    let changes: SimpleChanges = {
-      leftValue: {
-        currentValue: undefined,
-        previousValue: 'B',
-        firstChange: false,
-        isFirstChange: () => false
-      }
-    };
-    component.leftValue = undefined;
-    expect(() => component.ngOnChanges(changes)).toThrowError(
-      'Left pane value is not defined.'
-    );
-    changes = {
-      rightValue: {
-        currentValue: undefined,
-        previousValue: 'B',
-        firstChange: false,
-        isFirstChange: () => false
-      }
-    };
-    component.rightValue = undefined;
-    expect(() => component.ngOnChanges(changes)).toThrowError(
-      'Right pane value is not defined.'
-    );
-  });
-
   it('should watch for changes and set value for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
