@@ -237,11 +237,11 @@ export class ExplorationEngineService {
      }
 
      let initialCard =
-       this.stateCardObjectFactory.createNewCard(
+       StateCard.createNewCard(
          this.currentStateName, questionHtml, interactionHtml,
          interaction, initialState.recordedVoiceovers,
          initialState.writtenTranslations,
-         initialState.content.contentId);
+         initialState.content.contentId, this.audioTranslationLanguageService);
      successCallback(initialCard, nextFocusLabel);
    }
 
@@ -517,12 +517,13 @@ export class ExplorationEngineService {
      questionHtml = questionHtml + this._getRandomSuffix();
      nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
 
-     let nextCard = this.stateCardObjectFactory.createNewCard(
+     let nextCard = StateCard.createNewCard(
        this.nextStateName, questionHtml, nextInteractionHtml,
        this.exploration.getInteraction(this.nextStateName),
        this.exploration.getState(this.nextStateName).recordedVoiceovers,
        this.exploration.getState(this.nextStateName).writtenTranslations,
-       this.exploration.getState(this.nextStateName).content.contentId);
+       this.exploration.getState(this.nextStateName).content.contentId,
+       this.audioTranslationLanguageService);
      successCallback(
        nextCard, refreshInteraction, feedbackHtml,
        feedbackAudioTranslations, refresherExplorationId,

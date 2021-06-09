@@ -25,7 +25,9 @@ import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCardObjectFactory } from
+import { AudioTranslationLanguageService } from
+    'pages/exploration-player-page/services/audio-translation-language.service';
+import { StateCard, StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 
 describe('Player position service', () => {
@@ -34,6 +36,7 @@ describe('Player position service', () => {
   let scof = null;
   let onQuestionChangeSpy: jasmine.Spy;
   let subscriptions: Subscription;
+  let atls = AudioTranslationLanguageService;
 
   beforeEach(() => {
     pts = TestBed.get(PlayerTranscriptService);
@@ -72,12 +75,14 @@ describe('Player position service', () => {
   });
 
   it('should get current state name', () => {
-    pts.addNewCard(scof.createNewCard(
+    pts.addNewCard(StateCard.createNewCard(
       'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
-    pts.addNewCard(scof.createNewCard(
+      '<oppia-text-input-html></oppia-text-input-html>', null, null,
+      null, null, null));
+    pts.addNewCard(StateCard.createNewCard(
       'Second state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>'));
+      '<oppia-text-input-html></oppia-text-input-html>', null, null,
+      null, null, null));
     let callBack = () => {};
     pps.init(callBack);
     pps.setDisplayedCardIndex(0);

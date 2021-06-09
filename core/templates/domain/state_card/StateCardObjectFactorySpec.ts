@@ -18,12 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { AudioTranslationLanguageService} from
+    "pages/exploration-player-page/services/audio-translation-language.service";
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
+import {StateCard, StateCardObjectFactory} from
+    'domain/state_card/StateCardObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -37,6 +39,7 @@ describe('State card object factory', () => {
   let interactionObjectFactory = null;
   let writtenTranslationsObjectFactory = null;
   let _sampleCard = null;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -73,7 +76,7 @@ describe('State card object factory', () => {
       hints: [],
       id: 'TextInput'
     };
-    _sampleCard = stateCardObjectFactory.createNewCard(
+    _sampleCard = StateCard.createNewCard(
       'State 1', '<p>Content</p>', '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
       RecordedVoiceovers.createFromBackendDict({
@@ -95,7 +98,7 @@ describe('State card object factory', () => {
         }
       }),
       writtenTranslationsObjectFactory.createEmpty(),
-      'content');
+      'content', audioTranslationLanguageService);
   });
 
   it('should be able to get the various fields', () => {

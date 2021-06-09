@@ -372,8 +372,6 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
-import { StateCardObjectFactory } from
-  'domain/state_card/StateCardObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
@@ -683,7 +681,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static solutionObjectFactory: SolutionObjectFactory;
   static solutionValidityService: SolutionValidityService;
   static speechSynthesisChunkerService: SpeechSynthesisChunkerService;
-  static stateCardObjectFactory: StateCardObjectFactory;
   static stateClassifierMappingService: StateClassifierMappingService;
   static stateContentService: StateContentService;
   static stateCustomizationArgsService: StateCustomizationArgsService;
@@ -970,7 +967,6 @@ private skillRightsBackendApiService: SkillRightsBackendApiService,
 private solutionObjectFactory: SolutionObjectFactory,
 private solutionValidityService: SolutionValidityService,
 private speechSynthesisChunkerService: SpeechSynthesisChunkerService,
-private stateCardObjectFactory: StateCardObjectFactory,
 private stateClassifierMappingService: StateClassifierMappingService,
 private stateContentService: StateContentService,
 private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -1377,8 +1373,6 @@ private injector: Injector
       this.solutionValidityService);
     OppiaAngularRootComponent.speechSynthesisChunkerService = (
       this.speechSynthesisChunkerService);
-    OppiaAngularRootComponent.stateCardObjectFactory = (
-      this.stateCardObjectFactory);
     OppiaAngularRootComponent.stateClassifierMappingService = (
       this.stateClassifierMappingService);
     OppiaAngularRootComponent.stateContentService = this.stateContentService;

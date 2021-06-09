@@ -34,6 +34,7 @@ import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import {AudioTranslationLanguageService} from "pages/exploration-player-page/services/audio-translation-language.service";
 
 @Injectable({
   providedIn: 'root'
@@ -51,6 +52,7 @@ export class QuestionPlayerEngineService {
   constructor(
       private alertsService: AlertsService,
       private answerClassificationService: AnswerClassificationService,
+      private audioTranslationLanguageService: AudioTranslationLanguageService,
       private contextService: ContextService,
       private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
       private expressionInterpolationService: ExpressionInterpolationService,
@@ -312,12 +314,13 @@ export class QuestionPlayerEngineService {
           AppConstants.ENTITY_TYPE.QUESTION,
           this.questions[this.nextIndex].getId());
       }
-      nextCard = this.stateCardObjectFactory.createNewCard(
+      nextCard = StateCard.createNewCard(
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
         this.getNextStateData().writtenTranslations,
-        this.getNextStateData().content.contentId
+        this.getNextStateData().content.contentId,
+        this.audioTranslationLanguageService
       );
     } else if (!onSameCard) {
       this.contextService.removeCustomEntityContext();

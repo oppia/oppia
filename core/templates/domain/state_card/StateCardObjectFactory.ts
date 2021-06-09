@@ -242,6 +242,29 @@ export class StateCard {
   get contentId(): string {
     return this._contentId;
   }
+
+  /**
+   * @param {string} stateName - The state name for the current card.
+   * @param {string} contentHtml - The HTML string for the content displayed
+   *        on the content card.
+   * @param {string} interactionHtml - The HTML that calls the interaction
+   *        directive for the current card.
+   * @param {Interaction} interaction - An interaction object that stores all
+   *        the properties of the card's interaction.
+   * @param {RecordedVoiceovers} recordedVoiceovers
+   * @param {string} contentId
+   */
+  static createNewCard(
+    stateName: string, contentHtml: string, interactionHtml: string,
+    interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
+    writtenTranslations: WrittenTranslations, contentId: string,
+    audioTranslationLanguageService: AudioTranslationLanguageService): StateCard {
+    return new StateCard(
+      stateName, contentHtml, interactionHtml,
+      cloneDeep(interaction), [],
+      recordedVoiceovers, writtenTranslations, contentId,
+      audioTranslationLanguageService);
+  }
 }
 
 @Injectable({

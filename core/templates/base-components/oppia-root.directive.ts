@@ -91,7 +91,7 @@ angular.module('oppia').directive('oppiaRoot', [
               'SiteAnalyticsService', 'SkillObjectFactory',
               'SolutionObjectFactory',
               'SpeechSynthesisChunkerService',
-              'StateCardObjectFactory', 'StateClassifierMappingService',
+              'StateClassifierMappingService',
               'StateInteractionStatsService',
               'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
               'StateTopAnswersStatsService', 'StatesObjectFactory',
