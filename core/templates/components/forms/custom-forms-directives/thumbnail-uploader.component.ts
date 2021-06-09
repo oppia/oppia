@@ -63,6 +63,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       '/icons/story-image-icon.png'));
   transformedData: string;
   parsedResponse;
+  encodedImageURI: string;
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
@@ -136,7 +137,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     this.resampledFile = (
       this.imageUploadHelperService.convertImageDataToImageFile(
         imageURI));
-
+    this.encodedImageURI = imageURI;
     if (this.resampledFile === null) {
       this.alertsService.addWarning('Could not get resampled file.');
       return;
@@ -189,7 +190,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     modalRef.componentInstance.previewFooter = this.previewFooter;
     modalRef.componentInstance.previewTitle = this.previewTitle;
     modalRef.componentInstance.openInUploadMode = this.openInUploadMode;
-    modalRef.componentInstance.uploadedImage = this.uploadedImage;
+    modalRef.componentInstance.uploadedImage = this.encodedImageURI;
     modalRef.componentInstance.uploadedImageMimeType =
      this.uploadedImageMimeType;
     modalRef.componentInstance.tempBgColor = this.tempBgColor;
