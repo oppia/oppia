@@ -780,7 +780,7 @@ describe(
     var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
     var mockilss = {
-      getObjectUrlForImage: (filename) => {
+      getRawImageData: (filename) => {
         return dataUrl;
       },
       saveImage: (filename, imageData) => {
