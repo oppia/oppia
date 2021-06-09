@@ -34,8 +34,8 @@ export class UserInfo {
   _isTopicManager: boolean;
   _isSuperAdmin: boolean;
   _canCreateCollections: boolean;
-  // The following three properties are set to null for 'UserInfo' object when
-  // the user is not logged in. Check function 'createDefault' for reference.
+  // The following three properties are set to null when the
+  // user is not logged in.
   _preferredSiteLanguageCode: string | null;
   _username: string | null;
   _email: string | null;
