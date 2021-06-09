@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Error classes for model audits."""
+"""Objects for holding onto the results produced by Apache Beam jobs."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -82,8 +82,8 @@ class JobRunResult(python_utils.OBJECT):
             JobRunResult. A new JobRunResult instance with all stdout and stderr
             values concatenated together with newline delimiters.
         """
-        stdout = '\n'.join(r.stdout for r in job_run_results)
-        stderr = '\n'.join(r.stderr for r in job_run_results)
+        stdout = '\n'.join(r.stdout for r in job_run_results if r.stdout)
+        stderr = '\n'.join(r.stderr for r in job_run_results if r.stderr)
         # NOTE: We can't use `cls` because derived classes are allowed to have
         # different __init__ arguments, so only the base class is guaranteed to
         # support `stdout` and `stderr` as arguments.

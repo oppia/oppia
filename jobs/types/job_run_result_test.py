@@ -32,6 +32,18 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(run_result.stdout, 'abc')
         self.assertEqual(run_result.stderr, '123')
 
+    def test_concat(self):
+        single_job_run_result = job_run_result.JobRunResult.concat([
+            job_run_result.JobRunResult(stdout='abc', stderr=''),
+            job_run_result.JobRunResult(stdout='', stderr='123'),
+            job_run_result.JobRunResult(stdout='def', stderr='456'),
+        ])
+
+        self.assertItemsEqual(
+            single_job_run_result.stdout.split('\n'), ['abc', 'def'])
+        self.assertItemsEqual(
+            single_job_run_result.stderr.split('\n'), ['123', '456'])
+
     def test_raises_when_stdout_is_none(self):
         with self.assertRaisesRegexp(ValueError, 'must not be None'):
             job_run_result.JobRunResult(stdout=None, stderr='123')
