@@ -369,13 +369,11 @@ export class InteractionObjectFactory {
   }
 
   _createFromNumericInputCustomizationArgsBackendDict(
-    caBackendDict: NumericInputCustomizationArgsBackendDict
-): NumericInputCustomizationArgs {
-  const { placeholder } = caBackendDict;
-  return {
-    placeholder
-  };
-}
+      caBackendDict: NumericInputCustomizationArgsBackendDict
+  ): NumericInputCustomizationArgs {
+    const { placeholder } = caBackendDict;
+    return { placeholder };
+  }
 
   convertFromCustomizationArgsBackendDict(
       interactionId: string,
@@ -428,7 +426,10 @@ export class InteractionObjectFactory {
             <NumericExpressionInputCustomizationArgsBackendDict> caBackendDict)
         );
       case 'NumericInput':
-        return <NumericInputCustomizationArgs> cloneDeep(caBackendDict);
+        return (
+          this._createFromNumericInputCustomizationArgsBackendDict(
+            <NumericInputCustomizationArgsBackendDict> caBackendDict)
+        );
       case 'PencilCodeEditor':
         return <PencilCodeEditorCustomizationArgs> cloneDeep(caBackendDict);
       case 'RatioExpressionInput':

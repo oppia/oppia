@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('interactions/interaction-attributes-extractor.service.ts');
 require('interactions/NumericInput/directives/numeric-input-rules.service.ts');
 require(
   'interactions/NumericInput/directives/numeric-input-validation.service.ts');
@@ -38,11 +39,13 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
       template: require('./numeric-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', 'CurrentInteractionService', 'NumericInputRulesService',
-        'NumericInputValidationService',
+        '$attrs', 'CurrentInteractionService',
+        'InteractionAttributesExtractorService',
+        'NumericInputRulesService', 'NumericInputValidationService',
         function(
-            $attrs, CurrentInteractionService, NumericInputRulesService,
-            NumericInputValidationService) {
+            $attrs, CurrentInteractionService,
+            InteractionAttributesExtractorService,
+            NumericInputRulesService, NumericInputValidationService,) {
           var ctrl = this;
           ctrl.errorString = '';
           var isAnswerValid = function() {
@@ -66,6 +69,10 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
+            const { placeholder } =
+            InteractionAttributesExtractorService.getValuesFromAttributes(
+              'NumericInput', $attrs);
+            ctrl.placeholder = placeholder;
             ctrl.answer = (
               ctrl.savedSolution !== undefined ?
               ctrl.savedSolution : ''

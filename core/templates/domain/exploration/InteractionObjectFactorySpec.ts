@@ -357,6 +357,28 @@ describe('Interaction object factory', () => {
       confirmed_unclassified_answers: [],
       customization_args: {
         placeholder: {
+          value: true
+        }
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'NumericInput',
+      solution: solutionDict
+    });
+    expect(testInteraction.customizationArgs).toEqual({
+      placeholder: {
+        value: true
+      }
+    });
+  });
+
+  it('should correctly set customization arguments for ' +
+     'NumericInput', () => {
+    const testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
           value: false
         }
       },
@@ -371,21 +393,6 @@ describe('Interaction object factory', () => {
         value: false
       }
     });
-  });
-
-  it('should correctly set customization arguments for ' +
-     'NumericInput', () => {
-    const testInteraction = iof.createFromBackendDict({
-      answer_groups: answerGroupsDict,
-      confirmed_unclassified_answers: [],
-      customization_args: {},
-      default_outcome: defaultOutcomeDict,
-      hints: hintsDict,
-      id: 'NumericInput',
-      solution: solutionDict
-    });
-
-    expect(testInteraction.customizationArgs).toEqual({});
   });
 
   it('should correctly set customization arguments for ' +
