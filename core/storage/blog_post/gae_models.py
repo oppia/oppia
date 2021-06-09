@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,7 +80,7 @@ class BlogPostModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user():
         """Model is exported as multiple instances per user since there can
-        be multiple blog models relevant to a user.
+        be multiple blog post models relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
@@ -104,7 +106,7 @@ class BlogPostModel(base_models.BaseModel):
 
         Returns:
             str. A blog ID that is different from the IDs of all
-            the existing blogs.
+            the existing blog posts.
 
         Raises:
             Exception. There were too many collisions with existing blog IDs
@@ -206,7 +208,7 @@ class BlogPostModel(base_models.BaseModel):
 class BlogPostSummaryModel(base_models.BaseModel):
     """Summary model for blog posts.
 
-    This should be used whenever the content of the blog is not
+    This should be used whenever the content of the blog post is not
     needed (e.g. in search results, displaying blog post cards etc).
 
     The key of each instance is the blog id.
