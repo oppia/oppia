@@ -229,44 +229,6 @@ angular.module('oppia').directive('adminMiscTab', [
             });
         };
 
-        ctrl.flushMemoryCache = function() {
-          AdminBackendApiService.flushMemoryCacheAsync()
-            .then(() => {
-              ctrl.setStatusMessage('Success! Memory Cache Flushed.');
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            }, errorResponse => {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse);
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            });
-        };
-
-        ctrl.getMemoryCacheProfile = function() {
-          AdminBackendApiService.getMemoryCacheProfileAsync()
-            .then(response => {
-              ctrl.result = {
-                totalAllocatedInBytes: response.total_allocation,
-                peakAllocatedInBytes: response.peak_allocation,
-                totalKeysStored: response.total_keys_stored
-              };
-              ctrl.memoryCacheDataFetched = true;
-              ctrl.setStatusMessage('Success!');
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            }, errorResponse => {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse);
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            });
-        };
-
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
           AdminBackendApiService.updateUserNameAsync(

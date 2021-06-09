@@ -41,8 +41,8 @@ export class PromoBarComponent implements OnInit {
   ngOnInit(): void {
     this.promoBarBackendApiService.getPromoBarDataAsync()
       .then((promoBar) => {
-        this.promoBarIsEnabled = promoBar.isPromoBarEnabled();
-        this.promoBarMessage = promoBar.getPromoBarMessage();
+        this.promoBarIsEnabled = promoBar.promoBarEnabled;
+        this.promoBarMessage = promoBar.promoBarMessage;
       });
     this.promoIsVisible = !this.isPromoDismissed();
   }

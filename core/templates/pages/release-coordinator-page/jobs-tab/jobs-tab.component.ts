@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the jobs tab in the admin panel.
+ * @fileoverview Component for the jobs tab in the release-coordinator panel.
  */
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
+import { ReleaseCoordinatorBackendApiService, JobsData } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { ComputationData } from 'domain/admin/computation-data.model';
 import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { Job } from 'domain/admin/job.model';
 
 @Component({
-  selector: 'oppia-admin-jobs-tab',
-  templateUrl: './admin-jobs-tab.component.html'
+  selector: 'oppia-jobs-tab',
+  templateUrl: './jobs-tab.component.html'
 })
-export class AdminJobsTabComponent {
+export class JobsTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = (
     new EventEmitter
   );
@@ -41,12 +41,13 @@ export class AdminJobsTabComponent {
   AUDIT_JOB_SPECS: JobStatusSummary[] = [];
   RECENT_JOB_DATA: Job[] = [];
   constructor(
-    private adminBackendApiService: AdminBackendApiService,
+    private releaseCoordinatorBackendApiService: (
+      ReleaseCoordinatorBackendApiService),
     private windowRef: WindowRef,
   ) {}
 
   showJobOutput(jobId: string): void {
-    this.adminBackendApiService.fetchJobOutputAsync(jobId)
+    this.releaseCoordinatorBackendApiService.fetchJobOutputAsync(jobId)
       .then((jobOutput: string[]) => {
         this.showingJobOutput = true;
         this.jobOutput = jobOutput;
@@ -62,22 +63,23 @@ export class AdminJobsTabComponent {
   startNewJob(
       jobType: string): void {
     this.setStatusMessage.emit('Starting new job...');
-    this.adminBackendApiService.startNewJobAsync(jobType).then(() => {
-      this.setStatusMessage.emit('Job started successfully.');
-      this.windowRef._window().location.reload();
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.error
-      );
-    });
+    this.releaseCoordinatorBackendApiService.startNewJobAsync(jobType)
+      .then(() => {
+        this.setStatusMessage.emit('Job started successfully.');
+        this.windowRef._window().location.reload();
+      }, (errorResponse) => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.error
+        );
+      });
   }
 
   startComputation(
       computationType: string): void {
     this.setStatusMessage.emit('Starting computation');
 
-    this.adminBackendApiService.startComputationAsync(computationType)
-      .then(()=> {
+    this.releaseCoordinatorBackendApiService
+      .startComputationAsync(computationType).then(()=> {
         this.setStatusMessage.emit('Computation started successfully.');
         this.windowRef._window().location.reload();
       }, (errorResponse) => {
@@ -91,15 +93,15 @@ export class AdminJobsTabComponent {
       computationType: string
   ): void {
     this.setStatusMessage.emit('Stopping computation...');
-    this.adminBackendApiService.stopComputationAsync(computationType)
-      .then(() => {
-        this.setStatusMessage.emit('Abort signal sent to computation.');
-        this.windowRef._window().location.reload();
-      }, (errorResponse) => {
-        this.setStatusMessage.emit(
-          'Server error: ' + errorResponse.error
-        );
-      });
+    this.releaseCoordinatorBackendApiService.stopComputationAsync(
+      computationType).then(() => {
+      this.setStatusMessage.emit('Abort signal sent to computation.');
+      this.windowRef._window().location.reload();
+    }, (errorResponse) => {
+      this.setStatusMessage.emit(
+        'Server error: ' + errorResponse.error
+      );
+    });
   }
 
   cancelJob(
@@ -107,32 +109,29 @@ export class AdminJobsTabComponent {
       jobType: string): void {
     this.setStatusMessage.emit('Cancelling job...');
 
-    this.adminBackendApiService.cancelJobAsync(jobId, jobType).then(() => {
-      this.setStatusMessage.emit('Abort signal sent to job.');
-      this.windowRef._window().location.reload();
-    }, (errorResponse) => {
-      this.setStatusMessage.emit(
-        'Server error: ' + errorResponse.error);
-    });
+    this.releaseCoordinatorBackendApiService.cancelJobAsync(jobId, jobType)
+      .then(() => {
+        this.setStatusMessage.emit('Abort signal sent to job.');
+        this.windowRef._window().location.reload();
+      }, (errorResponse) => {
+        this.setStatusMessage.emit(
+          'Server error: ' + errorResponse.error);
+      });
   }
 
   ngOnInit(): void {
-    this.adminBackendApiService.getDataAsync()
-      .then((adminDataObject: AdminPageData) => {
-        this.HUMAN_READABLE_CURRENT_TIME = (
-          adminDataObject.humanReadableCurrentTime
-        );
-        this.CONTINUOUS_COMPUTATIONS_DATA = (
-          adminDataObject.continuousComputationsData
-        );
-        this.ONE_OFF_JOB_SPECS = adminDataObject.oneOffJobStatusSummaries;
-        this.UNFINISHED_JOB_DATA = adminDataObject.unfinishedJobData;
-        this.AUDIT_JOB_SPECS = adminDataObject.auditJobStatusSummaries;
-        this.RECENT_JOB_DATA = adminDataObject.recentJobData;
+    this.releaseCoordinatorBackendApiService.getJobsDataAsync()
+      .then((jobsData: JobsData) => {
+        this.HUMAN_READABLE_CURRENT_TIME = jobsData.humanReadableCurrentTime;
+        this.CONTINUOUS_COMPUTATIONS_DATA = jobsData.continuousComputationsData;
+        this.ONE_OFF_JOB_SPECS = jobsData.oneOffJobStatusSummaries;
+        this.UNFINISHED_JOB_DATA = jobsData.unfinishedJobData;
+        this.AUDIT_JOB_SPECS = jobsData.auditJobStatusSummaries;
+        this.RECENT_JOB_DATA = jobsData.recentJobData;
       });
     this.showingJobOutput = false;
   }
 }
 
-angular.module('oppia').directive('oppiaAdminJobsTab',
-  downgradeComponent({component: AdminJobsTabComponent}));
+angular.module('oppia').directive(
+  'oppiaJobsTab', downgradeComponent({component: JobsTabComponent}));

@@ -15,10 +15,6 @@
   <oppia-admin-prod-mode-activities-tab ng-if="$ctrl.isActivitiesTabOpen() && !$ctrl.inDevMode">
   </oppia-admin-prod-mode-activities-tab>
 
-  <oppia-admin-jobs-tab ng-if="$ctrl.isJobsTabOpen()"
-                        (set-status-message)="$ctrl.setStatusMessage($event)">
-  </oppia-admin-jobs-tab>
-
   <admin-config-tab ng-if="$ctrl.isConfigTabOpen()"
                     set-status-message="$ctrl.setStatusMessage">
   </admin-config-tab>

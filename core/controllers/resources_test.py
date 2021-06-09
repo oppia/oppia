@@ -794,3 +794,46 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'filename': self.TEST_AUDIO_FILE_MP3,
             'duration_secs': 15.255510204081633})
         self.assertEqual(response_dict, expected_value)
+
+
+class PromoBarHandlerTest(test_utils.GenericTestBase):
+    """Test for the PromoBarHandler."""
+
+    def setUp(self):
+        super(PromoBarHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def test_get_promo_bar_data(self):
+        response = self.get_json('/promo_bar_handler')
+        self.assertEqual(
+            response, {
+                'promo_bar_enabled': False,
+                'promo_bar_message': ''
+            })
+
+    def test_release_coordinator_able_to_update_promo_bar_config(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.put_json(
+            '/promo_bar_handler', {
+                'promo_bar_enabled': True,
+                'promo_bar_message': 'New promo bar message.'
+            }, csrf_token=csrf_token)
+        self.assertEqual(response, {})
+
+        response = self.get_json('/promo_bar_handler')
+        self.assertEqual(
+            response, {
+                'promo_bar_enabled': True,
+                'promo_bar_message': 'New promo bar message.'
+            })
+
+        self.logout()

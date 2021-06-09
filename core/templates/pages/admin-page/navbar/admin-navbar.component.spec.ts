@@ -75,7 +75,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
   });
 
@@ -84,7 +83,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
     adminRouterService.showTab('#config');
@@ -93,7 +91,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(true);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
   });
 
@@ -102,7 +99,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
     adminRouterService.showTab('#features');
@@ -111,7 +107,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(true);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
   });
 
@@ -120,7 +115,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
     adminRouterService.showTab('#roles');
@@ -129,25 +123,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(true);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-  });
-
-  it('should be routed to the jobs tab', () => {
-    expect(component.isActivitiesTabOpen()).toBe(true);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
-    expect(component.isMiscTabOpen()).toBe(false);
-
-    adminRouterService.showTab('#jobs');
-
-    expect(component.isActivitiesTabOpen()).toBe(false);
-    expect(component.isConfigTabOpen()).toBe(false);
-    expect(component.isFeaturesTabOpen()).toBe(false);
-    expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(true);
     expect(component.isMiscTabOpen()).toBe(false);
   });
 
@@ -156,7 +131,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(false);
 
     adminRouterService.showTab('#misc');
@@ -165,7 +139,6 @@ describe('Admin Navbar component', () => {
     expect(component.isConfigTabOpen()).toBe(false);
     expect(component.isFeaturesTabOpen()).toBe(false);
     expect(component.isRolesTabOpen()).toBe(false);
-    expect(component.isJobsTabOpen()).toBe(false);
     expect(component.isMiscTabOpen()).toBe(true);
   });
 
