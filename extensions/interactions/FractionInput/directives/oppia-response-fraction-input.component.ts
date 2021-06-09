@@ -17,7 +17,7 @@
  */
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Fraction } from 'domain/objects/FractionModel';
+import { Fraction } from 'domain/objects/fraction.model';
 import { FractionAnswer } from 'interactions/answer-defs';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 

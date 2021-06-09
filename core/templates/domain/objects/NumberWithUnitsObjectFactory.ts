@@ -21,7 +21,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Fraction } from
-  'domain/objects/FractionModel';
+  'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
 import { Units, UnitsObjectFactory } from

@@ -21,7 +21,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionAnswer } from 'interactions/answer-defs';
 import { Fraction } from
-  'domain/objects/FractionModel';
+  'domain/objects/fraction.model';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';

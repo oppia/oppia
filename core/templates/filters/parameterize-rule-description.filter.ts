@@ -16,7 +16,7 @@
  * @fileoverview ParameterizeRuleDescription filter for Oppia.
  */
 import { Ratio } from 'domain/objects/ratio.model';
-import { Fraction } from 'domain/objects/FractionModel';
+import { Fraction } from 'domain/objects/fraction.model';
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');

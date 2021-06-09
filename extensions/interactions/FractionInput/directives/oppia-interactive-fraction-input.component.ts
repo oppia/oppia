@@ -20,7 +20,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { Fraction } from 'domain/objects/FractionModel';
+import { Fraction } from 'domain/objects/fraction.model';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
 import { FractionInputCustomizationArgs } from 'interactions/customization-args-defs';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';

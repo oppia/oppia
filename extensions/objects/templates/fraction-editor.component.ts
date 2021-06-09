@@ -19,7 +19,7 @@
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Fraction } from 'domain/objects/FractionModel';
+import { Fraction } from 'domain/objects/fraction.model';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 

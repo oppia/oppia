@@ -17,7 +17,7 @@
  */
 
 import { Fraction } from
-  'domain/objects/FractionModel';
+  'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { ObjectsDomainConstants } from

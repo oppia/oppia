@@ -22,7 +22,7 @@ import { Injectable } from '@angular/core';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { Fraction } from
-  'domain/objects/FractionModel';
+  'domain/objects/fraction.model';
 import { InteractionAnswer, FractionAnswer, MultipleChoiceAnswer } from
   'interactions/answer-defs';
 import { MultipleChoiceInputCustomizationArgs } from

@@ -28,7 +28,7 @@ import { ConvertToPlainTextPipe } from
 import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
-import { Fraction } from 'domain/objects/FractionModel';
+import { Fraction } from 'domain/objects/fraction.model';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { NumberWithUnitsObjectFactory } from

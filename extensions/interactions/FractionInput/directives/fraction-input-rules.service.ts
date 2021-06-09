@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Fraction } from 'domain/objects/FractionModel';
+import { Fraction } from 'domain/objects/fraction.model';
 import { FractionAnswer } from 'interactions/answer-defs';
 import { UtilsService } from 'services/utils.service';
 import {
