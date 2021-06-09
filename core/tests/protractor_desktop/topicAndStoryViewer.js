@@ -83,7 +83,6 @@ describe('Topic and Story viewer functionality', function() {
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
-      });
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
