@@ -127,18 +127,6 @@ export class CkEditorInitializerService {
                       editor.widgets.finalizeCreation(container);
                     }
 
-                    /**
-                     * Need to manually $compile so the directive renders.
-                     * Note that.element.$ is the native DOM object
-                     * represented by that.element. See:
-                     * http://docs.ckeditor.com/#!/api/CKEDITOR.dom.element
-                     */
-                    // console.log(that.element.$);
-                    // $compile($(that.element.$).contents())($rootScope);
-                    // $timeout ensures we do not take the undo snapshot until
-                    // after angular finishes its changes to the component tags.
-                    // For inline widgets, place the caret after the
-                    // widget so the user can continue typing immediately.
                     if (isInline) {
                       var range = editor.createRange();
                       var widgetContainer = that.element.getParent();
