@@ -1708,8 +1708,10 @@ def is_version_of_draft_valid(exp_id, version):
         bool. Whether the given version number is the same as the current
         version number of the exploration in the datastore.
     """
-
-    return exp_fetchers.get_exploration_by_id(exp_id).version == version
+    latest_version = exp_fetchers.get_exploration_by_id(exp_id).version
+    if latest_version != version:
+        print(get_composite_change_list(exp_id, version, latest_version))
+    return latest_version == version
 
 
 def get_user_exploration_data(
@@ -2124,3 +2126,31 @@ def regenerate_missing_stats_for_exploration(exp_id):
         missing_exp_stats, missing_state_stats,
         num_valid_exp_stats, num_valid_state_stats
     )
+
+def get_composite_change_list(exp_id, old_version, new_version):
+    """Returns a list of ExplorationChange domain objects consisting of
+    changes from old_version to new_version.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        old_version: int. The version of the exploration on which the user is working.
+        new_version: int. The latest version of the exploration from the backend.
+
+    Returns:
+        list(ExplorationChange). List of ExplorationChange domain objects
+        consisting of changes from old_version to new_version.
+    """
+    snapshots = get_exploration_snapshots_metadata(
+        exp_id)
+
+    change_list = []
+    for i in range(old_version, new_version):
+        change_list += snapshots[i].commit_cmds
+
+    print(change_list)
+
+    complete_change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in change_list]
+
+    return complete_change_list

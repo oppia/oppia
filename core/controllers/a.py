@@ -1,0 +1,98 @@
+[
+    {
+        u"commit_cmds": [{u"cmd": u"create_new", u"category": u"", u"title": u""}],
+        u"commit_type": u"create",
+        u"committer_id": u"uid_kajucepggejybwkwjjlmtxpjdwzjrgau",
+        u"version_number": 1,
+        u"created_on_ms": 1623174917068.128,
+        u"commit_message": u"New exploration created.",
+    },
+    {
+        u"commit_cmds": [
+            {
+                u"cmd": u"edit_state_property",
+                u"new_value": False,
+                u"property_name": u"card_is_checkpoint",
+                u"state_name": u"Introduction",
+                u"old_value": True,
+            },
+            {
+                u"cmd": u"edit_state_property",
+                u"new_value": True,
+                u"property_name": u"card_is_checkpoint",
+                u"state_name": u"Introduction",
+                u"old_value": False,
+            },
+            {
+                u"cmd": u"edit_state_property",
+                u"new_value": {
+                    u"html": u"<p>aryamasnsakdldsa</p>",
+                    u"content_id": u"content",
+                },
+                u"property_name": u"content",
+                u"state_name": u"Introduction",
+                u"old_value": {u"html": u"", u"content_id": u"content"},
+            },
+            {
+                u"cmd": u"edit_state_property",
+                u"new_value": u"EndExploration",
+                u"property_name": u"widget_id",
+                u"state_name": u"Introduction",
+                u"old_value": None,
+            },
+            {
+                u"cmd": u"edit_state_property",
+                u"new_value": {u"recommendedExplorationIds": {u"value": []}},
+                u"property_name": u"widget_customization_args",
+                u"state_name": u"Introduction",
+                u"old_value": {},
+            },
+            {
+                u"cmd": u"edit_state_property",
+                u"new_value": None,
+                u"property_name": u"default_outcome",
+                u"state_name": u"Introduction",
+                u"old_value": {
+                    u"param_changes": [],
+                    u"dest": u"Introduction",
+                    u"refresher_exploration_id": None,
+                    u"feedback": {u"html": u"", u"content_id": u"default_outcome"},
+                    u"missing_prerequisite_skill_id": None,
+                    u"labelled_as_correct": False,
+                },
+            },
+        ],
+        u"commit_type": u"edit",
+        u"committer_id": u"uid_kajucepggejybwkwjjlmtxpjdwzjrgau",
+        u"version_number": 2,
+        u"created_on_ms": 1623174967161.956,
+        u"commit_message": None,
+    },
+    {
+        u"commit_cmds": [
+            {
+                u"cmd": u"edit_exploration_property",
+                u"new_value": u"Aryaman Testing",
+                u"property_name": u"title",
+                u"old_value": u"",
+            },
+            {
+                u"cmd": u"edit_exploration_property",
+                u"new_value": u"jshbjsagjdaryman is a good boy",
+                u"property_name": u"objective",
+                u"old_value": u"",
+            },
+            {
+                u"cmd": u"edit_exploration_property",
+                u"new_value": u"Algebra",
+                u"property_name": u"category",
+                u"old_value": u"",
+            },
+        ],
+        u"commit_type": u"edit",
+        u"committer_id": u"uid_kajucepggejybwkwjjlmtxpjdwzjrgau",
+        u"version_number": 3,
+        u"created_on_ms": 1623174976187.437,
+        u"commit_message": u"Add metadata: title, objective, category.",
+    },
+]
