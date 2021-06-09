@@ -45,11 +45,6 @@ describe('ProfileLinkImageComponent', () => {
       ProfileLinkImageBackendApiService);
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
-
   it('should get profile picture data on initialization', fakeAsync(() => {
     component.username = 'user1';
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(

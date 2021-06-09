@@ -34,11 +34,6 @@ describe('ProfileLinkTextComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
-
   it('should check if username is linkable', () => {
     let usernamesNotLinkable = ['admin', 'OppiaMigrationBot'];
 

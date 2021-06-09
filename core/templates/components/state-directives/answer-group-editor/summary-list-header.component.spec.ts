@@ -34,11 +34,6 @@ describe('SummaryListHeaderComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
-
   it('should delete item', () => {
     let eventToDelete: Event = new Event('event');
     component.index = 1;

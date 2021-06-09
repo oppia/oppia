@@ -46,11 +46,6 @@ describe('Outcome Feedback Editor Component', () => {
     contextService = TestBed.inject(ContextService);
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
-
   it('should set outcome feedback schema on initialization', () => {
     expect(component.OUTCOME_FEEDBACK_SCHEMA).toBe(undefined);
 
