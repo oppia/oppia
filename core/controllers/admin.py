@@ -741,7 +741,6 @@ class AdminRoleHandler(base.BaseHandler):
             'remove_from_all_topics', False)
 
         user_id = user_services.get_user_id_from_username(username)
-
         if user_id is None:
             raise self.InvalidInputException(
                 'User with given username does not exist.')
