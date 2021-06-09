@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StateCardObjectFactory.
+ * @fileoverview Tests for state-card.model.ts.
  */
 
 import { TestBed } from '@angular/core/testing';
