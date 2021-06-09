@@ -65,6 +65,7 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
     errors = []
     for arg_key, arg_schema in handler_args_schema.items():
         value, schema = construct_args_schema(arg_key, arg_schema, handler_args)
+
         try:
             normalized_value = schema_utils.normalize_against_schema(
                 value, schema)
@@ -85,6 +86,8 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
 # contains schema.
 SCHEMA_REQUIRING_HANDLERS = [
     'AdminPage',
+    'AdminHandler',
+    'AdminJobOutputHandler',
     'ExplorationRightsHandler',
     'CronExplorationRecommendationsHandler',
     'CronMailAdminContributorDashboardBottlenecksHandler',

@@ -32,6 +32,7 @@ import types
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import classifier_domain
 from core.domain import classifier_services
@@ -57,6 +58,14 @@ auth_services = models.Registry.import_auth_services()
 
 FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
+
+
+class MockHandlerWithSchema(base.BaseHandler):
+    """Baseclass for all MockHandlers. This class contains the basic schema,
+    which conform with the existing backend tests.
+    """
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}, 'POST': {}}
 
 
 class HelperFunctionTests(test_utils.GenericTestBase):
@@ -105,7 +114,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     DELETED_USER_EMAIL = 'deleted.user@example.com'
     DELETED_USER_USERNAME = 'deleteduser'
 
-    class MockHandlerWithInvalidReturnType(base.BaseHandler):
+    class MockHandlerWithInvalidReturnType(MockHandlerWithSchema):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
 
         def get(self):
@@ -117,17 +126,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """
             self.render_template({'invalid_page.html'})
 
-    class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
+    class MockHandlerForTestingErrorPageWithIframed(MockHandlerWithSchema):
         def get(self):
             self.iframed = True
             self.render_template('invalid_page.html')
 
-    class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+    class MockHandlerForTestingUiAccessWrapper(MockHandlerWithSchema):
         def get(self):
             """Handles GET requests."""
             pass
 
-    class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+    class MockHandlerForTestingAuthorizationWrapper(MockHandlerWithSchema):
 
         def get(self):
             """Handles GET requests."""
@@ -343,7 +352,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(logging, 'warning', mock_logging_function):
             self.testapp.head('/mock', status=500)
-            self.assertEqual(len(observed_log_messages), 2)
+            self.assertEqual(len(set(observed_log_messages)), 2)
             self.assertEqual(
                 observed_log_messages[0],
                 'Not a recognized request method.')
@@ -783,7 +792,7 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
 class EscapingTests(test_utils.GenericTestBase):
 
-    class FakePage(base.BaseHandler):
+    class FakePage(MockHandlerWithSchema):
         """Fake page for testing autoescaping."""
 
         def post(self):
@@ -815,7 +824,7 @@ class EscapingTests(test_utils.GenericTestBase):
 
 class RenderDownloadableTests(test_utils.GenericTestBase):
 
-    class MockHandler(base.BaseHandler):
+    class MockHandler(MockHandlerWithSchema):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
         """
@@ -1056,7 +1065,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
-    class FakeHandler(base.BaseHandler):
+    class FakeHandler(MockHandlerWithSchema):
         """A fake handler class."""
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -1143,7 +1152,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
-    class MockHandler(base.BaseHandler):
+    class MockHandler(MockHandlerWithSchema):
 
         def get(self):
             self.values.update(list(self.request.GET.items()))
@@ -1240,7 +1249,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
 
 class IframeRestrictionTests(test_utils.GenericTestBase):
 
-    class MockHandlerForTestingPageIframing(base.BaseHandler):
+    class MockHandlerForTestingPageIframing(MockHandlerWithSchema):
         def get(self):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
@@ -1346,6 +1355,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         """
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
         @acl_decorators.is_from_oppia_ml
         def post(self):
@@ -1357,6 +1368,8 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         """
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
         def extract_request_message_vm_id_and_signature(self):
             """Returns the message, vm_id and signature retrieved from the
@@ -1405,3 +1418,196 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/correctmock', payload, expected_status_int=200)
+
+
+class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
+
+    non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
+
+    def test_every_method_has_schema(self):
+        handlers_checked = []
+        handlers_need_schema = []
+
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+
+            handler_class_name = handler.__name__
+            if handler_class_name in self.non_schema_handlers:
+                continue
+
+            schema_written_for_request_methods =  (
+                handler.HANDLER_ARGS_SCHEMAS !=
+                    base.BaseHandler.HANDLER_ARGS_SCHEMAS)
+            schema_written_for_url_path_args = (
+                handler.URL_PATH_ARGS_SCHEMAS !=
+                    base.BaseHandler.URL_PATH_ARGS_SCHEMAS)
+            handler_have_schemas = (schema_written_for_request_methods and
+                schema_written_for_url_path_args)
+            handlers_checked.append(
+                    (handler_class_name, handler_have_schemas))
+
+        self.log_line('Verifying schema for handlers .... ')
+        for (name, handler_have_schemas) in handlers_checked:
+            if not handler_have_schemas:
+                handlers_need_schema.append(name)
+                self.log_line('Schema not present in %s. %s' % (name, 'FAIL' ))
+        self.log_line(
+            'Total number of handlers checked: %s' % len(handlers_checked))
+
+        for (name, handler_have_schemas) in handlers_checked:
+            self.assertTrue(handler_have_schemas,
+                'Schema required in handlers - [ %s ]' %(
+                    ', '.join(handlers_need_schema)))
+
+    def test_schema_keys_exactly_match_with_url_path_elements(self):
+        handlers_with_missing_schema_keys = []
+        schema_keys_match_with_path_elements = True
+
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+            handler_class_name = handler.__name__
+            if handler_class_name in self.non_schema_handlers:
+                continue
+            regex_pattern = r'<.*?>'
+            url_path_elements = [
+                keyword[1:-1] for keyword in re.findall(
+                    regex_pattern, route.name)]
+            schema_keys = [
+                key for key in handler.URL_PATH_ARGS_SCHEMAS.keys()]
+            missing_schema_keys = set(url_path_elements) - set(schema_keys)
+
+            if missing_schema_keys:
+                handlers_with_missing_schema_keys.append(handler_class_name)
+                schema_keys_match_with_path_elements = False
+                self.log_line('Missing key in URL_PATH_ARGS_SCHEMAS for '
+                    '%s: %s. %s' % (handler_class_name,
+                        ', '.join(missing_schema_keys), 'FAIL'))
+
+        self.assertTrue(schema_keys_match_with_path_elements,
+            'Missing schema keys in URL_PATH_ARGS_SCHEMAS '
+                'for [ %s ] classes.' % ', '.join(
+                    handlers_with_missing_schema_keys))
+
+    def test_schema_keys_exactly_match_with_request_methods_in_handlers(self):
+        handlers_with_missing_schema_keys = []
+        schema_keys_match_with_hansler_req_methods = True
+
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+            handler_class_name = handler.__name__
+
+            if handler_class_name in self.non_schema_handlers:
+                continue
+
+            handler_request_methods = []
+            if handler.get != base.BaseHandler.get:
+                handler_request_methods.append('GET')
+            if handler.put != base.BaseHandler.put:
+                handler_request_methods.append('PUT')
+            if handler.post != base.BaseHandler.post:
+                handler_request_methods.append('POST')
+            if handler.delete != base.BaseHandler.delete:
+                handler_request_methods.append('DELETE')
+            schema_keys = [
+                key for key in handler.HANDLER_ARGS_SCHEMAS.keys()]
+            missing_schema_keys = (
+                set(handler_request_methods) - set(schema_keys))
+
+            if missing_schema_keys:
+                handlers_with_missing_schema_keys.append(handler_class_name)
+                schema_keys_match_with_hansler_req_methods = False
+                self.log_line('Missing key in HANDLER_ARGS_SCHEMAS for %s: '
+                    '%s. %s' % (handler_class_name, ', '.join(
+                        missing_schema_keys), 'FAIL'))
+
+        self.assertTrue(schema_keys_match_with_hansler_req_methods,
+            'Missing schema keys in HANDLER_ARGS_SCHEMAS '
+                'for [ %s ] classes.' % ', '.join(
+                    handlers_with_missing_schema_keys))
+
+    def test_default_value_in_schema_conforms_with_schema(self):
+        handlers_checked = []
+        schema_validation = True
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+            handler_class_name = handler.__name__
+
+            if handler_class_name in self.non_schema_handlers:
+                continue
+
+            schemas = handler.HANDLER_ARGS_SCHEMAS
+            for keys, schema in schemas.items():
+                for key, value in schema.items():
+                    if 'default_value' not in value:
+                        continue
+                    default_value = {key: value['default_value']}
+                    default_value_schema = {key: value}
+
+                    errors = payload_validator.validate(
+                        default_value, default_value_schema, True)
+                    if not errors:
+                        continue
+
+                    self.log_line('Handler: %s, argument: %s, default value '
+                        'validation: %s' % (handler_class_name, key, 'FAIL'))
+                    if handler_class_name not in handlers_checked:
+                        handlers_checked.append(handler_class_name)
+                    schema_validation = False
+
+        self.assertTrue(schema_validation, 'Schema validation for default '
+            'values failed for handlers: [ %s ]' % ', '.join(handlers_checked))
+
+    def test_handlers_with_schema_are_not_in_the_schema_requiring_list(self):
+        handlers_to_remove = []
+        handlers_with_schema_are_not_in_schema_requiring_list = True
+        non_schema_requiring_handler = (
+            payload_validator.NON_SCHEMA_REQUIRING_HANDLERS)
+        self.log_line('nik')
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+            name = handler.__name__
+
+            if name in non_schema_requiring_handler:
+                continue
+
+            schema_written_for_request_methods =  (
+                handler.HANDLER_ARGS_SCHEMAS !=
+                    base.BaseHandler.HANDLER_ARGS_SCHEMAS)
+            schema_written_for_url_path_args = (
+                handler.URL_PATH_ARGS_SCHEMAS !=
+                    base.BaseHandler.URL_PATH_ARGS_SCHEMAS)
+            handler_have_schema = (schema_written_for_request_methods and
+                schema_written_for_url_path_args)
+            if (handler_have_schema and
+                    name in self.non_schema_handlers):
+                handlers_to_remove.append(name)
+                handlers_with_schema_are_not_in_schema_requiring_list = False
+
+        self.assertTrue(handlers_with_schema_are_not_in_schema_requiring_list,
+            'Remove [ %s ] these handlers from schema requiring list' % (
+                ', '.join(handlers_to_remove)))
