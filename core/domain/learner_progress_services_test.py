@@ -31,6 +31,8 @@ from core.domain import learner_progress_services
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -126,16 +128,28 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.publish_collection(self.owner_id, self.COL_ID_3)
 
         # Save new topics and stories.
-        self.subtopic_0 = topic_domain.Subtopic(
-            0, 'Title 1', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'dummy-subtopic-zero')
-        self.save_new_topic(
-            self.TOPIC_ID_0, self.owner_id, name='Topic 0',
-            url_fragment='topic-zero',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_0))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
         self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
@@ -157,16 +171,28 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
-        self.subtopic_1 = topic_domain.Subtopic(
-            0, 'Title 2', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'dummy-subtopic-one')
-        self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name='Topic 1',
-            url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_1], next_subtopic_id=1)
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
@@ -1687,7 +1713,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             incomplete_collection_summaries[0].title, 'Introduce Oppia')
         self.assertEqual(
-            partially_learnt_topic_summaries[0].name, 'Topic 1')
+            partially_learnt_topic_summaries[0].name, 'topic 1')
         self.assertEqual(
             completed_exp_summaries[0].title, 'Bridges in England')
         self.assertEqual(
@@ -1695,7 +1721,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_story_summaries[0].title, 'Title')
         self.assertEqual(
-            learnt_topic_summaries[0].name, 'Topic 0')
+            learnt_topic_summaries[0].name, 'topic')
         self.assertEqual(
             exploration_playlist_summaries[0].title, 'Welcome Oppia')
         self.assertEqual(
@@ -1713,6 +1739,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': self.EXP_ID_2
             }], 'Add new exploration')
+
+        # Add a node to a story that has already been completed.
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_2',
+                'title': 'Title 2'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_6,
+                'node_id': 'node_2'
+            })
+        ]
+
+        # Update the story.
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         # Get the progress of the user.
         activity_progress = learner_progress_services.get_activity_progress(
@@ -1734,6 +1780,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         incomplete_collection_summaries = (
             activity_progress[0].incomplete_collection_summaries)
+        completed_story_summaries = (
+            activity_progress[0].completed_story_summaries)
+        partially_learnt_topic_summaries = (
+            activity_progress[0].partially_learnt_topic_summaries)
 
         # Check that the collection to which a new exploration has been added
         # has been moved to the incomplete section.
@@ -1745,12 +1795,24 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
 
+        # Check that the story to which a new node has been added has been
+        # removed from completed section.
+        self.assertEqual(len(completed_story_summaries), 0)
+
+        # Check that the topic in which a node has been added to one of
+        # its stories has been moved to the incomplete section.
+        self.assertEqual(len(partially_learnt_topic_summaries), 2)
+        self.assertEqual(partially_learnt_topic_summaries[1].name, 'topic')
+
         # Delete a collection in the completed section.
         collection_services.delete_collection(self.owner_id, self.COL_ID_0)
         # Delete a collection in the incomplete section.
         collection_services.delete_collection(self.owner_id, self.COL_ID_1)
         # Delete a collection in the playlist section.
         collection_services.delete_collection(self.owner_id, self.COL_ID_3)
+
+        # Delete a topic from incomplete section.
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)
 
         # Get the progress of the user.
         activity_progress = learner_progress_services.get_activity_progress(
@@ -1765,3 +1827,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Check that the dashboard records the collection deleted in the
         # playlist section.
         self.assertEqual(activity_progress[1]['collection_playlist'], 1)
+
+        # Check that the dashboard records the topic deleted in the incomplete
+        # section.
+        self.assertEqual(activity_progress[1]['partially_learnt_topics'], 1)

@@ -1114,30 +1114,3 @@ def assign_role(committer, assignee, new_role, topic_id):
     })]
 
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)
-
-
-def get_stories_completed_in_topics(user_id, topic_ids):
-    """Returns the ids of the stories completed in each of the topics.
-
-    Args:
-        user_id: str. ID of the given user.
-        topic_ids: list(str). IDs of the topics.
-
-    Returns:
-        list(list(str)). List of the story ids completed in each
-        topic.
-    """
-    story_ids_completed_in_topic = []
-    for topic_id in topic_ids:
-        topic = topic_fetchers.get_topic_by_id(topic_id)
-        for reference in topic.canonical_story_references:
-            story_id = reference.story_id
-            story = story_fetchers.get_story_by_id(story_id)
-            ordered_node_ids = (
-                [node.id for node in story.story_contents.get_ordered_nodes()])
-            completed_node_ids = story_fetchers.get_completed_node_ids(
-                user_id, story_id)
-            if len(completed_node_ids) == len(ordered_node_ids):
-                story_ids_completed_in_topic.append(story_id)
-
-    return story_ids_completed_in_topic

@@ -30,7 +30,6 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_fetchers
-from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
 import utils
@@ -958,8 +957,7 @@ def _get_filtered_learnt_topic_summaries(
     learnt_to_partially_learnt_topics = []
     filtered_learnt_topic_summaries = []
 
-    completed_story_ids = topic_services.get_stories_completed_in_topics(
-        user_id, topic_ids)
+    completed_story_ids = get_all_completed_story_ids(user_id)
 
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is None:
@@ -1148,39 +1146,6 @@ def get_all_incomplete_story_ids(user_id):
         return []
 
 
-def _get_filtered_incomplete_story_summaries(
-        story_summaries, story_ids):
-    """Returns a list of summaries of the incomplete story ids and the ids
-    of stories that are no longer present.
-
-    Args:
-        story_summaries: list(StorySummary). The list of story
-            summary domain objects to be filtered.
-        story_ids: list(str). The ids of the story corresponding to
-            the story summary domain objects.
-
-    Returns:
-        tuple. A 2-tuple whose elements are as follows:
-        - list(StorySummary). A filtered list with the summary domain
-            objects of the incomplete stories.
-        - list(str). The ids of the stories that are no longer present.
-    """
-    nonexistent_incomplete_story_ids = []
-    filtered_incomplete_story_summaries = []
-    for index, story_summary in enumerate(story_summaries):
-        story = story_fetchers.get_story_by_id(story_summary.story_id)
-        if story_summary is None:
-            nonexistent_incomplete_story_ids.append(story_ids[index])
-        elif not story_services.is_story_published_and_present_in_topic(story):
-            nonexistent_incomplete_story_ids.append(story_ids[index])
-        else:
-            filtered_incomplete_story_summaries.append(story_summary)
-
-    return (
-        filtered_incomplete_story_summaries,
-        nonexistent_incomplete_story_ids)
-
-
 def get_all_partially_learnt_topic_ids(user_id):
     """Returns a list with the ids of all the topics partially learnt
     by the user.
@@ -1224,14 +1189,15 @@ def _get_filtered_partially_learnt_topic_summaries(
     nonexistent_partially_learnt_topic_ids = []
     filtered_partially_learnt_topic_summaries = []
     for index, topic_summary in enumerate(topic_summaries):
-        topic_id = topic_summary.id
-        topic_rights = topic_fetchers.get_topic_rights(topic_id)
         if topic_summary is None:
             nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
-        elif not topic_rights.topic_is_published:
-            nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
         else:
-            filtered_partially_learnt_topic_summaries.append(topic_summary)
+            topic_id = topic_summary.id
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
+            if not topic_rights.topic_is_published:
+                nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
+            else:
+                filtered_partially_learnt_topic_summaries.append(topic_summary)
 
     return (
         filtered_partially_learnt_topic_summaries,
