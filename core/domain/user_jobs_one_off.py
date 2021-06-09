@@ -173,8 +173,8 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
 
         for exp_id in incomplete_exploration_ids:
             story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
-            story = story_fetchers.get_story_by_id(story_id)
             if story_id:
+                story = story_fetchers.get_story_by_id(story_id)
                 if story_id not in item.story_ids:
                     item.story_ids.append(story_id)
                     if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
@@ -191,8 +191,8 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
 
                 if len(completed_nodes) != len(ordered_nodes):
                     item.story_ids.append(story_id)
-                    if story.corresponding_topic_id not in item.learnt_topic_ids: # pylint: disable=line-too-long
-                        item.learnt_topic_ids.append(
+                    if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
+                        item.partially_learnt_topic_ids.append(
                             story.corresponding_topic_id)
 
         item.update_timestamps()

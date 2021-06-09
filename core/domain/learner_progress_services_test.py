@@ -57,6 +57,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     COL_ID_1 = '1_welcome_introduce_oppia'
     COL_ID_2 = '2_welcome_introduce_oppia_interactions'
     COL_ID_3 = '3_welcome_oppia_collection'
+    STORY_ID_0 = 'story_0'
+    TOPIC_ID_0 = 'topic_0'
+    STORY_ID_1 = 'story_1'
+    TOPIC_ID_1 = 'topic_1'
+    STORY_ID_2 = 'story_2'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -70,11 +75,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.STORY_ID_0 = 'story_0'
-        self.TOPIC_ID_0 = 'topic_0'
-        self.STORY_ID_1 = 'story_1'
-        self.TOPIC_ID_1 = 'topic_1'
-        self.STORY_ID_2 = 'story_2'
 
         # Save a few explorations.
         self.save_new_valid_exploration(
@@ -202,21 +202,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
-            })]
-        story_services.update_story(
-            self.owner_id, self.STORY_ID_1, changelist, 'Added node.')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
-            'new_value': self.EXP_ID_5,
-            'node_id': 'node_1'
-        })]
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_5,
+                'node_id': 'node_1'
+            })
+        ]
 
         story_services.update_story(
-            self.owner_id, self.STORY_ID_1, change_list, 'Updated Node 1.')
+            self.owner_id, self.STORY_ID_1, changelist, 'Added Node 1.')
 
         # Publish topics and stories.
         topic_services.publish_story(
@@ -701,6 +698,81 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_0])
+
+    def test_remove_activity_ids_from_completed_list(self):
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id), [])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_collection_ids(
+                self.user_id), [])
+        self.assertEqual(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id), [])
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id), [])
+
+        # Mark an exploration as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 1)
+
+        # Mark a collection as completed.
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id)), 1)
+
+        # Mark a story as completed.
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id)), 1)
+
+        # Mark a topic as completed.
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id)), 1)
+
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get(
+                self.user_id, strict=False))
+
+        if completed_activities_model:
+            activities_completed = (
+                learner_progress_services._get_completed_activities_from_model( # pylint: disable=protected-access
+                    completed_activities_model))
+
+        # Remove exploration from model.
+        activities_completed.remove_exploration_id(self.EXP_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 0)
+
+        # Remove collection from model.
+        activities_completed.remove_collection_id(self.COL_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id)), 0)
+
+        # Remove story from model.
+        activities_completed.remove_story_id(self.STORY_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id)), 0)
+
+        # Remove topic from model.
+        activities_completed.remove_learnt_topic_id(self.TOPIC_ID_0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id)), 0)
 
     def test_remove_exp_from_incomplete_list(self):
         self.assertEqual(self._get_all_incomplete_exp_ids(
