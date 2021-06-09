@@ -134,7 +134,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
     $scope.confirm = function() {
       $uibModalInstance.close({
         newThumbnailDataUrl: $scope.uploadedImage,
-        newBgColor: tempBgColor,
+        newBgColor: $scope.bgColor,
         openInUploadMode: openInUploadMode,
         dimensions: dimensions
       });
