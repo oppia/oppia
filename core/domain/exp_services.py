@@ -1722,6 +1722,14 @@ def get_composite_change_list(exp_id, old_version, new_version):
     return composite_change_list
 
 
+def are_changes_mergeable(exp_id, change_list, version):
+    """
+    """
+
+    
+    pass
+
+
 def is_version_of_draft_valid(exp_id, version):
     """Checks if the draft version is the same as the latest version of the
     exploration.
