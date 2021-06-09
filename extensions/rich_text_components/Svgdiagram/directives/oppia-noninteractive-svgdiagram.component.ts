@@ -35,6 +35,7 @@
  */
 
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
@@ -42,6 +43,7 @@ import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
   selector: 'oppia-noninteractive-svgdiagram',
@@ -56,14 +58,15 @@ export class NoninteractiveSvgdiagram implements OnInit, OnChanges {
   filename: string;
   svgAltText: string = '';
   svgContainerStyle: { height: string, width: string };
-  svgUrl: string;
+  svgUrl: string | SafeResourceUrl;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imagePreloaderService: ImagePreloaderService
+    private imagePreloaderService: ImagePreloaderService,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   private _updateViewOnSvgFileChange(): void {
@@ -83,8 +86,9 @@ export class NoninteractiveSvgdiagram implements OnInit, OnChanges {
     };
     if (this.contextService.getImageSaveDestination() === (
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE)) {
-      this.svgUrl = this.imageLocalStorageService.getObjectUrlForImage(
-        this.filename);
+      this.svgUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+        this.imageLocalStorageService.getRawImageData(
+          this.filename));
     } else {
       this.svgUrl = this.assetsBackendApiService.getImageUrlForPreview(
         this.contextService.getEntityType(), this.contextService.getEntityId(),

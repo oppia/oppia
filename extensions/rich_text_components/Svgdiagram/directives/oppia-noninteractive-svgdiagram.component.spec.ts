@@ -25,6 +25,7 @@ import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SimpleChanges, SimpleChange } from '@angular/core';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('oppiaNoninteractiveSvgdiagram', () => {
   let component: NoninteractiveSvgdiagram;
@@ -119,7 +120,7 @@ describe(
     let contextService: ContextService;
 
     const mockImageLocalStorageService = {
-      getObjectUrlForImage: function() {
+      getRawImageData: function() {
         return 'imageUrl:exploration_1_svgFilename.svg';
       }
     };
@@ -130,6 +131,10 @@ describe(
           height: 350
         };
       }
+    };
+
+    const mockSvgSanitizerService = {
+      getTrustedSvgResourceUrl: (url) => url
     };
 
     beforeEach(waitForAsync(() => {
@@ -145,6 +150,10 @@ describe(
             {
               provide: ImagePreloaderService,
               useValue: mockImagePreloaderService
+            },
+            {
+              provide: SvgSanitizerService,
+              useValue: mockSvgSanitizerService
             }
           ]
         }
