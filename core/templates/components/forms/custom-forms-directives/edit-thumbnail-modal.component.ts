@@ -17,8 +17,7 @@
  */
 
 import { trigger, transition, style, animate } from '@angular/animations';
-import { SimpleChanges } from '@angular/core';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
@@ -39,7 +38,7 @@ interface InvalidTagsAndAttributes {
     ])
   ]
 })
-export class EditThumbnailModalComponent implements OnChanges {
+export class EditThumbnailModalComponent implements OnInit {
   @Input() bgColor: string;
   @Input() uploadedImage: string | null;
   @Input() aspectRatio: string;
@@ -66,13 +65,8 @@ export class EditThumbnailModalComponent implements OnChanges {
     private ngbActiveModal: NgbActiveModal,
   ) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.uploadedImage &&
-        changes.uploadedImage.currentValue ===
-         changes.uploadedImage.previousValue) {
-      this.openInUploadMode = false;
-      this.updateBackgroundColor(this.tempBgColor);
-    }
+  ngOnInit(): void {
+    this.updateBackgroundColor(this.bgColor);
   }
 
   setImageDimensions(height: number, width: number): void {

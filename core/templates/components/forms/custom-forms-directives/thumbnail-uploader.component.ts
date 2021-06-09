@@ -178,8 +178,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     const modalRef = this.ngbModal.open(
       EditThumbnailModalComponent,
       {backdrop: 'static'});
-    modalRef.componentInstance.bgColor =
-     this.allowedBgColors.length > 0 ? this.allowedBgColors[0] : '#fff';
+    modalRef.componentInstance.bgColor = this.tempBgColor;
     modalRef.componentInstance.allowedBgColors = this.allowedBgColors;
     modalRef.componentInstance.aspectRatio = this.aspectRatio;
     modalRef.componentInstance.dimensions = this.dimensions;
