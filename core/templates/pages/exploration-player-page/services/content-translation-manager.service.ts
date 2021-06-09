@@ -26,7 +26,7 @@ import { BaseTranslatableObject, InteractionRuleInputs } from
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from
-    'domain/state_card/state-card.model';
+  'domain/state_card/state-card.model';
 import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { SubtitledHtml } from

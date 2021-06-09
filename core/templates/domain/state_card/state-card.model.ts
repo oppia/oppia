@@ -258,7 +258,7 @@ export class StateCard {
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
       writtenTranslations: WrittenTranslations, contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService
-      ): StateCard {
+  ): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml,
       cloneDeep(interaction), [],
