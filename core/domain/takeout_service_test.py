@@ -41,7 +41,7 @@ import utils
     story_models, subtopic_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.auth,
-    models.NAMES.base_model, models.NAMES.blog, models.NAMES.collection,
+    models.NAMES.base_model, models.NAMES.blog_post, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
@@ -362,7 +362,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         16) Creates two reply-to ids for feedback.
         17) Creates a task closed by the user.
         18) Simulates user_1 scrubbing a report.
-        19) Creates new BlogPostRights model and BlogPostModel.
+        19) Creates new BlogPostModel and BlogPostRightsModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -761,7 +761,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         report_entity.update_timestamps()
         report_entity.put()
 
-        # Set-up for BlogPostModel.
+        # Set-up for the BlogPostModel.
         blog_post_model = blog_post_models.BlogPostModel(
             id=self.BLOG_ID_1,
             author_id=self.USER_ID_1,
@@ -778,7 +778,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_rights_old = blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_1,
             editor_ids=[self.USER_ID_1],
-            blog_is_published=True,
+            blog_post_is_published=True,
         )
 
         blog_post_rights_old.update_timestamps()
@@ -787,7 +787,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_rights_new = blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_2,
             editor_ids=[self.USER_ID_1],
-            blog_is_published=False,
+            blog_post_is_published=False,
         )
 
         blog_post_rights_new.update_timestamps()
@@ -960,6 +960,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences
         }
+
         # Perform export and compare.
         user_takeout_object = takeout_service.export_data_for_user(
             self.USER_ID_1)
