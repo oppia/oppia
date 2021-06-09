@@ -35,7 +35,6 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { ExplorationFooterComponent } from './layout-directives/exploration-footer.component';
 import { MatButtonModule } from '@angular/material/button';
 import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.component';
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
@@ -64,7 +63,6 @@ import { HintAndSolutionButtonsComponent } from 'components/button-directives/hi
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    ExplorationFooterComponent,
     LearnerAnswerInfoCard,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
@@ -81,7 +79,6 @@ import { HintAndSolutionButtonsComponent } from 'components/button-directives/hi
     ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     SwitchContentLanguageRefreshRequiredModalComponent,
-    ExplorationFooterComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
