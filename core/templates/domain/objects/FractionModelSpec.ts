@@ -24,6 +24,10 @@ import { Fraction } from
 describe('Fraction', () => {
   let errors: typeof ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
 
+  beforeEach(() => {
+    errors = ObjectsDomainConstants.FRACTION_PARSING_ERRORS;
+  });
+
   it('should create a new object from dict', () => {
     const fractionObject = {
       isNegative: false,
