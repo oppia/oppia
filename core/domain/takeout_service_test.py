@@ -762,7 +762,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         report_entity.put()
 
         # Set-up for BlogPostModel.
-        blog_post_models.BlogPostModel(
+        blog_post = blog_post_models.BlogPostModel(
             id=self.BLOG_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
@@ -773,6 +773,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail'
         ).put()
+        blog_post.update_timestamps()
+        blog_post.put()
 
         blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_1,
