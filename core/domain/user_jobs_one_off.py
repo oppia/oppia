@@ -152,7 +152,7 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (userbio_length, stringified_usernames)
 
 
-class PopulateStoriesAndTopicsInIncompleteActivtiesOneOffJob(
+class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to populate the story_ids and partially_learnt_topic_ids
     in Incomplete Activities Model."""
@@ -208,7 +208,7 @@ class PopulateStoriesAndTopicsInIncompleteActivtiesOneOffJob(
         yield (key, len(values))
 
 
-class PopulateStoriesAndTopicsInCompletedActivtiesOneOffJob(
+class PopulateStoriesAndTopicsInCompletedActivitiesOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to populate the story_ids and learnt_topic_ids
     in Completed Activities Model."""
