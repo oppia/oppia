@@ -17,8 +17,6 @@
  * card domain objects used in the exploration player.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
@@ -266,37 +264,3 @@ export class StateCard {
       audioTranslationLanguageService);
   }
 }
-
-@Injectable({
-  providedIn: 'root'
-})
-export class StateCardObjectFactory {
-  constructor(
-    private audioTranslationLanguageService: AudioTranslationLanguageService) {}
-
-  /**
-   * @param {string} stateName - The state name for the current card.
-   * @param {string} contentHtml - The HTML string for the content displayed
-   *        on the content card.
-   * @param {string} interactionHtml - The HTML that calls the interaction
-   *        directive for the current card.
-   * @param {Interaction} interaction - An interaction object that stores all
-   *        the properties of the card's interaction.
-   * @param {RecordedVoiceovers} recordedVoiceovers
-   * @param {string} contentId
-   */
-  createNewCard(
-      stateName: string, contentHtml: string, interactionHtml: string,
-      interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      writtenTranslations: WrittenTranslations, contentId: string): StateCard {
-    return new StateCard(
-      stateName, contentHtml, interactionHtml,
-      cloneDeep(interaction), [],
-      recordedVoiceovers, writtenTranslations, contentId,
-      this.audioTranslationLanguageService);
-  }
-}
-
-angular.module('oppia').factory(
-  'StateCardObjectFactory',
-  downgradeInjectable(StateCardObjectFactory));

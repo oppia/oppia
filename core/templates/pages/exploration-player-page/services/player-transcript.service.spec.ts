@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from
-  'domain/state_card/StateCardObjectFactory';
+    'domain/state_card/state-card.model';
 
 describe('Player transcript service', () => {
   let pts;

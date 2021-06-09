@@ -24,8 +24,8 @@ import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-import {StateCard, StateCardObjectFactory} from
-    'domain/state_card/StateCardObjectFactory';
+import { StateCard } from
+    'domain/state_card/state-card.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -35,7 +35,6 @@ import { Voiceover } from 'domain/exploration/voiceover.model';
 
 
 describe('State card object factory', () => {
-  let stateCardObjectFactory = null;
   let interactionObjectFactory = null;
   let writtenTranslationsObjectFactory = null;
   let _sampleCard = null;
@@ -46,7 +45,6 @@ describe('State card object factory', () => {
       providers: [CamelCaseToHyphensPipe]
     });
 
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     writtenTranslationsObjectFactory = TestBed.get(
       WrittenTranslationsObjectFactory);

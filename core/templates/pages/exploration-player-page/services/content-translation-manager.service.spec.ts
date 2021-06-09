@@ -28,7 +28,7 @@ import { SubtitledUnicodeObjectFactory } from
 import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import {StateCard} from
-    'domain/state_card/StateCardObjectFactory';
+    'domain/state_card/state-card.model';
 import { ContentTranslationManagerService } from
   'pages/exploration-player-page/services/content-translation-manager.service';
 import { PlayerTranscriptService } from
