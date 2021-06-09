@@ -195,7 +195,6 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
   'interactions/FractionInput/directives/fraction-input-validation.service';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GraphDetailService } from
   'interactions/GraphInput/directives/graph-detail.service';
@@ -560,7 +559,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static formatTimePipe: FormatTimePipe;
   static fractionInputRulesService: FractionInputRulesService;
   static fractionInputValidationService: FractionInputValidationService;
-  static fractionObjectFactory: FractionObjectFactory;
   static generateContentIdService: GenerateContentIdService;
   static graphDetailService: GraphDetailService;
   static graphInputRulesService: GraphInputRulesService;
@@ -845,7 +843,6 @@ private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
 private formatTimePipe: FormatTimePipe,
 private fractionInputRulesService: FractionInputRulesService,
 private fractionInputValidationService: FractionInputValidationService,
-private fractionObjectFactory: FractionObjectFactory,
 private generateContentIdService: GenerateContentIdService,
 private graphDetailService: GraphDetailService,
 private graphInputRulesService: GraphInputRulesService,
@@ -1178,8 +1175,6 @@ private injector: Injector
       this.fractionInputRulesService);
     OppiaAngularRootComponent.fractionInputValidationService = (
       this.fractionInputValidationService);
-    OppiaAngularRootComponent.fractionObjectFactory = (
-      this.fractionObjectFactory);
     OppiaAngularRootComponent.generateContentIdService = (
       this.generateContentIdService);
     OppiaAngularRootComponent.graphDetailService = this.graphDetailService;

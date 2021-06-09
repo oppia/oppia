@@ -17,7 +17,7 @@
  */
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { Fraction } from 'domain/objects/FractionModel';
 import { FractionAnswer } from 'interactions/answer-defs';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
@@ -31,13 +31,13 @@ export class ShortResponseFractionInput {
   escapedAnswer: string = '';
 
   constructor(
-    private readonly htmlEscaperService: HtmlEscaperService,
-    private readonly fractionObjectFactory: FractionObjectFactory) {}
+    private readonly htmlEscaperService: HtmlEscaperService
+  ) {}
 
   ngOnInit(): void {
     const fraction: FractionAnswer = (
       this.htmlEscaperService.escapedJsonToObj(this.answer) as FractionAnswer);
-    this.escapedAnswer = this.fractionObjectFactory.fromDict(
+    this.escapedAnswer = Fraction.fromDict(
       fraction).toString();
   }
 }

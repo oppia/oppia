@@ -17,7 +17,7 @@
  */
 import { Ratio } from 'domain/objects/ratio.model';
 
-require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/FractionModel.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
@@ -25,10 +25,10 @@ require('filters/format-rte-preview.filter.ts');
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 angular.module('oppia').filter('parameterizeRuleDescription', [
-  '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
+  '$filter', 'INTERACTION_SPECS', 'FractionModel',
   'NumberWithUnitsObjectFactory', 'POSITION_OF_TERMS_MAPPING',
   function(
-      $filter, INTERACTION_SPECS, FractionObjectFactory,
+      $filter, INTERACTION_SPECS, FractionModel,
       NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING) {
     return function(rule, interactionId, choices) {
       if (!rule) {
@@ -155,7 +155,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         } else if (varType === 'Graph') {
           replacementText = '[reference graph]';
         } else if (varType === 'Fraction') {
-          replacementText = FractionObjectFactory
+          replacementText = FractionModel
             .fromDict(inputs[varName]).toString();
         } else if (varType === 'NumberWithUnits') {
           replacementText = NumberWithUnitsObjectFactory

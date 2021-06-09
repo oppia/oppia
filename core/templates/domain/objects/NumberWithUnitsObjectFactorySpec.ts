@@ -16,8 +16,8 @@
  * @fileoverview unit tests for number with units object type factory service.
  */
 
-import { Fraction, FractionObjectFactory } from
-  'domain/objects/FractionObjectFactory';
+import { Fraction } from
+  'domain/objects/FractionModel';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { ObjectsDomainConstants } from
@@ -32,7 +32,7 @@ describe('NumberWithUnitsObjectFactory', () => {
 
     beforeEach(() => {
       nwuof = new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory(), new FractionObjectFactory());
+        new UnitsObjectFactory());
       uof = new UnitsObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
     });
