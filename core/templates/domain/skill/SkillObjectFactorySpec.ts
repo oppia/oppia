@@ -224,7 +224,7 @@ describe('Skill object factory', () => {
   });
 
   it('should return null when there are no rubrics' +
-    ' of the given difficulty', () => {
+    ' for the given difficulty', () => {
     let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getRubricExplanations('difficult')).toBe(null);
   });

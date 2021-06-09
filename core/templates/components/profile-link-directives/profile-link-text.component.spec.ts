@@ -43,7 +43,7 @@ describe('ProfileLinkTextComponent', () => {
     let usernamesNotLinkable = ['admin', 'OppiaMigrationBot'];
 
     expect(component.isUsernameLinkable(usernamesNotLinkable[0])).toBe(false);
-    expect(component.isUsernameLinkable(usernamesNotLinkable[0])).toBe(false);
+    expect(component.isUsernameLinkable(usernamesNotLinkable[1])).toBe(false);
     expect(component.isUsernameLinkable('linkableUsername')).toBe(true);
   });
 });

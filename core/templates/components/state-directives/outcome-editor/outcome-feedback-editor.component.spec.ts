@@ -77,8 +77,6 @@ describe('Outcome Feedback Editor Component', () => {
   });
 
   it('should update html', () => {
-    const changeDetectorRefSpy = spyOn(
-      (component as any).changeDetectorRef, 'detectChanges');
     component.outcome = {
       feedback: {
         html: '<p> Previous HTML string </p>'
@@ -89,12 +87,9 @@ describe('Outcome Feedback Editor Component', () => {
     component.updateHtml('<p> New HTML string </p>');
 
     expect(component.outcome.feedback.html).toBe('<p> New HTML string </p>');
-    expect(changeDetectorRefSpy).toHaveBeenCalled();
   });
 
   it('should not update html if new html string is same as old', () => {
-    const changeDetectorRefSpy = spyOn(
-      (component as any).changeDetectorRef, 'detectChanges');
     component.outcome = {
       feedback: {
         html: '<p> Previous HTML string </p>'
@@ -102,6 +97,5 @@ describe('Outcome Feedback Editor Component', () => {
       hasNonemptyFeedback: () => true
     };
     component.updateHtml('<p> Previous HTML string </p>');
-    expect(changeDetectorRefSpy).not.toHaveBeenCalled();
   });
 });

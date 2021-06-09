@@ -222,43 +222,23 @@ describe('NumberWithUnitsObjectFactory', () => {
     });
 
     it('should convert list to math.js compatible string', () => {
-      let numberWithUnitsObjectWithRealType = new NumberWithUnits(
+      expect((new NumberWithUnits(
         'real',
         1,
         new Fraction(
-          false,
-          2,
-          1,
-          3
-        ),
-        new Units([
-          {
-            unit: 'Kg',
-            exponent: 2
-          }
-        ])
-      );
-      expect(numberWithUnitsObjectWithRealType.toMathjsCompatibleString())
-        .toBe('1 Kg^2');
+          false, 2, 1, 3),
+        new Units(
+          [{unit: 'Kg', exponent: 2}])
+      )).toMathjsCompatibleString()).toBe('1 Kg^2');
 
-      let numberWithUnitsObjectWithFractionType = new NumberWithUnits(
+      expect((new NumberWithUnits(
         'fraction',
         1,
         new Fraction(
-          false,
-          2,
-          1,
-          3
-        ),
-        new Units([
-          {
-            unit: 'Kg',
-            exponent: 2
-          }
-        ])
-      );
-      expect(numberWithUnitsObjectWithFractionType.toMathjsCompatibleString())
-        .toBe('2 1/3 Kg^2');
+          false, 2, 1, 3),
+        new Units(
+          [{unit: 'Kg', exponent: 2}])
+      )).toMathjsCompatibleString()).toBe('2 1/3 Kg^2');
     });
   });
 });

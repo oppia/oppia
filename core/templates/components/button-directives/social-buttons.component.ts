@@ -19,21 +19,13 @@
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
 @Component({
   selector: 'oppia-social-buttons',
   templateUrl: './social-buttons.component.html',
   styleUrls: []
 })
 export class SocialButtonsComponent {
-  constructor(
-    private urlInterpolationService: UrlInterpolationService) {
-  }
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
+  constructor() {}
 }
 
 angular.module('oppia').directive('oppiaSocialButtons',

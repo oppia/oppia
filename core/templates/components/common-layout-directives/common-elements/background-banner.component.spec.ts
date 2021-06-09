@@ -35,11 +35,6 @@ describe('BackgroundBannerComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
-
   it('should get a random banner file image url on initialization', () => {
     expect(component.bannerImageFileUrl).toBe('');
 

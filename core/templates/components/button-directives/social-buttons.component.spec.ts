@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { SocialButtonsComponent } from './social-buttons.component';
 
@@ -24,7 +23,6 @@ import { SocialButtonsComponent } from './social-buttons.component';
 describe('SocialButtonsComponent', () => {
   let component: SocialButtonsComponent;
   let fixture: ComponentFixture<SocialButtonsComponent>;
-  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -38,22 +36,5 @@ describe('SocialButtonsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SocialButtonsComponent);
     component = fixture.componentInstance;
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
-  });
-
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
-
-  it('should get static image url', () => {
-    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'image-url'
-    );
-
-    expect(component.getStaticImageUrl('image-url')).toBe('image-url');
-    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
-      'image-url'
-    );
   });
 });
