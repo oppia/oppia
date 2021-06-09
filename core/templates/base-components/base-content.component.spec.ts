@@ -37,6 +37,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
 import { LoadingMessageComponent } from './loading-message.component';
 import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Base Content Component', () => {
   let fixture: ComponentFixture<BaseContentComponent>;
@@ -121,7 +122,8 @@ describe('Base Content Component', () => {
           useClass: MockPageTitleService
         },
         SidebarStatusService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
