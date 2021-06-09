@@ -35,11 +35,16 @@ describe('oppiaNoninteractiveSvgdiagram', function() {
     }
   };
 
+  const mockSvgSanitizerService = {
+    getTrustedSvgResourceUrl: (url) => url
+  };
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
     $provide.value('ImageLocalStorageService', {});
+    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
     $provide.value('$attrs', {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
       altWithValue: '&quot;altText&quot;'
@@ -67,7 +72,7 @@ describe('oppiaNoninteractiveSvgdiagram with image save destination as' +
   var contextService = null;
   var ctrl = null;
   var mockImageLocalStorageService = {
-    getObjectUrlForImage: function() {
+    getRawImageData: function() {
       return 'imageUrl:exploration_1_svgFilename.svg';
     }
   };
@@ -80,11 +85,16 @@ describe('oppiaNoninteractiveSvgdiagram with image save destination as' +
     }
   };
 
+  const mockSvgSanitizerService = {
+    getTrustedSvgResourceUrl: (url) => url
+  };
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', mockImageLocalStorageService);
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
+    $provide.value('SvgSanitizerService', mockSvgSanitizerService);
     $provide.value('$attrs', {
       svgFilenameWithValue: '&quot;svgFilename.svg&quot;',
       altWithValue: '&quot;altText&quot;'

@@ -26,16 +26,17 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   '$rootScope', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'ENTITY_TYPE',
+  'SvgSanitizerService', 'UrlInterpolationService', 'ENTITY_TYPE',
   'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE', 'LOADING_INDICATOR_URL',
   function(
       $rootScope, AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
-      UrlInterpolationService, ENTITY_TYPE,
+      SvgSanitizerService, UrlInterpolationService, ENTITY_TYPE,
       IMAGE_SAVE_DESTINATION_LOCAL_STORAGE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
@@ -110,8 +111,15 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
                 ContextService.getImageSaveDestination() ===
                 IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
                   ImageLocalStorageService.isInStorage(ctrl.filepath))) {
-                ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
+                const base64Url = ImageLocalStorageService.getRawImageData(
                   ctrl.filepath);
+                const mimeType = base64Url.split(';')[0];
+                if (mimeType === 'data:image/svg+xml') {
+                  ctrl.imageUrl = SvgSanitizerService.getTrustedSvgResourceUrl(
+                    base64Url);
+                } else {
+                  ctrl.imageUrl = base64Url;
+                }
               } else {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),

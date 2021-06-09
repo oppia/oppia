@@ -25,15 +25,16 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveMath', [
   '$rootScope', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImageLocalStorageService', 'ImagePreloaderService',
-  'ENTITY_TYPE', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+  'SvgSanitizerService', 'ENTITY_TYPE', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
   function(
       $rootScope, AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImageLocalStorageService, ImagePreloaderService,
-      ENTITY_TYPE, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+      SvgSanitizerService, ENTITY_TYPE, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
     return {
       restrict: 'E',
       scope: {},
@@ -85,8 +86,9 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
                 ContextService.getImageSaveDestination() ===
                 IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
                   ImageLocalStorageService.isInStorage(svgFilename))) {
-                ctrl.imageUrl = ImageLocalStorageService.getObjectUrlForImage(
-                  svgFilename);
+                ctrl.imageUrl = SvgSanitizerService.getTrustedSvgResourceUrl(
+                  ImageLocalStorageService.getRawImageData(
+                    mathExpressionContent.svg_filename));
               } else {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),

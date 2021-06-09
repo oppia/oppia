@@ -201,9 +201,8 @@ angular.module('oppia').component('svgFilenameEditor', {
         if (
           ctrl.imageSaveDestination ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
-            ImageLocalStorageService.isInStorage(ctrl.filepath))) {
-          var imageUrl = ImageLocalStorageService.getObjectUrlForImage(
-            svgFileName);
+            ImageLocalStorageService.isInStorage(svgFileName))) {
+          var imageUrl = ImageLocalStorageService.getRawImageData(svgFileName);
           return $sce.trustAsResourceUrl(imageUrl);
         }
         var encodedFilepath = window.encodeURIComponent(svgFileName);

@@ -25,17 +25,20 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 require('services/image-local-storage.service.ts');
+require('services/svg-sanitizer.service.ts');
 
 angular.module('oppia').component('oppiaNoninteractiveSvgdiagram', {
   template: require('./svgdiagram.component.html'),
   controller: [
     '$attrs', 'AssetsBackendApiService', 'ContextService',
     'HtmlEscaperService', 'ImageLocalStorageService',
-    'ImagePreloaderService', 'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
+    'ImagePreloaderService', 'SvgSanitizerService',
+    'IMAGE_SAVE_DESTINATION_LOCAL_STORAGE',
     function(
         $attrs, AssetsBackendApiService, ContextService,
         HtmlEscaperService, ImageLocalStorageService,
-        ImagePreloaderService, IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
+        ImagePreloaderService, SvgSanitizerService,
+        IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
       var ctrl = this;
       ctrl.$onInit = function() {
         ctrl.filename = HtmlEscaperService.escapedJsonToObj(
@@ -49,8 +52,8 @@ angular.module('oppia').component('oppiaNoninteractiveSvgdiagram', {
         if (
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
-          ctrl.svgUrl = ImageLocalStorageService.getObjectUrlForImage(
-            ctrl.filename);
+          ctrl.svgUrl = SvgSanitizerService.getTrustedSvgResourceUrl(
+            ImageLocalStorageService.getRawImageData(ctrl.filename));
         } else {
           ctrl.svgUrl = AssetsBackendApiService.getImageUrlForPreview(
             ContextService.getEntityType(), ContextService.getEntityId(),

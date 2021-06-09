@@ -670,7 +670,7 @@ describe('SvgFilenameEditor with image save destination as ' +
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockilss = {
-    getObjectUrlForImage: function(filename) {
+    getRawImageData: function(filename) {
       return dataUrl;
     },
     saveImage: function(filename, imageData) {
