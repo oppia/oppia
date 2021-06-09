@@ -166,12 +166,6 @@ describe('Base Content Component', () => {
     );
   });
 
-  it('should toggle sidebar', () => {
-    spyOn(sidebarStatusService, 'toggleSidebar');
-    componentInstance.toggleSidebar();
-    expect(sidebarStatusService.toggleSidebar).toHaveBeenCalled();
-  });
-
   it('should get sidebar status', () => {
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValue(false);
     expect(componentInstance.isSidebarShown()).toBeFalse();
