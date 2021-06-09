@@ -187,8 +187,6 @@ class BlogPostModel(base_models.BaseModel):
                 'thumbnail_filename': blog_post_model.thumbnail_filename,
                 'published_on': utils.get_time_in_millisecs(
                     blog_post_model.published_on),
-                'last_updated': utils.get_time_in_millisecs(
-                    blog_post_model.last_updated)
             }
 
         return user_data

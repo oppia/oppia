@@ -121,8 +121,6 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                 blog_post_id: {
                     'content': self.CONTENT,
                     'title': self.TITLE,
-                    'last_updated': utils.get_time_in_millisecs(
-                        self.blog_post_model.last_updated),
                     'published_on': utils.get_time_in_millisecs(
                         self.blog_post_model.published_on),
                     'url_fragment': 'sample-url-fragment',

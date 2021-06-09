@@ -762,31 +762,36 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         report_entity.put()
 
         # Set-up for BlogPostModel.
-        blog_post = blog_post_models.BlogPostModel(
+        blog_post_model = blog_post_models.BlogPostModel(
             id=self.BLOG_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
-            last_updated=self.GENERIC_DATE,
-            published_on=self.GENERIC_DATE,
+            published_on=datetime.datetime.utcnow(),
             url_fragment='sample-url-fragment',
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail'
-        ).put()
-        blog_post.update_timestamps()
-        blog_post.put()
+        )
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
 
-        blog_post_models.BlogPostRightsModel(
+        blog_post_rights_old = blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_1,
             editor_ids=[self.USER_ID_1],
             blog_is_published=True,
-        ).put()
+        )
 
-        blog_post_models.BlogPostRightsModel(
+        blog_post_rights_old.update_timestamps()
+        blog_post_rights_old.put()
+
+        blog_post_rights_new = blog_post_models.BlogPostRightsModel(
             id=self.BLOG_ID_2,
             editor_ids=[self.USER_ID_1],
             blog_is_published=False,
-        ).put()
+        )
+
+        blog_post_rights_new.update_timestamps()
+        blog_post_rights_new.put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
@@ -1165,6 +1170,19 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
+        blog_post_model = blog_post_models.BlogPostModel(
+            id=self.BLOG_ID_1,
+            author_id=self.USER_ID_1,
+            content='content sample',
+            title='sample title',
+            published_on=datetime.datetime.utcnow(),
+            url_fragment='sample-url-fragment',
+            tags=['tag', 'one'],
+            thumbnail_filename='thumbnail'
+        )
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+
         expected_stats_data = {
             'impact_score': self.USER_1_IMPACT_SCORE,
             'total_plays': self.USER_1_TOTAL_PLAYS,
@@ -1484,8 +1502,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_post_data = {
             'content': 'content sample',
             'title': 'sample title',
-            'last_updated': self.GENERIC_DATE,
-            'published_on': self.GENERIC_DATE,
+            'published_on': utils.get_time_in_millisecs(
+                blog_post_model.published_on),
             'url_fragment': 'sample-url-fragment',
             'tags': ['tag', 'one'],
             'thumbnail_filename': 'thumbnail'
