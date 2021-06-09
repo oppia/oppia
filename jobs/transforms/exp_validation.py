@@ -43,7 +43,7 @@ class ValidateExplorationSnapshotMetadataModel(
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
+            exp_domain.ExplorationChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return exp_domain.ExplorationChange
@@ -62,7 +62,7 @@ class ValidateExplorationRightsSnapshotMetadataModel(
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange. A domain object class for the
+            rights_domain.ExplorationRightsChange. A domain object class for the
             changes made by commit commands of the model.
         """
         return rights_domain.ExplorationRightsChange
@@ -81,8 +81,9 @@ class ValidateExplorationCommitLogEntryModel(
             input_model: datastore_services.Model. Entity to validate.
 
         Returns:
-            ExplorationRightsChange|ExplorationChange. A domain object class for
-            the changes made by commit commands of the model.
+            rights_domain.ExplorationRightsChange|exp_domain.ExplorationChange.
+            A domain object class for the changes made by commit commands of
+            the model.
 
         Raises:
             Exception. Entity id does not match regex pattern.
