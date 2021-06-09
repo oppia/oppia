@@ -17,7 +17,7 @@
  * hamburger-menu sidebar.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -27,22 +27,14 @@ import { WindowDimensionsService } from
 })
 export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
+
   private pendingSidebarClick: boolean = false;
   private sidebarIsShown: boolean = false;
-  private _toggleSidebarEventEmitter: EventEmitter<void> = (
-    new EventEmitter());
-
-  get toggleSidebarEventEmitter(): EventEmitter<void> {
-    return this._toggleSidebarEventEmitter;
-  }
-
-  private _onSideBarStatusUpdate: EventEmitter<boolean> = new EventEmitter();
 
   private _openSidebar(): void {
     if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {
       this.sidebarIsShown = true;
       this.pendingSidebarClick = true;
-      this.toggleSidebarEventEmitter.emit();
     }
   }
 
@@ -50,20 +42,21 @@ export class SidebarStatusService {
     if (this.sidebarIsShown) {
       this.sidebarIsShown = false;
       this.pendingSidebarClick = false;
-      this.toggleSidebarEventEmitter.emit();
-      this._onSideBarStatusUpdate.emit(false);
     }
   }
 
   isSidebarShown(): boolean {
     return this.sidebarIsShown;
   }
+
   openSidebar(): void {
     this._openSidebar();
   }
+
   closeSidebar(): void {
     this._closeSidebar();
   }
+
   toggleSidebar(): void {
     if (!this.sidebarIsShown) {
       this._openSidebar();
@@ -71,15 +64,13 @@ export class SidebarStatusService {
       this._closeSidebar();
     }
   }
+
   onDocumentClick(): void {
     if (!this.pendingSidebarClick) {
       this.sidebarIsShown = false;
     } else {
       this.pendingSidebarClick = false;
     }
-  }
-  get onSideBarStatusUpdate(): EventEmitter<boolean> {
-    return this._onSideBarStatusUpdate;
   }
 }
 

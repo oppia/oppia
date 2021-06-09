@@ -16,7 +16,7 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
@@ -37,8 +37,6 @@ export class BaseContentComponent {
   mobileNavOptionsAreShown: boolean = false;
   iframed: boolean;
   DEV_MODE = AppConstants.DEV_MODE;
-  getHeaderText: () => string;
-  getSubheaderText: () => string;
 
   constructor(
     private windowRef: WindowRef,
@@ -68,19 +66,14 @@ export class BaseContentComponent {
       (message: string) => this.loadingMessage = message
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+  }
 
-    /**
-     * Note to developers: pageTitleService variable is undefined when
-     * defining functions in a conventional way. It only becomes
-     * properly defined when used in ngOnInit.
-     */
-    this.getHeaderText = () => {
-      return this.pageTitleService.getPageTitleForMobileView();
-    };
+  getHeaderText(): string {
+    return this.pageTitleService.getPageTitleForMobileView();
+  }
 
-    this.getSubheaderText = () => {
-      return this.pageTitleService.getPageSubtitleForMobileView();
-    };
+  getSubheaderText(): string {
+    return this.pageTitleService.getPageSubtitleForMobileView();
   }
 
   isMainProdServer(): boolean {
