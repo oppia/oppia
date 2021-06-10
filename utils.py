@@ -30,9 +30,7 @@ import re
 import string
 import sys
 import time
-from typing import (
-        Any, Callable, Dict, Generator, Iterable, Iterator, List,
-        Text, Tuple, TypeVar, Union) # pylint: disable=unused-import,import-only-modules
+
 import unicodedata
 import zlib
 
@@ -49,10 +47,14 @@ DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
-
-T = TypeVar('T')
-U = TypeVar('U')
-DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
+MYPY = False
+if MYPY:
+    from typing import (
+            Any, Callable, Dict, Generator, Iterable, Iterator, List,
+            Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
+    T = TypeVar('T')
+    U = TypeVar('U')
+    DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
 # Every use of constants is followed by # type: ignore[attr-defined] because
 # mypy is not able to identify the attributes of constants but this will be
