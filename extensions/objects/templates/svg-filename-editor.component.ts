@@ -251,8 +251,8 @@ export class SvgFilenameEditorComponent implements OnInit {
     if (
       this.imageSaveDestination ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
-        this.imageLocalStorageService.isInStorage(this.filepath))) {
-      const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
+        this.imageLocalStorageService.isInStorage(svgFileName))) {
+      const imageUrl = this.imageLocalStorageService.getRawImageData(
         svgFileName);
       return {
         safeUrl: this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl),
