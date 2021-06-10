@@ -42,7 +42,9 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     $uibModalInstance = $injector.get('$uibModal');
     $scope = $rootScope.$new();
-    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromBackendDict(
+      {id: 1, title: 'subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     topic = TopicObjectFactory.createInterstitialTopic();
     topic._subtopics = [subtopic];
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);

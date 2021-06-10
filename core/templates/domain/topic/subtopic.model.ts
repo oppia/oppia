@@ -13,22 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model class for creating and mutating instances of frontend
  * subtopic domain objects.
  */
 
-import { ShortSkillSummary } from
-  'domain/skill/short-skill-summary.model';
-
-import constants from 'assets/constants';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { AppConstants } from 'app.constants';
 
 export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'url_fragment': string;
+  'thumbnail_filename': string | null;
+  'thumbnail_bg_color': string | null;
+  'url_fragment': string | null;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -40,15 +38,15 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  _skillSummary: ShortSkillSummary;
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
-  _urlFragment: string;
+  _skillSummary: ShortSkillSummary | undefined;
+  _thumbnailFilename: string | null;
+  _thumbnailBgColor: string | null;
+  _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string, thumbnailBgColor: string,
-      urlFragment: string) {
+      thumbnailFilename: string | null, thumbnailBgColor: string | null,
+      urlFragment: string | null) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -83,29 +81,34 @@ export class Subtopic {
     this._title = title;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment(): string | null {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string): void {
+  setUrlFragment(urlFragment: string | null): void {
     this._urlFragment = urlFragment;
   }
 
   validate(): string[] {
-    var issues = [];
+    let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
-      constants.VALID_URL_FRAGMENT_REGEX);
-    if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
-      issues.push('Subtopic url fragment is invalid.');
+      AppConstants.VALID_URL_FRAGMENT_REGEX);
+    if (this._urlFragment !== '' && this._urlFragment !== null) {
+      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+        issues.push('Subtopic url fragment is invalid.');
+      }
+    } else {
+      issues.push('Subtopic URL fragment should not be empty');
     }
+
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
     }
-    var skillIds = this._skillSummaries.map(function(skillSummary) {
+    let skillIds = this._skillSummaries.map((skillSummary) => {
       return skillSummary.getId();
     });
-    for (var i = 0; i < skillIds.length; i++) {
-      var skillId = skillIds[i];
+    for (let i = 0; i < skillIds.length; i++) {
+      let skillId = skillIds[i];
       if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
         issues.push(
           'The skill with id ' + skillId + ' is duplicated in' +
@@ -148,7 +151,7 @@ export class Subtopic {
   }
 
   removeSkill(skillId: string): void {
-    var index = this._skillSummaries.map(function(skillSummary) {
+    let index = this._skillSummaries.map(function(skillSummary) {
       return skillSummary.getId();
     }).indexOf(skillId);
     if (index > -1) {
@@ -162,7 +165,7 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
@@ -170,11 +173,11 @@ export class Subtopic {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
 
-  static create(
+  static createFromBackendDict(
       subtopicBackendDict: SubtopicBackendDict,
       skillIdToDescriptionMap: SkillIdToDescriptionMap): Subtopic {
     return new Subtopic(
@@ -183,16 +186,5 @@ export class Subtopic {
       subtopicBackendDict.thumbnail_filename,
       subtopicBackendDict.thumbnail_bg_color,
       subtopicBackendDict.url_fragment);
-  }
-
-  static createFromTitle(subtopicId: number, title: string): Subtopic {
-    return this.create({
-      id: subtopicId,
-      title: title,
-      skill_ids: [],
-      thumbnail_filename: null,
-      thumbnail_bg_color: null,
-      url_fragment: null
-    }, {});
   }
 }

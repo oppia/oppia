@@ -56,7 +56,9 @@ describe('Topic editor page', function() {
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
 
-    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromBackendDict(
+      {id: 1, title: 'subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic._thumbnailFilename = 'b.svg';
     var skillSummary = ShortSkillSummary.create(
       'skill1', 'Addition');

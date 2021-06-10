@@ -48,9 +48,15 @@ describe('Entity creation service', function() {
     EntityCreationService = $injector.get('EntityCreationService');
 
     var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
-    var subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
-    var subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
+    var subtopic1 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
+    var subtopic2 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
+    var subtopic3 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     topic.getSubtopics = function() {
       return [subtopic1, subtopic2, subtopic3];
     };

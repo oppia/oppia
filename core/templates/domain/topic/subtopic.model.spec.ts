@@ -13,15 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for Subtopic model.
+ * @fileoverview Unit Tests for Subtopic model.
  */
 
 import { TestBed } from '@angular/core/testing';
-
 import { Subtopic } from 'domain/topic/subtopic.model';
 
 describe('Subtopic object factory', () => {
-  var _sampleSubtopic = null;
+  var _sampleSubtopic: Subtopic;
   var skillIds = ['skill_1', 'skill_2'];
 
   beforeEach(() => {
@@ -41,7 +40,7 @@ describe('Subtopic object factory', () => {
       skill_1: 'Description 1',
       skill_2: 'Description 2'
     };
-    _sampleSubtopic = Subtopic.create(
+    _sampleSubtopic = Subtopic.createFromBackendDict(
       sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
   });
 
@@ -67,14 +66,6 @@ describe('Subtopic object factory', () => {
       _sampleSubtopic.validate()
     ).toEqual(['Subtopic title should not be empty']);
   });
-
-  it('should be able to create a subtopic object with given title and id',
-    () => {
-      var subtopic = Subtopic.createFromTitle(2, 'Title2');
-      expect(subtopic.getId()).toBe(2);
-      expect(subtopic.getTitle()).toBe('Title2');
-      expect(subtopic.getSkillSummaries()).toEqual([]);
-    });
 
   it('should not add duplicate elements to skill ids list', () => {
     expect(_sampleSubtopic.addSkill('skill_1', 'Description 1')).toEqual(false);

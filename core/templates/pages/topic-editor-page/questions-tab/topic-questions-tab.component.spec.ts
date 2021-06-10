@@ -131,7 +131,9 @@ describe('Topic questions tab', function() {
     });
 
     topic = TopicObjectFactory.createInterstitialTopic();
-    subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
+    subtopic1 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic1.addSkill('skill1', 'subtopic1 skill');
     topic.getSubtopics = function() {
       return [subtopic1];

@@ -56,7 +56,9 @@ describe('Subtopic editor tab', function() {
       fetchTotalQuestionCountForSkillIdsAsync: async() => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic = Subtopic.createFromTitle(1, 'Subtopic1');
+    var subtopic = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic._skillIds = ['skill_1'];
     subtopic.setUrlFragment('dummy-url');
     skillSummary = ShortSkillSummary.create(

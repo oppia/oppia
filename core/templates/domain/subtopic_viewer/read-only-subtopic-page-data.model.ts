@@ -78,7 +78,7 @@ export class ReadOnlySubtopicPageData {
   ReadOnlySubtopicPageData {
     let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
     Subtopic
-      .create(subtopicDataBackendDict.next_subtopic_dict, {})
+      .createFromBackendDict(subtopicDataBackendDict.next_subtopic_dict, {})
   ) : null;
 
     return new ReadOnlySubtopicPageData(

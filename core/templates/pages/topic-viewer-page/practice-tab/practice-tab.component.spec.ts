@@ -86,24 +86,24 @@ describe('Practice tab component', function() {
     component = fixture.componentInstance;
     component.topicName = 'Topic Name';
     component.subtopicsList = [
-      Subtopic.create({
+      Subtopic.createFromBackendDict({
         id: 1,
         title: 'Subtopic 1',
         skill_ids: ['1', '2'],
-        thumbnail_filename: '',
-        thumbnail_bg_color: '',
-        url_fragment: ''
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null
       }, {
         1: 'First skill',
         2: 'Second skill'
       }),
-      Subtopic.create({
+      Subtopic.createFromBackendDict({
         id: 2,
         title: 'Subtopic 2',
         skill_ids: [],
-        thumbnail_filename: '',
-        thumbnail_bg_color: '',
-        url_fragment: ''
+        thumbnail_filename: null,
+        thumbnail_bg_color: null,
+        url_fragment: null
       }, {
         1: 'First skill',
         2: 'Second skill'

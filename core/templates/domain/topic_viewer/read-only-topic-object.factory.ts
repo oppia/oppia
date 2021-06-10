@@ -146,7 +146,7 @@ export class ReadOnlyTopicObjectFactory {
   createFromBackendDict(
       topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map(subtopic => {
-      return Subtopic.create(
+      return Subtopic.createFromBackendDict(
         subtopic, topicDataDict.skill_descriptions);
     });
     let uncategorizedSkills =

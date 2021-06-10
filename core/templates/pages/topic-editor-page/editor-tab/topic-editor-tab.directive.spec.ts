@@ -118,7 +118,9 @@ describe('Topic editor tab directive', function() {
       TopicsAndSkillsDashboardBackendApiService:
         MockTopicsAndSkillsDashboardBackendApiService
     });
-    var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
+    var subtopic = Subtopic.createFromBackendDict(
+      {id: 1, title: 'subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     topic = TopicObjectFactory.createInterstitialTopic();
     skillSummary = ShortSkillSummary.create(
       'skill_1', 'Description 1');

@@ -342,9 +342,17 @@ export class Topic {
   }
 
   // Adds a new frontend subtopic domain object to this topic.
-  addSubtopic(title: string): void {
-    let newSubtopic = Subtopic.createFromTitle(
-      this._nextSubtopicId, title);
+  addSubtopic(_title: string): void {
+    let subtopicBackendDict: SubtopicBackendDict = {
+      id: this._nextSubtopicId,
+      title: _title,
+      skill_ids: [],
+      thumbnail_filename: null,
+      thumbnail_bg_color: null,
+      url_fragment: null
+    };
+    let newSubtopic = Subtopic.createFromBackendDict(
+      subtopicBackendDict, {});
     this._subtopics.push(newSubtopic);
     this._nextSubtopicId++;
   }
@@ -576,7 +584,7 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict: SkillIdToDescriptionMap): Topic {
     let subtopics = topicBackendDict.subtopics.map((
         subtopic: SubtopicBackendDict) => {
-      return Subtopic.create(
+      return Subtopic.createFromBackendDict(
         subtopic, skillIdToDescriptionDict);
     });
     let canonicalStoryReferences =

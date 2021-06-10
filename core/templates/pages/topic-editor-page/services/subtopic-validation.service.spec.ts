@@ -38,11 +38,17 @@ describe('Subtopic validation service', function() {
     SubtopicValidationService = $injector.get('SubtopicValidationService');
 
     var topic = TopicObjectFactory.createInterstitialTopic();
-    var subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
+    var subtopic1 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic1.setUrlFragment('subtopic-one');
-    var subtopic2 = Subtopic.createFromTitle(1, 'Subtopic2');
+    var subtopic2 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic2.setUrlFragment('subtopic-two');
-    var subtopic3 = Subtopic.createFromTitle(1, 'Subtopic3');
+    var subtopic3 = Subtopic.createFromBackendDict(
+      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+        thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic3.setUrlFragment('subtopic-three');
     topic.getSubtopics = function() {
       return [subtopic1, subtopic2, subtopic3];
