@@ -52,8 +52,7 @@ export class CodemirrorMergeviewComponent implements
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {
-      this.codeMirrorInstance =
-      (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
+      this.codeMirrorInstance = window.CodeMirror.MergeView(
         this.elementRef.nativeElement,
         {
           value: this.leftValue !== undefined ? this.leftValue : ' ',
@@ -80,9 +79,9 @@ export class CodemirrorMergeviewComponent implements
     }
     // Watch for changes and set value in right pane.
     if (changes.rightValue &&
-       changes.rightValue.currentValue !==
-       changes.rightValue.previousValue &&
-       this.codeMirrorInstance) {
+      changes.rightValue.currentValue !==
+      changes.rightValue.previousValue &&
+      this.codeMirrorInstance) {
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }

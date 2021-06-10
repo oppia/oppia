@@ -69,14 +69,17 @@ describe('Oppia CodeMirror Component', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     spyOn(window.CodeMirror, 'MergeView').and.callFake(
-      (element: HTMLElement) => <CodeMirror.MergeView.MergeViewEditor><unknown>{
-        editor: () => {
-          return { setValue: editSetValueSpy };
-        },
-        rightOriginal: () => {
-          return { setValue: rightOrgSetValueSpy };
-        }
+      (element: HTMLElement) => {
+        return <CodeMirror.MergeView.MergeViewEditor><unknown>{
+          editor: () => {
+            return { setValue: editSetValueSpy };
+          },
+          rightOriginal: () => {
+            return { setValue: rightOrgSetValueSpy };
+          }
+        };
       });
+    component.ngAfterViewInit();
     let changes: SimpleChanges = {
       leftValue: {
         currentValue: undefined,
@@ -107,13 +110,15 @@ describe('Oppia CodeMirror Component', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
     spyOn(window.CodeMirror, 'MergeView').and.callFake(
-      (element: HTMLElement) => <CodeMirror.MergeView.MergeViewEditor><unknown>{
-        editor: () => {
-          return { setValue: editSetValueSpy };
-        },
-        rightOriginal: () => {
-          return { setValue: rightOrgSetValueSpy };
-        }
+      (element: HTMLElement) => {
+        return <CodeMirror.MergeView.MergeViewEditor><unknown>{
+          editor: () => {
+            return { setValue: editSetValueSpy };
+          },
+          rightOriginal: () => {
+            return { setValue: rightOrgSetValueSpy };
+          }
+        };
       });
     component.ngAfterViewInit();
     const changes: SimpleChanges = {
