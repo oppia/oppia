@@ -38,7 +38,7 @@ interface ViewedProfileUsername {
 interface UserDisplayedStatistic {
   title: string;
   value: number;
-  helpText?: string;
+  helpText: string | null;
 }
 
 @Component({
@@ -108,10 +108,12 @@ export class ProfilePageComponent {
             'this score.')
         }, {
           title: 'Created',
-          value: data.createdExpSummaries.length
+          value: data.createdExpSummaries.length,
+          helpText: null
         }, {
           title: 'Edited',
-          value: data.createdExpSummaries.length
+          value: data.createdExpSummaries.length,
+          helpText: null
         }];
 
         this.userEditedExplorations = data.editedExpSummaries.sort(
