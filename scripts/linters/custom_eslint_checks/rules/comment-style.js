@@ -54,6 +54,9 @@ module.exports = {
       var sourceCode = context.getSourceCode();
       var comments = sourceCode.getAllComments();
       comments = comments.filter(token => token.type === 'Line');
+      if (comments.length === 0) {
+        return 0;
+      }
       var commentLine = comments[0].loc.start.line;
       var groupComments = [];
       var listComments = [comments[0]];
