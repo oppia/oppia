@@ -8,7 +8,7 @@
 </ng-template>
 
 <div class="conversation-skin-learner-answer-container">
-  <img class="conversation-skin-user-avatar rounded-circle" [src]="profilePicture" alt="">
+  <img class="conversation-skin-user-avatar rounded-circle" [src]="decodedProfilePicture ? decodedProfilePicture : ''" alt="">
   <div *ngIf="!data.isHint">
     <div *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"

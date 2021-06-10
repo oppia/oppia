@@ -42,6 +42,7 @@ export class InputResponsePairComponent {
   @Input() inputResponsePairId: string;
   @Input() isLastPair: boolean;
   OPPIA_AVATAR_LINK_URL: string;
+  decodedProfilePicture: string;
   @ViewChild('popover') popover: NgbPopover;
 
   constructor(
@@ -54,7 +55,7 @@ export class InputResponsePairComponent {
   ) {}
 
   ngOnInit(): void {
-    this.profilePicture = decodeURIComponent(this.profilePicture);
+    this.decodedProfilePicture = decodeURIComponent(this.profilePicture);
   }
 
   isVideoRteElementPresentInResponse(): boolean {
