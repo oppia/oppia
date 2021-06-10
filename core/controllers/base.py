@@ -182,12 +182,6 @@ class BaseHandler(webapp2.RequestHandler):
             self.current_user_is_super_admin = (
                 auth_claims is not None and auth_claims.role_is_super_admin)
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not self.current_user_is_super_admin
-                and self.request.path not in AUTH_HANDLER_PATHS):
-            auth_services.destroy_auth_session(self.response)
-            return
-
         if auth_claims:
             auth_id = auth_claims.auth_id
             user_settings = user_services.get_user_settings_by_auth_id(auth_id)
@@ -232,6 +226,10 @@ class BaseHandler(webapp2.RequestHandler):
             if self.user_id is None else user_settings.role)
         self.user = user_services.get_user_actions_info(self.user_id)
 
+        if not self._is_requested_path_currently_accessible_to_user():
+            auth_services.destroy_auth_session(self.response)
+            return
+
         self.values['is_moderator'] = (
             user_services.is_at_least_moderator(self.user_id))
         self.values['is_admin'] = user_services.is_admin(self.user_id)
@@ -253,9 +251,7 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if (feconf.ENABLE_MAINTENANCE_MODE
-                and not self.current_user_is_super_admin
-                and self.request.path not in AUTH_HANDLER_PATHS):
+        if not self._is_requested_path_currently_accessible_to_user():
             self.handle_exception(
                 self.TemporaryMaintenanceException(), self.app.debug)
             return
@@ -300,6 +296,30 @@ class BaseHandler(webapp2.RequestHandler):
                 return
 
         super(BaseHandler, self).dispatch()
+
+    @property
+    def current_user_is_site_maintainer(self):
+        """Returns whether the current user is a site maintainer.
+
+        A super admin or release coordinator is also a site maintainer.
+
+        Returns:
+            bool. Whether the current user is a site maintainer.
+        """
+        return (
+            self.current_user_is_super_admin or
+            self.role == feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+    def _is_requested_path_currently_accessible_to_user(self):
+        """Checks whether the requested path is currently accessible to user.
+
+        Returns:
+            bool. Whether the requested path is currently accessible to user.
+        """
+        return (
+            self.request.path in AUTH_HANDLER_PATHS or
+            not feconf.ENABLE_MAINTENANCE_MODE or
+            self.current_user_is_site_maintainer)
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
         """Base method to handle GET requests."""
