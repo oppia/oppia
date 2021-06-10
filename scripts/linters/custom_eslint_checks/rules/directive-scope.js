@@ -21,7 +21,7 @@
 
 module.exports = {
   meta: {
-    type: 'suggestion',
+    type: 'problem',
     docs: {
       description: (
         'Lint check to ensure that all directives have an explicit Scope: {}' +
