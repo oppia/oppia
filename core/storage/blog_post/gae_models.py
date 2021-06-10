@@ -132,8 +132,7 @@ class BlogPostModel(base_models.BaseModel):
             author_id: str. User ID of the author.
 
         Returns:
-            BlogPostModel. The newly created BlogPostModel
-            instance.
+            BlogPostModel. The newly created BlogPostModel instance.
 
         Raises:
             Exception. A blog post with the given blog ID exists already.
@@ -321,8 +320,8 @@ class BlogPostSummaryModel(base_models.BaseModel):
                 summary models are to be fetched.
 
         Returns:
-            list(BlogPostSummaryModel). The list of BlogPostSummaryModel
-            created by the given user.
+            list(BlogPostSummaryModel). The list of BlogPostSummaryModels
+            fetched using blog_ids.
         """
         return cls.get_multi(blog_ids)
 
