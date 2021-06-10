@@ -444,16 +444,6 @@ class CheckIfPrIsChangelogPrTests(test_utils.GenericTestBase):
             pr, diff_files, file_diffs)
         self.assertEqual(msg, '')
 
-    def test_fork_pr_is_not_low_risk(self):
-        pr = _make_pr(
-            'foo/oppia',
-            'update-changelog-for-release-v0.3.1',
-            'develop')
-
-        msg = check_if_pr_is_low_risk.check_if_pr_is_changelog_pr(
-            pr, None, None)
-        self.assertEqual(msg, 'Source repo is not oppia/oppia')
-
     def test_other_branch_pr_is_not_low_risk(self):
         pr = _make_pr(
             'oppia/oppia',

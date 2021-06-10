@@ -264,9 +264,6 @@ def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
         str. An empty string if the PR is a changelog PR and low-risk,
         else a message explaining why the PR is not low-risk.
     """
-    source_repo = pr['head']['repo']['full_name']
-    if source_repo != 'oppia/oppia':
-        return 'Source repo is not oppia/oppia'
     source_branch = pr['head']['ref']
     if not re.match(
             '^update-changelog-for-release-v[0-9.]+$',
