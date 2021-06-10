@@ -16,12 +16,11 @@
  * @fileoverview Unit tests for unicode string editor.
  */
 
-import { FormsModule } from '@angular/forms';
 import { EventEmitter, SimpleChanges } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { UnicodeStringEditorComponent } from './unicode-string-editor.component';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 import { ExternalSaveService } from 'services/external-save.service';
+import { FormsModule } from '@angular/forms';
+import { UnicodeStringEditorComponent } from './unicode-string-editor.component';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 describe('UnicodeStringEditorComponent', () => {
   let component: UnicodeStringEditorComponent;
@@ -36,8 +35,6 @@ describe('UnicodeStringEditorComponent', () => {
       declarations: [UnicodeStringEditorComponent]
     }).compileComponents();
   }));
-
-  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
@@ -65,7 +62,7 @@ describe('UnicodeStringEditorComponent', () => {
 
     // We cannot test what componentSubscriptions.add has been called with since
     // externalSaveService is a private variable and inside it is an anonymous
-    // fucntion.
+    // function.
     expect(component.componentSubscriptions.add).toHaveBeenCalled();
     expect(component.componentSubscriptions.closed).toBe(false);
     expect(component.alwaysEditable).toBe(false);
@@ -73,7 +70,27 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.active).toBe(false);
   });
 
-  it('should replace value when External Save is emitted', () => {
+  it('should not add subscription when alwaysEditable is true', () => {
+    spyOn(component, 'closeEditor').and.callThrough();
+    spyOn(component.componentSubscriptions, 'add');
+    component.alwaysEditable = true;
+    component.active = true;
+
+    expect(component.active).toBe(true);
+
+    component.ngOnInit();
+
+    // We cannot test what componentSubscriptions.add has been called with since
+    // externalSaveService is a private variable and inside it is an anonymous
+    // function.
+    expect(component.componentSubscriptions.add).not.toHaveBeenCalled();
+    expect(component.alwaysEditable).toBe(true);
+    expect(component.closeEditor).not.toHaveBeenCalled();
+    expect(component.active).toBe(true);
+  });
+
+  it('should update value after broadcasting ' +
+  'externalSave event when closing modal', () => {
     component.active = true;
     component.ngOnInit();
     spyOn(component, 'closeEditor').and.callThrough();
@@ -150,6 +167,27 @@ describe('UnicodeStringEditorComponent', () => {
 
     expect(component.largeInput).toBe(true);
   });
+
+  it('should not make largeInput true when large input is not entered', () => {
+    const changes: SimpleChanges = {
+      initArgs: {
+        previousValue: {
+          largeInput: true
+        },
+        currentValue: {
+          largeInput: true
+        },
+        firstChange: false,
+        isFirstChange: () => false
+      }
+    };
+    component.largeInput = false;
+
+    component.ngOnChanges(changes);
+
+    expect(component.largeInput).toBe(false);
+  });
+
 
   it('should unsubscribe when component is destroyed', () => {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();
