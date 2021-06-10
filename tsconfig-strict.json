@@ -102,8 +102,6 @@
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.ts",
     "core/templates/domain/skill/augmented-skill-summary.model.spec.ts",
-    "core/templates/domain/skill/skill-rights.model.ts",
-    "core/templates/domain/skill/skill-rights.model.spec.ts",
     "core/templates/domain/statistics/exploration-stats.model.ts",
     "core/templates/domain/statistics/exploration-stats.model.spec.ts",
     "core/templates/domain/story/StoryContentsObjectFactory.ts",

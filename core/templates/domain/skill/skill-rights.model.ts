@@ -18,19 +18,15 @@
 
 export interface SkillRightsBackendDict {
   'can_edit_skill_description': boolean,
-  'skill_id': string | null
+  'skill_id': string
 }
 
 export class SkillRights {
-  // The '_skillId' is set to null for the interstitial object which
-  // is to be used in the Skill Editor until the 'SkillRights' object
-  // has been loaded from the backend. Check function 'loadSkill' in
-  // 'SkillEditorStateService' for reference.
-  _skillId: string | null;
+  _skillId: string;
   _canEditSkillDescription: boolean;
 
   constructor(
-      skillId: string | null, canEditSkillDescription: boolean) {
+      skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
     this._canEditSkillDescription = canEditSkillDescription;
   }
@@ -46,7 +42,7 @@ export class SkillRights {
     return new SkillRights(null, false);
   }
 
-  getSkillId(): string | null {
+  getSkillId(): string {
     return this._skillId;
   }
 
