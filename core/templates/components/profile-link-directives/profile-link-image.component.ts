@@ -29,9 +29,10 @@ import { ProfileLinkImageBackendApiService } from
   styleUrls: []
 })
 export class ProfileLinkImageComponent implements OnInit {
-  @Input() username: string;
-  profileImageUrl: string;
-  profilePicture: string;
+  // Check TS-7-1 in the TS Strict Mode wiki for reference
+  @Input() username!: string;
+  profileImageUrl: string | undefined;
+  profilePicture: string | undefined;
   constructor(
     private profileLinkImageBackendApiService:
       ProfileLinkImageBackendApiService,
@@ -55,7 +56,7 @@ export class ProfileLinkImageComponent implements OnInit {
     // image if user is not logged in or has not uploaded a profile
     // picture, or the player is in preview mode.
     this.profileLinkImageBackendApiService.fetchProfilePictureDataAsync(
-      this.profileImageUrl).then((base64ProfilePicture: string) => {
+      this.profileImageUrl).then((base64ProfilePicture: string | null) => {
       this.profilePicture = (
         base64ProfilePicture || DEFAULT_PROFILE_IMAGE_PATH);
     });

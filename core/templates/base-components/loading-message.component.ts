@@ -24,7 +24,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
    templateUrl: './loading-message.component.html'
  })
 export class LoadingMessageComponent {
-   @Input() message: string;
+  // Check TS-7-1 in the TS Strict Mode wiki for reference
+   @Input() message!: string;
 }
 
 angular.module('oppia').directive('oppiaLoadingMessage',

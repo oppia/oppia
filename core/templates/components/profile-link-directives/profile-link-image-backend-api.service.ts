@@ -34,16 +34,19 @@ export class ProfileLinkImageBackendApiService {
     private http: HttpClient
   ) {}
 
-  async fetchProfilePictureDataAsync(profileImageUrl: string): Promise<string> {
+  async fetchProfilePictureDataAsync(profileImageUrl: string):
+  // It will return a 'null' Promise when the user is not logged in or has not
+  // uploaded a profile picture, or the player is in preview mode.
+    Promise<string | null> {
+    // A URL encoded base64 image is treated as unsafe by Angular. This is
+    // because angular's security doesn't allow anything outside the following
+    // regex: [a-z0-9+\/]+=*$/i in the image data, i.e., the string after
+    // "data:image/png;base64,". But URL encoded data contains "%" (%2B for
+    // "+" and "%3D" for ="). Hence the image is decoded here to conform to
+    // the security restrictions imposed by angular.
+    // TODO(#10463): Remove the 'replace newlines' logic after moving
+    // profile pictures to GCS.
     return this.http.get<ProfileDict>(profileImageUrl).pipe(
-      // A URL encoded base64 image is treated as unsafe by Angular. This is
-      // because angular's security doesn't allow anything outside the following
-      // regex: [a-z0-9+\/]+=*$/i in the image data, i.e., the string after
-      // "data:image/png;base64,". But URL encoded data contains "%" (%2B for
-      // "+" and "%3D" for ="). Hence the image is decoded here to conform to
-      // the security restrictions imposed by angular.
-      // TODO(#10463): Remove the 'replace newlines' logic after moving
-      // profile pictures to GCS.
       map(response => {
         return (
           response.profile_picture_data_url_for_username &&
