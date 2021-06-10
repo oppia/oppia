@@ -43,10 +43,6 @@ export class StoryEditorNavbarComponent implements OnInit {
   showNavigationOptions: boolean;
   showStoryEditOptions: boolean;
   activeTab: string;
-  storyEditorNavigationService: {
-    navigateToStoryEditor: () => void;
-    navigateToStoryPreviewTab: () => void;
-  };
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -102,7 +98,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.forceValidateExplorations = true;
   }
 
-  _validateStory(): void {
+  private _validateStory(): void {
     this.validationIssues = this.story.validate();
     let nodes = this.story.getStoryContents().getNodes();
     let skillIdsInTopic = (
@@ -133,7 +129,7 @@ export class StoryEditorNavbarComponent implements OnInit {
         nodePrepublishValidationIssues));
   }
 
-  _validateExplorations(): void {
+  private _validateExplorations(): void {
     let nodes = this.story.getStoryContents().getNodes();
     let explorationIds = [];
 
@@ -213,13 +209,11 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   selectMainTab(): void {
     this.activeTab = this.EDITOR;
-    this.storyEditorNavigationService.navigateToStoryEditor();
     this.showNavigationOptions = false;
   }
 
   selectPreviewTab(): void {
     this.activeTab = this.PREVIEW;
-    this.storyEditorNavigationService.navigateToStoryPreviewTab();
     this.showNavigationOptions = false;
   }
 
