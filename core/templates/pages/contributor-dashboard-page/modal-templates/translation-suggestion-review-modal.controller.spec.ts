@@ -68,9 +68,22 @@ describe('Translation Suggestion Review Modal Controller', function() {
       }
     };
 
-    const suggestionIdToSuggestion = {
-      suggestion_1: suggestion1,
-      suggestion_2: suggestion2
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: null
+    };
+    const contribution2 = {
+      suggestion: suggestion2,
+      details: {
+        topic_name: 'topic_2',
+        story_title: 'story_2',
+        chapter_title: 'chapter_2'
+      }
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_2: contribution2
     };
     beforeEach(angular.mock.inject(function($injector, $controller, $q) {
       const $rootScope = $injector.get('$rootScope');
@@ -96,7 +109,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         initialSuggestionId: 'suggestion_1',
         subheading: subheading,
         reviewable: reviewable,
-        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion),
+        suggestionIdToContribution: angular.copy(suggestionIdToContribution),
         userService: userService
       });
       $rootScope.$apply();
@@ -360,9 +373,22 @@ describe('Translation Suggestion Review Modal Controller', function() {
       }
     };
 
-    const suggestionIdToSuggestion = {
-      suggestion_1: suggestion1,
-      suggestion_2: suggestion2
+    const contribution1 = {
+      suggestion: suggestion1,
+      details: null
+    };
+    const contribution2 = {
+      suggestion: suggestion2,
+      details: {
+        topic_name: 'topic_2',
+        story_title: 'story_2',
+        chapter_title: 'chapter_2'
+      }
+    };
+
+    const suggestionIdToContribution = {
+      suggestion_1: contribution1,
+      suggestion_2: contribution2
     };
 
     beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -378,7 +404,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
         initialSuggestionId: 'suggestion_1',
         subheading: subheading,
         reviewable: reviewable,
-        suggestionIdToSuggestion: angular.copy(suggestionIdToSuggestion)
+        suggestionIdToContribution: angular.copy(suggestionIdToContribution)
       });
     }));
 

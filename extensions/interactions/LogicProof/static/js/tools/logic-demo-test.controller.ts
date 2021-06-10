@@ -285,7 +285,7 @@ logicDemo.controller('LogicDemoTestController', ['$scope', function($scope) {
     for (var i = 0; i < $scope.REPLACEMENT_PAIRS.length; i++) {
       // We use this as .replace() only replaces one instance.
       output = output.split($scope.REPLACEMENT_PAIRS[i].old).join(
-        $scope.REPLACEMENT_PAIRS[i]['new']);
+        $scope.REPLACEMENT_PAIRS[i].new);
     }
     return output;
   };

@@ -154,13 +154,13 @@
             </button>
           </div>
           <div ng-if="storyPreviewCardIsShown">
-            <preview-thumbnail name="editableTitle"
-                               aspect-ratio="'16:9'"
-                               description="editableDescription"
-                               filename="story.getThumbnailFilename()"
-                               thumbnail-bg-color="story.getThumbnailBgColor()"
-                               bg-color="'#2F6687'">
-            </preview-thumbnail>
+            <oppia-preview-thumbnail [name]="editableTitle"
+                                     [aspect-ratio]="'16:9'"
+                                     [description]="editableDescription"
+                                     [filename]="story.getThumbnailFilename()"
+                                     [thumbnail-bg-color]="story.getThumbnailBgColor()"
+                                     [bg-color]="'#2F6687'">
+            </oppia-preview-thumbnail>
           </div>
         </div>
       </md-card>
