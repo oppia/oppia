@@ -96,12 +96,12 @@ export class NumberWithUnits {
     if (this.type === 'real') {
       // If numerator and whole number is zero, then we can say that there is
       // no fraction part.
-      if(this.fraction.numerator !== 0 && this.fraction.wholeNumber !== 0) {
+      if (this.fraction.numerator !== 0 && this.fraction.wholeNumber !== 0) {
         throw new Error('Number with type real cannot have a fraction part.');
       }
       numberWithUnitsString += this.real + ' ';
     } else if (this.type === 'fraction') {
-      if(this.real !== 0) {
+      if (this.real !== 0) {
         throw new Error('Number with type fraction cannot have a real part.');
       }
       numberWithUnitsString += this.fraction.toString() + ' ';
