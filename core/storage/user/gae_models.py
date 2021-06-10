@@ -434,11 +434,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict. A dict with two keys, 'completed_exploration_ids'
-            and 'completed_collection_ids'. The corresponding values are
-            lists of the IDs of the explorations and collections,
-            respectively, which the given user has completed. If there is no
-            model for the given user_id, the function returns an empty dict.
+            dict. A dict with four keys, 'completed_exploration_ids',
+            'completed_collection_ids', 'completed_story_ids' and
+            'learnt_topic_ids'. The corresponding values are
+            lists of the IDs of the explorations, collections, stories
+            and topics respectively, which the given user has completed.
+            If there is no model for the given user_id, the function
+            returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if user_model is None:
@@ -528,10 +530,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. A dict with two keys, 'incomplete_exploration_ids'
-            and 'incomplete_collection_ids'. The corresponding values are
-            lists of the IDs of the explorations and collections,
-            respectively, which the given user has not yet completed. If
+            dict or None. A dict with four keys, 'incomplete_exploration_ids',
+            'incomplete_collection_ids', 'incomplete_story_ids' and
+            'partially_learnt_topic_ids'. The corresponding values are
+            lists of the IDs of the explorations, collections, stories and
+            topics respectively, which the given user has not yet completed. If
             the user_id is invalid, returns None.
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
