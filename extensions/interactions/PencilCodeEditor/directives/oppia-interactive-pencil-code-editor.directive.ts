@@ -158,7 +158,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               // user is sanitized by pencilcode so there is no security
               // issue in this case.
               pce.eval(
-                'document.body.innerHTML', // disable-bad-pattern-check
+                'document.body.innerHTML', // disable-bad-pattern-check.
                 function(pencilCodeHtml) {
                   var normalizedCode = getNormalizedCode();
 

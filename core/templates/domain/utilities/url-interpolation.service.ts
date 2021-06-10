@@ -132,10 +132,10 @@ export class UrlInterpolationService {
       return null;
     }
 
-    // Valid pattern: <alphanum>
+    // Valid pattern: <alphanum>.
     let INTERPOLATION_VARIABLE_REGEX = /<(\w+)>/;
 
-    // Invalid patterns: <<stuff>>, <stuff>>>, <>
+    // Invalid patterns: <<stuff>>, <stuff>>>, <>.
     let EMPTY_VARIABLE_REGEX = /<>/;
     let INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 

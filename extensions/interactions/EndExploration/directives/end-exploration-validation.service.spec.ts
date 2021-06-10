@@ -112,7 +112,8 @@ describe('EndExplorationValidationService', () => {
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
-      // This throws "Argument of type '{}' is not assignable to
+      // This throws "Argument of type '{}'. We need to suppress this
+      // error because is not assignable to
       // parameter of type 'EndExplorationCustomizationArgs'." We are purposely
       // assigning the wrong type of customization args in order to test
       // validations.
@@ -140,7 +141,8 @@ describe('EndExplorationValidationService', () => {
 
   it('should catch non-string value for recommended exploration ID',
     () => {
-      // This throws "Type 'number' is not assignable to type 'string'."
+      // This throws "Type 'number'. We need to suppress this error
+      // because is not assignable to type 'string'."
       // Here we are assigning the wrong type of value to
       // "customizationArguments" in order to test validations.
       // @ts-expect-error
@@ -155,7 +157,8 @@ describe('EndExplorationValidationService', () => {
 
   it('should have warnings for non-list format of recommended exploration IDs',
     () => {
-      // This throws "Type '"ExpID0"' is not assignable to type 'string[]'."
+      // This throws "Type '"ExpID0"'. We need to suppress this error
+      // because is not assignable to type 'string[]'."
       // Here we are assigning the wrong type of value to
       // "customizationArguments" in order to test validations.
       // @ts-expect-error

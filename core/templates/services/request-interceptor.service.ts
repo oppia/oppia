@@ -87,8 +87,8 @@ export class RequestInterceptor implements HttpInterceptor {
                 var body = new FormData();
                 body.append('payload', JSON.stringify(request.body));
                 // This throws "Cannot assign to 'body' because it is
-                // a read-only property". We need to manually suprress this
-                // error because this is a request interceptor and we need to
+                // a read-only property". We need to suppress this error because
+                // this is a request interceptor and we need to
                 // to modify the contents of the request.
                 // @ts-ignore
                 request.body = body;
@@ -97,8 +97,8 @@ export class RequestInterceptor implements HttpInterceptor {
               request.body.append('source', document.URL);
             } else {
               // This throws "Cannot assign to 'body' because it is
-              // a read-only property". We need to manually suprress this
-              // error because this is a request interceptor and we need to
+              // a read-only property". We need to suppress this error because
+              // this is a request interceptor and we need to
               // to modify the contents of the request.
               // @ts-ignore
               request.body = {

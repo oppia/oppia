@@ -215,7 +215,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -344,7 +344,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -372,7 +372,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);
@@ -416,7 +416,7 @@ describe('Audio translation bar directive', function() {
     // is not assignable to parameter of type 'WaveSurfer'."
     // This is because the actual 'WaveSurfer.create` function returns a
     // object with around 50 more properties than `waveSurferObjSpy`.
-    // We are suppressing this error because we have defined the properties
+    // We need to suppress this error because we have defined the properties
     // we need for this test in 'waveSurferObjSpy' object.
     // @ts-expect-error
     spyOn(WaveSurfer, 'create').and.returnValue(waveSurferObjSpy);

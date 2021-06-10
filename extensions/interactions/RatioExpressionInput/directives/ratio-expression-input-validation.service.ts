@@ -128,7 +128,7 @@ export class RatioExpressionInputValidationService {
         } else if (currentRuleType === 'HasSpecificTermEqualTo') {
           currentInput = [
             <number> rules[j].inputs.x, // The x-th term
-            <number> rules[j].inputs.y, // Should have value y
+            <number> rules[j].inputs.y, // Should have value y.
           ];
         } else {
           currentInput = <number[]> rules[j].inputs.x;
@@ -180,7 +180,7 @@ export class RatioExpressionInputValidationService {
           } else if (seenRuleType === 'HasSpecificTermEqualTo') {
             seenInput = [
               <number> seenRule.inputs.x, // The x-th term
-              <number> seenRule.inputs.y, // Should have value y
+              <number> seenRule.inputs.y, // Should have value y.
             ];
           } else {
             seenInput = <number[]> seenRule.inputs.x;

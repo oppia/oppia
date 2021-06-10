@@ -87,7 +87,8 @@ describe('ContinueValidationService', () => {
 
       expect(() => {
         validatorService.getAllWarnings(
-          // This throws "Argument of type '{}' is not assignable to
+          // This throws "Argument of type '{}'. We need to suppress this
+          // error because is not assignable to
           // parameter of type 'ContinueCustomizationArgs'." We are purposely
           // assigning the wrong type of customization args in order to test
           // validations.
