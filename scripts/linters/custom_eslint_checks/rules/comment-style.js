@@ -48,7 +48,7 @@ module.exports = {
       '}', '>'];
     var allowedPhrases = [
       '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
-      'eslint-enable', 'http://', 'https://', '----'];
+      'eslint-enable', 'http://', 'https://', 'disable', '----'];
 
     var getGroupComments = function() {
       var sourceCode = context.getSourceCode();
