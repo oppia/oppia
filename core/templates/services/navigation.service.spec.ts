@@ -62,7 +62,7 @@ describe('Navigation Service', () => {
     let mockEvent = {
       keyCode: 13,
       shiftKey: false
-    };
+    } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
       enter: 'open'
     };
@@ -77,7 +77,7 @@ describe('Navigation Service', () => {
     let mockEvent = {
       keyCode: 9,
       shiftKey: true
-    };
+    } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
       shiftTab: 'close',
     };
@@ -91,7 +91,7 @@ describe('Navigation Service', () => {
     let mockEvent = {
       keyCode: 9,
       shiftKey: true
-    };
+    } as unknown as KeyboardEvent;
     let eventsTobeHandled = {
       shiftTab: 'invalid'
     };

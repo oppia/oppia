@@ -29,25 +29,13 @@ import { UserService } from 'services/user.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { SearchService } from 'services/search.service';
-import { NavigationService } from 'services/navigation.service';
+import { EventToCodes, NavigationService } from 'services/navigation.service';
 import { AppConstants } from 'app.constants';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-
-interface EventToCodes {
-  enter?;
-  tab?;
-  shiftTab?;
-}
-
-interface KeyboardEvent {
-  keyCode?: number;
-  shiftKey?: boolean;
-  currentTarget?: string;
-}
 
 @Component({
   selector: 'oppia-top-navigation-bar',

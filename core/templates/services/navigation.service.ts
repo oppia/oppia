@@ -21,16 +21,10 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-interface KeyboardEvent {
-  keyCode?: number,
-  shiftKey?: boolean,
-  currentTarget?
-}
-
-interface EventToCodes {
-  enter?,
-  tab?,
-  shiftTab?,
+export interface EventToCodes {
+  enter?: string,
+  tab?: string,
+  shiftTab?: string,
 }
  @Injectable({
    providedIn: 'root'
