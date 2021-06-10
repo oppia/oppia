@@ -24,7 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
    templateUrl: './loading-message.component.html'
  })
 export class LoadingMessageComponent {
-  // Check TS-7-1 in the TS Strict Mode wiki for reference
+  // Check TS-7-1 in the TS Strict Mode wiki for reference.
    @Input() message!: string;
 }
 

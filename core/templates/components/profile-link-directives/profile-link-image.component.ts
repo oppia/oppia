@@ -29,7 +29,7 @@ import { ProfileLinkImageBackendApiService } from
   styleUrls: []
 })
 export class ProfileLinkImageComponent implements OnInit {
-  // Check TS-7-1 in the TS Strict Mode wiki for reference
+  // Check TS-7-1 in the TS Strict Mode wiki for reference.
   @Input() username!: string;
   profileImageUrl: string | undefined;
   profilePicture: string | undefined;
