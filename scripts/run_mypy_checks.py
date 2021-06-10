@@ -724,7 +724,7 @@ _PARSER.add_argument(
     )
 
 
-def get_cmd(files):
+def get_mypy_cmd(files):
     """Return the appropriate command to be run."""
     if files:
         cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
@@ -739,7 +739,7 @@ def main(args=None):
     """Runs the MyPy type checks."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     python_utils.PRINT('Starting Mypy type checks.')
-    cmd = _get_cmd(getattr(unused_parsed_args, 'files'))
+    cmd = get_mypy_cmd(getattr(unused_parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)
 
     if process == 0:

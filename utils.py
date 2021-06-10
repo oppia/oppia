@@ -30,8 +30,9 @@ import re
 import string
 import sys
 import time
-from typing import (Any, Callable, Dict, Generator, Iterable, Iterator, List,
-    Text, Tuple, TypeVar, Union) # pylint: disable=unused-import, import-only-modules
+from typing import (
+        Any, Callable, Dict, Generator, Iterable, Iterator, List,
+        Text, Tuple, TypeVar, Union) # pylint: disable=unused-import,import-only-modules
 import unicodedata
 import zlib
 
@@ -51,7 +52,7 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 U = TypeVar('U')
-DictListType = TypeVar('DictListType', Dict[Any, Any], List[Any])
+DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
 # Every use of constants is followed by # type: ignore[attr-defined] because
 # mypy is not able to identify the attributes of constants but this will be
@@ -59,6 +60,7 @@ DictListType = TypeVar('DictListType', Dict[Any, Any], List[Any])
 
 # We will be ignoring no-untyped-call and no-any-return here because
 # python_utils is untyped and will be removed in python3.
+
 
 class InvalidInputException(Exception):
     """Error class for invalid input."""
@@ -223,7 +225,7 @@ def dict_from_yaml(yaml_str):
 
 
 def recursively_remove_key(obj, key_to_remove):
-    # type: (DictListType, Text) -> None
+    # type: (DICT_LIST_TYPE, Text) -> None
     """Recursively removes keys from a list or dict.
 
     Args:

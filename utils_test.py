@@ -32,7 +32,7 @@ import python_utils
 import utils
 
 # TODO(#1234): Remove #type: ignore[attr-defined] from constants after introduction
-# of protobuf for constants
+# of protobuf for constants.
 
 
 class UtilsTests(test_utils.GenericTestBase):

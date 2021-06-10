@@ -47,13 +47,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.popen_swap_failure = self.swap(
             subprocess, 'Popen', mock_popen_failure)
 
-    def test_get_cmd_without_files(self):
-        cmd = run_mypy_checks.get_cmd(None)
+    def test_get_mypy_cmd_without_files(self):
+        cmd = run_mypy_checks.get_mypy_cmd(None)
         self.assertIn('--exclude', cmd)
         self.assertIn('--config-file', cmd)
 
-    def test_get_cmd_with_files(self):
-        cmd = run_mypy_checks.get_cmd([['file1.py', 'file2.py']])
+    def test_get_mypy_cmd_with_files(self):
+        cmd = run_mypy_checks.get_mypy_cmd([['file1.py', 'file2.py']])
         self.assertIn('file1.py', cmd)
         self.assertIn('file2.py', cmd)
         self.assertNotIn('--exclude', cmd)
