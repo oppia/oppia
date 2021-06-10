@@ -50,12 +50,20 @@ describe('When account is deleted it', function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
+    expect(await general.waitForUrlToChangeTo(
+      'http://localhost:9001/pending-account-deletion'))
+      .toEqual('http://localhost:9001/pending-account-deletion');
 
     await users.login('user1@delete.com');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
+    expect(await general.waitForUrlToChangeTo(
+      'http://localhost:9001/pending-account-deletion'))
+      .toEqual('http://localhost:9001/pending-account-deletion');
   });
 
   it('should delete private exploration', async function() {
@@ -68,8 +76,12 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationVoiceArtist('voiceArtist');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
+    expect(await general.waitForUrlToChangeTo(
+      'http://localhost:9001/pending-account-deletion'))
+      .toEqual('http://localhost:9001/pending-account-deletion');
 
     await users.login('voiceArtist@oppia.com');
     await general.openEditor(explorationId, false);
@@ -92,8 +104,12 @@ describe('When account is deleted it', function() {
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete3');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
+    expect(await general.waitForUrlToChangeTo(
+      'http://localhost:9001/pending-account-deletion'))
+      .toEqual('http://localhost:9001/pending-account-deletion');
 
     await users.login('user@check.com');
     await general.openEditor(explorationId, true);
@@ -111,8 +127,12 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationManager('secondOwner');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete4');
-    expect(await browser.getCurrentUrl()).toEqual(
-      'http://localhost:9001/pending-account-deletion');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
+    expect(await general.waitForUrlToChangeTo(
+      'http://localhost:9001/pending-account-deletion'))
+      .toEqual('http://localhost:9001/pending-account-deletion');
 
     await users.login('secondOwner@check.com');
     await general.openEditor(explorationId, true);

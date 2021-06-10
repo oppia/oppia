@@ -243,6 +243,18 @@ var navigateToTopicsAndSkillsDashboardPage = async function() {
   await waitFor.pageToFullyLoad();
 };
 
+var waitForUrlToChangeTo = async function(url) {
+  let urlRegex = new RegExp(url);
+  let currentUrl;
+  await browser.wait(async function() {
+    currentUrl = await browser.getCurrentUrl();
+    if (urlRegex.test(currentUrl)) {
+      return true;
+    }
+  }, 10000, 'Browser takes too long change URL');
+  return currentUrl;
+};
+
 exports.acceptAlert = acceptAlert;
 exports.acceptPrompt = acceptPrompt;
 exports.scrollToTop = scrollToTop;
@@ -276,3 +288,4 @@ exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
 exports.navigateToTopicsAndSkillsDashboardPage = (
   navigateToTopicsAndSkillsDashboardPage);
+exports.waitForUrlToChangeTo = waitForUrlToChangeTo;
