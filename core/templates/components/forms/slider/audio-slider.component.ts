@@ -40,8 +40,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   }`]
 })
 export class AudioSliderComponent {
-  @Input() value: number;
-  @Input() max: number;
+  // Refer TS-7-1 from the wiki.
+  @Input() value!: number;
+  @Input() max!: number;
   @Input() thumbLabel = false;
   @Output() valueChange = new EventEmitter<{ value: number }>();
   constructor() { }

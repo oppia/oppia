@@ -33,7 +33,7 @@ import { SubtitledHtml } from
   'domain/exploration/subtitled-html.model';
 import { Schema } from 'services/schema-default-value.service';
 import { SchemaConstants } from
-  'components/forms/schema-based-editors/schema-constants';
+  'components/forms/schema-based-editors/schema.constants';
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 import { WrittenTranslations } from
   'domain/exploration/WrittenTranslationsObjectFactory';
