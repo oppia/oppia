@@ -29,7 +29,8 @@ import { ProfileLinkImageBackendApiService } from
   styleUrls: []
 })
 export class ProfileLinkImageComponent implements OnInit {
-  // Check TS-7-1 in the TS Strict Mode wiki for reference.
+  // Angular lifecycle hooks are used to populate values, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
   @Input() username!: string;
   profileImageUrl: string | undefined;
   profilePicture: string | undefined;
