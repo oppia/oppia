@@ -723,6 +723,7 @@ _PARSER.add_argument(
     nargs='+'
     )
 
+
 def get_cmd(files):
     """Return the appropriate command to be run."""
     if files:
@@ -732,6 +733,7 @@ def get_cmd(files):
         cmd = [
             MYPY_CMD, '--exclude', rgx, '--config-file', CONFIG_FILE_PATH, '.']
     return cmd
+
 
 def main(args=None):
     """Runs the MyPy type checks."""
@@ -743,7 +745,8 @@ def main(args=None):
     if process == 0:
         python_utils.PRINT('Mypy type checks successful.')
     else:
-        python_utils.PRINT('Mypy type checks unsuccessful. Please fix the errors.')
+        python_utils.PRINT(
+            'Mypy type checks unsuccessful. Please fix the errors.')
         sys.exit(1)
     return process
 

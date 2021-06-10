@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import subprocess
-import tempfile
 
 from core.tests import test_utils
 from scripts import run_mypy_checks

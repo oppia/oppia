@@ -510,7 +510,8 @@
 /extensions/extensions.module.ts @vojtechjelinek
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
-/python_utils*.py @DubeySandeep
+/python_utils*.py @DubeySandeepf
+/mypy.ini @sajalasati
 
 
 # Restricted pages.

@@ -23,7 +23,7 @@ import base64
 import copy
 import datetime
 import os
-from typing import Any, List, Text
+from typing import Any, List, Text # pylint: disable=unused-import, import-only-modules
 
 from constants import constants
 from core.tests import test_utils
@@ -31,7 +31,7 @@ import feconf
 import python_utils
 import utils
 
-# TODO: Remove #type: ignore[attr-defined] from constants after introduction
+# TODO(#1234): Remove #type: ignore[attr-defined] from constants after introduction
 # of protobuf for constants
 
 

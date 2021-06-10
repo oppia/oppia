@@ -30,16 +30,17 @@ import re
 import string
 import sys
 import time
+from typing import (Any, Callable, Dict, Generator, Iterable, Iterator, List,
+    Text, Tuple, TypeVar, Union) # pylint: disable=unused-import, import-only-modules
 import unicodedata
 import zlib
-from typing import Any, Callable, Dict, Generator, Iterable, Iterator, List, Text, Tuple, TypeVar, Union # pylint: disable=unused-import
 
 from constants import constants
 import feconf
 import python_utils
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
-sys.path.insert(0, str(_YAML_PATH))
+sys.path.insert(0, python_utils.UNICODE(_YAML_PATH))
 
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
@@ -50,7 +51,7 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 U = TypeVar('U')
-DictListT = TypeVar('DictListT', Dict[Any, Any], List[Any])
+DictListType = TypeVar('DictListType', Dict[Any, Any], List[Any])
 
 # Every use of constants is followed by # type: ignore[attr-defined] because
 # mypy is not able to identify the attributes of constants but this will be
@@ -222,7 +223,7 @@ def dict_from_yaml(yaml_str):
 
 
 def recursively_remove_key(obj, key_to_remove):
-    # type: (DictListT, Text) -> None
+    # type: (DictListType, Text) -> None
     """Recursively removes keys from a list or dict.
 
     Args:
@@ -311,7 +312,7 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    if imghdr.what(None, h=str(content)) == 'png':
+    if imghdr.what(None, h=python_utils.UNICODE(content)) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
             python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
@@ -524,7 +525,8 @@ def get_human_readable_time_string(time_msec):
         str. A string representing the time.
     """
     return time.strftime(
-        str('%B %d %H:%M:%S'), time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[no-untyped-call]
+        python_utils.UNICODE('%B %d %H:%M:%S'),
+        time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[no-untyped-call]
 
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
@@ -1021,7 +1023,7 @@ def compress_to_zlib(data):
     Returns:
         str. Compressed data string.
     """
-    return zlib.compress(str(data))
+    return zlib.compress(python_utils.UNICODE(data))
 
 
 def decompress_from_zlib(data):
@@ -1034,7 +1036,7 @@ def decompress_from_zlib(data):
     Returns:
         str. Decompressed data string.
     """
-    return zlib.decompress(str(data))
+    return zlib.decompress(python_utils.UNICODE(data))
 
 
 def compute_list_difference(list_a, list_b):
