@@ -38,15 +38,15 @@ import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 interface EventToCodes {
-  enter?,
-  tab?,
-  shiftTab?,
+  enter?;
+  tab?;
+  shiftTab?;
 }
 
 interface KeyboardEvent {
-  keyCode?: number,
-  shiftKey?: boolean,
-  currentTarget?: string
+  keyCode?: number;
+  shiftKey?: boolean;
+  currentTarget?: string;
 }
 
 @Component({
@@ -222,7 +222,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     let dataUrl = await this.userService.getProfileImageDataUrlAsync();
     this.profilePictureDataUrl = decodeURIComponent(dataUrl);
   }
-
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
