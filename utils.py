@@ -317,7 +317,7 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    if imghdr.what(None, h=python_utils.UNICODE(content)) == 'png':
+    if imghdr.what(None, h=content) == 'png': # type: ignore[call-overload]
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
             python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
