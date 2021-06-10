@@ -23,6 +23,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 import subprocess
+import sys
 
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
@@ -716,33 +717,31 @@ Type checking script for Oppia codebase.
 _PARSER.add_argument(
     '--files',
     help='Files to type-check',
-    action='extend',
+    action='append',
     nargs='+'
     )
 
-
-def main(args=None):
-    """Runs the MyPy type checks."""
-    unused_parsed_args = _PARSER.parse_args(args=args)
-
-    print('Starting Mypy type checks.')
-
-    if unused_parsed_args.files:
-        cmd = (
-            [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] +
-            unused_parsed_args.files)
-
+def _get_cmd(files):
+    if files:
+        cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
     else:
         rgx = '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES)
         cmd = [
             MYPY_CMD, '--exclude', rgx, '--config-file', CONFIG_FILE_PATH, '.']
+    return cmd
 
+def main(args=None):
+    """Runs the MyPy type checks."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
+    print('Starting Mypy type checks.')
+    cmd = _get_cmd(getattr(unused_parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)
 
     if process == 0:
         print('Mypy type checks successful.')
     else:
         print('Mypy type checks unsuccessful. Please fix the errors.')
+        sys.exit(1)
     return process
 
 
