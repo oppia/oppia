@@ -45,7 +45,7 @@ module.exports = {
 
   create: function(context) {
     var allowedTerminatingPunctuations = ['.', '?', ';', ',', '{', '^', ')',
-      '}', '>',];
+      '}', '>'];
     var allowedPhrases = [
       '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
       'eslint-enable', 'http://', 'https://', '----'];

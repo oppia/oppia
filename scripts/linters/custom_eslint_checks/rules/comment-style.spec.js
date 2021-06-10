@@ -43,7 +43,7 @@ ruleTester.run('test-message-style', rule, {
     // @ts-expect-error
     var s = 9;
     `,
-`/**
+   `/**
  * @fileoverview Definitions for rich text components.
  *
  * NOTE TO DEVELOPERS: If a new inline element is added (i.e 'is_block_element'
