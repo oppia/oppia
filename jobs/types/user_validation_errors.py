@@ -70,4 +70,4 @@ class ArchivedModelNotMarkedDeletedError(
 
     def __init__(self, model):
         super(ArchivedModelNotMarkedDeletedError, self).__init__(model)
-        self.message = 'mark archived model as deleted'
+        self.message = 'model is archived but not marked as deleted'

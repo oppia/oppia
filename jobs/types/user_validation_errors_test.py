@@ -160,4 +160,5 @@ class ArchivedModelNotMarkedDeletedErrorTests(
         self.assertEqual(
             error.message,
             'ArchivedModelNotMarkedDeletedError in '
-            'UserQueryModel(id=\'test\'): mark archived model as deleted')
+            'UserQueryModel(id=\'test\'): model is archived '
+            'but not marked as deleted')
