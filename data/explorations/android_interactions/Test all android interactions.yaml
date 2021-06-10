@@ -62,6 +62,13 @@ states:
       - hint_content:
           content_id: hint_2
           html: <p>Remember that two halves, when added together, make one whole.</p>
+      - hint_content:
+          content_id: hint_3
+          html: <p>One half is a fraction resulting from dividing one by two.</p>
+      - hint_content:
+          content_id: hint_4
+          html: <p>Half in fraction&nbsp;is represented by 1 in the numerator and
+            2 in the denominator.</p>
       id: FractionInput
       solution:
         answer_is_exclusive: true
@@ -75,7 +82,7 @@ states:
           html: <p>Half of something has one part in the numerator for every two parts
             in the denominator.</p>
     linked_skill_id: null
-    next_content_id_index: 3
+    next_content_id_index: 5
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -84,6 +91,8 @@ states:
         default_outcome: {}
         feedback_1: {}
         hint_2: {}
+        hint_3: {}
+        hint_4: {}
         solution: {}
     solicit_answer_details: false
     written_translations:
@@ -93,6 +102,8 @@ states:
         default_outcome: {}
         feedback_1: {}
         hint_2: {}
+        hint_3: {}
+        hint_4: {}
         solution: {}
   Introduction:
     card_is_checkpoint: true
