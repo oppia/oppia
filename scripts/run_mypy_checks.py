@@ -25,6 +25,8 @@ import os
 import subprocess
 import sys
 
+import python_utils
+
 # List of directories whose files won't be type-annotated ever.
 EXCLUDED_DIRECTORIES = [
     'proto_files/',
@@ -721,7 +723,8 @@ _PARSER.add_argument(
     nargs='+'
     )
 
-def _get_cmd(files):
+def get_cmd(files):
+    """Return the appropriate command to be run."""
     if files:
         cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
     else:
@@ -733,14 +736,14 @@ def _get_cmd(files):
 def main(args=None):
     """Runs the MyPy type checks."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    print('Starting Mypy type checks.')
+    python_utils.PRINT('Starting Mypy type checks.')
     cmd = _get_cmd(getattr(unused_parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)
 
     if process == 0:
-        print('Mypy type checks successful.')
+        python_utils.PRINT('Mypy type checks successful.')
     else:
-        print('Mypy type checks unsuccessful. Please fix the errors.')
+        python_utils.PRINT('Mypy type checks unsuccessful. Please fix the errors.')
         sys.exit(1)
     return process
 
