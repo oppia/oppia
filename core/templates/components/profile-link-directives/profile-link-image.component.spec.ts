@@ -19,7 +19,7 @@ import { ProfileLinkImageBackendApiService } from './profile-link-image-backend-
 import { ProfileLinkImageComponent } from './profile-link-image.component';
 
 /**
- * @fileoverview Unit tests for ProfileLinkImageComponent
+ * @fileoverview Unit tests for ProfileLinkImageComponent.
  */
 
 describe('ProfileLinkImageComponent', () => {
@@ -51,17 +51,17 @@ describe('ProfileLinkImageComponent', () => {
       'default-image-url');
 
     spyOn(profileLinkImageBackendApiService, 'fetchProfilePictureDataAsync')
-      .and.returnValue(Promise.resolve('base64-profile-picture'));
+      .and.returnValue(Promise.resolve('path/to/base64-profile-picture-url'));
 
     component.ngOnInit();
     tick();
 
     expect(component.profileImageUrl).toBe(
       '/preferenceshandler/profile_picture_by_username/user1');
-    expect(component.profilePicture).toBe('base64-profile-picture');
+    expect(component.profilePicture).toBe('path/to/base64-profile-picture-url');
   }));
 
-  it('should get default profile picture if user\' profile picture data is' +
+  it('should get default profile picture if user\'s profile picture data is' +
     ' not available', fakeAsync(() => {
     component.username = 'user1';
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(

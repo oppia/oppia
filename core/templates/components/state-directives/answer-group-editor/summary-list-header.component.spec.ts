@@ -16,7 +16,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SummaryListHeaderComponent } from './summary-list-header.component';
 
 /**
- * @fileoverview Unit tests for SummaryListHeaderComponent
+ * @fileoverview Unit tests for SummaryListHeaderComponent.
  */
 
 describe('SummaryListHeaderComponent', () => {

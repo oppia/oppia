@@ -79,18 +79,11 @@ describe('Outcome Feedback Editor Component', () => {
       hasNonemptyFeedback: () => true
     };
 
+    expect(component.outcome.feedback.html).toBe(
+      '<p> Previous HTML string </p>');
+
     component.updateHtml('<p> New HTML string </p>');
 
     expect(component.outcome.feedback.html).toBe('<p> New HTML string </p>');
-  });
-
-  it('should not update html if new html string is same as old', () => {
-    component.outcome = {
-      feedback: {
-        html: '<p> Previous HTML string </p>'
-      },
-      hasNonemptyFeedback: () => true
-    };
-    component.updateHtml('<p> Previous HTML string </p>');
   });
 });

@@ -85,10 +85,12 @@ describe('Audio File Uploader Component', () => {
       files: files
     };
     spyOn(component.fileChange, 'emit');
+    spyOn(component.fileClear, 'emit');
 
     component.addAudio(new Event('add'));
 
     expect(component.fileChange.emit).toHaveBeenCalledWith(files[0]);
+    expect(component.fileClear.emit).not.toHaveBeenCalled();
   });
 
   it('should emit fileClear event if file is not valid', () => {
@@ -100,10 +102,12 @@ describe('Audio File Uploader Component', () => {
       ]
     };
     spyOn(component.fileClear, 'emit');
+    spyOn(component.fileChange, 'emit');
 
     component.addAudio(new Event('add'));
 
     expect(component.fileClear.emit).toHaveBeenCalled();
+    expect(component.fileChange.emit).not.toHaveBeenCalled();
   });
 
   it('should emit fileClear event if no file is uploaded', () => {
@@ -111,9 +115,11 @@ describe('Audio File Uploader Component', () => {
       files: []
     };
     spyOn(component.fileClear, 'emit');
+    spyOn(component.fileChange, 'emit');
 
     component.addAudio(new Event('add'));
 
     expect(component.fileClear.emit).toHaveBeenCalled();
+    expect(component.fileChange.emit).not.toHaveBeenCalled();
   });
 });

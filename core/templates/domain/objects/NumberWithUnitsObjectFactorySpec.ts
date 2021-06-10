@@ -211,7 +211,7 @@ describe('NumberWithUnitsObjectFactory', () => {
         },
         units: [
           {
-            unit: 'Kg',
+            unit: 'kg',
             exponent: 2
           }
         ]

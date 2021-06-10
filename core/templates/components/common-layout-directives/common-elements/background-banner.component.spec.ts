@@ -17,7 +17,7 @@ import { BackgroundBannerComponent } from './background-banner.component';
 
 
 /**
- * @fileoverview Unit tests for BackgroundBannerComponent
+ * @fileoverview Unit tests for BackgroundBannerComponent.
  */
 
 describe('BackgroundBannerComponent', () => {

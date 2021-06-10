@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for SkillCreationService
+ * @fileoverview Unit test for SkillCreationService.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -63,6 +63,11 @@ describe('SkillCreationService', () => {
         .STATUS_UNCHANGED);
 
     skillCreationService.disableSkillDescriptionStatusMarker();
+
+    expect(skillCreationService.skillDescriptionStatusMarker).toBe(
+      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
+        .STATUS_DISABLED);
+
     skillCreationService.resetSkillDescriptionStatusMarker();
 
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
