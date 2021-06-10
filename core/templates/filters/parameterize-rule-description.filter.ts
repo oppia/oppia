@@ -155,8 +155,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         } else if (varType === 'Graph') {
           replacementText = '[reference graph]';
         } else if (varType === 'Fraction') {
-          replacementText = Fraction
-            .fromDict(inputs[varName]).toString();
+          replacementText = Fraction.fromDict(inputs[varName]).toString();
         } else if (varType === 'NumberWithUnits') {
           replacementText = NumberWithUnitsObjectFactory
             .fromDict(inputs[varName]).toString();

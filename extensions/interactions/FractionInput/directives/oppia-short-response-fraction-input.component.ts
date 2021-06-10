@@ -37,8 +37,7 @@ export class ShortResponseFractionInput {
   ngOnInit(): void {
     const fraction: FractionAnswer = (
       this.htmlEscaperService.escapedJsonToObj(this.answer) as FractionAnswer);
-    this.escapedAnswer = Fraction.fromDict(
-      fraction).toString();
+    this.escapedAnswer = Fraction.fromDict(fraction).toString();
   }
 }
 

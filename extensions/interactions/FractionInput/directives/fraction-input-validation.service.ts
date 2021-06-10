@@ -20,8 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { FractionAnswer } from 'interactions/answer-defs';
-import { Fraction } from
-  'domain/objects/fraction.model';
+import { Fraction } from 'domain/objects/fraction.model';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { AppConstants } from 'app.constants';

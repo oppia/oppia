@@ -155,8 +155,7 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
   submitAnswer(): void {
     const answer: string = this.answer;
     try {
-      const fraction = Fraction.fromRawInputString(
-        answer);
+      const fraction = Fraction.fromRawInputString(answer);
       if (this.requireSimplestForm &&
         !fraction.isEqualTo(fraction.convertToSimplestForm())
       ) {

@@ -16,8 +16,7 @@
  * @fileoverview unit tests for number with units object type factory service.
  */
 
-import { Fraction } from
-  'domain/objects/fraction.model';
+import { Fraction } from 'domain/objects/fraction.model';
 import { NumberWithUnits, NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { ObjectsDomainConstants } from

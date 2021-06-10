@@ -105,7 +105,7 @@ export class Solution {
     } else if (interactionId === 'NumberWithUnits') {
       correctAnswer = (new NumberWithUnitsObjectFactory(
         new UnitsObjectFactory())).fromDict(
-        <NumberWithUnitsAnswer> this.correctAnswer).toString();
+          <NumberWithUnitsAnswer> this.correctAnswer).toString();
     } else if (interactionId === 'DragAndDropSortInput') {
       let formatRtePreview = new FormatRtePreviewPipe(new CapitalizePipe());
       correctAnswer = [];
