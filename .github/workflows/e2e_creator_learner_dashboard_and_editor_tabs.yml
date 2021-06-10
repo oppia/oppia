@@ -23,6 +23,7 @@ jobs:
           architecture: 'x64'
       - name: Setup python by installing wheel
         run: pip install wheel==0.35.0
+      - uses: ./.github/actions/merge
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - id: check-risk
