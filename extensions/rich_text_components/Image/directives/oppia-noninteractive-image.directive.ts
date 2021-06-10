@@ -87,7 +87,10 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
                 .then(function(objectUrl) {
                   ctrl.isTryAgainShown = false;
                   ctrl.isLoadingIndicatorShown = false;
-                  ctrl.imageUrl = objectUrl;
+                  ctrl.imageUrl = (
+                    ctrl.filepath.endsWith('.svg') ?
+                    objectUrl.changingThisBreaksApplicationSecurity :
+                    objectUrl);
                   $rootScope.$applyAsync();
                 }, function() {
                   ctrl.isTryAgainShown = true;
@@ -116,7 +119,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
                 const mimeType = base64Url.split(';')[0];
                 if (mimeType === 'data:image/svg+xml') {
                   ctrl.imageUrl = SvgSanitizerService.getTrustedSvgResourceUrl(
-                    base64Url);
+                    base64Url).changingThisBreaksApplicationSecurity;
                 } else {
                   ctrl.imageUrl = base64Url;
                 }

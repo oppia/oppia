@@ -68,7 +68,7 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
             !(ContextService.getEntityType() === ENTITY_TYPE.SKILL)) {
             ImagePreloaderService.getImageUrlAsync(svgFilename)
               .then(function(objectUrl) {
-                ctrl.imageUrl = objectUrl;
+                ctrl.imageUrl = objectUrl.changingThisBreaksApplicationSecurity;
                 $rootScope.$applyAsync();
               });
           } else {
@@ -88,7 +88,8 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
                   ImageLocalStorageService.isInStorage(svgFilename))) {
                 ctrl.imageUrl = SvgSanitizerService.getTrustedSvgResourceUrl(
                   ImageLocalStorageService.getRawImageData(
-                    mathExpressionContent.svg_filename));
+                    mathExpressionContent.svg_filename))
+                  .changingThisBreaksApplicationSecurity;
               } else {
                 ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
                   ContextService.getEntityType(), ContextService.getEntityId(),

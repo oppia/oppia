@@ -53,7 +53,8 @@ angular.module('oppia').component('oppiaNoninteractiveSvgdiagram', {
           ContextService.getImageSaveDestination() ===
           IMAGE_SAVE_DESTINATION_LOCAL_STORAGE) {
           ctrl.svgUrl = SvgSanitizerService.getTrustedSvgResourceUrl(
-            ImageLocalStorageService.getRawImageData(ctrl.filename));
+            ImageLocalStorageService.getRawImageData(ctrl.filename))
+            .changingThisBreaksApplicationSecurity;
         } else {
           ctrl.svgUrl = AssetsBackendApiService.getImageUrlForPreview(
             ContextService.getEntityType(), ContextService.getEntityId(),

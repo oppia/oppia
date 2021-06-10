@@ -86,7 +86,9 @@ describe('oppiaNoninteractiveSvgdiagram with image save destination as' +
   };
 
   const mockSvgSanitizerService = {
-    getTrustedSvgResourceUrl: (url) => url
+    getTrustedSvgResourceUrl: (url) => {
+      return { changingThisBreaksApplicationSecurity: url };
+    }
   };
 
   beforeEach(angular.mock.module('oppia'));
