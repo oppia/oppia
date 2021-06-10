@@ -33,10 +33,9 @@ export class ProfileLinkImageBackendApiService {
   constructor(
     private http: HttpClient
   ) {}
-
-  async fetchProfilePictureDataAsync(profileImageUrl: string):
   // It will return a 'null' Promise when the user is not logged in or has not
   // uploaded a profile picture, or the player is in preview mode.
+  async fetchProfilePictureDataAsync(profileImageUrl: string):
     Promise<string | null> {
     // A URL encoded base64 image is treated as unsafe by Angular. This is
     // because angular's security doesn't allow anything outside the following
