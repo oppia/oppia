@@ -24,21 +24,23 @@ import { NgModule } from '@angular/core';
 import { NgbModalModule, NgbPopoverModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { MaterialModule } from './material.module';
+import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
 import { DirectivesModule } from 'directives/directives.module';
 import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { FormsModule } from '@angular/forms';
+import { MaterialModule } from './material.module';
+import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { SharedFormsModule } from './forms/shared-forms.module';
 import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
-import { SharedFormsModule } from './forms/shared-forms.module';
-import { ObjectComponentsModule } from 'objects/object-components.module';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 
 
 // Components.
+import { AudioBarComponent } from 'pages/exploration-player-page/layout-directives/audio-bar.component';
 import { ExplorationEmbedButtonModalComponent } from './button-directives/exploration-embed-button-modal.component';
 import { BackgroundBannerComponent } from './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from './common-layout-directives/common-elements/attribution-guide.component';
@@ -76,9 +78,17 @@ import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { CorrectnessFooterComponent } from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
 import { ContinueButtonComponent } from 'pages/exploration-player-page/learner-experience/continue-button.component';
 import { QuestionDifficultySelectorComponent } from './question-difficulty-selector/question-difficulty-selector.component';
+import { TopNavigationBarWrapperComponent } from 'pages/exploration-editor-page/top-navigation-bar-wrapper.component';
+import { SideNavigationBarWrapperComponent } from 'pages/exploration-editor-page/side-navigation-bar-wrapper.component';
+import { BaseContentComponent } from '../base-components/base-content.component';
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
+import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
+import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
+import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
+import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
+import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
 
 
 // Directives.
@@ -111,6 +121,24 @@ import { TranslateCustomParser } from 'pages/translate-custom-parser';
 import { MissingTranslationCustomHandler } from 'pages/missing-translation-custom-handler';
 import constants from 'assets/constants';
 
+import { HammerGestureConfig } from '@angular/platform-browser';
+import * as hammer from 'hammerjs';
+
+
+export class MyHammerConfig extends HammerGestureConfig {
+  overrides = {
+    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
+    pinch: { enable: false },
+    rotate: { enable: false },
+  };
+
+  options = {
+    cssProps: {
+      userSelect: true
+    }
+  };
+}
+
 const toastrConfig = {
   allowHtml: false,
   iconClasses: {
@@ -130,6 +158,7 @@ const toastrConfig = {
   imports: [
     BrowserModule,
     CommonModule,
+    CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
     MaterialModule,
@@ -188,22 +217,34 @@ const toastrConfig = {
     TranslateDefaultParser,
     AngularFireAuth,
     {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+    {
+      provide: HAMMER_GESTURE_CONFIG,
+      useClass: MyHammerConfig
+    }
   ],
 
   declarations: [
+    AlertMessageComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     AttributionGuideComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
+    ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     FilterForMatchingSubstringPipe,
+    HintAndSolutionButtonsComponent,
     I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
@@ -215,6 +256,7 @@ const toastrConfig = {
     PreviewThumbnailComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    SideNavigationBarWrapperComponent,
     PromoBarComponent,
     QuestionDifficultySelectorComponent,
     SelectSkillModalComponent,
@@ -234,6 +276,7 @@ const toastrConfig = {
     ThumbnailDisplayComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     TruncateAndCapitalizePipe,
     SummarizeNonnegativeNumberPipe,
     TruncatePipe,
@@ -244,6 +287,8 @@ const toastrConfig = {
   ],
 
   entryComponents: [
+    AlertMessageComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
@@ -252,8 +297,10 @@ const toastrConfig = {
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    BaseContentComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingMessageComponent,
@@ -261,12 +308,16 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
     StateSkillEditorComponent,
     ExplorationEmbedButtonModalComponent,
     OutcomeFeedbackEditorComponent,
+    HintAndSolutionButtonsComponent,
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     I18nLanguageSelectorComponent,
@@ -275,11 +326,13 @@ const toastrConfig = {
     QuestionDifficultySelectorComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
+    SideNavigationBarWrapperComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     LearnerDashboardIconsComponent
   ],
@@ -301,17 +354,25 @@ const toastrConfig = {
     SharedPipesModule,
     TranslateModule,
     // Components, directives, and pipes.
+    AlertMessageComponent,
     AttributionGuideComponent,
+    AudioBarComponent,
     AudioFileUploaderComponent,
     AlertMessageComponent,
     BackgroundBannerComponent,
+    BaseContentComponent,
     CorrectnessFooterComponent,
     ContinueButtonComponent,
     CreateNewSkillModalComponent,
     CreateActivityButtonComponent,
     CreateActivityModalComponent,
+    DisplaySolutionModalComponent,
+    DisplaySolutionInterstititalModalComponent,
+    DisplayHintModalComponent,
+    ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     CollectionSummaryTileComponent,
+    HintAndSolutionButtonsComponent,
     I18nLanguageSelectorComponent,
     InputResponsePairComponent,
     LazyLoadingComponent,
@@ -325,8 +386,8 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OutcomeFeedbackEditorComponent,
     QuestionDifficultySelectorComponent,
+    SideNavigationBarWrapperComponent,
     StateSkillEditorComponent,
-    SharingLinksComponent,
     SelectSkillModalComponent,
     SideNavigationBarComponent,
     SharingLinksComponent,
@@ -338,6 +399,7 @@ const toastrConfig = {
     TakeBreakModalComponent,
     ThumbnailDisplayComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TopNavigationBarWrapperComponent,
     WarningsAndAlertsComponent,
     UploadActivityModalComponent,
     WrapTextWithEllipsisPipe,

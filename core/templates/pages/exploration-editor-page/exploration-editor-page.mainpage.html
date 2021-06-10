@@ -42,7 +42,8 @@
                   <nav class="navbar navbar-expand navbar-light oppia-navbar oppia-prevent-selection" role="navigation"
                        headroom tolerance="0" offset="0">
                     <div class="navbar-container">
-                      <top-navigation-bar></top-navigation-bar>
+                      <!-- TODO(#12518): Replace usage of top-navigation-wrapper component with top-navigation-bar-component -->
+                      <oppia-top-navigation-wrapper></oppia-top-navigation-wrapper>
                       <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
                         <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
 
@@ -101,8 +102,8 @@
                     </div>
                   </div>
                 </noscript>
-
-                <oppia-side-navigation-bar [display]="isSidebarShown()"></oppia-side-navigation-bar>
+                <!-- TODO(#12518): Replace usage of top-navigation-wrapper component with top-navigation-bar-component -->
+                <oppia-side-navigation-bar-wrapper></oppia-side-navigation-bar-wrapper>
                 <editor-navigation></editor-navigation>
               </div>
             </div>
