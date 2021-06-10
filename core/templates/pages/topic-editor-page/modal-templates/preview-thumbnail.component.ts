@@ -37,8 +37,8 @@ export class PreviewThumbnailComponent {
   editableThumbnailDataUrl: string;
 
   constructor(
-     private contextService: ContextService,
-     private imageUploadHelperService: ImageUploadHelperService
+    private contextService: ContextService,
+    private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
   ngOnInit(): void {

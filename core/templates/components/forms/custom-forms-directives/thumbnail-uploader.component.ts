@@ -58,9 +58,11 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
   newThumbnailDataUrl: string;
   localStorageBgcolor: string;
   imageUploadUrlTemplate: string;
-  editableThumbnailDataUrl = (
+  hidePlaceholder = true;
+  placeholderImageUrl = (
     this.urlInterpolationService.getStaticImageUrl(
       '/icons/story-image-icon.png'));
+  editableThumbnailDataUrl: string;
   transformedData: string;
   parsedResponse;
   encodedImageURI: string;
@@ -89,8 +91,6 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
           this.contextService.getEntityType(),
           this.contextService.getEntityId()));
       this.uploadedImage = this.editableThumbnailDataUrl;
-    } else {
-      this.editableThumbnailDataUrl = this.placeholderImageDataUrl;
     }
   }
 
@@ -124,6 +124,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
       this.uploadedImage = this.editableThumbnailDataUrl;
     }
     this.thumbnailIsLoading = true;
+    this.hidePlaceholder = false;
   }
 
   saveThumbnailBgColor(newBgColor: string): void {
@@ -201,6 +202,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
        this.imageUploadHelperService.generateImageFilename(
          data.dimensions.height, data.dimensions.width, 'svg');
       this.newThumbnailDataUrl = data.newThumbnailDataUrl;
+      this.hidePlaceholder = false;
       if (!this.useLocalStorage) {
         if (data.openInUploadMode) {
           this.tempImageName = (
