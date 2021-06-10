@@ -529,9 +529,10 @@ def get_human_readable_time_string(time_msec):
     Returns:
         str. A string representing the time.
     """
+    # Ignoring arg-type because we are preventing direct usage of 'str' for
+    # Python3 compatibilty.
     return time.strftime(
-        python_utils.UNICODE('%B %d %H:%M:%S'),
-        time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[no-untyped-call]
+        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[no-untyped-call,arg-type]
 
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
@@ -1028,7 +1029,9 @@ def compress_to_zlib(data):
     Returns:
         str. Compressed data string.
     """
-    return zlib.compress(python_utils.UNICODE(data))
+    # Ignoring arg-type because we are preventing direct usage of 'str' for
+    # Python3 compatibilty.
+    return zlib.compress(data) # type: ignore[arg-type]
 
 
 def decompress_from_zlib(data):
@@ -1041,7 +1044,9 @@ def decompress_from_zlib(data):
     Returns:
         str. Decompressed data string.
     """
-    return zlib.decompress(python_utils.UNICODE(data))
+    # Ignoring arg-type because we are preventing direct usage of 'str' for
+    # Python3 compatibilty.
+    return zlib.decompress(data) # type: ignore[arg-type]
 
 
 def compute_list_difference(list_a, list_b):
