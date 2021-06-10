@@ -75,7 +75,7 @@ export class QuestionPlayerEngineService {
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';
-    let N = Math.round(Math.random() * 1000);
+    const N = Math.round(Math.random() * 1000);
     for (let i = 0; i < N; i++) {
       randomSuffix += ' ';
     }
@@ -93,9 +93,9 @@ export class QuestionPlayerEngineService {
     }
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
-    let initialState = this.questions[0].getStateData();
+    const initialState = this.questions[0].getStateData();
 
-    let questionHtml = this.makeQuestion(initialState, []);
+    const questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
       return;
@@ -104,10 +104,10 @@ export class QuestionPlayerEngineService {
     this.setCurrentIndex(0);
     this.nextIndex = 0;
 
-    let interaction = initialState.interaction;
-    let nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    const interaction = initialState.interaction;
+    const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
-    let interactionId = interaction.id;
+    const interactionId = interaction.id;
     let interactionHtml = null;
 
     if (interactionId) {
@@ -115,7 +115,7 @@ export class QuestionPlayerEngineService {
         interactionId, interaction.customizationArgs, true, nextFocusLabel,
         null);
     }
-    let initialCard =
+    const initialCard =
       this.stateCardObjectFactory.createNewCard(
         null, questionHtml, interactionHtml, interaction,
         initialState.recordedVoiceovers,
@@ -132,7 +132,7 @@ export class QuestionPlayerEngineService {
   }
 
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    let interactionId = this.getNextStateData().interaction.id;
+    const interactionId = this.getNextStateData().interaction.id;
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
@@ -222,16 +222,16 @@ export class QuestionPlayerEngineService {
       return;
     }
 
-    let answerString = answer as string;
+    const answerString = answer as string;
     this.setAnswerIsBeingProcessed(true);
-    let oldState = this.getCurrentStateData();
-    let recordedVoiceovers = oldState.recordedVoiceovers;
-    let classificationResult = (
+    const oldState = this.getCurrentStateData();
+    const recordedVoiceovers = oldState.recordedVoiceovers;
+    const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
         null, oldState.interaction, answer,
         interactionRulesService));
-    let answerGroupIndex = classificationResult.answerGroupIndex;
-    let answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+    const answerGroupIndex = classificationResult.answerGroupIndex;
+    const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
     let taggedSkillMisconceptionId = null;
     if (oldState.interaction.answerGroups[answerGroupIndex]) {
       taggedSkillMisconceptionId =
@@ -242,15 +242,15 @@ export class QuestionPlayerEngineService {
     // Use angular.copy() to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    let outcome = angular.copy(classificationResult.outcome);
+    const outcome = angular.copy(classificationResult.outcome);
     // Compute the data for the next state.
-    let oldParams = {
+    const oldParams = {
       answer: answerString
     };
-    let feedbackHtml =
+    const feedbackHtml =
       this.makeFeedback(outcome.feedback.html, [oldParams]);
-    let feedbackContentId = outcome.feedback.contentId;
-    let feedbackAudioTranslations = (
+    const feedbackContentId = outcome.feedback.contentId;
+    const feedbackAudioTranslations = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
@@ -275,20 +275,20 @@ export class QuestionPlayerEngineService {
     }
     this.setAnswerIsBeingProcessed(false);
 
-    let interactionId = oldState.interaction.id;
-    let interactionIsInline = (
+    const interactionId = oldState.interaction.id;
+    const interactionIsInline = (
       !interactionId ||
       InteractionSpecsConstants.
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
-    let refreshInteraction = (
+    const refreshInteraction = (
       answerIsCorrect || interactionIsInline);
 
     this.nextIndex = this.currentIndex + 1;
-    let isFinalQuestion = (this.nextIndex === this.questions.length);
-    let onSameCard = !answerIsCorrect;
+    const isFinalQuestion = (this.nextIndex === this.questions.length);
+    const onSameCard = !answerIsCorrect;
 
-    let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextCard = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);

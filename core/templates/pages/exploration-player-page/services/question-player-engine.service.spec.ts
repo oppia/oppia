@@ -425,32 +425,43 @@ describe('Question player engine service ', () => {
   });
 
   it('should load questions when initialized', () => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'setQuestionPlayerIsOpen');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, successHandler, failHandler);
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(3);
   });
 
+  it('should set question player mode to true when initialized', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
+
+    expect(contextService.isInQuestionPlayerMode()).toBe(false);
+
+    questionPlayerEngineService.init(
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
+
+    expect(contextService.isInQuestionPlayerMode()).toBe(true);
+  });
+
   it('should update the current question ID when a new card is added', () => {
-    let successCallback = jasmine.createSpy('success');
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let submitAnswerSuccessCb = jasmine.createSpy('success');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
     let answer = 'answer';
     let interactionRulesService: InteractionRulesService;
     let answerClassificationResult = new AnswerClassificationResult(
-      outcomeObjectFactory
-        .createNew('default', '', '', []), 1, 0, 'default_outcome'
-    );
+      outcomeObjectFactory.createNew(
+        'default', '', '', []), 1, 0, 'default_outcome');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'setQuestionPlayerIsOpen');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(answerClassificationResult);
@@ -458,12 +469,12 @@ describe('Question player engine service ', () => {
       .and.callFake((html, envs) => html);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, successHandler, failHandler);
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
     let currentQuestion1 = questionPlayerEngineService.getCurrentQuestion();
     expect(currentQuestion1.getId()).toBe('questionId1');
 
     questionPlayerEngineService.submitAnswer(
-      answer, interactionRulesService, successCallback);
+      answer, interactionRulesService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
     let currentQuestion2 = questionPlayerEngineService.getCurrentQuestion();
 
@@ -471,10 +482,10 @@ describe('Question player engine service ', () => {
   });
 
   it('should return the current question Id', () => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'setQuestionPlayerIsOpen');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     expect(() => {
@@ -482,21 +493,21 @@ describe('Question player engine service ', () => {
     }).toThrowError('Cannot read property \'getId\' of undefined');
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, successHandler, failHandler);
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getCurrentQuestionId())
       .toBe('questionId1');
   });
 
   it('should return number of questions', () => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'setQuestionPlayerIsOpen');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, successHandler, failHandler);
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
     let totalQuestions = questionPlayerEngineService.getQuestionCount();
     expect(totalQuestions).toBe(3);
 
@@ -505,20 +516,20 @@ describe('Question player engine service ', () => {
     expect(totalQuestions).toBe(0);
 
     questionPlayerEngineService.init(
-      [singleQuestionBackendDict], successHandler, failHandler);
+      [singleQuestionBackendDict], initSuccessCb, initErrorCb);
     totalQuestions = questionPlayerEngineService.getQuestionCount();
     expect(totalQuestions).toBe(1);
   });
 
   it('should clear all questions', () => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'setQuestionPlayerIsOpen');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, successHandler, failHandler);
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(3);
 
@@ -528,9 +539,9 @@ describe('Question player engine service ', () => {
   });
 
   it('should return the language code correctly when new card is added', () => {
-    let successCallback = jasmine.createSpy('success');
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let submitAnswerSuccessCb = jasmine.createSpy('success');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
     let answer = 'answer';
     let interactionRulesService: InteractionRulesService;
     let answerClassificationResult = new AnswerClassificationResult(
@@ -538,7 +549,7 @@ describe('Question player engine service ', () => {
         .createNew('default', '', '', []), 1, 0, 'default_outcome'
     );
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+    spyOn(contextService, 'setQuestionPlayerIsOpen');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(answerClassificationResult);
@@ -546,20 +557,20 @@ describe('Question player engine service ', () => {
       .and.callFake((html, envs) => html);
 
     questionPlayerEngineService.init(
-      multipleQuestionsBackendDict, successHandler, failHandler);
+      multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
     let languageCode = questionPlayerEngineService.getLanguageCode();
 
     expect(languageCode).toBe('en');
 
     questionPlayerEngineService.submitAnswer(
-      answer, interactionRulesService, successCallback);
+      answer, interactionRulesService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
     expect(languageCode).toBe('br');
 
     questionPlayerEngineService.submitAnswer(
-      answer, interactionRulesService, successCallback);
+      answer, interactionRulesService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
@@ -574,8 +585,8 @@ describe('Question player engine service ', () => {
 
   it('should show warning message while loading a question ' +
     'if the question name is empty', () => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
 
     singleQuestionBackendDict.question_state_data
       .content.html = null;
@@ -585,34 +596,34 @@ describe('Question player engine service ', () => {
       .and.callFake((html, envs) => html);
 
     questionPlayerEngineService.init(
-      [singleQuestionBackendDict], successHandler, failHandler);
+      [singleQuestionBackendDict], initSuccessCb, initErrorCb);
 
     expect(alertsServiceSpy).toHaveBeenCalledWith(
       'Question name should not be empty.');
   });
 
   it('should not load questions if there are no questions', () => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    let initSuccessCb = jasmine.createSpy('success');
+    let initErrorCb = jasmine.createSpy('fail');
 
     let alertsServiceSpy = spyOn(
       alertsService, 'addWarning').and.returnValue();
 
     questionPlayerEngineService.init(
-      [], successHandler, failHandler);
+      [], initSuccessCb, initErrorCb);
 
     expect(alertsServiceSpy).toHaveBeenCalledWith(
       'There are no questions to display.');
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
+    expect(initSuccessCb).not.toHaveBeenCalled();
+    expect(initErrorCb).toHaveBeenCalled();
   });
 
   describe('on submitting answer ', () => {
     it('should call success callback if the submitted' +
       'answer is correct', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
@@ -625,34 +636,39 @@ describe('Question player engine service ', () => {
         .and.returnValue(answerClassificationResult);
 
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
+        multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
-      expect(successCallback).toHaveBeenCalled();
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
     });
 
     it('should not submit answer again if the answer ' +
       'is already being processed', () => {
-      let successCallback = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory
+          .createNew('default', '', '', []), 1, 0, 'default_outcome'
+      );
 
-      spyOn(answerClassificationService, 'getMatchingClassificationResult');
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
 
       questionPlayerEngineService.setAnswerIsBeingProcessed(true);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
-      expect(successCallback).not.toHaveBeenCalled();
+      expect(submitAnswerSuccessCb).not.toHaveBeenCalled();
     });
 
     it('should show warning message if the feedback ' +
       'content is empty', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
@@ -671,10 +687,10 @@ describe('Question player engine service ', () => {
       singleQuestionBackendDict.question_state_data
         .interaction.default_outcome.feedback.html = null;
       questionPlayerEngineService.init(
-        [singleQuestionBackendDict], successHandler, failHandler);
+        [singleQuestionBackendDict], initSuccessCb, initErrorCb);
 
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Feedback content should not be empty.');
@@ -682,9 +698,9 @@ describe('Question player engine service ', () => {
 
     it('should show warning message if the question ' +
       'name is empty', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
@@ -710,19 +726,19 @@ describe('Question player engine service ', () => {
         .and.callFake((html, envs) => html);
 
       questionPlayerEngineService.init(
-        [singleQuestionBackendDict], successHandler, failHandler);
+        [singleQuestionBackendDict], initSuccessCb, initErrorCb);
       questionPlayerEngineService.setCurrentIndex(0);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Question name should not be empty.');
     });
 
     it('should update the current index when a card is added', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
@@ -731,7 +747,7 @@ describe('Question player engine service ', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen').and.returnValue(null);
+      spyOn(contextService, 'setQuestionPlayerIsOpen');
       spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(answerClassificationService, 'getMatchingClassificationResult')
         .and.returnValue(answerClassificationResult);
@@ -739,9 +755,9 @@ describe('Question player engine service ', () => {
         .and.callFake((html, envs) => html);
 
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
+        multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(questionPlayerEngineService.getCurrentIndex()).toBe(0);
 
@@ -752,9 +768,9 @@ describe('Question player engine service ', () => {
 
     it('should not create next card if the existing ' +
       'card is the last one', () => {
-      let successCallback = jasmine.createSpy('success');
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let initSuccessCb = jasmine.createSpy('success');
+      let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
       let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
@@ -776,7 +792,7 @@ describe('Question player engine service ', () => {
 
       // We are using a stub backend dict which consists of three questions.
       questionPlayerEngineService.init(
-        multipleQuestionsBackendDict, successHandler, failHandler);
+        multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
 
       let createNewCardSpy = spyOn(
         stateCardObjectFactory, 'createNewCard').and.returnValue(sampleCard);
@@ -785,7 +801,7 @@ describe('Question player engine service ', () => {
 
       // Submitting answer to the first question.
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId1');
@@ -794,7 +810,7 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.recordNewCardAdded();
       // Submitting answer to the second question.
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId2');
@@ -803,7 +819,7 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.recordNewCardAdded();
       // Submitting answer to the last question.
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, successCallback);
+        answer, interactionRulesService, submitAnswerSuccessCb);
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId3');
