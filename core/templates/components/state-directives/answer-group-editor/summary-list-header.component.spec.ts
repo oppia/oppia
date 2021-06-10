@@ -35,15 +35,15 @@ describe('SummaryListHeaderComponent', () => {
   });
 
   it('should delete item', () => {
-    let eventToDelete: Event = new Event('event');
+    let eventToDeleteItem: Event = new Event('event');
     component.index = 1;
     spyOn(component.summaryDelete, 'emit');
 
-    component.deleteItem(eventToDelete);
+    component.deleteItem(eventToDeleteItem);
 
     expect(component.summaryDelete.emit).toHaveBeenCalledWith({
       index: 1,
-      event: eventToDelete
+      event: eventToDeleteItem
     });
   });
 });

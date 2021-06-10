@@ -226,19 +226,45 @@ describe('NumberWithUnitsObjectFactory', () => {
         'real',
         1,
         new Fraction(
-          false, 2, 1, 3),
+          false, 0, 0, 3),
         new Units(
-          [{unit: 'Kg', exponent: 2}])
-      )).toMathjsCompatibleString()).toBe('1 Kg^2');
+          [{unit: 'kg', exponent: 2}])
+      )).toMathjsCompatibleString()).toBe('1 kg^2');
 
       expect((new NumberWithUnits(
+        'fraction',
+        0,
+        new Fraction(
+          false, 2, 1, 3),
+        new Units(
+          [{unit: 'kg', exponent: 2}])
+      )).toMathjsCompatibleString()).toBe('2 1/3 kg^2');
+    });
+
+    it('should throw an error if a fraction is given with ' +
+      ' a real type number', () => {
+      expect(() => ((new NumberWithUnits(
+        'real',
+        1,
+        new Fraction(
+          false, 2, 1, 3),
+        new Units(
+          [{unit: 'kg', exponent: 2}])
+      )).toMathjsCompatibleString())).toThrowError(
+        'Number with type real cannot have a fraction part.');
+    });
+
+    it('should throw an error if a real is given with ' +
+      ' a fraction type number', () => {
+      expect(() => ((new NumberWithUnits(
         'fraction',
         1,
         new Fraction(
           false, 2, 1, 3),
         new Units(
-          [{unit: 'Kg', exponent: 2}])
-      )).toMathjsCompatibleString()).toBe('2 1/3 Kg^2');
+          [{unit: 'kg', exponent: 2}])
+      )).toMathjsCompatibleString())).toThrowError(
+        'Number with type fraction cannot have a real part.');
     });
   });
 });
