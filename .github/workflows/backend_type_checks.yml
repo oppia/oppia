@@ -28,7 +28,7 @@ jobs:
         run: pip2 install wheel==0.35.0
       - name: Install Third Party Dependencies
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: python2 -m scripts.install_third_party_libs
+        run: alias python=python2 && python2 -m scripts.install_third_party_libs
       - name: Run Mypy type checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: PYTHONIOENCODING=utf-8 python2 -m scripts.run_mypy_checks
