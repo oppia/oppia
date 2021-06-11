@@ -1,2 +1,0 @@
-mypy==0.902
-types-PyYAML==0.1.6
