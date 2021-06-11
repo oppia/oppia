@@ -149,7 +149,7 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
     user_models.UserQueryModel
 )
 class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
-    """DoFn to validate archived models marked deleted"""
+    """DoFn to validate archived models marked deleted."""
 
     def process(self, input_model):
         """Function that checks if archived model is marked deleted.
