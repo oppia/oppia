@@ -68,17 +68,20 @@ describe('Oppia CodeMirror Component', () => {
   it('should not allow undefined for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    spyOn(window.CodeMirror, 'MergeView').and.callFake(
-      (element: HTMLElement) => {
-        return <CodeMirror.MergeView.MergeViewEditor><unknown>{
-          editor: () => {
-            return { setValue: editSetValueSpy };
-          },
-          rightOriginal: () => {
-            return { setValue: rightOrgSetValueSpy };
-          }
-        };
-      });
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      CodeMirror: {
+        MergeView: () => {
+          return {
+            editor: () => {
+              return { setValue: editSetValueSpy };
+            },
+            rightOriginal: () => {
+              return { setValue: rightOrgSetValueSpy };
+            }
+          };
+        }
+      }
+    });
     component.ngAfterViewInit();
     let changes: SimpleChanges = {
       leftValue: {
@@ -109,17 +112,20 @@ describe('Oppia CodeMirror Component', () => {
   it('should watch for changes and set value for left or right pane', () => {
     const editSetValueSpy = jasmine.createSpy('editSetValueSpy');
     const rightOrgSetValueSpy = jasmine.createSpy('rightOrgSetValueSpy');
-    spyOn(window.CodeMirror, 'MergeView').and.callFake(
-      (element: HTMLElement) => {
-        return <CodeMirror.MergeView.MergeViewEditor><unknown>{
-          editor: () => {
-            return { setValue: editSetValueSpy };
-          },
-          rightOriginal: () => {
-            return { setValue: rightOrgSetValueSpy };
-          }
-        };
-      });
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      CodeMirror: {
+        MergeView: () => {
+          return {
+            editor: () => {
+              return { setValue: editSetValueSpy };
+            },
+            rightOriginal: () => {
+              return { setValue: rightOrgSetValueSpy };
+            }
+          };
+        }
+      }
+    });
     component.ngAfterViewInit();
     const changes: SimpleChanges = {
       leftValue: {

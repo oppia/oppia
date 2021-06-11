@@ -25,9 +25,9 @@ export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  'thumbnail_filename': string;
-  'thumbnail_bg_color': string;
-  'url_fragment': string;
+  'thumbnail_filename': string | null;
+  'thumbnail_bg_color': string | null;
+  'url_fragment': string | null;
 }
 
 export interface SkillIdToDescriptionMap {
@@ -39,14 +39,14 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  _thumbnailFilename: string;
-  _thumbnailBgColor: string;
-  _urlFragment: string;
+  _thumbnailFilename: string | null;
+  _thumbnailBgColor: string | null;
+  _urlFragment: string | null;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string, thumbnailBgColor: string,
-      urlFragment: string) {
+      thumbnailFilename: string | null, thumbnailBgColor: string | null,
+      urlFragment: string | null) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -81,11 +81,11 @@ export class Subtopic {
     this._title = title;
   }
 
-  getUrlFragment(): string {
+  getUrlFragment(): string | null {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string): void {
+  setUrlFragment(urlFragment: string | null): void {
     this._urlFragment = urlFragment;
   }
 
@@ -162,15 +162,15 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string {
+  getThumbnailFilename(): string | null {
     return this._thumbnailFilename;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor(thumbnailBgColor: string | null): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getThumbnailBgColor(): string {
+  getThumbnailBgColor(): string | null {
     return this._thumbnailBgColor;
   }
 

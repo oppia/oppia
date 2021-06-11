@@ -52,7 +52,8 @@ export class CodemirrorMergeviewComponent implements
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {
-      this.codeMirrorInstance = window.CodeMirror.MergeView(
+      this.codeMirrorInstance =
+      (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
         this.elementRef.nativeElement,
         {
           value: this.leftValue !== undefined ? this.leftValue : ' ',
