@@ -144,6 +144,7 @@ RERUN_POLICIES = {
     'profilefeatures': RERUN_POLICY_NEVER,
     'profilemenu': RERUN_POLICY_NEVER,
     'publication': RERUN_POLICY_KNOWN_FLAKES,
+    'releasecoordinatorpagefeatures': RERUN_POLICY_NEVER,
     'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
     'subscriptions': RERUN_POLICY_KNOWN_FLAKES,
     'topicandstoryeditor': RERUN_POLICY_ALWAYS,
