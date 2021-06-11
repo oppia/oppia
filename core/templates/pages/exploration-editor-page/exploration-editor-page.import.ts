@@ -55,3 +55,4 @@ require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
+require('base-components/base-content.component.ts');

@@ -64,7 +64,7 @@
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateCacheService } from 'ngx-translate-cache';
 
-import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector, NgZone } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -613,6 +613,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static musicNotesInputRulesService: MusicNotesInputRulesService;
   static musicNotesInputValidationService: MusicNotesInputValidationService;
   static musicPhrasePlayerService: MusicPhrasePlayerService;
+  static ngZone: NgZone;
   static normalizeWhitespacePipe: NormalizeWhitespacePipe;
   static normalizeWhitespacePunctuationAndCasePipe:
     NormalizeWhitespacePunctuationAndCasePipe;
@@ -898,6 +899,7 @@ private multipleChoiceInputValidationService:
 private musicNotesInputRulesService: MusicNotesInputRulesService,
 private musicNotesInputValidationService: MusicNotesInputValidationService,
 private musicPhrasePlayerService: MusicPhrasePlayerService,
+private ngZone: NgZone,
 private normalizeWhitespacePipe: NormalizeWhitespacePipe,
 private normalizeWhitespacePunctuationAndCasePipe:
   NormalizeWhitespacePunctuationAndCasePipe,
@@ -1262,6 +1264,7 @@ private injector: Injector
       this.musicNotesInputValidationService);
     OppiaAngularRootComponent.musicPhrasePlayerService = (
       this.musicPhrasePlayerService);
+    OppiaAngularRootComponent.ngZone = this.ngZone;
     OppiaAngularRootComponent.normalizeWhitespacePipe = (
       this.normalizeWhitespacePipe);
     OppiaAngularRootComponent.normalizeWhitespacePunctuationAndCasePipe = (
