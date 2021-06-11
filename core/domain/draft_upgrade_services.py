@@ -114,18 +114,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        for change in draft_change_list:
-            if (change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                # Converting the answer groups depends on getting an
-                # exploration state of v45, because we need to add a
-                # customization_arg for numeric-input interaction to disable
-                # the ability of user to enter input less than zero.
-                # Since we do not yet support passing an exploration state of a
-                # given version into draft conversion functions, we throw an
-                # Exception to indicate that the conversion cannot be completed.
-                raise InvalidDraftConversionException(
-                    'Conversion cannot be completed.')
         return draft_change_list
 
     @classmethod

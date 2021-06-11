@@ -185,9 +185,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v45, 1, 2, self.EXP_ID)
         )
-        # Verify that changes which include answer groups are
-        # not upgraded to v45.
-        self.assertIsNone(migrated_draft_change_list_v46)
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v45_dict_list = [
