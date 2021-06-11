@@ -122,6 +122,7 @@
     "oppia/comment-style": "error",
     "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
+    "oppia/directive-scope": "error",
     "oppia/no-testonly": "error",
     "oppia/sorted-dependencies": "error",
     "oppia/test-message-style": "error",
