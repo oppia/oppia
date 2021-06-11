@@ -21,11 +21,16 @@ import { Pipe, PipeTransform } from '@angular/core';
 // Note that this filter does not truncate at the middle of a word.
 @Pipe({name: 'truncateAndCapitalize'})
 export class TruncateAndCapitalizePipe implements PipeTransform {
-  transform(input: string, maxNumberOfCharacters: number): string {
+  // 'maxNumberOfCharacters' can be set to 'null' for returning the entire input
+  // string with the first letter capitalized.
+  transform(input: string, maxNumberOfCharacters: number | null): string {
     if (!input) {
       return input;
     }
-    let words = input.trim().match(/\S+/g);
+    // The following regexp match will only return 'null' on an empty input
+    // string, the condition is already being checked above.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    let words = input.trim().match(/\S+/g)!;
 
     // Capitalize the first word and add it to the result.
     let result = words[0].charAt(0).toUpperCase() + words[0].slice(1);

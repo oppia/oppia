@@ -20,7 +20,7 @@ import { TruncateAndCapitalizePipe } from
   'filters/string-utility-filters/truncate-and-capitalize.pipe';
 
 describe('Testing filters', function() {
-  let truncateAndCapitalizePipe: TruncateAndCapitalizePipe = null;
+  let truncateAndCapitalizePipe: TruncateAndCapitalizePipe;
   beforeEach(() => {
     truncateAndCapitalizePipe = new TruncateAndCapitalizePipe();
   });
