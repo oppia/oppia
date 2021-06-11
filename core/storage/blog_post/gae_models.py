@@ -172,8 +172,8 @@ class BlogPostModel(base_models.BaseModel):
             found.
         """
         return BlogPostModel.query().filter(
-            cls.url_fragment == url_fragment).filter(
-                cls.deleted == False).get() # pylint: disable=singleton-comparison
+            cls.url_fragment == url_fragment
+        ).filter(cls.deleted == False).get() # pylint: disable=singleton-comparison
 
     @classmethod
     def export_data(cls, user_id):
@@ -294,7 +294,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
         if cls.get_by_id(blog_post_id):
             raise Exception(
                 'Blog Post ID conflict on creating new blog post summary model.'
-                )
+            )
 
         entity = cls(
             id=blog_post_id,
@@ -380,12 +380,12 @@ class BlogPostRightsModel(base_models.BaseModel):
     @staticmethod
     def get_model_association_to_user():
         """Model is exported as one instance shared across users since multiple
-        users can edit the blog.
+        users can edit the blog post.
         """
         return (
             base_models.MODEL_ASSOCIATION_TO_USER
             .ONE_INSTANCE_SHARED_ACROSS_USERS
-            )
+        )
 
     @classmethod
     def get_export_policy(cls):
@@ -413,7 +413,7 @@ class BlogPostRightsModel(base_models.BaseModel):
 
         return {
             'editable_blog_post_ids': editable_blog_post_ids,
-            }
+        }
 
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls):
@@ -447,7 +447,7 @@ class BlogPostRightsModel(base_models.BaseModel):
         entity = cls(
             id=blog_post_id,
             editor_ids=[author_id]
-            )
+        )
         entity.update_timestamps()
         entity.put()
 

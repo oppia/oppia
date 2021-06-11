@@ -1513,7 +1513,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'editable_blog_post_ids': [
                 self.BLOG_POST_ID_1,
                 self.BLOG_POST_ID_2
-                ],
+            ],
         }
         expected_user_data = {
             'user_stats': expected_stats_data,
