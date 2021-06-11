@@ -27,6 +27,7 @@ import { StoryEditorStateService } from '../services/story-editor-state.service'
 import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
@@ -49,7 +50,8 @@ export class StoryEditorNavbarComponent implements OnInit {
     private storyValidationService: StoryValidationService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private ngbModal: NgbModal,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private storyEditorNavigationService: StoryEditorNavigationService;
   ) {}
 
   EDITOR = 'Editor';
@@ -209,11 +211,13 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   selectMainTab(): void {
     this.activeTab = this.EDITOR;
+    this.storyEditorNavigationService.navigateToStoryEditor();
     this.showNavigationOptions = false;
   }
 
   selectPreviewTab(): void {
     this.activeTab = this.PREVIEW;
+    this.storyEditorNavigationService.navigateToStoryPreviewTab();
     this.showNavigationOptions = false;
   }
 

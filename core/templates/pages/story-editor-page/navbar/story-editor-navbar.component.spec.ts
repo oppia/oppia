@@ -131,6 +131,10 @@ describe('Story editor navbar component', () => {
     spyOn(storyEditorStateService, 'getTopicUrlFragment').and.returnValue(
       'fractions');
     spyOn(storyEditorStateService, 'getTopicName').and.returnValue('addition');
+    spyOn(editableStoryBackendApiService, 'changeStoryPublicationStatusAsync')
+      .and.returnValue(Promise.resolve());
+    spyOn(editableStoryBackendApiService, 'validateExplorationsAsync')
+      .and.returnValue(Promise.resolve([]));
   });
 
   afterEach(() => {
@@ -220,8 +224,6 @@ describe('Story editor navbar component', () => {
         .and.returnValue(mockStoryReinitializedEventEmitter);
       spyOn(storyEditorStateService, 'getStoryWithUrlFragmentExists')
         .and.returnValue(true);
-      spyOn(editableStoryBackendApiService, 'validateExplorationsAsync')
-        .and.returnValue(Promise.resolve([]));
 
       component.ngOnInit();
       fixture.detectChanges();
@@ -304,8 +306,6 @@ describe('Story editor navbar component', () => {
     spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockStoryInitializedEventEmitter);
-    spyOn(editableStoryBackendApiService, 'changeStoryPublicationStatusAsync')
-      .and.returnValue(Promise.resolve());
 
     component.ngOnInit();
     mockStoryInitializedEventEmitter.emit();
@@ -386,31 +386,31 @@ describe('Story editor navbar component', () => {
     expect(clearChangesSpy).toHaveBeenCalled();
   });
 
-  describe('open a confirmation modal for saving chages ', () => {
+  describe('open a confirmation modal for saving changes ', () => {
     it('should save story successfully on' +
       'clicking save draft button', fakeAsync(() => {
+      const commitMessage = 'commitMessage';
+  
       story = storyObjectFactory.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
-      spyOnProperty(storyEditorStateService, 'onStoryInitialized')
-        .and.returnValue(mockStoryInitializedEventEmitter);
-      spyOn(editableStoryBackendApiService, 'changeStoryPublicationStatusAsync')
-        .and.returnValue(Promise.resolve());
       const saveChangesSpy = spyOn(
         storyEditorStateService, 'saveStory')
         .and.callFake((commitMessage, successCallback, errorCallback) => {
           if (commitMessage !== null) {
             successCallback();
           }
-          errorCallback('Expected a commit message but received none.');
+          else{
+            errorCallback('Expected a commit message but received none.');
+          }
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
         return <NgbModalRef>(
           { componentInstance: MockNgbModalRef,
-            result: Promise.resolve()
+            result: Promise.resolve(commitMessage)
           });
       });
 
@@ -419,7 +419,9 @@ describe('Story editor navbar component', () => {
       storyEditorStateService.setStory(story);
       fixture.detectChanges();
 
-      component.commitMessage = 'commitMessage';
+      expect(modalSpy).not.toHaveBeenCalled();
+      expect(saveChangesSpy).not.toHaveBeenCalled();
+
       component.saveChanges();
       tick();
       fixture.detectChanges();
@@ -431,13 +433,12 @@ describe('Story editor navbar component', () => {
     it('should show error message if the story was not saved' +
       'on clicking save draft button', fakeAsync(() => {
       story = storyObjectFactory.createFromBackendDict(storyBackendDict);
+      const commitMessage = null;
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
         .and.returnValue(mockStoryInitializedEventEmitter);
-      spyOn(editableStoryBackendApiService, 'changeStoryPublicationStatusAsync')
-        .and.returnValue(Promise.resolve());
       const alertsSpy = spyOn(
         alertsService, 'addInfoMessage').and.returnValue(null);
       const saveChangesSpy = spyOn(
@@ -446,14 +447,16 @@ describe('Story editor navbar component', () => {
           if (commitMessage !== null) {
             successCallback();
           }
-          errorCallback('Expected a commit message but received none.');
+          else{
+            errorCallback('Expected a commit message but received none.');
+          }
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
         setTimeout(opt.beforeDismiss);
         return <NgbModalRef>(
           { componentInstance: MockNgbModalRef,
-            result: Promise.resolve()
+            result: Promise.resolve(commitMessage)
           });
       });
 
@@ -461,6 +464,9 @@ describe('Story editor navbar component', () => {
       mockStoryInitializedEventEmitter.emit();
       storyEditorStateService.setStory(story);
       fixture.detectChanges();
+
+      expect(modalSpy).not.toHaveBeenCalled();
+      expect(saveChangesSpy).not.toHaveBeenCalled();
 
       component.commitMessage = null;
       component.saveChanges();
@@ -480,15 +486,15 @@ describe('Story editor navbar component', () => {
       spyOn(storyEditorStateService, 'getStory').and.returnValue(story);
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
         .and.returnValue(mockStoryInitializedEventEmitter);
-      spyOn(editableStoryBackendApiService, 'changeStoryPublicationStatusAsync')
-        .and.returnValue(Promise.resolve());
       const saveChangesSpy = spyOn(
         storyEditorStateService, 'saveStory')
         .and.callFake((commitMessage, successCallback, errorCallback) => {
           if (commitMessage !== null) {
             successCallback();
           }
-          errorCallback('Expected a commit message but received none.');
+          else{
+            errorCallback('Expected a commit message but received none.');
+          }
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
@@ -504,7 +510,9 @@ describe('Story editor navbar component', () => {
       storyEditorStateService.setStory(story);
       fixture.detectChanges();
 
-      component.commitMessage = 'commitMessage';
+      expect(modalSpy).not.toHaveBeenCalled();
+      expect(saveChangesSpy).not.toHaveBeenCalled();
+
       component.saveChanges();
       tick();
       fixture.detectChanges();
