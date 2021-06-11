@@ -1,0 +1,103 @@
+<oppia-release-coordinator-navbar [(activeTab)]="activeTab"></oppia-release-coordinator-navbar>
+
+<div align="center"
+     *ngIf="statusMessage"
+     class="oppia-status-message-container protractor-test-status-message">
+  {{ statusMessage }}
+</div>
+<br>
+<div class="oppia-release-coordinator-page-tabs-container">
+  <oppia-jobs-tab *ngIf="activeTab === TAB_ID_JOBS" (setStatusMessage)="statusMessage=$event"></oppia-jobs-tab>
+
+  <div class="oppia-tlease-coordiator-misc-tab-container" *ngIf="activeTab === TAB_ID_MISC">
+    <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
+      <h3>Flush the Memory Cache</h3>
+      <div class="oppia-action-buttons-container">
+        <button mat-raised-button color="primary" (click)="flushMemoryCache()">Flush Cache</button>
+        <button mat-raised-button color="primary" (click)="getMemoryCacheProfile()">Get Memory Cache Profile</button>
+      </div>
+      <div class="mt-4" *ngIf="memoryCacheDataFetched">
+        <table class="table text-center view-results-table">
+          <thead>
+            <tr>
+              <td><strong>Total Memory Allocated in Bytes</strong></td>
+              <td><strong>Peak Memory Allocation in Bytes</strong></td>
+              <td><strong>Number of Keys Allocated</strong></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ memoryCacheProfile.totalAllocatedInBytes }}</td>
+              <td>{{ memoryCacheProfile.peakAllocatedInBytes }}</td>
+              <td>{{ memoryCacheProfile.totalKeysStored }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
+      <form (ngSubmit)="updatePromoBarConfig()" [formGroup]="promoBarConfigForm">
+        <div class="oppia-promo-bar-config-field">
+          <h3>Promo-bar config</h3>
+          <mat-slide-toggle [color]="'primary'" formControlName="enabled">
+          </mat-slide-toggle>
+        </div>
+        <div class="oppia-promo-bar-config-field row">
+          <label class="col-sm-4 col-form-label">Promo-bar Message:</label>
+          <input matInput class="col-sm-8 form-control display-inline"
+                 type="text"
+                 formControlName="message">
+        </div>
+        <mat-divider></mat-divider>
+        <div class="oppia-action-buttons-container">
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="!promoBarConfigForm.dirty">
+            Save changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-release-coordinator-page-tabs-container {
+    padding-top: 16px;
+  }
+  .oppia-status-message-container {
+    background-color: #fff;
+    border: 1px solid #00376d;
+    bottom: 30px;
+    max-width: 30%;
+    position: fixed;
+    right: 30px;
+    z-index: 3000;
+  }
+  .oppia-release-coordinator-page-card {
+    max-width: 700px;
+  }
+  .oppia-release-coordinator-page-card button {
+    margin-left: 20px;
+    max-width: 40%;
+  }
+  .oppia-release-coordinator-page-card.oppia-long-text p {
+    margin: 0 0 1em 0;
+  }
+  .oppia-action-buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  .oppia-long-text-card {
+    max-width: 700px;
+  }
+  .oppia-promo-bar-config-field {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+</style>
