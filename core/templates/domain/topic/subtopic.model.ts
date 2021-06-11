@@ -39,14 +39,14 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  _thumbnailFilename: string | null;
-  _thumbnailBgColor: string | null;
-  _urlFragment: string | null;
+  _thumbnailFilename: string;
+  _thumbnailBgColor: string;
+  _urlFragment: string;
   constructor(
       subtopicId: number, title: string, skillIds: string[],
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      thumbnailFilename: string | null, thumbnailBgColor: string | null,
-      urlFragment: string | null) {
+      thumbnailFilename: string, thumbnailBgColor: string,
+      urlFragment: string) {
     this._id = subtopicId;
     this._title = title;
     this._skillIds = skillIds;
@@ -81,11 +81,11 @@ export class Subtopic {
     this._title = title;
   }
 
-  getUrlFragment(): string | null {
+  getUrlFragment(): string {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string | null): void {
+  setUrlFragment(urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
@@ -162,15 +162,15 @@ export class Subtopic {
     this._thumbnailFilename = thumbnailFilename;
   }
 
-  getThumbnailFilename(): string | null {
+  getThumbnailFilename(): string {
     return this._thumbnailFilename;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string | null): void {
+  setThumbnailBgColor(thumbnailBgColor: string): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
-  getThumbnailBgColor(): string | null {
+  getThumbnailBgColor(): string {
     return this._thumbnailBgColor;
   }
 

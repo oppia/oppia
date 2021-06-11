@@ -36,7 +36,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   // TODO(#13015): Remove use of unknown as a type.
   // The property 'value' is dependent on other property, 'localValue', from
   // 'schema-based-editor'. Most components using 'localValue' are currently in
-  // AngularJS, so it's type cannot be determined for now.
+  // AngularJS, so its type cannot be determined for now.
   @Input() value!: unknown;
   @Input() refresh: boolean = false;
   @Input() readOnly = false;

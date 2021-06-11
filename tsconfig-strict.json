@@ -122,8 +122,6 @@
     "core/templates/domain/summary/creator-exploration-summary.model.spec.ts",
     "core/templates/domain/topic/StoryReferenceObjectFactory.ts",
     "core/templates/domain/topic/StoryReferenceObjectFactorySpec.ts",
-    "core/templates/domain/topic_viewer/read-only-topic-object.factory.ts",
-    "core/templates/domain/topic_viewer/read-only-topic-object.factory.spec.ts",
     "core/templates/domain/utilities/audio-file.model.ts",
     "core/templates/domain/utilities/audio-language.model.ts",
     "core/templates/domain/utilities/audio-language.model.spec.ts",
