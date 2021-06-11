@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import itertools
 import logging
 import re
 
@@ -1273,20 +1274,18 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
     # with that pseudonymous user ID in all the models.
     blog_post_model_class = blog_post_models.BlogPostModel
     blog_post_models_list = blog_post_model_class.query(
-        datastore_services.any_of(
-            blog_post_model_class.author_id == user_id)
+        blog_post_model_class.author_id == user_id
         ).fetch()
-    blogpost_ids = set([model.id for model in blog_post_models_list])
+    blog_post_ids = {model.id for model in blog_post_models_list}
 
     blog_post_summary_model_class = blog_post_models.BlogPostSummaryModel
     blog_post_summary_models = blog_post_summary_model_class.query(
-        datastore_services.any_of(
-            blog_post_summary_model_class.author_id == user_id)
+        blog_post_summary_model_class.author_id == user_id
         ).fetch()
-    blogpost_ids |= set([model.id for model in blog_post_summary_models])
+    blog_post_ids |= {model.id for model in blog_post_summary_models}
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.NAMES.blog_post, blogpost_ids)
+        pending_deletion_request, models.NAMES.blog_post, blog_post_ids)
     # TODO(#13053): Add wipeout for BlogPostsRightsModel after adding
     # service layer.
     @transaction_services.run_in_transaction_wrapper
@@ -1315,7 +1314,8 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
             model for model in blog_posts_related_models
             if isinstance(model, blog_post_summary_model_class)]
         for blog_post_summary in blog_post_summary_models_list:
-            blog_post_summary.author_id = pseudonymized_id
+            if blog_post_summary.author_id == user_id:
+                blog_post_summary.author_id = pseudonymized_id
             blog_post_summary.update_timestamps()
 
         datastore_services.put_multi(
@@ -1325,13 +1325,11 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
     blog_posts_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
             models.NAMES.blog_post.value])
-    for blogpost_id, pseudonymized_id in blog_posts_ids_to_pids.items():
+    for blog_post_id, pseudonymized_id in blog_posts_ids_to_pids.items():
         blog_posts_related_models = [
-            model for model in blog_post_models_list
-            if model.id == blogpost_id
-        ] + [
-            model for model in blog_post_summary_models
-            if model.id == blogpost_id
+            model for model in itertools.chain(
+                blog_post_models_list, blog_post_summary_models)
+            if model.id == blog_post_id
         ]
         transaction_slices = utils.grouper(
             blog_posts_related_models,

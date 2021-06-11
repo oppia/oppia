@@ -44,7 +44,10 @@ class BlogPostModel(base_models.BaseModel):
     title = datastore_services.StringProperty(indexed=True, required=True)
     # Content of the blog post.
     content = datastore_services.TextProperty(indexed=False, required=True)
-    # The unique url fragment of the blog post.
+    # The unique url fragment of the blog post. If the user directly enters the
+    # blog post's url in the editor or the homepage, the blogPostModel will be
+    # queried using the url fragment to retrieve data for populating the editor
+    # dashboard / blog post page.
     url_fragment = (
         datastore_services.StringProperty(indexed=True, required=True))
     # Tags associated with the blog post. 'repeated' property is set to true
@@ -156,9 +159,6 @@ class BlogPostModel(base_models.BaseModel):
 
         return entity
 
-    # If the user directly enters the blog post's url in the editor or the
-    # homepage, the blogPostModel will be queried using the url fragment to
-    # retrieve data for populating the editor dashboard / blog post page.
     @classmethod
     def get_by_url_fragment(cls, url_fragment):
         """Gets BlogPostModel by url_fragment. Returns None if the blog post
@@ -171,9 +171,10 @@ class BlogPostModel(base_models.BaseModel):
             BlogPostModel | None. The blog post model of the Blog or None if not
             found.
         """
-        return BlogPostModel.query().filter(
-            cls.url_fragment == url_fragment
-        ).filter(cls.deleted == False).get() # pylint: disable=singleton-comparison
+        return BlogPostModel.query(
+            datastore_services.all_of(
+                cls.url_fragment == url_fragment, cls.deleted == False) # pylint: disable=singleton-comparison
+        ).get()
 
     @classmethod
     def export_data(cls, user_id):
@@ -247,9 +248,9 @@ class BlogPostSummaryModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(datastore_services.any_of(
-            cls.author_id == user_id,
-        )).get(keys_only=True) is not None
+        return cls.query(
+            cls.author_id == user_id
+        ).get(keys_only=True) is not None
 
     @staticmethod
     def get_model_association_to_user():
@@ -359,7 +360,9 @@ class BlogPostRightsModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(
-            # This checks if any of the editor IDs is equal to the user_id.
+            # NOTE: Even though `editor_ids` is repeated, we can compare it to a
+            # single value and it will return models where any of the editor IDs
+            # are equal to user_id.
             cls.editor_ids == user_id
         ).get(keys_only=True) is not None
 
