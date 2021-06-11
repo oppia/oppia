@@ -30,24 +30,24 @@ import { UserService } from 'services/user.service';
   templateUrl: './collection-summary-tile.component.html',
 })
 export class CollectionSummaryTileComponent implements OnInit {
-  @Input() getCollectionId: string;
-  @Input() getCollectionTitle: string;
-  @Input() getLastUpdatedMsec: number;
-  @Input() getObjective: string;
-  @Input() getNodeCount: string;
-  @Input() getCategory: string;
-  @Input() getThumbnailIconUrl: string;
-  @Input() getThumbnailBgColor: string;
-  @Input() isPlaylistTile: boolean;
-  @Input() isLinkedToEditorPage: boolean;
-  @Input() showLearnerDashboardIconsIfPossible: string;
-  @Input() isContainerNarrow: boolean;
-  @Input() isOwnedByCurrentUser: boolean;
+  @Input() getCollectionId!: string;
+  @Input() getCollectionTitle!: string;
+  @Input() getLastUpdatedMsec!: number;
+  @Input() getObjective!: string;
+  @Input() getNodeCount!: string;
+  @Input() getCategory!: string;
+  @Input() getThumbnailIconUrl!: string;
+  @Input() getThumbnailBgColor!: string;
+  @Input() isPlaylistTile!: boolean;
+  @Input() isLinkedToEditorPage!: boolean;
+  @Input() showLearnerDashboardIconsIfPossible!: string;
+  @Input() isContainerNarrow!: boolean;
+  @Input() isOwnedByCurrentUser!: boolean;
 
-  userIsLoggedIn: boolean;
-  collectionIsCurrentlyHoveredOver: boolean;
-  defaultEmptyTitle: string;
-  activityTypeCollection: string;
+  userIsLoggedIn!: boolean;
+  collectionIsCurrentlyHoveredOver!: boolean;
+  defaultEmptyTitle!: string;
+  activityTypeCollection!: string;
 
   constructor(
     private dateTimeFormatService: DateTimeFormatService,
@@ -68,7 +68,7 @@ export class CollectionSummaryTileComponent implements OnInit {
       this.getLastUpdatedMsec);
   }
 
-  getCollectionLink(): string {
+  getCollectionLink(): string | null {
     let targetUrl = (
       this.isLinkedToEditorPage ?
         CollectionSummaryTileConstants.COLLECTION_EDITOR_URL :

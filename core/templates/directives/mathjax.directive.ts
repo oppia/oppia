@@ -23,7 +23,7 @@ import {Directive, ElementRef, Input, OnChanges, SimpleChanges} from '@angular/c
   selector: '[oppiaMathJax]'
 })
 export class MathJaxDirective implements OnChanges {
-  @Input('oppiaMathJax') texExpression: string;
+  @Input('oppiaMathJax') texExpression!: string;
 
   constructor(private el: ElementRef) {
   }
