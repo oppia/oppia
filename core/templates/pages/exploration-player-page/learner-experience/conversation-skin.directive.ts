@@ -47,7 +47,6 @@ require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
-require('domain/state_card/state-card.model.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
@@ -367,8 +366,8 @@ angular.module('oppia').directive('conversationSkin', [
         'PlayerTranscriptService', 'QuestionPlayerEngineService',
         'QuestionPlayerStateService', 'ReadOnlyCollectionBackendApiService',
         'RefresherExplorationConfirmationModalService',
-        'SiteAnalyticsService',
-        'StatsReportingService', 'StoryViewerBackendApiService', 'UrlService',
+        'SiteAnalyticsService', 'StatsReportingService',
+        'StoryViewerBackendApiService', 'UrlService',
         'UserService', 'WindowDimensionsService',
         'COMPONENT_NAME_FEEDBACK', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
@@ -398,8 +397,8 @@ angular.module('oppia').directive('conversationSkin', [
             PlayerTranscriptService, QuestionPlayerEngineService,
             QuestionPlayerStateService, ReadOnlyCollectionBackendApiService,
             RefresherExplorationConfirmationModalService,
-            SiteAnalyticsService,
-            StatsReportingService, StoryViewerBackendApiService, UrlService,
+            SiteAnalyticsService, StatsReportingService,
+            StoryViewerBackendApiService, UrlService,
             UserService, WindowDimensionsService,
             COMPONENT_NAME_FEEDBACK, CONTENT_FOCUS_LABEL_PREFIX,
             CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
