@@ -86,11 +86,6 @@ export class QuestionPlayerEngineService {
   private loadInitialQuestion(
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
-    if (!this.questions || this.questions.length === 0) {
-      this.alertsService.addWarning('There are no questions to display.');
-      errorCallback();
-      return;
-    }
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
     const initialState = this.questions[0].getStateData();
@@ -98,6 +93,7 @@ export class QuestionPlayerEngineService {
     const questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
+      errorCallback();
       return;
     }
 
@@ -150,6 +146,11 @@ export class QuestionPlayerEngineService {
     for (let i = 0; i < questionDicts.length; i++) {
       this.addQuestion(
         this.questionObjectFactory.createFromBackendDict(questionDicts[i]));
+    }
+    if (!this.questions || this.questions.length === 0) {
+      this.alertsService.addWarning('There are no questions to display.');
+      errorCallback();
+      return;
     }
     this.loadInitialQuestion(successCallback, errorCallback);
   }
