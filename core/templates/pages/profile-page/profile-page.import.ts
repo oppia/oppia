@@ -35,3 +35,4 @@ require('base-components/oppia-root.directive.ts');
 
 require('base-components/oppia-footer.component.ts');
 require('pages/profile-page/profile-page.component.ts');
+require('base-components/base-content.component.ts');
