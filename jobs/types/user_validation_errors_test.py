@@ -142,3 +142,23 @@ class DraftChangeListLastUpdatedInvalidErrorTests(
             'ExplorationUserDataModel(id=\'123\'): draft change list last '
             'updated %s is greater than the time when job was run' %
             last_updated)
+
+
+class ArchivedModelNotMarkedDeletedErrorTests(
+        base_validation_errors_test.AuditErrorsTestBase):
+
+    def test_message(self):
+        model = user_models.UserQueryModel(
+            id='test',
+            submitter_id='submitter',
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            query_status=feconf.USER_QUERY_STATUS_ARCHIVED
+        )
+        error = user_validation_errors.ArchivedModelNotMarkedDeletedError(model)
+
+        self.assertEqual(
+            error.message,
+            'ArchivedModelNotMarkedDeletedError in '
+            'UserQueryModel(id=\'test\'): model is archived '
+            'but not marked as deleted')
