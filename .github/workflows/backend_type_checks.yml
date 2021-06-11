@@ -16,12 +16,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-18.04]
-        python-version: [ '2.7', '3.7']
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '2.x'
           architecture: 'x64'
       - name: Setup python by installing wheel
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
@@ -31,4 +30,4 @@ jobs:
         run: alias python=python2 && python2 -m scripts.install_third_party_libs
       - name: Run Mypy type checks
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: PYTHONIOENCODING=utf-8 python2 -m scripts.run_mypy_checks
+        run: pip3 install mypy && PYTHONIOENCODING=utf-8 python2 -m scripts.run_mypy_checks
