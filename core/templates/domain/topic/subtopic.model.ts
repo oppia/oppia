@@ -25,9 +25,9 @@ export interface SubtopicBackendDict {
   'id': number;
   'title': string;
   'skill_ids': string[];
-  'thumbnail_filename': string | null;
-  'thumbnail_bg_color': string | null;
-  'url_fragment': string | null;
+  'thumbnail_filename': string;
+  'thumbnail_bg_color': string;
+  'url_fragment': string;
 }
 
 export interface SkillIdToDescriptionMap {
