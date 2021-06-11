@@ -153,7 +153,7 @@ describe('Teach Page', () => {
     expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
       .toHaveBeenCalled();
   });
-  
+
   it('should record analytics when Visit Classroom is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
@@ -169,7 +169,8 @@ describe('Teach Page', () => {
       expect(
         component.windowRef.nativeWindow.location.href
       ).toBe('/community-library');
-  });
+    }
+  );
   
   it('should record analytics when Browse Library is clicked', () => {
     spyOn(
@@ -186,7 +187,8 @@ describe('Teach Page', () => {
       expect(
         component.windowRef.nativeWindow.location.href
       ).toBe('/teach');
-  });
+    }
+  );
   
   it('should record analytics when Guide For Parents is clicked', () => {
     spyOn(
@@ -203,7 +205,8 @@ describe('Teach Page', () => {
       expect(
         component.windowRef.nativeWindow.location.href
       ).toBe('/teach');
-  });
+    }
+  );
   
   it('should record analytics when Tips For Parents is clicked', () => {
     spyOn(
