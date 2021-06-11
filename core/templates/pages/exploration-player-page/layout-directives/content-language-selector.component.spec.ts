@@ -38,9 +38,7 @@ import { SwitchContentLanguageRefreshRequiredModalComponent } from
   'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { AudioTranslationLanguageService} from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/audio-translation-language.service';
+import { AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 
 class MockContentTranslationLanguageService {
   getCurrentContentLanguageCode() {
