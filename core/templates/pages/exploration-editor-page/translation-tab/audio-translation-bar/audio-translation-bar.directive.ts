@@ -61,6 +61,7 @@ require('services/external-save.service.ts');
 import WaveSurfer from 'wavesurfer.js';
 
 import { Subscription } from 'rxjs';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -206,15 +207,19 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.checkingMicrophonePermission = false;
 
               $scope.elapsedTime = 0;
-              $scope.timerInterval = $interval(function() {
-                $scope.elapsedTime++;
-                // $scope.recordingTimeLimit is decremented to
-                // compensate for the audio recording timing inconsistency,
-                // so it allows the server to accept the recording.
-                if ($scope.elapsedTime === $scope.recordingTimeLimit - 1) {
-                  $scope.stopRecording();
-                }
-              }, 1000);
+              OppiaAngularRootComponent.ngZone.runOutsideAngular(() => {
+                $scope.timerInterval = $interval(function() {
+                  OppiaAngularRootComponent.ngZone.run(() => {
+                    $scope.elapsedTime++;
+                    // $scope.recordingTimeLimit is decremented to
+                    // compensate for the audio recording timing inconsistency,
+                    // so it allows the server to accept the recording.
+                    if ($scope.elapsedTime === $scope.recordingTimeLimit - 1) {
+                      $scope.stopRecording();
+                    }
+                  });
+                }, 1000);
+              });
             }, function() {
               // When the user denies microphone access.
               $scope.recordingPermissionDenied = true;
