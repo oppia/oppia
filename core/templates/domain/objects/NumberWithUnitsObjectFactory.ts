@@ -94,16 +94,8 @@ export class NumberWithUnits {
       unitsString);
 
     if (this.type === 'real') {
-      // When numerator or whole number is not zero, then we throw an error. As,
-      // a number of type real should not have a fraction part.
-      if (this.fraction.numerator !== 0 || this.fraction.wholeNumber !== 0) {
-        throw new Error('Number with type real cannot have a fraction part.');
-      }
       numberWithUnitsString += this.real + ' ';
     } else if (this.type === 'fraction') {
-      if (this.real !== 0) {
-        throw new Error('Number with type fraction cannot have a real part.');
-      }
       numberWithUnitsString += this.fraction.toString() + ' ';
     }
     numberWithUnitsString += unitsString.trim();
