@@ -886,6 +886,7 @@ def _get_filtered_completed_story_summaries(
             nonexistent_completed_story_ids.append(story_ids[index])
         else:
             story_id = story_summary.id
+            story = story_fetchers.get_story_by_id(story_id)
             if len(story_fetchers.get_completed_node_ids(
                     user_id, story_id)) != len(story_summary.node_titles):
                 remove_story_from_completed_list(user_id, story_id)
