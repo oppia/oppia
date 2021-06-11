@@ -453,12 +453,6 @@ MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
 
-# If requests can be sent to the bulk email provider (requires the Mailchimp API
-# key, username and audience id fields to be filled).
-CAN_SEND_REQUESTS_TO_BULK_EMAIL_SERVICE_PROVIDER = bool(
-    (not constants.DEV_MODE) and MAILCHIMP_AUDIENCE_ID and MAILCHIMP_API_KEY and
-    MAILCHIMP_USERNAME)
-
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
