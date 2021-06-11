@@ -34,7 +34,7 @@ export class AudioFileUploaderComponent {
   @ViewChild('fileInput') fileInputRef!: ElementRef;
   @ViewChild('inputForm') inputFormRef!: ElementRef;
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
-  // 'null' implies not displaying an error message
+  // 'null' implies not displaying an error message.
   errorMessage: string | null = null;
 
   // Returns 'null' when the uploaded file is valid.
