@@ -390,7 +390,7 @@ describe('Story editor navbar component', () => {
     it('should save story successfully on' +
       'clicking save draft button', fakeAsync(() => {
       const commitMessage = 'commitMessage';
-  
+
       story = storyObjectFactory.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
@@ -400,8 +400,7 @@ describe('Story editor navbar component', () => {
         .and.callFake((commitMessage, successCallback, errorCallback) => {
           if (commitMessage !== null) {
             successCallback();
-          }
-          else{
+          } else {
             errorCallback('Expected a commit message but received none.');
           }
           return true;
@@ -446,8 +445,7 @@ describe('Story editor navbar component', () => {
         .and.callFake((commitMessage, successCallback, errorCallback) => {
           if (commitMessage !== null) {
             successCallback();
-          }
-          else{
+          } else {
             errorCallback('Expected a commit message but received none.');
           }
           return true;
@@ -491,8 +489,7 @@ describe('Story editor navbar component', () => {
         .and.callFake((commitMessage, successCallback, errorCallback) => {
           if (commitMessage !== null) {
             successCallback();
-          }
-          else{
+          } else {
             errorCallback('Expected a commit message but received none.');
           }
           return true;

@@ -51,7 +51,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
-    private storyEditorNavigationService: StoryEditorNavigationService;
+    private storyEditorNavigationService: StoryEditorNavigationService
   ) {}
 
   EDITOR = 'Editor';
