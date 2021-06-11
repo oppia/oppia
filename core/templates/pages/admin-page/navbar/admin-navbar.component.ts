@@ -55,10 +55,6 @@ export class AdminNavbarComponent implements OnInit {
     return this.adminRouterService.isActivitiesTabOpen();
   }
 
-  isJobsTabOpen(): boolean {
-    return this.adminRouterService.isJobsTabOpen();
-  }
-
   isConfigTabOpen(): boolean {
     return this.adminRouterService.isConfigTabOpen();
   }

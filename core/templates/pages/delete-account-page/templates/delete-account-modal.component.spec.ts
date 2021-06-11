@@ -17,7 +17,6 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserService } from 'services/user.service';
@@ -25,13 +24,7 @@ import { DeleteAccountModalComponent } from './delete-account-modal.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UserInfo } from 'domain/user/user-info.model';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
