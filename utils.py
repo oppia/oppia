@@ -51,8 +51,8 @@ SECONDS_IN_MINUTE = 60
 MYPY = False
 if MYPY:
     from typing import (
-            Any, Callable, Dict, Generator, Iterable, Iterator, List,
-            Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
+        Any, Callable, Dict, Generator, Iterable, Iterator, List,
+        Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
     T = TypeVar('T')
     U = TypeVar('U')
     DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
