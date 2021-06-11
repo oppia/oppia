@@ -26,7 +26,7 @@ describe('Url Service', () => {
   let windowRef: WindowRef;
   let sampleHash = 'sampleHash';
   let pathname = '/embed';
-  // Check https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  // Check https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys.
   let mockLocation:
    Pick<Location, 'href' | 'origin' | 'pathname' | 'hash' | 'search'>;
   let origin = 'http://sample.com';
