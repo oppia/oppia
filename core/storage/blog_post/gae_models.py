@@ -38,11 +38,11 @@ class BlogPostModel(base_models.BaseModel):
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = True
 
-    # The ID of the user the blog is authored by.
+    # The ID of the user the blog post is authored by.
     author_id = datastore_services.StringProperty(required=True)
-    # Title of the blog.
+    # Title of the blog post.
     title = datastore_services.StringProperty(indexed=True, required=True)
-    # Content of the blog.
+    # Content of the blog post.
     content = datastore_services.TextProperty(indexed=False, required=True)
     # The unique url fragment of the blog post.
     url_fragment = (
@@ -50,7 +50,7 @@ class BlogPostModel(base_models.BaseModel):
     # Tags associated with the blog post. 'repeated' property is set to true
     # to take a list of values of underlying type(str).
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
-    # The thumbnail filename of the blog.
+    # The thumbnail filename of the blog post.
     thumbnail_filename = datastore_services.StringProperty(required=True)
     # Time when the blog post model was published.
     published_on = (
@@ -333,7 +333,7 @@ class BlogPostRightsModel(base_models.BaseModel):
     The id of each instance is the blog_post_id.
     """
 
-    # The user_id of the blog editors of this blog.
+    # The user_id of the blog editors of this blog post.
     editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this blog post is published or not.
