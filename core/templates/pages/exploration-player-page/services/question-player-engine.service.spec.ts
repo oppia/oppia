@@ -23,6 +23,7 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -41,6 +42,7 @@ describe('Question player engine service ', () => {
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
   let stateCardObjectFactory: StateCardObjectFactory;
+  let textInputService: InteractionRulesService;
 
   beforeEach(() => {
     singleQuestionBackendDict = {
@@ -422,6 +424,7 @@ describe('Question player engine service ', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
+    textInputService = TestBed.get(TextInputRulesService);
   });
 
   it('should load questions when initialized', () => {
@@ -451,12 +454,12 @@ describe('Question player engine service ', () => {
     expect(contextService.isInQuestionPlayerMode()).toBe(true);
   });
 
-  it('should update the current question ID when a new card is added', () => {
+  it('should update the current question ID when an answer is ' +
+    'submitted and a new card is recorded', () => {
     let submitAnswerSuccessCb = jasmine.createSpy('success');
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
     let answer = 'answer';
-    let interactionRulesService: InteractionRulesService;
     let answerClassificationResult = new AnswerClassificationResult(
       outcomeObjectFactory.createNew(
         'default', '', '', []), 1, 0, 'default_outcome');
@@ -474,7 +477,7 @@ describe('Question player engine service ', () => {
     expect(currentQuestion1.getId()).toBe('questionId1');
 
     questionPlayerEngineService.submitAnswer(
-      answer, interactionRulesService, submitAnswerSuccessCb);
+      answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
     let currentQuestion2 = questionPlayerEngineService.getCurrentQuestion();
 
@@ -538,12 +541,12 @@ describe('Question player engine service ', () => {
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
   });
 
-  it('should return the language code correctly when new card is added', () => {
+  it('should return the language code correctly when an answer is ' +
+    'submitted and a new card is recorded', () => {
     let submitAnswerSuccessCb = jasmine.createSpy('success');
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
     let answer = 'answer';
-    let interactionRulesService: InteractionRulesService;
     let answerClassificationResult = new AnswerClassificationResult(
       outcomeObjectFactory
         .createNew('default', '', '', []), 1, 0, 'default_outcome'
@@ -563,14 +566,14 @@ describe('Question player engine service ', () => {
     expect(languageCode).toBe('en');
 
     questionPlayerEngineService.submitAnswer(
-      answer, interactionRulesService, submitAnswerSuccessCb);
+      answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
     expect(languageCode).toBe('br');
 
     questionPlayerEngineService.submitAnswer(
-      answer, interactionRulesService, submitAnswerSuccessCb);
+      answer, textInputService, submitAnswerSuccessCb);
     questionPlayerEngineService.recordNewCardAdded();
 
     languageCode = questionPlayerEngineService.getLanguageCode();
@@ -619,13 +622,12 @@ describe('Question player engine service ', () => {
   });
 
   describe('on submitting answer ', () => {
-    it('should call success callback if the submitted' +
+    it('should call success callback if the submitted ' +
       'answer is correct', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
@@ -638,7 +640,7 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(false);
       expect(submitAnswerSuccessCb).toHaveBeenCalled();
@@ -648,7 +650,6 @@ describe('Question player engine service ', () => {
       'is already being processed', () => {
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
@@ -659,7 +660,7 @@ describe('Question player engine service ', () => {
 
       questionPlayerEngineService.setAnswerIsBeingProcessed(true);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(submitAnswerSuccessCb).not.toHaveBeenCalled();
     });
@@ -670,7 +671,6 @@ describe('Question player engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', null, null, []), 1, 0, 'default_outcome'
@@ -690,7 +690,7 @@ describe('Question player engine service ', () => {
         [singleQuestionBackendDict], initSuccessCb, initErrorCb);
 
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Feedback content should not be empty.');
@@ -702,7 +702,6 @@ describe('Question player engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
@@ -729,7 +728,7 @@ describe('Question player engine service ', () => {
         [singleQuestionBackendDict], initSuccessCb, initErrorCb);
       questionPlayerEngineService.setCurrentIndex(0);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(alertsServiceSpy)
         .toHaveBeenCalledWith('Question name should not be empty.');
@@ -740,7 +739,6 @@ describe('Question player engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
@@ -757,7 +755,7 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.init(
         multipleQuestionsBackendDict, initSuccessCb, initErrorCb);
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(questionPlayerEngineService.getCurrentIndex()).toBe(0);
 
@@ -772,7 +770,6 @@ describe('Question player engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let initErrorCb = jasmine.createSpy('fail');
       let answer = 'answer';
-      let interactionRulesService: InteractionRulesService;
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory
           .createNew('default', '', '', []), 1, 0, 'default_outcome'
@@ -801,7 +798,7 @@ describe('Question player engine service ', () => {
 
       // Submitting answer to the first question.
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId1');
@@ -810,7 +807,7 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.recordNewCardAdded();
       // Submitting answer to the second question.
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId2');
@@ -819,12 +816,12 @@ describe('Question player engine service ', () => {
       questionPlayerEngineService.recordNewCardAdded();
       // Submitting answer to the last question.
       questionPlayerEngineService.submitAnswer(
-        answer, interactionRulesService, submitAnswerSuccessCb);
+        answer, textInputService, submitAnswerSuccessCb);
 
       expect(
         questionPlayerEngineService.getCurrentQuestionId()).toBe('questionId3');
-      // Please note that after submitting answer to the final question new
-      // card was not created, hence createNewCardSpy was not called.
+      // Please note that after submitting answer to the final question,
+      // a new card was not created, hence createNewCardSpy was not called.
       expect(createNewCardSpy).toHaveBeenCalledTimes(2);
     });
   });
