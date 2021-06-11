@@ -29,14 +29,14 @@
           <span placement="right"
                 [ngbPopover]="usernameIsLong ? username.helpText : undefined"
                 triggers="mouseenter:mouseleave">
-            <strong>{{ username.value| truncate:16 }}</strong>
+            <strong>{{ username.value | truncate:16 }}</strong>
           </span>
         </h2>
         <h2 class="oppia-profile-username-small-screen">
           <span placement="right"
                 [ngbPopover]="username.helpText"
                 triggers="mouseenter:mouseleave">
-            <strong>{{ username.value| truncate:11 }}</strong>
+            <strong>{{ username.value | truncate:11 }}</strong>
           </span>
         </h2>
 

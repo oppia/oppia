@@ -224,8 +224,8 @@ export class ProfilePageComponent {
   }
 
   goToNextPage(): void {
-    if ((this.currentPageNumber + 1) * this.PAGE_SIZE >= (
-      this.data.editedExpSummaries.length)) {
+    let summariesLength = this.data.editedExpSummaries.length;
+    if ((this.currentPageNumber + 1) * this.PAGE_SIZE >= summariesLength) {
       this.loggerService.error('Error: Cannot increment page');
     } else {
       this.currentPageNumber++;
