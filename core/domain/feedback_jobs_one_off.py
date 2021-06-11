@@ -144,7 +144,6 @@ class TrimTextMessageLengthOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 model_instance.update_timestamps(update_last_updated_time=False)
                 model_instance.put()
                 yield (model_instance.thread_id, model_instance.message_id)
-
         yield ('SUCCESS', 1)
 
     @staticmethod

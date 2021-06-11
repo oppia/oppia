@@ -155,7 +155,7 @@ class GeneralFeedbackMessageModelValidator(
 
     @classmethod
     def _validate_text(cls, item):
-        """Validate text length is less than 10000 characters.
+        """Validates text length is less than 10000 characters.
 
         Args:
             item: datastore_services.Model. GeneralFeedbackMessageModel to
