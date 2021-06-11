@@ -117,14 +117,16 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
     """The endpoint for the webhook that is triggered when a user
     subscribes/unsubscribes to the bulk email service provider externally."""
 
-    def get(self):
+    @acl_decorators.is_valid_service_provider
+    def get(self, _):
         """Handles GET requests. This is just an empty endpoint that is
         required since when the webhook is updated in the bulk email service
         provider, a GET request is sent initially to validate the endpoint.
         """
         pass
 
-    def post(self):
+    @acl_decorators.is_valid_service_provider
+    def post(self, _):
         """Handles POST requests."""
         if self.request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
             self.render_json({})

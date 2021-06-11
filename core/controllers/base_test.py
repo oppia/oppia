@@ -1156,11 +1156,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
         self.assertGreater(len(handlers_checked), 0)
 
         for (name, method, handler_is_decorated) in handlers_checked:
-            # Since 'BulkEmailWebhookEndpoint' is a class that is not called
-            # from the frontend, but instead from a third party provider via a
-            # webhook, no decorator is required.
-            if name != "BulkEmailWebhookEndpoint":
-                self.assertTrue(handler_is_decorated)
+            self.assertTrue(handler_is_decorated)
 
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):

@@ -89,6 +89,39 @@ def open_access(handler):
     return test_can_access
 
 
+def is_valid_service_provider(handler):
+    """Decorator to give access to everyone.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that can also give access to
+        everyone.
+    """
+
+    def test_is_valid_service_provider(self, secret, **kwargs):
+        """Gives access to everyone.
+
+        Args:
+            secret: str. The key that is used to authenticate that the request
+                has originated from a known service provider.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if feconf.MAILCHIMP_SECRET is None:
+            raise self.PageNotFoundException
+        elif secret != feconf.MAILCHIMP_SECRET:
+            raise self.PageNotFoundException
+        else:
+            return handler(self, secret, **kwargs)
+    test_is_valid_service_provider.__wrapped__ = True
+
+    return test_is_valid_service_provider
+
+
 def does_classroom_exist(handler):
     """Decorator to check whether classroom exists.
 
