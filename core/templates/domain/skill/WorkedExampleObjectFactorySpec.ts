@@ -41,9 +41,9 @@ describe('Worked example object factory', () => {
   });
 
   it('should create a new worked example from a backend dictionary', () => {
-    let workedExample =
-          workedExampleObjectFactory.createFromBackendDict(
-            workedExampleBackendDict);
+    let workedExample = (
+      workedExampleObjectFactory.createFromBackendDict(
+        workedExampleBackendDict));
     expect(workedExample.getQuestion()).toEqual(
       SubtitledHtml.createDefault(
         'worked example question 1', 'worked_example_q_1'));
@@ -53,9 +53,9 @@ describe('Worked example object factory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    let workedExample =
-        workedExampleObjectFactory.createFromBackendDict(
-          workedExampleBackendDict);
+    let workedExample = (
+      workedExampleObjectFactory.createFromBackendDict(
+        workedExampleBackendDict));
     expect(workedExample.toBackendDict()).toEqual(workedExampleBackendDict);
   });
 });

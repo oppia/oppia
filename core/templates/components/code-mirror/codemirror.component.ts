@@ -45,7 +45,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   // NOTE TO DEVELOPERS: It can be the case sometimes that actual codeMirror
   // file (https://github.com/scttcper/ngx-codemirror/blob/d7701404d188046bc
   // 9fa27edfd6b4baa50179749/src/lib/codemirror.component.ts#L89)
-  // fails to initialise the component, this can make below
+  // fails to initialise the component, this can make the below
   // properties undefined.
   @ViewChild(CodemirrorComponent) codemirrorComponent:
    CodemirrorComponent | undefined;

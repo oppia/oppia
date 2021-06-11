@@ -28,6 +28,8 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class CodemirrorMergeviewComponent implements
   AfterViewInit, OnInit, OnChanges {
   @Input() options = {};
+  // These properties comes from 'state-diff-modal.controller.ts' file and can
+  // be undefined sometimes, after the view initializes.
   @Input() leftValue: string | undefined;
   @Input() rightValue: string | undefined;
   // 'ngOnChanges' sometimes runs before the view has been initialized,
@@ -53,14 +55,14 @@ export class CodemirrorMergeviewComponent implements
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {
       this.codeMirrorInstance =
-      (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
-        this.elementRef.nativeElement,
-        {
-          value: this.leftValue !== undefined ? this.leftValue : ' ',
-          orig: this.rightValue !== undefined ? this.rightValue : ' ',
-          ...this.options
-        }
-      );
+        (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
+          this.elementRef.nativeElement,
+          {
+            value: this.leftValue !== undefined ? this.leftValue : ' ',
+            orig: this.rightValue !== undefined ? this.rightValue : ' ',
+            ...this.options
+          }
+        );
     });
   }
 
