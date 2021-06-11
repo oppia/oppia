@@ -22,8 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.platform import models
+from core.tests import test_utils
 import feconf
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import user_validation
 from jobs.types import base_validation_errors
 from jobs.types import user_validation_errors
@@ -225,5 +227,49 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
             self.pipeline
             | beam.Create([model])
             | beam.ParDo(user_validation.ValidateDraftChangeListLastUpdated())
+        )
+        self.assert_pcoll_equal(output, [])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_user_email_preferences_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserEmailPreferencesModel', 'id'),
+            ['UserSettingsModel'])
+
+
+class ValidateArchivedModelsMarkedDeletedTests(
+        job_test_utils.PipelinedTestBase):
+
+    def test_archived_model_not_marked_deleted(self):
+        model = user_models.UserQueryModel(
+            id='123',
+            submitter_id='111',
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            query_status=feconf.USER_QUERY_STATUS_ARCHIVED
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
+        )
+        self.assert_pcoll_equal(output, [
+            user_validation_errors.ArchivedModelNotMarkedDeletedError(model)])
+
+    def test_model_not_archived_not_marked_deleted(self):
+        model = user_models.UserQueryModel(
+            id='123',
+            submitter_id='111',
+            created_on=self.NOW,
+            last_updated=self.NOW,
+            query_status=feconf.USER_QUERY_STATUS_PROCESSING
+        )
+        output = (
+            self.pipeline
+            | beam.Create([model])
+            | beam.ParDo(user_validation.ValidateArchivedModelsMarkedDeleted())
         )
         self.assert_pcoll_equal(output, [])

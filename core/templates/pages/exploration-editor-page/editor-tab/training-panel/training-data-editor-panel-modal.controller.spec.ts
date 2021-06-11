@@ -180,8 +180,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
         expect($scope.answerGroupHasNonEmptyRules).toBe(true);
         expect($scope.inputTemplate).toBe(
           '<oppia-interactive-text-input ' +
-          'label-for-focus-target="testInteractionInput" last-answer="null">' +
-          '</oppia-interactive-text-input>');
+          'label-for-focus-target="testInteractionInput" [last-answer]="null"' +
+          '></oppia-interactive-text-input>');
       });
 
     it('should call init when controller is initialized', function() {

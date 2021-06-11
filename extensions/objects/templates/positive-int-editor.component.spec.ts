@@ -16,16 +16,31 @@
  * @fileoverview Unit tests for the positive int component.
  */
 
-describe('PositiveInt', function() {
-  var ctrl = null;
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { TestBed, waitForAsync } from '@angular/core/testing';
+import { PositiveIntEditorComponent } from './positive-int-editor.component';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('positiveIntEditor');
-    ctrl.$onInit();
+describe('PositiveInt', function() {
+  let component: PositiveIntEditorComponent;
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [PositiveIntEditorComponent],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  it('should initialize the value', function() {
-    expect(ctrl.value).toEqual(1);
+  beforeEach(waitForAsync(() => {
+    component = TestBed.createComponent(
+      PositiveIntEditorComponent).componentInstance;
+  }));
+
+  it('should initialize the value', () => {
+    component.getSchema();
+    component.ngOnInit();
+    expect(component.value).toEqual(1);
+    component.updateValue(2);
+    component.updateValue(2);
+    expect(component.value).toEqual(2);
   });
 });
