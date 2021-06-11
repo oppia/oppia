@@ -30,8 +30,7 @@ describe('NumberWithUnitsObjectFactory', () => {
     var errors = null;
 
     beforeEach(() => {
-      nwuof = new NumberWithUnitsObjectFactory(
-        new UnitsObjectFactory());
+      nwuof = new NumberWithUnitsObjectFactory(new UnitsObjectFactory());
       uof = new UnitsObjectFactory();
       errors = ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS;
     });
