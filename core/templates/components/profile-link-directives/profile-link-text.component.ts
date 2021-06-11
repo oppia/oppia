@@ -25,7 +25,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class ProfileLinkTextComponent {
-  @Input() username: string;
+  // Angular lifecycle hooks are used to populate values, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  @Input() username!: string;
   constructor() {}
   isUsernameLinkable(username: string): boolean {
     return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
