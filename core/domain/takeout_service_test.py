@@ -234,8 +234,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     PROFILE_ID_1 = 'profile_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
-    BLOG_ID_1 = 'blog_id_1'
-    BLOG_ID_2 = 'blog_id_2'
+    BLOG_POST_ID_1 = 'blog_post_id_1'
+    BLOG_POST_ID_2 = 'blog_post_id_2'
     TOPIC_ID_1 = 'topic_id_1'
     TOPIC_ID_2 = 'topic_id_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
@@ -763,7 +763,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Set-up for the BlogPostModel.
         blog_post_model = blog_post_models.BlogPostModel(
-            id=self.BLOG_ID_1,
+            id=self.BLOG_POST_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
@@ -776,7 +776,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_model.put()
 
         blog_post_rights_old = blog_post_models.BlogPostRightsModel(
-            id=self.BLOG_ID_1,
+            id=self.BLOG_POST_ID_1,
             editor_ids=[self.USER_ID_1],
             blog_post_is_published=True,
         )
@@ -785,7 +785,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_rights_old.put()
 
         blog_post_rights_new = blog_post_models.BlogPostRightsModel(
-            id=self.BLOG_ID_2,
+            id=self.BLOG_POST_ID_2,
             editor_ids=[self.USER_ID_1],
             blog_post_is_published=False,
         )
@@ -1172,7 +1172,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.put()
 
         blog_post_model = blog_post_models.BlogPostModel(
-            id=self.BLOG_ID_1,
+            id=self.BLOG_POST_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
@@ -1510,7 +1510,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'thumbnail_filename': 'thumbnail'
         }
         expected_blog_post_rights = {
-            'editable_blog_post_ids': [self.BLOG_ID_1, self.BLOG_ID_2],
+            'editable_blog_post_ids': [
+                self.BLOG_POST_ID_1,
+                self.BLOG_POST_ID_2
+                ],
         }
         expected_user_data = {
             'user_stats': expected_stats_data,

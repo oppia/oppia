@@ -49,7 +49,6 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             author_id=self.USER_ID,
             content=self.CONTENT,
             title=self.TITLE,
-            last_updated=datetime.datetime.utcnow(),
             published_on=datetime.datetime.utcnow(),
             url_fragment='sample-url-fragment',
             tags=self.TAGS,
@@ -72,14 +71,16 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID))
 
     def test_raise_exception_by_mocking_collision(self):
-        """Tests create and generate_new_blog_id methods for raising
+        """Tests create and generate_new_blog_post_id methods for raising
         exception.
         """
         blog_post_model_cls = blog_post_models.BlogPostModel
 
         # Test create method.
         with self.assertRaisesRegexp(
-            Exception, 'A blog post with the given blog ID exists already.'):
+            Exception, 'A blog post with the given blog post ID exists'
+            ' already.'):
+
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 blog_post_model_cls, 'get_by_id',
@@ -87,19 +88,19 @@ class BlogPostModelTest(test_utils.GenericTestBase):
                     lambda x, y: True,
                     blog_post_model_cls)):
                 blog_post_model_cls.create(
-                    'blog_id', self.USER_ID)
+                    'blog_post_id', self.USER_ID)
 
-        # Test generate_new_blog_id method.
+        # Test generate_new_blog_post_id method.
         with self.assertRaisesRegexp(
             Exception,
-            'New blog id generator is producing too many collisions.'):
+            'New blog post id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 blog_post_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
                     blog_post_model_cls)):
-                blog_post_model_cls.generate_new_blog_id()
+                blog_post_model_cls.generate_new_blog_post_id()
 
     def test_get_by_url_fragment(self):
         self.assertEqual(
@@ -110,7 +111,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
 
     def test_creating_new_blog_post_model_instance(self):
         blog_post_model_id = (
-            blog_post_models.BlogPostModel.generate_new_blog_id())
+            blog_post_models.BlogPostModel.generate_new_blog_post_id())
         blog_post_model_instance = (
             blog_post_models.BlogPostModel.create(
                 blog_post_model_id, self.USER_ID))
@@ -164,7 +165,6 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                 author_id=self.USER_ID,
                 summary=self.SUMMARY,
                 title=self.TITLE,
-                last_updated=datetime.datetime.utcnow(),
                 published_on=datetime.datetime.utcnow(),
                 url_fragment='sample-url-fragment',
                 tags=self.TAGS,
@@ -179,7 +179,6 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                 author_id=self.USER_ID,
                 summary='sample summary',
                 title='Sample Tile',
-                last_updated=datetime.datetime.utcnow(),
                 published_on=datetime.datetime.utcnow(),
                 url_fragment='sample-url-fragment-two',
                 tags=self.TAGS,
@@ -209,7 +208,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         # Test create method.
         with self.assertRaisesRegexp(
             Exception,
-            'Blog ID conflict on creating new blog post summary model.'):
+            'Blog Post ID conflict on creating new blog post summary model.'):
             #  Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 blog_post_summary_model_cls, 'get_by_id',
@@ -221,7 +220,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
 
     def test_creating_new_blog_post_summary_model(self):
         blog_post_model_id = (
-            blog_post_models.BlogPostModel.generate_new_blog_id())
+            blog_post_models.BlogPostModel.generate_new_blog_post_id())
         blog_post_summary_model_instance = (
             blog_post_models.BlogPostSummaryModel.create(
                 blog_post_model_id, self.USER_ID))
@@ -231,10 +230,10 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
             blog_post_summary_model_instance.author_id, self.USER_ID)
 
     def test_get_blog_post_summary_models(self):
-        blog_ids = ['blog_two', 'blog_one']
+        blog_post_ids = ['blog_two', 'blog_one']
         blog_post_summary_models = (
             blog_post_models.BlogPostSummaryModel.get_blog_post_summary_models(
-                blog_ids))
+                blog_post_ids))
         self.assertEqual(len(blog_post_summary_models), 2)
         self.assertEqual(
             blog_post_summary_models[0], self.blog_post_summary_model_new)
@@ -249,13 +248,13 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
     USER_ID = 'user_1'
     USER_ID_NEW = 'user_2'
     USER_ID_OLD = 'user_3'
-    BLOG_ID_NEW = 'blog_id'
-    BLOG_ID_OLD = 'blog_old_id'
+    BLOG_POST_ID_NEW = 'blog_post_id'
+    BLOG_POST_ID_OLD = 'blog_post_old_id'
 
     def setUp(self):
         super(BlogPostRightsModelTest, self).setUp()
         self.blog_post_rights_model = blog_post_models.BlogPostRightsModel(
-            id=self.BLOG_ID_NEW,
+            id=self.BLOG_POST_ID_NEW,
             editor_ids=[self.USER_ID_NEW],
             blog_post_is_published=True,
         )
@@ -263,7 +262,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.blog_post_rights_model.put()
 
         self.blog_post_rights_model_new = blog_post_models.BlogPostRightsModel(
-            id=self.BLOG_ID_OLD,
+            id=self.BLOG_POST_ID_OLD,
             editor_ids=[self.USER_ID_OLD, self.USER_ID_NEW, self.USER_ID],
             blog_post_is_published=False,
         )
@@ -301,7 +300,10 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_post_models.BlogPostRightsModel.export_data(
                 self.USER_ID_NEW))
         expected_blog_post_ids = {
-            'editable_blog_post_ids': [self.BLOG_ID_NEW, self.BLOG_ID_OLD, ],
+            'editable_blog_post_ids': [
+                self.BLOG_POST_ID_NEW,
+                self.BLOG_POST_ID_OLD,
+                ],
         }
         self.assertEqual(expected_blog_post_ids, blog_post_ids)
 
@@ -326,7 +328,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         # Test create method.
         with self.assertRaisesRegexp(
             Exception,
-            'Blog ID conflict on creating new blog post rights model.'):
+            'Blog Post ID conflict on creating new blog post rights model.'):
             #  Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 blog_post_rights_model_cls, 'get_by_id',
@@ -338,7 +340,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
 
     def test_creating_new_blog_post_rights_model(self):
         blog_post_model_id = (
-            blog_post_models.BlogPostModel.generate_new_blog_id())
+            blog_post_models.BlogPostModel.generate_new_blog_post_id())
         blog_post_rights_model_instance = (
             blog_post_models.BlogPostRightsModel.create(
                 blog_post_model_id, self.USER_ID))
