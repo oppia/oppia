@@ -255,15 +255,18 @@ var TopicEditorPage = function() {
 
     await action.sendKeys(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
-    await workflow.submitImage(
-      topicThumbnailButton, thumbnailContainer, imgPath, false);
+
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
     await action.click('Edit subtopic htm content button', subtopicPageContentButton);
     var pageEditor = element(by.css(
       '.protractor-test-create-subtopic-page-content'));
     await action.click('Subtopic html editor', pageEditor);
-    await action.sendKeys('Page editor input', pageEditorInput);
+    await action.sendKeys('Page editor input', pageEditorInput, htmlContent);
+
+    await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath, false);
+    
     await action.click('Confirm subtopic creation button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
