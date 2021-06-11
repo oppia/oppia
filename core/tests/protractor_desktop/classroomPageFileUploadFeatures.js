@@ -44,11 +44,6 @@ describe('Classroom page functionality', function() {
 
     await users.createAndLoginAdminUser(
       'creator@classroomPage.com', 'creatorClassroomPage');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
   });
 
   afterAll(async function() {
