@@ -1,0 +1,260 @@
+{
+    "init_state_name": "Introduction1",
+    "tags": [],
+    "objective": "jshbjsagjdaryman is a good boy",
+    "is_topic_manager": false,
+    "correctness_feedback_enabled": false,
+    "show_state_translation_tutorial_on_load": true,
+    "rights": {
+        "voice_artist_names": [],
+        "editor_names": [],
+        "cloned_from": null,
+        "status": "public",
+        "viewer_names": [],
+        "viewable_if_private": false,
+        "owner_names": [
+            "atpug22",
+            "test"
+        ],
+        "community_owned": false
+    },
+    "show_state_editor_tutorial_on_load": false,
+    "is_moderator": false,
+    "language_code": "en",
+    "draft_changes": [
+        {
+            "state_name": "Introduction1",
+            "property_name": "answer_groups",
+            "new_value": [
+                {
+                    "tagged_skill_misconception_id": null,
+                    "training_data": [],
+                    "rule_specs": [
+                        {
+                            "rule_type": "IsLessThanOrEqualTo",
+                            "inputs": {
+                                "x": 50
+                            }
+                        }
+                    ],
+                    "outcome": {
+                        "feedback": {
+                            "html": "<p>hghgf jhgjhgj</p>",
+                            "content_id": "feedback_3"
+                        },
+                        "param_changes": [],
+                        "missing_prerequisite_skill_id": null,
+                        "dest": "end",
+                        "refresher_exploration_id": null,
+                        "labelled_as_correct": false
+                    }
+                }
+            ],
+            "old_value": [
+                {
+                    "tagged_skill_misconception_id": null,
+                    "training_data": [],
+                    "rule_specs": [
+                        {
+                            "rule_type": "IsLessThanOrEqualTo",
+                            "inputs": {
+                                "x": 50
+                            }
+                        }
+                    ],
+                    "outcome": {
+                        "feedback": {
+                            "html": "<p>hghgf</p>",
+                            "content_id": "feedback_3"
+                        },
+                        "param_changes": [],
+                        "missing_prerequisite_skill_id": null,
+                        "dest": "end",
+                        "refresher_exploration_id": null,
+                        "labelled_as_correct": false
+                    }
+                }
+            ],
+            "cmd": "edit_state_property"
+        },
+        {
+            "state_name": "Introduction1",
+            "property_name": "answer_groups",
+            "new_value": [
+                {
+                    "tagged_skill_misconception_id": null,
+                    "training_data": [],
+                    "rule_specs": [
+                        {
+                            "rule_type": "IsLessThanOrEqualTo",
+                            "inputs": {
+                                "x": 50
+                            }
+                        }
+                    ],
+                    "outcome": {
+                        "feedback": {
+                            "content_id": "feedback_3",
+                            "html": "<p>hghgf jhgjhgj hkjkjkjnkjnjnk</p>"
+                        },
+                        "param_changes": [],
+                        "missing_prerequisite_skill_id": null,
+                        "dest": "end",
+                        "refresher_exploration_id": null,
+                        "labelled_as_correct": false
+                    }
+                }
+            ],
+            "old_value": [
+                {
+                    "tagged_skill_misconception_id": null,
+                    "training_data": [],
+                    "rule_specs": [
+                        {
+                            "rule_type": "IsLessThanOrEqualTo",
+                            "inputs": {
+                                "x": 50
+                            }
+                        }
+                    ],
+                    "outcome": {
+                        "feedback": {
+                            "content_id": "feedback_3",
+                            "html": "<p>hghgf jhgjhgj</p>"
+                        },
+                        "param_changes": [],
+                        "missing_prerequisite_skill_id": null,
+                        "dest": "end",
+                        "refresher_exploration_id": null,
+                        "labelled_as_correct": false
+                    }
+                }
+            ],
+            "cmd": "edit_state_property"
+        }
+    ],
+    "is_super_admin": false,
+    "is_admin": false,
+    "param_specs": {},
+    "category": "Algebra",
+    "version": 26,
+    "param_changes": [],
+    "title": "Aryaman Testing",
+    "states": {
+        "Introduction1": {
+            "linked_skill_id": null,
+            "card_is_checkpoint": true,
+            "content": {
+                "content_id": "content",
+                "html": "<p>&nbsp;lol Ram Ram Ram</p>"
+            },
+            "next_content_id_index": 4,
+            "written_translations": {
+                "translations_mapping": {
+                    "default_outcome": {},
+                    "feedback_3": {},
+                    "content": {}
+                }
+            },
+            "param_changes": [],
+            "recorded_voiceovers": {
+                "voiceovers_mapping": {
+                    "default_outcome": {},
+                    "feedback_3": {},
+                    "content": {}
+                }
+            },
+            "solicit_answer_details": false,
+            "interaction": {
+                "default_outcome": {
+                    "feedback": {
+                        "content_id": "default_outcome",
+                        "html": "<p>gg</p>"
+                    },
+                    "labelled_as_correct": false,
+                    "dest": "Introduction1",
+                    "missing_prerequisite_skill_id": null,
+                    "param_changes": [],
+                    "refresher_exploration_id": null
+                },
+                "hints": [],
+                "customization_args": {},
+                "confirmed_unclassified_answers": [],
+                "solution": null,
+                "answer_groups": [
+                    {
+                        "tagged_skill_misconception_id": null,
+                        "training_data": [],
+                        "rule_specs": [
+                            {
+                                "rule_type": "IsLessThanOrEqualTo",
+                                "inputs": {
+                                    "x": 50
+                                }
+                            }
+                        ],
+                        "outcome": {
+                            "feedback": {
+                                "content_id": "feedback_3",
+                                "html": "<p>hghgf jhgjhgj hkjkjkjnkjnjnk</p>"
+                            },
+                            "labelled_as_correct": false,
+                            "dest": "end",
+                            "missing_prerequisite_skill_id": null,
+                            "param_changes": [],
+                            "refresher_exploration_id": null
+                        }
+                    }
+                ],
+                "id": "NumericInput"
+            },
+            "classifier_model_id": null
+        },
+        "end": {
+            "linked_skill_id": null,
+            "card_is_checkpoint": false,
+            "content": {
+                "content_id": "content",
+                "html": "<p>nvjhjsadaskjashdkjhsdk nnewfweCongratulations, you have finished!</p>"
+            },
+            "next_content_id_index": 0,
+            "written_translations": {
+                "translations_mapping": {
+                    "content": {}
+                }
+            },
+            "param_changes": [],
+            "recorded_voiceovers": {
+                "voiceovers_mapping": {
+                    "content": {}
+                }
+            },
+            "solicit_answer_details": false,
+            "interaction": {
+                "default_outcome": null,
+                "hints": [],
+                "customization_args": {
+                    "recommendedExplorationIds": {
+                        "value": []
+                    }
+                },
+                "confirmed_unclassified_answers": [],
+                "solution": null,
+                "answer_groups": [],
+                "id": "EndExploration"
+            },
+            "classifier_model_id": null
+        }
+    },
+    "user_email": "guptaaryaman22@gmail.com",
+    "email_preferences": {
+        "mute_feedback_notifications": false,
+        "mute_suggestion_notifications": false
+    },
+    "exploration_id": "CwYhb8pnr3aJ",
+    "auto_tts_enabled": true,
+    "username": "atpug22",
+    "draft_change_list_id": 33,
+    "is_version_of_draft_valid": true,
+    "exploration_is_linked_to_story": false
+}

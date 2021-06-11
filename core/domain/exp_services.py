@@ -1713,21 +1713,162 @@ def get_composite_change_list(exp_id, old_version, new_version):
 
     composite_change_list_dict = []
     for i in range(old_version, new_version):
-        composite_change_list_dict += snapshots[i]['commit_cmds']
+        composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
 
     composite_change_list = [
                 exp_domain.ExplorationChange(change)
-                for change in change_list]
+                for change in composite_change_list_dict]
 
     return composite_change_list
 
 
-def are_changes_mergeable(exp_id, change_list, version):
+def are_changes_mergeable(exp_id, version, change_list ):
     """
+    Args:
+        exp_id: id of the exploration in which changes are being made.
+        version: version of an exploration from frontend on which a user is working.
+        change_list: list of the changes made by the user on the frontend, which
+            needs to be checked for mergeability.
+
+    Attributes:
+        latest_version: latest version of an exploration in the backend.
+        complete_change_list: complete list of the changes in an exploration from the
+            backend between version and latest version.
+        added_states_name: list of new states added in a complete change list.
+        deleted_states_name: list of deleted states in a complete change list.
+        old_to_new_state_names: stores the changes in the state names in the
+            complete_change_list.
+        old_version: copy of the frontend version of an exploration.
+        new_version: copy of the latest backend version of an exploration.
+        changed_properties: list of all the properties changed according to
+            the state and property name.
+        state_names_of_renamed_states: stores the changes in the state names
+            in change_list.
+
+    Returns:
+        boolean. A boolean value True if the changes are mergeable and False if
+            the changes are not mergeable.
     """
 
-    
-    pass
+    latest_version = exp_fetchers.get_exploration_by_id(exp_id).version
+    if latest_version == version:
+        return True
+    else:
+        composite_change_list = get_composite_change_list(exp_id, version, latest_version)
+        added_state_names = []
+        deleted_state_names = []
+        new_to_old_state_names = {}
+        changed_properties= {}
+        old_version = exp_fetchers.get_exploration_by_id(exp_id, version)
+        new_version = exp_fetchers.get_exploration_by_id(exp_id, latest_version)
+        for change in composite_change_list:
+            if change.cmd == exp_domain.CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                state_name = change.state_name
+                if state_name in added_state_names:
+                    added_state_names.remove(state_name)
+                else:
+                    original_state_name = state_name
+                    if original_state_name in new_to_old_state_names:
+                        original_state_name = new_to_old_state_names.pop(
+                            original_state_name)
+                    deleted_state_names.append(original_state_name)
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in added_state_names:
+                    added_state_names.remove(old_state_name)
+                    added_state_names.append(new_state_name)
+                elif old_state_name in new_to_old_state_names:
+                    new_to_old_state_names[new_state_name] = (
+                        new_to_old_state_names.pop(old_state_name))
+                else:
+                    new_to_old_state_names[new_state_name] = old_state_name
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                state_name = change.state_name
+                if state_name in new_to_old_state_names:
+                    state_name = new_to_old_state_names[change.state_name]
+                if state_name in changed_properties:
+                    if change.property_name not in changed_properties[state_name]:
+                        changed_properties[state_name].append(change.property_name)
+                else:
+                    changed_properties[state_name] = [change.property_name]
+
+        old_to_new_state_names = {
+            value: key for key, value in new_to_old_state_names.items()
+        }
+
+        if len(added_state_names) > 0 or len(deleted_state_names) > 0:
+            """Here we will send the changelist, version, latest_version,
+            and exploration to the admin, so that the conditions can we reviewed"""
+            return False
+
+        """changed_properties = {}
+        for change in composite_change_list:
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                changed_properties[change.state_name][change.property].append(change)
+
+        print(changed_properties)
+
+        changed_properties = {
+            "statename" : {
+                "property1": [changes],
+                "property2": [changes],
+            }
+        } """
+
+        changes_are_mergeable = False
+        state_names_of_renamed_states = {}
+        for change in change_list:
+            change_is_mergeable = False
+            if change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in state_names_of_renamed_states:
+                    state_names_of_renamed_states[new_state_name] = (
+                        state_names_of_renamed_states.pop(old_state_name))
+                else:
+                    state_names_of_renamed_states[new_state_name] = old_state_name
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                old_state_name = change.state_name
+                new_state_name = change.state_name
+                if change.state_name in state_names_of_renamed_states:
+                    old_state_name = state_names_of_renamed_states[change.state_name]
+                if change.state_name in old_to_new_state_names:
+                    new_state_name = old_to_new_state_names[change.state_name]
+                if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                    if (old_version.states[old_state_name].content.html ==
+                        new_version.states[new_state_name].content.html):
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id):
+                            print("interraction_id")
+                            change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id):
+                            if cmp(old_version.states[old_state_name].interaction.customization_args,
+                                new_version.states[new_state_name].interaction.customization_args) == 0:
+                                change_is_mergeable = True
+                                print("customizarion_args")
+
+
+            if change_is_mergeable:
+                changes_are_mergeable = True
+                continue
+            else:
+                changes_are_mergeable = False
+                return False
+
+        if changes_are_mergeable:
+            return True
+        else:
+            return False
+
 
 
 def is_version_of_draft_valid(exp_id, version):
