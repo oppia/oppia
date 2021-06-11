@@ -1316,9 +1316,9 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_post_accept['status'],
             suggestion_models.STATUS_ACCEPTED)
         (
-            questions, merged_question_skill_links, _) = (
+            questions, merged_question_skill_links) = (
                 question_services.get_displayable_question_skill_link_details(
-                    1, [self.SKILL_ID], ''))
+                    1, [self.SKILL_ID], 0))
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,

@@ -600,19 +600,24 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         list(Suggestion). A list of suggestions which the given user is allowed
         to review.
     """
-    all_suggestions = ([
-        get_suggestion_from_model(s) for s in (
-            suggestion_models.GeneralSuggestionModel
-            .get_in_review_suggestions_of_suggestion_type(
-                suggestion_type, user_id))
-    ])
-    user_review_rights = user_services.get_user_contribution_rights(user_id)
+    all_suggestions = []
     if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        contribution_rights = user_services.get_user_contribution_rights(
+            user_id)
         language_codes = (
-            user_review_rights.can_review_translation_for_language_codes)
-        return [
-            suggestion for suggestion in all_suggestions
-            if suggestion.change.language_code in language_codes]
+            contribution_rights.can_review_translation_for_language_codes)
+        all_suggestions = ([
+            get_suggestion_from_model(s) for s in (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_translation_suggestions(
+                    user_id, language_codes))
+        ])
+    elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        all_suggestions = ([
+            get_suggestion_from_model(s) for s in (
+                suggestion_models.GeneralSuggestionModel
+                .get_in_review_question_suggestions(user_id))
+        ])
 
     return all_suggestions
 
