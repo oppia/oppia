@@ -32,22 +32,27 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { ProfilePageNavbarComponent } from
   'pages/profile-page/profile-page-navbar.component';
+import { ProfilePageComponent } from './profile-page.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
+    NgbPopoverModule,
     SharedComponentsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
-    ProfilePageNavbarComponent
+    ProfilePageNavbarComponent,
+    ProfilePageComponent
   ],
   entryComponents: [
     OppiaAngularRootComponent,
-    ProfilePageNavbarComponent
+    ProfilePageNavbarComponent,
+    ProfilePageComponent
   ],
   providers: [
     {
