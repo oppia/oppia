@@ -252,6 +252,9 @@
     "extensions/objects/templates/boolean-editor.component.ts",
     "extensions/objects/templates/code-string-editor.component.ts",
   ],
-  "include": ["typings/*.ts"],
+  "include": [
+    "typings/*.ts",
+    "core/templates/pages/delete-account-page/services/*.ts",
+  ],
   "exclude": ["extensions/classifiers/proto"]
 }
