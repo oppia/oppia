@@ -35,11 +35,11 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         super(MypyScriptChecks, self).setUp()
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE)
-        def mock_popen_success(unused_cmd, stdout):  # pylint: disable=unused-argument
+        def mock_popen_success(unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
             return process_success
 
         process_failure = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_popen_failure(unused_cmd, stdout):  # pylint: disable=unused-argument
+        def mock_popen_failure(unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
             return process_failure
 
         self.popen_swap_success = self.swap(
@@ -72,3 +72,23 @@ class MypyScriptChecks(test_utils.GenericTestBase):
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
             self.assertEqual(output[0], '')
+
+    def test_main_files_success(self):
+        with self.popen_swap_success:
+            process = run_mypy_checks.main(args=['--files', 'file1.py'])
+            self.assertEqual(process, 0)
+
+    def test_main_success(self):
+        with self.popen_swap_success:
+            process = run_mypy_checks.main(args=[])
+            self.assertEqual(process, 0)
+
+    def test_main_files_failure(self):
+        with self.popen_swap_failure:
+            with self.assertRaisesRegexp(SystemExit, '1'):
+                run_mypy_checks.main(args=['--files', 'file1.py'])
+
+    def test_main_failure(self):
+        with self.popen_swap_failure:
+            with self.assertRaisesRegexp(SystemExit, '1'):
+                run_mypy_checks.main(args=[])
