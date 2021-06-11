@@ -4642,7 +4642,6 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
             author_id=self.user_1_id,
             content=self.CONTENT,
             title=self.TITLE,
-            last_updated=datetime.datetime.utcnow(),
             published_on=datetime.datetime.utcnow(),
             url_fragment='sample-url-fragment',
             tags=self.TAGS,
@@ -4655,7 +4654,6 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
             author_id=self.user_1_id,
             summary=self.SUMMARY,
             title=self.TITLE,
-            last_updated=datetime.datetime.utcnow(),
             published_on=datetime.datetime.utcnow(),
             url_fragment='sample-url-fragment',
             tags=self.TAGS,
@@ -4711,7 +4709,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
-        # Verify that both the blog post summary and the rights have the same
+        # Verify that both the blog post and the blog post summary have the same
         # pseudonymous user ID.
         pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
@@ -4736,7 +4734,6 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
                     author_id=self.user_1_id,
                     content=self.CONTENT,
                     title=self.TITLE,
-                    last_updated=datetime.datetime.utcnow(),
                     published_on=datetime.datetime.utcnow(),
                     url_fragment='sample-url-fragment',
                     tags=self.TAGS,
@@ -4753,7 +4750,6 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
                     author_id=self.user_1_id,
                     summary=self.SUMMARY,
                     title=self.TITLE,
-                    last_updated=datetime.datetime.utcnow(),
                     published_on=datetime.datetime.utcnow(),
                     url_fragment='sample-url-fragment',
                     tags=self.TAGS,

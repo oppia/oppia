@@ -100,49 +100,49 @@ class BlogPostModel(base_models.BaseModel):
         })
 
     @classmethod
-    def generate_new_blog_id(cls):
-        """Generates a new blog ID which is unique and is in the form of
+    def generate_new_blog_post_id(cls):
+        """Generates a new blog post ID which is unique and is in the form of
         random hash of 12 chars.
 
         Returns:
-            str. A blog ID that is different from the IDs of all
+            str. A blog post ID that is different from the IDs of all
             the existing blog posts.
 
         Raises:
-            Exception. There were too many collisions with existing blog IDs
-                when attempting to generate a new blog ID.
+            Exception. There were too many collisions with existing blog post
+                IDs when attempting to generate a new blog post ID.
         """
 
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
-            blog_id = utils.convert_to_hash(
+            blog_post_id = utils.convert_to_hash(
                 python_utils.UNICODE(
                     utils.get_random_int(base_models.RAND_RANGE)),
                 base_models.ID_LENGTH)
-            if not cls.get_by_id(blog_id):
-                return blog_id
+            if not cls.get_by_id(blog_post_id):
+                return blog_post_id
         raise Exception(
-            'New blog id generator is producing too many collisions.')
+            'New blog post id generator is producing too many collisions.')
 
     @classmethod
-    def create(cls, blog_id, author_id):
+    def create(cls, blog_post_id, author_id):
         """Creates a new BlogPostModel entry.
 
         Args:
-            blog_id: str. Blog ID of the newly-created blog post.
+            blog_post_id: str. Blog Post ID of the newly-created blog post.
             author_id: str. User ID of the author.
 
         Returns:
             BlogPostModel. The newly created BlogPostModel instance.
 
         Raises:
-            Exception. A blog post with the given blog ID exists already.
+            Exception. A blog post with the given blog post ID exists already.
         """
-        if cls.get_by_id(blog_id):
+        if cls.get_by_id(blog_post_id):
             raise Exception(
-                'A blog post with the given blog ID exists already.')
+                'A blog post with the given blog post ID exists already.')
 
         entity = cls(
-            id=blog_id,
+            id=blog_post_id,
             author_id=author_id,
             content='',
             title='',
@@ -210,7 +210,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     This should be used whenever the content of the blog post is not
     needed (e.g. in search results, displaying blog post cards etc).
 
-    The key of each instance is the blog id.
+    The key of each instance is the blog post id.
     """
 
     # The ID of the user the blog post is authored by.
@@ -276,11 +276,11 @@ class BlogPostSummaryModel(base_models.BaseModel):
         })
 
     @classmethod
-    def create(cls, blog_id, author_id):
+    def create(cls, blog_post_id, author_id):
         """Creates a new BlogPostSummaryModel entry.
 
         Args:
-            blog_id: str. Blog ID of the newly-created blog post.
+            blog_post_id: str. Blog Post ID of the newly-created blog post.
             author_id: str. User ID of the author.
 
         Returns:
@@ -288,15 +288,16 @@ class BlogPostSummaryModel(base_models.BaseModel):
             instance.
 
         Raises:
-            Exception. A blog post summary model with the given blog ID exists
-                already.
+            Exception. A blog post summary model with the given blog post ID
+                exists already.
         """
-        if cls.get_by_id(blog_id):
+        if cls.get_by_id(blog_post_id):
             raise Exception(
-                'Blog ID conflict on creating new blog post summary model.')
+                'Blog Post ID conflict on creating new blog post summary model.'
+                )
 
         entity = cls(
-            id=blog_id,
+            id=blog_post_id,
             author_id=author_id,
             summary='',
             title='',
@@ -311,25 +312,25 @@ class BlogPostSummaryModel(base_models.BaseModel):
         return entity
 
     @classmethod
-    def get_blog_post_summary_models(cls, blog_ids):
+    def get_blog_post_summary_models(cls, blog_post_ids):
         """Returns a list of BlogPostSummaryModels for blog posts created by
         the user.
 
         Args:
-            blog_ids: list(str). Contains blog ids for which the blog post
-                summary models are to be fetched.
+            blog_post_ids: list(str). Contains blog post ids for which the blog
+                post summary models are to be fetched.
 
         Returns:
             list(BlogPostSummaryModel). The list of BlogPostSummaryModels
-            fetched using blog_ids.
+            fetched using blog_post_ids.
         """
-        return cls.get_multi(blog_ids)
+        return cls.get_multi(blog_post_ids)
 
 
 class BlogPostRightsModel(base_models.BaseModel):
     """Storage model for rights related to a blog post.
 
-    The id of each instance is the blog_id.
+    The id of each instance is the blog_post_id.
     """
 
     # The user_id of the blog editors of this blog.
@@ -424,11 +425,11 @@ class BlogPostRightsModel(base_models.BaseModel):
         }
 
     @classmethod
-    def create(cls, blog_id, author_id):
+    def create(cls, blog_post_id, author_id):
         """Creates a new BlogPostRightsModel entry.
 
         Args:
-            blog_id: str. Blog ID of the newly-created blog post.
+            blog_post_id: str. Blog Post ID of the newly-created blog post.
             author_id: str. User ID of the author.
 
         Returns:
@@ -436,15 +437,15 @@ class BlogPostRightsModel(base_models.BaseModel):
             instance.
 
         Raises:
-            Exception. A blog post rights model with the given blog ID exists
-                already.
+            Exception. A blog post rights model with the given blog post ID
+                exists already.
         """
-        if cls.get_by_id(blog_id):
+        if cls.get_by_id(blog_post_id):
             raise Exception(
-                'Blog ID conflict on creating new blog post rights model.')
+                'Blog Post ID conflict on creating new blog post rights model.')
 
         entity = cls(
-            id=blog_id,
+            id=blog_post_id,
             editor_ids=[author_id]
             )
         entity.update_timestamps()
