@@ -62,9 +62,9 @@ if MYPY:
     DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
 # TODO(#13059): Every use of constants is followed by
-# 'type: ignore[attr-defined]'' because mypy is not able to identify the attributes
-# of constants but this will be fixed after introduction of protobuf for
-# constants.
+# 'type: ignore[attr-defined]' because mypy is not able to identify the
+# attributes of constants but this will be fixed after introduction of protobuf
+# for constants.
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
 # because python_utils is untyped and will be removed in python3.
@@ -410,7 +410,7 @@ def set_url_query_parameter(url, param_name, param_value):
 
     return ( # type: ignore[no-any-return]
         python_utils.url_unsplit( # type: ignore[no-untyped-call]
-        (scheme, netloc, path, new_query_string, fragment)))
+            (scheme, netloc, path, new_query_string, fragment)))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -478,7 +478,7 @@ def base64_from_int(value):
     """
     byte_value = (
         b'[' + python_utils.convert_to_bytes( # type: ignore[no-untyped-call]
-        value) + b']')
+            value) + b']')
     return base64.b64encode(byte_value)
 
 
@@ -740,7 +740,7 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             'received %s.' % (name_type, allowed_length, name))
 
     if not re.match(
-        constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined]
+            constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined]
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
@@ -802,7 +802,7 @@ def require_valid_meta_tag_content(meta_tag_content):
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
     if len(meta_tag_content) > (
-        constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined]
+            constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined]
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined]
@@ -932,7 +932,7 @@ def get_supported_audio_language_description(language_code):
         Exception. If the given language code is unsupported.
     """
     for language in (
-        constants.SUPPORTED_AUDIO_LANGUAGES): # type: ignore[attr-defined]
+            constants.SUPPORTED_AUDIO_LANGUAGES): # type: ignore[attr-defined]
         if language['id'] == language_code:
             return language['description'] # type: ignore[no-any-return]
     raise Exception('Unsupported audio language code: %s' % language_code)
@@ -1097,7 +1097,7 @@ def compute_list_difference(list_a, list_b):
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic
 # type "OrderedDict"' but here we don't need to specify this.
 class OrderedCounter(
-    collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+        collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass

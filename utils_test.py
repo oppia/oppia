@@ -35,8 +35,8 @@ MYPY = False
 if MYPY:
     from typing import Any, List, Text # isort:skip # pylint: disable=unused-import, import-only-modules
 
-# TODO(#1234): Remove #type: ignore[attr-defined] from constants after introduction
-# of protobuf for constants.
+# TODO(#1234): Remove #type: ignore[attr-defined] from constants after
+# introduction of protobuf for constants.
 
 
 class UtilsTests(test_utils.GenericTestBase):
