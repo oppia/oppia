@@ -115,30 +115,14 @@ const setRole = async function(browser, page, role) {
     // eslint-disable-next-line dot-notation
     await page.goto(
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
-    // eslint-disable-next-line no-console
-    console.log('Entered Role Page');
     await page.waitForSelector(updateFormName);
-    // eslint-disable-next-line no-console
-    console.log('Found form selector');
     await page.type(updateFormName, 'username1');
-    // eslint-disable-next-line no-console
-    console.log('Updated form name');
     await page.select(roleSelect, role);
-    // eslint-disable-next-line no-console
-    console.log('Selected role');
     await page.waitForSelector(updateFormSubmit);
-    // eslint-disable-next-line no-console
-    console.log('Found submit selector');
     await page.click(updateFormSubmit);
-    // eslint-disable-next-line no-console
-    console.log('Clicked submit button');
     await page.waitForSelector(statusMessage);
-    // eslint-disable-next-line no-console
-    console.log('Found status selector');
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
-    // eslint-disable-next-line no-console
-    console.log('Entered creator dashboard');
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Changing role to admin failed');
@@ -168,17 +152,11 @@ const getExplorationEditorUrl = async function(browser, page) {
 
 const getCollectionEditorUrl = async function(browser, page) {
   try {
-    // eslint-disable-next-line no-console
-    console.log('Entered collection editor');
     await setRole(browser, page, 'string:COLLECTION_EDITOR');
-    // eslint-disable-next-line no-console
-    console.log('Finished setting role for collection editor');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto(
       CREATOR_DASHBOARD_URL, { waitUntil: networkIdle });
-    // eslint-disable-next-line no-console
-    console.log('Entered creator dashboard');
     await page.waitForSelector(createButtonSelector, {visible: true});
     await page.click(createButtonSelector);
     await page.waitForSelector(
