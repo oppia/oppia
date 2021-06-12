@@ -180,8 +180,6 @@ const getCollectionEditorUrl = async function(browser, page) {
     // eslint-disable-next-line no-console
     console.log('Entered creator dashboard');
     await page.waitForSelector(createButtonSelector, {visible: true});
-    // eslint-disable-next-line no-console
-    console.log('Found create button selector');
     await page.click(createButtonSelector);
     await page.waitForSelector(
       createCollectionButtonSelector, {visible: true});
