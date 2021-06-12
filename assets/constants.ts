@@ -5869,6 +5869,6 @@ export default {
     }
   ],
 
-  "DEV_MODE": false,
+  "DEV_MODE": true,
   "EMULATOR_MODE": true
 } as const;
