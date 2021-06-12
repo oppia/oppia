@@ -19,7 +19,8 @@
 // The base-class for all of the events that the application pushes onto the
 // MessageQueue. The only guarantee that this class makes is a read-only Type.
 export abstract class BaseEvent {
-  public readonly type: string;
+  // The value of type is set inside the Event classes which extend BaseEvent.
+  public readonly type!: string;
 }
 
 // The sub-class / base-class for all of the message-heavy events that this
