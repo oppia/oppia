@@ -277,7 +277,7 @@ describe('Library controller', function() {
         spyOn(carouselMock, 'scrollLeft').and.returnValue(100);
         var animateSpy = spyOn(carouselMock, 'animate').and.callFake(
           // This throws an error of argument type. We need to suppress this
-          // error because  animate expect to receive properties with different
+          // error because animate expect to receive properties with different
           // names from css and animationSettings.
           // @ts-expect-error
           (css, animationSettings) => {

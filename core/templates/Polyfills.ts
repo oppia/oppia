@@ -121,8 +121,8 @@ if (!('outerHTML' in SVGElement.prototype)) {
 // so we set an empty object first.
 if (navigator.mediaDevices === undefined) {
   // This throws "Cannot assign to 'mediaDevices' because it
-  // is a read-only property.". We need to suppress this error because since
-  // some browsers may not have this property at all. So, we need to set it to
+  // is a read-only property.". We need to suppress this error because some
+  // browsers may not have this property at all. So, we need to set it to
   // an empty object.
   // @ts-ignore
   navigator.mediaDevices = {};

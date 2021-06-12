@@ -735,7 +735,7 @@ describe('Image preloader service', () => {
     // This throws "Argument of type 'mockReaderObject' is not assignable
     // to parameter of type 'FileReader'.". We need to suppress this error
     // because 'FileReader' has around 15 more properties. We have only defined
-    // because the properties we need in 'mockReaderObject'.
+    // the properties we need in 'mockReaderObject'.
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 

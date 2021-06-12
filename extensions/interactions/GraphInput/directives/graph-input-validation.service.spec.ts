@@ -131,10 +131,9 @@ describe('GraphInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         // This throws "Argument of type '{}'. We need to suppress this error
-        // because ..  oppia/comment-style is not assignable to
-        // parameter of type 'GraphInputCustomizationArgs'." We are purposely
-        // assigning the wrong type of customization args in order to test
-        // validations.
+        // because ..  oppia/comment-style is not assignable to parameter of
+        // type 'GraphInputCustomizationArgs'." We are purposely assigning the
+        // wrong type of customization args in order to test validations.
         // @ts-expect-error
         currentState, {}, answerGroups, goodDefaultOutcome);
     }).toThrowError(

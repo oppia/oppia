@@ -85,10 +85,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for programming language', () => {
-    // This throws "Type '1'. We need to suppress this error
-    // because is not assignable to type 'string'."
-    // Here we are assigning the wrong type of value to
-    // "customizationArguments" in order to test validations.
+    // This throws "Type '1'. We need to suppress this error because is not
+    // assignable to type 'string'." Here we are assigning the wrong type
+    // of value to "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.language.value = 1;
     var warnings = validatorService.getAllWarnings(
@@ -100,10 +99,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for placeholder text', () => {
-    // This throws "Type '1'. We need to suppress this error because
-    // is not assignable to type 'string'."
-    // Here we are assigning the wrong type of value to
-    // "customizationArguments" in order to test validations.
+    // This throws "Type '1'. We need to suppress this error because is not
+    // assignable to type 'string'." Here we are assigning the wrong type of
+    // value to "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.placeholder.value = 1;
     var warnings = validatorService.getAllWarnings(
@@ -115,10 +113,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for preCode text', () => {
-    // This throws "Type '1'. We need to suppress this error
-    // because is not assignable to type 'string'."
-    // Here we are assigning the wrong type of value to
-    // "customizationArguments" in order to test validations.
+    // This throws "Type '1'. We need to suppress this error because is not
+    // assignable to type 'string'." Here we are assigning the wrong type of
+    // value to "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.preCode.value = 1;
     var warnings = validatorService.getAllWarnings(
@@ -130,10 +127,9 @@ describe('CodeReplValidationService', () => {
   });
 
   it('should catch non-string value for postCode text', () => {
-    // This throws "Type '1'. We need to suppress this error
-    // because is not assignable to type 'string'."
-    // Here we are assigning the wrong type of value to
-    // "customizationArguments" in order to test validations.
+    // This throws "Type '1'. We need to suppress this error because is not
+    // assignable to type 'string'." Here we are assigning the wrong type of
+    // value to "customizationArguments" in order to test validations.
     // @ts-expect-error
     customizationArguments.postCode.value = 1;
     var warnings = validatorService.getAllWarnings(

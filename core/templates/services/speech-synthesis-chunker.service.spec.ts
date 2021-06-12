@@ -160,9 +160,8 @@ describe('Speech Synthesis Chunker Service', () => {
         // This throws "Argument of type '{ speak: () => void; onend:
         // () => void; }' is not assignable to parameter of type
         // 'SpeechSynthesisUtterance'.". We need to suppress this error because
-        // 'SpeechSynthesisUtterance' has around 10 more properties.
-        // We have only defined the properties we need
-        // in 'mockSpeechSynthesisUtteran'.
+        // 'SpeechSynthesisUtterance' has around 10 more properties. We have
+        // only defined the properties we need in 'mockSpeechSynthesisUtteran'.
         // @ts-expect-error
         mockSpeechSynthesisUtteran);
     });
