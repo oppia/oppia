@@ -33,6 +33,7 @@ import $ from 'jquery';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 // ^^^ This block is to be removed.
 
 require(
@@ -60,7 +61,7 @@ describe('Audio translation bar directive', function() {
   var userExplorationPermissionsService = null;
   var userService = null;
   var voiceoverRecordingService = null;
-  let zone: NgZone = null;
+  let zone = null;
 
   var stateName = 'State1';
   var explorationId = 'exp1';
@@ -83,6 +84,7 @@ describe('Audio translation bar directive', function() {
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
     zone = TestBed.inject(NgZone);
+    OppiaAngularRootComponent.ngZone = zone;
     spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
     spyOn(zone, 'run').and.callFake((fn: Function) => fn());
   });
