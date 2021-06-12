@@ -135,13 +135,6 @@ const setRole = async function(browser, page, role) {
     await page.waitForSelector(statusMessage);
     // eslint-disable-next-line no-console
     console.log('Found status selector');
-    await page.waitForFunction(
-      'document.querySelector(' +
-        '".protractor-test-status-message").innerText.includes(' +
-        '"successfully updated to")'
-    );
-    // eslint-disable-next-line no-console
-    console.log('Function succeeded');
     // eslint-disable-next-line dot-notation
     await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
     // eslint-disable-next-line no-console
