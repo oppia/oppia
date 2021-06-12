@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for InformationCardModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Information Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -24,6 +26,7 @@ describe('Information Card Modal Controller', function() {
   var expInfo = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     DateTimeFormatService = $injector.get('DateTimeFormatService');

@@ -57,28 +57,6 @@ describe('Admin Page', function() {
     await users.logout();
   });
 
-  it('should run,verify and stop one-off jobs', async function() {
-    await users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
-    await adminPage.getJobsTab();
-
-    // The following jobs are selected arbitrarily.
-    await adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
-    await adminPage.expectJobToBeRunning('FeedbackThreadCacheOneOffJob');
-    await adminPage.expectNumberOfRunningOneOffJobs(1);
-
-    await adminPage.startOneOffJob('ExplorationValidityJobManager');
-    await adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
-    await adminPage.expectNumberOfRunningOneOffJobs(2);
-
-    await adminPage.stopOneOffJob('FeedbackThreadCacheOneOffJob');
-    await adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
-    await adminPage.expectNumberOfRunningOneOffJobs(1);
-
-    await adminPage.stopOneOffJob('ExplorationValidityJobManager');
-    await adminPage.expectNumberOfRunningOneOffJobs(0);
-    await users.logout();
-  });
-
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
   });
