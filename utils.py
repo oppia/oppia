@@ -48,6 +48,10 @@ ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
+
+# During type checking, mypy assumes the variable 'MYPY' to be true.
+# Typing is not a module in python2, so it will only be imported only while type
+# checking.
 MYPY = False
 if MYPY:
     from typing import (
@@ -57,12 +61,15 @@ if MYPY:
     U = TypeVar('U')
     DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
-# Every use of constants is followed by # type: ignore[attr-defined] because
-# mypy is not able to identify the attributes of constants but this will be
-# fixed after introduction of protobuf for constants.
+# TODO(#13059): Every use of constants is followed by
+# type: ignore[attr-defined] because mypy is not able to identify the attributes
+# of constants but this will be fixed after introduction of protobuf for
+# constants.
 
-# We will be ignoring no-untyped-call and no-any-return here because
-# python_utils is untyped and will be removed in python3.
+# TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
+# because python_utils is untyped and will be removed in python3.
+# These will be removed after python3 migration and adding stubs for new python3
+# libraries.
 
 
 class InvalidInputException(Exception):
