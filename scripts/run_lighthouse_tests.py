@@ -95,18 +95,24 @@ def run_webpack_compilation():
 
 
 def export_url(url):
-    """Exports the url to an environmental variable."""
-    url_list = url.split('/')
+    """Exports the entity ID in the URL to an environmental variable.
+
+    Args:
+        url: str. The URL to parse and extract the entity ID from. If no ID is
+            present, nothing is exported to the environment.
+    """
+    url_parts = url.split('/')
+    python_utils.PRINT('Parsing and exporting entity ID in URL: %s' % url)
     if 'collection_editor' in url:
-        os.environ['collection_editor'] = url_list[5]
+        os.environ['collection_id'] = url_parts[5]
     elif 'create' in url:
-        os.environ['exploration_editor'] = url_list[4]
+        os.environ['exploration_id'] = url_parts[4]
     elif 'topic_editor' in url:
-        os.environ['topic_editor'] = url_list[4]
+        os.environ['topic_id'] = url_parts[4]
     elif 'story_editor' in url:
-        os.environ['story_editor'] = url_list[4]
+        os.environ['story_id'] = url_parts[4]
     elif 'skill_editor' in url:
-        os.environ['skill_editor'] = url_list[4]
+        os.environ['skill_id'] = url_parts[4]
     else:
         return
 
