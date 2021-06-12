@@ -1439,7 +1439,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'showChoicesInShuffledOrder': {
                 'value': True
             },
-             'choices': {
+            'choices': {
                 'value': [
                     {
                         'content_id':'ca_choices_0',
