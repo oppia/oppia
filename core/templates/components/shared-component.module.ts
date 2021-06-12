@@ -65,6 +65,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { OppiaFooterComponent } from '../base-components/oppia-footer.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
 import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
@@ -83,6 +84,7 @@ import { BaseContentComponent } from '../base-components/base-content.component'
 import { PreviewThumbnailComponent } from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
 import { InputResponsePairComponent } from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
 import { I18nLanguageSelectorComponent } from '../base-components/i18n-language-selector.component';
+import { StorySummaryTileComponent } from './summary-tile/story-summary-tile.component';
 import { ExplorationFooterComponent } from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
 import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/modals/display-solution-modal.component';
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
@@ -91,7 +93,6 @@ import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-so
 
 
 // Directives.
-import { StorySummaryTileDirective } from './summary-tile/story-summary-tile.directive';
 import { SubtopicSummaryTileDirective } from './summary-tile/subtopic-summary-tile.directive';
 
 
@@ -251,6 +252,7 @@ const toastrConfig = {
     LimitToPipe,
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     PreviewThumbnailComponent,
     ProfileLinkImageComponent,
@@ -265,7 +267,7 @@ const toastrConfig = {
     SkillMasteryViewerComponent,
     StateSkillEditorComponent,
     SocialButtonsComponent,
-    StorySummaryTileDirective,
+    StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
@@ -319,10 +321,12 @@ const toastrConfig = {
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     I18nLanguageSelectorComponent,
+    OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
     SideNavigationBarComponent,
+    StorySummaryTileComponent,
     SideNavigationBarWrapperComponent,
     SummaryListHeaderComponent,
     ThumbnailDisplayComponent,
@@ -381,6 +385,7 @@ const toastrConfig = {
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     SideNavigationBarWrapperComponent,
     StateSkillEditorComponent,
@@ -389,7 +394,7 @@ const toastrConfig = {
     SharingLinksComponent,
     SkillSelectorComponent,
     SocialButtonsComponent,
-    StorySummaryTileDirective,
+    StorySummaryTileComponent,
     SubtopicSummaryTileDirective,
     SummaryListHeaderComponent,
     TakeBreakModalComponent,
