@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import payload_validator
 from core.tests import test_utils
 
+
 class ErrorValidationUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_args_raises_exceptions(self):
