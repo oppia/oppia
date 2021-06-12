@@ -27,6 +27,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ExplorationEmbedButtonModalComponent } from
   'components/button-directives/exploration-embed-button-modal.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'sharing-links',
@@ -50,7 +51,8 @@ export class SharingLinksComponent implements OnInit {
     private nbgModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private htmlEscaperService: HtmlEscaperService) {}
+    private htmlEscaperService: HtmlEscaperService,
+    private windowRef: WindowRef) {}
 
   ngOnInit(): void {
     if (this.shareType === 'exploration') {
@@ -61,12 +63,13 @@ export class SharingLinksComponent implements OnInit {
       this.activityUrlFragment = 'collection';
     } else {
       throw new Error(
-        'SharingLinks directive can only be used either in the' +
+        'SharingLinks component can only be used either in the' +
         'collection player or the exploration player');
     }
 
     this.serverName = (
-      window.location.protocol + '//' + window.location.host);
+      this.windowRef.nativeWindow.location.protocol + '//'
+        + this.windowRef.nativeWindow.location.host);
 
     this.escapedTwitterText = (
       this.htmlEscaperService.unescapedStrToEscapedStr(
@@ -112,7 +115,8 @@ export class SharingLinksComponent implements OnInit {
     } else if (this.shareType === 'collection') {
       this.siteAnalyticsService.registerShareCollectionEvent(network);
     }
-    window.open(this.getUrl(network), '', 'height=460, width=640');
+    this.windowRef.nativeWindow
+      .open(this.getUrl(network), '', 'height=460, width=640');
   }
 }
 
