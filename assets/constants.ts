@@ -4801,6 +4801,10 @@ export default {
     "description": "Nederlands (Dutch)",
     "direction": "ltr"
   }, {
+    "code": "fat",
+    "description": "Fanti",
+    "direction": "ltr"
+  }, {
     "code": "tl",
     "description": "Filipino (Filipino)",
     "direction": "ltr"
@@ -4909,8 +4913,16 @@ export default {
     "description": "español (Spanish)",
     "direction": "ltr"
   }, {
+    "code": "sw",
+    "description": "kiswahili (Swahili)",
+    "direction": "ltr"
+  }, {
     "code": "sv",
     "description": "svenska (Swedish)",
+    "direction": "ltr"
+  }, {
+    "code": "ta",
+    "description": "தமிழ் (Tamil)",
     "direction": "ltr"
   }, {
     "code": "th",
@@ -5071,6 +5083,11 @@ export default {
     "relatedLanguages": ["ee"],
     "direction": "ltr"
   }, {
+    "id": "fat",
+    "description": "Fanti",
+    "relatedLanguages": ["ak", "fat"],
+    "direction": "ltr"
+  }, {
     "id": "tl",
     "description": "Filipino",
     "relatedLanguages": ["tl"],
@@ -5211,9 +5228,19 @@ export default {
     "relatedLanguages": ["es"],
     "direction": "ltr"
   }, {
+    "id": "sw",
+    "description": "Swahili",
+    "relatedLanguages": ["sw"],
+    "direction": "ltr"
+  }, {
     "id": "sv",
     "description": "Swedish",
-    "relatedLanguages": ["sw"],
+    "relatedLanguages": ["sv"],
+    "direction": "ltr"
+  }, {
+    "id": "ta",
+    "description": "Tamil",
+    "relatedLanguages": ["ta"],
     "direction": "ltr"
   }, {
     "id": "te",

@@ -32,6 +32,50 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(run_result.stdout, 'abc')
         self.assertEqual(run_result.stderr, '123')
 
+    def test_concat(self):
+        single_job_run_result = job_run_result.JobRunResult.concat([
+            job_run_result.JobRunResult(stdout='abc', stderr=''),
+            job_run_result.JobRunResult(stdout='', stderr='123'),
+            job_run_result.JobRunResult(stdout='def', stderr='456'),
+        ])
+
+        self.assertItemsEqual(
+            single_job_run_result.stdout.split('\n'), ['abc', 'def'])
+        self.assertItemsEqual(
+            single_job_run_result.stderr.split('\n'), ['123', '456'])
+
+    def test_raises_when_stdout_is_none(self):
+        with self.assertRaisesRegexp(ValueError, 'must not be None'):
+            job_run_result.JobRunResult(stdout=None, stderr='123')
+
+    def test_raises_when_stderr_is_none(self):
+        with self.assertRaisesRegexp(ValueError, 'must not be None'):
+            job_run_result.JobRunResult(stdout='123', stderr=None)
+
+    def test_does_not_raise_in_subclasses_when_stdout_is_none(self):
+        class SubclassOfJobRunResult(job_run_result.JobRunResult):
+            """A subclass of JobRunResult."""
+
+            pass
+
+        SubclassOfJobRunResult(stdout=None, stderr='123')
+
+    def test_does_not_raise_in_subclasses_when_stderr_is_none(self):
+        class SubclassOfJobRunResult(job_run_result.JobRunResult):
+            """A subclass of JobRunResult."""
+
+            pass
+
+        SubclassOfJobRunResult(stdout='123', stderr=None)
+
+    def test_len_in_bytes(self):
+        result = job_run_result.JobRunResult(stdout='123', stderr='123')
+        self.assertEqual(result.len_in_bytes(), 8)
+
+    def test_len_in_bytes_of_empty_strings(self):
+        result = job_run_result.JobRunResult(stdout='', stderr='')
+        self.assertEqual(result.len_in_bytes(), 2)
+
     def test_equality(self):
         a_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
         b_result = job_run_result.JobRunResult(stdout='def', stderr='456')
