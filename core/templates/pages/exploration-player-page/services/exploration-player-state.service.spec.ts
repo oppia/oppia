@@ -521,11 +521,11 @@ describe('Exploration Player State Service', () => {
     // Here exploration context consists of 'explore', 'create',
     // 'skill_editor' and 'embed'.
     spyOn(urlService, 'getPathname')
-      .and.returnValue('/create/in/path/name')
+      .and.returnValue('/create/in/path/name');
     spyOn(urlService, 'getExplorationVersionFromUrl')
       .and.returnValue(2);
 
-    expect(explorationPlayerStateService.version).toBe(undefined)
+    expect(explorationPlayerStateService.version).toBe(undefined);
     explorationPlayerStateService.ngOnInit();
     expect(explorationPlayerStateService.version).toBe(2);
   });
@@ -534,9 +534,9 @@ describe('Exploration Player State Service', () => {
     'does not have exploration context when initialized', () => {
     // Here default value is 1.
     spyOn(urlService, 'getPathname')
-      .and.returnValue('/create_is_not/in/path/name')
+      .and.returnValue('/create_is_not/in/path/name');
 
-    expect(explorationPlayerStateService.version).toBe(undefined)
+    expect(explorationPlayerStateService.version).toBe(undefined);
     explorationPlayerStateService.ngOnInit();
     expect(explorationPlayerStateService.version).toBe(1);
   });
