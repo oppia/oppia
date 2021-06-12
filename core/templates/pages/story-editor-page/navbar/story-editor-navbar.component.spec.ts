@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the story editor navbar component.
  */
 
-import { Story, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -44,7 +44,7 @@ describe('Story editor navbar component', () => {
   let undoRedoService: UndoRedoService;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
   let ngbModal: NgbModal;
-  let storyBackendDict;
+  let storyBackendDict: StoryBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -108,10 +108,12 @@ describe('Story editor navbar component', () => {
         }],
       },
       language_code: 'en',
-      story_contents_schema_version: '1',
+      meta_tag_content: "meta",
       url_fragment: 'url',
       version: 1,
-      corresponding_topic_id: 'topic_id'
+      corresponding_topic_id: 'topic_id',
+      thumbnail_bg_color: 'red',
+      thumbnail_filename: 'image'
     };
 
     spyOn(storyEditorStateService, 'getSkillSummaries').and.returnValue(
