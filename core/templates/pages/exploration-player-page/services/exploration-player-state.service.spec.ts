@@ -191,7 +191,8 @@ describe('Exploration Player State Service', () => {
     pretestQuestionBackendApiService = (
       pretestQuestionBackendApiService as unknown) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
-    urlService = TestBed.inject(UrlService);
+    urlService = (TestBed.inject(UrlService) as unknown) as
+      jasmine.SpyObj<UrlService>;
   });
 
   it('should properly initialize player', () => {
