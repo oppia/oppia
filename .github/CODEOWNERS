@@ -513,7 +513,7 @@
 /extensions/extensions.module.ts @vojtechjelinek
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
-/python_utils*.py @DubeySandeepf
+/python_utils*.py @DubeySandeep
 /mypy.ini @sajalasati
 /mypy_requirements.txt @sajalasati
 
