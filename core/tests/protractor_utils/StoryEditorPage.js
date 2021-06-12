@@ -473,7 +473,7 @@ var StoryEditorPage = function() {
   this.expectAcquiredSkillDescriptionCardCount = async function(number) {
     let count = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-acquired-skill-description-card').length();
+        'protractor-test-acquired-skill-description-card').length;
     });
     await expect(count).toEqual(number);
   };
@@ -481,7 +481,7 @@ var StoryEditorPage = function() {
   this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
     let count = await browser.executeScript(() => {
       return document.getElementsByClassName(
-        'protractor-test-prerequisite-skill-description-card').length();
+        'protractor-test-prerequisite-skill-description-card').length;
     });
     await expect(count).toEqual(number);
   };
