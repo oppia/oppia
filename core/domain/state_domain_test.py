@@ -1442,15 +1442,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'choices': {
                 'value': [
                     {
-                        'content_id':'ca_choices_0',
+                        'content_id': 'ca_choices_0',
                         'html': '\u003cp\u003eoption 1\u003c/p\u003e'
                     },
                     {
-                        'content_id':'ca_choices_1',
+                        'content_id': 'ca_choices_1',
                         'html': '1,000'
                     },
                     {
-                        'content_id':'ca_choices_2',
+                        'content_id': 'ca_choices_2',
                         'html': '100'
                     }
                 ]
