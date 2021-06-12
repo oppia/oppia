@@ -84,6 +84,7 @@ describe('Audio translation bar directive', function() {
       StateRecordedVoiceoversService);
     zone = TestBed.inject(NgZone);
     spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
+    spyOn(zone, 'run').and.callFake((fn: Function) => fn());
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
