@@ -83,11 +83,6 @@ describe('Topic and Story viewer functionality', function() {
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
-    await adminPage.editConfigProperty(
-      'Make classroom page accessible.',
-      'Boolean', async function(elem) {
-        await elem.setValue(true);
-      });
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
