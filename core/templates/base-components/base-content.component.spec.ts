@@ -32,8 +32,7 @@ import { BackgroundMaskService } from 'services/stateful/background-mask.service
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Base Content Component', () => {
+describe('Base Content Component', () => {
   let fixture: ComponentFixture<BaseContentComponent>;
   let componentInstance: BaseContentComponent;
   let isIframed: boolean = false;
