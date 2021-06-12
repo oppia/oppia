@@ -25,7 +25,6 @@ from core.domain import base_model_validators
 from core.domain import rights_domain
 from core.platform import models
 from jobs import job_test_utils
-from jobs.transforms import base_validation
 from jobs.transforms import exp_validation
 from jobs.types import base_validation_errors
 
