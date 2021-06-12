@@ -28,11 +28,11 @@ import { Interaction, InteractionObjectFactory } from 'domain/exploration/Intera
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode, SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 
-fdescribe('Editor state service', () => {
+describe('Editor state service', () => {
   let ecs: StateEditorService = null;
   let suof: SubtitledUnicodeObjectFactory = null;
   let sof: SolutionObjectFactory = null;
@@ -57,7 +57,7 @@ fdescribe('Editor state service', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
-     mockInteraction = interactionObjectFactory.createFromBackendDict({
+    mockInteraction = interactionObjectFactory.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {
