@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,14 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file has scope set to false which is not allowed.
+ * @fileoverview Constants for the Oppia release coordinator page.
  */
 
-angular.module('oppia').directive('baseContent', [
-  function() {
-    return {
-      scope: false, // Scope should not be false.
-    }
-  }
-]);
+export const ReleaseCoordinatorPageConstants = {
+  TAB_ID_JOBS: 'jobs',
+  TAB_ID_MISC: ' misc',
+} as const;
