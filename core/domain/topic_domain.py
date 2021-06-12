@@ -478,13 +478,12 @@ class Topic(python_utils.OBJECT):
     def __init__(
             self, topic_id, name, abbreviated_name, url_fragment,
             thumbnail_filename, thumbnail_bg_color, thumbnail_size_in_bytes,
-            description, canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, subtopics, subtopic_schema_version,
-            next_subtopic_id, language_code, version,
-            story_reference_schema_version, meta_tag_content,
-            practice_tab_is_displayed, page_title_fragment_for_web,
-            created_on=None,
-            last_updated=None):
+            description, canonical_story_references,
+            additional_story_references, uncategorized_skill_ids,
+            subtopics, subtopic_schema_version, next_subtopic_id,
+            language_code, version, story_reference_schema_version,
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web, created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -634,7 +633,6 @@ class Topic(python_utils.OBJECT):
         Returns:
             Topic. The corresponding Topic domain object.
         """
-        print(topic_dict)
         topic = cls(
             topic_dict['id'], topic_dict['name'],
             topic_dict['abbreviated_name'],
@@ -1287,7 +1285,7 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_thumbnail_size_in_bytes: int|None. The updated thumbnail size
-                in bytes for the topic
+                in bytes for the topic.
         """
         self.thumbnail_size_in_bytes = new_thumbnail_size_in_bytes
 

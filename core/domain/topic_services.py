@@ -40,7 +40,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-import requests
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -66,9 +65,6 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
             'Topic with URL Fragment \'%s\' already exists'
             % topic.url_fragment)
     create_new_topic_rights(topic.id, committer_id)
-    print("Inside _create_topic....")
-    print(topic.thumbnail_size_in_bytes)
-    print()
     model = topic_models.TopicModel(
         id=topic.id,
         name=topic.name,
@@ -96,9 +92,6 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         page_title_fragment_for_web=topic.page_title_fragment_for_web
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    print()
-    print("Model ... ")
-    print(model)
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     topic.version += 1
     generate_topic_summary(topic.id)
@@ -277,11 +270,12 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_thumbnail_filename(change.new_value)
-                    thumbnail_url = ('http://localhost:8181/assetsdevhandler/topic/%s'
-                                      '/assets/thumbnail/%s' % (topic_id, change.new_value))
-                    thumbnail_size_in_bytes = python_utils.url_open(thumbnail_url).headers['Content-Length']
-                    print()
-                    print("Thumbnail size in bytes = " + str(thumbnail_size_in_bytes))
+                    thumbnail_url = (
+                            'http://localhost:8181/assetsdevhandler/topic/%s/'
+                            'assets/thumbnail/%s'
+                            % (topic_id, change.new_value))
+                    thumbnail_size_in_bytes = python_utils.url_open(
+                        thumbnail_url).headers['Content-Length']
                     topic.update_thumbnail_size_in_bytes(thumbnail_size_in_bytes)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
