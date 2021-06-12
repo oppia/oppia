@@ -31,10 +31,11 @@ from jobs.types import user_validation_errors
 import apache_beam as beam
 
 (
-    auth_models, collection_models, exp_models, user_models
+    auth_models, collection_models, exp_models,
+    feedback_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.auth, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.user
+    models.NAMES.feedback, models.NAMES.user
 ])
 
 
@@ -116,23 +117,20 @@ def completed_activities_model_relationships(model):
     yield model.collection_ids, [collection_models.CollectionModel]
 
 
-@validation_decorators.RelationshipsOf(
-    user_models.IncompleteActivitiesModel)
+@validation_decorators.RelationshipsOf(user_models.IncompleteActivitiesModel)
 def incomplete_activities_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.exploration_ids, [exp_models.ExplorationModel]
     yield model.collection_ids, [collection_models.CollectionModel]
 
 
-@validation_decorators.RelationshipsOf(
-    user_models.ExpUserLastPlaythroughModel)
+@validation_decorators.RelationshipsOf(user_models.ExpUserLastPlaythroughModel)
 def exp_user_last_playthrough_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.exploration_id, [exp_models.ExplorationModel]
 
 
-@validation_decorators.RelationshipsOf(
-    user_models.LearnerPlaylistModel)
+@validation_decorators.RelationshipsOf(user_models.LearnerPlaylistModel)
 def learner_playlist_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.exploration_ids, [exp_models.ExplorationModel]
@@ -149,6 +147,39 @@ def user_contributions_model_relationships(model):
 @validation_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
 def user_email_preferences_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
+    yield model.id, [user_models.UserSettingsModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserSubscriptionsModel)
+def user_subscriptions_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.exploration_ids, [exp_models.ExplorationModel]
+    yield model.collection_ids, [collection_models.CollectionModel]
+    yield (
+        model.general_feedback_thread_ids,
+        [feedback_models.GeneralFeedbackThreadModel])
+    yield model.creator_ids, [user_models.UserSubscribersModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserSubscribersModel)
+def user_subscribers_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.subscriber_ids, [user_models.UserSubscriptionsModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserRecentChangesBatchModel)
+def user_recent_changes_batch_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [user_models.UserSettingsModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserStatsModel)
+def user_stats_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
     yield model.id, [user_models.UserSettingsModel]
 
 

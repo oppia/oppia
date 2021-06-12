@@ -284,3 +284,39 @@ class RelationshipsOfTests(test_utils.TestBase):
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserEmailPreferencesModel', 'id'),
             ['UserSettingsModel'])
+
+    def test_user_subscriptions_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'exploration_ids'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'collection_ids'),
+            ['CollectionModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'general_feedback_thread_ids'),
+            ['GeneralFeedbackThreadModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'creator_ids'),
+            ['UserSubscribersModel'])
+
+    def test_user_subscribers_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscribersModel', 'subscriber_ids'),
+            ['UserSubscriptionsModel'])
+
+    def test_user_recent_changes_batch_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserRecentChangesBatchModel', 'id'),
+            ['UserSettingsModel'])
+
+    def test_user_stats_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserStatsModel', 'id'),
+            ['UserSettingsModel'])
