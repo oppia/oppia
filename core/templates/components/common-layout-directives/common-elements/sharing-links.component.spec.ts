@@ -44,7 +44,7 @@ export class MockNgbModalRef {
   };
 }
 
-fdescribe('SharingLinksComponent', () => {
+describe('SharingLinksComponent', () => {
   let component: SharingLinksComponent;
   let fixture: ComponentFixture<SharingLinksComponent>;
   let windowRef: MockWindowRef;
@@ -79,8 +79,9 @@ fdescribe('SharingLinksComponent', () => {
     expect(component.activityId).toBe('exp1');
     expect(component.activityUrlFragment).toBe('explore');
     expect(component.serverName).toBe('https://www.oppia.org');
-    expect(component.escapedTwitterText).toBe('Check out this interactive' +
-      ' lesson on Oppia - a free platform for teaching and learning!');
+    expect(component.escapedTwitterText).toBe(
+      'Check out this interactive lesson on Oppia - a free platform' +
+      ' for teaching and learning!');
     expect(component.classroomUrl).toBe('/assets/images/general/classroom.png');
   });
 
@@ -94,16 +95,18 @@ fdescribe('SharingLinksComponent', () => {
     expect(component.activityId).toBe('col1');
     expect(component.activityUrlFragment).toBe('collection');
     expect(component.serverName).toBe('https://www.oppia.org');
-    expect(component.escapedTwitterText).toBe('Check out this interactive' +
-      ' lesson on Oppia - a free platform for teaching and learning!');
+    expect(component.escapedTwitterText).toBe(
+      'Check out this interactive lesson on Oppia - a free platform' +
+      ' for teaching and learning!');
     expect(component.classroomUrl).toBe('/assets/images/general/classroom.png');
   });
 
   it('should throw an error when SharingLink component is used' +
     ' at any other place than exploration player or collection player', () => {
-    // Type '"not-exp-or-col"' is not assignable to type 'ShareType'.
-    // This is because 'shareType' can only be equal to 'exploration' or
-    // 'collection', but we set an invalid value in order to test validations.
+    // This throws "Type '"not-exp-or-col"' is not assignable to type
+    // 'ShareType'". This needs to be suppressed because, 'shareType' can only
+    // be equal to 'exploration' or 'collection', but we set an invalid value
+    // in order to test validations.
     // @ts-expect-error
     component.shareType = 'not-exp-or-col';
 
@@ -134,14 +137,13 @@ fdescribe('SharingLinksComponent', () => {
       ' lesson on Oppia - a free platform for teaching and learning!';
 
     expect(component.getUrl('facebook')).toBe(
-      `https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/explore/exp1&display=popup&ref=plugin&src=share_button`
+      'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/explore/exp1&display=popup&ref=plugin&src=share_button'
     );
     expect(component.getUrl('twitter')).toBe(
-      `https://twitter.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1`
+      'https://twitter.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1'
     );
     expect(component.getUrl('classroom')).toBe(
-      `https://classroom.google.com/share?url=https://www.oppia.org/explore/exp1`
-    );
+      'https://classroom.google.com/share?url=https://www.oppia.org/explore/exp1');
   });
 
   it('should show embed exploration modal when' +

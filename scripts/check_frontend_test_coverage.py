@@ -263,7 +263,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'set-of-translatable-html-content-ids-editor.component.ts',
     'set-of-unicode-string-editor.component.ts',
     'shared.ts',
-    'sharing-links.component.ts',
     'side-navigation-bar-wrapper.component.ts',
     'skill-concept-card-editor.directive.ts',
     'skill-creation.service.ts',
