@@ -259,6 +259,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.removePrerequisiteSkillId = function(skillId) {
             StoryUpdateService.removePrerequisiteSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
+            $scope.$applyAsync();
           };
 
           $scope.addPrerequisiteSkillId = function() {
@@ -336,6 +337,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.removeAcquiredSkillId = function(skillId) {
             StoryUpdateService.removeAcquiredSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
+            $scope.$applyAsync();
           };
 
           $scope.unfinalizeOutline = function() {
