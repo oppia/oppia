@@ -65,6 +65,7 @@ import { SummaryListHeaderComponent } from './state-directives/answer-group-edit
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
+import { OppiaFooterComponent } from '../base-components/oppia-footer.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
 import { CreateNewSkillModalComponent } from 'pages/topics-and-skills-dashboard-page/create-new-skill-modal.component';
 import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
@@ -251,6 +252,7 @@ const toastrConfig = {
     LimitToPipe,
     LoadingMessageComponent,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     PreviewThumbnailComponent,
     ProfileLinkImageComponent,
@@ -319,6 +321,7 @@ const toastrConfig = {
     InputResponsePairComponent,
     KeyboardShortcutHelpModalComponent,
     I18nLanguageSelectorComponent,
+    OppiaFooterComponent,
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
@@ -381,6 +384,7 @@ const toastrConfig = {
     RubricsEditorComponent,
     FilterForMatchingSubstringPipe,
     OnScreenKeyboardComponent,
+    OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
     SideNavigationBarWrapperComponent,
     StateSkillEditorComponent,

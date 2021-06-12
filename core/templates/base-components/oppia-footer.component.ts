@@ -13,24 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the donate page.
+ * @fileoverview Component for the footer.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
+import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngSanitize', 'ngTouch',
-  'pascalprecht.translate', 'toastr', 'ui.bootstrap'
-]);
+@Component({
+  selector: 'oppia-footer',
+  templateUrl: './oppia-footer.component.html'
+})
+export class OppiaFooterComponent {
+  siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
+}
 
-require('Polyfills.ts');
-
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/donate-page/donate-page.module.ts');
-require('App.ts');
-require('base-components/base-content.component.ts');
-require('base-components/oppia-root.directive.ts');
-
-require('base-components/oppia-footer.component.ts');
+angular.module('oppia').directive('oppiaFooter',
+  downgradeComponent({
+    component: OppiaFooterComponent
+  }) as angular.IDirectiveFactory);
