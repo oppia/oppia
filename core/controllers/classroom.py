@@ -33,9 +33,6 @@ class ClassroomPage(base.BaseHandler):
     def get(self, _):
         """Handles GET requests."""
 
-        if not config_domain.CLASSROOM_PAGE_IS_ACCESSIBLE.value:
-            raise self.PageNotFoundException
-
         self.render_template('classroom-page.mainpage.html')
 
 

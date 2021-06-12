@@ -22,12 +22,10 @@ export interface UserInfoBackendDict {
   'is_super_admin': boolean;
   'is_topic_manager': boolean;
   'can_create_collections': boolean;
-  'user_is_logged_in': boolean;
-  // The following three properties are set to null when the
-  // user is not logged in.
   'preferred_site_language_code': string | null;
   'username': string | null;
   'email': string | null;
+  'user_is_logged_in': boolean;
 }
 
 export class UserInfo {
@@ -36,6 +34,8 @@ export class UserInfo {
   _isTopicManager: boolean;
   _isSuperAdmin: boolean;
   _canCreateCollections: boolean;
+  // The following three properties are set to null when the
+  // user is not logged in.
   _preferredSiteLanguageCode: string | null;
   _username: string | null;
   _email: string | null;
