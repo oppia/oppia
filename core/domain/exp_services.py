@@ -1714,7 +1714,8 @@ def get_composite_change_list(exp_id, old_version, new_version):
     composite_change_list_dict = []
     for i in range(old_version, new_version):
         composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
-
+    print("composite_chanhge_lst")
+    print(composite_change_list_dict)
     composite_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in composite_change_list_dict]
@@ -1761,6 +1762,9 @@ def are_changes_mergeable(exp_id, version, change_list ):
         changed_properties= {}
         old_version = exp_fetchers.get_exploration_by_id(exp_id, version)
         new_version = exp_fetchers.get_exploration_by_id(exp_id, latest_version)
+        print(old_version.to_dict())
+        print("new_version")
+        print(new_version.to_dict())
         for change in composite_change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 added_state_names.append(change.state_name)
@@ -1817,7 +1821,6 @@ def are_changes_mergeable(exp_id, version, change_list ):
                 "property2": [changes],
             }
         } """
-
         changes_are_mergeable = False
         state_names_of_renamed_states = {}
         for change in change_list:
@@ -1851,10 +1854,109 @@ def are_changes_mergeable(exp_id, version, change_list ):
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                         if (old_version.states[old_state_name].interaction.id ==
                             new_version.states[new_state_name].interaction.id):
-                            if cmp(old_version.states[old_state_name].interaction.customization_args,
-                                new_version.states[new_state_name].interaction.customization_args) == 0:
+                            if old_state_name in changed_properties:
+                                if change.property_name not in changed_properties[old_state_name]:
+                                    change_is_mergeable = True
+                            else:
                                 change_is_mergeable = True
-                                print("customizarion_args")
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id):
+                            if old_state_name in changed_properties:
+                                if ('widget_customization_args' not in
+                                    changed_properties[old_state_name] and
+                                    change.property_name not in changed_properties[old_state_name]):
+                                    change_is_mergeable = True
+                            else:
+                                change_is_mergeable = True
+                elif (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                        if old_state_name in changed_properties:
+                            if change.property_name not in changed_properties[old_state_name]:
+                                change_is_mergeable = True
+                        else:
+                            change_is_mergeable = True
+                elif (change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                    if old_state_name in changed_properties:
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id):
+                            if change.property_name not in changed_properties[old_state_name]:
+                                change_is_mergeable = True
+                            else:
+                                old_content_id_list = [hint.hint_content.content_id
+                                    for hint in old_version.states[old_state_name].interaction.hints]
+                                new_content_id_list = [hint.hint_content.content_id
+                                    for hint in new_version.states[new_state_name].interaction.hints]
+                                if len(old_content_id_list) == 5 or len(old_content_id_list) == 5:
+                                    return False
+                                for hint in change.new_value:
+                                    if (hint["hint_content"]["content_id"] not in old_content_id_list and
+                                        hint["hint_content"]["content_id"] not in new_content_id_list):
+                                        change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                    if old_state_name in changed_properties:
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id):
+                            if ('widget_customization_args' not in
+                                changed_properties[old_state_name]):
+                                old_solution = old_version.states[old_state_name].interaction.solution
+                                new_solution = new_version.states[new_state_name].interaction.solution
+                                if old_solution and new_solution:
+                                    if (old_solution.answer_is_exclusive == new_solution.answer_is_exclusive and
+                                        old_solution.correct_answer == new_solution.correct_answer and
+                                        old_solution.explanation.html == new_solution.explanation.html):
+                                        change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                    exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if old_state_name in changed_properties:
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id and
+                            old_version.states[old_state_name].solicit_answer_details ==
+                            new_version.states[new_state_name].solicit_answer_details):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    for state in old_version.states:
+
+
+            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                if change.property_name == 'title':
+                    if old_version.title == new_version.title:
+                        change_is_mergeable = True
+                elif change.property_name == 'category':
+                    if old_version.category == new_version.category:
+                        change_is_mergeable = True
+                elif change.property_name == 'objective':
+                    if old_version.objective == new_version.objective:
+                        change_is_mergeable = True
+                elif change.property_name == 'language_code':
+                    if old_version.language_code == new_version.language_code:
+                        change_is_mergeable = True
+                elif change.property_name == 'tags':
+                    if old_version.tags == new_version.tags:
+                        change_is_mergeable = True
+                elif change.property_name == 'blurb':
+                    if old_version.blurb == new_version.blurb:
+                        change_is_mergeable = True
+                elif change.property_name == 'author_notes':
+                    if old_version.author_notes == new_version.author_notes:
+                        change_is_mergeable = True
+                elif change.property_name == 'init_state_name':
+                    if old_version.init_state_name == new_version.init_state_name:
+                        change_is_mergeable = True
+                elif change.property_name == 'auto_tts_enabled':
+                    if old_version.auto_tts_enabled == new_version.auto_tts_enabled:
+                        change_is_mergeable = True
+                elif change.property_name == 'correctness_feedback_enabled':
+                    if old_version.correctness_feedback_enabled == new_version.correctness_feedback_enabled:
+                        change_is_mergeable = True
 
 
             if change_is_mergeable:

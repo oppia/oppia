@@ -1,108 +1,137 @@
 {
-    u'id': u'CwYhb8pnr3aJ',
-    u'author_notes': u'',
-    u'correctness_feedback_enabled': False,
-    u'param_changes': [],
-    u'language_code': u'en',
-    u'title': u'Aryaman Testing',
-    u'param_specs': {},
-    u'states_schema_version': 45,
-    u'states': {
-        u'Introduction1': {
-            u'linked_skill_id': None,
-            u'recorded_voiceovers': {
-                u'voiceovers_mapping': {
-                    u'default_outcome': {},
-                    u'content': {},
-                    u'ca_buttonText_2': {}
+    u"language_code": u"en",
+    u"param_specs": {},
+    u"param_changes": [],
+    u"init_state_name": u"Introduction",
+    u"category": u"Algebra",
+    u"title": u"Aryaman Testing",
+    u"blurb": u"",
+    u"correctness_feedback_enabled": False,
+    u"tags": [],
+    u"states": {
+        u"Introduction": {
+            u"written_translations": {
+                u"translations_mapping": {
+                    u"hint_5": {},
+                    u"feedback_4": {},
+                    u"default_outcome": {},
+                    u"ca_choices_0": {},
+                    u"ca_choices_1": {},
+                    u"ca_choices_2": {},
+                    u"ca_choices_3": {},
+                    u"content": {},
                 }
             },
-            u'param_changes': [],
-            u'content': {
-                u'content_id': u'content',
-                u'html': u'<p>Ram Ram Ram</p>'
-            },
-            u'card_is_checkpoint': True,
-            u'next_content_id_index': 3,
-            u'written_translations': {
-                u'translations_mapping': {
-                    u'default_outcome': {},
-                    u'content': {},
-                    u'ca_buttonText_2': {}
+            u"recorded_voiceovers": {
+                u"voiceovers_mapping": {
+                    u"hint_5": {},
+                    u"feedback_4": {},
+                    u"default_outcome": {},
+                    u"ca_choices_0": {},
+                    u"ca_choices_1": {},
+                    u"ca_choices_2": {},
+                    u"ca_choices_3": {},
+                    u"content": {},
                 }
             },
-            u'solicit_answer_details': False,
-            u'classifier_model_id': None,
-            u'interaction': {
-                u'id': u'Continue',
-                u'answer_groups': [],
-                u'solution': None,
-                u'confirmed_unclassified_answers': [],
-                u'hints': [],
-                u'default_outcome': {
-                    u'dest': u'end',
-                    u'refresher_exploration_id': None,
-                    u'labelled_as_correct': False,
-                    u'feedback': {
-                        u'content_id': u'default_outcome',
-                        u'html': u''
+            u"solicit_answer_details": False,
+            u"interaction": {
+                u"customization_args": {
+                    u"choices": {
+                        u"value": [
+                            {u"content_id": u"ca_choices_0", u"html": u"<p>d</p>"},
+                            {u"content_id": u"ca_choices_1", u"html": u"<p>f</p>"},
+                            {u"content_id": u"ca_choices_2", u"html": u"<p>fd</p>"},
+                            {u"content_id": u"ca_choices_3", u"html": u"<p>dfs</p>"},
+                        ]
                     },
-                    u'missing_prerequisite_skill_id': None,
-                    u'param_changes': []
+                    u"minAllowableSelectionCount": {u"value": 1},
+                    u"maxAllowableSelectionCount": {u"value": 1},
                 },
-                u'customization_args': {
-                    u'buttonText': {
-                        u'value': {
-                            u'content_id': u'ca_buttonText_2',
-                            u'unicode_str': u'Continue'
+                u"answer_groups": [
+                    {
+                        u"outcome": {
+                            u"feedback": {
+                                u"content_id": u"feedback_4",
+                                u"html": u"<p>dd</p>",
+                            },
+                            u"refresher_exploration_id": None,
+                            u"dest": u"end",
+                            u"param_changes": [],
+                            u"missing_prerequisite_skill_id": None,
+                            u"labelled_as_correct": False,
+                        },
+                        u"training_data": [],
+                        u"rule_specs": [
+                            {
+                                u"inputs": {u"x": [u"ca_choices_1"]},
+                                u"rule_type": u"Equals",
+                            }
+                        ],
+                        u"tagged_skill_misconception_id": None,
+                    }
+                ],
+                u"default_outcome": {
+                    u"feedback": {
+                        u"content_id": u"default_outcome",
+                        u"html": u"<p>lol</p>",
+                    },
+                    u"refresher_exploration_id": None,
+                    u"dest": u"Introduction",
+                    u"param_changes": [],
+                    u"missing_prerequisite_skill_id": None,
+                    u"labelled_as_correct": False,
+                },
+                u"solution": None,
+                u"confirmed_unclassified_answers": [],
+                u"id": u"ItemSelectionInput",
+                u"hints": [
+                    {
+                        u"hint_content": {
+                            u"content_id": u"hint_5",
+                            u"html": u"<p>sdcsc</p>",
                         }
                     }
-                }
-            }
+                ],
+            },
+            u"param_changes": [],
+            u"next_content_id_index": 6,
+            u"classifier_model_id": None,
+            u"card_is_checkpoint": True,
+            u"linked_skill_id": None,
+            u"content": {u"content_id": u"content", u"html": u"<p>asdsdasdad</p>"},
         },
-        u'end': {
-            u'linked_skill_id': None,
-            u'recorded_voiceovers': {
-                u'voiceovers_mapping': {
-                    u'content': {}
-                }
+        u"end": {
+            u"written_translations": {u"translations_mapping": {u"content": {}}},
+            u"recorded_voiceovers": {u"voiceovers_mapping": {u"content": {}}},
+            u"solicit_answer_details": False,
+            u"interaction": {
+                u"customization_args": {u"recommendedExplorationIds": {u"value": []}},
+                u"answer_groups": [],
+                u"default_outcome": None,
+                u"solution": None,
+                u"confirmed_unclassified_answers": [],
+                u"id": u"EndExploration",
+                u"hints": [],
             },
-            u'param_changes': [],
-            u'content': {
-                u'content_id': u'content',
-                u'html': u'<p>sadaskjashdkjhsdk nnewfweCongratulations, you have finished!</p>'
+            u"param_changes": [],
+            u"next_content_id_index": 0,
+            u"classifier_model_id": None,
+            u"card_is_checkpoint": False,
+            u"linked_skill_id": None,
+            u"content": {
+                u"content_id": u"content",
+                u"html": u"<p>sadsasCongratulations, you have finished!</p>",
             },
-            u'card_is_checkpoint': False,
-            u'next_content_id_index': 0,
-            u'written_translations': {
-                u'translations_mapping': {
-                    u'content': {}
-                }
-            },
-            u'solicit_answer_details': False,
-            u'classifier_model_id': None,
-            u'interaction': {
-                u'id': u'EndExploration',
-                u'answer_groups': [],
-                u'solution': None,
-                u'confirmed_unclassified_answers': [],
-                u'hints': [],
-                u'default_outcome': None,
-                u'customization_args': {
-                    u'recommendedExplorationIds': {
-                        u'value': []
-                    }
-                }
-            }
-        }
+        },
     },
-    u'category': u'Algebra',
-    u'blurb': u'',
-    u'auto_tts_enabled': True,
-    u'init_state_name': u'Introduction1',
-    u'objective': u'jshbjsagjdaryman is a good boy',
-    u'tags': []
+    u"id": u"YMvZUgskbbTf",
+    u"objective": u"jshbjsagjdaryman is a good boy",
+    u"auto_tts_enabled": True,
+    u"states_schema_version": 45,
+    u"author_notes": u"",
 }
+
 
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
@@ -303,3 +332,161 @@ def apply_change_list(exploration_id, change_list):
                             feconf.CURRENT_STATE_SCHEMA_VERSION,
                             change.to_version))
         return exploration
+
+
+a = {
+    u"param_specs": {},
+    u"title": u"Aryaman Testing",
+    u"id": u"YMvZUgskbbTf",
+    u"states": {
+        u"Introduction": {
+            u"written_translations": {
+                u"translations_mapping": {
+                    u"hint_5": {},
+                    u"feedback_10": {},
+                    u"feedback_11": {},
+                    u"content": {},
+                    u"hint_13": {},
+                    u"hint_12": {},
+                    u"default_outcome": {},
+                }
+            },
+            u"interaction": {
+                u"customization_args": {},
+                u"hints": [
+                    {
+                        u"hint_content": {
+                            u"content_id": u"hint_5",
+                            u"html": u"<p>sdcsc</p>",
+                        }
+                    },
+                    {
+                        u"hint_content": {
+                            u"content_id": u"hint_12",
+                            u"html": u"<p>dsc</p>",
+                        }
+                    },
+                    {
+                        u"hint_content": {
+                            u"content_id": u"hint_13",
+                            u"html": u"<p>zxxcz</p>",
+                        }
+                    },
+                ],
+                u"id": u"NumericInput",
+                u"answer_groups": [
+                    {
+                        u"outcome": {
+                            u"labelled_as_correct": True,
+                            u"refresher_exploration_id": None,
+                            u"missing_prerequisite_skill_id": None,
+                            u"feedback": {
+                                u"content_id": u"feedback_10",
+                                u"html": u"<p>gg</p>",
+                            },
+                            u"param_changes": [],
+                            u"dest": u"end",
+                        },
+                        u"rule_specs": [
+                            {
+                                u"inputs": {u"x": 50.0},
+                                u"rule_type": u"IsLessThanOrEqualTo",
+                            }
+                        ],
+                        u"training_data": [],
+                        u"tagged_skill_misconception_id": None,
+                    },
+                    {
+                        u"outcome": {
+                            u"labelled_as_correct": True,
+                            u"refresher_exploration_id": None,
+                            u"missing_prerequisite_skill_id": None,
+                            u"feedback": {
+                                u"content_id": u"feedback_11",
+                                u"html": u"<p>hgsdhg</p>",
+                            },
+                            u"param_changes": [],
+                            u"dest": u"end",
+                        },
+                        u"rule_specs": [
+                            {
+                                u"inputs": {u"x": 60.0},
+                                u"rule_type": u"IsGreaterThanOrEqualTo",
+                            }
+                        ],
+                        u"training_data": [],
+                        u"tagged_skill_misconception_id": None,
+                    },
+                ],
+                u"solution": None,
+                u"confirmed_unclassified_answers": [],
+                u"default_outcome": {
+                    u"labelled_as_correct": False,
+                    u"refresher_exploration_id": None,
+                    u"missing_prerequisite_skill_id": None,
+                    u"feedback": {
+                        u"content_id": u"default_outcome",
+                        u"html": u"<p>lol</p>",
+                    },
+                    u"param_changes": [],
+                    u"dest": u"Introduction",
+                },
+            },
+            u"solicit_answer_details": False,
+            u"recorded_voiceovers": {
+                u"voiceovers_mapping": {
+                    u"hint_5": {},
+                    u"feedback_10": {},
+                    u"feedback_11": {},
+                    u"content": {},
+                    u"hint_13": {},
+                    u"hint_12": {},
+                    u"default_outcome": {},
+                }
+            },
+            u"next_content_id_index": 14,
+            u"linked_skill_id": None,
+            u"param_changes": [],
+            u"content": {
+                u"content_id": u"content",
+                u"html": u"<p>dsdsdsdscc dadsasa asdsdasdad</p>",
+            },
+            u"card_is_checkpoint": True,
+            u"classifier_model_id": None,
+        },
+        u"end": {
+            u"written_translations": {u"translations_mapping": {u"content": {}}},
+            u"interaction": {
+                u"customization_args": {u"recommendedExplorationIds": {u"value": []}},
+                u"hints": [],
+                u"id": u"EndExploration",
+                u"answer_groups": [],
+                u"solution": None,
+                u"confirmed_unclassified_answers": [],
+                u"default_outcome": None,
+            },
+            u"solicit_answer_details": False,
+            u"recorded_voiceovers": {u"voiceovers_mapping": {u"content": {}}},
+            u"next_content_id_index": 0,
+            u"linked_skill_id": None,
+            u"param_changes": [],
+            u"content": {
+                u"content_id": u"content",
+                u"html": u"<p>sadsasCongratulations, you have finished!</p>",
+            },
+            u"card_is_checkpoint": False,
+            u"classifier_model_id": None,
+        },
+    },
+    u"states_schema_version": 45,
+    u"tags": [],
+    u"auto_tts_enabled": True,
+    u"correctness_feedback_enabled": True,
+    u"param_changes": [],
+    u"category": u"Algebra",
+    u"objective": u"jshbjsagjdaryman is a good boy",
+    u"init_state_name": u"Introduction",
+    u"blurb": u"",
+    u"language_code": u"en",
+    u"author_notes": u"",
+}
