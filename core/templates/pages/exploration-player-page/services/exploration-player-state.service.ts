@@ -87,7 +87,7 @@ export class ExplorationPlayerStateService {
   ) {
     this.init();
   }
-  init(): void { 
+  init(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
