@@ -34,8 +34,10 @@ interface NonnegativeIntSchema {
   templateUrl: './nonnegative-int-editor.component.html'
 })
 export class NonnegativeIntEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-  @Input() value: number;
+  // Angular lifecycle hooks are used to populate values, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  @Input() modalId!: symbol;
+  @Input() value!: number;
 
   @Output() valueChanged: EventEmitter<number> = new EventEmitter<number>();
   SCHEMA: NonnegativeIntSchema = {
