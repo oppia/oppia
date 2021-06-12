@@ -69,8 +69,8 @@ export class TopicSummary {
       public thumbnailFilename: string,
       public thumbnailBgColor: string,
       public degreesOfMastery: DegreesOfMastery,
-      public skillDescription: SkillIdToDescriptionMap,
-      public subtopic: Subtopic[],
+      public skillDescriptions: SkillIdToDescriptionMap,
+      public subtopics: Subtopic[],
       public urlFragment: string) { }
 
   static createFromBackendDict(
@@ -179,12 +179,12 @@ export class TopicSummary {
     return this.degreesOfMastery;
   }
 
-  getSkillDescription(): SkillIdToDescriptionMap {
-    return this.skillDescription;
+  getSkillDescriptions(): SkillIdToDescriptionMap {
+    return this.skillDescriptions;
   }
 
-  getSubtopic(): Subtopic[] {
-    return this.subtopic;
+  getSubtopics(): Subtopic[] {
+    return this.subtopics;
   }
 
   isTopicPublished(): boolean {

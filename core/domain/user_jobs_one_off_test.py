@@ -589,7 +589,7 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJobTests(
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                 'old_value': None,
                 'new_value': self.EXP_ID_4,
-                'node_id': 'node_1'
+                'node_id': 'node_2'
             })
         ]
 
@@ -605,7 +605,7 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJobTests(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-    def test_adds_story_and_topic_for_incomplete_exp(self):
+    def test_adds_story_and_topic_for_one_incomplete_exp(self):
         # Mark an exploration as incomplete.
         state_name = 'state_name'
         version = 1
@@ -623,7 +623,27 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJobTests(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id)), 1)
 
-    def test_adds_story_and_topic_for_completed_exp(self):
+    def test_adds_story_and_topic_for_multiple_incomplete_exp(self):
+        # Mark 2 exploration in different stories as incomplete.
+        state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_3, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 2)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 2)
+
+    def test_adds_story_and_topic_for_one_completed_exp(self):
         # Mark an exploration as completed.
         learner_progress_services.mark_exploration_as_completed(
             self.user_id, self.EXP_ID_1)
@@ -631,19 +651,94 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJobTests(
             learner_progress_services.get_all_completed_exp_ids(
                 self.user_id)), 1)
 
-        job_id = user_jobs_one_off.PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob.create_new() # pylint: disable=line-too-long
-        user_jobs_one_off.PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob.enqueue(job_id) # pylint: disable=line-too-long
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-
+        self._run_one_off_job()
         self.assertEqual(len(
             learner_progress_services.get_all_incomplete_story_ids(
                 self.user_id)), 1)
         self.assertEqual(len(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id)), 1)
+
+    def test_adds_story_and_topic_for_multiple_completed_exp(self):
+        # Mark 2 explorations in different stories as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_3)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 2)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 2)
+
+    def test_adds_story_and_topic_for_one_completed_and_one_incomplete_exp(
+            self):
+        # Mark an exploration as completed and other as incomplete in same
+        # story.
+        state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_2, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 1)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 1)
+
+    def test_adds_story_and_topic_for_both_incomplete_exp(self):
+        # Mark two exploration as incomplete in same story.
+        state_name = 'state_name'
+        version = 1
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_1, state_name, version)
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.user_id, self.EXP_ID_2, state_name, version)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 1)
+
+    def test_does_not_add_story_and_topic_for_completed_exp(self):
+        # Mark 2 exp from the same story as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_1)
+        learner_progress_services.mark_exploration_as_completed(
+            self.user_id, self.EXP_ID_2)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_exp_ids(
+                self.user_id)), 2)
+
+        self._run_one_off_job()
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.user_id)), 0)
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.user_id)), 0)
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):

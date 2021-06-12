@@ -183,17 +183,19 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
 
         for exp_id in completed_exploration_ids:
             story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
-            if story_id and story_id not in item.story_ids:
+            if story_id:
                 story = story_fetchers.get_story_by_id(story_id)
-                completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                    user_id, story_id)
-                ordered_nodes = story.story_contents.get_ordered_nodes()
+                if story_id not in item.story_ids:
+                    completed_nodes = (
+                        story_fetchers.get_completed_nodes_in_story(
+                            user_id, story_id))
+                    ordered_nodes = story.story_contents.get_ordered_nodes()
 
-                if len(completed_nodes) != len(ordered_nodes):
-                    item.story_ids.append(story_id)
-                    if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
-                        item.partially_learnt_topic_ids.append(
-                            story.corresponding_topic_id)
+                    if len(completed_nodes) != len(ordered_nodes):
+                        item.story_ids.append(story_id)
+                        if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
+                            item.partially_learnt_topic_ids.append(
+                                story.corresponding_topic_id)
 
         item.update_timestamps()
         item.put()
