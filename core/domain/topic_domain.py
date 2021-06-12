@@ -563,6 +563,7 @@ class Topic(python_utils.OBJECT):
             'url_fragment': self.url_fragment,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
+            'thumbnail_size_in_bytes': self.thumbnail_size_in_bytes,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -679,8 +680,6 @@ class Topic(python_utils.OBJECT):
             Topic. The corresponding Topic domain object.
         """
         topic_dict = json.loads(json_string.decode('utf-8'))
-        print("Deserialize topic dict value....")
-        print(topic_dict)
 
         created_on = (
             utils.convert_string_to_naive_datetime_object(
