@@ -1456,7 +1456,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
     non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
 
-    def test_every_method_has_schema(self):
+    def test_every_handler_class_has_schema(self):
         handlers_checked = []
         handlers_need_schema = []
 

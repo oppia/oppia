@@ -301,10 +301,9 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             self.validate_args_schema()
-        except self.InvalidInputException as e:
+        except Exception as e:
             self.handle_exception(e, self.app.debug)
-        except NotImplementedError as e:
-            self.handle_exception(e, self.app.debug)
+            return
 
         super(BaseHandler, self).dispatch()
 
@@ -328,13 +327,10 @@ class BaseHandler(webapp2.RequestHandler):
             raise NotImplementedError(
                 'Please provide schema for url path args in %s '
                 'handler class' % (handler_class_name))
-        if self.HANDLER_ARGS_SCHEMAS is None:
-            raise NotImplementedError(
-                'Please provide schema for %s method in %s handler class' % (
-                    request_method, handler_class_name))
 
         allowed_extra_args = False
-        if self.GET_HANDLER_ERROR_RETURN_TYPE == 'html':
+        if (self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+                request_method == 'GET'):
             allowed_extra_args = True
 
         # Validation for url path elements.
@@ -352,11 +348,11 @@ class BaseHandler(webapp2.RequestHandler):
         if handler_args is None:
             return
 
-        schema_for_handler_args = self.HANDLER_ARGS_SCHEMAS
         try:
+            schema_for_handler_args = self.HANDLER_ARGS_SCHEMAS
             schema_for_handler_args = schema_for_handler_args[request_method]
         except Exception:
-            raise self.InvalidInputException(
+            raise NotImplementedError(
                 'Provide schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
