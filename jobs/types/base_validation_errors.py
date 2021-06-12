@@ -25,6 +25,12 @@ from jobs.types import job_run_result
 import python_utils
 
 
+class ModelIdRegexException(Exception):
+    """Error class for models with ids that fail to match a regex pattern."""
+
+    pass
+
+
 class BaseAuditError(job_run_result.JobRunResult):
     """Base class for model audit errors.
 

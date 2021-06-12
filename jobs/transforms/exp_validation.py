@@ -26,6 +26,7 @@ from core.platform import models
 from jobs import job_utils
 from jobs.decorators import validation_decorators
 from jobs.transforms import base_validation
+from jobs.types import base_validation_errors
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -94,7 +95,7 @@ class ValidateExplorationCommitLogEntryModel(
         elif model.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:
-            raise Exception(
+            raise base_validation_errors.ModelIdRegexException(
                 'model %s Entity id %s: Entity id does not match regex '
                 'pattern' % (
                     base_model_validators.ERROR_CATEGORY_ID_CHECK, model.id))
