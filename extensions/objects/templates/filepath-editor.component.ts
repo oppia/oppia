@@ -516,18 +516,15 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
     }
   }
 
-  private getTrustedResourceUrlForImageFileName(
-      imageFileName, sanitizeSvg = false) {
+  private getTrustedResourceUrlForImageFileName(imageFileName) {
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
       this.imageLocalStorageService.isInStorage(imageFileName)) {
-      const imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
+      const imageUrl = this.imageLocalStorageService.getRawImageData(
         imageFileName);
-      if (imageFileName.endsWith('.svg') && sanitizeSvg) {
-        const rawImageData = this.imageLocalStorageService.getRawImageData(
-          imageFileName);
-        return this.svgSanitizerService.getTrustedSvgResourceUrl(rawImageData);
+      if (imageFileName.endsWith('.svg')) {
+        return this.svgSanitizerService.getTrustedSvgResourceUrl(imageUrl);
       }
       return imageUrl;
     }
@@ -815,7 +812,8 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
 
   private updateValidationWithLatestDimensions(): void {
     const dimensions = this.calculateTargetImageDimensions();
-    const imageDataURI = <string> this.data.metadata.uploadedImageData;
+    const imageDataURI = (
+      this.imgData || <string> this.data.metadata.uploadedImageData);
     const mimeType = (<string>imageDataURI).split(';')[0];
     if (mimeType === 'data:image/gif') {
       let successCb = obj => {
@@ -889,7 +887,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
         savedImageFilename: filename,
         // Check point 2 in the note before imports and after fileoverview.
         savedImageUrl: this.getTrustedResourceUrlForImageFileName(
-          filename, true) as string
+          filename) as string
       },
       crop: true
     };
@@ -1054,18 +1052,13 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       // Check point 2 in the note before imports and after fileoverview.
       this.imgData = imageData;
       this.imageLocalStorageService.saveImage(filename, imageData);
-      const img = new Image();
-      img.onload = () => {
-        this.setSavedImageFilename(filename, true);
-        const dimensions = (
-          this.imagePreloaderService.getDimensionsOfImage(filename));
-        this.imageContainerStyle = {
-          height: dimensions.height + 'px',
-          width: dimensions.width + 'px'
-        };
+      this.setSavedImageFilename(filename, true);
+      const dimensions = (
+        this.imagePreloaderService.getDimensionsOfImage(filename));
+      this.imageContainerStyle = {
+        height: dimensions.height + 'px',
+        width: dimensions.width + 'px'
       };
-      // Check point 2 in the note before imports and after fileoverview.
-      img.src = this.getTrustedResourceUrlForImageFileName(filename) as string;
     };
     reader.readAsDataURL(resampledFile);
   }
