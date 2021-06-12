@@ -19,7 +19,7 @@
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
-require('base-components/base-content.directive.ts');
+require('base-components/base-content.component.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
@@ -30,7 +30,7 @@ require(
 require(
   'pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts');
 require(
-  'pages/topic-editor-page/questions-tab/topic-questions-tab.directive.ts');
+  'pages/topic-editor-page/questions-tab/topic-questions-tab.component.ts');
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
