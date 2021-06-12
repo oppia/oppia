@@ -17,13 +17,9 @@
  */
 
 import { DOCUMENT } from '@angular/common';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
-import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component';
-import { SideNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
-import { TopNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.component';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { Observable, of } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -35,11 +31,9 @@ import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
-import { LoadingMessageComponent } from './loading-message.component';
-import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-describe('Base Content Component', () => {
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Base Content Component', () => {
   let fixture: ComponentFixture<BaseContentComponent>;
   let componentInstance: BaseContentComponent;
   let isIframed: boolean = false;
@@ -62,19 +56,19 @@ describe('Base Content Component', () => {
   }
 
   class MockWindowRef {
-    nativeWindow = {
-      location: {
-        hostname: hostname,
-        href: href,
-        pathname: pathname,
-        search: search,
-        hash: hash
-      }
-    };
+     nativeWindow = {
+       location: {
+         hostname: hostname,
+         href: href,
+         pathname: pathname,
+         search: search,
+         hash: hash
+       }
+     };
   }
 
   class MockLoaderService {
-    onLoadingMessageChange: Observable<string> = of('Test Message');
+     onLoadingMessageChange: Observable<string> = of('Test Message');
   }
 
   class MockPageTitleService {
@@ -91,14 +85,7 @@ describe('Base Content Component', () => {
     TestBed.configureTestingModule({
       declarations: [
         BaseContentComponent,
-        OppiaFooterDirective,
-        LoadingMessageComponent,
-        WarningsAndAlertsComponent,
-        PromoBarComponent,
-        TopNavigationBarComponent,
-        SideNavigationBarComponent,
         MockTranslatePipe,
-        AlertMessageComponent,
         LimitToPipe
       ],
       providers: [
@@ -134,18 +121,18 @@ describe('Base Content Component', () => {
     loaderService = (loaderService as unknown) as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     keyboardShortcutService = (keyboardShortcutService as unknown) as
-    jasmine.SpyObj<KeyboardShortcutService>;
+     jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
     windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     sidebarStatusService = (sidebarStatusService as unknown) as
-    jasmine.SpyObj<SidebarStatusService>;
+     jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
     bottomNavbarStatusService = (bottomNavbarStatusService as unknown) as
-    jasmine.SpyObj<BottomNavbarStatusService>;
+     jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
     backgroundMaskService = (backgroundMaskService as unknown) as
-    jasmine.SpyObj<BackgroundMaskService>;
+     jasmine.SpyObj<BackgroundMaskService>;
   });
 
   it('should create', () => {
@@ -164,7 +151,7 @@ describe('Base Content Component', () => {
     expect(componentInstance.getSubheaderText).toBeDefined();
     expect(windowRef.nativeWindow.location.href).toEqual(
       'https://oppiatestserver.appspot.com' +
-      pathname + search + hash
+       pathname + search + hash
     );
   });
 

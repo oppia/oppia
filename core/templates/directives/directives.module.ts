@@ -27,7 +27,6 @@ import { FocusOnDirective } from './focus-on.directive';
 import { HeadroomDirective } from './headroom.directive';
 import { MathJaxDirective } from './mathjax.directive';
 import { NgInitDirective } from './ng-init.directive';
-import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 
 @NgModule({
   imports: [
@@ -40,7 +39,6 @@ import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
     HeadroomDirective,
     MathJaxDirective,
     NgInitDirective,
-    OppiaFooterDirective,
   ],
   entryComponents: [],
   exports: [
@@ -48,7 +46,6 @@ import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
     HeadroomDirective,
     MathJaxDirective,
     NgInitDirective,
-    OppiaFooterDirective,
   ],
 })
 
