@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Lint check to ensure that follow valid comment
- * style.
+ * @fileoverview Lint check to ensure that comments follow valid style.
  */
 
 'use strict';
@@ -24,7 +23,7 @@ module.exports = {
     type: 'problem',
     docs: {
       description: (
-        'Lint check to ensure that follow valid comment style'),
+        'Lint check to ensure that comments follow valid style'),
       category: 'Stylistic Issues',
       recommended: true
     },
@@ -45,7 +44,7 @@ module.exports = {
 
   create: function(context) {
     var allowedTerminatingPunctuations = ['.', '?', ';', ',', '{', '^', ')',
-      '}', '>'];
+      '}', '>', '/>'];
     var allowedPhrases = [
       '@ts-expect-error', '@ts-ignore', '--params', 'eslint-disable',
       'eslint-enable', 'http://', 'https://', 'disable', '----'];

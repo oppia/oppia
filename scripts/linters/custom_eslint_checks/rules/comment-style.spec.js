@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,10 +58,22 @@ ruleTester.run('test-message-style', rule, {
   invalid: [
     {
       code:
-        `// We only run the e2e action checks on end-to-end test files.
+        `// We only run the e2e action checks on end-to-end test files
+        // The following must be off so that we can enable
+        var a = 5;
+        `,
+      errors: [{
+        message: (
+          'Invalid punctuation used at the end of the comment'),
+        type: null
+      }]
+    },
+    {
+      code:
+        `// Taking a variable name a.
         var a = 5;
 
-        // The following must be off so that we can enable
+        // assign it value to 5 above
         `,
       errors: [{
         message: (
