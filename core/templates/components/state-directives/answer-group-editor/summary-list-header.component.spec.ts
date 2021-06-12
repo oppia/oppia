@@ -34,7 +34,7 @@ describe('SummaryListHeaderComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should delete item', () => {
+  it('should delete item when user clicks on the delete button', () => {
     let itemDeletionEvent: Event = new Event('event');
     component.index = 1;
     spyOn(component.summaryDelete, 'emit');

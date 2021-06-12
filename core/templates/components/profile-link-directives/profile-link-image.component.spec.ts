@@ -45,7 +45,7 @@ describe('ProfileLinkImageComponent', () => {
       ProfileLinkImageBackendApiService);
   });
 
-  it('should get profile picture data on initialization', fakeAsync(() => {
+  it('should show profile picture on initialisation', fakeAsync(() => {
     component.username = 'user1';
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'default-image-url');
@@ -61,8 +61,8 @@ describe('ProfileLinkImageComponent', () => {
     expect(component.profilePicture).toBe('path/to/base64-profile-picture-url');
   }));
 
-  it('should get default profile picture if user\'s profile picture data is' +
-    ' not available', fakeAsync(() => {
+  it('should show the default profile picture user hasn\'t set or has' +
+    ' removed their profile picture', fakeAsync(() => {
     component.username = 'user1';
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'default-image-url');
@@ -75,7 +75,7 @@ describe('ProfileLinkImageComponent', () => {
     expect(component.profilePicture).toBe('default-image-url');
   }));
 
-  it('should check if username is linkable', () => {
+  it('should link the username/profile to the image if linkable', () => {
     let usernamesNotLinkable = ['admin', 'OppiaMigrationBot'];
 
     expect(component.isUsernameLinkable(usernamesNotLinkable[0])).toBe(false);

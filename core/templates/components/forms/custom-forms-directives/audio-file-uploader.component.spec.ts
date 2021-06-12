@@ -72,7 +72,7 @@ describe('Audio File Uploader Component', () => {
       .toEqual('This file is not recognized as an audio file.');
   });
 
-  it('should add audio file', () => {
+  it('should upload an audio file', () => {
     let files = [
       new File(['foo'], 'audio.mp3', {
         type: 'audio/mpeg',
@@ -93,7 +93,7 @@ describe('Audio File Uploader Component', () => {
     expect(component.fileClear.emit).not.toHaveBeenCalled();
   });
 
-  it('should emit fileClear event if file is not valid', () => {
+  it('should not upload if the audio file is not valid', () => {
     component.fileInputRef.nativeElement = {
       files: [
         new File(['foo'], 'audio.mp4', {
@@ -110,7 +110,7 @@ describe('Audio File Uploader Component', () => {
     expect(component.fileChange.emit).not.toHaveBeenCalled();
   });
 
-  it('should emit fileClear event if no file is uploaded', () => {
+  it('should reset the uploader if no file is uploaded by the user', () => {
     component.fileInputRef.nativeElement = {
       files: []
     };
