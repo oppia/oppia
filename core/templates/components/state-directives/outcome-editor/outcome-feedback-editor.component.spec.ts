@@ -72,6 +72,10 @@ describe('Outcome Feedback Editor Component', () => {
   });
 
   it('should update html', () => {
+    const changeDetectorRef = fixture.debugElement.injector.get(
+      ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = {
       feedback: {
         html: '<p> Previous HTML string </p>'
@@ -85,5 +89,26 @@ describe('Outcome Feedback Editor Component', () => {
     component.updateHtml('<p> New HTML string </p>');
 
     expect(component.outcome.feedback.html).toBe('<p> New HTML string </p>');
+    expect(detectChangesSpy).toHaveBeenCalled();
+  });
+
+  it('should not update html if the new and old html' +
+    ' strings are the same', () => {
+    const changeDetectorRef = fixture.debugElement.injector.get(
+      ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype, 'detectChanges');
+    component.outcome = {
+      feedback: {
+        html: '<p> Previous HTML string </p>'
+      },
+      hasNonemptyFeedback: () => true
+    };
+
+    expect(component.outcome.feedback.html).toBe(
+      '<p> Previous HTML string </p>');
+
+    component.updateHtml('<p> Previous HTML string </p>');
+    expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 });
