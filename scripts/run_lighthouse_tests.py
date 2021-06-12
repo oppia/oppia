@@ -62,17 +62,23 @@ def run_lighthouse_puppeteer_script():
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
 
-    try:
-        script_output = subprocess.check_output(bash_command).split('\n')
-    except subprocess.CalledProcessError:
+    process = subprocess.Popen(
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+        for line in stdout:
+            export_url(line)
+        python_utils.PRINT('Lighthouse checks completed successfully.')
+    else:
+        python_utils.PRINT('Return code: %s' % process.returncode)
+        python_utils.PRINT('OUTPUT:')
+        python_utils.PRINT(stdout)
+        python_utils.PRINT('ERROR:')
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Puppeteer script failed. More details can be found above.')
         sys.exit(1)
-    else:
-        python_utils.PRINT(script_output)
-        for url in script_output:
-            export_url(url)
-        python_utils.PRINT('Puppeteer script completed successfully.')
 
 
 def run_webpack_compilation():
@@ -94,24 +100,26 @@ def run_webpack_compilation():
         sys.exit(1)
 
 
-def export_url(url):
-    """Exports the entity ID in the URL to an environmental variable.
+def export_url(line):
+    """Exports the entity ID in the given line to an environmental variable, if
+    the line is a URL.
 
     Args:
-        url: str. The URL to parse and extract the entity ID from. If no ID is
-            present, nothing is exported to the environment.
+        line: str. The line to parse and extract the entity ID from. If no
+            recognizable URL is present, nothing is exported to the
+            environment.
     """
-    url_parts = url.split('/')
-    python_utils.PRINT('Parsing and exporting entity ID in URL: %s' % url)
-    if 'collection_editor' in url:
+    url_parts = line.split('/')
+    python_utils.PRINT('Parsing and exporting entity ID in line: %s' % line)
+    if 'collection_editor' in line:
         os.environ['collection_id'] = url_parts[5]
-    elif 'create' in url:
+    elif 'create' in line:
         os.environ['exploration_id'] = url_parts[4]
-    elif 'topic_editor' in url:
+    elif 'topic_editor' in line:
         os.environ['topic_id'] = url_parts[4]
-    elif 'story_editor' in url:
+    elif 'story_editor' in line:
         os.environ['story_id'] = url_parts[4]
-    elif 'skill_editor' in url:
+    elif 'skill_editor' in line:
         os.environ['skill_id'] = url_parts[4]
     else:
         return
@@ -130,10 +138,17 @@ def run_lighthouse_checks(lighthouse_mode):
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
     ]
 
-    try:
-        subprocess.check_call(bash_command)
+    process = subprocess.Popen(
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
         python_utils.PRINT('Lighthouse checks completed successfully.')
-    except subprocess.CalledProcessError:
+    else:
+        python_utils.PRINT('Return code: %s' % process.returncode)
+        python_utils.PRINT('OUTPUT:')
+        python_utils.PRINT(stdout)
+        python_utils.PRINT('ERROR:')
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Lighthouse checks failed. More details can be found above.')
         sys.exit(1)
