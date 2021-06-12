@@ -17,13 +17,9 @@
  */
 
 import { DOCUMENT } from '@angular/common';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AlertMessageComponent } from 'components/common-layout-directives/common-elements/alert-message.component';
-import { PromoBarComponent } from 'components/common-layout-directives/common-elements/promo-bar.component';
-import { SideNavigationBarComponent } from 'components/common-layout-directives/navigation-bars/side-navigation-bar.component';
-import { TopNavigationBarDirective } from 'components/common-layout-directives/navigation-bars/top-navigation-bar.directive';
 import { LimitToPipe } from 'filters/limit-to.pipe';
-import { OppiaFooterDirective } from 'pages/OppiaFooterDirective';
 import { Observable, of } from 'rxjs';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -35,8 +31,6 @@ import { SidebarStatusService } from 'services/sidebar-status.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { BaseContentComponent } from './base-content.component';
-import { LoadingMessageComponent } from './loading-message.component';
-import { WarningsAndAlertsComponent } from './warnings-and-alerts.component';
 
 describe('Base Content Component', () => {
   let fixture: ComponentFixture<BaseContentComponent>;
@@ -90,14 +84,7 @@ describe('Base Content Component', () => {
     TestBed.configureTestingModule({
       declarations: [
         BaseContentComponent,
-        OppiaFooterDirective,
-        LoadingMessageComponent,
-        WarningsAndAlertsComponent,
-        PromoBarComponent,
-        TopNavigationBarDirective,
-        SideNavigationBarComponent,
         MockTranslatePipe,
-        AlertMessageComponent,
         LimitToPipe
       ],
       providers: [
@@ -121,7 +108,8 @@ describe('Base Content Component', () => {
           useClass: MockPageTitleService
         },
         SidebarStatusService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
