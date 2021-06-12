@@ -20,7 +20,6 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
@@ -31,7 +30,6 @@ import { AnswerClassificationService, InteractionRulesService } from 'pages/expl
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
@@ -39,10 +37,6 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
   providedIn: 'root'
 })
 export class QuestionPlayerEngineService {
-  private explorationId: string = null;
-  private questionPlayerMode: boolean = null;
-  private version: number = null;
-
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
   private currentIndex: number = null;
@@ -56,10 +50,7 @@ export class QuestionPlayerEngineService {
       private expressionInterpolationService: ExpressionInterpolationService,
       private focusManagerService: FocusManagerService,
       private questionObjectFactory: QuestionObjectFactory,
-      private readOnlyExplorationBackendApiService:
-        ReadOnlyExplorationBackendApiService,
-      private stateCardObjectFactory: StateCardObjectFactory,
-      private urlService: UrlService) {
+      private stateCardObjectFactory: StateCardObjectFactory) {
 
   }
 
@@ -83,9 +74,9 @@ export class QuestionPlayerEngineService {
     // value. If they are the same, then the variable is not updated.
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
-    var randomSuffix = '';
-    var N = Math.round(Math.random() * 1000);
-    for (var i = 0; i < N; i++) {
+    let randomSuffix = '';
+    const N = Math.round(Math.random() * 1000);
+    for (let i = 0; i < N; i++) {
       randomSuffix += ' ';
     }
     return randomSuffix;
@@ -95,35 +86,32 @@ export class QuestionPlayerEngineService {
   private loadInitialQuestion(
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
-    if (!this.questions || this.questions.length === 0) {
+    this.contextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
+    const initialState = this.questions[0].getStateData();
+
+    const questionHtml = this.makeQuestion(initialState, []);
+    if (questionHtml === null) {
+      this.alertsService.addWarning('Question name should not be empty.');
       errorCallback();
       return;
     }
-    this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
-    var initialState = this.questions[0].getStateData();
 
-    var questionHtml = this.makeQuestion(initialState, []);
-    if (questionHtml === null) {
-      this.alertsService.addWarning('Expression parsing error.');
-      return;
-    }
-
-    this.currentIndex = 0;
+    this.setCurrentIndex(0);
     this.nextIndex = 0;
 
-    var interaction = initialState.interaction;
-    var nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    const interaction = initialState.interaction;
+    const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
-    var interactionId = interaction.id;
-    var interactionHtml = null;
+    const interactionId = interaction.id;
+    let interactionHtml = null;
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
         interactionId, interaction.customizationArgs, true, nextFocusLabel,
         null);
     }
-    var initialCard =
+    const initialCard =
       this.stateCardObjectFactory.createNewCard(
         null, questionHtml, interactionHtml, interaction,
         initialState.recordedVoiceovers,
@@ -140,7 +128,7 @@ export class QuestionPlayerEngineService {
   }
 
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    var interactionId = this.getNextStateData().interaction.id;
+    const interactionId = this.getNextStateData().interaction.id;
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
@@ -154,29 +142,29 @@ export class QuestionPlayerEngineService {
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
     this.contextService.setQuestionPlayerIsOpen();
-    this.explorationId = this.contextService.getExplorationId();
-    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
-    this.version = this.urlService.getExplorationVersionFromUrl();
-
-    if (!this.questionPlayerMode) {
-      this.readOnlyExplorationBackendApiService
-        .loadExplorationAsync(this.explorationId, this.version)
-        .then(function(exploration) {
-          this.version = exploration.version;
-        });
+    this.setAnswerIsBeingProcessed(false);
+    for (let i = 0; i < questionDicts.length; i++) {
+      this.addQuestion(
+        this.questionObjectFactory.createFromBackendDict(questionDicts[i]));
     }
-
-    this.answerIsBeingProcessed = false;
-    for (var i = 0; i < questionDicts.length; i++) {
-      this.questions.push(
-        this.questionObjectFactory.createFromBackendDict(questionDicts[i])
-      );
+    if (!this.questions || this.questions.length === 0) {
+      this.alertsService.addWarning('There are no questions to display.');
+      errorCallback();
+      return;
     }
     this.loadInitialQuestion(successCallback, errorCallback);
   }
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
+  }
+
+  getCurrentIndex(): number {
+    return this.currentIndex;
+  }
+
+  setCurrentIndex(value: number): void {
+    this.currentIndex = value;
   }
 
   getCurrentQuestion(): Question {
@@ -189,14 +177,6 @@ export class QuestionPlayerEngineService {
 
   getQuestionCount(): number {
     return this.questions.length;
-  }
-
-  getExplorationId(): string {
-    return this.explorationId;
-  }
-
-  getExplorationVersion(): number {
-    return this.version;
   }
 
   clearQuestions(): void {
@@ -213,6 +193,14 @@ export class QuestionPlayerEngineService {
 
   isAnswerBeingProcessed(): boolean {
     return this.answerIsBeingProcessed;
+  }
+
+  setAnswerIsBeingProcessed(value: boolean): void {
+    this.answerIsBeingProcessed = value;
+  }
+
+  addQuestion(question: Question): void {
+    this.questions.push(question);
   }
 
   submitAnswer(
@@ -235,75 +223,76 @@ export class QuestionPlayerEngineService {
       return;
     }
 
-    var answerString = answer as string;
-    this.answerIsBeingProcessed = true;
-    var oldState = this.getCurrentStateData();
-    var recordedVoiceovers = oldState.recordedVoiceovers;
-    var classificationResult = (
+    const answerString = answer as string;
+    this.setAnswerIsBeingProcessed(true);
+    const oldState = this.getCurrentStateData();
+    const recordedVoiceovers = oldState.recordedVoiceovers;
+    const classificationResult = (
       this.answerClassificationService.getMatchingClassificationResult(
         null, oldState.interaction, answer,
         interactionRulesService));
-    var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
-    var taggedSkillMisconceptionId = null;
-    if (oldState.interaction.answerGroups[answerString]) {
+    const answerGroupIndex = classificationResult.answerGroupIndex;
+    const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+    let taggedSkillMisconceptionId = null;
+    if (oldState.interaction.answerGroups[answerGroupIndex]) {
       taggedSkillMisconceptionId =
-        oldState.interaction.answerGroups[answerString]
+        oldState.interaction.answerGroups[answerGroupIndex]
           .taggedSkillMisconceptionId;
     }
 
     // Use angular.copy() to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    var outcome = angular.copy(classificationResult.outcome);
+    const outcome = angular.copy(classificationResult.outcome);
     // Compute the data for the next state.
-    var oldParams = {
+    const oldParams = {
       answer: answerString
     };
-    var feedbackHtml =
+    const feedbackHtml =
       this.makeFeedback(outcome.feedback.html, [oldParams]);
-    var feedbackContentId = outcome.feedback.contentId;
-    var feedbackAudioTranslations = (
+    const feedbackContentId = outcome.feedback.contentId;
+    const feedbackAudioTranslations = (
       recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
     if (feedbackHtml === null) {
-      this.answerIsBeingProcessed = false;
-      this.alertsService.addWarning('Expression parsing error.');
+      this.setAnswerIsBeingProcessed(false);
+      this.alertsService.addWarning('Feedback content should not be empty.');
       return;
     }
 
-    var newState = null;
+    let newState = null;
     if (answerIsCorrect && (this.currentIndex < this.questions.length - 1)) {
       newState = this.questions[this.currentIndex + 1].getStateData();
     } else {
       newState = oldState;
     }
 
-    var questionHtml = this.makeQuestion(newState, [oldParams, {
+    let questionHtml = this.makeQuestion(newState, [oldParams, {
       answer: 'answer'
     }]);
     if (questionHtml === null) {
-      this.answerIsBeingProcessed = false;
-      this.alertsService.addWarning('Expression parsing error.');
+      this.setAnswerIsBeingProcessed(false);
+      this.alertsService.addWarning('Question name should not be empty.');
       return;
     }
-    this.answerIsBeingProcessed = false;
+    this.setAnswerIsBeingProcessed(false);
 
-    var interactionId = oldState.interaction.id;
-    var interactionIsInline = (
+    const interactionId = oldState.interaction.id;
+    const interactionIsInline = (
       !interactionId ||
       InteractionSpecsConstants.
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
-    var refreshInteraction = (
+    const refreshInteraction = (
       answerIsCorrect || interactionIsInline);
 
     this.nextIndex = this.currentIndex + 1;
-    var isFinalQuestion = (this.nextIndex === this.questions.length);
-    var onSameCard = !answerIsCorrect;
+    const isFinalQuestion = (this.nextIndex === this.questions.length);
+    const onSameCard = !answerIsCorrect;
 
-    var _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    var nextCard = null;
+    const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    let nextCard = null;
     if (!isFinalQuestion) {
-      var nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
+      let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
