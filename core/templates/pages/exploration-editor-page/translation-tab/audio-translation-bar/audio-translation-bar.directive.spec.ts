@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, NgZone } from '@angular/core';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { StateRecordedVoiceoversService } from
   // eslint-disable-next-line max-len
@@ -60,6 +60,7 @@ describe('Audio translation bar directive', function() {
   var userExplorationPermissionsService = null;
   var userService = null;
   var voiceoverRecordingService = null;
+  let zone: NgZone = null;
 
   var stateName = 'State1';
   var explorationId = 'exp1';
@@ -81,6 +82,8 @@ describe('Audio translation bar directive', function() {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
+    zone = TestBed.inject(NgZone);
+    spyOn(zone, 'runOutsideAngular').and.callFake((fn: Function) => fn());
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
