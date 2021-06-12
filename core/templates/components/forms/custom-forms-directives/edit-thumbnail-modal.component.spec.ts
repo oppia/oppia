@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { EditThumbnailModalComponent } from './edit-thumbnail-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { NO_ERRORS_SCHEMA, Pipe, SimpleChanges } from '@angular/core';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Pipe({name: 'translate'})
@@ -157,18 +157,10 @@ describe('Edit Thumbnail Modal Component', () => {
     expect(component.invalidImageWarningIsShown).toBeTrue();
   });
 
-  it('should check for uploaded Image if there is a filechange', () => {
-    component.uploadedImage = 'uploaded_image1.svg';
-    const changes: SimpleChanges = {
-      uploadedImage: {
-        previousValue: 'uploaded_image1.svg',
-        currentValue: 'uploaded_image1.svg',
-        firstChange: false,
-        isFirstChange: () => false
-      }
-    };
-    component.ngOnChanges(changes);
-    expect(component.openInUploadMode).toBeFalse();
+  it('should update bgColor on initialization of modal', () => {
+    component.bgColor = '#FFFFFF';
+    component.ngOnInit();
+    expect(component.updateBackgroundColor).toHaveBeenCalled();
   });
 
   it('should check for uploaded image to be svg', () => {
@@ -200,7 +192,7 @@ describe('Edit Thumbnail Modal Component', () => {
 
   it('should close the modal when clicking on Add Thumbnail Button', () => {
     component.uploadedImage = 'uploaded_img.svg';
-    component.tempBgColor = '#fff';
+    component.bgColor = '#fff';
     component.openInUploadMode = false;
     component.dimensions = {
       height: 180,
@@ -221,12 +213,5 @@ describe('Edit Thumbnail Modal Component', () => {
   it('should close the modal on clicking cancel button', () => {
     component.cancel();
     expect(dismissSpy).toHaveBeenCalled();
-  });
-
-  it('should set updated background color on closing the modal', () => {
-    component.bgColor = '#123456';
-    component.confirm();
-    expect(dismissSpy).toHaveBeenCalledWith(
-      jasmine.objectContaining({ newBgColor: '#123456' }));
   });
 });
