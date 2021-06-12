@@ -271,9 +271,8 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
                     topic.update_thumbnail_filename(change.new_value)
                     thumbnail_url = (
-                            'http://localhost:8181/assetsdevhandler/topic/%s/'
-                            'assets/thumbnail/%s'
-                            % (topic_id, change.new_value))
+                        'http://localhost:8181/assetsdevhandler/topic/%s/assets'
+                        '/thumbnail/%s' % (topic_id, change.new_value))
                     thumbnail_size_in_bytes = python_utils.url_open(
                         thumbnail_url).headers['Content-Length']
                     topic.update_thumbnail_size_in_bytes(thumbnail_size_in_bytes)
