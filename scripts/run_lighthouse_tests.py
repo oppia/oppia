@@ -67,7 +67,7 @@ def run_lighthouse_puppeteer_script():
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         python_utils.PRINT(stdout)
-        for line in stdout:
+        for line in stdout.split('\n'):
             export_url(line)
         python_utils.PRINT('Lighthouse checks completed successfully.')
     else:
