@@ -62,7 +62,7 @@ if MYPY:
     DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
 # TODO(#13059): Every use of constants is followed by
-# type: ignore[attr-defined] because mypy is not able to identify the attributes
+# 'type: ignore[attr-defined]'' because mypy is not able to identify the attributes
 # of constants but this will be fixed after introduction of protobuf for
 # constants.
 
@@ -112,7 +112,8 @@ def get_file_contents(filepath, raw_bytes=False, mode='r'):
     else:
         encoding = 'utf-8'
 
-    with python_utils.open_file(filepath, mode, encoding=encoding) as f: # type: ignore[no-untyped-call]
+    with python_utils.open_file( # type: ignore[no-untyped-call]
+        filepath, mode, encoding=encoding) as f:
         return f.read() # type: ignore[no-any-return]
 
 
@@ -327,7 +328,8 @@ def convert_png_binary_to_data_url(content):
     if imghdr.what(None, h=content) == 'png': # type: ignore[call-overload]
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
-            python_utils.url_quote(base64.b64encode(content)) # type: ignore[no-untyped-call]
+            python_utils.url_quote( # type: ignore[no-untyped-call]
+                base64.b64encode(content))
         )
     else:
         raise Exception('The given string does not represent a PNG image.')
@@ -396,14 +398,19 @@ def set_url_query_parameter(url, param_name, param_value):
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = python_utils.url_split(url) # type: ignore[no-untyped-call]
-    query_params = python_utils.parse_query_string(query_string) # type: ignore[no-untyped-call]
+    scheme, netloc, path, query_string, fragment = (
+        python_utils.url_split(url)) # type: ignore[no-untyped-call]
+    query_params = (
+        python_utils.parse_query_string( # type: ignore[no-untyped-call]
+            query_string))
 
     query_params[param_name] = [param_value]
-    new_query_string = python_utils.url_encode(query_params, doseq=True) # type: ignore[no-untyped-call]
+    new_query_string = python_utils.url_encode( # type: ignore[no-untyped-call]
+        query_params, doseq=True)
 
-    return python_utils.url_unsplit( # type: ignore[no-untyped-call,no-any-return]
-        (scheme, netloc, path, new_query_string, fragment))
+    return ( # type: ignore[no-any-return]
+        python_utils.url_unsplit( # type: ignore[no-untyped-call]
+        (scheme, netloc, path, new_query_string, fragment)))
 
 
 class JSONEncoderForHTML(json.JSONEncoder):
@@ -450,7 +457,9 @@ def convert_to_hash(input_string, max_length):
     # Prefixing altchars with b' to ensure that all characters in encoded_string
     # remain encoded (otherwise encoded_string would be of type unicode).
     encoded_string = base64.b64encode(
-        hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(), # type: ignore[no-untyped-call]
+        hashlib.sha1(
+            python_utils.convert_to_bytes(  # type: ignore[no-untyped-call]
+                input_string)).digest(),
         altchars=b'ab'
     ).replace('=', 'c')
 
@@ -467,7 +476,9 @@ def base64_from_int(value):
     Returns:
         *. Returns the base64 representation of the number passed.
     """
-    byte_value = b'[' + python_utils.convert_to_bytes(value) + b']' # type: ignore[no-untyped-call]
+    byte_value = (
+        b'[' + python_utils.convert_to_bytes( # type: ignore[no-untyped-call]
+        value) + b']')
     return base64.b64encode(byte_value)
 
 
@@ -482,7 +493,9 @@ def get_time_in_millisecs(datetime_obj):
         float. The time in milliseconds since the Epoch.
     """
     msecs = time.mktime(datetime_obj.timetuple()) * 1000.0
-    return msecs + python_utils.divide(datetime_obj.microsecond, 1000.0) # type: ignore[no-untyped-call,no-any-return]
+    return ( # type: ignore[no-any-return]
+        msecs + python_utils.divide( # type: ignore[no-untyped-call]
+            datetime_obj.microsecond, 1000.0))
 
 
 def convert_naive_datetime_to_string(datetime_obj):
@@ -539,7 +552,9 @@ def get_human_readable_time_string(time_msec):
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
     return time.strftime(
-        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0))) # type: ignore[no-untyped-call,arg-type]
+        '%B %d %H:%M:%S', # type: ignore[arg-type]
+        time.gmtime(python_utils.divide( # type: ignore[no-untyped-call]
+            time_msec, 1000.0)))
 
 
 def create_string_from_largest_unit_in_timedelta(timedelta_obj):
@@ -724,7 +739,8 @@ def require_valid_url_fragment(name, name_type, allowed_length):
             '%s field should not exceed %d characters, '
             'received %s.' % (name_type, allowed_length, name))
 
-    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined]
+    if not re.match(
+        constants.VALID_URL_FRAGMENT_REGEX, name): # type: ignore[attr-defined]
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.' % (
@@ -785,7 +801,8 @@ def require_valid_meta_tag_content(meta_tag_content):
         raise ValidationError(
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content)
-    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT: # type: ignore[attr-defined]
+    if len(meta_tag_content) > (
+        constants.MAX_CHARS_IN_META_TAG_CONTENT): # type: ignore[attr-defined]
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_META_TAG_CONTENT) # type: ignore[attr-defined]
@@ -845,7 +862,8 @@ def get_hex_color_for_category(category):
     """
     return ( # type: ignore[no-any-return]
         constants.CATEGORIES_TO_COLORS[category] # type: ignore[attr-defined]
-        if category in constants.CATEGORIES_TO_COLORS # type: ignore[attr-defined]
+        if category in (
+            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
         else constants.DEFAULT_COLOR) # type: ignore[attr-defined]
 
 
@@ -861,7 +879,8 @@ def get_thumbnail_icon_url_for_category(category):
         str. Path to the Thumbnail Icon assigned to that category.
     """
     icon_name = (
-        category if category in constants.CATEGORIES_TO_COLORS # type: ignore[attr-defined]
+        category if category in (
+            constants.CATEGORIES_TO_COLORS) # type: ignore[attr-defined]
         else constants.DEFAULT_THUMBNAIL_ICON) # type: ignore[attr-defined]
     # Remove all spaces from the string.
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
@@ -877,7 +896,8 @@ def is_supported_audio_language_code(language_code):
     Returns:
         bool. Whether the language code is supported audio language code or not.
     """
-    language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES] # type: ignore[attr-defined]
+    language_codes = [lc['id'] for lc in (
+        constants.SUPPORTED_AUDIO_LANGUAGES)] # type: ignore[attr-defined]
     return language_code in language_codes
 
 
@@ -892,7 +912,8 @@ def is_valid_language_code(language_code):
         bool. Whether the language code is valid or not.
     """
     language_codes = [
-        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES] # type: ignore[attr-defined]
+        lc['code'] for lc in (
+            constants.SUPPORTED_CONTENT_LANGUAGES)] # type: ignore[attr-defined]
     return language_code in language_codes
 
 
@@ -910,7 +931,8 @@ def get_supported_audio_language_description(language_code):
     Raises:
         Exception. If the given language code is unsupported.
     """
-    for language in constants.SUPPORTED_AUDIO_LANGUAGES: # type: ignore[attr-defined]
+    for language in (
+        constants.SUPPORTED_AUDIO_LANGUAGES): # type: ignore[attr-defined]
         if language['id'] == language_code:
             return language['description'] # type: ignore[no-any-return]
     raise Exception('Unsupported audio language code: %s' % language_code)
@@ -963,7 +985,9 @@ def unescape_encoded_uri_component(escaped_string):
     Returns:
         str. Decoded string that was initially encoded with encodeURIComponent.
     """
-    return python_utils.urllib_unquote(escaped_string).decode('utf-8') # type: ignore[no-untyped-call,no-any-return]
+    return ( # type: ignore[no-any-return]
+        python_utils.urllib_unquote( # type: ignore[no-untyped-call]
+            escaped_string).decode('utf-8'))
 
 
 def snake_case_to_camel_case(snake_str):
@@ -1072,7 +1096,8 @@ def compute_list_difference(list_a, list_b):
 
 # Ignoring type-arg because error thrown is 'Missing type parameters for generic
 # type "OrderedDict"' but here we don't need to specify this.
-class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+class OrderedCounter(
+    collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass
@@ -1099,7 +1124,9 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return python_utils.zip_longest(*args, fillvalue=fillvalue) # type: ignore[no-untyped-call, no-any-return]
+    return ( # type: ignore[no-any-return]
+        python_utils.zip_longest( # type: ignore[no-untyped-call]
+            *args, fillvalue=fillvalue))
 
 
 def partition(iterable, predicate=bool, enumerated=False):
@@ -1146,7 +1173,8 @@ def partition(iterable, predicate=bool, enumerated=False):
         new_iterable = iterable
 
     # Creates two distinct generators over the same iterable. Memory-efficient.
-    true_part, false_part = itertools.tee((i, predicate(i)) for i in new_iterable)
+    true_part, false_part = itertools.tee(
+        (i, predicate(i)) for i in new_iterable)
     return (
         (i for i, predicate_is_true in true_part if predicate_is_true),
         (i for i, predicate_is_true in false_part if not predicate_is_true))

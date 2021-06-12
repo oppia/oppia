@@ -42,9 +42,6 @@ if MYPY:
 class UtilsTests(test_utils.GenericTestBase):
     """Test the core utility methods."""
 
-    def test_import(self):
-        utils.import_mypy_typing()
-
     def test_get_comma_sep_string_from_list(self):
         # type: () -> None
         """Test get_comma_sep_string_from_list method."""
