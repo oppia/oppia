@@ -259,12 +259,11 @@ var TopicEditorPage = function() {
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
     await action.click('Edit subtopic htm content button', subtopicPageContentButton);
-    var subtopicDecriptionRteToolbar = element(by.id('cke_editor3'));
-    await waitFor.visibilityOf(subtopicDecriptionRteToolbar,
-      'Subtopic Description RTE taking too long to appear');
     var subtopicDecriptionRte = element(by.css('oppia-rte'));
+    await waitFor.visibilityOf(subtopicDecriptionRte,
+      'Subtopic description RTE taking too long to appear.');
     await action.sendKeys('Subtopic Description RTE', subtopicDecriptionRte,
-      htmlContent, true);
+      htmlContent);
 
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath, false);
