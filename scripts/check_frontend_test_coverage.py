@@ -284,7 +284,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'solution-explanation-editor.directive.ts',
     'state-content-editor.directive.ts',
     'state-editor.directive.ts',
-    'state-editor.service.ts',
     'state-hints-editor.directive.ts',
     'state-interaction-editor.directive.ts',
     'state-property.service.ts',
