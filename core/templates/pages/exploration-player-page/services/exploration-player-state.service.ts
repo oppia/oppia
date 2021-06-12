@@ -17,7 +17,7 @@
  *  like engine service.
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter, OnInit } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -47,7 +47,7 @@ interface QuestionPlayerConfigDict {
 @Injectable({
   providedIn: 'root'
 })
-export class ExplorationPlayerStateService {
+export class ExplorationPlayerStateService implements OnInit {
   private _totalQuestionsReceivedEventEmitter: EventEmitter<number> = (
     new EventEmitter());
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> = (
@@ -84,7 +84,9 @@ export class ExplorationPlayerStateService {
     ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private urlService: UrlService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
@@ -102,7 +104,7 @@ export class ExplorationPlayerStateService {
       this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
       this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
       this.explorationId = this.contextService.getExplorationId();
-      this.version = urlService.getExplorationVersionFromUrl();
+      this.version = this.urlService.getExplorationVersionFromUrl();
 
       if (!this.questionPlayerMode &&
       !('skill_editor' === this.urlService.getPathname()

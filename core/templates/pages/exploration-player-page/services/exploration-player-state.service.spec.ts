@@ -95,28 +95,6 @@ describe('Exploration Player State Service', () => {
     inapplicable_skill_misconception_ids: []
   };
 
-  class MockUrlService {
-    getCollectionIdFromExplorationUrl(): string {
-      return '';
-    }
-
-    getExplorationVersionFromUrl(): string {
-      return null;
-    }
-
-    getStoryUrlFragmentFromLearnerUrl(): string {
-      return '1';
-    }
-
-    getUrlParams(): object {
-      return {};
-    }
-
-    getPathname(): string {
-      return '/no_skill_editor/in/path/name';
-    }
-  }
-
   class MockContextService {
     isInExplorationEditorPage(): boolean {
       return false;
@@ -154,10 +132,7 @@ describe('Exploration Player State Service', () => {
           provide: ContextService,
           useClass: MockContextService
         },
-        {
-          provide: UrlService,
-          useClass: MockUrlService
-        },
+        UrlService,
         {
           provide: ReadOnlyExplorationBackendApiService,
           useClass: MockReadOnlyExplorationBackendApiService
@@ -216,8 +191,7 @@ describe('Exploration Player State Service', () => {
     pretestQuestionBackendApiService = (
       pretestQuestionBackendApiService as unknown) as
       jasmine.SpyObj<PretestQuestionBackendApiService>;
-    urlService = (TestBed.inject(UrlService) as unknown) as
-      jasmine.SpyObj<UrlService>;
+    urlService = TestBed.inject(UrlService);
   });
 
   it('should properly initialize player', () => {
@@ -225,6 +199,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationPlayerStateService, 'initExplorationPreviewPlayer');
     let callback = () => {};
 
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.editorPreviewMode = true;
     explorationPlayerStateService.initializePlayer(callback);
     expect(playerTranscriptService.init).toHaveBeenCalled();
@@ -243,6 +218,7 @@ describe('Exploration Player State Service', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(explorationEngineService, 'init');
 
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initializeExplorationServices(
       returnDict, false, () => {});
 
@@ -258,6 +234,7 @@ describe('Exploration Player State Service', () => {
     let pretestQuestionDicts = [];
     let callback = () => {};
 
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initializePretestServices(
       pretestQuestionDicts, callback);
     expect(playerCorrectnessFeedbackEnabledService.init)
@@ -272,6 +249,7 @@ describe('Exploration Player State Service', () => {
     let successCallback = () => {};
     let errorCallback = () => {};
 
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initializeQuestionPlayerServices(
       questions, successCallback, errorCallback);
 
@@ -342,6 +320,7 @@ describe('Exploration Player State Service', () => {
     spyOn(playerCorrectnessFeedbackEnabledService, 'init');
     spyOn(numberAttemptsService, 'reset');
 
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initExplorationPreviewPlayer(() => {});
     tick();
 
@@ -360,6 +339,7 @@ describe('Exploration Player State Service', () => {
 
     let successCallback = () => {};
     let errorCallback = () => {};
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initQuestionPlayer({
       skillList: [],
       questionCount: 1,
@@ -390,6 +370,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationPlayerStateService, 'initializeExplorationServices');
 
     let successCallback = () => {};
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initExplorationPlayer(successCallback);
     tick();
     expect(explorationFeaturesService.init).toHaveBeenCalled();
@@ -414,6 +395,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationPlayerStateService, 'initializeExplorationServices');
 
     let successCallback = () => {};
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initExplorationPlayer(successCallback);
     tick();
     expect(explorationPlayerStateService.setExplorationMode).toHaveBeenCalled();
@@ -440,6 +422,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationPlayerStateService, 'initializeExplorationServices');
 
     let successCallback = () => {};
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initExplorationPlayer(successCallback);
     tick();
     expect(explorationPlayerStateService.setStoryChapterMode)
@@ -453,6 +436,7 @@ describe('Exploration Player State Service', () => {
     spyOn(explorationPlayerStateService, 'initQuestionPlayer');
     let successCallback = () => {};
     let errorCallback = () => {};
+    explorationPlayerStateService.ngOnInit();
     explorationPlayerStateService.initializeQuestionPlayer({
       skillList: [],
       questionCount: 1,
@@ -530,5 +514,30 @@ describe('Exploration Player State Service', () => {
     expect(explorationPlayerStateService.onPlayerStateChange).toBeDefined();
     expect(explorationPlayerStateService.onOppiaFeedbackAvailable)
       .toBeDefined();
+  });
+
+  it('should set exploration version from url if the url' +
+    'has exploration context when initialized', () => {
+    // Here exploration context consists of 'explore', 'create',
+    // 'skill_editor' and 'embed'.
+    spyOn(urlService, 'getPathname')
+      .and.returnValue('/create/in/path/name')
+    spyOn(urlService, 'getExplorationVersionFromUrl')
+      .and.returnValue(2);
+
+    expect(explorationPlayerStateService.version).toBe(undefined)
+    explorationPlayerStateService.ngOnInit();
+    expect(explorationPlayerStateService.version).toBe(2);
+  });
+
+  it('should set exploration version to default value if the url' +
+    'does not have exploration context when initialized', () => {
+    // Here default value is 1.
+    spyOn(urlService, 'getPathname')
+      .and.returnValue('/create_is_not/in/path/name')
+
+    expect(explorationPlayerStateService.version).toBe(undefined)
+    explorationPlayerStateService.ngOnInit();
+    expect(explorationPlayerStateService.version).toBe(1);
   });
 });
