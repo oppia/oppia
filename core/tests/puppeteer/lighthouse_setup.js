@@ -106,6 +106,7 @@ const login = async function(browser, page) {
     console.log('Login Failed');
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -132,6 +133,7 @@ const setRole = async function(browser, page, role) {
     console.log('Changing role to admin failed');
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -149,6 +151,7 @@ const getExplorationEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -170,6 +173,7 @@ const getCollectionEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -214,6 +218,7 @@ const getTopicEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -245,6 +250,7 @@ const getStoryEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -276,6 +282,7 @@ const getSkillEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -305,7 +312,7 @@ const main = async function() {
     ].join('\n')
   );
   await page.close();
-  process.exit();
+  process.exit(0);
 };
 
 main();
