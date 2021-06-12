@@ -68,8 +68,8 @@ export class SharingLinksComponent implements OnInit {
     }
 
     this.serverName = (
-      this.windowRef.nativeWindow.location.protocol + '//'
-        + this.windowRef.nativeWindow.location.host);
+      this.windowRef.nativeWindow.location.protocol + '//' +
+        this.windowRef.nativeWindow.location.host);
 
     this.escapedTwitterText = (
       this.htmlEscaperService.unescapedStrToEscapedStr(
