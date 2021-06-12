@@ -1073,6 +1073,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_release_coordinator_page
         def get(self):
@@ -1145,6 +1147,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_run_any_job
         def get(self):
@@ -1214,6 +1218,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_memcache
         def get(self):
@@ -2628,6 +2634,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             }
         }
         HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         @acl_decorators.can_access_story_viewer_page
         def get(self, _):
             self.render_template('story-viewer-page.mainpage.html')

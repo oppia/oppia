@@ -60,14 +60,6 @@ FORTY_EIGHT_HOURS_IN_SECS = 48 * 60 * 60
 PADDING = 1
 
 
-class MockHandlerWithSchema(base.BaseHandler):
-    """Baseclass for all MockHandlers. This class contains the basic schema,
-    which conform with the existing backend tests.
-    """
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {'GET': {}, 'POST': {}}
-
-
 class HelperFunctionTests(test_utils.GenericTestBase):
 
     def test_load_template(self):
@@ -114,8 +106,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     DELETED_USER_EMAIL = 'deleted.user@example.com'
     DELETED_USER_USERNAME = 'deleteduser'
 
-    class MockHandlerWithInvalidReturnType(MockHandlerWithSchema):
+    class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             self.render_template('invalid_page.html')
@@ -126,17 +120,25 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """
             self.render_template({'invalid_page.html'})
 
-    class MockHandlerForTestingErrorPageWithIframed(MockHandlerWithSchema):
+    class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             self.iframed = True
             self.render_template('invalid_page.html')
 
-    class MockHandlerForTestingUiAccessWrapper(MockHandlerWithSchema):
+    class MockHandlerForTestingUiAccessWrapper(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             """Handles GET requests."""
             pass
 
-    class MockHandlerForTestingAuthorizationWrapper(MockHandlerWithSchema):
+    class MockHandlerForTestingAuthorizationWrapper(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             """Handles GET requests."""
@@ -810,8 +812,10 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
 
 class EscapingTests(test_utils.GenericTestBase):
 
-    class FakePage(MockHandlerWithSchema):
+    class FakePage(base.BaseHandler):
         """Fake page for testing autoescaping."""
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
         def post(self):
             """Handles POST requests."""
@@ -842,10 +846,13 @@ class EscapingTests(test_utils.GenericTestBase):
 
 class RenderDownloadableTests(test_utils.GenericTestBase):
 
-    class MockHandler(MockHandlerWithSchema):
+    class MockHandler(base.BaseHandler):
         """Mock handler that subclasses BaseHandler and serves a response
         that is of a 'downloadable' type.
         """
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             """Handles GET requests."""
             file_contents = 'example'
@@ -1083,9 +1090,11 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
 class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
 
-    class FakeHandler(MockHandlerWithSchema):
+    class FakeHandler(base.BaseHandler):
         """A fake handler class."""
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             """Handles get requests."""
@@ -1170,7 +1179,9 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
 
 class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
     """Test that request.GET.items() correctly retrieves escaped characters."""
-    class MockHandler(MockHandlerWithSchema):
+    class MockHandler(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         def get(self):
             self.values.update(list(self.request.GET.items()))
@@ -1267,7 +1278,10 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
 
 class IframeRestrictionTests(test_utils.GenericTestBase):
 
-    class MockHandlerForTestingPageIframing(MockHandlerWithSchema):
+    class MockHandlerForTestingPageIframing(base.BaseHandler):
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
         def get(self):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
@@ -1458,7 +1472,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             if handler_class_name in self.non_schema_handlers:
                 continue
 
-            schema_written_for_request_methods =  (
+            schema_written_for_request_methods = (
                 handler.HANDLER_ARGS_SCHEMAS !=
                     base.BaseHandler.HANDLER_ARGS_SCHEMAS)
             schema_written_for_url_path_args = (
@@ -1473,13 +1487,13 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         for (name, handler_have_schemas) in handlers_checked:
             if not handler_have_schemas:
                 handlers_need_schema.append(name)
-                self.log_line('Schema not present in %s. %s' % (name, 'FAIL' ))
+                self.log_line('Schema not present in %s. %s' % (name, 'FAIL'))
         self.log_line(
             'Total number of handlers checked: %s' % len(handlers_checked))
 
         for (name, handler_have_schemas) in handlers_checked:
             self.assertTrue(handler_have_schemas,
-                'Schema required in handlers - [ %s ]' %(
+                'Schema required in handlers - [ %s ]' % (
                     ', '.join(handlers_need_schema)))
 
     def test_schema_keys_exactly_match_with_url_path_elements(self):
@@ -1600,7 +1614,6 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         handlers_with_schema_are_not_in_schema_requiring_list = True
         non_schema_requiring_handler = (
             payload_validator.NON_SCHEMA_REQUIRING_HANDLERS)
-        self.log_line('nik')
         for route in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
@@ -1613,7 +1626,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             if name in non_schema_requiring_handler:
                 continue
 
-            schema_written_for_request_methods =  (
+            schema_written_for_request_methods = (
                 handler.HANDLER_ARGS_SCHEMAS !=
                     base.BaseHandler.HANDLER_ARGS_SCHEMAS)
             schema_written_for_url_path_args = (

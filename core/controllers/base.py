@@ -312,8 +312,8 @@ class BaseHandler(webapp2.RequestHandler):
         """Validates schema for controller layer handler class arguments.
 
         Raises:
-            InvalidInputException: Schema validation failed.
-            NotImplementedError: Schema is not provided in handler class.
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
         """
         handler_class_name = self.__class__.__name__
         request_method = self.request.environ['REQUEST_METHOD']
@@ -321,18 +321,17 @@ class BaseHandler(webapp2.RequestHandler):
         url_path_args = self.request.route_kwargs
         non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
 
-
         if handler_class_name in non_schema_handlers:
             return
 
-        if self.URL_PATH_ARGS_SCHEMAS == None:
+        if self.URL_PATH_ARGS_SCHEMAS is None:
             raise NotImplementedError(
-                    'Please provide schema for %s method in %s handler class' %
-                    (request_method, handler_class_name))
-        if self.HANDLER_ARGS_SCHEMAS == None:
+                'Please provide schema for url path args in %s '
+                'handler class' % (handler_class_name))
+        if self.HANDLER_ARGS_SCHEMAS is None:
             raise NotImplementedError(
-                    'Please provide schema for %s method in %s handler class' %
-                    (request_method, handler_class_name))
+                'Please provide schema for %s method in %s handler class' % (
+                    request_method, handler_class_name))
 
         allowed_extra_args = False
         if self.GET_HANDLER_ERROR_RETURN_TYPE == 'html':
@@ -350,20 +349,22 @@ class BaseHandler(webapp2.RequestHandler):
             handler_args = {}
             for arg in self.request.arguments():
                 handler_args[arg] = self.request.get(arg)
-        if handler_args == None:
+        if handler_args is None:
             return
 
         schema_for_handler_args = self.HANDLER_ARGS_SCHEMAS
         try:
             schema_for_handler_args = schema_for_handler_args[request_method]
-        except Exception as e:
-            raise self.InvalidInputException('Provide schema for %s method'
-                ' in %s handler class.' % (request_method, handler_class_name))
+        except Exception:
+            raise self.InvalidInputException(
+                'Provide schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name))
 
         errors = payload_validator.validate(
             handler_args, schema_for_handler_args, allowed_extra_args)
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
+
     @property
     def current_user_is_site_maintainer(self):
         """Returns whether the current user is a site maintainer.

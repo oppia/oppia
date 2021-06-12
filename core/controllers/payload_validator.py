@@ -14,14 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Validates handler args against its schema by calling schema utils.
+Also contains a list of handler class names which does not contain the schema.
+"""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import schema_utils
-import python_utils
+
 
 def construct_args_schema(arg_key, arg_schema, handler_args):
-    """Constructs the schema for missing or None valued argument.
+    """This constructs the schema for missing or None valued argument.
 
     Args:
         arg_key: str. Name of the argument.
@@ -30,24 +34,26 @@ def construct_args_schema(arg_key, arg_schema, handler_args):
             coming from payloads or requests or url path elements.
 
     Returns:
-        value: dict. Value of the argument, empty dict if initially it was
-            None valued or missing in handler_args.
-        schema: dict: Schema of the argument.
+        *. A 2-tuple, the first element of which is the value of the argument,
+        it may be empty dict if initially it was None valued or missing in the
+        handler args. The second element is the schema of the argument
+        represented in dict.
     """
     value = {}
     schema = {}
-    if arg_key not in handler_args or handler_args[arg_key] == None:
-            schema['type'] = 'dict'
-            properties = [{
-                'name': arg_key,
-                'schema': arg_schema
-            }]
-            schema['properties'] = properties
+    if arg_key not in handler_args or handler_args[arg_key] is None:
+        schema['type'] = 'dict'
+        properties = [{
+            'name': arg_key,
+            'schema': arg_schema
+        }]
+        schema['properties'] = properties
     else:
         value = handler_args[arg_key]
         schema = arg_schema
 
     return value, schema
+
 
 def validate(handler_args, handler_args_schema, allowed_extra_args):
     """Calls schema utils for normalization of object against its schema
@@ -67,8 +73,7 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
         value, schema = construct_args_schema(arg_key, arg_schema, handler_args)
 
         try:
-            normalized_value = schema_utils.normalize_against_schema(
-                value, schema)
+            schema_utils.normalize_against_schema(value, schema)
         except Exception as e:
             errors.append(
                 'Schema validation for \'%s\' failed: %s' % (arg_key, e))
@@ -79,6 +84,7 @@ def validate(handler_args, handler_args_schema, allowed_extra_args):
         errors.append('Found extra args: %s.' % (list(extra_args)))
 
     return errors
+
 
 # Handlers which require schema validation, but currently they do
 # not have schema. In order to add schema incrementally this list is
@@ -338,8 +344,10 @@ SCHEMA_REQUIRING_HANDLERS = [
     'EmailDashboardCancelEmailHandler',
     'NumberOfDeletionRequestsHandler',
     'DeleteUserHandler',
-    'FakePage',
-    'FakeHandler',
+    'MemoryCacheHandler',
+    'JobOutputHandler',
+    'JobsHandler',
+    'ReleaseCoordinatorPage',
     'EditorAutosaveHandler'
 ]
 
