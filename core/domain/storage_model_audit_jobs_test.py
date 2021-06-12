@@ -48,9 +48,6 @@ MODEL_CLASS_NAMES_TO_EXCLUDE = {
     'ExplorationAnnotationsModel',
     'StateAnswersModel',
     'StateAnswersCalcOutputModel',
-    'BlogPostModel',
-    'BlogPostRightsModel',
-    'BlogPostSummaryModel'
 }
 
 

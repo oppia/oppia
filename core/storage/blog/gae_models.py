@@ -54,8 +54,10 @@ class BlogPostModel(base_models.BaseModel):
     # to take a list of values of underlying type(str).
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog post.
-    thumbnail_filename = datastore_services.StringProperty(required=True)
-    # Time when the blog post model was published.
+    thumbnail_filename = (
+        datastore_services.StringProperty(indexed=True, required=True))
+    # Time when the blog post model was last published. Value will be None
+    # if the blog post is a draft i.e it is not published.
     published_on = (
         datastore_services.DateTimeProperty(indexed=True))
 
@@ -226,8 +228,10 @@ class BlogPostSummaryModel(base_models.BaseModel):
     # Tags associated with the blog post.
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog post.
-    thumbnail_filename = datastore_services.StringProperty(required=True)
-    # Time when the blog post model was published.
+    thumbnail_filename = (
+        datastore_services.StringProperty(indexed=True, required=True))
+    # Time when the blog post model was last published. Value will be None
+    # if the blog post is a draft i.e it is not published.
     published_on = (
         datastore_services.DateTimeProperty(indexed=True))
 
@@ -251,30 +255,6 @@ class BlogPostSummaryModel(base_models.BaseModel):
         return cls.query(
             cls.author_id == user_id
         ).get(keys_only=True) is not None
-
-    @staticmethod
-    def get_model_association_to_user():
-        """Model data has already been associated as a part of the
-        BlogPostModel to the user and thus does not need a separate user
-        association.
-        """
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls):
-        """Model contains data corresponding to a user (author_id), but this
-        isn't exported because noteworthy details that belong to this
-        model have already been exported as a part of the BlogPostModel.
-        """
-        return dict(super(BlogPostSummaryModel, cls).get_export_policy(), **{
-            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-        })
 
     @classmethod
     def create(cls, blog_post_id, author_id):
@@ -312,6 +292,30 @@ class BlogPostSummaryModel(base_models.BaseModel):
 
         return entity
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model data has already been associated as a part of the
+        BlogPostModel to the user and thus does not need a separate user
+        association.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model contains data corresponding to a user (author_id), but this
+        isn't exported because noteworthy details that belong to this
+        model have already been exported as a part of the BlogPostModel.
+        """
+        return dict(super(BlogPostSummaryModel, cls).get_export_policy(), **{
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'tags': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        })
+
     @classmethod
     def get_blog_post_summary_models(cls, blog_post_ids):
         """Returns a list of BlogPostSummaryModels for blog posts created by
@@ -334,7 +338,7 @@ class BlogPostRightsModel(base_models.BaseModel):
     The id of each instance is the blog_post_id.
     """
 
-    # The user_id of the blog editors of this blog post.
+    # The user_ids of the blog editors of this blog post.
     editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this blog post is published or not.
@@ -351,7 +355,7 @@ class BlogPostRightsModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether BlogPostRightsModel references user.
+        """Check whether BlogPostRightsModel references to the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -377,7 +381,6 @@ class BlogPostRightsModel(base_models.BaseModel):
             list(BlogPostRightsModel). The list of BlogPostRightsModel objects
             in which the given user is a editor.
         """
-
         return cls.query(cls.editor_ids == user_id).fetch()
 
     @staticmethod
@@ -408,10 +411,9 @@ class BlogPostRightsModel(base_models.BaseModel):
         Returns:
             dict. The user-relevant properties of BlogPostsRightsModel.
             in a python dict format. In this case, we are returning all the
-            ids of blog posts for which the user is editor of.
+            ids of blog posts for which the user is an editor.
         """
         editable_blog_posts = cls.get_all().filter(cls.editor_ids == user_id)
-
         editable_blog_post_ids = [blog.key.id() for blog in editable_blog_posts]
 
         return {

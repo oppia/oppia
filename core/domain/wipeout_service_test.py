@@ -47,13 +47,13 @@ import feconf
 import python_utils
 
 (
-    app_feedback_report_models, auth_models, blog_post_models,
+    app_feedback_report_models, auth_models, blog_models,
     collection_models, config_models, email_models, exp_models,
     feedback_models, improvements_models, question_models, skill_models,
     story_models, subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
-    models.NAMES.app_feedback_report, models.NAMES.auth, models.NAMES.blog_post,
+    models.NAMES.app_feedback_report, models.NAMES.auth, models.NAMES.blog,
     models.NAMES.collection, models.NAMES.config, models.NAMES.email,
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
     models.NAMES.question, models.NAMES.skill, models.NAMES.story,
@@ -4615,7 +4615,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
 
 
-class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
+class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
     BLOG_1_ID = 'blog_1_id'
@@ -4632,12 +4632,12 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
     THUMBNAIL = 'xyzabc'
 
     def setUp(self):
-        super(WipeoutServiceDeleteBlogPostsModelsTests, self).setUp()
+        super(WipeoutServiceDeleteBlogPostModelsTests, self).setUp()
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.blog_post_model = blog_post_models.BlogPostModel(
+        self.blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_1_ID,
             author_id=self.user_1_id,
             content=self.CONTENT,
@@ -4649,7 +4649,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         )
         self.blog_post_model.update_timestamps()
         self.blog_post_model.put()
-        self.blog_post_summary_model = blog_post_models.BlogPostSummaryModel(
+        self.blog_post_summary_model = blog_models.BlogPostSummaryModel(
             id=self.BLOG_1_ID,
             author_id=self.user_1_id,
             summary=self.SUMMARY,
@@ -4673,10 +4673,10 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.blog_post.value]
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
         )
         blog_post_model = (
-            blog_post_models.BlogPostModel.get_by_id(
+            blog_models.BlogPostModel.get_by_id(
                 self.BLOG_1_ID)
         )
         self.assertEqual(
@@ -4684,7 +4684,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
         )
         blog_post_summary_model = (
-            blog_post_models.BlogPostSummaryModel.get_by_id(
+            blog_models.BlogPostSummaryModel.get_by_id(
                 self.BLOG_1_ID)
         )
         self.assertEqual(
@@ -4698,7 +4698,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
 
         # Return blog post model to the original user ID.
         blog_post_model = (
-            blog_post_models.BlogPostModel.get_by_id(
+            blog_models.BlogPostModel.get_by_id(
                 self.BLOG_1_ID)
         )
         blog_post_model.author_id = self.user_1_id
@@ -4714,10 +4714,10 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.blog_post.value]
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
         )
         new_blog_post_model = (
-            blog_post_models.BlogPostModel.get_by_id(
+            blog_models.BlogPostModel.get_by_id(
                 self.BLOG_1_ID)
         )
         self.assertEqual(
@@ -4729,7 +4729,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         blog_post_models_list = []
         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
             blog_post_models_list.append(
-                blog_post_models.BlogPostModel(
+                blog_models.BlogPostModel(
                     id='blogmodel-%s' % i,
                     author_id=self.user_1_id,
                     content=self.CONTENT,
@@ -4740,12 +4740,12 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
                     thumbnail_filename=self.THUMBNAIL
                 )
             )
-            blog_post_models.BlogPostModel.update_timestamps_multi(
+            blog_models.BlogPostModel.update_timestamps_multi(
                 blog_post_models_list)
         blog_post_summary_models_list = []
         for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
             blog_post_summary_models_list.append(
-                blog_post_models.BlogPostSummaryModel(
+                blog_models.BlogPostSummaryModel(
                     id='blogmodel-%s' % i,
                     author_id=self.user_1_id,
                     summary=self.SUMMARY,
@@ -4756,7 +4756,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
                     thumbnail_filename=self.THUMBNAIL
                 )
             )
-            blog_post_models.BlogPostSummaryModel.update_timestamps_multi(
+            blog_models.BlogPostSummaryModel.update_timestamps_multi(
                 blog_post_summary_models_list)
         datastore_services.put_multi(
             blog_post_models_list + blog_post_summary_models_list)
@@ -4767,11 +4767,11 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
         pseudonymizable_user_id_mapping = (
             user_models.PendingDeletionRequestModel.get_by_id(
                 self.user_1_id
-            ).pseudonymizable_entity_mappings[models.NAMES.blog_post.value]
+            ).pseudonymizable_entity_mappings[models.NAMES.blog.value]
         )
 
         pseudonymized_blog_post_models = (
-            blog_post_models.BlogPostModel.get_multi(
+            blog_models.BlogPostModel.get_multi(
                 [model.id for model in blog_post_models_list]
             )
         )
@@ -4782,7 +4782,7 @@ class WipeoutServiceDeleteBlogPostsModelsTests(test_utils.GenericTestBase):
             )
 
         pseudonymized_blog_post_summary_models = (
-            blog_post_models.BlogPostSummaryModel.get_multi(
+            blog_models.BlogPostSummaryModel.get_multi(
                 [model.id for model in blog_post_summary_models_list]
             )
         )
