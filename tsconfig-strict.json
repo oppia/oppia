@@ -203,7 +203,12 @@
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.spec.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
-    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
+    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts",
+    "extensions/objects/templates/html-editor.component.ts",
+    "extensions/objects/templates/int-editor.component.ts",
+    "extensions/objects/templates/list-of-tabs-editor.component.ts",
+    "extensions/objects/templates/list-of-unicode-string-editor.component.ts",
+    "extensions/objects/templates/logic-error-category-editor.component.ts"
   ],
   "include": ["typings/*.ts"],
   "exclude": ["extensions/classifiers/proto"]

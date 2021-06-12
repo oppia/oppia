@@ -23,17 +23,22 @@
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+interface IntValidatorSchema {
+  type: string,
+  validators: { id: string }[]
+}
 @Component({
   selector: 'int-editor',
   templateUrl: './int-editor.component.html',
   styleUrls: []
 })
 export class IntEditorComponent implements OnInit {
-  @Input() modalId: symbol;
-
-  @Input() value: number;
+  // Angular lifecycle hooks are used to populate values, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  @Input() modalId!: symbol;
+  @Input() value!: number;
   @Input() valueChanged: EventEmitter<number> = new EventEmitter<number>();
-  SCHEMA: { type: string; validators: { id: string; }[]; } = {
+  SCHEMA: IntValidatorSchema = {
     type: 'int',
     validators: [{
       id: 'is_integer'
@@ -49,7 +54,7 @@ export class IntEditorComponent implements OnInit {
     }
   }
 
-  getSchema(): { type: string; validators: { id: string; }[]; } {
+  getSchema(): IntValidatorSchema {
     return this.SCHEMA;
   }
 

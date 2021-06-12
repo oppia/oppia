@@ -30,8 +30,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class HtmlEditorComponent {
-  @Input() modalId: symbol;
-  @Input() value;
+  // Angular lifecycle hooks are used to populate values, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  @Input() modalId!: symbol;
+  @Input() value!: string;
   @Output() valueChanged = new EventEmitter();
   schema = {
     type: 'html'
