@@ -30,8 +30,12 @@ from jobs.types import user_validation_errors
 
 import apache_beam as beam
 
-(auth_models, user_models) = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+(
+    auth_models, collection_models, exp_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.auth, models.NAMES.collection, models.NAMES.exploration,
+    models.NAMES.user
+])
 
 
 @validation_decorators.AuditsExisting(
@@ -105,9 +109,44 @@ class ValidateOldModelsMarkedDeleted(beam.DoFn):
             yield user_validation_errors.ModelExpiringError(model)
 
 
+@validation_decorators.RelationshipsOf(user_models.CompletedActivitiesModel)
+def completed_activities_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.exploration_ids, [exp_models.ExplorationModel]
+    yield model.collection_ids, [collection_models.CollectionModel]
+
+
 @validation_decorators.RelationshipsOf(
-    user_models.UserEmailPreferencesModel
-)
+    user_models.IncompleteActivitiesModel)
+def incomplete_activities_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.exploration_ids, [exp_models.ExplorationModel]
+    yield model.collection_ids, [collection_models.CollectionModel]
+
+
+@validation_decorators.RelationshipsOf(
+    user_models.ExpUserLastPlaythroughModel)
+def exp_user_last_playthrough_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.exploration_id, [exp_models.ExplorationModel]
+
+
+@validation_decorators.RelationshipsOf(
+    user_models.LearnerPlaylistModel)
+def learner_playlist_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.exploration_ids, [exp_models.ExplorationModel]
+    yield model.collection_ids, [collection_models.CollectionModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserContributionsModel)
+def user_contributions_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+    yield model.created_exploration_ids, [exp_models.ExplorationModel]
+    yield model.edited_exploration_ids, [exp_models.ExplorationModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
 def user_email_preferences_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
     yield model.id, [user_models.UserSettingsModel]
