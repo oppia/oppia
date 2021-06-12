@@ -3,17 +3,15 @@
     <h1 [innerHTML]="'I18N_LICENSE_TERMS_HEADING' | translate"></h1>
   </div>
   <background-banner></background-banner>
-  <div>
-    <div class="oppia-static-content-below-banner">
-      <div class="oppia-page-card oppia-static-content">
-        <div class="about-tab-container">
-          <div class="oppia-license-terms oppia-about-tab-content"
-               [ngClass]="{'oppia-about-visible-content': true}">
-            <div class="oppia-static-card-content oppia-static-card-content-narrow">
-              <h2 [innerHTML]="'I18N_LICENSE_PAGE_LICENSE_HEADING' | translate"></h2>
-              <p [innerHTML]="'I18N_LICENSE_PAGE_PARAGRAPH_1' | translate"></p>
-              <p [innerHTML]="'I18N_LICENSE_PAGE_PARAGRAPH_2' | translate"></p>
-            </div>
+  <div class="oppia-static-content-below-banner">
+    <div class="oppia-page-card oppia-static-content">
+      <div class="about-tab-container">
+        <div class="oppia-license-terms oppia-about-tab-content"
+              [ngClass]="{'oppia-about-visible-content': true}">
+          <div class="oppia-static-card-content oppia-static-card-content-narrow">
+            <h2 [innerHTML]="'I18N_LICENSE_PAGE_LICENSE_HEADING' | translate"></h2>
+            <p [innerHTML]="'I18N_LICENSE_PAGE_PARAGRAPH_1' | translate"></p>
+            <p [innerHTML]="'I18N_LICENSE_PAGE_PARAGRAPH_2' | translate"></p>
           </div>
         </div>
       </div>

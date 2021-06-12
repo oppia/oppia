@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Scripts for the teach page.
+ * @fileoverview Scripts for the license page.
  */
 
 import 'core-js/es7/reflect';

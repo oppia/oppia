@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the participation playbook page.
+ * @fileoverview Module for the license page.
  */
 
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
