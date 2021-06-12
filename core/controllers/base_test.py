@@ -1388,7 +1388,13 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {'POST': {}}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'vm_id': {'type': 'unicode'},
+                'signature': {'type': 'unicode'},
+                'message': {'type': 'unicode'},
+            }
+        }
 
         @acl_decorators.is_from_oppia_ml
         def post(self):
@@ -1401,7 +1407,13 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
         REQUIRE_PAYLOAD_CSRF_CHECK = False
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {'POST': {}}
+        HANDLER_ARGS_SCHEMAS = {
+            'POST': {
+                'vm_id': {'type': 'unicode'},
+                'signature': {'type': 'unicode'},
+                'message': {'type': 'unicode'},
+            }
+        }
 
         def extract_request_message_vm_id_and_signature(self):
             """Returns the message, vm_id and signature retrieved from the
