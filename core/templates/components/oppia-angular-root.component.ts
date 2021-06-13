@@ -80,24 +80,6 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { ServicesConstants } from 'services/services.constants';
 import 'third-party-imports/ckeditor.import.ts';
-/* eslint-disable */
-/* Don't modify anything outside the {} brackets.
- * The contents of the {} brackets should be formatted as a JSON object.
- * JSON rules:
- * 1. All keys and string values must be enclosed in double quotes.
- * 2. Each key/value pair should be on a new line.
- * 3. All values and keys must be constant, you can't use any JavaScript
- *    functions.
- */
-
-/**
- * @fileoverview Definitions for rich text components.
- *
- * NOTE TO DEVELOPERS: If a new inline element is added (i.e 'is_block_element'
- * is false), then make sure to add .cke_widget_<element id> {display: inline;}
- * style to the element's directive HTML and add a CSS style similar to
- * oppia-noninteractive-link in oppia.css for the new directive.
- */
 
 import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
 import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
@@ -109,33 +91,33 @@ import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-n
 import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import { CkEditorInitializerService } from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { HtmlEscaperService } from 'services/html-escaper.service';
- 
+
 const componentMap = {
-  "Collapsible": {
-    "component_class": NoninteractiveCollapsible,
+  Collapsible: {
+    component_class: NoninteractiveCollapsible,
   },
-  "Image": {
-    "component_class": NoninteractiveImage,
+  Image: {
+    component_class: NoninteractiveImage,
   },
-  "Link": {
-    "component_class": NoninteractiveLink,
+  Link: {
+    component_class: NoninteractiveLink,
   },
-  "Math": {
-    "component_class": NoninteractiveMath,
+  Math: {
+    component_class: NoninteractiveMath,
   },
-  "Skillreview": {
-    "component_class": NoninteractiveSkillreview,
+  Skillreview: {
+    component_class: NoninteractiveSkillreview,
   },
-  "Svgdiagram": {
-    "component_class": NoninteractiveSvgdiagram,
+  Svgdiagram: {
+    component_class: NoninteractiveSvgdiagram,
   },
-  "Tabs": {
-    "component_class": NoninteractiveTabs,
+  Tabs: {
+    component_class: NoninteractiveTabs,
   },
-  "Video": {
-    "component_class": NoninteractiveVideo,
+  Video: {
+    component_class: NoninteractiveVideo,
   }
-}; 
+};
 @Component({
   selector: 'oppia-angular-root',
   template: ''
