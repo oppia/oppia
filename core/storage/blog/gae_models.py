@@ -53,9 +53,10 @@ class BlogPostModel(base_models.BaseModel):
     # Tags associated with the blog post. 'repeated' property is set to true
     # to take a list of values of underlying type(str).
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
-    # The thumbnail filename of the blog post.
-    thumbnail_filename = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    # The thumbnail filename of the blog post. It's value will be None until
+    # a thumbnail is added to the blog post. It can be None only when blog 
+    # post is a draft.
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
     # if the blog has never been published.
     published_on = (
@@ -154,7 +155,7 @@ class BlogPostModel(base_models.BaseModel):
             published_on=None,
             url_fragment='',
             tags=[],
-            thumbnail_filename=''
+            thumbnail_filename=None
         )
         entity.update_timestamps()
         entity.put()
@@ -227,9 +228,10 @@ class BlogPostSummaryModel(base_models.BaseModel):
         datastore_services.StringProperty(indexed=True, required=True))
     # Tags associated with the blog post.
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
-    # The thumbnail filename of the blog post.
-    thumbnail_filename = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    # The thumbnail filename of the blog post.It's value will be none until
+    # a thumbnail is added to the blog post.It can be None only when blog
+    # post is a draft.
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
     # if the blog post has never been published.
     published_on = (
