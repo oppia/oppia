@@ -3173,8 +3173,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'answer_groups': [answer_group],
                 'confirmed_unclassified_answers': [],
                 'customization_args': {
-                    'placeholder': {
-                        'value': True
+                    'inputGreaterThanZero': {
+                        'value': False
                     },
                     'rows': {'value': 1}
                 },
@@ -3221,4 +3221,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['placeholder'].value, True)
+            cust_args['placeholder'].value, False)

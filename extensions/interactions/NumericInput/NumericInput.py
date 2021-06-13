@@ -39,7 +39,7 @@ class NumericInput(base.BaseInteraction):
     show_generic_submit_button = True
 
     _customization_arg_specs = [{
-        'name': 'placeholder',
+        'name': 'inputGreaterThanZero',
         'description': (
             'Allow only input greater than or equal to zero for' +
             ' Number Input interaction.'),

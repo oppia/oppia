@@ -69,10 +69,10 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
-            const { placeholder } =
+            const { inputGreaterThanZero } =
             InteractionAttributesExtractorService.getValuesFromAttributes(
               'NumericInput', $attrs);
-            ctrl.placeholder = placeholder;
+            ctrl.inputGreaterThanZero = inputGreaterThanZero;
             ctrl.answer = (
               ctrl.savedSolution !== undefined ?
               ctrl.savedSolution : ''

@@ -219,7 +219,7 @@ type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
 type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     NumericInputCustomizationArgsBackendDict,
-    { placeholder: { value: boolean } },
+    { inputGreaterThanZero: { value: boolean } },
     NumericInputCustomizationArgs
   >
 >;

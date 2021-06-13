@@ -3606,7 +3606,7 @@ states:
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
+        inputGreaterThanZero:
           value: False
         rows:
           value: 1
@@ -3675,7 +3675,7 @@ states:
       answer_groups: []
       confirmed_unclassified_answers: []
       customization_args:
-        placeholder:
+        inputGreaterThanZero:
           value: False
         rows:
           value: 1

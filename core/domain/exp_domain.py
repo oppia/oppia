@@ -1822,9 +1822,9 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v45_dict_to_v46_dict(cls, states_dict):
-        """Converts from version 45 to 46. Version 46 adds a new
+        """Converts from version 45 to 46. Version 46 adds inputGreaterThanzero
         customization arg to NumericInput interaction which allows
-        creators to set input should be grater than or equal to zero.
+        creators to set input should be greater than or equal to zero.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -1840,7 +1840,7 @@ class Exploration(python_utils.OBJECT):
                 customization_args = state_dict['interaction'][
                     'customization_args']
                 customization_args.update({
-                    'placeholder': {
+                    'inputGreaterThanZero': {
                         'value': False
                     }
                 })

@@ -112,8 +112,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
           };
 
-          ctrl.NumericInputCustArgEnabled = function() {
-            if (NumericInputValidationService.isCustomizationArgTrue()) {
+          ctrl.numericInputCustArgEnabled = function() {
+            if (NumericInputValidationService.isInputGreaterThanZeroTrue()) {
               return true;
             }
             return false;

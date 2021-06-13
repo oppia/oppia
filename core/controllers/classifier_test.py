@@ -402,7 +402,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 'state_name': new_exp.init_state_name,
                 'new_value': {
-                    'placeholder': {
+                    'inputGreaterThanZero': {
                         'value': True
                     }
                 }

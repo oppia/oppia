@@ -38,9 +38,9 @@ export class NumericInputValidationService {
       private baseInteractionValidationServiceInstance:
         baseInteractionValidationService) {}
 
-  isCustomizationArgTrue(
+  isInputGreaterThanZeroTrue(
       customizationArgs: NumericInputCustomizationArgs): boolean {
-    if (customizationArgs.placeholder.value === true) {
+    if (customizationArgs.inputGreaterThanZero.value) {
       return true;
     }
     return false;
@@ -97,6 +97,17 @@ export class NumericInputValidationService {
           'is greater than the first number.')
       });
     };
+    var raiseWarningForinputGreaterThanZero = function(
+        ruleIndex, input) {
+      if (input < 0 && customizationArgs.inputGreaterThanZero.value) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Rule ' + (ruleIndex + 1) + ' input ' +
+            ' should be greater than or equal to zero. ')
+        });
+      }
+    };
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
@@ -113,14 +124,7 @@ export class NumericInputValidationService {
           case 'Equals':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, x, x, true, true);
-            if (x < 0 && customizationArgs.placeholder.value) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' input ' +
-                  ' should be greater than or equal to zero. ')
-              });
-            }
+            raiseWarningForinputGreaterThanZero(j, x);
             break;
           case 'IsInclusivelyBetween':
             var a = rule.inputs.a;
@@ -129,7 +133,7 @@ export class NumericInputValidationService {
               raiseWarningForRuleIsInclusivelyBetween(j, i);
             }
             setLowerAndUpperBounds(range, a, b, true, true);
-            if (a < 0 && customizationArgs.placeholder.value) {
+            if (a < 0 && customizationArgs.inputGreaterThanZero.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (
@@ -149,32 +153,18 @@ export class NumericInputValidationService {
           case 'IsLessThan':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, false);
-            if (x < 0 && customizationArgs.placeholder.value) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' input ' +
-                  ' should be greater than or equal to zero. ')
-              });
-            }
+            raiseWarningForinputGreaterThanZero(j, x);
             break;
           case 'IsLessThanOrEqualTo':
             var x = (<number>rule.inputs.x);
             setLowerAndUpperBounds(range, -Infinity, x, false, true);
-            if (x <= 0 && customizationArgs.placeholder.value) {
-              warningsList.push({
-                type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Rule ' + (j + 1) + ' input ' +
-                  ' should be greater than or equal to zero. ')
-              });
-            }
+            raiseWarningForinputGreaterThanZero(j, x);
             break;
           case 'IsWithinTolerance':
             var x = (<number>rule.inputs.x);
             var tol = (<number>rule.inputs.tol);
             setLowerAndUpperBounds(range, x - tol, x + tol, true, true);
-            if ((x + tol) < 0 && customizationArgs.placeholder.value) {
+            if ((x + tol) < 0 && customizationArgs.inputGreaterThanZero.value) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: (

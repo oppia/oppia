@@ -61,7 +61,7 @@ describe('NumericInputValidationService', () => {
     rof = TestBed.get(RuleObjectFactory);
 
     customizationArgs = {
-      placeholder: {
+      inputGreaterThanZero: {
         value: true
       }
     };
@@ -147,18 +147,18 @@ describe('NumericInputValidationService', () => {
   });
 
   it('should set customization_arg as true', () => {
-    validatorService.isCustomizationArgTrue(customizationArgs);
-    expect(customizationArgs.placeholder.value).toBe(true);
+    validatorService.isInputGreaterThanZeroTrue(customizationArgs);
+    expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
   });
 
   it('should set customization_arg as true', () => {
     customizationArgs = {
-      placeholder: {
+      inputGreaterThanZero: {
         value: false
       }
     };
-    validatorService.isCustomizationArgTrue(customizationArgs);
-    expect(customizationArgs.placeholder.value).toBe(false);
+    validatorService.isInputGreaterThanZeroTrue(customizationArgs);
+    expect(customizationArgs.inputGreaterThanZero.value).toBe(false);
   });
 
   it('should show warning if input less than zero for IsWithinTolerance',
@@ -173,7 +173,7 @@ describe('NumericInputValidationService', () => {
       answerGroups[0].rules = [zeroWithinToleranceOfOneRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-      expect(customizationArgs.placeholder.value).toBe(true);
+      expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 1 Upper bound of the tolerance range  should ' +
@@ -191,7 +191,7 @@ describe('NumericInputValidationService', () => {
     answerGroups[0].rules = [lessThanOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(customizationArgs.placeholder.value).toBe(true);
+    expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 input  should be greater than or equal to zero. '
@@ -208,7 +208,7 @@ describe('NumericInputValidationService', () => {
     answerGroups[0].rules = [equalsZeroRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(customizationArgs.placeholder.value).toBe(true);
+    expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 input  should be greater than or equal to zero. '
@@ -226,7 +226,7 @@ describe('NumericInputValidationService', () => {
       answerGroups[0].rules = [lessThanOrEqualToOneRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-      expect(customizationArgs.placeholder.value).toBe(true);
+      expect(customizationArgs.inputGreaterThanZero.value).toBe(true);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 1 input  should be greater than or equal to zero. '

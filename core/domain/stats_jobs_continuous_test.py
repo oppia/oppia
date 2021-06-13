@@ -530,7 +530,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name':
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                     'new_value': {
-                        'placeholder': {
+                        'inputGreaterThanZero': {
                             'value': True
                         }
                     },
@@ -718,7 +718,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name':
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                     'new_value': {
-                        'placeholder': {
+                        'inputGreaterThanZero': {
                             'value': True
                         }
                     },

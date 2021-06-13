@@ -1097,7 +1097,7 @@ class Question(python_utils.OBJECT):
 
     @classmethod
     def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
-        """Converts from version 45 to 46. Version 46 adds a new
+        """Converts from version 45 to 46. Version 46 adds inputGreaterThanzero
         customization arg to NumericInput interaction which allows
         creators to set input range greater than or equal to zero.
 
@@ -1113,8 +1113,8 @@ class Question(python_utils.OBJECT):
             customization_args = question_state_dict[
                 'interaction']['customization_args']
             customization_args.update({
-                'placeholder': {
-                    'value': True
+                'inputGreaterThanZero': {
+                    'value': False
                 }
             })
         return question_state_dict

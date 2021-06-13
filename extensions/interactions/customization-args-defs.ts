@@ -412,12 +412,12 @@ export interface NumericExpressionInputCustomizationArgs {
 
 
 export interface NumericInputCustomizationArgsBackendDict {
-  placeholder: {
+  inputGreaterThanZero: {
     value: boolean;
   };
 }
 export interface NumericInputCustomizationArgs {
-  placeholder: {
+  inputGreaterThanZero: {
     value: boolean;
   };
 }
