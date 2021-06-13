@@ -53,16 +53,17 @@ SECONDS_IN_MINUTE = 60
 # Typing is not a module in python2, so it will only be imported only while type
 # checking.
 MYPY = False
-def import_typing():
-    from typing import (
-        Any, Callable, Dict, Generator, Iterable, Iterator, List,
-        Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
-    T = TypeVar('T')
-    U = TypeVar('U')
-    DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
 if MYPY:
-    import_typing()
+    try:
+        from typing import (
+            Any, Callable, Dict, Generator, Iterable, Iterator, List,
+            Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
+        T = TypeVar('T')
+        U = TypeVar('U')
+        DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
+    except:
+        pass
 
 # TODO(#13059): Every use of constants is followed by
 # 'type: ignore[attr-defined]' because mypy is not able to identify the
