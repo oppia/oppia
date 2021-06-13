@@ -80,6 +80,7 @@ var skillCkEditor = '.protractor-test-ck-editor';
 var updateFormName = '.protractor-update-form-name';
 var updateFormSubmit = '.protractor-update-form-submit';
 var roleSelect = '.protractor-update-form-role-select';
+var viewRoleSelect = '.protractor-test-role-method';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
@@ -129,6 +130,11 @@ const setRole = async function(browser, page, role) {
     await page.waitForSelector(statusMessage);
     // eslint-disable-next-line no-console
     console.log('Found status message');
+    // This is done partly to give the page time to stabilize after submitting
+    // the form.
+    await page.select(viewRoleSelect, 'username');
+    // eslint-disable-next-line no-console
+    console.log('Selected username in top dropdown');
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
