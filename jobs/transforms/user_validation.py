@@ -143,3 +143,26 @@ class ValidateDraftChangeListLastUpdated(beam.DoFn):
                 model.draft_change_list_last_updated > current_time):
             yield user_validation_errors.DraftChangeListLastUpdatedInvalidError(
                 model)
+
+
+@validation_decorators.AuditsExisting(
+    user_models.UserQueryModel
+)
+class ValidateArchivedModelsMarkedDeleted(beam.DoFn):
+    """DoFn to validate archived models marked deleted."""
+
+    def process(self, input_model):
+        """Function that checks if archived model is marked deleted.
+
+        Args:
+            input_model: user_models.UserQueryModel.
+                Entity to validate.
+
+        Yields:
+            ArchivedModelNotMarkedDeletedError. Error for models marked
+            archived but not deleted.
+        """
+        model = job_utils.clone_model(input_model)
+        if model.query_status == feconf.USER_QUERY_STATUS_ARCHIVED:
+            yield user_validation_errors.ArchivedModelNotMarkedDeletedError(
+                model)
