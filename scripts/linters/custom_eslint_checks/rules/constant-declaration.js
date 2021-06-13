@@ -35,20 +35,46 @@ module.exports = {
     schema: [],
     messages: {
       nonConstantFile: 'constant is used in non constant file.',
-      multipleConstant: 'There are two constants in this file.'
+      multipleConstant: 'There are two constants in this file.',
+      notFoundAsConst: (
+        'Please add \'as const\' at the end of the constant ' +
+        'deceleration. A constants file should have the following ' +
+        'structure:\n export const SomeConstants = { ... } as const;')
     },
   },
 
   create: function(context) {
     var constantsDeclarations = [];
     var args;
-    var fileName = context.getFilename();
+    var asConstFound = false;
+    var filename = context.getFilename();
+
     var selector = (
       'CallExpression[callee.property.name=constant]' +
       '[callee.object.callee.object.name=angular]');
+
+    if (filename.endsWith('constants.ts')) {
+      return {
+        'Program': (node) => {
+          asConstFound = false;
+        },
+        'TSAsExpression[typeAnnotation.typeName.name=const]': () => {
+          asConstFound = true;
+        },
+        'Program:exit': (node) => {
+          if (!asConstFound) {
+            context.report ({
+              node: node,
+              messageId: 'notFoundAsConst'
+            });
+          }
+        }
+      }
+    }
+
     return {
       [selector]: function(node) {
-        if (!fileName.endsWith('.constants.ajs.ts')) {
+        if (!filename.endsWith('.constants.ajs.ts')) {
           context.report ({
             node: node,
             messageId: 'nonConstantFile'
