@@ -34,7 +34,6 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
   './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 
 @NgModule({
@@ -48,7 +47,6 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
-    AdminJobsTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent
@@ -57,7 +55,6 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
-    AdminJobsTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent

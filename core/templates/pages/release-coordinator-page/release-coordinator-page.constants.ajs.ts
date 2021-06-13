@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Invalid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. This file has scope set to True which is not allowed.
+ * @fileoverview Constants for the release coordinator page.
  */
 
-angular.module('oppia').directive('baseContent', {}, [{},
-  function() {
-    return {
-      scope: true // Scope should not be true.
-    }
-    browser.wait()
-  }
-]);
+// TODO(#7092): Delete this file once migration is complete and these AngularJS
+// equivalents of the Angular constants are no longer needed.
+import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
+
+angular.module('oppia').constant(
+  'TAB_ID_JOBS', ReleaseCoordinatorPageConstants.TAB_ID_JOBS);
+angular.module('oppia').constant(
+  'TAB_ID_MISC', ReleaseCoordinatorPageConstants.TAB_ID_MISC);
