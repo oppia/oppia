@@ -91,7 +91,7 @@ def open_access(handler):
 
 
 def is_source_mailchimp(handler):
-    """Decorator to check whether the request generated from Mailchimp.
+    """Decorator to check whether the request was generated from Mailchimp.
 
     Args:
         handler: function. The function to be decorated.
@@ -101,7 +101,7 @@ def is_source_mailchimp(handler):
     """
 
     def test_is_source_mailchimp(self, secret, **kwargs):
-        """Checks whether the request generated from Mailchimp.
+        """Checks whether the request was generated from Mailchimp.
 
         Args:
             secret: str. The key that is used to authenticate that the request
