@@ -433,25 +433,15 @@ var StoryEditorPage = function() {
   };
 
   this.addAcquiredSkill = async function(skillName) {
-    await waitFor.visibilityOf(
-      addAcquiredSkillButton,
-      'addAcquiredSkillButton takes too long to be visible');
-    await waitFor.elementToBeClickable(
-      addAcquiredSkillButton,
-      'addAcquiredSkillButton takes too long to be clickable');
-    await addAcquiredSkillButton.click();
+    await action.click(
+      'addAcquiredSkillButton', addAcquiredSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
 
   this.addPrerequisiteSkill = async function(skillName) {
-    await waitFor.visibilityOf(
-      addPrerequisiteSkillButton,
-      'addPrerequisitesSkillButton takes too long to be visible');
-    await waitFor.elementToBeClickable(
-      addPrerequisiteSkillButton,
-      'addPrerequisitesSkillButton takes too long to be clickable');
-    await addPrerequisiteSkillButton.click();
+    await action.click(
+      'addPrerequisiteSkillButton', addPrerequisiteSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
