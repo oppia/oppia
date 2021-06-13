@@ -252,22 +252,25 @@ var TopicEditorPage = function() {
 
   this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
     await action.click('Add subtopic button', addSubtopicButton);
-    await action.sendKeys('New subtopic title field', newSubtopicTitlefield, title);
+    await action.sendKeys(
+      'New subtopic title field', newSubtopicTitlefield, title);
 
     await action.sendKeys(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
 
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
-    await action.click('Edit subtopic htm content button', subtopicPageContentButton);
+    await action.click(
+      'Edit subtopic htm content button', subtopicPageContentButton);
     var subtopicDescriptionEditor = element(by.css(
       '.protractor-test-subtopic-description-editor'));
     var richTextEditor = await forms.RichTextEditor(subtopicDescriptionEditor);
     await richTextEditor.appendPlainText(htmlContent);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath, false);
-    
-    await action.click('Confirm subtopic creation button', confirmSubtopicCreationButton);
+
+    await action.click(
+      'Confirm subtopic creation button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
