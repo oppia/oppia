@@ -129,6 +129,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
+  static ngZone: NgZone;
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteHelperService;
@@ -179,6 +180,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       this.classroomBackendApiService);
     OppiaAngularRootComponent.i18nLanguageCodeService = (
       this.i18nLanguageCodeService);
+    OppiaAngularRootComponent.ngZone = this.ngZone;
     OppiaAngularRootComponent.pageTitleService = this.pageTitleService;
     OppiaAngularRootComponent.profilePageBackendApiService = (
       this.profilePageBackendApiService);
