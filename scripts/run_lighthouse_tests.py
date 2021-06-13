@@ -138,7 +138,7 @@ def run_lighthouse_checks(lighthouse_mode):
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
-        '--max-old-space-size=2048'
+        '--max-old-space-size=4096'
     ]
 
     process = subprocess.Popen(
