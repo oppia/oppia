@@ -26,7 +26,7 @@ export interface SubtopicBackendDict {
   'skill_ids': string[];
   // For a newly created subtopic, properties below are initialized
   // with a null value and should be passed by user to create a subtopic.
-  // Here null implies that properties are yet to be assigned
+  // Here null implies that properties are yet to be assigned.
   'thumbnail_filename': string | null;
   'thumbnail_bg_color': string | null;
   'url_fragment': string | null;
