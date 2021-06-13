@@ -27,7 +27,9 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary-tile.component';
+import { ClassroomPageComponent } from './classroom-page.component';
+import { TopicSummaryTileComponent } from
+  'components/summary-tile/topic-summary-tile.component';
 
 @NgModule({
   imports: [
@@ -36,10 +38,12 @@ import { TopicSummaryTileComponent } from 'components/summary-tile/topic-summary
     SharedComponentsModule
   ],
   declarations: [
+    ClassroomPageComponent,
     OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
   entryComponents: [
+    ClassroomPageComponent,
     OppiaAngularRootComponent,
     TopicSummaryTileComponent
   ],
