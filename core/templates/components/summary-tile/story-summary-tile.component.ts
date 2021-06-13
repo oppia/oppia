@@ -45,6 +45,12 @@ export class StorySummaryTileComponent implements OnInit {
   circumference = (20 * 2 * Math.PI);
   gapLength = 5;
   EXPLORE_PAGE_PREFIX = '/explore/';
+  storyLink: string;
+  storyTitle: string;
+  strokeDashArrayValues: string | number;
+  completedStrokeDashArrayValues: string;
+  thumbnailBgColor: string;
+  nodeTitles: string[];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -175,6 +181,13 @@ export class StorySummaryTileComponent implements OnInit {
       this.thumbnailUrl = null;
     }
     this.getStrokeDashArrayValues();
+    this.storyLink = this.getStoryLink();
+    this.storyTitle = this.storySummary.getTitle();
+    this.strokeDashArrayValues = this.getStrokeDashArrayValues();
+    this.completedStrokeDashArrayValues =
+      this.getCompletedStrokeDashArrayValues();
+    this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
+    this.nodeTitles = this.storySummary.getNodeTitles();
   }
 }
 
