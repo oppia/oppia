@@ -28,7 +28,7 @@ import { SkillSelectorComponent } from 'components/skill-selector/skill-selector
 import { AugmentedSkillSummary, AugmentedSkillSummaryBackendDict } from 'domain/skill/augmented-skill-summary.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
@@ -401,7 +401,7 @@ describe('Skills List Component', () => {
 
   it('should assign skill to topic', fakeAsync(() => {
     mockNgbModal.modal = 'assign_skill_to_topic';
-    componentInstance.editableTopicSummaries = [new TopicSummary(
+    componentInstance.editableTopicSummaries = [new CreatorTopicSummary(
       'test_id',
       'asd',
       1,

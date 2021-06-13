@@ -30,9 +30,9 @@ import {
   StorySummaryBackendDict
 } from 'domain/story/story-summary.model';
 import {
-  TopicSummary,
-  TopicSummaryBackendDict
-} from 'domain/topic/topic-summary.model';
+  LearnerTopicSummary,
+  LearnerTopicSummaryBackendDict
+} from 'domain/topic/learner-topic-summary.model';
 import {
   FeedbackThreadSummary,
   FeedbackThreadSummaryBackendDict
@@ -59,8 +59,8 @@ interface LearnerDashboardDataBackendDict {
   'incomplete_collections_list': CollectionSummaryBackendDict[];
   'collection_playlist': CollectionSummaryBackendDict[];
   'completed_stories_list': StorySummaryBackendDict[];
-  'learnt_topics_list': TopicSummaryBackendDict[];
-  'partially_learnt_topics_list': TopicSummaryBackendDict[];
+  'learnt_topics_list': LearnerTopicSummaryBackendDict[];
+  'partially_learnt_topics_list': LearnerTopicSummaryBackendDict[];
   'number_of_unread_threads': number;
   'thread_summaries': FeedbackThreadSummaryBackendDict[];
   'completed_to_incomplete_collections': string[];
@@ -78,8 +78,8 @@ interface LearnerDashboardData {
   incompleteCollectionsList: CollectionSummary[];
   collectionPlaylist: CollectionSummary[];
   completedStoriesList: StorySummary[];
-  learntTopicsList: TopicSummary[];
-  partiallyLearntTopicsList: TopicSummary[];
+  learntTopicsList: LearnerTopicSummary[];
+  partiallyLearntTopicsList: LearnerTopicSummary[];
   numberOfUnreadThreads: number;
   threadSummaries: FeedbackThreadSummary[];
   completedToIncompleteCollections: string[];
@@ -141,11 +141,11 @@ export class LearnerDashboardBackendApiService {
                 .createFromBackendDict(storySummary))),
           learntTopicsList: (
             dashboardData.learnt_topics_list.map(
-              topicSummary => TopicSummary
+              topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
           partiallyLearntTopicsList: (
             dashboardData.partially_learnt_topics_list.map(
-              topicSummary => TopicSummary
+              topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (

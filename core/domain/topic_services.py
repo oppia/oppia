@@ -1114,3 +1114,19 @@ def assign_role(committer, assignee, new_role, topic_id):
     })]
 
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)
+
+
+def get_story_titles_in_topic(topic):
+    """Returns titles of the stories present in the topic.
+
+    Args:
+        topic: list(Topic). The topic domin objects.
+
+    Returns:
+        list(str). The list of story titles in the topic.
+    """
+    canonical_story_dicts = topic.canonical_story_references
+    story_ids = [story.story_id for story in canonical_story_dicts]
+    stories = story_fetchers.get_stories_by_ids(story_ids)
+    story_titles = [story.title for story in stories]
+    return story_titles

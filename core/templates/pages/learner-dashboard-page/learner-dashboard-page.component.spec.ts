@@ -47,7 +47,7 @@ import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { TopicSummary } from 'domain/topic/topic-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -423,11 +423,11 @@ describe('Learner dashboard page', () => {
                 storySummary))),
           learntTopicsList: (
             learnerDashboardData.learnt_topic_list.map(
-              topicSummary => TopicSummary.createFromBackendDict(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
                 topicSummary))),
           partiallyLearntTopicsList: (
             learnerDashboardData.partially_learnt_topics_list.map(
-              topicSummary => TopicSummary.createFromBackendDict(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
                 topicSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
