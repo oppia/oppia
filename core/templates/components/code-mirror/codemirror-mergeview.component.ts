@@ -28,12 +28,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class CodemirrorMergeviewComponent implements
   AfterViewInit, OnInit, OnChanges {
   @Input() options = {};
-  // These properties comes from 'state-diff-modal.controller.ts' file and can
-  // be undefined sometimes, after the view initializes.
   @Input() leftValue: string = ' ';
   @Input() rightValue: string = ' ';
-  // 'ngOnChanges' sometimes runs before the view has been initialized,
-  // to cater this we are checking it be to not undefined.
+  // This property is initialized using Angular lifecycle hook
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
 
   constructor(
