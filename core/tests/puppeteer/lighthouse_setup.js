@@ -118,11 +118,17 @@ const setRole = async function(browser, page, role) {
     await page.waitForSelector(updateFormName);
     await page.type(updateFormName, 'username1');
     await page.select(roleSelect, role);
+    // eslint-disable-next-line no-console
+    console.log('Selected role');
     await page.waitForSelector(updateFormSubmit);
+    // eslint-disable-next-line no-console
+    console.log('Found selector');
     await page.click(updateFormSubmit);
+    // eslint-disable-next-line no-console
+    console.log('Submitted form');
     await page.waitForSelector(statusMessage);
-    // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
+    // eslint-disable-next-line no-console
+    console.log('Found status message');
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
