@@ -33,6 +33,7 @@ import { LogicProofInteractionModule } from './LogicProof/logic-proof-interactio
 import { MultipleChoiceInputInteractionModule } from './MultipleChoiceInput/multiple-choice-input-interactions.module';
 import { SetInputInteractionModule } from './SetInput/set-input-interactions.module';
 import { TextInputInteractionModule } from './TextInput/text-input-interactions.module';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -48,7 +49,8 @@ import { TextInputInteractionModule } from './TextInput/text-input-interactions.
     LogicProofInteractionModule,
     MultipleChoiceInputInteractionModule,
     SetInputInteractionModule,
-    TextInputInteractionModule
+    TextInputInteractionModule,
+    TranslateModule
   ],
   declarations: [],
   entryComponents: [],

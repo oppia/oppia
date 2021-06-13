@@ -21,7 +21,6 @@
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { angularServices } from 'services/angular-services.index';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 angular.module('oppia').directive('oppiaRoot', [
   '$translate', function($translate) {
@@ -123,20 +122,23 @@ angular.module('oppia').directive('oppiaRoot', [
             OppiaAngularRootComponent.ajsTranslate = $translate;
             const translateService = (
               OppiaAngularRootComponent.translateService);
+            const translateCacheService = (
+              OppiaAngularRootComponent.translateCacheService);
             const i18nLanguageCodeService = (
               OppiaAngularRootComponent.i18nLanguageCodeService);
-            translateService.use(
-              i18nLanguageCodeService.getCurrentI18nLanguageCode());
-            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-              (code) => translateService.use(code)
-            );
-            i18nLanguageCodeService.setI18nLanguageCode(
-              $translate.proposedLanguage() || $translate.use());
 
-            I18nLanguageCodeService.languageCodeChangeEventEmitter
-              .subscribe((code) => {
+            i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+              (code) => {
+                translateService.use(code);
                 $translate.use(code);
-              });
+              }
+            );
+            translateCacheService.init();
+
+            const cachedLanguage = translateCacheService.getCachedLanguage();
+            if (cachedLanguage) {
+              i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
+            }
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;

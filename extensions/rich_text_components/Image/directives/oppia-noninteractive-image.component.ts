@@ -29,6 +29,8 @@ import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { AppConstants } from 'app.constants';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { SafeResourceUrl } from '@angular/platform-browser';
 
 interface Dimension {
   height: string;
@@ -44,7 +46,7 @@ export class NoninteractiveImage implements OnInit {
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
   filepath: string;
-  imageUrl: string = '';
+  imageUrl: SafeResourceUrl | string = '';
   imageAltText: string = '';
   imageCaption: string = '';
   loadingIndicatorUrl;
@@ -59,7 +61,8 @@ export class NoninteractiveImage implements OnInit {
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   ngOnInit(): void {
@@ -106,8 +109,15 @@ export class NoninteractiveImage implements OnInit {
           this.contextService.getImageSaveDestination() ===
                 AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
             this.imageLocalStorageService.isInStorage(this.filepath))) {
-          this.imageUrl = this.imageLocalStorageService.getObjectUrlForImage(
+          const base64Url = this.imageLocalStorageService.getRawImageData(
             this.filepath);
+          const mimeType = base64Url.split(';')[0];
+          if (mimeType === 'data:image/svg+xml') {
+            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+              base64Url);
+          } else {
+            this.imageUrl = base64Url;
+          }
         } else {
           this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
             this.contextService.getEntityType(),
