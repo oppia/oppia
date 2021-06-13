@@ -19,6 +19,7 @@
 
 var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
+var forms = require('./forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -259,12 +260,10 @@ var TopicEditorPage = function() {
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
     await action.click('Edit subtopic htm content button', subtopicPageContentButton);
-    var subtopicDecriptionRte = element(by.css('oppia-rte'));
-    await waitFor.visibilityOf(subtopicDecriptionRte,
-      'Subtopic description RTE taking too long to appear.');
-    await action.sendKeys('Subtopic Description RTE', subtopicDecriptionRte,
-      htmlContent);
-
+    var subtopicDescriptionEditor = element(by.css(
+      '.protractor-test-subtopic-description-editor'));
+    var richTextEditor = await forms.RichTextEditor(subtopicDescriptionEditor);
+    await richTextEditor.appendPlainText(htmlContent);
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer, imgPath, false);
     
