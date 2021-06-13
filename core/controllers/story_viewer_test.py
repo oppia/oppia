@@ -22,11 +22,9 @@ from constants import constants
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import story_domain
-from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_domain
-from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -482,186 +480,40 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertIsNone(json_response['next_node_id'])
         self.assertTrue(json_response['ready_for_review_test'])
 
-    def test_mark_story_as_incomplete_and_completed(self):
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        ordered_node_ids = (
-            [node.id for node in story.story_contents.get_ordered_nodes()])
-        completed_node_ids = story_fetchers.get_completed_node_ids(
-            self.viewer_id, self.STORY_ID)
+    def test_mark_story_and_topic_as_incomplete_and_partially_learnt(self):
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_1
+                ), {}, csrf_token=csrf_token
+            )
 
-        next_node_id = None
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.viewer_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_incomplete_story_ids(
+                self.viewer_id)), 1)
 
-        # Marking NODE_ID_1 as completed.
-        if self.NODE_ID_1 not in completed_node_ids:
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+    def test_mark_story_and_topic_as_completed_and_learnt(self):
+        csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
 
-            completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                self.viewer_id, self.STORY_ID)
-            completed_node_ids = [
-                completed_node.id for completed_node in completed_nodes]
-
-            for node_id in ordered_node_ids:
-                if node_id not in completed_node_ids:
-                    next_node_id = node_id
-                    break
-
-        if next_node_id:
-            learner_progress_services.mark_story_as_incomplete(
-                self.viewer_id, self.STORY_ID)
-            self.assertEqual(
-                learner_progress_services.get_all_incomplete_story_ids(
-                    self.viewer_id), [self.STORY_ID])
-
-        # Marking NODE_ID_3 as completed.
-        if self.NODE_ID_3 not in completed_node_ids:
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.STORY_ID, self.NODE_ID_3)
-
-            completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                self.viewer_id, self.STORY_ID)
-            completed_node_ids = [
-                completed_node.id for completed_node in completed_nodes]
-
-            for node_id in ordered_node_ids:
-                if node_id not in completed_node_ids:
-                    next_node_id = node_id
-                    break
-
-        if not next_node_id:
-            learner_progress_services.mark_story_as_completed(
-                self.viewer_id, self.STORY_ID)
-            self.assertEqual(
-                learner_progress_services.get_all_completed_story_ids(
-                    self.viewer_id), [self.STORY_ID])
-            self.assertEqual(
-                learner_progress_services.get_all_incomplete_story_ids(
-                    self.viewer_id), [])
-
-    def test_mark_topic_as_learnt_and_partially_learnt(self):
-        # Add new story to TOPIC_ID.
-        story = story_domain.Story.create_default_story(
-            self.NEW_STORY_ID, 'A story', 'Description', self.TOPIC_ID, 'story')
-        story_services.save_new_story(self.admin_id, story)
-        topic_services.add_canonical_story(
-            self.admin_id, self.TOPIC_ID, self.NEW_STORY_ID)
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_1,
-                'title': 'Title 1'
-            }), story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'old_value': None,
-                'new_value': self.EXP_ID_2,
-                'node_id': self.NODE_ID_1
-            })
-        ]
-        story_services.update_story(
-            self.admin_id, self.NEW_STORY_ID, changelist, 'Added node.')
-        topic_services.publish_story(
-            self.TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
-
-        story = story_fetchers.get_story_by_id(self.STORY_ID)
-        ordered_node_ids = (
-            [node.id for node in story.story_contents.get_ordered_nodes()])
-        completed_node_ids = story_fetchers.get_completed_node_ids(
-            self.viewer_id, self.STORY_ID)
-
-        # Marking NODE_ID_1 as completed in STORY_ID.
-        if self.NODE_ID_1 not in completed_node_ids:
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.STORY_ID, self.NODE_ID_1)
-
-            completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                self.viewer_id, self.STORY_ID)
-            completed_node_ids = [
-                completed_node.id for completed_node in completed_nodes]
-
-            for node_id in ordered_node_ids:
-                if node_id not in completed_node_ids:
-                    next_node_id = node_id
-                    break
-
-        if next_node_id:
-            learner_progress_services.mark_topic_as_partially_learnt(
-                self.viewer_id, self.TOPIC_ID)
-            self.assertEqual(
-                learner_progress_services.get_all_partially_learnt_topic_ids(
-                    self.viewer_id), [self.TOPIC_ID])
-
-        # Marking NODE_ID_3 in STORY_ID as completed.
-        if self.NODE_ID_3 not in completed_node_ids:
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.STORY_ID, self.NODE_ID_3)
-
-            completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                self.viewer_id, self.STORY_ID)
-            completed_node_ids = [
-                completed_node.id for completed_node in completed_nodes]
-
-            for node_id in ordered_node_ids:
-                if node_id not in completed_node_ids:
-                    next_node_id = node_id
-                    break
-
-        if not next_node_id:
-            completed_story_ids = (
-                learner_progress_services.get_all_completed_story_ids(
-                    self.user_id))
-            topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-            story_ids_in_topic = []
-            for story in topic.canonical_story_references:
-                story_ids_in_topic.append(story.story_id)
-
-            is_topic_completed = set(story_ids_in_topic).issubset(
-                set(completed_story_ids))
-
-            if not is_topic_completed:
-                learner_progress_services.mark_topic_as_partially_learnt(
-                    self.user_id, topic.id)
-                self.assertEqual(
-                    learner_progress_services.get_all_partially_learnt_topic_ids( # pylint: disable=line-too-long
-                        self.viewer_id), [self.TOPIC_ID])
-
-        # Marking NODE_ID_1 in NEW_STORY_ID as completed.
-        story = story_fetchers.get_story_by_id(self.NEW_STORY_ID)
-        ordered_node_ids = (
-            [node.id for node in story.story_contents.get_ordered_nodes()])
-        completed_node_ids = story_fetchers.get_completed_node_ids(
-            self.viewer_id, self.NEW_STORY_ID)
-
-        if self.NODE_ID_2 not in completed_node_ids:
-            story_services.record_completed_node_in_story_context(
-                self.viewer_id, self.STORY_ID, self.NODE_ID_2)
-
-            completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                self.viewer_id, self.STORY_ID)
-            completed_node_ids = [
-                completed_node.id for completed_node in completed_nodes]
-
-            for node_id in ordered_node_ids:
-                if node_id not in completed_node_ids:
-                    next_node_id = node_id
-                    break
-
-        if not next_node_id:
-            completed_story_ids = (
-                learner_progress_services.get_all_completed_story_ids(
-                    self.user_id))
-            topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
-            story_ids_in_topic = []
-            for story in topic.canonical_story_references:
-                story_ids_in_topic.append(story.story_id)
-
-            is_topic_completed = set(story_ids_in_topic).issubset(
-                set(completed_story_ids))
-
-            if is_topic_completed:
-                learner_progress_services.mark_topic_as_learnt(
-                    self.user_id, topic.id)
-                self.assertEqual(
-                    learner_progress_services.get_all_learnt_topic_ids(
-                        self.viewer_id), [self.TOPIC_ID])
+        self.assertEqual(len(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.viewer_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_story_ids(
+                self.viewer_id)), 1)

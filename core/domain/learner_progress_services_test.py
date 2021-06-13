@@ -61,7 +61,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     TOPIC_ID_0 = 'topic_0'
     STORY_ID_1 = 'story_1'
     TOPIC_ID_1 = 'topic_1'
-    STORY_ID_2 = 'story_2'
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -1071,6 +1070,76 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             completed_collection_summaries[1].id, '1_welcome_introduce_oppia')
         self.assertEqual(len(completed_collection_summaries), 2)
+
+    def test_unpublishing_completed_story_filters_it_out(self):
+        # Add stories to the completed list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
+
+        # Unpublish STORY_ID_1.
+        topic_services.unpublish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_story_summaries = (
+            all_filtered_summaries.completed_story_summaries)
+
+        # Test that completed story summaries don't include unpublished
+        # stories. Ensure that completed_story_summaries[0] matches
+        # STORY_ID_0.
+        self.assertEqual(
+            completed_story_summaries[0].id, self.STORY_ID_0)
+        self.assertEqual(len(completed_story_summaries), 1)
+
+    def test_unpublishing_learnt_topic_filters_it_out(self):
+        # Add topics to the learnt list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Unpublish TOPIC_ID_1.
+        topic_services.unpublish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_1)
+        self.assertEqual(
+            topic_rights.topic_is_published, False)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        learnt_topic_summaries = (
+            all_filtered_summaries.learnt_topic_summaries)
+
+        # Test that learnt topic summaries don't include unpublished
+        # topics. Ensure that learnt_topic_summaries[0] matches
+        # TOPIC_ID_0.
+        self.assertEqual(
+            learnt_topic_summaries[0].id, self.TOPIC_ID_0)
+        self.assertEqual(len(learnt_topic_summaries), 1)
 
     def test_republishing_completed_collection_filters_as_complete(self):
         # Add collection to the completed list.
