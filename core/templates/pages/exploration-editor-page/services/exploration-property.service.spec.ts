@@ -24,6 +24,7 @@ import { ChangeListService } from 'pages/exploration-editor-page/services/change
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
@@ -34,6 +35,10 @@ describe('Exploration Property Service', () => {
   let editExplorationPropertySpy;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+
     explorationPropertyService = TestBed.inject(ExplorationPropertyService);
     changeListService = TestBed.inject(ChangeListService);
     paramChangesObjectFactory = TestBed.inject(ParamChangesObjectFactory);
