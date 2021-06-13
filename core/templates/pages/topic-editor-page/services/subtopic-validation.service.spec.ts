@@ -43,11 +43,11 @@ describe('Subtopic validation service', function() {
         thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic1.setUrlFragment('subtopic-one');
     var subtopic2 = Subtopic.createFromBackendDict(
-      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+      {id: 1, title: 'Subtopic2', skill_ids: [], thumbnail_filename: null,
         thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic2.setUrlFragment('subtopic-two');
     var subtopic3 = Subtopic.createFromBackendDict(
-      {id: 1, title: 'Subtopic1', skill_ids: [], thumbnail_filename: null,
+      {id: 1, title: 'Subtopic3', skill_ids: [], thumbnail_filename: null,
         thumbnail_bg_color: null, url_fragment: null}, {});
     subtopic3.setUrlFragment('subtopic-three');
     topic.getSubtopics = function() {

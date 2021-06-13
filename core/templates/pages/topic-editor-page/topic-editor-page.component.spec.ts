@@ -199,13 +199,13 @@ describe('Topic editor page', function() {
       TopicEditorStateService, 'getTopicWithUrlFragmentExists').and.returnValue(
       true);
     ctrl._validateTopic();
-    expect(ctrl.validationIssues.length).toEqual(2);
+    expect(ctrl.validationIssues.length).toEqual(3);
     expect(ctrl.validationIssues[0]).toEqual(
       'A topic with this name already exists.');
     expect(ctrl.validationIssues[1]).toEqual(
       'Topic URL fragment already exists.');
-    expect(ctrl.getWarningsCount()).toEqual(2);
-    expect(ctrl.getTotalWarningsCount()).toEqual(2);
+    expect(ctrl.getWarningsCount()).toEqual(3);
+    expect(ctrl.getTotalWarningsCount()).toEqual(3);
   });
 
   it('should return the navbar text', function() {
