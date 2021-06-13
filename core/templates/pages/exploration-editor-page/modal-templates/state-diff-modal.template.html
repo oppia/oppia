@@ -24,7 +24,8 @@
 </table>
 
 <div class="modal-body" ng-cloak>
-  <oppia-codemirror-mergeview [options]="CODEMIRROR_MERGEVIEW_OPTIONS"
+  <oppia-codemirror-mergeview ng-if="yamlStrs.leftPane && yamlStrs.rightPane"
+                              [options]="CODEMIRROR_MERGEVIEW_OPTIONS"
                               [left-value]="yamlStrs.leftPane"
                               [right-value]="yamlStrs.rightPane">
   </oppia-codemirror-mergeview>

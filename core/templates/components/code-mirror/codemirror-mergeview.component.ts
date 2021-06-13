@@ -30,8 +30,8 @@ export class CodemirrorMergeviewComponent implements
   @Input() options = {};
   // These properties comes from 'state-diff-modal.controller.ts' file and can
   // be undefined sometimes, after the view initializes.
-  @Input() leftValue: string | undefined;
-  @Input() rightValue: string | undefined;
+  @Input() leftValue: string = ' ';
+  @Input() rightValue: string = ' ';
   // 'ngOnChanges' sometimes runs before the view has been initialized,
   // to cater this we are checking it be to not undefined.
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
@@ -58,8 +58,8 @@ export class CodemirrorMergeviewComponent implements
         (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
           this.elementRef.nativeElement,
           {
-            value: this.leftValue !== undefined ? this.leftValue : ' ',
-            orig: this.rightValue !== undefined ? this.rightValue : ' ',
+            value: this.leftValue,
+            orig: this.rightValue,
             ...this.options
           }
         );
@@ -72,9 +72,6 @@ export class CodemirrorMergeviewComponent implements
       changes.leftValue.currentValue !==
       changes.leftValue.previousValue &&
       this.codeMirrorInstance) {
-      if (this.leftValue === undefined) {
-        throw new Error('Left pane value is not defined.');
-      }
       this.ngZone.runOutsideAngular(() => {
         this.codeMirrorInstance.editor().setValue(
           changes.leftValue.currentValue);
@@ -85,9 +82,6 @@ export class CodemirrorMergeviewComponent implements
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue &&
       this.codeMirrorInstance) {
-      if (this.rightValue === undefined) {
-        throw new Error('Right pane value is not defined.');
-      }
       this.ngZone.runOutsideAngular(() => {
         this.codeMirrorInstance.rightOriginal().setValue(
           changes.rightValue.currentValue);
