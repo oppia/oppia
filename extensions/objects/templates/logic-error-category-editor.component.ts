@@ -33,8 +33,8 @@ interface ErrorCategory {
   styleUrls: []
 })
 export class LogicErrorCategoryEditorComponent implements OnInit {
-  // Angular lifecycle hooks are used to populate values, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  // These properties are initialized using angular lifecycle hooks, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() modalId!: symbol;
   @Input() value!: ErrorCategory;
   @Output() valueChanged = new EventEmitter();
