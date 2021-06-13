@@ -108,7 +108,8 @@ def normalize_against_schema(
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
 
-        # For handling optional cases.
+        # For handling cases of missing args.
+        list_of_missing_args_with_default_none = []
         for p in schema[SCHEMA_KEY_PROPERTIES]:
 
             if (SCHEMA_KEY_DEFAULT_VALUE not in p[SCHEMA_KEY_SCHEMA] or
@@ -120,9 +121,20 @@ def normalize_against_schema(
             # Don't normalize if dafault_value is None.
             if default_value is None:
                 expected_dict_keys.remove(p[SCHEMA_KEY_NAME])
+                list_of_missing_args_with_default_none.append(
+                    p[SCHEMA_KEY_NAME])
                 continue
-
             obj[p[SCHEMA_KEY_NAME]] = default_value
+
+        # To remove dict from the properties field if the schema of a
+        # missing arg contains default_value: None.
+        for _ in list_of_missing_args_with_default_none:
+            for i in range(len(schema[SCHEMA_KEY_PROPERTIES])):
+                if (p[SCHEMA_KEY_NAME] not in
+                        list_of_missing_args_with_default_none):
+                    continue
+                del schema[SCHEMA_KEY_PROPERTIES][i]
+                break
 
         missing_keys = list(set(expected_dict_keys) - set(obj.keys()))
         extra_keys = list(set(obj.keys()) - set(expected_dict_keys))
