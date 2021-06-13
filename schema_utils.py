@@ -110,10 +110,19 @@ def normalize_against_schema(
 
         # For handling optional cases.
         for p in schema[SCHEMA_KEY_PROPERTIES]:
-            if (SCHEMA_KEY_DEFAULT_VALUE in p[SCHEMA_KEY_SCHEMA] and
-                    p[SCHEMA_KEY_NAME] not in obj):
-                default_value = p[SCHEMA_KEY_SCHEMA][SCHEMA_KEY_DEFAULT_VALUE]
-                obj[p[SCHEMA_KEY_NAME]] = default_value
+
+            if (SCHEMA_KEY_DEFAULT_VALUE not in p[SCHEMA_KEY_SCHEMA] or
+                    p[SCHEMA_KEY_NAME] in obj):
+                continue
+
+            default_value = p[SCHEMA_KEY_SCHEMA][SCHEMA_KEY_DEFAULT_VALUE]
+
+            # Don't normalize if dafault_value is None.
+            if default_value is None:
+                expected_dict_keys.remove(p[SCHEMA_KEY_NAME])
+                continue
+
+            obj[p[SCHEMA_KEY_NAME]] = default_value
 
         missing_keys = list(set(expected_dict_keys) - set(obj.keys()))
         extra_keys = list(set(obj.keys()) - set(expected_dict_keys))
@@ -124,8 +133,6 @@ def normalize_against_schema(
         normalized_obj = {}
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
             key = prop[SCHEMA_KEY_NAME]
-            if obj[key] is None:
-                continue
             normalized_obj[key] = normalize_against_schema(
                 obj[key],
                 prop[SCHEMA_KEY_SCHEMA],
