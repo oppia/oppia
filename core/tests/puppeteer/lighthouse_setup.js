@@ -125,9 +125,9 @@ const setRole = async function(browser, page, role) {
     await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Changing role to admin failed');
-    // eslint-disable-next-line no-console
     console.log(e);
+    // eslint-disable-next-line no-console
+    console.log(e.stack);
     process.exit(1);
   }
 };
@@ -146,6 +146,8 @@ const getExplorationEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    // eslint-disable-next-line no-console
+    console.log(e.stack);
     process.exit(1);
   }
 };
@@ -168,6 +170,8 @@ const getCollectionEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    // eslint-disable-next-line no-console
+    console.log(e.stack);
     process.exit(1);
   }
 };
@@ -213,6 +217,8 @@ const getTopicEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    // eslint-disable-next-line no-console
+    console.log(e.stack);
     process.exit(1);
   }
 };
@@ -245,6 +251,8 @@ const getStoryEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    // eslint-disable-next-line no-console
+    console.log(e.stack);
     process.exit(1);
   }
 };
@@ -277,6 +285,8 @@ const getSkillEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    // eslint-disable-next-line no-console
+    console.log(e.stack);
     process.exit(1);
   }
 };
