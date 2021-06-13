@@ -80,7 +80,6 @@ var skillCkEditor = '.protractor-test-ck-editor';
 var updateFormName = '.protractor-update-form-name';
 var updateFormSubmit = '.protractor-update-form-submit';
 var roleSelect = '.protractor-update-form-role-select';
-var viewRoleSelect = '.protractor-test-role-method';
 var statusMessage = '.protractor-test-status-message';
 
 const login = async function(browser, page) {
@@ -118,13 +117,17 @@ const setRole = async function(browser, page, role) {
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(updateFormName);
     await page.type(updateFormName, 'username1');
-    await page.select(roleSelect, role);
+    await page.select(roleSelect, 'string:' + role);
     await page.waitForSelector(updateFormSubmit);
     await page.click(updateFormSubmit);
     await page.waitForSelector(statusMessage, {visible: true});
-    // This is done partly to give the page time to stabilize after submitting
-    // the form.
-    await page.select(viewRoleSelect, 'username');
+    await page.waitForFunction(
+      'Array.prototype.slice.call(' +
+      '  document.querySelectorAll(".protractor-test-status-message")' +
+      ').some(' +
+      '  (statusMessageElem) => statusMessageElem.innerText.includes(' +
+      '    "' + role + '"))'
+    );
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -156,7 +159,7 @@ const getExplorationEditorUrl = async function(browser, page) {
 
 const getCollectionEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'string:COLLECTION_EDITOR');
+    await setRole(browser, page, 'COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -180,7 +183,7 @@ const getCollectionEditorUrl = async function(browser, page) {
 
 const getTopicEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'string:ADMIN');
+    await setRole(browser, page, 'ADMIN');
     // eslint-disable-next-line dot-notation
     await page.goto(
       TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
