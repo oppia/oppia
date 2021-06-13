@@ -18,6 +18,7 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
@@ -50,11 +51,11 @@ describe('When account is deleted it', function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
-    expect(await browser.getCurrentUrl()).toEqual(
+    await waitFor.urlRedirection(
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('user1@delete.com');
-    expect(await browser.getCurrentUrl()).toEqual(
+    await waitFor.urlRedirection(
       'http://localhost:9001/pending-account-deletion');
   });
 
@@ -68,7 +69,7 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationVoiceArtist('voiceArtist');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
-    expect(await browser.getCurrentUrl()).toEqual(
+    await waitFor.urlRedirection(
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('voiceArtist@oppia.com');
@@ -92,7 +93,7 @@ describe('When account is deleted it', function() {
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete3');
-    expect(await browser.getCurrentUrl()).toEqual(
+    await waitFor.urlRedirection(
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('user@check.com');
@@ -111,7 +112,7 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationManager('secondOwner');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete4');
-    expect(await browser.getCurrentUrl()).toEqual(
+    await waitFor.urlRedirection(
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('secondOwner@check.com');
