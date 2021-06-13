@@ -68,6 +68,9 @@ angular.module('oppia').component('searchBar', {
        */
       ctrl.openSubmenu = function(evt, menuName) {
         NavigationService.openSubmenu(evt, menuName);
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the directive is migrated to angular.
+        $rootScope.$applyAsync();
       };
       /**
        * Handles keydown events on menus.
@@ -84,6 +87,9 @@ angular.module('oppia').component('searchBar', {
       ctrl.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
         NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
         ctrl.activeMenuName = NavigationService.activeMenuName;
+        // TODO(#8521): Remove the use of $rootScope.$apply()
+        // once the directive is migrated to angular.
+        $rootScope.$applyAsync();
       };
 
       // Update the description, numSelections and summary fields of the

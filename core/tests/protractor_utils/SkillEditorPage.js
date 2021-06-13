@@ -259,10 +259,9 @@ var SkillEditorPage = function() {
 
     await (await browser.switchTo().activeElement()).sendKeys(explanation);
 
-    await waitFor.elementToBeClickable(
-      saveConceptCardExplanationButton,
-      'Save Concept Card Explanation button takes too long to be clickable');
-    await saveConceptCardExplanationButton.click();
+    await action.click(
+      'Save Concept Card Explanation Button',
+      saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
       editor, 'Explanation Editor takes too long to close');
   };

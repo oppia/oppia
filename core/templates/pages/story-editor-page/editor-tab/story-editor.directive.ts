@@ -113,6 +113,7 @@ angular.module('oppia').directive('storyEditor', [
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
             $scope.storyUrlFragmentExists = false;
+            $scope.$applyAsync();
           };
 
           $scope.setNodeToEdit = function(nodeId) {
