@@ -3633,6 +3633,91 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[2]['created_on_ms'],
             snapshots_metadata[3]['created_on_ms'])
 
+    def test_get_composite_change_list(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id)
+
+        # Upgrade to version 2.
+        exploration.title = 'First title'
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            self.owner_id, exploration, 'Changed title.', [])
+
+        # Change list for version 3.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'old_value': None,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'old_value': None,
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        })]
+        exp_services.update_exploration(
+            'second_committer_id', exploration.id, change_list,
+            'Added new state and interaction')
+
+        # Change list for version 4.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'New state'
+        })]
+        exp_services.update_exploration(
+            'committer_id_3', exploration.id, change_list,
+            'Deleted state: New state')
+
+        # Complete change list from version 1 to 4.
+        composite_change_list_dict_expected = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        },
+        {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'old_value': None,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        },
+        {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name':
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+            'state_name': 'New state',
+            'old_value': None,
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'content_id': 'ca_placeholder_0',
+                        'unicode_str': ''
+                    }
+                },
+                'rows': {'value': 1}
+            }
+        },
+        {
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'New state'
+        }]
+
+        composite_change_list = exp_services.get_composite_change_list(self.EXP_0_ID, 1, 4)
+        composite_change_list_dict = [change.to_dict() for change in composite_change_list]
+        self.assertEqual(composite_change_list_dict_expected, composite_change_list_dict)
+
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
     """Test methods relating to the exploration commit log."""

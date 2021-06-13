@@ -1709,13 +1709,17 @@ def get_composite_change_list(exp_id, old_version, new_version):
         list(ExplorationChange). List of ExplorationChange domain objects
         consisting of changes from old_version to new_version.
     """
-    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
+    if old_version > new_version:
+        raise Exception(
+                'Unexpected error: Trying to find change list from version %s '
+                'of exploration to version %s. Please reload the page and try again.'
+                % (old_version, new_version))
 
+    snapshots_metadata = get_exploration_snapshots_metadata(exp_id)
     composite_change_list_dict = []
     for i in range(old_version, new_version):
         composite_change_list_dict += snapshots_metadata[i]['commit_cmds']
-    print("composite_chanhge_lst")
-    print(composite_change_list_dict)
+
     composite_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in composite_change_list_dict]
@@ -1733,7 +1737,7 @@ def are_changes_mergeable(exp_id, version, change_list ):
 
     Attributes:
         latest_version: latest version of an exploration in the backend.
-        complete_change_list: complete list of the changes in an exploration from the
+        composite_change_list: complete list of the changes in an exploration from the
             backend between version and latest version.
         added_states_name: list of new states added in a complete change list.
         deleted_states_name: list of deleted states in a complete change list.
@@ -1923,7 +1927,8 @@ def are_changes_mergeable(exp_id, version, change_list ):
                         change_is_mergeable = True
                 elif (change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    for state in old_version.states:
+                    if old_state_name in changed_properties:
+                        pass
 
 
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
