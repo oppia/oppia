@@ -57,7 +57,7 @@ class BlogPostModel(base_models.BaseModel):
     thumbnail_filename = (
         datastore_services.StringProperty(indexed=True, required=True))
     # Time when the blog post model was last published. Value will be None
-    # if the blog post is a draft i.e it is not published.
+    # if the blog post is a draft i.e if the blog has never been published.
     published_on = (
         datastore_services.DateTimeProperty(indexed=True))
 
@@ -255,42 +255,6 @@ class BlogPostSummaryModel(base_models.BaseModel):
         return cls.query(
             cls.author_id == user_id
         ).get(keys_only=True) is not None
-
-    @classmethod
-    def create(cls, blog_post_id, author_id):
-        """Creates a new BlogPostSummaryModel entry.
-
-        Args:
-            blog_post_id: str. Blog Post ID of the newly-created blog post.
-            author_id: str. User ID of the author.
-
-        Returns:
-            BlogPostSummaryModel. The newly created BlogPostSummaryModel
-            instance.
-
-        Raises:
-            Exception. A blog post summary model with the given blog post ID
-                exists already.
-        """
-        if cls.get_by_id(blog_post_id):
-            raise Exception(
-                'Blog Post ID conflict on creating new blog post summary model.'
-            )
-
-        entity = cls(
-            id=blog_post_id,
-            author_id=author_id,
-            summary='',
-            title='',
-            published_on=None,
-            url_fragment='',
-            tags=[],
-            thumbnail_filename=''
-        )
-        entity.update_timestamps()
-        entity.put()
-
-        return entity
 
     @staticmethod
     def get_model_association_to_user():

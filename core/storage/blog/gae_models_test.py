@@ -211,35 +211,6 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_summary_models[1], self.blog_post_summary_model_old)
 
-    def test_raise_exception_by_mocking_collision(self):
-        """Tests create methods for raising exception."""
-
-        blog_post_summary_model_cls = blog_models.BlogPostSummaryModel
-
-        # Test create method.
-        with self.assertRaisesRegexp(
-            Exception,
-            'Blog Post ID conflict on creating new blog post summary model.'):
-            #  Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                blog_post_summary_model_cls, 'get_by_id',
-                types.MethodType(
-                    lambda x, y: True,
-                    blog_post_summary_model_cls)):
-                blog_post_summary_model_cls.create(
-                    'blog_one', self.USER_ID)
-
-    def test_creating_new_blog_post_summary_model(self):
-        blog_post_model_id = (
-            blog_models.BlogPostModel.generate_new_blog_post_id())
-        blog_post_summary_model_instance = (
-            blog_models.BlogPostSummaryModel.create(
-                blog_post_model_id, self.USER_ID))
-        self.assertEqual(
-            blog_post_summary_model_instance.id, blog_post_model_id)
-        self.assertEqual(
-            blog_post_summary_model_instance.author_id, self.USER_ID)
-
 
 class BlogPostRightsModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostRightsModel class."""

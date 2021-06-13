@@ -775,23 +775,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_model.update_timestamps()
         blog_post_model.put()
 
-        blog_post_rights_old = blog_models.BlogPostRightsModel(
+        blog_post_rights_for_post_1 = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_1,
             editor_ids=[self.USER_ID_1],
             blog_post_is_published=True,
         )
 
-        blog_post_rights_old.update_timestamps()
-        blog_post_rights_old.put()
+        blog_post_rights_for_post_1.update_timestamps()
+        blog_post_rights_for_post_1.put()
 
-        blog_post_rights_new = blog_models.BlogPostRightsModel(
+        blog_post_rights_for_post_2 = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_2,
             editor_ids=[self.USER_ID_1],
             blog_post_is_published=False,
         )
 
-        blog_post_rights_new.update_timestamps()
-        blog_post_rights_new.put()
+        blog_post_rights_for_post_2.update_timestamps()
+        blog_post_rights_for_post_2.put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
