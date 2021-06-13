@@ -512,8 +512,8 @@
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
 /schema_utils*.py @DubeySandeep
-/core/controllers/payload_validator.py @Nik-09
-/core/controllers/payload_validator_test.py @Nik-09
+/core/controllers/payload_validator.py @aks681
+/core/controllers/payload_validator_test.py @aks681
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
 
