@@ -1071,6 +1071,51 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             completed_collection_summaries[1].id, '1_welcome_introduce_oppia')
         self.assertEqual(len(completed_collection_summaries), 2)
 
+    def test_republishing_completed_collection_filters_as_complete(self):
+        # Add collection to the completed list.
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(
+            learner_progress_services.get_all_completed_collection_ids(
+                self.user_id), [self.COL_ID_0])
+
+        # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
+        system_user = user_services.get_system_user()
+        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
+        private_collection = collection_services.get_collection_summary_by_id(
+            self.COL_ID_0)
+        self.assertEqual(
+            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_collection_summaries = (
+            all_filtered_summaries.completed_collection_summaries)
+        # Test that completed col summaries don't include private collection.
+        self.assertEqual(len(completed_collection_summaries), 0)
+
+        # Republish COL_ID_0 to change status back to ACTIVITY_STATUS_PUBLIC.
+        self.publish_collection(self.owner_id, self.COL_ID_0)
+        learner_progress_services.mark_collection_as_completed(
+            self.user_id, self.COL_ID_0)
+        public_collection = collection_services.get_collection_summary_by_id(
+            self.COL_ID_0)
+        self.assertEqual(
+            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        completed_collection_summaries = (
+            all_filtered_summaries.completed_collection_summaries)
+        # Test that completed col summaries includes original COL_ID_0.
+        self.assertEqual(
+            completed_collection_summaries[0].id, '0_arch_bridges_in_england')
+        self.assertEqual(len(completed_collection_summaries), 1)
+
     def test_unpublishing_completed_story_filters_it_out(self):
         # Add stories to the completed list.
         story_services.record_completed_node_in_story_context(
@@ -1141,50 +1186,71 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learnt_topic_summaries[0].id, self.TOPIC_ID_0)
         self.assertEqual(len(learnt_topic_summaries), 1)
 
-    def test_republishing_completed_collection_filters_as_complete(self):
-        # Add collection to the completed list.
-        learner_progress_services.mark_collection_as_completed(
-            self.user_id, self.COL_ID_0)
+    def test_deleting_a_story_filters_it_out_from_completed_list(self):
+        # Add stories to the completed list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
         self.assertEqual(
-            learner_progress_services.get_all_completed_collection_ids(
-                self.user_id), [self.COL_ID_0])
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
-        # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
-        system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
-        private_collection = collection_services.get_collection_summary_by_id(
-            self.COL_ID_0)
-        self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
-
-        # Call get_activity_progress to get filtered progress.
-        user_activity = learner_progress_services.get_activity_progress(
-            self.user_id)
-        all_filtered_summaries = user_activity[0]
-        completed_collection_summaries = (
-            all_filtered_summaries.completed_collection_summaries)
-        # Test that completed col summaries don't include private collection.
-        self.assertEqual(len(completed_collection_summaries), 0)
-
-        # Republish COL_ID_0 to change status back to ACTIVITY_STATUS_PUBLIC.
-        self.publish_collection(self.owner_id, self.COL_ID_0)
-        learner_progress_services.mark_collection_as_completed(
-            self.user_id, self.COL_ID_0)
-        public_collection = collection_services.get_collection_summary_by_id(
-            self.COL_ID_0)
-        self.assertEqual(
-            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
+        # Delete STORY_ID_1.
+        story_services.delete_story(self.admin_id, self.STORY_ID_1)
 
         # Call get_activity_progress to get filtered progress.
         user_activity = learner_progress_services.get_activity_progress(
             self.user_id)
         all_filtered_summaries = user_activity[0]
-        completed_collection_summaries = (
-            all_filtered_summaries.completed_collection_summaries)
-        # Test that completed col summaries includes original COL_ID_0.
+        completed_story_summaries = (
+            all_filtered_summaries.completed_story_summaries)
+
+        # Test that completed story summaries don't include deleted
+        # stories. Ensure that completed_story_summaries[0] matches
+        # STORY_ID_0.
         self.assertEqual(
-            completed_collection_summaries[0].id, '0_arch_bridges_in_england')
-        self.assertEqual(len(completed_collection_summaries), 1)
+            completed_story_summaries[0].id, self.STORY_ID_0)
+        self.assertEqual(len(completed_story_summaries), 1)
+
+    def test_deleting_a_topic_filters_it_out_from_learnt_list(self):
+        # Add topics to the learnt list.
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_0, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_0)
+        story_services.record_completed_node_in_story_context(
+            self.user_id, self.STORY_ID_1, 'node_1')
+        learner_progress_services.mark_story_as_completed(
+            self.user_id, self.STORY_ID_1)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+        self.assertEqual(
+            learner_progress_services.get_all_learnt_topic_ids(
+                self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
+
+        # Delete TOPIC_ID_1.
+        topic_services.delete_topic(self.admin_id, self.TOPIC_ID_1)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        learnt_topic_summaries = (
+            all_filtered_summaries.learnt_topic_summaries)
+
+        # Test that learnt topic summaries don't include deleted
+        # stories. Ensure that learnt_topic_summaries[0] matches
+        # TOPIC_ID_0.
+        self.assertEqual(
+            learnt_topic_summaries[0].id, self.TOPIC_ID_0)
+        self.assertEqual(len(learnt_topic_summaries), 1)
 
     def test_get_all_incomplete_exp_ids(self):
         self.assertEqual(
