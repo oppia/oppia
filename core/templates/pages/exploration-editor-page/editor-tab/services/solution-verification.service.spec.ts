@@ -25,16 +25,14 @@ import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory'
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('Solution Verification Service', () => {
   let ess, siis, scas, sof, svs, see;
   let mockInteractionState;
+  importAllAngularServices();
 
   beforeEach(() => {
     mockInteractionState = {
@@ -74,12 +72,7 @@ describe('Solution Verification Service', () => {
     svs = TestBed.get(SolutionVerificationService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
   // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
   // block when ExplorationStateService has been migrated to Angular 8.
   beforeEach(angular.mock.inject(function($injector) {

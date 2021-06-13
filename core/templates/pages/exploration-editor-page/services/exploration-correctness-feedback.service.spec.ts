@@ -17,14 +17,14 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-import { UpgradedServices } from 'services/UpgradedServices';
 import { ExplorationDataService } from './exploration-data.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
 
 describe('Exploration Correctness Feedback Service', function() {
   var ExplorationCorrectnessFeedbackService;
+  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,13 +42,7 @@ describe('Exploration Correctness Feedback Service', function() {
     });
   });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     ExplorationCorrectnessFeedbackService = $injector.get(
       'ExplorationCorrectnessFeedbackService');

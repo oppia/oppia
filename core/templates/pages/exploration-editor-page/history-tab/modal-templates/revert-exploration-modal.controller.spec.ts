@@ -14,6 +14,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Unit tests for RevertExplorationModalController.
@@ -24,6 +25,7 @@ describe('Revert Exploration Modal Controller', function() {
   var $uibModalInstance = null;
   var version = '1';
   var explorationId = 'exp1';
+  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
