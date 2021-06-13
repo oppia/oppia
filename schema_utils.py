@@ -129,7 +129,7 @@ def normalize_against_schema(
         # To remove dict from the properties field if the schema of a
         # missing arg contains default_value: None.
         for _ in list_of_missing_args_with_default_none:
-            for i in range(len(schema[SCHEMA_KEY_PROPERTIES])):
+            for i in python_utils.RANGE(len(schema[SCHEMA_KEY_PROPERTIES])):
                 if (p[SCHEMA_KEY_NAME] not in
                         list_of_missing_args_with_default_none):
                     continue
