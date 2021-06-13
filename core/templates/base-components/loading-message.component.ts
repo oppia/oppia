@@ -24,8 +24,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
    templateUrl: './loading-message.component.html'
  })
 export class LoadingMessageComponent {
-  // Angular lifecycle hooks are used to populate values, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  // This property is initialized using angular lifecycle hooks, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
    @Input() message!: string;
 }
 
