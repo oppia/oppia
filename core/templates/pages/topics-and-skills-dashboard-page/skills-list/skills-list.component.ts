@@ -54,7 +54,7 @@ export class SkillsListComponent {
   @Input() skillSummaries: AugmentedSkillSummary[];
   @Input() pageNumber: number;
   @Input() itemsPerPage: number;
-  @Input() editableTopicSummaries: TopicSummary[];
+  @Input() editableTopicSummaries: CreatorTopicSummary[];
   @Input() mergeableSkillSummaries: SkillSummary[];
   @Input() untriagedSkillSummaries: SkillSummary[];
   @Input() userCanDeleteSkill: boolean;
