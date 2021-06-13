@@ -55,19 +55,19 @@ describe('Base Content Component', () => {
   }
 
   class MockWindowRef {
-     nativeWindow = {
-       location: {
-         hostname: hostname,
-         href: href,
-         pathname: pathname,
-         search: search,
-         hash: hash
-       }
-     };
+    nativeWindow = {
+      location: {
+        hostname: hostname,
+        href: href,
+        pathname: pathname,
+        search: search,
+        hash: hash
+      }
+    };
   }
 
   class MockLoaderService {
-     onLoadingMessageChange: Observable<string> = of('Test Message');
+    onLoadingMessageChange: Observable<string> = of('Test Message');
   }
 
   class MockPageTitleService {
