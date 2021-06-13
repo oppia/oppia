@@ -23,7 +23,7 @@ require('base-components/base-content.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
-require('components/summary-tile/topic-summary-tile.directive.ts');
+require('components/summary-tile/topic-summary-tile.component.ts');
 
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('pages/library-page/search-bar/search-bar.component.ts');

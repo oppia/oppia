@@ -15,10 +15,10 @@
   </div>
   <div class="oppia-topic-summary-tiles">
     <div ng-repeat="topicSummary in $ctrl.classroomData.getTopicSummaries()" class="oppia-topic-summary-tile protractor-test-topic-summary-tile">
-      <topic-summary-tile topic-summary="topicSummary"
-                          classroom-url-fragment="$ctrl.classroomUrlFragment"
-                          published="topicSummary.isTopicPublished()">
-      </topic-summary-tile>
+      <oppia-topic-summary-tile [topic-summary]="topicSummary"
+                                [classroom-url-fragment]="$ctrl.classroomUrlFragment"
+                                [is-published]="topicSummary.isTopicPublished()">
+      </oppia-topic-summary-tile>
     </div>
   </div>
   <div class="oppia-classroom-search-container">
