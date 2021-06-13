@@ -127,7 +127,7 @@ const setRole = async function(browser, page, role) {
     await page.click(updateFormSubmit);
     // eslint-disable-next-line no-console
     console.log('Submitted form');
-    await page.waitForSelector(statusMessage);
+    await page.waitForSelector(statusMessage, {visible: true});
     // eslint-disable-next-line no-console
     console.log('Found status message');
     // This is done partly to give the page time to stabilize after submitting
