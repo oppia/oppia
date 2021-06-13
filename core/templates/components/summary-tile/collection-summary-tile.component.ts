@@ -48,6 +48,8 @@ export class CollectionSummaryTileComponent implements OnInit {
 
   userIsLoggedIn: boolean = false;
   collectionIsCurrentlyHoveredOver: boolean = false;
+  // These properties are initialized using component interactions,
+  // see https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
 
