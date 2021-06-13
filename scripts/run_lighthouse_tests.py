@@ -174,10 +174,7 @@ def main(args=None):
 
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         python_utils.PRINT('Building files in production mode.')
-        # We are using --source_maps here, so that we have at least one CI check
-        # that builds using source maps in prod env. This is to ensure that
-        # there are no issues while deploying oppia.
-        build.main(args=['--prod_env', '--source_maps'])
+        build.main(args=['--prod_env'])
     elif lighthouse_mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         build.main(args=[])
         run_webpack_compilation()
