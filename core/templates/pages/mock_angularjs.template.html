@@ -1,0 +1,39 @@
+<script>
+  window.angular = {
+    $$minErr() { },
+    module(str) {
+      return {
+        directive(name, object) {
+          return this;
+        },
+        info() {
+          return this;
+        },
+        factory(name, object) {
+          return this;
+        },
+        provider(name) {
+          return this;
+        },
+        filter(name, object) {
+          return this;
+        },
+        run(str) {
+          return this;
+        },
+        constant() {
+          return this;
+        },
+        controller(name, constructor) {
+          return this;
+        },
+        service(name, constructor) {
+          return this;
+        },
+        config(configFn) {
+          return this;
+        }
+      };
+    }
+  };
+</script>

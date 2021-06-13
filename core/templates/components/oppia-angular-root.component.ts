@@ -463,15 +463,18 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-angular-root',
-  template: ''
+  templateUrl: './oppia-angular-root.component.html'
 })
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-  static ajsTranslate;
+  direction: string = 'ltr';
+  currentLang = 'en';
+
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;
@@ -1490,6 +1493,24 @@ private injector: Injector
       this.writtenTranslationsObjectFactory);
 
     OppiaAngularRootComponent.injector = this.injector;
+
+    this.translateService.use(
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+      (code) => {
+        this.translateService.use(code);
+        this.currentLang = code;
+        for (var i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
+          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id ===
+            this.currentLang) {
+            this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
+            break;
+          }
+        }
+      }
+    );
+    this.translateCacheService.init();
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
