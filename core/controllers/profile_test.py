@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import logging
 import re
 import zipfile
 
@@ -810,7 +811,8 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         super(BulkEmailWebhookEndpointTests, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.swap_secret = self.swap(feconf, 'MAILCHIMP_SECRET', 'secret')
+        self.swap_secret = self.swap(
+            feconf, 'MAILCHIMP_WEBHOOK_SECRET', 'secret')
         self.swap_audience_id = (
             self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
         user_services.update_email_preferences(
@@ -845,12 +847,16 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             self.assertEqual(json_response, {})
 
     def test_post_with_invalid_secret(self):
-        with self.swap(feconf, 'MAILCHIMP_SECRET', 'invalid_secret'):
-            self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
-                    'data[list_id]': 'audience_id',
-                    'data[email]': 'invalid_email'
-                }, use_payload=False, expected_status_int=404)
+        with self.swap_secret:
+            with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+                self.post_json(
+                    '%s/invalid_secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                        'data[list_id]': 'audience_id',
+                        'data[email]': 'invalid_email'
+                    }, use_payload=False, expected_status_int=404)
+                self.assertIn(
+                    'Invalid Mailchimp webhook request received with secret: '
+                    'invalid_secret', captured_logs)
 
     def test_post(self):
         with self.swap_secret, self.swap_audience_id:

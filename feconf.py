@@ -453,7 +453,7 @@ MAILCHIMP_API_KEY = None
 # Mailchimp username.
 MAILCHIMP_USERNAME = None
 # Mailchimp secret, used to authenticate webhook requests.
-MAILCHIMP_SECRET = None
+MAILCHIMP_WEBHOOK_SECRET = None
 
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch

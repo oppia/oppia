@@ -117,7 +117,7 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
     """The endpoint for the webhook that is triggered when a user
     subscribes/unsubscribes to the bulk email service provider externally."""
 
-    @acl_decorators.is_valid_service_provider
+    @acl_decorators.is_source_mailchimp
     def get(self, _):
         """Handles GET requests. This is just an empty endpoint that is
         required since when the webhook is updated in the bulk email service
@@ -125,7 +125,7 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         """
         pass
 
-    @acl_decorators.is_valid_service_provider
+    @acl_decorators.is_source_mailchimp
     def post(self, _):
         """Handles POST requests."""
         if self.request.get('data[list_id]') != feconf.MAILCHIMP_AUDIENCE_ID:
@@ -365,18 +365,11 @@ class SignupHandler(base.BaseHandler):
                 raise self.InvalidInputException(e)
 
         if can_receive_email_updates is not None:
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, can_receive_email_updates,
-                    feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                    feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE))
-            if bulk_email_signup_message_should_be_shown:
-                self.render_json({
-                    'bulk_email_signup_message_should_be_shown': (
-                        bulk_email_signup_message_should_be_shown)
-                })
-                return
+            user_services.update_email_preferences(
+                self.user_id, can_receive_email_updates,
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         # Note that an email is only sent when the user registers for the first
         # time.
