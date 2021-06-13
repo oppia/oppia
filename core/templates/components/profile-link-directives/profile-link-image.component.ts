@@ -29,8 +29,8 @@ import { ProfileLinkImageBackendApiService } from
   styleUrls: []
 })
 export class ProfileLinkImageComponent implements OnInit {
-  // Angular lifecycle hooks are used to populate values, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  // This property is initialized using angular lifecycle hooks, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() username!: string;
   profileImageUrl: string | undefined;
   profilePicture: string | undefined;
