@@ -48,9 +48,19 @@ class BlogPostModelValidatorTests(test_utils.AuditJobsTestBase):
         self.blog_post_model_instance = blog_models.BlogPostModel.create(
             self.blog_post_id, self.author_id
         )
-        blog_models.BlogPostSummaryModel.create(
-            self.blog_post_id, self.author_id
-        )
+        self.blog_post_summary_model = (
+            blog_models.BlogPostSummaryModel(
+                id=self.blog_post_id,
+                author_id=self.author_id,
+                summary='',
+                title='',
+                published_on=None,
+                url_fragment='',
+                tags=[],
+                thumbnail_filename=''
+            ))
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
         blog_models.BlogPostRightsModel.create(
             self.blog_post_id, self.author_id
         )
@@ -97,9 +107,18 @@ class BlogPostSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             blog_models.BlogPostModel.generate_new_blog_post_id())
 
         self.blog_post_summary_model_instance = (
-            blog_models.BlogPostSummaryModel.create(
-                self.blog_post_id, self.author_id
+            blog_models.BlogPostSummaryModel(
+                id=self.blog_post_id,
+                author_id=self.author_id,
+                summary='',
+                title='',
+                published_on=None,
+                url_fragment='',
+                tags=[],
+                thumbnail_filename=''
             ))
+        self.blog_post_summary_model_instance.update_timestamps()
+        self.blog_post_summary_model_instance.put()
         blog_models.BlogPostModel.create(self.blog_post_id, self.author_id)
         blog_models.BlogPostRightsModel.create(
             self.blog_post_id, self.author_id)
@@ -150,8 +169,20 @@ class BlogPostRightsModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.blog_post_id, self.author_id
             ))
         blog_models.BlogPostModel.create(self.blog_post_id, self.author_id)
-        blog_models.BlogPostSummaryModel.create(
-            self.blog_post_id, self.author_id)
+
+        self.blog_post_summary_model = (
+            blog_models.BlogPostSummaryModel(
+                id=self.blog_post_id,
+                author_id=self.author_id,
+                summary='',
+                title='',
+                published_on=None,
+                url_fragment='',
+                tags=[],
+                thumbnail_filename=''
+            ))
+        self.blog_post_summary_model.update_timestamps()
+        self.blog_post_summary_model.put()
 
         self.job_class = (
             prod_validation_jobs_one_off
