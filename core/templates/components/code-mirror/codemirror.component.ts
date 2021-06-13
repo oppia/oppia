@@ -33,11 +33,7 @@ interface CodeMirrorMergeViewOptions {
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   @Input() options!: CodeMirrorMergeViewOptions;
-  // TODO(#13015): Remove use of unknown as a type.
-  // The property 'value' is dependent on other property, 'localValue', from
-  // 'schema-based-editor'. Most components using 'localValue' are currently in
-  // AngularJS, so its type cannot be determined for now.
-  @Input() value!: unknown;
+  @Input() value!: string;
   @Input() refresh: boolean = false;
   @Input() readOnly = false;
   @Output() valueChange = new EventEmitter();
@@ -54,7 +50,7 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
 
   constructor() { }
 
-  updateValue(val: unknown): void {
+  updateValue(val: string): void {
     this.value = val;
     this.valueChange.emit(val);
   }
