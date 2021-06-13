@@ -28,8 +28,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   styleUrls: []
 })
 export class ListOfTabsEditorComponent implements OnInit {
-  // Angular lifecycle hooks are used to populate values, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  // These properties are initialized using angular lifecycle hooks, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() modalId!: symbol;
   // TODO(#13015): Remove use of unknown as a type.
   // The property 'value' is dependent on another property, 'localValue', from
