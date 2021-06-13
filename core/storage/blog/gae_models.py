@@ -54,7 +54,7 @@ class BlogPostModel(base_models.BaseModel):
     # to take a list of values of underlying type(str).
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog post. It's value will be None until
-    # a thumbnail is added to the blog post. It can be None only when blog 
+    # a thumbnail is added to the blog post. It can be None only when blog
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
