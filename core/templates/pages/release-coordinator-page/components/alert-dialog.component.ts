@@ -13,12 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia release coordinator page.
+ * @fileoverview Component for alerting the user about an error that has
+ * occurred.
  */
 
-export const ReleaseCoordinatorPageConstants = {
-  BEAM_JOBS_TAB_IS_ENABLED: false,
-  TAB_ID_BEAM_JOBS: 'beam_jobs',
-  TAB_ID_JOBS: 'jobs',
-  TAB_ID_MISC: ' misc',
-} as const;
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+@Component({
+  selector: 'alert-dialog',
+  templateUrl: './alert-dialog.component.html',
+})
+export class AlertDialogComponent {
+  constructor(@Inject(MAT_DIALOG_DATA) public error: Error) {}
+}
