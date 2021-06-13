@@ -160,45 +160,55 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
-        return [user_models.IncompleteActivitiesModel]
+        return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
         user_id = item.id
+        activity_ids_in_learner_dashboard = (
+            learner_progress_services.get_learner_dashboard_activities(
+                user_id))
         incomplete_exploration_ids = (
-            learner_progress_services.get_all_incomplete_exp_ids(user_id))
+            activity_ids_in_learner_dashboard.incomplete_exploration_ids)
         completed_exploration_ids = (
-            learner_progress_services.get_all_completed_exp_ids(user_id))
+            activity_ids_in_learner_dashboard.completed_exploration_ids)
 
-        for exp_id in incomplete_exploration_ids:
-            story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
-            if story_id:
-                story = story_fetchers.get_story_by_id(story_id)
-                if story_id not in item.story_ids:
-                    item.story_ids.append(story_id)
-                    if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
-                        item.partially_learnt_topic_ids.append(
-                            story.corresponding_topic_id)
+        story_ids_linked_to_incomplete_explorations = (
+            list(set(exp_services.get_story_ids_linked_to_explorations(
+                incomplete_exploration_ids))))
+        stories_linked_to_incomplete_explorations = (
+            story_fetchers.get_stories_by_ids(
+                story_ids_linked_to_incomplete_explorations))
 
-        for exp_id in completed_exploration_ids:
-            story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
-            if story_id:
-                story = story_fetchers.get_story_by_id(story_id)
-                if story_id not in item.story_ids:
-                    completed_nodes = (
-                        story_fetchers.get_completed_nodes_in_story(
-                            user_id, story_id))
-                    ordered_nodes = story.story_contents.get_ordered_nodes()
+        story_ids_linked_to_completed_explorations = (
+            list(set(exp_services.get_story_ids_linked_to_explorations(
+                completed_exploration_ids))))
+        stories_linked_to_completed_explorations = (
+            story_fetchers.get_stories_by_ids(
+                story_ids_linked_to_completed_explorations))
 
-                    if len(completed_nodes) != len(ordered_nodes):
-                        item.story_ids.append(story_id)
-                        if story.corresponding_topic_id not in item.partially_learnt_topic_ids: # pylint: disable=line-too-long
-                            item.partially_learnt_topic_ids.append(
-                                story.corresponding_topic_id)
+        # Mark story and topic as incomplete for incomplete explorations.
+        for story in stories_linked_to_incomplete_explorations:
+            if story:
+                learner_progress_services.mark_story_as_incomplete(
+                    user_id, story.id)
+                learner_progress_services.mark_topic_as_partially_learnt(
+                    user_id, story.corresponding_topic_id)
 
-        item.update_timestamps()
-        item.put()
+        # Mark story and topic as incomplete for completed explorations.
+        for story in stories_linked_to_completed_explorations:
+            if story:
+                completed_nodes = (
+                    story_fetchers.get_completed_nodes_in_story(
+                        user_id, story.id))
+                all_nodes = story.story_contents.nodes
+
+                if len(completed_nodes) != len(all_nodes):
+                    learner_progress_services.mark_story_as_incomplete(
+                        user_id, story.id)
+                    learner_progress_services.mark_topic_as_partially_learnt(
+                        user_id, story.corresponding_topic_id)
 
         yield (
             'Successfully added story_ids and topic_ids '
@@ -218,7 +228,7 @@ class PopulateStoriesAndTopicsInCompletedActivitiesOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
-        return [user_models.CompletedActivitiesModel]
+        return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
@@ -227,22 +237,26 @@ class PopulateStoriesAndTopicsInCompletedActivitiesOneOffJob(
         completed_exploration_ids = (
             learner_progress_services.get_all_completed_exp_ids(user_id))
 
-        for exp_id in completed_exploration_ids:
-            story_id = exp_services.get_story_id_linked_to_exploration(exp_id)
-            if story_id and story_id not in item.story_ids:
-                story = story_fetchers.get_story_by_id(story_id)
-                completed_nodes = story_fetchers.get_completed_nodes_in_story(
-                    user_id, story_id)
-                ordered_nodes = story.story_contents.get_ordered_nodes()
+        story_ids_linked_to_completed_explorations = (
+            list(set(exp_services.get_story_ids_linked_to_explorations(
+                completed_exploration_ids))))
+        stories_linked_to_completed_explorations = (
+            story_fetchers.get_stories_by_ids(
+                story_ids_linked_to_completed_explorations))
 
-                if len(completed_nodes) == len(ordered_nodes):
-                    item.story_ids.append(story_id)
-                    if story.corresponding_topic_id not in item.learnt_topic_ids: # pylint: disable=line-too-long
-                        item.learnt_topic_ids.append(
-                            story.corresponding_topic_id)
+        # Mark story and topic as completed for completed explorations.
+        for story in stories_linked_to_completed_explorations:
+            if story:
+                completed_nodes = (
+                    story_fetchers.get_completed_nodes_in_story(
+                        user_id, story.id))
+                all_nodes = story.story_contents.nodes
 
-        item.update_timestamps()
-        item.put()
+                if len(completed_nodes) == len(all_nodes):
+                    learner_progress_services.mark_story_as_completed(
+                        user_id, story.id)
+                    learner_progress_services.mark_topic_as_learnt(
+                        user_id, story.corresponding_topic_id)
 
         yield (
             'Successfully added story_ids and topic_ids '
