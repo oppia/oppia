@@ -133,9 +133,12 @@ def run_lighthouse_checks(lighthouse_mode):
             accessibility mode or performance mode.
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
+    # The max-old-space-size is a quick fix for node running out of heap memory
+    # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
         common.NODE_BIN_PATH, lhci_path, 'autorun',
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
+        '--max-old-space-size=2048'
     ]
 
     process = subprocess.Popen(
