@@ -3808,7 +3808,6 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
 
-        self.login(self.author_email)
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.exploration_id, self.author_id, [
@@ -3875,19 +3874,24 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             },
             'change to state 1')
 
-        translation_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[0]
-        question_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', 'skill_123')])[0]
-        edit_state_suggestion = suggestion_services.query_suggestions(
-            [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[1]
+        translation_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        question_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        edit_state_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+
+        self.assertEqual(len(translation_suggestions), 1)
+        self.assertEqual(len(question_suggestions), 1)
+        self.assertEqual(len(edit_state_suggestions), 1)
+
+        translation_suggestion = translation_suggestions[0]
+        question_suggestion = question_suggestions[0]
+        edit_state_suggestion = edit_state_suggestions[0]
+
         self.translation_suggestion_id = translation_suggestion.suggestion_id
         self.question_suggestion_id = question_suggestion.suggestion_id
         self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
-        self.logout()
 
     def test_authors_cannot_update_suggestion_that_they_created(self):
         self.login(self.author_email)
@@ -3897,7 +3901,8 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You are not allowed to update suggestions that you created.')
+            'The user, %s is not allowed to update self-created'
+            'suggestions.' % self.author_username)
         self.logout()
 
     def test_admin_can_update_any_given_translation_suggestion(self):
