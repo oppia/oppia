@@ -40,7 +40,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
   }`]
 })
 export class AudioSliderComponent {
-  // Refer TS-7-1 from the wiki.
+  // These properties are initialized using angular lifecycle hooks, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() value!: number;
   @Input() max!: number;
   @Input() thumbLabel = false;

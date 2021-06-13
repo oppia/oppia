@@ -30,6 +30,8 @@ import { UserService } from 'services/user.service';
   templateUrl: './collection-summary-tile.component.html',
 })
 export class CollectionSummaryTileComponent implements OnInit {
+  // These properties are initialized using component interactions,
+  // see https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() getCollectionId!: string;
   @Input() getCollectionTitle!: string;
   @Input() getLastUpdatedMsec!: number;
@@ -38,14 +40,14 @@ export class CollectionSummaryTileComponent implements OnInit {
   @Input() getCategory!: string;
   @Input() getThumbnailIconUrl!: string;
   @Input() getThumbnailBgColor!: string;
-  @Input() isPlaylistTile!: boolean;
-  @Input() isLinkedToEditorPage!: boolean;
+  @Input() isPlaylistTile: boolean = false;
+  @Input() isLinkedToEditorPage: boolean = false;
   @Input() showLearnerDashboardIconsIfPossible!: string;
-  @Input() isContainerNarrow!: boolean;
-  @Input() isOwnedByCurrentUser!: boolean;
+  @Input() isContainerNarrow: boolean = false;
+  @Input() isOwnedByCurrentUser: boolean = false;
 
-  userIsLoggedIn!: boolean;
-  collectionIsCurrentlyHoveredOver!: boolean;
+  userIsLoggedIn: boolean = false;
+  collectionIsCurrentlyHoveredOver: boolean = false;
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
 

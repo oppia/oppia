@@ -29,23 +29,25 @@ interface DeleteSummaryEventData {
   templateUrl: './summary-list-header.component.html'
 })
 export class SummaryListHeaderComponent {
- @Input() disableSorting!: boolean;
- @Input() index!: number;
- @Input() summary!: string;
- @Input() shortSummary!: string;
- @Input() isActive!: boolean;
- @Output() summaryDelete:
- EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
- @Input() isDeleteAvailable!: boolean;
- @Input() numItems!: number;
+  // These properties are initialized using component interaction, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
+  @Input() disableSorting: boolean = false;
+  @Input() index!: number;
+  @Input() summary!: string;
+  @Input() shortSummary!: string;
+  @Input() isActive: boolean = false;
+  @Output() summaryDelete:
+    EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
+  @Input() isDeleteAvailable: boolean = false;
+  @Input() numItems!: number;
 
- deleteItem(evt: Event): void {
-   let eventData = {
-     index: this.index,
-     event: evt
-   };
-   this.summaryDelete.emit(eventData);
- }
+  deleteItem(evt: Event): void {
+    let eventData = {
+      index: this.index,
+      event: evt
+    };
+    this.summaryDelete.emit(eventData);
+  }
 }
 
 angular.module('oppia').directive('oppiaSummaryListHeader',

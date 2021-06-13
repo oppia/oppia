@@ -31,7 +31,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   styleUrls: []
 })
 export class CodeStringEditorComponent implements OnInit {
-  @Input() alwaysEditable!: boolean;
+  @Input() alwaysEditable: boolean = false;
   @Input() value!: string | string[];
   @Output() valueChanged: EventEmitter<string> = new EventEmitter<string>();
   debounceInputSubject: Subject<string> = new Subject<string>();

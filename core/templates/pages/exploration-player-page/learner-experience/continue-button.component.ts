@@ -25,7 +25,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './continue-button.component.html'
 })
 export class ContinueButtonComponent {
-  @Input() isLearnAgainButton!: boolean;
+  @Input() isLearnAgainButton: boolean = false;
+  // This property is initialized after component interaction, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() focusLabel!: string;
   @Output() clickContinueButton: EventEmitter<void> = (
     new EventEmitter());
