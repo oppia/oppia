@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,6 +41,5 @@ let mockAngular = {
   value: () => mockAngular
 };
 // This throws "Property 'angular' does not exist on type 'Window & typeof
-// globalThis'."
-// @ts-expect-error
-window.angular = mockAngular;
+// globalThis'." when the `as unknown as ...` is not used.
+(window as unknown as {angular: typeof mockAngular}).angular = mockAngular;
