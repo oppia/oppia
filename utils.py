@@ -30,15 +30,17 @@ import re
 import string
 import sys
 import time
-from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
-    Any, Callable, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
-    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 import unicodedata
 import zlib
 
 from constants import constants
 import feconf
 import python_utils
+
+from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
+    Any, Callable, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
+    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
+
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH) # type: ignore[arg-type]
