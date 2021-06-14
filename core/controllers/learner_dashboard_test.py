@@ -172,17 +172,12 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['learnt_topics_list']), 0)
 
-        self.subtopic_0 = topic_domain.Subtopic(
-            0, 'Title 1', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'dummy-subtopic-zero')
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_0], next_subtopic_id=1)
-
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         learner_progress_services.mark_topic_as_learnt(
@@ -238,17 +233,12 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['partially_learnt_topics_list']), 0)
 
-        self.subtopic_0 = topic_domain.Subtopic(
-            0, 'Title 1', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'dummy-subtopic-zero')
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_0], next_subtopic_id=1)
-
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         learner_progress_services.mark_topic_as_partially_learnt(
@@ -333,10 +323,6 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             self.COL_ID_3, self.owner_id, title=self.COL_TITLE_3)
         self.publish_collection(self.owner_id, self.COL_ID_3)
 
-        self.subtopic_0 = topic_domain.Subtopic(
-            0, 'Title 1', ['skill_id_1'], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'dummy-subtopic-zero')
         self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
