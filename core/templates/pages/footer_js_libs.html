@@ -4,7 +4,7 @@
     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
   <% if (webpackConfig.mode == 'production') { %>
-    <script src="/build/webpack_bundles/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
   <% } else { %>
     <script src="<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
   <% } %>
@@ -12,6 +12,6 @@
 
 <% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
   <script src="/third_party/generated/js/third_party.min.js"></script>
-<% } else if(htmlWebpackPlugin.options.hybrid) { %>
+<% } else if (htmlWebpackPlugin.options.hybrid) { %>
   <script src="/third_party/generated/js/third_party.js"></script>
 <% } %>
