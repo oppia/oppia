@@ -25,6 +25,7 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { NavigationService } from 'services/navigation.service';
 
 var MockWindow = function() {
   this.location = {
@@ -54,6 +55,7 @@ describe('Search bar component', function() {
     constructTranslationIdsService = TestBed.get(
       ConstructTranslationIdsService);
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
+    navigationService = TestBed.get(NavigationService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -66,7 +68,6 @@ describe('Search bar component', function() {
     $location = $injector.get('$location');
     $rootScope = $injector.get('$rootScope');
     classroomBackendApiService = $injector.get('ClassroomBackendApiService');
-    navigationService = $injector.get('NavigationService');
     urlService = $injector.get('UrlService');
 
     $scope = $rootScope.$new();
@@ -75,7 +76,8 @@ describe('Search bar component', function() {
       $rootScope: $rootScope,
       $scope: $scope,
       ConstructTranslationIdsService: constructTranslationIdsService,
-      I18nLanguageCodeService: i18nLanguageCodeService
+      I18nLanguageCodeService: i18nLanguageCodeService,
+      NavigationService: navigationService
     });
 
     // This approach was choosen because spyOn() doesn't work on properties
