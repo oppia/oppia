@@ -26,7 +26,7 @@
  * that don't use AngularJS.
  */
 
-// TODO: Remove the mock-ajs.ts file after the migration is complete.
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 
 let mockAngular = {
   component: () => mockAngular,

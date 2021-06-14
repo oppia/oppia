@@ -154,7 +154,7 @@ module.exports = {
   },
 
   /**
-   * TODO: Remove the hybrid field from the html webpack plugin options
+   * TODO(#13079): Remove the hybrid field from the html webpack plugin options
    * once angularjs is removed from corresponding pages.
    */
   plugins: [
