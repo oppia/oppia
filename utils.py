@@ -49,14 +49,9 @@ PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
-# During type checking, mypy assumes the variable 'MYPY' to be true.
-# Typing is not a module in python2, so it will only be imported only while type
-# checking.
-
-
 from typing import (
     Any, Callable, Dict, Generator, Iterable, Iterator, List,
-    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
+    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 T = TypeVar('T')
 U = TypeVar('U')
 DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
