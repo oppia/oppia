@@ -17,20 +17,22 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed} from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
+import { fakeAsync, TestBed, tick} from '@angular/core/testing';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeBackendDict, ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
+import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
+import { TextInputRulesService } from 'interactions/TextInput/directives/text-input-rules.service';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
-import { ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { AnswerClassificationService } from './answer-classification.service';
+import { ExplorationFeatures, ExplorationFeaturesBackendApiService } from 'services/exploration-features-backend-api.service';
+import { AnswerClassificationService, InteractionRulesService } from './answer-classification.service';
 import { AudioPreloaderService } from './audio-preloader.service';
-import { AudioTranslationLanguageService } from './audio-translation-language.service';
 import { ContentTranslationLanguageService } from './content-translation-language.service';
 import { ExplorationEngineService } from './exploration-engine.service';
 import { ImagePreloaderService } from './image-preloader.service';
@@ -38,20 +40,17 @@ import { LearnerParamsService } from './learner-params.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
-describe('Exploration engine service ', () => {
+fdescribe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let contextService: ContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationFeaturesBackendApiService:
     ExplorationFeaturesBackendApiService;
   let explorationEngineService: ExplorationEngineService;
-  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationObjectFactory: ExplorationObjectFactory;
-  let focusManagerService: FocusManagerService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerParamsService: LearnerParamsService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -60,277 +59,289 @@ describe('Exploration engine service ', () => {
   let stateCardObjectFactory: StateCardObjectFactory;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
+  let paramChangeObjectFactory: ParamChangeObjectFactory;
+  let textInputService: InteractionRulesService;
+  let outcomeObjectFactory: OutcomeObjectFactory;
 
   let explorationDict: ExplorationBackendDict;
+  let paramChangeDict: ParamChangeBackendDict;
+  let explorationBackendResponse: FetchExplorationBackendResponse;
+  let explorationFeatures: ExplorationFeatures;
 
   beforeEach(() => {
     explorationDict = {
-      correctness_feedback_enabled: false,
-      draft_change_list_id: 1,
-      draft_changes: [],
-      version: 1,
-      is_version_of_draft_valid: true,
-      language_code: 'en',
-      title: 'My Title',
-      init_state_name: 'Introduction',
       states: {
-        'State 1': {
-          param_changes: [],
-          content: {
-            content_id: 'content',
-            html: '<p>State 1 Content</p>'
-          },
+        Start: {
+          classifier_model_id: null,
           recorded_voiceovers: {
             voiceovers_mapping: {
-              content: {
-                en: {
-                  filename: 'en-2.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2
-                }
-              },
-              default_outcome: {}
-            }
-          },
-          interaction: {
-            id: 'Continue',
-            default_outcome: {
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              dest: 'State 3',
-              param_changes: [],
-              labelled_as_correct: false,
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-            },
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              buttonText: {
-                value: 'Continue'
-              }
-            },
-            solution: null,
-            answer_groups: [],
-            hints: []
-          },
-          solicit_answer_details: false,
-          card_is_checkpoint: false,
-          written_translations: {
-            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
               content: {},
               default_outcome: {}
             }
           },
-          linked_skill_id: null,
-          classifier_model_id: null,
-          next_content_id_index: null,
-        },
-        'State 3': {
-          param_changes: [],
-          content: {
-            content_id: 'content',
-            html: 'Congratulations, you have finished!',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {
-                en: {
-                  filename: 'en-4.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2
-                }
-              }
-            }
-          },
-          interaction: {
-            id: 'EndExploration',
-            default_outcome: null,
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              recommendedExplorationIds: {
-                value: []
-              }
-            },
-            solution: null,
-            answer_groups: [],
-            hints: []
-          },
           solicit_answer_details: false,
-          card_is_checkpoint: false,
           written_translations: {
             translations_mapping: {
-              content: {}
-            }
-          },
-          linked_skill_id: null,
-          classifier_model_id: null,
-          next_content_id_index: null,
-        },
-        'State 2': {
-          param_changes: [],
-          content: {
-            content_id: 'content',
-            html: '<p>State 2 Content</p>'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {
-                en: {
-                  filename: 'en-3.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2
-                }
-              },
-              default_outcome: {}
-            }
-          },
-          interaction: {
-            id: 'Continue',
-            default_outcome: {
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
-              },
-              dest: 'State 3',
-              param_changes: [],
-              labelled_as_correct: false,
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-            },
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              buttonText: {
-                value: 'Continue'
-              }
-            },
-            solution: null,
-            answer_groups: [],
-            hints: []
-          },
-          solicit_answer_details: false,
-          card_is_checkpoint: false,
-          written_translations: {
-            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
               content: {},
               default_outcome: {}
             }
           },
-          linked_skill_id: null,
-          classifier_model_id: null,
-          next_content_id_index: null,
-        },
-        Introduction: {
-          param_changes: [],
-          content: {
-            content_id: 'content',
-            html: '<p>Introduction Content</p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {
-                en: {
-                  filename: 'en-1.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2
-                }
-              },
-              default_outcome: {},
-              feedback_1: {}
-            }
-          },
           interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
             id: 'TextInput',
-            default_outcome: {
-              dest: 'Introduction',
-              feedback: {
-                content_id: 'default_outcome',
-                html: '<p>Try again.</p>'
-              },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-            },
-            confirmed_unclassified_answers: [],
+            hints: [],
             customization_args: {
               rows: {
                 value: 1
               },
               placeholder: {
-                value: ''
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0'
+                }
               }
             },
-            solution: null,
-            answer_groups: [{
-              rule_specs: [{
-                rule_type: 'Contains',
-                inputs: {x: {
-                  contentId: 'rule_input',
-                  normalizedStrSet: ['1']
-                }}
-              }],
-              outcome: {
-                dest: 'State 1',
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: "<p>Let's go to State 1</p>"
+            answer_groups: [
+              {
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: '<p>Good Job</p>'
+                  },
+                  param_changes: [],
+                  dest: 'Mid'
                 },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null,
-                missing_prerequisite_skill_id: null,
+                training_data: [],
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: {
+                        normalizedStrSet: [
+                          'answer'
+                        ],
+                        contentId: 'rule_input_2'
+                      }
+                    },
+                    rule_type: 'FuzzyEquals'
+                  }
+                ],
+                tagged_skill_misconception_id: null
+              }
+            ],
+            default_outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>Try again.</p>'
               },
-              training_data: null,
-              tagged_skill_misconception_id: null,
-            }, {
-              rule_specs: [{
-                rule_type: 'Contains',
-                inputs: {x: {
-                  contentId: 'rule_input',
-                  normalizedStrSet: ['2']
-                }}
-              }],
-              outcome: {
-                dest: 'State 2',
-                feedback: {
-                  content_id: 'feedback_2',
-                  html: "<p>Let's go to State 2</p>"
-                },
-                labelled_as_correct: false,
-                param_changes: [],
-                refresher_exploration_id: null,
-                missing_prerequisite_skill_id: null,
-              },
-              training_data: null,
-              tagged_skill_misconception_id: null,
-            }],
-            hints: []
-          },
-          solicit_answer_details: false,
-          card_is_checkpoint: true,
-          written_translations: {
-            translations_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {}
+              param_changes: [],
+              dest: 'Start'
             }
           },
+          param_changes: [],
+          next_content_id_index: 3,
+          card_is_checkpoint: true,
           linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>First Question</p>'
+          }
+        },
+        End: {
           classifier_model_id: null,
-          next_content_id_index: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {}
+            }
+          },
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              content: {}
+            }
+          },
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'EndExploration',
+            hints: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: ['recommnendedExplorationId']
+              }
+            },
+            answer_groups: [],
+            default_outcome: null
+          },
+          param_changes: [],
+          next_content_id_index: 0,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: 'Congratulations, you have finished!'
+          }
+        },
+        Mid: {
+          classifier_model_id: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {
+              ca_placeholder_0: {},
+              feedback_1: {},
+              rule_input_2: {},
+              content: {},
+              default_outcome: {}
+            }
+          },
+          interaction: {
+            solution: null,
+            confirmed_unclassified_answers: [],
+            id: 'TextInput',
+            hints: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: {
+                  unicode_str: '',
+                  content_id: 'ca_placeholder_0'
+                }
+              }
+            },
+            answer_groups: [
+              {
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  refresher_exploration_id: null,
+                  labelled_as_correct: false,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: ' <p>Good Job</p>'
+                  },
+                  param_changes: [],
+                  dest: 'End'
+                },
+                training_data: [],
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: {
+                        normalizedStrSet: [
+                          'answer'
+                        ],
+                        contentId: 'rule_input_2'
+                      }
+                    },
+                    rule_type: 'FuzzyEquals'
+                  }
+                ],
+                tagged_skill_misconception_id: null
+              }
+            ],
+            default_outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>try again.</p>'
+              },
+              param_changes: [],
+              dest: 'Mid'
+            }
+          },
+          param_changes: [],
+          next_content_id_index: 3,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          content: {
+            content_id: 'content',
+            html: '<p>Second Question</p>'
+          }
         }
       },
-      param_specs: {},
+      auto_tts_enabled: true,
+      version: 2,
+      param_specs: {
+        x: {
+          obj_type: 'UnicodeString'
+        },
+        y: {
+          obj_type: 'UnicodeString'
+        }
+      },
       param_changes: [],
+      title: 'My Exploration Title',
+      correctness_feedback_enabled: false,
+      draft_change_list_id: 9,
+      is_version_of_draft_valid: null,
+      language_code: 'en',
+      init_state_name: 'Start',
+      draft_changes: null,
     };
-  })
-  
+
+    paramChangeDict = {
+      customization_args: {
+        parse_with_jinja: false,
+        value: 'val',
+        list_of_values: ['val1, val2']
+      },
+      generator_id: 'Copier',
+      name: 'answer'
+    };
+
+    explorationBackendResponse = {
+      can_edit: true,
+      exploration: {
+        init_state_name: 'state_name',
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: '',
+        language_code: '',
+        objective: '',
+        correctness_feedback_enabled: false
+      },
+      exploration_id: 'test_id',
+      is_logged_in: true,
+      session_id: 'test_session',
+      version: 1,
+      preferred_audio_language_code: 'en',
+      preferred_language_codes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      record_playthrough_probability: 1
+    };
+
+    explorationFeatures = {
+      isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: true
+    };
+  });
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -339,8 +350,6 @@ describe('Exploration engine service ', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService);
     contextService = TestBed.inject(ContextService);
     contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService);
@@ -348,37 +357,552 @@ describe('Exploration engine service ', () => {
       ExpressionInterpolationService);
     explorationFeaturesBackendApiService = TestBed.inject(
       ExplorationFeaturesBackendApiService);
-    explorationHtmlFormatterService = TestBed.inject(
-      ExplorationHtmlFormatterService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    focusManagerService = TestBed.inject(FocusManagerService);
-    focusManagerService = TestBed.inject(FocusManagerService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
+    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
+    textInputService = TestBed.get(TextInputRulesService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
   });
 
-  fit('should init', () => {
-    let initSuccessCb = jasmine.createSpy('success');
-
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+  beforeEach(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(2);
     spyOn(contentTranslationLanguageService, 'init').and.returnValue(null);
     spyOn(imagePreloaderService, 'init').and.returnValue(null);
     spyOn(imagePreloaderService, 'kickOffImagePreloader').and.returnValue(null);
+    spyOn(audioPreloaderService, 'init').and.returnValue(null);
+    spyOn(audioPreloaderService, 'kickOffAudioPreloader').and.returnValue(null);
     spyOn(statsReportingService, 'recordExplorationStarted')
       .and.returnValue(null);
+    spyOn(statsReportingService, 'recordAnswerSubmitted').and.returnValue(null);
+    spyOn(statsReportingService, 'recordAnswerSubmitAction')
+      .and.returnValue(null);
+    spyOn(expressionInterpolationService, 'processHtml')
+      .and.callFake((html, envs) => html);
+    spyOn(readOnlyExplorationBackendApiService, 'loadExplorationAsync')
+      .and.returnValue(Promise.resolve(explorationBackendResponse));
+  });
+
+  it('should load exploration when initialized in ' +
+    'exploration player page', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    // Setting exploration player page.
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(explorationEngineService.isInPreviewMode()).toBe(false);
+    expect(() => {
+      explorationEngineService.getExplorationTitle();
+    }).toThrowError('Cannot read property \'title\' of undefined');
 
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
-    
+
+    const explorationTitle = explorationEngineService.getExplorationTitle();
+    expect(explorationTitle).toBe('My Exploration Title');
+    expect(initSuccessCb).toHaveBeenCalled();
+  });
+
+  it('should load exploration when initialized in ' +
+    'exploration editor page', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    let paramChanges = paramChangeObjectFactory.createFromBackendDict(
+      paramChangeDict);
+    // Setting exploration editor page.
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
+    spyOn(urlService, 'getPathname')
+      .and.returnValue('/create/in/path/name');
+    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
+
+    // Since the constructor will be automatically called in unit tests, it
+    // is hard to test or spy on the constructor. So, we have created a
+    // function to manually trigger and tests different edge cases.
+    explorationEngineService.setExplorationProperties();
+
+    expect(explorationEngineService.isInPreviewMode()).toBe(true);
+    expect(() => {
+      explorationEngineService.getExplorationTitle();
+    }).toThrowError('Cannot read property \'title\' of undefined');
+
+    explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    const explorationTitle = explorationEngineService.getExplorationTitle();
+    expect(explorationTitle).toBe('My Exploration Title');
+    expect(initSuccessCb).toHaveBeenCalled();
+  });
+
+  describe('on submitting answer ', () => {
+    it('should call success callback if the submitted ' +
+      'answer is correct', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'Mid',
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'Answer is correct!'
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }), 1, 0, 'default_outcome');
+
+      let lastCard = stateCardObjectFactory.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id');
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+      const isAnswerCorrect = explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+
+      expect(submitAnswerSuccessCb).toHaveBeenCalled();
+      expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
+      expect(isAnswerCorrect).toBe(true);
+    });
+
+    it('should not submit answer again if the answer ' +
+      'is already being processed', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'Mid',
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'Answer is correct!'
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }), 1, 0, 'default_outcome');
+
+      let lastCard = stateCardObjectFactory.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id');
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+      // Setting answer is being processed to true.
+      explorationEngineService.answerIsBeingProcessed = true;
+      explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+
+      expect(submitAnswerSuccessCb).not.toHaveBeenCalled();
+    });
+
+    it('should show warning message if the feedback ' +
+      'content is empty', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'Mid',
+          feedback: {
+            content_id: 'feedback_1',
+            html: null
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }), 1, 0, 'default_outcome');
+
+      let lastCard = stateCardObjectFactory.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id');
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      let alertsServiceSpy = spyOn(
+        alertsService, 'addWarning').and.returnValue();
+
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+      explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+
+      expect(alertsServiceSpy)
+        .toHaveBeenCalledWith('Feedback content should not be empty.');
+    });
+
+    it('should show warning message if the parameters ' +
+      'are empty', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'Mid',
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'feedback'
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }), 1, 0, 'default_outcome');
+
+      let lastCard = stateCardObjectFactory.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id');
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      let alertsServiceSpy = spyOn(
+        alertsService, 'addWarning').and.returnValue();
+      spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+      spyOn(explorationEngineService, 'makeParams')
+        .and.returnValue(null);
+
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+      explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+
+      expect(alertsServiceSpy)
+        .toHaveBeenCalledWith('Parameters should not be empty.');
+    });
+
+    it('should show warning message if the question ' +
+      'name is empty', () => {
+      let initSuccessCb = jasmine.createSpy('success');
+      let submitAnswerSuccessCb = jasmine.createSpy('success');
+      let answer = 'answer';
+      let answerClassificationResult = new AnswerClassificationResult(
+        outcomeObjectFactory.createFromBackendDict({
+          dest: 'Mid',
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'feedback'
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        }), 1, 0, 'default_outcome');
+
+      let lastCard = stateCardObjectFactory.createNewCard(
+        'Card 1', 'Content html', 'Interaction text', null,
+        null, null, 'content_id');
+
+      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(playerTranscriptService, 'getLastStateName')
+        .and.returnValue('Start');
+      spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(answerClassificationResult);
+      spyOn(explorationEngineService, 'makeQuestion')
+        .and.returnValue(null);
+      let alertsServiceSpy = spyOn(
+        alertsService, 'addWarning').and.returnValue();
+
+      explorationEngineService.init(
+        explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+      explorationEngineService.submitAnswer(
+        answer, textInputService, submitAnswerSuccessCb);
+
+      expect(alertsServiceSpy)
+        .toHaveBeenCalledWith('Question name should not be empty.');
+    });
+  });
+
+  it('should check whether we can ask learner for answer ' +
+    'details', fakeAsync(() => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(explorationFeaturesBackendApiService, 'fetchExplorationFeaturesAsync')
+      .and.returnValue(Promise.resolve(explorationFeatures));
+
+    // Here default value is set to false.
+    expect(explorationEngineService.getAlwaysAskLearnerForAnswerDetails())
+      .toBe(false);
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+    tick();
+
+    const answerDetails = (
+      explorationEngineService.getAlwaysAskLearnerForAnswerDetails());
+    expect(answerDetails).toBe(true);
+  }));
+
+  it('should return default exploration Id', () => {
+    // Please note that default exploration Id is 'test_id'.
+    // This is being initialized in the constructor.
+
+    const explorationId = explorationEngineService.getExplorationId();
+    expect(explorationId).toBe('test_id');
+  });
+
+  it('should return exploration title', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getExplorationTitle();
+    }).toThrowError('Cannot read property \'title\' of undefined');
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    const explorationTitle = explorationEngineService.getExplorationTitle();
+    expect(explorationTitle).toBe('My Exploration Title');
+  });
+
+  it('should return exploration version', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    // Here 1 is default value, this is being initialized in the constructor.
+    expect(explorationEngineService.getExplorationVersion()).toBe(1);
+
+    explorationEngineService.init(
+      explorationDict, 2, null, true, ['en'], initSuccessCb);
+
+    const explorationVersion = explorationEngineService.getExplorationVersion();
+    expect(explorationVersion).toBe(2);
+  });
+
+  it('should return author recommended exploration Id\'s', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getAuthorRecommendedExpIds();
+    }).toThrowError(
+      'Cannot read property \'getAuthorRecommendedExpIds\' of undefined');
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    explorationEngineService.currentStateName = 'End';
+
+    const recommendedId = explorationEngineService.getAuthorRecommendedExpIds();
+    expect(recommendedId).toContain('recommnendedExplorationId');
+  });
+
+  it('should update current state when an answer is submitted ' +
+    'and a new card is recorded', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    let submitAnswerSuccessCb = jasmine.createSpy('success');
+    let answer = 'answer';
+    let answerClassificationResult = new AnswerClassificationResult(
+      outcomeObjectFactory.createFromBackendDict({
+        dest: 'Mid',
+        feedback: {
+          content_id: 'feedback_1',
+          html: 'Answer is correct!'
+        },
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      }), 1, 0, 'default_outcome');
+
+    let lastCard = stateCardObjectFactory.createNewCard(
+      'Card 1', 'Content html', 'Interaction text', null,
+      null, null, 'content_id');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(playerTranscriptService, 'getLastStateName')
+      .and.returnValue('Start');
+    spyOn(playerTranscriptService, 'getLastCard').and.returnValue(lastCard);
+    spyOn(answerClassificationService, 'getMatchingClassificationResult')
+      .and.returnValue(answerClassificationResult);
+
+    expect(explorationEngineService.currentStateName).toBe(undefined);
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    explorationEngineService.submitAnswer(
+      answer, textInputService, submitAnswerSuccessCb);
+    expect(explorationEngineService.currentStateName).toBe('Start');
+    explorationEngineService.recordNewCardAdded();
+    expect(explorationEngineService.currentStateName).toBe('Mid');
+  });
+
+  it('should load initial state', () => {
+    let moveToExplorationCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    explorationEngineService.exploration = explorationObjectFactory
+      .createFromBackendDict(explorationDict);
+
+    let currentStateName = explorationEngineService.currentStateName;
+    expect(currentStateName).toBe(undefined);
+
+    explorationEngineService.moveToExploration(moveToExplorationCb);
+
+    currentStateName = explorationEngineService.currentStateName;
+    let initalState = explorationEngineService.exploration.initStateName;
+    expect(currentStateName).toBe(initalState);
+  });
+
+  it('should return true if current state is initial state', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.isCurrentStateInitial();
+    }).toThrowError('Cannot read property \'initStateName\' of undefined');
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    expect(explorationEngineService.isCurrentStateInitial()).toBe(true);
+  });
+
+  it('should return current state', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+
+    expect(() => {
+      explorationEngineService.getState();
+    }).toThrowError('Cannot read property \'getState\' of undefined');
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    let currentState = explorationEngineService.getState();
+    expect(currentState.name).toBe('Start');
+  });
+
+  it('should return language code', () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+
+    expect(() => {
+      explorationEngineService.getLanguageCode();
+    }).toThrowError('Cannot read property \'getLanguageCode\' of undefined');
+
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+
+    expect(explorationEngineService.getLanguageCode()).toBe('en');
+  });
+
+  it('should get the update active state event emitter', () => {
+    let mockEventEmitter = new EventEmitter();
+    expect(explorationEngineService.onUpdateActiveStateIfInEditor)
+      .toEqual(mockEventEmitter);
+  });
+
+  it('should throw error if we populate exploration data ' +
+    'in exploration player page', () => {
+    // Please note that 'initSettingsFromEditor' function is strictly
+    // used for the exploration editor page before initialization.
+    // This method should not be called from the exploration player page.
+    let paramChanges = paramChangeObjectFactory.createFromBackendDict(
+      paramChangeDict);
+
+    // Checking if we are currently in exploration editor preview mode.
+    expect(explorationEngineService.isInPreviewMode()).toBe(false);
+    expect(() => {
+      explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
+    }).toThrowError('Cannot populate exploration in learner mode.');
+  });
+
+  describe('on validating parameters ', () => {
+    it('should create new parameters successfully', () => {
+      paramChangeDict.customization_args.parse_with_jinja = true;
+      paramChangeDict.generator_id = 'not_copier';
+
+      let oldParams = {
+        guess: '-1',
+        answer: 'val'
+      };
+
+      let expectedParams = {
+        guess: '-1',
+        answer: 'val1, val2'
+      };
+
+      let paramChanges = paramChangeObjectFactory.createFromBackendDict(
+        paramChangeDict);
+      const newParams = explorationEngineService.makeParams(oldParams, [paramChanges], []);
+      expect(newParams).toEqual(expectedParams);
+    });
+
+    it('should not create new parameters if paramater ' +
+      'values are empty', () => {
+      paramChangeDict.customization_args.parse_with_jinja = true;
+      let oldParams = {};
+
+      let paramChanges = paramChangeObjectFactory.createFromBackendDict(
+        paramChangeDict);
+      spyOn(expressionInterpolationService, 'processUnicode')
+        .and.returnValue(null);
+
+      const newParams = explorationEngineService.makeParams(
+        oldParams, [paramChanges], []);
+
+      expect(newParams).toBe(null);
+    });
+
+    it('should return old parameters', () => {
+      paramChangeDict.customization_args.parse_with_jinja = true;
+      let oldParams = {
+        guess: '-1',
+        answer: 'val'
+      };
+
+      let paramChanges = paramChangeObjectFactory.createFromBackendDict(
+        paramChangeDict);
+      const newParams = explorationEngineService
+        .makeParams(oldParams, [paramChanges], []);
+
+      expect(newParams).toEqual(oldParams);
+    });
   });
 });
