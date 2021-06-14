@@ -130,6 +130,8 @@
 /core/templates/pages/about-page/ @DubeySandeep
 # TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
 /core/templates/pages/about-page/about-page.constants.ts @seanlip
+/core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
+/core/templates/pages/license-page/license-page.component.html @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
 # TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
 /core/templates/pages/privacy-page/privacy-page.component.html @seanlip
@@ -138,7 +140,6 @@
 /core/templates/pages/terms-page/ @DubeySandeep
 # TODO(#12736): Restore code ownership to @BenHenning after 2021-05-24.
 /core/templates/pages/terms-page/terms-page.component.html @seanlip
-/core/templates/pages/license-page/license-page.component.html @seanlip
 
 
 # Dashboard pages.
@@ -592,7 +593,6 @@
 /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/participation-playbook/ @jameesjohn @vojtechjelinek
-/core/templates/pages/license-page/ @jameesjohn @vojtechjelinek
 
 # Speed Improvement team.
 /app_dev.yaml @vojtechjelinek
