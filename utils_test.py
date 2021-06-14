@@ -31,11 +31,9 @@ import feconf
 import python_utils
 import utils
 
-MYPY = False
-if MYPY:
-    from typing import Any, List, Text # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, List, Text # isort:skip # pylint: disable=unused-import, import-only-modules
 
-# TODO(#1234): Remove #type: ignore[attr-defined] from constants after
+# TODO(#13059): Remove #type: ignore[attr-defined] from constants after
 # introduction of protobuf for constants.
 
 
