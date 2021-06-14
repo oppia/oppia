@@ -66,6 +66,11 @@ export class BaseContentComponent {
       (message: string) => this.loadingMessage = message
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+
+    // TODO(sll): Use 'touchstart' for mobile.
+    this.windowRef.nativeWindow.document.addEventListener('click', () => {
+      this.sidebarStatusService.onDocumentClick();
+    });
   }
 
   getHeaderText(): string {
