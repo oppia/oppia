@@ -30,9 +30,9 @@ import re
 import string
 import sys
 import time
-from typing import ( # pylint: disable=unused-import, import-only-modules
-    Any, Callable, Dict, Generator, Iterable, Iterator, List, # pylint: disable=unused-import, import-only-modules
-    Text, Tuple, TypeVar, Union) # pylint: disable=unused-import, import-only-modules
+from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
+    Any, Callable, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
+    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 import unicodedata
 import zlib
 
