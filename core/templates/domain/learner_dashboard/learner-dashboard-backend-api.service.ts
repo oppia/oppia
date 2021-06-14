@@ -88,7 +88,7 @@ interface LearnerDashboardData {
   learntToPartiallyLearntTopics: string[];
   numberOfNonexistentActivities: NonExistentActivities;
   subscriptionList: ProfileSummary[];
-  topicToLearn: LearnerTopicSummary[];
+  topicsToLearn: LearnerTopicSummary[];
 }
 
 interface AddMessagePayload {
@@ -149,6 +149,11 @@ export class LearnerDashboardBackendApiService {
             dashboardData.partially_learnt_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
+          topicsToLearn: (
+            dashboardData.topic_to_learn.map(
+              topicSummary => LearnerTopicSummary.createFromBackendDict(
+                topicSummary))
+          ),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
@@ -166,12 +171,7 @@ export class LearnerDashboardBackendApiService {
           subscriptionList: (
             dashboardData.subscription_list.map(
               profileSummary => ProfileSummary
-                .createFromCreatorBackendDict(profileSummary))),
-          topicToLearn: (
-            dashboardData.topic_to_learn.map(
-              topicSummary => LearnerTopicSummary.createFromBackendDict(
-                topicSummary))
-          )
+                .createFromCreatorBackendDict(profileSummary)))
         });
       }, errorResponse => {
         reject(errorResponse.status);
