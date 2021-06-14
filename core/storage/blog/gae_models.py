@@ -297,6 +297,24 @@ class BlogPostSummaryModel(base_models.BaseModel):
         """
         return cls.get_multi(blog_post_ids)
 
+    @classmethod
+    def get_blog_post_summary_by_title(cls, title):
+        """Gets BlogPostModel by title. Returns None if the blog post
+        with the given title doesn't exist.
+
+        Args:
+            title: str. The title of the blog post.
+
+        Returns:
+            BlogPostModel | None. The blog post model of the Blog or None if not
+            found.
+        """
+        return BlogPostModel.query(
+            datastore_services.all_of(
+                cls.title.lower() == title.lower(),
+                cls.deleted == False) # pylint: disable=singleton-comparison
+        ).get()
+
 
 class BlogPostRightsModel(base_models.BaseModel):
     """Storage model for rights related to a blog post.
