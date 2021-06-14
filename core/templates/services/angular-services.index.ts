@@ -264,6 +264,7 @@ import { StatsReportingService } from 'pages/exploration-player-page/services/st
 import { NotificationsDashboardPageBackendApiService } from 'pages/notifications-dashboard-page/notifications-dashboard-page-backend-api.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service';
+import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
@@ -357,6 +358,7 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { NavigationService } from './navigation.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -552,6 +554,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['MusicNotesInputRulesService', MusicNotesInputRulesService],
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
+  ['NavigationService', NavigationService],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
@@ -614,6 +617,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RefresherExplorationConfirmationModalService',
     RefresherExplorationConfirmationModalService],
+  ['ReleaseCoordinatorBackendApiService', ReleaseCoordinatorBackendApiService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
