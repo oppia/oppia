@@ -319,11 +319,20 @@ describe('Editor state service', () => {
   });
 
   it('should check event listener registration status', () => {
+    // Registration status is true only when,
+    // stateInteractionEditorInitialised, stateResponsesInitialised and
+    // stateEditorDirectiveInitialised are true.
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
+
+    // Set stateInteractionEditorInitialised as true.
     ecs.updateStateInteractionEditorInitialised();
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
+
+    // Set stateResponsesInitialised as true.
     ecs.updateStateResponsesInitialised();
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
+
+    // Set stateEditorDirectiveInitialised as true.
     ecs.updateStateEditorDirectiveInitialised();
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(true);
   });
