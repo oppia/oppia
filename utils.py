@@ -30,7 +30,9 @@ import re
 import string
 import sys
 import time
-
+from typing import (
+    Any, Callable, Dict, Generator, Iterable, Iterator, List,
+    Text, Tuple, TypeVar, Union) # pylint: disable=unused-import, import-only-modules
 import unicodedata
 import zlib
 
@@ -49,9 +51,6 @@ PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
-from typing import (
-    Any, Callable, Dict, Generator, Iterable, Iterator, List,
-    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 T = TypeVar('T')
 U = TypeVar('U')
 DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
