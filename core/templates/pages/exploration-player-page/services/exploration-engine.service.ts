@@ -93,42 +93,42 @@ export class ExplorationEngineService {
      this.setExplorationProperties();
    }
 
-  setExplorationProperties(): void {
-    let pathnameArray = this.urlService.getPathname().split('/');
-    let explorationContext = false;
+   setExplorationProperties(): void {
+     let pathnameArray = this.urlService.getPathname().split('/');
+     let explorationContext = false;
 
-    for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'explore' ||
-            pathnameArray[i] === 'create' ||
-            pathnameArray[i] === 'skill_editor' ||
-            pathnameArray[i] === 'embed') {
-        explorationContext = true;
-        break;
-      }
-    }
+     for (let i = 0; i < pathnameArray.length; i++) {
+       if (pathnameArray[i] === 'explore' ||
+             pathnameArray[i] === 'create' ||
+             pathnameArray[i] === 'skill_editor' ||
+             pathnameArray[i] === 'embed') {
+         explorationContext = true;
+         break;
+       }
+     }
 
-    if (explorationContext) {
-      this._explorationId = this.contextService.getExplorationId();
-      this.version = this.urlService.getExplorationVersionFromUrl();
-      this._editorPreviewMode = this.contextService
-        .isInExplorationEditorPage();
-      this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
-      if (!this._questionPlayerMode &&
-      !('skill_editor' === this.urlService.getPathname()
-        .split('/')[1].replace(/"/g, "'"))) {
-        this.readOnlyExplorationBackendApiService
-          .loadExplorationAsync(this._explorationId, this.version)
-          .then((exploration) => {
-            this.version = exploration.version;
-          });
-      }
-    } else {
-      this._explorationId = 'test_id';
-      this.version = 1;
-      this._editorPreviewMode = false;
-      this._questionPlayerMode = false;
-    }
-  }
+     if (explorationContext) {
+       this._explorationId = this.contextService.getExplorationId();
+       this.version = this.urlService.getExplorationVersionFromUrl();
+       this._editorPreviewMode = this.contextService
+         .isInExplorationEditorPage();
+       this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+       if (!this._questionPlayerMode &&
+       !('skill_editor' === this.urlService.getPathname()
+         .split('/')[1].replace(/"/g, "'"))) {
+         this.readOnlyExplorationBackendApiService
+           .loadExplorationAsync(this._explorationId, this.version)
+           .then((exploration) => {
+             this.version = exploration.version;
+           });
+       }
+     } else {
+       this._explorationId = 'test_id';
+       this.version = 1;
+       this._editorPreviewMode = false;
+       this._questionPlayerMode = false;
+     }
+   }
 
    randomFromArray<T>(arr: T[]): T {
      return arr[Math.floor(Math.random() * arr.length)];

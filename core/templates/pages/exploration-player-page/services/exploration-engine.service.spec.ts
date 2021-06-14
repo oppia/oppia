@@ -40,7 +40,7 @@ import { LearnerParamsService } from './learner-params.service';
 import { PlayerTranscriptService } from './player-transcript.service';
 import { StatsReportingService } from './stats-reporting.service';
 
-fdescribe('Exploration engine service ', () => {
+describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
@@ -870,7 +870,8 @@ fdescribe('Exploration engine service ', () => {
 
       let paramChanges = paramChangeObjectFactory.createFromBackendDict(
         paramChangeDict);
-      const newParams = explorationEngineService.makeParams(oldParams, [paramChanges], []);
+      const newParams = explorationEngineService.makeParams(
+        oldParams, [paramChanges], []);
       expect(newParams).toEqual(expectedParams);
     });
 
