@@ -1669,25 +1669,27 @@ class SchemaValidationMockHandlerTests(test_utils.GenericTestBase):
 
     exp_id = 'exp_id'
 
-    class MockHandlerWithInvalidSchema(BaseClassWithSchema):
+    class MockHandlerWithInvalidSchema(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
                 'type': 'int'
             }
         }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
             return self.render_json({'exploration_id': exploration_id})
 
-    class MockHandlerWithValidSchema(BaseClassWithSchema):
+    class MockHandlerWithValidSchema(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {
             'exploration_id': {
                 'type': 'unicode'
             }
         }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
