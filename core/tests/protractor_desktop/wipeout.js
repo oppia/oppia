@@ -19,10 +19,13 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
+var pendingAccountDeletionHeading =
+  element(by.css('.protractor-pending-account-deletion'));
 
 describe('When account is deleted it', function() {
   var EXPLORATION_TITLE = 'Exploration';
@@ -50,10 +53,16 @@ describe('When account is deleted it', function() {
     await users.createAndLoginUser('user1@delete.com', 'userToDelete1');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
     await users.login('user1@delete.com');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
@@ -68,6 +77,9 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationVoiceArtist('voiceArtist');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete2');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
@@ -92,6 +104,9 @@ describe('When account is deleted it', function() {
     var explorationId = await general.getExplorationIdFromEditor();
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete3');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 
@@ -111,6 +126,9 @@ describe('When account is deleted it', function() {
     await workflow.addExplorationManager('secondOwner');
     await deleteAccountPage.get();
     await deleteAccountPage.requestAccountDeletion('userToDelete4');
+    await waitFor.visibilityOf(
+      pendingAccountDeletionHeading,
+      'Pending Account Deletion Page takes too long to appear');
     expect(await browser.getCurrentUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
 

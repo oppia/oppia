@@ -260,6 +260,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.removePrerequisiteSkillId = function(skillId) {
             StoryUpdateService.removePrerequisiteSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
+            $scope.$applyAsync();
           };
 
           $scope.addPrerequisiteSkillId = function() {
@@ -290,6 +291,9 @@ angular.module('oppia').directive('storyNodeEditor', [
                 AlertsService.addInfoMessage(
                   'Given skill is already a prerequisite skill', 5000);
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -327,6 +331,9 @@ angular.module('oppia').directive('storyNodeEditor', [
                 AlertsService.addInfoMessage(
                   'Given skill is already an acquired skill', 5000);
               }
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -337,6 +344,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.removeAcquiredSkillId = function(skillId) {
             StoryUpdateService.removeAcquiredSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
+            $scope.$applyAsync();
           };
 
           $scope.unfinalizeOutline = function() {
