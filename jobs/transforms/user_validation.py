@@ -35,8 +35,8 @@ import apache_beam as beam
     exp_models, feedback_models, skill_models,
     story_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.skill, models.NAMES.skill,
+    models.NAMES.auth, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
     models.NAMES.story, models.NAMES.user
 ])
 
