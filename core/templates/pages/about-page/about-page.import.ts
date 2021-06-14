@@ -18,9 +18,18 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
+import 'pages/mock-ajs';
+import 'Polyfills.ts';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AboutPageModule } from './about-page.module';
+import { AppConstants } from 'app.constants';
+import { enableProdMode } from '@angular/core';
 
-require('Polyfills.ts');
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
 
-// The module needs to be loaded directly after jquery since it defines the
-// main module the elements are attached to.
-require('pages/about-page/about-page.module.ts');
+platformBrowserDynamic().bootstrapModule(AboutPageModule).catch(
+  // eslint-disable-next-line no-console
+  (err) => console.log(err)
+);

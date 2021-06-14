@@ -25,6 +25,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -45,11 +46,15 @@ describe('OppiaAngularRootComponent', function() {
         },
         {
           provide: TranslateCacheService,
-          useValue: null
+          useValue: {
+            init: () => {}
+          }
         },
         {
           provide: TranslateService,
-          useValue: null
+          useValue: {
+            use: () => {}
+          }
         }
       ],
     }).compileComponents();
@@ -63,7 +68,7 @@ describe('OppiaAngularRootComponent', function() {
   describe('.initialized', () => {
     it('should emit once ngAfterViewInit is called', () => {
       component.ngAfterViewInit();
-
+      TestBed.inject(I18nLanguageCodeService).setI18nLanguageCode('en');
       expect(emitSpy).toHaveBeenCalled();
     });
   });
