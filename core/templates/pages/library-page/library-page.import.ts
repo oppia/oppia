@@ -26,7 +26,7 @@ import ngInfiniteScroll from 'ng-infinite-scroll';
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate', ngInfiniteScroll,
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+  'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
 require('Polyfills.ts');

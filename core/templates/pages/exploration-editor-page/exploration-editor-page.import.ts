@@ -32,8 +32,7 @@ angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate',
   'ngJoyRide', 'ngMaterial',
   'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui-leaflet',
-  'ui.sortable', 'ui.tree', uiValidate,
+  'ui.bootstrap', 'ui-leaflet', 'ui.sortable', 'ui.tree', uiValidate,
 ]);
 
 require('Polyfills.ts');

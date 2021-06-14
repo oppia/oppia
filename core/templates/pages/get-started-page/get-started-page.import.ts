@@ -22,7 +22,7 @@ import 'zone.js';
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
+  'ui.bootstrap'
 ]);
 
 require('Polyfills.ts');

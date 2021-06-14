@@ -25,7 +25,7 @@ import uiValidate from 'angular-ui-validate';
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', uiValidate
+  'ui.bootstrap', 'ui.sortable', uiValidate
 ]);
 
 require('Polyfills.ts');

@@ -26,5 +26,5 @@ declare var angular: ng.IAngularStatic;
 angular.module('oppia', [
   require('angular-cookies'), 'ngAnimate', 'ngJoyRide',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+  'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);

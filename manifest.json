@@ -106,17 +106,6 @@
           "js": ["angular-translate-interpolation-messageformat.min.js"]
         }
       },
-      "angularToastr": {
-        "version": "1.7.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/Foxandxss/angular-toastr/archive/1.7.0.zip",
-        "rootDirPrefix": "angular-toastr-",
-        "targetDirPrefix": "angular-toastr-",
-        "bundle": {
-          "css": ["dist/angular-toastr.min.css"],
-          "js": ["dist/angular-toastr.tpls.min.js"]
-        }
-      },
       "popperJs": {
         "version": "1.15.0",
         "downloadFormat": "zip",
