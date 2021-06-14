@@ -233,6 +233,7 @@ describe('Learner dashboard page', () => {
     incomplete_explorations_list: [],
     incomplete_collections_list: [],
     partially_learnt_topics_list: [],
+    topics_to_learn: [],
     subscription_list: subscriptionsList,
     completed_to_incomplete_collections: [],
     completed_to_incomplete_stories: [],
@@ -429,6 +430,9 @@ describe('Learner dashboard page', () => {
             learnerDashboardData.partially_learnt_topics_list.map(
               topicSummary => LearnerTopicSummary.createFromBackendDict(
                 topicSummary))),
+          topicsToLearn: (learnerDashboardData.topics_to_learn.map(
+            topicSummary => LearnerTopicSummary.createFromBackendDict(
+              topicSummary))),
           collectionPlaylist: (
             learnerDashboardData.collection_playlist.map(
               collectionSummary => CollectionSummary
