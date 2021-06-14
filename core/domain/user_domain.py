@@ -725,6 +725,23 @@ class CompletedActivities(python_utils.OBJECT):
         self.learnt_topic_ids.remove(learnt_topic_id)
 
 
+class LearnerGoals(python_utils.OBJECT):
+    """Domain object for the goals selected by learner model."""
+
+    def __init__(
+            self, user_id, topic_ids_to_learn):
+        self.id = user_id
+        self.topic_ids_to_learn = topic_ids_to_learn
+
+    def add_topic_id_to_learn(self, topic_id_to_learn):
+        """Adds the topic id to the list of topic ids to learn."""
+        self.topic_ids_to_learn.append(topic_id_to_learn)
+
+    def remove_topic_id_to_learn(self, topic_id_to_learn):
+        """Removes the topic id from the list of topic ids to learn."""
+        self.topic_ids_to_learn.remove(topic_id_to_learn)
+
+
 class LearnerPlaylist(python_utils.OBJECT):
     """Domain object for the learner playlist model."""
 
