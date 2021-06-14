@@ -27,6 +27,7 @@ interface IntValidatorSchema {
   type: string,
   validators: { id: string }[]
 }
+
 @Component({
   selector: 'int-editor',
   templateUrl: './int-editor.component.html',
