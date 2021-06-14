@@ -67,6 +67,7 @@ export class BaseContentComponent {
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
 
+    // TODO(sll): Use 'touchstart' for mobile.
     this.windowRef.nativeWindow.document.addEventListener('click', () => {
       this.sidebarStatusService.onDocumentClick();
     });
