@@ -152,6 +152,11 @@ module.exports = {
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
   },
+
+  /**
+   * TODO: Remove the hybrid field from the html webpack plugin options
+   * once angularjs is removed from corresponding pages.
+   */
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['about'],
