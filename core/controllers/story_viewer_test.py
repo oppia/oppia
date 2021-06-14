@@ -51,12 +51,14 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.TOPIC_ID = 'topic_id'
         self.STORY_ID = 'story_id'
         self.STORY_URL_FRAGMENT = 'title-one'
+        self.STORY_URL_FRAGMENT_TWO = 'story-two'
         self.NODE_ID_1 = 'node_1'
         self.NODE_ID_2 = 'node_2'
         self.NODE_ID_3 = 'node_3'
         self.EXP_ID_0 = '0'
         self.EXP_ID_1 = '1'
         self.EXP_ID_2 = '2'
+        self.EXP_ID_3 = 'exp_3'
         self.EXP_ID_7 = '7'
         self.NEW_TOPIC_ID = 'new_topic_id'
         self.NEW_STORY_ID = 'new_story_id'
@@ -513,6 +515,71 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
         self.assertEqual(len(
             learner_progress_services.get_all_learnt_topic_ids(
+                self.viewer_id)), 1)
+        self.assertEqual(len(
+            learner_progress_services.get_all_completed_story_ids(
+                self.viewer_id)), 1)
+
+    def test_mark_topic_as_partially_learnt_and_story_as_completed(self):
+        self.NEW_USER_EMAIL = 'newUser@newUser.com'
+        self.NEW_USER_USERNAME = 'newUser'
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_3, self.admin_id, title='Title 3', end_state_name='End',
+            correctness_feedback_enabled=True)
+        self.publish_exploration(self.admin_id, self.EXP_ID_3)
+
+        story = story_domain.Story.create_default_story(
+            self.NEW_STORY_ID, 'Title', 'Description', self.TOPIC_ID,
+            self.STORY_URL_FRAGMENT_TWO)
+        story.meta_tag_content = 'story meta content'
+
+        exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [self.EXP_ID_3], user=self.admin))
+        self.node_1 = {
+            'id': self.NODE_ID_1,
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'thumbnail_filename': 'image_1.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.EXP_ID_3,
+            'exp_summary_dict': exp_summary_dicts[0],
+            'completed': False
+        }
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1)
+        ]
+        self.nodes = story.story_contents.nodes
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_2'
+        story_services.save_new_story(self.admin_id, story)
+        topic_services.add_canonical_story(
+            self.admin_id, self.TOPIC_ID, self.NEW_STORY_ID)
+        topic_services.publish_story(
+            self.TOPIC_ID, self.NEW_STORY_ID, self.admin_id)
+
+        csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
+
+        self.assertEqual(len(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.viewer_id)), 1)
         self.assertEqual(len(
             learner_progress_services.get_all_completed_story_ids(

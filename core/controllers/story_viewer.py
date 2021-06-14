@@ -210,33 +210,31 @@ class StoryProgressHandler(base.BaseHandler):
             ready_for_review_test = True
 
         # If there is no next_node_id, the story is marked as completed else
-        # mark the story as incomplete and topic as partially learnt.
+        # mark the story as incomplete.
         if not next_node_id:
             learner_progress_services.mark_story_as_completed(
                 self.user_id, story_id)
-            completed_story_ids = (
-                learner_progress_services.get_all_completed_story_ids(
-                    self.user_id))
-            story_ids_in_topic = []
-            for story in topic.canonical_story_references:
-                story_ids_in_topic.append(story.story_id)
-
-            # If all the stories in the topic are in the completed stories list,
-            # mark the topic as learnt else mark it as partially learnt.
-            is_topic_completed = set(story_ids_in_topic).issubset(
-                set(completed_story_ids))
-
-            if not is_topic_completed:
-                learner_progress_services.mark_topic_as_partially_learnt(
-                    self.user_id, topic.id)
-            else:
-                learner_progress_services.mark_topic_as_learnt(
-                    self.user_id, topic.id)
-
         else:
             learner_progress_services.mark_story_as_incomplete(
                 self.user_id, story.id)
+
+        completed_story_ids = (
+            learner_progress_services.get_all_completed_story_ids(
+                self.user_id))
+        story_ids_in_topic = []
+        for story in topic.canonical_story_references:
+            story_ids_in_topic.append(story.story_id)
+
+        is_topic_completed = set(story_ids_in_topic).issubset(
+            set(completed_story_ids))
+
+        # If all the stories in the topic are not in the completed stories
+        # list, mark the topic as partially learnt else mark it as learnt.
+        if not is_topic_completed:
             learner_progress_services.mark_topic_as_partially_learnt(
+                self.user_id, topic.id)
+        else:
+            learner_progress_services.mark_topic_as_learnt(
                 self.user_id, topic.id)
 
         return self.render_json({
