@@ -53,6 +53,16 @@ module.exports = {
     };
 
     return {
+      'VariableDeclaration[kind=const]': function(node) {
+        var constName = node.declarations[0].id.name
+        if ((node.declarations[0].id.type === 'Identifier') &&
+          (constName !== constName.toUpperCase())) {
+          context.report({
+            node: node,
+            message: 'Please make sure constant names are in all-caps'
+          });
+        }
+      },
       CallExpression: function(node) {
         checkSleepCall(node);
       },
