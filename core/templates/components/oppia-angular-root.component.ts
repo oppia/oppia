@@ -1550,11 +1550,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       }
     ]);
 
-    // Add lang attribute to html tag
+    // Add lang attribute to html tag.
     this.documentAttributeCustomizationService.addAttribute(
       'lang', this.currentLang);
 
-    // Initialize translations
+    // Initialize translations.
     this.translateService.use(
       this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 
