@@ -16,7 +16,7 @@
  * @fileoverview Component for the Base Transclusion Component.
  */
 
-import { Component } from '@angular/core';
+import { Component, Directive } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service';
@@ -113,6 +113,11 @@ export class BaseContentComponent {
     mainContentElement.focus();
   }
 }
+
+@Directive({
+  selector: 'navbar-breadcrumb'
+})
+export class BaseContentNavBarBreadCrumbDirective {}
 
 angular.module('oppia').directive('oppiaBaseContent',
   downgradeComponent({
