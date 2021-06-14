@@ -50,8 +50,7 @@ class BlogPostModel(base_models.BaseModel):
     # dashboard / blog post page.
     url_fragment = (
         datastore_services.StringProperty(indexed=True, required=True))
-    # Tags associated with the blog post. 'repeated' property is set to true
-    # to take a list of values of underlying type(str).
+    # Tags associated with the blog post.
     tags = datastore_services.StringProperty(indexed=True, repeated=True)
     # The thumbnail filename of the blog post. It's value will be None until
     # a thumbnail is added to the blog post. It can be None only when blog
@@ -379,8 +378,8 @@ class BlogPostRightsModel(base_models.BaseModel):
             in a python dict format. In this case, we are returning all the
             ids of blog posts for which the user is an editor.
         """
-        editable_blog_posts = cls.get_all().filter(cls.editor_ids == user_id)
-        editable_blog_post_ids = [blog.key.id() for blog in editable_blog_posts]
+        editable_blog_posts = cls.query(cls.editor_ids == user_id).fetch()
+        editable_blog_post_ids = [blog.id for blog in editable_blog_posts]
 
         return {
             'editable_blog_post_ids': editable_blog_post_ids,

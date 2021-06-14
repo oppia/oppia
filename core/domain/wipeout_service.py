@@ -1260,6 +1260,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
 
 def _pseudonymize_blog_post_models(pending_deletion_request):
     """Pseudonymizes the blog post models for the user with user_id.
+       Also removes the user-id from the list of editor ids from the
+       blog post rights model.
 
     Args:
         pending_deletion_request: PendingDeletionRequest. The pending
@@ -1286,8 +1288,16 @@ def _pseudonymize_blog_post_models(pending_deletion_request):
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
         pending_deletion_request, models.NAMES.blog, blog_post_ids)
-    # TODO(#13053): Add wipeout for BlogPostRightsModel after adding
-    # service layer.
+
+    # We want to remove the user ID from the list of editor ids
+    # on all the blog post rights models related to the user.
+    blog_post_rights_model_class = blog_models.BlogPostRightsModel
+    blog_post_rights_models = blog_post_rights_model_class.query(
+        blog_post_rights_model_class.editor_ids == user_id
+    ).fetch()
+    for rights_model in blog_post_rights_models:
+        rights_model.editor_ids.remove(user_id)
+
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
             blog_posts_related_models, pseudonymized_id):
