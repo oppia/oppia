@@ -18,8 +18,8 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import { WorkedExampleBackendDict, WorkedExampleObjectFactory} from 'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {
   let workedExampleBackendDict: WorkedExampleBackendDict;
