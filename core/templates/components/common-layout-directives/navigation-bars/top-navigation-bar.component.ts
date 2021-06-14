@@ -19,6 +19,7 @@
  */
 
 import { Subscription } from 'rxjs';
+import { ContextService } from 'services/context.service';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { SidebarStatusService } from 'services/sidebar-status.service';
@@ -37,6 +38,11 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
+interface LanguageInfo {
+  id: string;
+  text: string;
+  direction: string
+}
 @Component({
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
@@ -45,6 +51,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText: string;
   @Input() subheaderText: string;
 
+  currentLanguageCode: string;
+  currentLanguageText: string;
   isModerator: boolean;
   isAdmin: boolean;
   isTopicManager: boolean;
@@ -55,7 +63,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   logoutUrl: string;
   userMenuIsShown: boolean;
   inClassroomPage: boolean;
+  showLanguageSelector: boolean;
   standardNavIsShown: boolean;
+  supportedSiteLanguages: LanguageInfo[];
   ACTION_OPEN: string;
   ACTION_CLOSE: string;
   KEYBOARD_EVENT_TO_KEY_CODES: {
@@ -99,6 +109,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   constructor(
     private classroomBackendApiService: ClassroomBackendApiService,
+    private contextService: ContextService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private debouncerService: DebouncerService,
@@ -122,6 +133,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.logoutUrl = AppConstants.LOGOUT_URL;
     this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
     this.inClassroomPage = false;
+    this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
+      (languageInfo: LanguageInfo) => {
+        return languageInfo;
+      }
+    );
+
+    this.showLanguageSelector = (
+      !this.contextService.getPageContext().endsWith('editor'));
+
     this.standardNavIsShown = (
       this.NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(this.currentUrl) === -1);
     if (this.currentUrl === 'learn') {
@@ -152,6 +172,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.i18nLanguageCodeService.setI18nLanguageCode(
           userInfo.getPreferredSiteLanguageCode());
       }
+      this.currentLanguageCode = (
+        this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+      this.supportedSiteLanguages.forEach(element => {
+        if (element.id === this.currentLanguageCode) {
+          this.currentLanguageText = element.text;
+        }
+      });
       this.isModerator = userInfo.isModerator();
       this.isAdmin = userInfo.isAdmin();
       this.isTopicManager = userInfo.isTopicManager();
@@ -213,6 +240,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  changeLanguage(languageCode: string, languageText: string): void {
+    this.currentLanguageCode = languageCode;
+    this.currentLanguageText = languageText;
+    this.i18nLanguageCodeService.setI18nLanguageCode(languageCode);
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      if (userInfo.isLoggedIn()) {
+        this.userBackendApiService.updatePreferredSiteLanguageAsync(
+          this.currentLanguageCode);
+      }
+    });
   }
 
   onLoginButtonClicked(): void {
