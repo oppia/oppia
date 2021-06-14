@@ -606,3 +606,26 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     captured_logs,
                     ['Could not find a story corresponding to %s '
                      'id.' % self.STORY_ID])
+
+    def test_remove_topic_to_learn(self):
+        learner_progress_services.add_topic_to_learn(
+            self.viewer_id, self.TOPIC_ID)
+        self.assertEqual(
+            len(learner_progress_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 1)
+        csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.post_json(
+                '%s/staging/topic/%s/%s' % (
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_URL_FRAGMENT,
+                    self.NODE_ID_3
+                ), {}, csrf_token=csrf_token
+            )
+
+        self.assertEqual(
+            len(learner_progress_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 0)

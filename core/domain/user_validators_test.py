@@ -952,6 +952,162 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
+class LearnerGoalsModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    TOPIC_ID_0 = 'topic_0'
+    TOPIC_ID_1 = 'topic_1'
+
+    def setUp(self):
+        super(LearnerGoalsModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_0, 'topic', 'abbrev', 'description')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_0))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic 1', 'abbrev-one', 'description 1')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title 1', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                'dummy-subtopic-url-one')]
+        topic.next_subtopic_id = 2
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, self.TOPIC_ID_1))
+        subtopic_page_services.save_subtopic_page(
+            self.owner_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        learner_progress_services.add_topic_to_learn(
+            self.user_id, self.TOPIC_ID_0)
+        learner_progress_services.mark_topic_as_learnt(
+            self.user_id, self.TOPIC_ID_1)
+
+        self.model_instance = user_models.LearnerGoalsModel.get_by_id(
+            self.user_id)
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .LearnerGoalsModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated LearnerGoalsModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of LearnerGoalsModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.user_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'LearnerGoalsModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.user_id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of LearnerGoalsModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.user_id, self.user_id, self.user_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_missing_topic_model_failure(self):
+        topic_models.TopicModel.get_by_id(self.TOPIC_ID_0).delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for topic_ids_to_learn '
+                'field check of LearnerGoalsModel\', '
+                '[u"Entity id %s: based on field topic_ids_to_learn having '
+                'value topic_0, expected model TopicModel with id topic_0 but '
+                'it doesn\'t exist"]]') % self.user_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_common_topic(self):
+        self.model_instance.topic_ids_to_learn.append(self.TOPIC_ID_1)
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for topic_ids_to_learn match '
+            'check of LearnerGoalsModel\', '
+            '[u"Entity id %s: Common values for topic_ids_to_learn in entity '
+            'and learnt_topic_ids in CompletedActivitiesModel: '
+            '[u\'topic_1\']"]]') % (
+                self.user_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+
 class ExpUserLastPlaythroughModelValidatorTests(
         test_utils.AuditJobsTestBase):
 

@@ -411,6 +411,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<activity_type>/<activity_id>' %
         feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
         reader.LearnerIncompleteActivityHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' %
+        feconf.LEARNER_GOALS_URL, reader.LearnerGoalsHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,

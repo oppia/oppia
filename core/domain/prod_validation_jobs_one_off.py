@@ -815,6 +815,14 @@ class IncompleteActivitiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.IncompleteActivitiesModel]
 
 
+class LearnerGoalsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates LearnerGoalsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.LearnerGoalsModel]
+
+
 class ExpUserLastPlaythroughModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates ExpUserLastPlaythroughModel."""
 

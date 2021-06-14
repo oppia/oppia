@@ -282,6 +282,41 @@ describe('Learner Dashboard Backend API Service', () => {
       creator_impact: 0,
       creator_picture_data_url: 'path/to/img'
     }],
+    topic_to_learn: [{
+      id: 'hyuy4GUlvTqJ',
+      name: 'Sample Name',
+      classroom: 'Math',
+      language_code: 'en',
+      version: 1,
+      canonical_story_count: 3,
+      additional_story_count: 0,
+      uncategorized_skill_count: 1,
+      subtopic_count: 1,
+      topic_model_created_on: 1466178691847.67,
+      topic_model_last_updated: 1466178759209.839,
+      description: 'description',
+      total_skill_count: 2,
+      total_published_node_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      url_fragment: 'sample-name',
+      subtopics: [{
+        skill_ids: ['skill_id_2'],
+        id: 1,
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
+      }],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
     user_email: 'user@example.com',
     completed_to_incomplete_collections: [],
     completed_to_incomplete_stories: [],

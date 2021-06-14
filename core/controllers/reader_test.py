@@ -1402,6 +1402,37 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(response['error'], 'NONE EXP VERSION: Maybe quit')
 
+    def test_post_request_for_learner_goals_handler(self):
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Add the topic id to the topics to learn list.
+        self.post_json(
+            '/learnergoalshandler/%s' % self.TOPIC_ID,
+            {}, csrf_token=csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_topic_ids_to_learn(
+                self.user_id), [self.TOPIC_ID])
+
+    def test_delete_request_for_learner_goals_handler(self):
+        self.login(self.USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Add the topic id to the topics to learn list.
+        self.post_json(
+            '/learnergoalshandler/%s' % self.TOPIC_ID,
+            {}, csrf_token=csrf_token)
+        self.assertEqual(
+            learner_progress_services.get_all_topic_ids_to_learn(
+                self.user_id), [self.TOPIC_ID])
+
+        # Remove the topic id from the topics to learn list.
+        self.delete_json(
+            '/learnergoalshandler/%s' % self.TOPIC_ID)
+        self.assertEqual(
+            learner_progress_services.get_all_topic_ids_to_learn(
+                self.user_id), [])
+
     def test_remove_exp_from_incomplete_list_handler(self):
         """Test handler for removing explorations from the partially completed
         list.
