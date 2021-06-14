@@ -320,7 +320,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_rights_model_instance.editor_ids, [self.USER_ID])
 
-    def deassign_user_from_all_blog_posts(self):
+    def test_deassign_user_from_all_blog_posts(self):
         """Tests removing user id from the list of editor ids for blog post
         assigned to a user.
         """
