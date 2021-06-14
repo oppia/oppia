@@ -1175,17 +1175,20 @@ angular.module('oppia').directive('conversationSkin', [
             if (conceptCardIsBeingShown &&
                 PlayerTranscriptService.isLastCard(currentIndex)) {
               $scope.returnToExplorationAfterConceptCard();
+              $rootScope.$applyAsync();
               return;
             }
             if ($scope.questionSessionCompleted) {
               QuestionPlayerStateService.onQuestionSessionCompleted.emit(
                 QuestionPlayerStateService.getQuestionPlayerStateData());
+              $rootScope.$applyAsync();
               return;
             }
             if ($scope.moveToExploration) {
               $scope.moveToExploration = false;
               ExplorationPlayerStateService.moveToExploration(
                 _initializeDirectiveComponents);
+              $rootScope.$applyAsync();
               return;
             }
             if (
@@ -1197,6 +1200,7 @@ angular.module('oppia').directive('conversationSkin', [
                 StateCardObjectFactory.createNewCard(
                   null, $scope.conceptCard.getExplanation(), null, null, null,
                   null, null));
+              $rootScope.$applyAsync();
               return;
             }
             /* This is for the following situation:
@@ -1213,6 +1217,7 @@ angular.module('oppia').directive('conversationSkin', [
             }
             $scope.answerIsCorrect = false;
             $scope.showPendingCard();
+            $rootScope.$applyAsync();
           };
 
           var scrollToBottom = function() {

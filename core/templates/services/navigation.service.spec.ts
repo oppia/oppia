@@ -16,102 +16,88 @@
  * @fileoverview Unit tests for NavigationService
  */
 
-require('services/navigation.service.ts');
+import { TestBed } from '@angular/core/testing';
+import { NavigationService } from './navigation.service';
 
 describe('Navigation Service', () => {
-  var NavigationService = null;
-  var angularElementSpy;
-  var element = {
-    focus: function() {},
-    closest: function() {}
+  let navigationService: NavigationService;
+  let element = {
+    focus: () => {},
+    closest: () => {}
   };
-  var closestReturn = {
-    find: function() {}
+  let closestReturn = {
+    find: () => {}
   };
-  var findReturn = {
-    blur: function() {}
+  let findReturn = {
+    blur: () => {}
   };
-  var focusAngularElementSpy;
-  var blurAngularElementSpy;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
-    NavigationService = $injector.get('NavigationService');
-
-    // This throws "Argument of type '{ focus: () => void; closest: ()
-    // => void; }' is not assignable to parameter of type 'JQLite'."
-    // This is because 'JQLite' has around 150 more properties.
-    // We have only defined the properties we need in 'element'.
-    // @ts-expect-error
-    angularElementSpy = spyOn(angular, 'element').and.returnValue(element);
-    focusAngularElementSpy = spyOn(element, 'focus').and.callThrough();
-    blurAngularElementSpy = spyOn(findReturn, 'blur').and.callThrough();
-
-    spyOn(element, 'closest').and.callFake(function() {
+  beforeEach(() => {
+    navigationService = TestBed.inject(NavigationService);
+    navigationService.KEYBOARD_EVENT_TO_KEY_CODES = {
+      enter: {
+        shiftKeyIsPressed: false,
+        keyCode: 13
+      },
+      tab: {
+        shiftKeyIsPressed: false,
+        keyCode: 9
+      },
+      shiftTab: {
+        shiftKeyIsPressed: true,
+        keyCode: 9
+      }
+    };
+    navigationService.ACTION_OPEN = 'open';
+    navigationService.ACTION_CLOSE = 'close';
+    spyOn(element, 'closest').and.callFake(() => {
       return closestReturn;
     });
-    spyOn(closestReturn, 'find').and.callFake(function() {
+    spyOn(closestReturn, 'find').and.callFake(() => {
       return findReturn;
     });
-  }));
-
-  it('should open and close submenu', function() {
-    var mockEvent = {
-      currentTarget: null
-    };
-
-    NavigationService.openSubmenu(mockEvent, 'New menu');
-    expect(angularElementSpy).toHaveBeenCalledWith(mockEvent.currentTarget);
-    expect(focusAngularElementSpy).toHaveBeenCalled();
-    expect(NavigationService.activeMenuName).toBe('New menu');
-
-    NavigationService.closeSubmenu(mockEvent);
-    expect(angularElementSpy).toHaveBeenCalledWith(mockEvent.currentTarget);
-    expect(blurAngularElementSpy).toHaveBeenCalled();
-    expect(NavigationService.activeMenuName).toBe('');
   });
 
-  it('should open submenu when event has open action type', function() {
-    var mockEvent = {
+  it('should open submenu when event has open action type', () => {
+    let mockEvent = {
       keyCode: 13,
       shiftKey: false
-    };
-    var eventsTobeHandled = {
+    } as unknown as KeyboardEvent;
+    let eventsTobeHandled = {
       enter: 'open'
     };
 
-    var openSubmenuSpy = spyOn(NavigationService, 'openSubmenu')
+    let openSubmenuSpy = spyOn(navigationService, 'openSubmenu')
       .and.callThrough();
-    NavigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
+    navigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
     expect(openSubmenuSpy).toHaveBeenCalled();
   });
 
-  it('should close submenu when event has close action type', function() {
-    var mockEvent = {
+  it('should close submenu when event has close action type', () => {
+    let mockEvent = {
       keyCode: 9,
       shiftKey: true
+    } as unknown as KeyboardEvent;
+    let eventsTobeHandled = {
+      shiftTab: 'close',
     };
-    var eventsTobeHandled = {
-      shiftTab: 'close'
-    };
-
-    var closeSubmenuSpy = spyOn(NavigationService, 'closeSubmenu').and
+    let closeSubmenuSpy = spyOn(navigationService, 'closeSubmenu').and
       .callThrough();
-    NavigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
+    navigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
     expect(closeSubmenuSpy).toHaveBeenCalled();
   });
 
-  it('should throw an error when event has invalid action type', function() {
-    var mockEvent = {
+  it('should throw an error when event has invalid action type', () => {
+    let mockEvent = {
       keyCode: 9,
       shiftKey: true
-    };
-    var eventsTobeHandled = {
+    } as unknown as KeyboardEvent;
+    let eventsTobeHandled = {
       shiftTab: 'invalid'
     };
 
-    expect(function() {
-      NavigationService.onMenuKeypress(
+    expect(() => {
+      navigationService.onMenuKeypress(
         mockEvent, 'New menu', eventsTobeHandled);
     }).toThrowError('Invalid action type.');
   });
