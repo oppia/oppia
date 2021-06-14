@@ -32,7 +32,7 @@ import sys
 import time
 from typing import (
     Any, Callable, Dict, Generator, Iterable, Iterator, List,
-    Text, Tuple, TypeVar, Union) # pylint: disable=unused-import, import-only-modules
+    Text, Tuple, TypeVar, Union) # pylint: disable=unused-import
 import unicodedata
 import zlib
 
