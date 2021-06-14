@@ -20,7 +20,6 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
 
 var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
 var ExplorationEditorPage = require(
