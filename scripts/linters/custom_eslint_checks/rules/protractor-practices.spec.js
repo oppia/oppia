@@ -21,7 +21,7 @@
 var rule = require('./protractor-practices');
 var RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester();
+var ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2016 } });
 ruleTester.run('protractor-practices', rule, {
   valid: [{
     code:
@@ -65,7 +65,7 @@ ruleTester.run('protractor-practices', rule, {
     },
     {
       code:
-      `const Value = 5;`,
+      'const Value = 5;',
       errors: [{
         message: 'Please make sure constant names are in all-caps',
       }],
