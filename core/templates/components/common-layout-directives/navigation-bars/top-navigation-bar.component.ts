@@ -41,7 +41,7 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 interface LanguageInfo {
   id: string;
   text: string;
-  direction: string
+  direction: string;
 }
 @Component({
   selector: 'oppia-top-navigation-bar',
