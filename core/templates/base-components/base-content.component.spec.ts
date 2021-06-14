@@ -64,7 +64,9 @@ describe('Base Content Component', () => {
         hash: hash
       },
       document: {
-        addEventListener(event: string, callback: () => void) {}
+        addEventListener(event: string, callback: () => void) {
+          callback();
+        }
       }
     };
   }
