@@ -51,7 +51,6 @@ import { AboutPageRootComponent } from './about-page-root.component';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      deps: [CsrfTokenService],
       multi: true
     },
     {

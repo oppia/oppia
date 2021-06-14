@@ -117,8 +117,6 @@ angular.module('oppia').directive('oppiaRoot', [
               );
             }
 
-            const translateCacheService = (
-              OppiaAngularRootComponent.translateCacheService);
             const i18nLanguageCodeService = (
               OppiaAngularRootComponent.i18nLanguageCodeService);
 
@@ -127,11 +125,6 @@ angular.module('oppia').directive('oppiaRoot', [
                 $translate.use(code);
               }
             );
-
-            const cachedLanguage = translateCacheService.getCachedLanguage();
-            if (cachedLanguage) {
-              i18nLanguageCodeService.setI18nLanguageCode(cachedLanguage);
-            }
 
             // The next line allows the transcluded content to start executing.
             $scope.initialized = true;

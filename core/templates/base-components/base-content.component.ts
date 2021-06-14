@@ -66,6 +66,10 @@ export class BaseContentComponent {
       (message: string) => this.loadingMessage = message
     );
     this.keyboardShortcutService.bindNavigationShortcuts();
+
+    this.windowRef.nativeWindow.document.addEventListener('click', () => {
+      this.sidebarStatusService.onDocumentClick();
+    });
   }
 
   getHeaderText(): string {

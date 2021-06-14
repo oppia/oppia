@@ -28,45 +28,27 @@ require('app.constants.ajs.ts');
  */
 
 angular.module('oppia').controller('Base', [
-  '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
+  '$rootScope', '$scope',
   'CsrfTokenService', 'DocumentAttributeCustomizationService', 'LoaderService',
-  'MetaTagCustomizationService', 'SidebarStatusService',
-  'UrlInterpolationService', 'UrlService', 'DEV_MODE',
-  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME', 'SUPPORTED_SITE_LANGUAGES',
+  'MetaTagCustomizationService',
+  'UrlInterpolationService', 'UrlService',
+  'SITE_NAME', 'SUPPORTED_SITE_LANGUAGES',
   function(
-      $document, $rootScope, $scope, AlertsService, BackgroundMaskService,
+      $rootScope, $scope,
       CsrfTokenService, DocumentAttributeCustomizationService, LoaderService,
-      MetaTagCustomizationService, SidebarStatusService,
-      UrlInterpolationService, UrlService, DEV_MODE,
-      SITE_FEEDBACK_FORM_URL, SITE_NAME, SUPPORTED_SITE_LANGUAGES) {
+      MetaTagCustomizationService,
+      UrlInterpolationService, UrlService,
+      SITE_NAME, SUPPORTED_SITE_LANGUAGES) {
     var ctrl = this;
     $scope.getAssetUrl = function(path) {
       return UrlInterpolationService.getFullStaticAssetUrl(path);
     };
 
-    $scope.isBackgroundMaskActive = () => BackgroundMaskService.isMaskActive();
-    $scope.isSidebarShown = () => SidebarStatusService.isSidebarShown();
-    $scope.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
-
-    $scope.skipToMainContent = function() {
-      var mainContentElement = document.getElementById(
-        'oppia-main-content');
-
-      if (!mainContentElement) {
-        throw new Error('Variable mainContentElement is undefined.');
-      }
-      mainContentElement.tabIndex = -1;
-      mainContentElement.scrollIntoView();
-      mainContentElement.focus();
-    };
     ctrl.$onInit = function() {
       $scope.siteName = SITE_NAME;
       $scope.currentLang = 'en';
       $scope.direction = 'ltr';
       $scope.pageUrl = UrlService.getCurrentLocation().href;
-      $scope.iframed = UrlService.isIframed();
-      $scope.AlertsService = AlertsService;
-      $rootScope.DEV_MODE = DEV_MODE;
       // If this is nonempty, the whole page goes into 'Loading...' mode.
       LoaderService.hideLoadingScreen();
 
@@ -124,13 +106,10 @@ angular.module('oppia').controller('Base', [
           }
         }
       });
-      $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+
       DocumentAttributeCustomizationService.addAttribute(
         'lang', $scope.currentLang);
       // TODO(sll): Use 'touchstart' for mobile.
-      $document.on('click', function() {
-        SidebarStatusService.onDocumentClick();
-      });
     };
   }
 ]);

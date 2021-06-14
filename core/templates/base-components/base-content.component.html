@@ -2,7 +2,7 @@
 <ng-template #footerTpl>
   <ng-container>
     <span #ref>
-      <ng-content select="page-footer"></ng-content>
+      <ng-content select=".page-footer"></ng-content>
     </span>
   </ng-container>
   <ng-container *ngIf="ref.childNodes.length == 0">
@@ -43,7 +43,7 @@
                  headroom>
               <div class="navbar-container">
                 <div class="oppia-base-content-pre-logo-container">
-                  <ng-content select="navbar-pre-logo-action"></ng-content>
+                  <ng-content select=".navbar-pre-logo-action"></ng-content>
                 </div>
                 <oppia-top-navigation-bar [headerText]="getHeaderText()"
                                           [subheaderText]="getSubheaderText()">
@@ -52,7 +52,7 @@
                   <div class="mr-auto">
                     <ng-content select=".navbar-breadcrumb"></ng-content>
                   </div>
-                  <ng-content select="nav-options"></ng-content>
+                  <ng-content select=".nav-options"></ng-content>
                 </div>
               </div>
             </nav>
@@ -65,7 +65,7 @@
               </i>
               <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
                 <div>
-                  <ng-content select="mobile-nav-options"></ng-content>
+                  <ng-content select=".mobile-nav-options"></ng-content>
                 </div>
               </div>
             </div>
