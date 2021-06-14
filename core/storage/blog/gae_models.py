@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import python_utils
 import utils
+
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
 
@@ -39,7 +40,7 @@ class BlogPostModel(base_models.BaseModel):
     ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The ID of the user the blog post is authored by.
-    author_id = datastore_services.StringProperty(required=True)
+    author_id = datastore_services.StringProperty(indexed=True, required=True)
     # Title of the blog post.
     title = datastore_services.StringProperty(indexed=True, required=True)
     # Content of the blog post.
@@ -70,7 +71,7 @@ class BlogPostModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether BlogPostRightsModel references user.
+        """Check whether BlogPostModel references user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -117,7 +118,6 @@ class BlogPostModel(base_models.BaseModel):
             Exception. There were too many collisions with existing blog post
                 IDs when attempting to generate a new blog post ID.
         """
-
         for _ in python_utils.RANGE(base_models.MAX_RETRIES):
             blog_post_id = utils.convert_to_hash(
                 python_utils.UNICODE(
@@ -188,7 +188,6 @@ class BlogPostModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from BlogPostModel.
         """
-
         user_data = dict()
         blog_post_models = cls.get_all().filter(
             cls.author_id == user_id).fetch()
@@ -233,8 +232,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
     # if the blog post has never been published.
-    published_on = (
-        datastore_services.DateTimeProperty(indexed=True))
+    published_on = (datastore_services.DateTimeProperty(indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -280,21 +278,6 @@ class BlogPostSummaryModel(base_models.BaseModel):
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'published_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
-
-    @classmethod
-    def get_blog_post_summary_models(cls, blog_post_ids):
-        """Returns a list of BlogPostSummaryModels for blog posts created by
-        the user.
-
-        Args:
-            blog_post_ids: list(str). Contains blog post ids for which the blog
-                post summary models are to be fetched.
-
-        Returns:
-            list(BlogPostSummaryModel). The list of BlogPostSummaryModels
-            fetched using blog_post_ids.
-        """
-        return cls.get_multi(blog_post_ids)
 
 
 class BlogPostRightsModel(base_models.BaseModel):
@@ -348,8 +331,7 @@ class BlogPostRightsModel(base_models.BaseModel):
             # NOTE: Even though `editor_ids` is repeated, we can compare it to a
             # single value and it will return models where any of the editor IDs
             # are equal to user_id.
-            cls.editor_ids == user_id
-        ).get(keys_only=True) is not None
+            cls.editor_ids == user_id).get(keys_only=True) is not None
 
     @classmethod
     def get_by_user(cls, user_id):

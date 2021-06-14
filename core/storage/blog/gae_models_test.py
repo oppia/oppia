@@ -203,8 +203,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
     def test_get_blog_post_summary_models(self):
         blog_post_ids = ['blog_two', 'blog_one']
         blog_post_summary_models = (
-            blog_models.BlogPostSummaryModel.get_blog_post_summary_models(
-                blog_post_ids))
+            blog_models.BlogPostSummaryModel.get_multi(blog_post_ids))
         self.assertEqual(len(blog_post_summary_models), 2)
         self.assertEqual(
             blog_post_summary_models[0], self.blog_post_summary_model_new)
