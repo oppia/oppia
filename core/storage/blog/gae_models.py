@@ -313,10 +313,26 @@ class BlogPostRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Model contains data to pseudonymize or delete corresponding
-        to a user: editor_ids field.
+        """Model contains data to be deleted corresponding to a user: editor_ids
+        field. It does not delete the model but removes the user id from the
+        list of editor ids corresponding to a blog post rights model.
         """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def deassign_user_from_all_blog_posts(cls, user_id):
+        """Removes user_id from the list of editor_ids from all the blog
+        post rights models.
+
+        Args:
+            user_id: str. The ID of the user to be removed from editor ids.
+        """
+        blog_post_rights_models = cls.query(cls.editor_ids == user_id).fetch()
+        if blog_post_rights_models:
+            for rights_model in blog_post_rights_models:
+                rights_model.editor_ids.remove(user_id)
+            datastore_services.update_timestamps_multi(blog_post_rights_models)
+            datastore_services.put_multi(blog_post_rights_models)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

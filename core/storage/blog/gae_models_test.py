@@ -243,7 +243,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             blog_models.BlogPostRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -319,3 +319,14 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             blog_post_rights_model_instance.id, blog_post_model_id)
         self.assertEqual(
             blog_post_rights_model_instance.editor_ids, [self.USER_ID])
+
+    def deassign_user_from_all_blog_posts(self):
+        """Tests removing user id from the list of editor ids for blog post
+        assigned to a user.
+        """
+
+        blog_models.BlogPostRightsModel.deassign_user_from_all_blog_posts(
+            self.USER_ID_NEW)
+        blog_post_rights_models = blog_models.BlogPostRightsModel.get_all()
+        for model in blog_post_rights_models:
+            self.assertTrue(self.USER_ID_NEW not in model.editor_ids)
