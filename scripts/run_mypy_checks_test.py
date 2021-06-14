@@ -35,11 +35,13 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         super(MypyScriptChecks, self).setUp()
         process_success = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE)
-        def mock_popen_success(unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
+        def mock_popen_success(
+                unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
             return process_success
 
         process_failure = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_popen_failure(unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
+        def mock_popen_failure(
+                unused_cmd, stdout=None, stdin=None, stderr=None):  # pylint: disable=unused-argument
             return process_failure
 
         self.popen_swap_success = self.swap(
