@@ -1467,18 +1467,20 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
 
     non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
+    wiki_page_link = (
+        'https://github.com/oppia/oppia/wiki/Validation-of-handler-args')
 
     def test_every_handler_class_has_schema(self):
-        handlers_checked = []
+        """This test ensures that every child class of BaseHandler must have
+        schema defined into it.
+        """
         handlers_need_schema = []
-
         for route in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
-            else:
-                handler = route.handler
+            handler = route.handler
 
             handler_class_name = handler.__name__
             if handler_class_name in self.non_schema_handlers:
@@ -1492,69 +1494,67 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     base.BaseHandler.URL_PATH_ARGS_SCHEMAS)
             handler_have_schemas = (schema_written_for_request_methods and
                 schema_written_for_url_path_args)
-            handlers_checked.append(
-                    (handler_class_name, handler_have_schemas))
 
-        self.log_line('Verifying schema for handlers .... ')
-        for (name, handler_have_schemas) in handlers_checked:
-            if not handler_have_schemas:
-                handlers_need_schema.append(name)
-                self.log_line('Schema not present in %s. %s' % (name, 'FAIL'))
-        self.log_line(
-            'Total number of handlers checked: %s' % len(handlers_checked))
+            if handler_have_schemas is False:
+                handlers_need_schema.append(handler_class_name)
 
-        for (name, handler_have_schemas) in handlers_checked:
-            self.assertTrue(handler_have_schemas,
-                'Schema required in handlers - [ %s ]' % (
-                    ', '.join(handlers_need_schema)))
+        error_msg = (
+            'Schema required in handlers: [ %s ].'
+            '\nVisit %s to know, How to write schema for handler args.' % (
+                ', '.join(handlers_need_schema), self.wiki_page_link))
+
+        self.assertEqual(handlers_need_schema, [], error_msg)
 
     def test_schema_keys_exactly_match_with_url_path_elements(self):
+        """This test ensures that schema keys in URL_PATH_ARGS_SCHEMAS must
+        exactly match with url path elements.
+        """
         handlers_with_missing_schema_keys = []
-        schema_keys_match_with_path_elements = True
-
         for route in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
-            else:
-                handler = route.handler
+            handler = route.handler
+
             handler_class_name = handler.__name__
             if handler_class_name in self.non_schema_handlers:
                 continue
+
             regex_pattern = r'<.*?>'
             url_path_elements = [
                 keyword[1:-1] for keyword in re.findall(
                     regex_pattern, route.name)]
-            schema_keys = [
-                key for key in handler.URL_PATH_ARGS_SCHEMAS.keys()]
-            missing_schema_keys = set(url_path_elements) - set(schema_keys)
+            schema_keys = handler.URL_PATH_ARGS_SCHEMAS.keys()
 
+            missing_schema_keys = set(url_path_elements) - set(schema_keys)
             if missing_schema_keys:
                 handlers_with_missing_schema_keys.append(handler_class_name)
-                schema_keys_match_with_path_elements = False
-                self.log_line('Missing key in URL_PATH_ARGS_SCHEMAS for '
-                    '%s: %s. %s' % (handler_class_name,
-                        ', '.join(missing_schema_keys), 'FAIL'))
+                self.log_line(
+                    'Missing key in URL_PATH_ARGS_SCHEMAS for %s: %s.' % (
+                        handler_class_name, ', '.join(missing_schema_keys)))
 
-        self.assertTrue(schema_keys_match_with_path_elements,
-            'Missing schema keys in URL_PATH_ARGS_SCHEMAS '
-                'for [ %s ] classes.' % ', '.join(
-                    handlers_with_missing_schema_keys))
+        error_msg = (
+            'Missing schema keys in URL_PATH_ARGS_SCHEMAS for [ %s ] classes.'
+            '\nVisit %s to know, How to write schema for handler args.' % (
+                ', '.join(handlers_with_missing_schema_keys),
+                    self.wiki_page_link))
+
+        self.assertEqual(handlers_with_missing_schema_keys, [], error_msg)
 
     def test_schema_keys_exactly_match_with_request_methods_in_handlers(self):
+        """This test ensures that schema keys in URL_PATH_ARGS_SCHEMAS must
+        exactly match with url path elements.
+        """
         handlers_with_missing_schema_keys = []
-        schema_keys_match_with_hansler_req_methods = True
-
         for route in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
-            else:
-                handler = route.handler
-            handler_class_name = handler.__name__
+            handler = route.handler
 
+            handler_class_name = handler.__name__
             if handler_class_name in self.non_schema_handlers:
                 continue
 
@@ -1567,63 +1567,71 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 handler_request_methods.append('POST')
             if handler.delete != base.BaseHandler.delete:
                 handler_request_methods.append('DELETE')
-            schema_keys = [
-                key for key in handler.HANDLER_ARGS_SCHEMAS.keys()]
+            schema_keys = handler.HANDLER_ARGS_SCHEMAS.keys()
+
             missing_schema_keys = (
                 set(handler_request_methods) - set(schema_keys))
-
             if missing_schema_keys:
                 handlers_with_missing_schema_keys.append(handler_class_name)
-                schema_keys_match_with_hansler_req_methods = False
-                self.log_line('Missing key in HANDLER_ARGS_SCHEMAS for %s: '
-                    '%s. %s' % (handler_class_name, ', '.join(
-                        missing_schema_keys), 'FAIL'))
+                self.log_line(
+                    'Missing key in HANDLER_ARGS_SCHEMAS for %s: %s.' % (
+                        handler_class_name, ', '.join(missing_schema_keys)))
 
-        self.assertTrue(schema_keys_match_with_hansler_req_methods,
-            'Missing schema keys in HANDLER_ARGS_SCHEMAS '
-                'for [ %s ] classes.' % ', '.join(
-                    handlers_with_missing_schema_keys))
+        error_msg = (
+            'Missing schema keys in HANDLER_ARGS_SCHEMAS for [ %s ] classes.'
+            '\nVisit %s to know, How to write schema for handler args.' % (
+                ', '.join(handlers_with_missing_schema_keys),
+                    self.wiki_page_link))
+
+        self.assertEqual(handlers_with_missing_schema_keys, [], error_msg)
 
     def test_default_value_in_schema_conforms_with_schema(self):
-        handlers_checked = []
-        schema_validation = True
+        """This test check whether the default_value provided in schema
+        conforms with the schema.
+        """
+        list_of_handlers = []
         for route in main.URLS:
             # URLS = MAPREDUCE_HANDLERS + other handlers. MAPREDUCE_HANDLERS
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
-            else:
-                handler = route.handler
-            handler_class_name = handler.__name__
+            handler = route.handler
 
+            handler_class_name = handler.__name__
             if handler_class_name in self.non_schema_handlers:
                 continue
 
             schemas = handler.HANDLER_ARGS_SCHEMAS
-            for keys, schema in schemas.items():
-                for key, value in schema.items():
-                    if 'default_value' not in value:
+            for request_method, request_method_schema in schemas.items():
+                for arg, schema in request_method_schema.items():
+                    if 'default_value' not in schema:
                         continue
-                    default_value = {key: value['default_value']}
-                    default_value_schema = {key: value}
+                    default_value = {arg: schema['default_value']}
+                    default_value_schema = {arg: schema}
 
                     errors = payload_validator.validate(
                         default_value, default_value_schema, True)
-                    if not errors:
+                    if len(errors) == 0:
                         continue
 
-                    self.log_line('Handler: %s, argument: %s, default value '
-                        'validation: %s' % (handler_class_name, key, 'FAIL'))
-                    if handler_class_name not in handlers_checked:
-                        handlers_checked.append(handler_class_name)
-                    schema_validation = False
+                    self.log_line(
+                        'Handler: %s, argument: %s, default_value '
+                            'validation failed.' % (handler_class_name, key))
+                    if handler_class_name not in list_of_handlers:
+                        list_of_handlers.append(handler_class_name)
 
-        self.assertTrue(schema_validation, 'Schema validation for default '
-            'values failed for handlers: [ %s ]' % ', '.join(handlers_checked))
+        error_msg = (
+            'Schema validation for default values failed for handlers: [ %s ].'
+            '\nVisit %s to know, How to write schema for handler args.' % (
+                ', '.join(list_of_handlers), self.wiki_page_link))
+
+        self.assertEqual(list_of_handlers, [], error_msg)
 
     def test_handlers_with_schema_are_not_in_the_schema_requiring_list(self):
+        """This test checks if a handler contains schema then, handler class
+        name should not be present in SCHEMA_REQUIRING_HANDLERS list.
+        """
         handlers_to_remove = []
-        handlers_with_schema_are_not_in_schema_requiring_list = True
         non_schema_requiring_handler = (
             payload_validator.NON_SCHEMA_REQUIRING_HANDLERS)
         for route in main.URLS:
@@ -1631,10 +1639,9 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             # are tuples. So, below check is to handle them.
             if isinstance(route, tuple):
                 continue
-            else:
-                handler = route.handler
-            name = handler.__name__
+            handler = route.handler
 
+            name = handler.__name__
             if name in non_schema_requiring_handler:
                 continue
 
@@ -1646,11 +1653,77 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     base.BaseHandler.URL_PATH_ARGS_SCHEMAS)
             handler_have_schema = (schema_written_for_request_methods and
                 schema_written_for_url_path_args)
-            if (handler_have_schema and
-                    name in self.non_schema_handlers):
-                handlers_to_remove.append(name)
-                handlers_with_schema_are_not_in_schema_requiring_list = False
 
-        self.assertTrue(handlers_with_schema_are_not_in_schema_requiring_list,
-            'Remove [ %s ] these handlers from schema requiring list' % (
+            if handler_have_schema and name in self.non_schema_handlers:
+                handlers_to_remove.append(name)
+
+        error_msg = (
+            'Handlers to be removed from schema requiring list: [ %s ].' % (
                 ', '.join(handlers_to_remove)))
+
+        self.assertEqual(handlers_to_remove, [], error_msg)
+
+
+class SchemaValidationMockHandlerTests(test_utils.GenericTestBase):
+    """Tests to check schema validation system."""
+
+    exp_id = 'exp_id'
+
+    class MockHandlerWithInvalidSchema(BaseClassWithSchema):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'int'
+            }
+        }
+
+        @acl_decorators.can_play_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithValidSchema(BaseClassWithSchema):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'exploration_id': {
+                'type': 'unicode'
+            }
+        }
+
+        @acl_decorators.can_play_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SchemaValidationMockHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>',
+                    self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+        self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>',
+                    self.MockHandlerWithValidSchema)], debug=feconf.DEBUG))
+
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+
+    def test_cannot_access_exploration_with_incorrect_schema(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp1):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.exp_id,
+                    expected_status_int=400)
+            error_msg = (
+                'Schema validation for \'exploration_id\' failed: Could not '
+                'convert str to int: %s' % self.exp_id)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_can_access_exploration_with_correct_schema(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp2):
+            response = self.get_json(
+                '/mock_play_exploration/%s' % self.exp_id,
+                    expected_status_int=200)
+        self.logout()

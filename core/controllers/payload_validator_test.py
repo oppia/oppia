@@ -1,5 +1,5 @@
 # Tests.
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@ from core.tests import test_utils
 class ErrorValidationUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_args_raises_exceptions(self):
+
+        # List of 3-tuples, where the first element is an invalid argument dict,
+        # the second element is a schema dict and the third element
+        # is a list of errors.
         list_of_invalid_args_with_schema_and_errors = [
             ({
                 'exploration_id': 2
@@ -46,17 +50,17 @@ class ErrorValidationUnitTests(test_utils.GenericTestBase):
                 'exploration_id': 'any_exp_id'
             }, {}, ['Found extra args: [u\'exploration_id\'].'])
         ]
-        for item in list_of_invalid_args_with_schema_and_errors:
-            handler_args, handler_args_schema, error_msg = item
+        for handler_args, handler_args_schema, error_msg in (
+                list_of_invalid_args_with_schema_and_errors):
             errors = payload_validator.validate(
                 handler_args, handler_args_schema, False)
-            self.log_line(errors)
-            self.log_line(handler_args)
-            self.log_line(handler_args_schema)
-            self.log_line(error_msg)
+
             self.assertEqual(error_msg, errors)
 
     def test_valid_args_do_not_raises_exception(self):
+
+        # List of 2-tuples, where the first element is a valid argument dict,
+        # and the second element is a schema dict.
         list_of_valid_args_with_schmea = [
             ({}, {
                 'exploration_id': {
@@ -83,4 +87,4 @@ class ErrorValidationUnitTests(test_utils.GenericTestBase):
         for handler_args, handler_args_schema in list_of_valid_args_with_schmea:
             errors = payload_validator.validate(
                 handler_args, handler_args_schema, False)
-            self.assertFalse(errors)
+            self.assertEqual(errors, [])

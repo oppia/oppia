@@ -2153,14 +2153,15 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
         'C0035': (
             'Please add schema in URL_ARGS_PATH_SCHEMA for %s class.',
             'no-schema-for-url-path-elements',
-            'Please add schema for url path elements by folllowing wiki link-'
-            'https://github.com/oppia/oppia/..'
+            'Please add schema for url path elements by folllowing wiki link- '
+            'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
         ),
         'C0036': (
             'Please add schema in HANDLER_ARGS_SCHEMAS for %s class.',
             'no-schema-for-handler-args',
             'Please add schema for payload arguments and url query string '
-            'parameters by following the link- <link>.'
+            'parameters by following the link- '
+            'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
         )
     }
     non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
@@ -2178,7 +2179,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):
                 in the AST.
         """
         basehandler_child_class = self.check_parent_class_is_basehandler(node)
-        if not basehandler_child_class:
+        if basehandler_child_class is False:
             for j in node.ancestors():
                 if self.check_parent_class_is_basehandler(j):
                     basehandler_child_class = True

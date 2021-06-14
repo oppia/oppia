@@ -328,6 +328,9 @@ class BaseHandler(webapp2.RequestHandler):
                 'Please provide schema for url path args in %s '
                 'handler class' % (handler_class_name))
 
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
         allowed_extra_args = False
         if (self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
                 request_method == 'GET'):
@@ -338,7 +341,7 @@ class BaseHandler(webapp2.RequestHandler):
         errors = payload_validator.validate(
             url_path_args, schema_for_url_path_args, allowed_extra_args)
         if errors:
-            raise Exception('\n'.join(errors))
+            raise self.InvalidInputException('\n'.join(errors))
 
         # Validation for body params and url query string params.
         if request_method in ['GET', 'DELETE']:
@@ -350,14 +353,14 @@ class BaseHandler(webapp2.RequestHandler):
 
         try:
             schema_for_handler_args = self.HANDLER_ARGS_SCHEMAS
-            schema_for_handler_args = schema_for_handler_args[request_method]
+            schema_for_request_method = schema_for_handler_args[request_method]
         except Exception:
             raise NotImplementedError(
                 'Provide schema for %s method in %s handler class.' % (
                     request_method, handler_class_name))
 
         errors = payload_validator.validate(
-            handler_args, schema_for_handler_args, allowed_extra_args)
+            handler_args, schema_for_request_method, allowed_extra_args)
         if errors:
             raise self.InvalidInputException('\n'.join(errors))
 

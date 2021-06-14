@@ -110,27 +110,27 @@ def normalize_against_schema(
 
         # For handling cases of missing args.
         list_of_missing_args_with_default_none = []
-        for p in schema[SCHEMA_KEY_PROPERTIES]:
+        for prop in schema[SCHEMA_KEY_PROPERTIES]:
 
-            if (SCHEMA_KEY_DEFAULT_VALUE not in p[SCHEMA_KEY_SCHEMA] or
-                    p[SCHEMA_KEY_NAME] in obj):
+            if (SCHEMA_KEY_DEFAULT_VALUE not in prop[SCHEMA_KEY_SCHEMA] or
+                    prop[SCHEMA_KEY_NAME] in obj):
                 continue
 
-            default_value = p[SCHEMA_KEY_SCHEMA][SCHEMA_KEY_DEFAULT_VALUE]
+            default_value = prop[SCHEMA_KEY_SCHEMA][SCHEMA_KEY_DEFAULT_VALUE]
 
-            # Don't normalize if dafault_value is None.
+            # Don't normalize if default_value is None.
             if default_value is None:
-                expected_dict_keys.remove(p[SCHEMA_KEY_NAME])
+                expected_dict_keys.remove(prop[SCHEMA_KEY_NAME])
                 list_of_missing_args_with_default_none.append(
-                    p[SCHEMA_KEY_NAME])
+                    prop[SCHEMA_KEY_NAME])
                 continue
-            obj[p[SCHEMA_KEY_NAME]] = default_value
+            obj[prop[SCHEMA_KEY_NAME]] = default_value
 
         # To remove dict from the properties field if the schema of a
-        # missing arg contains default_value: None.
+        # missing arg contains 'default_value': None.
         for _ in list_of_missing_args_with_default_none:
             for i in python_utils.RANGE(len(schema[SCHEMA_KEY_PROPERTIES])):
-                if (p[SCHEMA_KEY_NAME] not in
+                if (schema[SCHEMA_KEY_PROPERTIES][i][SCHEMA_KEY_NAME] not in
                         list_of_missing_args_with_default_none):
                     continue
                 del schema[SCHEMA_KEY_PROPERTIES][i]
