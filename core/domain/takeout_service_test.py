@@ -35,13 +35,13 @@ import python_utils
 import utils
 
 (
-    app_feedback_report_models, auth_models, base_models, blog_post_models,
+    app_feedback_report_models, auth_models, base_models, blog_models,
     collection_models, config_models, email_models, exploration_models,
     feedback_models, improvements_models, question_models, skill_models,
     story_models, subtopic_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.auth,
-    models.NAMES.base_model, models.NAMES.blog_post, models.NAMES.collection,
+    models.NAMES.base_model, models.NAMES.blog, models.NAMES.collection,
     models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.improvements, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
@@ -762,7 +762,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         report_entity.put()
 
         # Set-up for the BlogPostModel.
-        blog_post_model = blog_post_models.BlogPostModel(
+        blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_POST_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
@@ -775,23 +775,23 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         blog_post_model.update_timestamps()
         blog_post_model.put()
 
-        blog_post_rights_old = blog_post_models.BlogPostRightsModel(
+        blog_post_rights_for_post_1 = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_1,
             editor_ids=[self.USER_ID_1],
             blog_post_is_published=True,
         )
 
-        blog_post_rights_old.update_timestamps()
-        blog_post_rights_old.put()
+        blog_post_rights_for_post_1.update_timestamps()
+        blog_post_rights_for_post_1.put()
 
-        blog_post_rights_new = blog_post_models.BlogPostRightsModel(
+        blog_post_rights_for_post_2 = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_2,
             editor_ids=[self.USER_ID_1],
             blog_post_is_published=False,
         )
 
-        blog_post_rights_new.update_timestamps()
-        blog_post_rights_new.put()
+        blog_post_rights_for_post_2.update_timestamps()
+        blog_post_rights_for_post_2.put()
 
     def set_up_trivial(self):
         """Setup for trivial test of export_data functionality."""
@@ -1171,7 +1171,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
-        blog_post_model = blog_post_models.BlogPostModel(
+        blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_POST_ID_1,
             author_id=self.USER_ID_1,
             content='content sample',
@@ -1513,7 +1513,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'editable_blog_post_ids': [
                 self.BLOG_POST_ID_1,
                 self.BLOG_POST_ID_2
-                ],
+            ],
         }
         expected_user_data = {
             'user_stats': expected_stats_data,

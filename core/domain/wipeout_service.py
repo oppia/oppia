@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import itertools
 import logging
 import re
 
@@ -38,13 +39,13 @@ import python_utils
 import utils
 
 (
-    app_feedback_report_models, base_models, blog_post_models,
+    app_feedback_report_models, base_models, blog_models,
     collection_models, config_models, exp_models, feedback_models,
     question_models, skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.app_feedback_report, models.NAMES.base_model,
-    models.NAMES.blog_post, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.blog, models.NAMES.collection, models.NAMES.config,
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
@@ -344,7 +345,7 @@ def delete_user(pending_deletion_request):
             'topic_id',
             feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
             ('manager_ids',))
-        _pseudonymize_blog_posts_models(pending_deletion_request)
+        _pseudonymize_blog_post_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.email)
 
 
@@ -1257,7 +1258,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         )
 
 
-def _pseudonymize_blog_posts_models(pending_deletion_request):
+def _pseudonymize_blog_post_models(pending_deletion_request):
     """Pseudonymizes the blog post models for the user with user_id.
 
     Args:
@@ -1271,23 +1272,21 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
     # post models and blog post summary models then
     # we generate a pseudonymous user ID and replace the user ID
     # with that pseudonymous user ID in all the models.
-    blog_post_model_class = blog_post_models.BlogPostModel
+    blog_post_model_class = blog_models.BlogPostModel
     blog_post_models_list = blog_post_model_class.query(
-        datastore_services.any_of(
-            blog_post_model_class.author_id == user_id)
-        ).fetch()
-    blogpost_ids = set([model.id for model in blog_post_models_list])
+        blog_post_model_class.author_id == user_id
+    ).fetch()
+    blog_post_ids = {model.id for model in blog_post_models_list}
 
-    blog_post_summary_model_class = blog_post_models.BlogPostSummaryModel
+    blog_post_summary_model_class = blog_models.BlogPostSummaryModel
     blog_post_summary_models = blog_post_summary_model_class.query(
-        datastore_services.any_of(
-            blog_post_summary_model_class.author_id == user_id)
-        ).fetch()
-    blogpost_ids |= set([model.id for model in blog_post_summary_models])
+        blog_post_summary_model_class.author_id == user_id
+    ).fetch()
+    blog_post_ids |= {model.id for model in blog_post_summary_models}
 
     _save_pseudonymizable_entity_mappings_to_different_pseudonyms(
-        pending_deletion_request, models.NAMES.blog_post, blogpost_ids)
-    # TODO(sll):Add wipeout for BlogPostsRightsModel after adding
+        pending_deletion_request, models.NAMES.blog, blog_post_ids)
+    # TODO(#13053): Add wipeout for BlogPostRightsModel after adding
     # service layer.
     @transaction_services.run_in_transaction_wrapper
     def _pseudonymize_models_transactional(
@@ -1315,23 +1314,22 @@ def _pseudonymize_blog_posts_models(pending_deletion_request):
             model for model in blog_posts_related_models
             if isinstance(model, blog_post_summary_model_class)]
         for blog_post_summary in blog_post_summary_models_list:
-            blog_post_summary.author_id = pseudonymized_id
+            if blog_post_summary.author_id == user_id:
+                blog_post_summary.author_id = pseudonymized_id
             blog_post_summary.update_timestamps()
 
         datastore_services.put_multi(
             blog_post_models_list +
             blog_post_summary_models_list)
 
-    blog_posts_ids_to_pids = (
+    blog_post_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
-            models.NAMES.blog_post.value])
-    for blogpost_id, pseudonymized_id in blog_posts_ids_to_pids.items():
+            models.NAMES.blog.value])
+    for blog_post_id, pseudonymized_id in blog_post_ids_to_pids.items():
         blog_posts_related_models = [
-            model for model in blog_post_models_list
-            if model.id == blogpost_id
-        ] + [
-            model for model in blog_post_summary_models
-            if model.id == blogpost_id
+            model for model in itertools.chain(
+                blog_post_models_list, blog_post_summary_models)
+            if model.id == blog_post_id
         ]
         transaction_slices = utils.grouper(
             blog_posts_related_models,
