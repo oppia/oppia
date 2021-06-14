@@ -35,10 +35,28 @@ class RegistryTests(test_utils.TestBase):
             return unique_obj
 
         get_all_jobs_swap = self.swap(
-            base_jobs._JobMetaclass, 'get_all_jobs', get_all_jobs_mock) # pylint: disable=protected-access
+            base_jobs.JobMetaclass, 'get_all_jobs', get_all_jobs_mock)
 
         with get_all_jobs_swap:
             self.assertIs(registry.get_all_jobs(), unique_obj)
 
     def test_get_all_jobs_never_returns_an_empty_list(self):
         self.assertNotEqual(registry.get_all_jobs(), [])
+
+    def test_get_all_job_names_returns_value_from_job_metaclass(self):
+        unique_obj = object()
+
+        @classmethod
+        def get_all_job_names_mock(unused_cls):
+            """Returns the unique_obj."""
+            return unique_obj
+
+        get_all_job_names_swap = self.swap(
+            base_jobs.JobMetaclass,
+            'get_all_job_names', get_all_job_names_mock)
+
+        with get_all_job_names_swap:
+            self.assertIs(registry.get_all_job_names(), unique_obj)
+
+    def test_get_all_job_names_never_returns_an_empty_list(self):
+        self.assertNotEqual(registry.get_all_job_names(), [])

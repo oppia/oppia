@@ -184,4 +184,12 @@ describe('Edit Thumbnail Modal Controller', function() {
     expect($scope.uploadedImage).toBe(null);
     expect($scope.invalidImageWarningIsShown).toBe(true);
   });
+
+  it('should set updated background color on closing the modal', () => {
+    $scope.bgColor = '#123456';
+    $scope.confirm();
+    expect($uibModalInstance.close).toHaveBeenCalledWith(
+      jasmine.objectContaining({ newBgColor: '#123456' })
+    );
+  });
 });

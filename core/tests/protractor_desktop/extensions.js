@@ -131,6 +131,7 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
+    await explorationEditorPage.saveChanges();
 
     var defaultOutcomeSet = false;
 
@@ -201,8 +202,11 @@ describe('Interactions', function() {
         await explorationEditorPage.navigateToMainTab();
         await explorationEditorMainTab.deleteInteraction();
       }
+      if (interaction.testSuite.length > 0) {
+        await explorationEditorPage.discardChanges();
+        defaultOutcomeSet = false;
+      }
     }
-    await explorationEditorPage.discardChanges();
     await users.logout();
   });
 
