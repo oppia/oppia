@@ -38,7 +38,7 @@ class ValidateExplorationSnapshotMetadataModel(
     """Overrides _get_change_domain_class for exploration models """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
@@ -57,7 +57,7 @@ class ValidateExplorationRightsSnapshotMetadataModel(
     """Overrides _get_change_domain_class for exploration models """
 
     def _get_change_domain_class(self, input_model): # pylint: disable=unused-argument
-        """Returns a Change domain class.
+        """Returns a change domain class.
 
         Args:
             input_model: datastore_services.Model. Entity to validate.
