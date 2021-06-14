@@ -30,7 +30,7 @@ import re
 import string
 import sys
 import time
-from typing import (
+from typing import ( # pylint: disable=unused-import, import-only-modules
     Any, Callable, Dict, Generator, Iterable, Iterator, List, # pylint: disable=unused-import, import-only-modules
     Text, Tuple, TypeVar, Union) # pylint: disable=unused-import, import-only-modules
 import unicodedata
