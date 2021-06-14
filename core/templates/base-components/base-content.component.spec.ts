@@ -62,6 +62,9 @@ describe('Base Content Component', () => {
         pathname: pathname,
         search: search,
         hash: hash
+      },
+      document: {
+        addEventListener(event: string, callback: () => void) {}
       }
     };
   }

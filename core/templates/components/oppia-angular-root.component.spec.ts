@@ -47,7 +47,10 @@ describe('OppiaAngularRootComponent', function() {
         {
           provide: TranslateCacheService,
           useValue: {
-            init: () => {}
+            init: () => {},
+            getCachedLanguage: () => {
+              return 'en';
+            }
           }
         },
         {
