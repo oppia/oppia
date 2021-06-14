@@ -31,7 +31,7 @@ export class CodemirrorMergeviewComponent implements
   // These properties are initialized using Angular lifecycle hooks
   // and component interactions, therefore we need to do non-null assertion,
   // for more information see https://github.com/oppia/oppia/wiki/Guide-on-
-  // defining-types#ts-7-1
+  // defining-types#ts-7-1.
   @Input() leftValue!: string;
   @Input() rightValue!: string;
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
