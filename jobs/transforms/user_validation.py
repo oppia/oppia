@@ -31,11 +31,13 @@ from jobs.types import user_validation_errors
 import apache_beam as beam
 
 (
-    auth_models, collection_models, exp_models,
-    feedback_models, user_models
+    auth_models, collection_models, email_models,
+    exp_models, feedback_models, skill_models,
+    story_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.auth, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.user
+    models.NAMES.feedback, models.NAMES.skill, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.user
 ])
 
 
@@ -178,6 +180,65 @@ def user_recent_changes_batch_model_relationships(model):
 
 @validation_decorators.RelationshipsOf(user_models.UserStatsModel)
 def user_stats_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.id, [user_models.UserSettingsModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.ExplorationUserDataModel)
+def exploration_user_data_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.exploration_id, [exp_models.ExplorationModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.CollectionProgressModel)
+def collection_progress_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.collection_id, [collection_models.CollectionModel]
+    yield model.completed_explorations, [exp_models.ExplorationModel]
+    yield model.user_id, [user_models.CompletedActivitiesModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.StoryProgressModel)
+def story_progress_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.story_id, [story_models.StoryModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserQueryModel)
+def user_query_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.sent_email_model_id, [email_models.BulkEmailModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserBulkEmailsModel)
+def user_bulk_emails_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.sent_email_model_ids, [email_models.BulkEmailModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserSkillMasteryModel)
+def user_skill_mastery_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.skill_id, [skill_models.SkillModel]
+
+
+@validation_decorators.RelationshipsOf(
+    user_models.UserContributionProficiencyModel)
+def user_contribution_proficiency_model_relationships(model):
+    """Yields how the properties of the model relates to the ID of others."""
+
+    yield model.user_id, [user_models.UserSettingsModel]
+
+
+@validation_decorators.RelationshipsOf(user_models.UserContributionRightsModel)
+def user_contribution_rights_model_relationships(model):
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.id, [user_models.UserSettingsModel]
