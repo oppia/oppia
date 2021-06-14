@@ -375,10 +375,10 @@ describe('Core exploration functionality', function() {
       await explorationEditorMainTab.addResponse(
         'NumericInput', async function(richTextEditor) {
           await richTextEditor.appendBoldText('correct');
-        }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+        }, 'final card', true, 'IsInclusivelyBetween', 1, 3);
       var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
       await responseEditor.expectRuleToBe(
-        'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+        'NumericInput', 'IsInclusivelyBetween', [1, 3]);
       responseEditor = await explorationEditorMainTab.getResponseEditor(0);
       await responseEditor.expectFeedbackInstructionToBe('correct');
       responseEditor = await explorationEditorMainTab.getResponseEditor(
@@ -420,9 +420,10 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
-    // Numeric input does not have any customization arguments. Therefore the
-    // customization modal and the save interaction button does not appear.
-    await explorationEditorMainTab.setInteraction('NumericInput');
+    // NumberWithUnits input does not have any customization arguments.
+    // Therefore the customization modal and the save interaction button does
+    // not appear.
+    await explorationEditorMainTab.setInteraction('NumberWithUnits');
     await explorationEditorMainTab.deleteInteraction();
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
@@ -434,11 +435,11 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
-    // Numeric input does not have any customization arguments. Therefore, on
-    // re-clicking, a modal opens up informing the user that this interaction
-    // does not have any customization options. To dismiss this modal, user
-    // clicks 'Okay' implying that he/she has got the message.
-    await explorationEditorMainTab.setInteraction('NumericInput');
+    // NumberWithUnits input does not have any customization arguments.
+    // Therefore, on re-clicking, a modal opens up informing the user that
+    // this interaction does not have any customization options. To dismiss
+    // this modal, user clicks 'Okay' implying that he/she has got the message.
+    await explorationEditorMainTab.setInteraction('NumberWithUnits');
     var testInteractionButton = element(by.css('.protractor-test-interaction'));
     await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(
