@@ -171,7 +171,7 @@ describe('Teach Page', () => {
       ).toBe('/community-library');
     }
   );
-  
+
   it('should record analytics when Browse Library is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
@@ -189,7 +189,7 @@ describe('Teach Page', () => {
       ).toBe('/teach');
     }
   );
-  
+
   it('should record analytics when Guide For Parents is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
@@ -207,7 +207,7 @@ describe('Teach Page', () => {
       ).toBe('/teach');
     }
   );
-  
+
   it('should record analytics when Tips For Parents is clicked', () => {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
