@@ -167,10 +167,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State 3',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'content_html': '<p>old content html</p>',
-                    'translation_html': '<p>In Hindi</p>',
-                    'data_format': 'html',
-                    'needs_update': False
+                    'original_content': '<p>old content html</p>',
+                    'translated_content': '<p>In Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'change to state 3',
             }, csrf_token=csrf_token)
@@ -729,15 +728,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State 1',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'content_html': text_to_translate,
-                    'translation_html': (
+                    'original_content': text_to_translate,
+                    'translated_content': (
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;translation_image.png&quot;" '
                         'caption-with-value="&quot;&quot;" '
                         'alt-with-value="&quot;Image&quot;">'
                         '</oppia-noninteractive-image>'),
-                    'data_format': 'html',
-                    'needs_update': False
+                    'data_format': 'html'
                 },
             }, csrf_token=csrf_token,
             upload_files=(
@@ -1883,10 +1881,9 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>',
-                    'data_format': 'html',
-                    'needs_update': False
+                    'original_content': '<p>new content html</p>',
+                    'translated_content': '<p>new content html in Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)
@@ -2093,10 +2090,9 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'content_html': '<p>new content html</p>',
-                    'translation_html': '<p>new content html in Hindi</p>',
-                    'data_format': 'html',
-                    'needs_update': False
+                    'original_content': '<p>new content html</p>',
+                    'translated_content': '<p>new content html in Hindi</p>',
+                    'data_format': 'html'
                 },
                 'description': 'Adds translation',
             }, csrf_token=csrf_token)

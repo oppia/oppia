@@ -292,10 +292,9 @@ describe('Translation Modal Component', () => {
           content_id: 'contentId1',
           state_name: 'stateName1',
           language_code: 'es',
-          content_html: 'text1',
-          translation_html: 'texto1',
-          data_format: 'html',
-          needs_update: false
+          original_content: 'text1',
+          translated_content: 'texto1',
+          data_format: 'html'
         }
       };
       component.ngOnInit();
@@ -390,10 +389,9 @@ describe('Translation Modal Component', () => {
             content_id: 'contentId2',
             state_name: 'stateName2',
             language_code: 'es',
-            content_html: 'text2',
-            translation_html: 'texto2',
-            data_format: 'html',
-            needs_update: false
+            original_content: 'text2',
+            translated_content: 'texto2',
+            data_format: 'html'
           }
         };
         component.skipActiveTranslation();

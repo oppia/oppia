@@ -2090,10 +2090,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': translation_html,
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': translation_html,
+            'data_format': 'html'
         }
 
         translation_suggestion = suggestion_services.create_suggestion(
@@ -3674,10 +3673,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': translation_html,
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': translation_html,
+            'data_format': 'html'
         }
 
         with self.mock_datetime_utcnow(submission_datetime):
@@ -4435,10 +4433,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(

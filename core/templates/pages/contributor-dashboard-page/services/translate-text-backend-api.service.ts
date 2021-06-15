@@ -44,7 +44,7 @@ export class TranslateTextBackendApiService {
 
   async suggestTranslatedTextAsync(
       expId: string, expVersion: string, contentId: string, stateName: string,
-      languageCode: string, contentHtml: string, translationHtml: string,
+      languageCode: string, originalContent: string, translatedContent: string,
       imagesData: ImagesData[]): Promise<unknown> {
     const postData = {
       suggestion_type: 'translate_content',
@@ -57,10 +57,9 @@ export class TranslateTextBackendApiService {
         content_id: contentId,
         state_name: stateName,
         language_code: languageCode,
-        content_html: contentHtml,
-        translation_html: translationHtml,
-        data_format: TRANSLATION_DATA_FORMAT_HTML,
-        needs_update: false
+        original_content: originalContent,
+        translated_content: translatedContent,
+        data_format: TRANSLATION_DATA_FORMAT_HTML
       }
     };
 

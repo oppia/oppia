@@ -405,10 +405,9 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'content_html': '<p>The new content to voiceover</p>',
-                    'translation_html': '<p>Translation in Hindi</p>',
-                    'data_format': 'html',
-                    'needs_update': False
+                    'original_content': '<p>The new content to voiceover</p>',
+                    'translated_content': '<p>Translation in Hindi</p>',
+                    'data_format': 'html'
                 })], 'Adds new content to init state and its translation')
 
         content = voiceover_services.get_text_to_create_voiceover_application(

@@ -59,10 +59,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         'state_name': 'End State',
         'content_id': 'content',
         'language_code': 'hi',
-        'content_html': '',
-        'translation_html': '<p>This is translated html.</p>',
-        'data_format': 'html',
-        'needs_update': False
+        'original_content': '<p>Original content</p>',
+        'translated_content': '<p>This is translated html.</p>',
+        'data_format': 'html'
     }
 
     def setUp(self):
@@ -445,10 +444,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
-                'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>',
-                'data_format': 'html',
-                'needs_update': False
+                'original_content': '<p><strong>Test content</strong></p>',
+                'translated_content': '<p>Translated text</p>',
+                'data_format': 'html'
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -464,10 +462,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'state_name': 'End State',
                 'content_id': 'content',
                 'language_code': 'hi',
-                'content_html': '<p><strong>Test content</strong></p>',
-                'translation_html': '<p>Translated text</p>',
-                'data_format': 'html',
-                'needs_update': False
+                'original_content': '<p><strong>Test content</strong></p>',
+                'translation_content': '<p>Translated text</p>',
+                'data_format': 'html'
             }),
         ]
         exp_services.update_exploration(

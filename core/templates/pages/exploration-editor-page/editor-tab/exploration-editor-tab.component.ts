@@ -309,7 +309,7 @@ angular.module('oppia').component('explorationEditorTab', {
                 contentId)) {
                 writtenTranslations.markAllTranslationsAsNeedingUpdate(
                   contentId);
-                ExplorationStatesService.markWrittenTranslationAsNeedingUpdate(
+                ExplorationStatesService.markWrittenTranslationsAsNeedingUpdate(
                   contentId, stateName);
               }
             });

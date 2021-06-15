@@ -324,8 +324,8 @@ describe('Translation Suggestion Review Modal Controller', function() {
           state_name: 'State 3',
           content_id: 'content',
           language_code: 'hi',
-          content_html: '<p>old content html</p>',
-          translation_html: '<p>In Hindi</p>'
+          original_content: '<p>old content html</p>',
+          translated_content: '<p>In Hindi</p>'
         };
         spyOn(contributionAndReviewService, 'updateTranslationSuggestionAsync')
           .and.callFake((

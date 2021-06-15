@@ -1637,7 +1637,7 @@ class WrittenTranslations(python_utils.OBJECT):
         self.translations_mapping[content_id][language_code] = (
             written_translation)
 
-    def mark_written_translation_as_needing_update(self, content_id):
+    def mark_written_translations_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
         languages.
 
@@ -2725,29 +2725,28 @@ class State(python_utils.OBJECT):
             content_id, language_code, translation_html)
 
     def add_written_translation(
-            self, content_id, language_code, html, data_format, needs_update):
-        """Update a translation for the given content id in a given language.
+            self, content_id, language_code, translation, data_format):
+        """Adds a translation for the given content id in a given language.
 
         Args:
             content_id: str. The id of the content.
             language_code: str. The language code of the translated html.
-            html: str. The translated html.
+            translation: str. The translated content.
             data_format: str. The data format of the translated content.
-            needs_update: bool. Whether the translation needs to be updated.
         """
         written_translation = WrittenTranslation(
-            data_format, html, needs_update)
+            data_format, translation, False)
         self.written_translations.translations_mapping[content_id][
             language_code] = written_translation
 
-    def mark_written_translation_as_needing_update(self, content_id):
+    def mark_written_translations_as_needing_update(self, content_id):
         """Marks translation as needing update for the given content id in all
         languages.
 
         Args:
             content_id: str. The id of the content.
         """
-        self.written_translations.mark_written_translation_as_needing_update(
+        self.written_translations.mark_written_translations_as_needing_update(
             content_id)
 
     def update_content(self, content):

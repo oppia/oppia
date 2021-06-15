@@ -434,24 +434,22 @@ angular.module('oppia').factory('ExplorationStatesService', [
         return _states.getState(stateName).writtenTranslations;
       },
       saveWrittenTranslation: function(
-          contentId, dataFormat, languageCode, stateName,
-          translationHtml, needsUpdate) {
+          contentId, dataFormat, languageCode, stateName, translatedContent) {
         ChangeListService.addWrittenTranslation(
-          contentId, dataFormat, languageCode, stateName,
-          translationHtml, needsUpdate);
+          contentId, dataFormat, languageCode, stateName, translatedContent);
         let stateData = _states.getState(stateName);
         if (stateData.writtenTranslations.hasWrittenTranslation(
           contentId, languageCode)) {
           stateData.writtenTranslations.updateWrittenTranslation(
-            contentId, languageCode, translationHtml);
+            contentId, languageCode, translatedContent);
         } else {
           stateData.writtenTranslations.addWrittenTranslation(
-            contentId, languageCode, dataFormat, translationHtml);
+            contentId, languageCode, dataFormat, translatedContent);
         }
         _states.setState(stateName, angular.copy(stateData));
       },
-      markWrittenTranslationAsNeedingUpdate: function(contentId, stateName) {
-        ChangeListService.markTranslationAsNeedingUpdate(contentId, stateName);
+      markWrittenTranslationsAsNeedingUpdate: function(contentId, stateName) {
+        ChangeListService.markTranslationsAsNeedingUpdate(contentId, stateName);
         let stateData = _states.getState(stateName);
         const translationMapping = (
           stateData.writtenTranslations.translationsMapping[contentId]);

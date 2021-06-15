@@ -968,10 +968,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         'state_name': 'state_1',
         'content_id': 'content',
         'language_code': 'hi',
-        'content_html': '<p>State name: state_1, Content id: content</p>',
-        'translation_html': '<p>This is translated html.</p>',
-        'data_format': 'html',
-        'needs_update': False
+        'original_content': '<p>State name: state_1, Content id: content</p>',
+        'translated_content': '<p>This is translated html.</p>',
+        'data_format': 'html'
     }
 
     class MockExploration(python_utils.OBJECT):
@@ -1036,10 +1035,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state_1',
             'content_id': 'content',
             'language_code': language_code,
-            'content_html': '<p>State name: state_1, Content id: content</p>',
-            'translation_html': '<p>This is translated html.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': (
+                '<p>State name: state_1, Content id: content</p>'),
+            'translated_content': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         with self.swap(
@@ -1649,10 +1648,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'content_id': 'content',
             'language_code': 'hi',
-            'content_html': content_html,
-            'translation_html': '<p>This is translated html.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': content_html,
+            'translated_content': '<p>This is translated html.</p>',
+            'data_format': 'html'
         }
 
         suggestion_services.create_suggestion(
@@ -1958,10 +1956,9 @@ class ReviewableSuggestionEmailInfoUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': translation_html,
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': translation_html,
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -2602,10 +2599,9 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -3205,10 +3201,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -3716,10 +3711,9 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(
@@ -3995,10 +3989,9 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translation_html': '<p>This is the translated content.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translated_content': '<p>This is the translated content.</p>',
+            'data_format': 'html'
         }
 
         return suggestion_services.create_suggestion(

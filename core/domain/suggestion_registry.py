@@ -575,11 +575,13 @@ class SuggestionTranslateContent(BaseSuggestion):
                     suggestion_models.SCORE_TYPE_TRANSLATION,
                     self.get_score_type()))
 
-        # Suggestions in the future will only use CMD_ADD_WRITTEN_TRANSLATION.
-        # CMD_ADD_TRANSLATION is added in the following check to support older
-        # suggestions.
+        # TODO(#12981): Write a one-off job to modify all existing translation
+        # suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
+        # CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will
+        # only use CMD_ADD_WRITTEN_TRANSLATION. DEPRECATED_CMD_ADD_TRANSLATION
+        # is added in the following check to support older suggestions.
         accepted_cmds = [
-            exp_domain.CMD_ADD_TRANSLATION,
+            exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
             exp_domain.CMD_ADD_WRITTEN_TRANSLATION
         ]
         if self.change.cmd not in accepted_cmds:

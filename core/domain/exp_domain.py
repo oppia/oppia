@@ -82,19 +82,21 @@ CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
 # TODO(#12981): Write a one-off job to modify all existing translation
-# suggestions to use CMD_ADD_WRITTEN_TRANSLATION.
+# suggestions that use DEPRECATED_CMD_ADD_TRANSLATION to use
+# CMD_ADD_WRITTEN_TRANSLATION instead. Suggestions in the future will only use
+# CMD_ADD_WRITTEN_TRANSLATION.
 # DEPRECATED: This command is deprecated. Please do not use. The command remains
 # here to support old suggestions. This takes additional 'state_name',
 # 'content_id', 'language_code' and 'content_html' and 'translation_html'
 # parameters.
-CMD_ADD_TRANSLATION = 'add_translation'
+DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
-# 'needs_update', 'date_format', 'content_html' and 'translation_html'
+# 'needs_update', 'data_format', 'original_content' and 'translated_content'
 # parameters.
 CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
 # This takes additional 'content_id' and 'state_name' parameters.
-CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE = (
-    'mark_written_translation_as_needing_update')
+CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+    'mark_written_translations_as_needing_update')
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -285,7 +287,7 @@ class ExplorationChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
-        'name': CMD_ADD_TRANSLATION,
+        'name': DEPRECATED_CMD_ADD_TRANSLATION,
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html'],
@@ -294,12 +296,12 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_ADD_WRITTEN_TRANSLATION,
         'required_attribute_names': [
-            'state_name', 'content_id', 'language_code',
-            'needs_update', 'translation_html', 'data_format'],
-        'optional_attribute_names': ['content_html'],
+            'state_name', 'content_id', 'language_code', 'original_content',
+            'translated_content', 'data_format'],
+        'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
-        'name': CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+        'name': CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
         'required_attribute_names': ['content_id', 'state_name'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []

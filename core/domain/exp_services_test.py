@@ -3012,7 +3012,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             })
 
         change_list.append(exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'cmd': exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
             'state_name': self.init_state_name,
             'content_id': 'content',
             'language_code': 'hi',
@@ -3045,9 +3045,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'state_name': self.init_state_name,
             'content_id': 'content',
             'language_code': 'hi',
-            'translation_html': '<p>Translated text</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'original_content': '<p>original text</p>',
+            'translated_content': '<p>Translated text</p>',
+            'data_format': 'html'
         }))
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, '')
@@ -3058,7 +3058,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'hi': 1
         })
 
-    def test_mark_written_translation_as_needing_update(self):
+    def test_mark_written_translations_as_needing_update(self):
         """Test updating of content."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         self.assertEqual(exploration.get_translation_counts(), {})
@@ -3079,18 +3079,18 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'state_name': self.init_state_name,
                 'content_id': 'content',
                 'language_code': 'hi',
+                'original_content': '<p>Original content</p>',
                 'translation_html': '<p>Translated text in Hindi</p>',
-                'data_format': 'html',
-                'needs_update': False
+                'data_format': 'html'
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                 'state_name': self.init_state_name,
                 'content_id': 'content',
                 'language_code': 'bn',
-                'translation_html': '<p>Translated text in Bangla</p>',
-                'data_format': 'html',
-                'needs_update': False
+                'original_content': '<p>Original content</p>',
+                'translated_content': '<p>Translated text in Bangla</p>',
+                'data_format': 'html'
             })
         ]
         exp_services.update_exploration(
@@ -3115,7 +3115,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         # Mark all translations for a state as needing update.
         update_change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+            'cmd': exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
             'state_name': self.init_state_name,
             'content_id': 'content'
         })]

@@ -134,8 +134,7 @@ angular.module('oppia').component('stateTranslationEditor', {
             contentId, languageCode);
           ExplorationStatesService.saveWrittenTranslation(
             contentId, newWrittenTranslation.dataFormat, languageCode,
-            stateName, newWrittenTranslation.translation,
-            newWrittenTranslation.needsUpdate);
+            stateName, newWrittenTranslation.translation);
           StateWrittenTranslationsService.saveDisplayedValue();
           TranslationStatusService.refresh();
         }
