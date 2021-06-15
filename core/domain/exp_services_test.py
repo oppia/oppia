@@ -3045,8 +3045,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'state_name': self.init_state_name,
             'content_id': 'content',
             'language_code': 'hi',
-            'original_content': '<p>original text</p>',
-            'translated_content': '<p>Translated text</p>',
+            'content_html': '<p>original text</p>',
+            'translation_html': '<p>Translated text</p>',
             'data_format': 'html'
         }))
         exp_services.update_exploration(
@@ -3079,7 +3079,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'state_name': self.init_state_name,
                 'content_id': 'content',
                 'language_code': 'hi',
-                'original_content': '<p>Original content</p>',
+                'content_html': '<p>Original content</p>',
                 'translation_html': '<p>Translated text in Hindi</p>',
                 'data_format': 'html'
             }),
@@ -3088,8 +3088,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'state_name': self.init_state_name,
                 'content_id': 'content',
                 'language_code': 'bn',
-                'original_content': '<p>Original content</p>',
-                'translated_content': '<p>Translated text in Bangla</p>',
+                'content_html': '<p>Original content</p>',
+                'translation_html': '<p>Translated text in Bangla</p>',
                 'data_format': 'html'
             })
         ]

@@ -257,14 +257,14 @@ angular.module('oppia').factory('ChangeListService', [
        * @param {string} dataFormat - The data format of the content.
        * @param {string} languageCode - The language code.
        * @param {string} stateName - The current state name.
-       * @param {string} translatedContent - The translated content.
+       * @param {string} translationHtml - The translated content.
        */
       addWrittenTranslation: function(
-          contentId, dataFormat, languageCode, stateName, translatedContent) {
+          contentId, dataFormat, languageCode, stateName, translationHtml) {
         // Written translations submitted via the translation tab in the
-        // exploration editor need not pass original_content because
+        // exploration editor need not pass content_html because
         // translations submitted via this method do not undergo a review. The
-        // original_content is only required when submitting translations via
+        // content_html is only required when submitting translations via
         // the contributor dashboard because such translation suggestions
         // undergo a manual review process where the reviewer will need to look
         // at the corresponding original content at the time of submission.
@@ -274,8 +274,8 @@ angular.module('oppia').factory('ChangeListService', [
           data_format: dataFormat,
           language_code: languageCode,
           state_name: stateName,
-          original_content: 'N/A',
-          translated_content: translatedContent
+          content_html: 'N/A',
+          translation_html: translationHtml
         });
       },
       /**

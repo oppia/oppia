@@ -99,8 +99,8 @@ export interface ExplorationChangeAddWrittenTranslation {
   'content_id': string;
   'data_format': string;
   'language_code': string;
-  'original_content': string;
-  'translated_content': string;
+  'content_html': string;
+  'translation_html': string;
 }
 
 export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {

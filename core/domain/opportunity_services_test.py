@@ -59,8 +59,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         'state_name': 'End State',
         'content_id': 'content',
         'language_code': 'hi',
-        'original_content': '<p>Original content</p>',
-        'translated_content': '<p>This is translated html.</p>',
+        'content_html': '<p>Original content</p>',
+        'translation_html': '<p>This is translated html.</p>',
         'data_format': 'html'
     }
 
@@ -444,8 +444,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
-                'original_content': '<p><strong>Test content</strong></p>',
-                'translated_content': '<p>Translated text</p>',
+                'content_html': '<p><strong>Test content</strong></p>',
+                'translation_html': '<p>Translated text</p>',
                 'data_format': 'html'
             }),
             exp_domain.ExplorationChange({
@@ -462,7 +462,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'state_name': 'End State',
                 'content_id': 'content',
                 'language_code': 'hi',
-                'original_content': '<p><strong>Test content</strong></p>',
+                'content_html': '<p><strong>Test content</strong></p>',
                 'translation_content': '<p>Translated text</p>',
                 'data_format': 'html'
             }),

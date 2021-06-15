@@ -91,7 +91,7 @@ CMD_DELETE_STATE = 'delete_state'
 # parameters.
 DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
-# 'needs_update', 'data_format', 'original_content' and 'translated_content'
+# 'needs_update', 'data_format', 'content_html' and 'translation_html'
 # parameters.
 CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
 # This takes additional 'content_id' and 'state_name' parameters.
@@ -296,8 +296,8 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_ADD_WRITTEN_TRANSLATION,
         'required_attribute_names': [
-            'state_name', 'content_id', 'language_code', 'original_content',
-            'translated_content', 'data_format'],
+            'state_name', 'content_id', 'language_code', 'content_html',
+            'translation_html', 'data_format'],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {

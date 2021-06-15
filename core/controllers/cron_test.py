@@ -405,8 +405,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': self.language_code,
-            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translated_content': self.default_translation_html,
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': self.default_translation_html,
             'data_format': 'html'
         }
 
@@ -577,8 +577,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
             'language_code': language_code,
-            'original_content': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
-            'translated_content': '<p>This is the translated content.</p>',
+            'content_html': feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+            'translation_html': '<p>This is the translated content.</p>',
             'data_format': 'html'
         }
 

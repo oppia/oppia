@@ -858,8 +858,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                 'state_name': 'Introduction',
                 'content_id': 'content',
                 'language_code': 'hi',
-                'original_content': '<p>This is a content.</p>',
-                'translated_content': '<p>This is translated html.</p>',
+                'content_html': '<p>This is a content.</p>',
+                'translation_html': '<p>This is translated html.</p>',
                 'data_format': 'html'
             },
             'score_category': 'translation.Algebra',
@@ -905,8 +905,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'content_id': 'content',
             'language_code': 'hi',
-            'original_content': '<p>This is a content.</p>',
-            'translated_content': '<p>This is the updated translated html.</p>',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
         with self.assertRaisesRegexp(
@@ -930,8 +930,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'en',
-            'original_content': '<p>This is a content.</p>',
-            'translated_content': '<p>This is the updated translated html.</p>',
+            'content_html': '<p>This is a content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
         with self.assertRaisesRegexp(
@@ -955,8 +955,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'en',
-            'original_content': '<p>This is the changed content.</p>',
-            'translated_content': '<p>This is the updated translated html.</p>',
+            'content_html': '<p>This is the changed content.</p>',
+            'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
         with self.assertRaisesRegexp(
@@ -1550,8 +1550,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'state_name': 'Introduction',
             'content_id': 'content',
             'language_code': 'hi',
-            'original_content': html_content,
-            'translated_content': '<p>This is translated html.</p>',
+            'content_html': html_content,
+            'translation_html': '<p>This is translated html.</p>',
             'data_format': 'html'
         }
         suggestion = suggestion_registry.SuggestionTranslateContent(

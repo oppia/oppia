@@ -167,8 +167,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State 3',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'original_content': '<p>old content html</p>',
-                    'translated_content': '<p>In Hindi</p>',
+                    'content_html': '<p>old content html</p>',
+                    'translation_html': '<p>In Hindi</p>',
                     'data_format': 'html'
                 },
                 'description': 'change to state 3',
@@ -728,8 +728,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State 1',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'original_content': text_to_translate,
-                    'translated_content': (
+                    'content_html': text_to_translate,
+                    'translation_html': (
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&quot;translation_image.png&quot;" '
                         'caption-with-value="&quot;&quot;" '
@@ -1881,8 +1881,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'original_content': '<p>new content html</p>',
-                    'translated_content': '<p>new content html in Hindi</p>',
+                    'content_html': '<p>new content html</p>',
+                    'translation_html': '<p>new content html in Hindi</p>',
                     'data_format': 'html'
                 },
                 'description': 'Adds translation',
@@ -2090,8 +2090,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                     'state_name': 'Introduction',
                     'content_id': 'content',
                     'language_code': 'hi',
-                    'original_content': '<p>new content html</p>',
-                    'translated_content': '<p>new content html in Hindi</p>',
+                    'content_html': '<p>new content html</p>',
+                    'translation_html': '<p>new content html in Hindi</p>',
                     'data_format': 'html'
                 },
                 'description': 'Adds translation',
