@@ -25,7 +25,6 @@
  */
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import 'firebase/auth';
-import 'hammerjs';
 import 'leaflet/dist/leaflet.css';
 import { ContextService } from 'services/context.service';
 require('app.constants.ajs.ts');
@@ -43,7 +42,7 @@ require(
   'side-navigation-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.directive.ts');
+  'top-navigation-bar.component.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
@@ -412,7 +411,6 @@ angular.module('oppia').config([
       .translations('en', DEFAULT_TRANSLATIONS)
       .fallbackLanguage('en')
       .determinePreferredLanguage()
-      .useCookieStorage()
       // The messageformat interpolation method is necessary for pluralization.
       // Is optional and should be passed as argument to the translate call. See
       // https://angular-translate.github.io/docs/#/guide/14_pluralization
