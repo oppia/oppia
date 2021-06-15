@@ -119,12 +119,10 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      browser.waitForAngularEnabled(true);
       await holdCtrlAndPressKey('0');
       await waitFor.urlRedirection(GET_STARTED_URL);
 
@@ -180,12 +178,10 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      browser.waitForAngularEnabled(true);
       await holdCtrlAndPressKey('1');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
 
@@ -241,12 +237,10 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      browser.waitForAngularEnabled(true);
       await holdCtrlAndPressKey('2');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
 
@@ -302,12 +296,10 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
-      browser.waitForAngularEnabled(true);
       await holdCtrlAndPressKey('3');
       await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
 
@@ -363,68 +355,54 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
 
       await browser.get('privacy-policy');
       await waitFor.urlRedirection(PRIVACY_POLICY_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
-      browser.waitForAngularEnabled(false);
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
 
       await browser.get('learner-dashboard');
       await waitFor.urlRedirection(LEARNER_DASHBOARD_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
-      browser.waitForAngularEnabled(false);
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
 
       await browser.get('donate');
       await waitFor.urlRedirection(DONATE_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
-      browser.waitForAngularEnabled(false);
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
 
       await browser.get('notifications');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
-      browser.waitForAngularEnabled(false);
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
 
       await browser.get('creator-dashboard');
       await waitFor.urlRedirection(CREATOR_DASHBOARD_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
-      browser.waitForAngularEnabled(false);
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
 
       await browser.get('community-library');
       await waitFor.urlRedirection(COMMUNITY_LIBRARY_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
 
       await holdCtrlAndPressKey('4');
-      browser.waitForAngularEnabled(false);
       await waitFor.urlRedirection(ABOUT_URL);
-      browser.waitForAngularEnabled(true);
     });
 
   it('should navigate to the notifications page when ctrl+5 is pressed',
@@ -436,11 +414,9 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
-      browser.waitForAngularEnabled(true);
 
       await holdCtrlAndPressKey('5');
       await waitFor.urlRedirection(NOTIFICATIONS_URL);
@@ -497,11 +473,9 @@ describe('screenreader and keyboard user accessibility features', function() {
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);
 
-      browser.waitForAngularEnabled(false);
       await browser.get('about');
       await waitFor.urlRedirection(ABOUT_URL);
       await waitFor.presenceOf(oppiaContentContainer, ERROR_MESSAGE);
-      browser.waitForAngularEnabled(true);
 
       await holdCtrlAndPressKey('6');
       await waitFor.urlRedirection(PREFERENCES_URL);

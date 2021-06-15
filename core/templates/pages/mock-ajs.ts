@@ -28,6 +28,8 @@
 
 // TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 
+import { VERSION } from '@angular/core';
+
 let mockAngular = {
   component: () => mockAngular,
   config: () => mockAngular,
@@ -40,7 +42,8 @@ let mockAngular = {
   requires: () => [],
   run: () => mockAngular,
   service: () => mockAngular,
-  value: () => mockAngular
+  value: () => mockAngular,
+  version: VERSION
 };
 // This throws "Property 'angular' does not exist on type 'Window & typeof
 // globalThis'." when the `as unknown as ...` is not used.
