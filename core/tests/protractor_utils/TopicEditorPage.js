@@ -237,8 +237,11 @@ var TopicEditorPage = function() {
   };
 
   this.deleteSubtopicWithIndex = async function(index) {
+    await waitFor.visibilityOf(
+      subtopicEditOptions.first(),
+      'Subtopic Edit Options taking too long to appear');
     var subtopicEditOptionBox = subtopicEditOptions.get(index);
-    await subtopicEditOptionBox.click();
+    await action.click('Subtopic Edit Option Box', subtopicEditOptionBox);
     await waitFor.elementToBeClickable(
       deleteSubtopicButton,
       'Delete subtopic button taking too long to be clickable');
@@ -521,6 +524,8 @@ var TopicEditorPage = function() {
       saveTopicButton,
       'Save topic button takes too long to be clickable');
     await saveTopicButton.click();
+    await waitFor.visibilityOf(
+      commitMessageField, 'Commit Message field taking too long to appear.');
     await commitMessageField.sendKeys(commitMessage);
 
     await waitFor.elementToBeClickable(
