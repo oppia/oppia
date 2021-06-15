@@ -31,6 +31,7 @@
 import { VERSION } from '@angular/core';
 
 let mockAngular = {
+  $$minErr: () => mockAngular,
   component: () => mockAngular,
   config: () => mockAngular,
   constant: () => mockAngular,
@@ -38,7 +39,9 @@ let mockAngular = {
   directive: () => mockAngular,
   factory: () => mockAngular,
   filter: () => mockAngular,
+  info: () => mockAngular,
   module: () => mockAngular,
+  provider: () => mockAngular,
   requires: () => [],
   run: () => mockAngular,
   service: () => mockAngular,

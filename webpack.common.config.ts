@@ -250,7 +250,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['contact'],
       filename: 'contact-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Contact the Oppia team, submit feedback, and learn ' +
@@ -285,7 +284,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['delete_account'],
       filename: 'delete-account-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/delete-account-page/' +
@@ -296,7 +294,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['donate'],
       filename: 'donate-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Donate to The Oppia Foundation to enable more ' +
@@ -415,7 +412,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['get_started'],
       filename: 'get-started-page.mainpage.html',
-      hybrid: true,
       meta: {
         name: defaultMeta.name,
         description: 'Learn how to get started using Oppia.'
@@ -428,7 +424,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['landing'],
       filename: 'topic-landing-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix + '/pages/landing-pages/topic-landing-page/' +
@@ -655,7 +650,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['stewards'],
       filename: 'stewards-landing-page.mainpage.html',
-      hybrid: true,
       meta: defaultMeta,
       template:
         commonPrefix +
