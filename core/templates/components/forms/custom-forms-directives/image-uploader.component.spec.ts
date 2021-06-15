@@ -24,7 +24,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
 
 
-fdescribe('ImageUploaderComponent', () => {
+describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
   let fixture: ComponentFixture<ImageUploaderComponent>;
   let igs: IdGenerationService;
