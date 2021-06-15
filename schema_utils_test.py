@@ -37,6 +37,7 @@ SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
 SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
 SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
+SCHEMA_KEY_DEFAULT_VALUE = schema_utils.SCHEMA_KEY_DEFAULT_VALUE
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
 # This key is used for 'type: custom' objects, as a way of indicating how
@@ -51,7 +52,7 @@ SCHEMA_KEY_REPLACEMENT_UI_CONFIG = 'replacement_ui_config'
 # The following keys are always accepted as optional keys in any schema.
 OPTIONAL_SCHEMA_KEYS = [
     SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG,
-    SCHEMA_KEY_VALIDATORS]
+    SCHEMA_KEY_VALIDATORS, SCHEMA_KEY_DEFAULT_VALUE]
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 # 'Custom' objects undergo an entirely separate normalization process, defined
@@ -970,6 +971,37 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (None, 'Expected dict, received None'),
             (123, 'Expected dict, received 123'),
             ('abc', 'Expected dict, received abc')]
+
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_dict_schema_with_default_value(self):
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_DICT,
+            'properties': [{
+                'name': 'arg_with_default_none',
+                'schema': {
+                    'type': 'unicode',
+                    'default_value': None
+                }
+            }, {
+                'name': 'arg_with_some_default',
+                'schema': {
+                    'type': 'unicode',
+                    'default_value': 'arbitary_text'
+                }
+            }]
+        }
+
+        # Missing args should not raise errors if SCHEMA_KEY_DEFAULT_VALUE
+        # is present in schema.
+        mappings = [
+            ({}, {
+                'arg_with_some_default': 'arbitary_text'
+            })
+        ]
+
+        invalid_values_with_error_messages = []
 
         self.check_normalization(
             schema, mappings, invalid_values_with_error_messages)

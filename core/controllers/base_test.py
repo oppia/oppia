@@ -1280,7 +1280,14 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
 
     class MockHandlerForTestingPageIframing(base.BaseHandler):
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {
+                'iframe_restriction': {
+                    'type': 'unicode',
+                    'default_value': None
+                }
+            }
+        }
 
         def get(self):
             iframe_restriction = self.request.get(
@@ -1664,8 +1671,8 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(handlers_to_remove, [], error_msg)
 
 
-class SchemaValidationMockHandlerTests(test_utils.GenericTestBase):
-    """Tests to check schema validation system."""
+class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
+    """Tests to check schema validation architecture for url path elements."""
 
     exp_id = 'exp_id'
 
@@ -1695,18 +1702,33 @@ class SchemaValidationMockHandlerTests(test_utils.GenericTestBase):
         def get(self, exploration_id):
             return self.render_json({'exploration_id': exploration_id})
 
+    class MockHandlerWithMissingUrlPathSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_play_exploration
+        def get(self, exploration_id):
+            return self.render_json({'exploration_id': exploration_id})
+
     def setUp(self):
-        super(SchemaValidationMockHandlerTests, self).setUp()
+        super(SchemaValidationUrlArgsTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock_play_exploration/<exploration_id>',
                     self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+
         self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock_play_exploration/<exploration_id>',
                     self.MockHandlerWithValidSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp3 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration/<exploration_id>',
+                    self.MockHandlerWithMissingUrlPathSchema)],
+                debug=feconf.DEBUG))
 
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
@@ -1728,4 +1750,90 @@ class SchemaValidationMockHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.exp_id,
                     expected_status_int=200)
+        self.logout()
+
+    def test_cannot_access_exploration_with_missing_schema(self):
+        self.login(self.OWNER_EMAIL)
+        error_msg = (
+            'Please provide schema for url path args in '
+            'MockHandlerWithMissingUrlPathSchema handler class')
+
+        with self.swap(self, 'testapp', self.mock_testapp3):
+            response = self.get_json('/mock_play_exploration/%s' % self.exp_id,
+                expected_status_int=500)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+
+class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
+    """Tests to check schema validation architecture for request args."""
+
+    exp_id = 'exp_id'
+
+    class MockHandlerWithInvalidSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {
+            'GET': {
+                'exploration_id': {
+                'type': 'int'
+                }
+            }
+        }
+
+        @acl_decorators.can_play_exploration
+        def get(self):
+            exploration_id = self.request.get('exploration_id')
+            return self.render_json({'exploration_id': exploration_id})
+
+    class MockHandlerWithMissingRequestSchema(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {}
+
+        @acl_decorators.can_play_exploration
+        def get(self):
+            exploration_id = self.request.get('exploration_id')
+            return self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(SchemaValidationRequestArgsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_testapp1 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithInvalidSchema)], debug=feconf.DEBUG))
+
+        self.mock_testapp2 = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock_play_exploration',
+                    self.MockHandlerWithMissingRequestSchema)],
+                debug=feconf.DEBUG))
+
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+
+    def test_cannot_access_exploration_with_incorrect_schema(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp1):
+            response = self.get_json(
+                '/mock_play_exploration?exploration_id=%s' % self.exp_id,
+                    expected_status_int=400)
+            error_msg = (
+                'Schema validation for \'exploration_id\' failed: Could not '
+                'convert unicode to int: %s' % self.exp_id)
+            self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_cannot_access_exploration_with_missing_schema(self):
+        self.login(self.OWNER_EMAIL)
+        error_msg = (
+            'Provide schema for GET method in '
+            'MockHandlerWithMissingRequestSchema handler class.')
+
+        with self.swap(self, 'testapp', self.mock_testapp2):
+            response = self.get_json(
+                '/mock_play_exploration?exploration_id=%s' % self.exp_id,
+                    expected_status_int=500)
+            self.assertEqual(response['error'], error_msg)
         self.logout()

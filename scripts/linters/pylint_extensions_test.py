@@ -3394,9 +3394,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
 
         schemaless_class_node = astroid.extract_node(
             """
-            class BaseHandler:
-                pass
-            class FakeClass(BaseHandler): #@
+            class FakeClass(base.BaseHandler): #@
                 URL_PATH_ARGS_SCHEMAS = {}
                 HANDLER_ARGS_SCHEMAS = {
                     'GET': {}
@@ -3404,4 +3402,51 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
             """)
 
         with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_classdef(schemaless_class_node)
+
+    def test_list_of_non_schema_handlers_do_not_raise_errors(self):
+        """Handler class name in list of NON_SCHEMA_HANDLERS do not raise
+        error for missing schemas.
+        """
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowHandlerWithoutSchema)
+        checker_test_object.setup_method()
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class SessionBeginHandler(base.BaseHandler): #@
+                def get(self):
+                    return
+            """)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_classdef(schemaless_class_node)
+
+    def test_non_schema_handlers_with_BaseHandler_as_parent_raise_error(self):
+        """Handlers which are child classes of BaseHandler must have schema
+        defined locally into the class.
+        """
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowHandlerWithoutSchema)
+        checker_test_object.setup_method()
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseClass(base.BaseHandler):
+                HANDLER_ARGS_SCHEMAS = {}
+                URL_PATH_ARGS_SCHEMA = {}
+
+            class FakeClass(BaseClass): #@
+                HANDLER_ARGS_SCHEMAS = {}
+            """)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-schema-for-url-path-elements',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
             checker_test_object.checker.visit_classdef(schemaless_class_node)
