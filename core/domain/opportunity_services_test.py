@@ -59,7 +59,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         'state_name': 'End State',
         'content_id': 'content',
         'language_code': 'hi',
-        'content_html': '<p>Original content</p>',
+        'content_html': '',
         'translation_html': '<p>This is translated html.</p>',
         'data_format': 'html'
     }
@@ -463,7 +463,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'content_id': 'content',
                 'language_code': 'hi',
                 'content_html': '<p><strong>Test content</strong></p>',
-                'translation_content': '<p>Translated text</p>',
+                'translation_html': '<p>Translated text</p>',
                 'data_format': 'html'
             }),
         ]
