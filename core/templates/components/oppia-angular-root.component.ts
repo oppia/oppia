@@ -256,9 +256,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       'lang', this.currentLang);
 
     // Initialize translations.
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => {
         this.translateService.use(code);

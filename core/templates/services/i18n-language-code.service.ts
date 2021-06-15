@@ -18,6 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class I18nLanguageCodeService {
    * complete.
    */
   static languageCodeChangeEventEmitter = new EventEmitter<string> ();
-  static languageCode = 'en';
+  static languageCode: string = AppConstants.DEFAULT_LANGUAGE_CODE;
 
   private _preferredLanguageCodesLoadedEventEmitter =
     new EventEmitter<string[]>();
