@@ -268,12 +268,12 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
     var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
-    await pageEditorInput.click();
-    await pageEditorInput.sendKeys(htmlContent);
-    await waitFor.elementToBeClickable(
-      confirmSubtopicCreationButton,
-      'Confirm subtopic creation button takes too long to be clickable');
-    await confirmSubtopicCreationButton.click();
+    await action.click(
+      'Page Editor Input', pageEditorInput);
+    await action.sendKeys(
+      'Page Editor Input', pageEditorInput, htmlContent);
+    await action.click(
+      'Confrim Subtopic Creation Button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
