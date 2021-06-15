@@ -17,12 +17,12 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { TranslatePipe } from 'filters/translate.pipe';
 import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
 import { UrlParamsType, UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { CreateActivityButtonComponent } from './create-activity-button.component';
 
 /**
@@ -117,7 +117,7 @@ describe('CreateActivityButtonComponent', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         CreateActivityButtonComponent,
-        TranslatePipe
+        MockTranslatePipe
       ],
       providers: [
         UserService,
