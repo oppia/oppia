@@ -3772,8 +3772,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         'content_html': '<p>old content html</p>',
         'state_name': 'State 1',
         'translation_html': '<p>Translation for content.</p>',
-        'data_format': 'html',
-        'needs_update': False
+        'data_format': 'html'
     }
 
     class MockHandler(base.BaseHandler):

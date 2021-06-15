@@ -91,8 +91,7 @@ CMD_DELETE_STATE = 'delete_state'
 # parameters.
 DEPRECATED_CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'state_name', 'content_id', 'language_code',
-# 'needs_update', 'data_format', 'content_html' and 'translation_html'
-# parameters.
+# 'data_format', 'content_html' and 'translation_html' parameters.
 CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation'
 # This takes additional 'content_id' and 'state_name' parameters.
 CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (

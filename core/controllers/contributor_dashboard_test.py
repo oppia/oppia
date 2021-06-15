@@ -466,8 +466,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'language_code': 'hi',
             'content_html': '',
             'translation_html': '<p>Translation for content.</p>',
-            'data_format': 'html',
-            'needs_update': False
+            'data_format': 'html'
         }
         suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
