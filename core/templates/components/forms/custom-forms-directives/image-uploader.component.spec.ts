@@ -37,7 +37,7 @@ describe('ImageUploaderComponent', () => {
         ImageUploaderComponent,
         MockTranslatePipe,
       ],
-      providers:[
+      providers: [
         {provide: WindowRef, useValue: windowRef}
       ]
     }).compileComponents();
@@ -76,7 +76,7 @@ describe('ImageUploaderComponent', () => {
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
     let dataTransfer = new DataTransfer();
-    const validFile = new File(['image'], 'image.jpg',{type: 'image/jpg'});
+    const validFile = new File(['image'], 'image.jpg', {type: 'image/jpg'});
     dataTransfer.items.add(validFile);
 
     spyOn(component.fileChanged, 'emit');
@@ -95,7 +95,7 @@ describe('ImageUploaderComponent', () => {
 
     let dataTransfer = new DataTransfer();
     const file = new File(
-      ['image'], 'image.svg',{type: 'image/svg+xml'});
+      ['image'], 'image.svg', {type: 'image/svg+xml'});
     dataTransfer.items.add(file);
 
     spyOn(component.fileChanged, 'emit');
@@ -105,7 +105,7 @@ describe('ImageUploaderComponent', () => {
     }));
 
     expect(component.errorMessage).toBe(
-      'This image format is not supported')
+      'This image format is not supported');
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
   });
 
@@ -116,7 +116,7 @@ describe('ImageUploaderComponent', () => {
 
     let dataTransfer = new DataTransfer();
     const fileWithDiffNameAndExtension = new File(
-      ['image'], 'image.png',{type: 'image/svg+xml'});
+      ['image'], 'image.png', {type: 'image/svg+xml'});
     dataTransfer.items.add(fileWithDiffNameAndExtension);
 
     spyOn(component.fileChanged, 'emit');
@@ -126,7 +126,7 @@ describe('ImageUploaderComponent', () => {
     }));
 
     expect(component.errorMessage).toBe(
-      'This image format does not match the filename extension.')
+      'This image format does not match the filename extension.');
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
   });
 
@@ -137,7 +137,7 @@ describe('ImageUploaderComponent', () => {
 
     let dataTransfer = new DataTransfer();
     const file = new File(
-      ['image'], 'image.jpeg',{type: 'image/jpeg'});
+      ['image'], 'image.jpeg', {type: 'image/jpeg'});
     dataTransfer.items.add(file);
 
     spyOn(component.fileChanged, 'emit');
@@ -147,7 +147,7 @@ describe('ImageUploaderComponent', () => {
     }));
 
     expect(component.errorMessage).toBe(
-      'mp3 is not in the list of allowed image formats.')
+      'mp3 is not in the list of allowed image formats.');
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
   });
 
@@ -157,7 +157,7 @@ describe('ImageUploaderComponent', () => {
 
     let dataTransfer = new DataTransfer();
     const fileWithInvalidFormat = new File(
-      ['image'], 'image.mp3',{type: 'mp3'});
+      ['image'], 'image.mp3', {type: 'mp3'});
     dataTransfer.items.add(fileWithInvalidFormat);
 
     spyOn(component.fileChanged, 'emit');
@@ -167,7 +167,7 @@ describe('ImageUploaderComponent', () => {
     }));
 
     expect(component.errorMessage).toBe(
-      'This file is not recognized as an image')
+      'This file is not recognized as an image');
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
   });
 
@@ -177,7 +177,7 @@ describe('ImageUploaderComponent', () => {
 
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File(
-      [''], 'image.jpg',{type: 'image/jpg'});
+      [''], 'image.jpg', {type: 'image/jpg'});
 
     Object.defineProperty(fileWithLargeSize, 'size', {value: 100 * 1024 + 100});
 
@@ -190,7 +190,7 @@ describe('ImageUploaderComponent', () => {
     }));
 
     expect(component.errorMessage).toBe(
-      'The maximum allowed file size is 100 KB (100.1 KB given).')
+      'The maximum allowed file size is 100 KB (100.1 KB given).');
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
   });
 
@@ -234,7 +234,7 @@ describe('ImageUploaderComponent', () => {
 
   it('should upload an image', () => {
     component.imageInputRef.nativeElement = {
-      files: [new File(['image'], 'image.jpg',{type: 'image/jpg'})]
+      files: [new File(['image'], 'image.jpg', {type: 'image/jpg'})]
     };
     component.imageInputRef.nativeElement.value = 'image.jpg';
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];

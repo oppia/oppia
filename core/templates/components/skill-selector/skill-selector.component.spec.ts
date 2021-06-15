@@ -39,23 +39,27 @@ describe('SkillSelectorComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should initialize topic and subtopic filters', () => {
+  it('should initialize topic and subtopic filters to unchecked state', () => {
     component.categorizedSkills = {
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ],
-        'subtopic2': [
+        subtopic2: [
           ShortSkillSummary.create('skill3', 'Skill 3 description.')
         ]
       }
     };
 
+    expect(component.topicFilterList).toEqual([]);
+    expect(component.subTopicFilterDict).toEqual({});
+
     component.ngOnInit();
 
+    // Expecting all topics and subtopics to be unchecked after initialization.
     expect(component.topicFilterList).toEqual([
       {
         topicName: 'topic1',
@@ -63,7 +67,7 @@ describe('SkillSelectorComponent', () => {
       }
     ]);
     expect(component.subTopicFilterDict).toEqual({
-      'topic1': [
+      topic1: [
         {
           subTopicName: 'uncategorized',
           checked: false
@@ -77,38 +81,41 @@ describe('SkillSelectorComponent', () => {
           checked: false
         }
       ]
-    })
+    });
   });
 
   it('should check if skill is empty', () => {
     let categorizedSkills = {
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ],
-        'subtopic2': []
+        subtopic2: []
       }
     };
 
-    expect(component.checkIfEmpty(categorizedSkills.topic1.subtopic1)).toBe(false);
-    expect(component.checkIfEmpty(categorizedSkills.topic1.subtopic2)).toBe(true);
+    expect(component.checkIfEmpty(
+      categorizedSkills.topic1.subtopic1)).toBe(false);
+    expect(component.checkIfEmpty(
+      categorizedSkills.topic1.subtopic2)).toBe(true);
   });
 
   it('should check if topic is empty', () => {
+    // An empty topic must have an empty 'uncategorized' subtopic.
     component.currCategorizedSkills = {
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ]
       },
-      'topic2': {
-        'uncategorized': []
+      topic2: {
+        uncategorized: []
       }
     };
 
@@ -128,16 +135,16 @@ describe('SkillSelectorComponent', () => {
   it('should display subtopics from all topics in the subtopic filter if' +
     ' no topic is checked', () => {
     component.categorizedSkills = {
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ]
       },
-      'topic2': {
-        'uncategorized': [
+      topic2: {
+        uncategorized: [
           ShortSkillSummary.create('skill4', 'Skill 4 description.')
         ]
       }
@@ -149,8 +156,9 @@ describe('SkillSelectorComponent', () => {
 
     component.updateSkillsListOnTopicFilterChange();
 
+    // All subtopics from all topics is included in the subtopic filter dict.
     expect((component.subTopicFilterDict)).toEqual({
-      'topic1': [
+      topic1: [
         {
           subTopicName: 'uncategorized',
           checked: false
@@ -160,7 +168,7 @@ describe('SkillSelectorComponent', () => {
           checked: false
         }
       ],
-      'topic2': [
+      topic2: [
         {
           subTopicName: 'uncategorized',
           checked: false
@@ -171,30 +179,32 @@ describe('SkillSelectorComponent', () => {
 
   it('should update skill list when user filters skills by only topics', () => {
     component.categorizedSkills = {
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ],
-        'subtopic2': [
+        subtopic2: [
           ShortSkillSummary.create('skill3', 'Skill 3 description.')
         ]
       },
-      'topic2': {
-        'uncategorized': [
+      topic2: {
+        uncategorized: [
           ShortSkillSummary.create('skill4', 'Skill 4 description.')
         ],
-        'subtopic3': [
+        subtopic3: [
           ShortSkillSummary.create('skill5', 'Skill 5 description.')
         ],
-        'subtopic4': [
+        subtopic4: [
           ShortSkillSummary.create('skill6', 'Skill 6 description.')
         ]
       }
     };
     component.ngOnInit();
+
+    // User checks the 'topic1' radio button.
     component.topicFilterList = [
       {
         topicName: 'topic1',
@@ -209,14 +219,14 @@ describe('SkillSelectorComponent', () => {
     component.updateSkillsListOnTopicFilterChange();
 
     expect(component.currCategorizedSkills).toEqual({
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ],
-        'subtopic2': [
+        subtopic2: [
           ShortSkillSummary.create('skill3', 'Skill 3 description.')
         ]
       }
@@ -226,25 +236,25 @@ describe('SkillSelectorComponent', () => {
   it('should update skill list when user filters skills by' +
     ' topics and subtopics', () => {
     component.categorizedSkills = {
-      'topic1': {
-        'uncategorized': [
+      topic1: {
+        uncategorized: [
           ShortSkillSummary.create('skill1', 'Skill 1 description.')
         ],
-        'subtopic1': [
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ],
-        'subtopic2': [
+        subtopic2: [
           ShortSkillSummary.create('skill3', 'Skill 3 description.')
         ]
       },
-      'topic2': {
-        'uncategorized': [
+      topic2: {
+        uncategorized: [
           ShortSkillSummary.create('skill4', 'Skill 4 description.')
         ],
-        'subtopic3': [
+        subtopic3: [
           ShortSkillSummary.create('skill5', 'Skill 5 description.')
         ],
-        'subtopic4': [
+        subtopic4: [
           ShortSkillSummary.create('skill6', 'Skill 6 description.')
         ]
       }
@@ -252,28 +262,28 @@ describe('SkillSelectorComponent', () => {
 
     component.ngOnInit();
 
+    // User checks 'topic1' radio button and 'subtopic1' radio button.
     component.topicFilterList = [
       {
         topicName: 'topic1',
         checked: true
       }
     ];
-
     component.subTopicFilterDict = {
-      'topic1': [
+      topic1: [
         {
           subTopicName: 'subtopic1',
           checked: true
         }
       ]
-    }
+    };
 
     component.updateSkillsListOnSubtopicFilterChange();
 
     expect((component.currCategorizedSkills)).toEqual({
-      'topic1': {
-        'uncategorized': [],
-        'subtopic1': [
+      topic1: {
+        uncategorized: [],
+        subtopic1: [
           ShortSkillSummary.create('skill2', 'Skill 2 description.')
         ]
       }
@@ -288,9 +298,8 @@ describe('SkillSelectorComponent', () => {
         checked: true
       }
     ];
-
     component.subTopicFilterDict = {
-      'topic1': [
+      topic1: [
         {
           subTopicName: 'subtopic1',
           checked: true
@@ -307,7 +316,7 @@ describe('SkillSelectorComponent', () => {
       }
     ]);
     expect(component.subTopicFilterDict).toEqual({
-      'topic1': [
+      topic1: [
         {
           subTopicName: 'subtopic1',
           checked: false
@@ -322,14 +331,12 @@ describe('SkillSelectorComponent', () => {
       ShortSkillSummary.create('skill2', 'Skill 2 description.'),
       ShortSkillSummary.create('skill3', 'Skill 2 and 3 description.')
     ];
-
     let searchText = 'skill 2';
-
 
     expect(component.searchInSubtopicSkills(
       inputShortSkillSummaries, searchText)).toEqual([
-        ShortSkillSummary.create('skill2', 'Skill 2 description.'),
-        ShortSkillSummary.create('skill3', 'Skill 2 and 3 description.')
+      ShortSkillSummary.create('skill2', 'Skill 2 description.'),
+      ShortSkillSummary.create('skill3', 'Skill 2 and 3 description.')
     ]);
   });
 
