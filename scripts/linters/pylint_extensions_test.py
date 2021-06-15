@@ -3340,3 +3340,68 @@ class DisallowDunderMetaclassCheckerTests(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_classdef(metaclass_node)
+
+
+class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
+
+    def test_non_schema_handlers_for_request_args_raise_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowHandlerWithoutSchema)
+        checker_test_object.setup_method()
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class FakeClass(base.BaseHandler): #@
+                URL_PATH_ARGS_SCHEMAS = {}
+            """)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-schema-for-handler-args',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            checker_test_object.checker.visit_classdef(schemaless_class_node)
+
+    def test_non_schema_handlers_for_url_path_args_raise_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowHandlerWithoutSchema)
+        checker_test_object.setup_method()
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class FakeClass(base.BaseHandler): #@
+                HANDLER_ARGS_SCHEMAS = {}
+            """)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-schema-for-url-path-elements',
+                node=schemaless_class_node,
+                args=(schemaless_class_node.name)
+            )
+        ):
+            checker_test_object.checker.visit_classdef(schemaless_class_node)
+
+    def test_handlers_with_schema_do_not_raise_error(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowHandlerWithoutSchema)
+        checker_test_object.setup_method()
+
+        schemaless_class_node = astroid.extract_node(
+            """
+            class BaseHandler:
+                pass
+            class FakeClass(BaseHandler): #@
+                URL_PATH_ARGS_SCHEMAS = {}
+                HANDLER_ARGS_SCHEMAS = {
+                    'GET': {}
+                }
+            """)
+
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_classdef(schemaless_class_node)

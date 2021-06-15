@@ -25,6 +25,7 @@ import logging
 import os
 import time
 
+from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
 from core.domain import config_domain
@@ -144,6 +145,9 @@ class BaseHandler(webapp2.RequestHandler):
     POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = None
+    HANDLER_ARGS_SCHEMAS = None
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
         # Set self.request, self.response and self.app.
@@ -295,7 +299,70 @@ class BaseHandler(webapp2.RequestHandler):
                 self.handle_exception(e, self.app.debug)
                 return
 
+        try:
+            self.validate_args_schema()
+        except Exception as e:
+            self.handle_exception(e, self.app.debug)
+            return
+
         super(BaseHandler, self).dispatch()
+
+    def validate_args_schema(self):
+        """Validates schema for controller layer handler class arguments.
+
+        Raises:
+            InvalidInputException. Schema validation failed.
+            NotImplementedError. Schema is not provided in handler class.
+        """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        handler_args = self.payload
+        url_path_args = self.request.route_kwargs
+        non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
+
+        if handler_class_name in non_schema_handlers:
+            return
+
+        if self.URL_PATH_ARGS_SCHEMAS is None:
+            raise NotImplementedError(
+                'Please provide schema for url path args in %s '
+                'handler class' % (handler_class_name))
+
+        # For html handlers, extra args are allowed (to accommodate
+        # e.g. utm parameters which are not used by the backend but
+        # needed for analytics).
+        allowed_extra_args = False
+        if (self.GET_HANDLER_ERROR_RETURN_TYPE == 'html' and
+                request_method == 'GET'):
+            allowed_extra_args = True
+
+        # Validation for url path elements.
+        schema_for_url_path_args = self.URL_PATH_ARGS_SCHEMAS
+        errors = payload_validator.validate(
+            url_path_args, schema_for_url_path_args, allowed_extra_args)
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
+
+        # Validation for body params and url query string params.
+        if request_method in ['GET', 'DELETE']:
+            handler_args = {}
+            for arg in self.request.arguments():
+                handler_args[arg] = self.request.get(arg)
+        if handler_args is None:
+            return
+
+        try:
+            schema_for_handler_args = self.HANDLER_ARGS_SCHEMAS
+            schema_for_request_method = schema_for_handler_args[request_method]
+        except Exception:
+            raise NotImplementedError(
+                'Provide schema for %s method in %s handler class.' % (
+                    request_method, handler_class_name))
+
+        errors = payload_validator.validate(
+            handler_args, schema_for_request_method, allowed_extra_args)
+        if errors:
+            raise self.InvalidInputException('\n'.join(errors))
 
     @property
     def current_user_is_site_maintainer(self):

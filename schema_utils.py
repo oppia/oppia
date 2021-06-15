@@ -47,6 +47,8 @@ SCHEMA_KEY_NAME = 'name'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
+SCHEMA_KEY_DEFAULT_VALUE = 'default_value'
+SCHEMA_KEY_OBJECT_CLASS = 'object_class'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -57,6 +59,7 @@ SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
 SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
+SCHEMA_TYPE_OBJECT_DICT = 'object_dict'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
@@ -104,10 +107,40 @@ def normalize_against_schema(
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [
             p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
+
+        # For handling cases of missing args.
+        list_of_missing_args_with_default_none = []
+        for prop in schema[SCHEMA_KEY_PROPERTIES]:
+
+            if (SCHEMA_KEY_DEFAULT_VALUE not in prop[SCHEMA_KEY_SCHEMA] or
+                    prop[SCHEMA_KEY_NAME] in obj):
+                continue
+
+            default_value = prop[SCHEMA_KEY_SCHEMA][SCHEMA_KEY_DEFAULT_VALUE]
+
+            # Don't normalize if default_value is None.
+            if default_value is None:
+                expected_dict_keys.remove(prop[SCHEMA_KEY_NAME])
+                list_of_missing_args_with_default_none.append(
+                    prop[SCHEMA_KEY_NAME])
+                continue
+            obj[prop[SCHEMA_KEY_NAME]] = default_value
+
+        # To remove dict from the properties field if the schema of a
+        # missing arg contains 'default_value': None.
+        for _ in list_of_missing_args_with_default_none:
+            for i in python_utils.RANGE(len(schema[SCHEMA_KEY_PROPERTIES])):
+                if (schema[SCHEMA_KEY_PROPERTIES][i][SCHEMA_KEY_NAME] not in
+                        list_of_missing_args_with_default_none):
+                    continue
+                del schema[SCHEMA_KEY_PROPERTIES][i]
+                break
+
+        missing_keys = list(set(expected_dict_keys) - set(obj.keys()))
+        extra_keys = list(set(obj.keys()) - set(expected_dict_keys))
+
         assert set(obj.keys()) == set(expected_dict_keys), (
-            'Missing keys: %s, Extra keys: %s' % (
-                list(set(expected_dict_keys) - set(obj.keys())),
-                list(set(obj.keys()) - set(expected_dict_keys))))
+            'Missing keys: %s, Extra keys: %s' % (missing_keys, extra_keys))
 
         normalized_obj = {}
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
@@ -178,6 +211,10 @@ def normalize_against_schema(
                 obj = python_utils.UNICODE(obj)
             assert isinstance(obj, python_utils.UNICODE), (
                 'Expected unicode, received %s' % obj)
+        normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
+        validation_class = schema[SCHEMA_KEY_OBJECT_CLASS]
+        validation_class(obj)
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])

@@ -27,6 +27,7 @@ import re
 import sys
 import tokenize
 
+from core.controllers import payload_validator
 import python_utils
 from .. import docstrings_checker
 
@@ -2139,6 +2140,64 @@ class DisallowDunderMetaclassChecker(checkers.BaseChecker):
             self.add_message('no-dunder-metaclass', node=node)
 
 
+class DisallowHandlerWithoutSchema(checkers.BaseChecker):
+    """Custom pylint checker prohibiting handlers which do not have schema
+    defined within the class.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'disallow-handlers-without-schema'
+    priority = -1
+    msgs = {
+        'C0035': (
+            'Please add schema in URL_ARGS_PATH_SCHEMA for %s class.',
+            'no-schema-for-url-path-elements',
+            'Please add schema for url path elements by folllowing wiki link- '
+            'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
+        ),
+        'C0036': (
+            'Please add schema in HANDLER_ARGS_SCHEMAS for %s class.',
+            'no-schema-for-handler-args',
+            'Please add schema for payload arguments and url query string '
+            'parameters by following the link- '
+            'https://github.com/oppia/oppia/wiki/Validation-of-handler-args'
+        )
+    }
+    non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
+
+    def check_parent_class_is_basehandler(self, node):
+        """Checks whether a class is child class of BaseHandler."""
+        return 'base.BaseHandler' in node.basenames
+
+    def visit_classdef(self, node):
+        """Visit each class definition in controllers layer module and check
+        if it contains schema or not.
+
+        Args:
+            node: astroid.nodes.ClassDef. Node for a class definition
+                in the AST.
+        """
+        basehandler_child_class = self.check_parent_class_is_basehandler(node)
+        if basehandler_child_class is False:
+            for j in node.ancestors():
+                if self.check_parent_class_is_basehandler(j):
+                    basehandler_child_class = True
+                    break
+        if basehandler_child_class is False:
+            return
+
+        if node.name in self.non_schema_handlers:
+            return
+
+        if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
+            self.add_message(
+                'no-schema-for-url-path-elements', node=node, args=(node.name))
+        if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
+            self.add_message(
+                'no-schema-for-handler-args', node=node, args=(node.name))
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -2162,3 +2221,4 @@ def register(linter):
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowDunderMetaclassChecker(linter))
+    linter.register_checker(DisallowHandlerWithoutSchema(linter))
