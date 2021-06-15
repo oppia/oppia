@@ -189,7 +189,7 @@
 
 
 # Exploration project.
-/core/controllers/editor*.py @aks681
+/core/controllers/editor*.py @aks681 @rohitkatlaa
 /core/controllers/reader*.py @aks681
 /core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @aks681
@@ -201,8 +201,8 @@
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
-/core/templates/components/button-directives/hint-and-solution-buttons.directive*.ts @kevintab95
-/core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
+/core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
+/core/templates/components/button-directives/hint-and-solution-buttons.component.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
 /core/templates/components/on-screen-keyboard/ @aks681
@@ -387,7 +387,7 @@
 # New structures team.
 # Question project.
 /core/controllers/practice_sessions*.py @aks681
-/core/controllers/question*.py @aks681
+/core/controllers/question*.py @aks681 @rohitkatlaa
 /core/controllers/review_tests*.py @aks681
 /core/domain/classroom_domain.py @aks681
 /core/domain/classroom_services*.py @aks681
@@ -458,7 +458,7 @@
 
 
 # Infrastructure.
-/jobs/ @brianrodri
+/jobs/ @brianrodri @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -597,8 +597,6 @@
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-/core/templates/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
-/core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
