@@ -389,7 +389,6 @@ class CronJobTests(test_utils.GenericTestBase):
 
     def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
         report_submitted_timestamp = datetime.datetime.fromtimestamp(1615519337)
         ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)

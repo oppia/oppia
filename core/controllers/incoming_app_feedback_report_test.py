@@ -25,7 +25,6 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
-import utils
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.NAMES.app_feedback_report])
@@ -113,8 +112,15 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
             csrf_token=self.get_new_csrf_token(), expected_status_int=500)
 
     def _post_json_with_test_headers(self, payload, expected_status=200):
-        # Use str-type representations of the valid authentication values since
-        # webapp requires the header values to be str-types, so they must have
+        """Sends a post request usint str-type representations of the header
+        values so that header validation is successful.
+
+        Args:
+            payload: dict. The request payload of a feedback report.
+            expected_status: datetime.int. The expected response status of the
+                request.
+        """
+        # Webapp requires the header values to be str-types, so they must have
         # parity for the tests correctly check these fields.
         with self.swap(feconf, 'ANDROID_API_KEY', ANDROID_API_KEY_STRING):
             with self.swap(
@@ -131,4 +137,3 @@ class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
                             payload, headers=self.headers,
                             csrf_token=self.get_new_csrf_token(),
                             expected_status_int=expected_status)
-

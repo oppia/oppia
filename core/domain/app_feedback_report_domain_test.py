@@ -1066,7 +1066,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def test_validation_ticket_name_too_long_fails(self):
         long_name = 'too long'
-        for i in range(constants.MAXIMUM_TICKET_NAME_LENGTH):
+        for _ in python_utils.RANGE(constants.MAXIMUM_TICKET_NAME_LENGTH):
             long_name += 'x'
         self.ticket_obj.ticket_name = long_name
         self._assert_validation_error(

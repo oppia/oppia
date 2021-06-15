@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import types
 
 from core.domain import app_feedback_report_constants as constants
 from core.domain import app_feedback_report_domain
@@ -988,7 +987,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         for category in constants.ALLOWED_CATEGORIES:
             self.assertEqual(
                 app_feedback_report_services._get_category_from_string(
-                    category.name),category)
+                    category.name), category)
 
     def test_get_category_from_string_with_invalid_string_raises_error(self):
         invalid_category = 'invalid_category'
@@ -1000,18 +999,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_android_text_size_from_string_returns_expected_text_size(self):
         for text_size in constants.ALLOWED_ANDROID_TEXT_SIZES:
-            if text_size != constants.ANDROID_TEXT_SIZE.text_size_unspecified:
-                self.assertEqual(
-                    app_feedback_report_services._get_android_text_size_from_string( # pylint: disable=line-too-long
-                        text_size.name), text_size)
-
-    def test_get_android_text_size_from_string_with_unspecified_throws_error(
-            self):
-        with self.assertRaisesRegexp(
-            utils.InvalidInputException,
-            'The given Android app text size text_size_unspecified is invalid'):
+            self.assertEqual(
                 app_feedback_report_services._get_android_text_size_from_string(
-                    constants.ANDROID_TEXT_SIZE.text_size_unspecified.name)
+                    text_size.name), text_size)
 
     def test_get_android_text_size_from_string_with_invalid_string_raises_error(
             self):
@@ -1041,7 +1031,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             isinstance(
                 navigation_drawer_obj,
                 app_feedback_report_domain.NavigationDrawerEntryPoint))
-                
+
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.lesson_player.name)
         lesson_player_obj = (
@@ -1051,7 +1041,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             isinstance(
                 lesson_player_obj,
                 app_feedback_report_domain.LessonPlayerEntryPoint))
-                
+
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.revision_card.name)
         revision_card_obj = (
@@ -1061,7 +1051,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             isinstance(
                 revision_card_obj,
                 app_feedback_report_domain.RevisionCardEntryPoint))
-                
+
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.crash.name)
         crash_obj = (
@@ -1103,7 +1093,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_store_incoming_report_stats_with_web_platform_raises_error(self):
         mock_web_report_obj = self.android_report_obj
         mock_web_report_obj.platform = constants.PLATFORM_CHOICE_WEB
-        
+
         with self.assertRaisesRegexp(
             NotImplementedError,
             'Stats aggregation for incoming web reports have not been '
