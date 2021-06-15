@@ -189,7 +189,7 @@
 
 
 # Exploration project.
-/core/controllers/editor*.py @aks681
+/core/controllers/editor*.py @aks681 @rohitkatlaa
 /core/controllers/reader*.py @aks681
 /core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @aks681
@@ -387,7 +387,7 @@
 # New structures team.
 # Question project.
 /core/controllers/practice_sessions*.py @aks681
-/core/controllers/question*.py @aks681
+/core/controllers/question*.py @aks681 @rohitkatlaa
 /core/controllers/review_tests*.py @aks681
 /core/domain/classroom_domain.py @aks681
 /core/domain/classroom_services*.py @aks681
@@ -458,7 +458,7 @@
 
 
 # Infrastructure.
-/jobs/ @brianrodri
+/jobs/ @brianrodri @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
