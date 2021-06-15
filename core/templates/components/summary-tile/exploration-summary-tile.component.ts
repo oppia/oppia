@@ -73,6 +73,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   isRefresherExploration: boolean;
   contributors: object;
   lastUpdatedDateTime: string = '';
+  avgRating;
+  thumbnailIcon;
 
   constructor(
     private ratingComputationService: RatingComputationService,
@@ -119,6 +121,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
           this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
       });
     this.lastUpdatedDateTime = this.getLastUpdatedDatetime();
+    this.avgRating = this.getAverageRating();
+    this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
   }
 
   ngOnDestroy(): void {
