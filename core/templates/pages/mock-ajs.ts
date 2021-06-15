@@ -45,6 +45,7 @@ let mockAngular = {
   value: () => mockAngular,
   version: VERSION
 };
+
 // This throws "Property 'angular' does not exist on type 'Window & typeof
 // globalThis'." when the `as unknown as ...` is not used.
 (window as unknown as {angular: typeof mockAngular}).angular = mockAngular;
