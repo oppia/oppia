@@ -90,6 +90,7 @@ import { DisplaySolutionModalComponent } from 'pages/exploration-player-page/mod
 import { DisplaySolutionInterstititalModalComponent } from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
 import { DisplayHintModalComponent } from 'pages/exploration-player-page/modals/display-hint-modal.component';
 import { HintAndSolutionButtonsComponent } from './button-directives/hint-and-solution-buttons.component';
+import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
 
 
 // Directives.
@@ -261,6 +262,7 @@ const toastrConfig = {
     PromoBarComponent,
     SelectSkillModalComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SharingLinksComponent,
     SideNavigationBarComponent,
     SkillSelectorComponent,
@@ -325,6 +327,7 @@ const toastrConfig = {
     PreviewThumbnailComponent,
     PromoBarComponent,
     RubricsEditorComponent,
+    SearchBarComponent,
     SideNavigationBarComponent,
     StorySummaryTileComponent,
     SideNavigationBarWrapperComponent,
@@ -387,6 +390,7 @@ const toastrConfig = {
     OnScreenKeyboardComponent,
     OppiaFooterComponent,
     OutcomeFeedbackEditorComponent,
+    SearchBarComponent,
     SideNavigationBarWrapperComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
