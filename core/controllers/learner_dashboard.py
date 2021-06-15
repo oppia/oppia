@@ -77,14 +77,14 @@ class LearnerDashboardHandler(base.BaseHandler):
                 learner_progress.incomplete_collection_summaries))
 
         completed_story_summary_dicts = (
-            learner_progress_services.get_story_summary_dicts(
+            learner_progress_services.get_displayable_story_summary_dicts(
                 self.user_id, learner_progress.completed_story_summaries))
 
         learnt_topic_summary_dicts = (
-            learner_progress_services.get_topic_summary_dicts(
+            learner_progress_services.get_displayable_topic_summary_dicts(
                 self.user_id, learner_progress.learnt_topic_summaries))
         partially_learnt_topic_summary_dicts = (
-            learner_progress_services.get_topic_summary_dicts(
+            learner_progress_services.get_displayable_topic_summary_dicts(
                 self.user_id,
                 learner_progress.partially_learnt_topic_summaries))
 

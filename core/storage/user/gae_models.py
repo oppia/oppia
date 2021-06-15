@@ -476,7 +476,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of all the topics partially mastered by the user(i.e. the topics in
     # which the learner has not completed all the subtopics).
-    partially_mastered_topic_id = (
+    partially_mastered_topic_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -497,7 +497,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'story_ids': base_models.EXPORT_POLICY.EXPORTED,
             'partially_learnt_topic_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'partially_mastered_topic_id': (
+            'partially_mastered_topic_ids': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE)
         })
 

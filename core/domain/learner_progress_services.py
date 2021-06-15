@@ -372,12 +372,12 @@ def mark_story_as_incomplete(user_id, story_id):
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel(id=user_id))
 
-    story_ids = get_all_completed_story_ids(user_id)
+    completed_story_ids = get_all_completed_story_ids(user_id)
 
     incomplete_activities = _get_incomplete_activities_from_model(
         incomplete_activities_model)
 
-    if (story_id not in story_ids and
+    if (story_id not in completed_story_ids and
             story_id not in incomplete_activities.story_ids):
         incomplete_activities.add_story_id(story_id)
         _save_incomplete_activities(incomplete_activities)
@@ -401,12 +401,12 @@ def mark_topic_as_partially_learnt(user_id, topic_id):
         incomplete_activities_model = (
             user_models.IncompleteActivitiesModel(id=user_id))
 
-    topic_ids = get_all_learnt_topic_ids(user_id)
+    learnt_topic_ids = get_all_learnt_topic_ids(user_id)
 
     incomplete_activities = _get_incomplete_activities_from_model(
         incomplete_activities_model)
 
-    if (topic_id not in topic_ids and
+    if (topic_id not in learnt_topic_ids and
             topic_id not in incomplete_activities.partially_learnt_topic_ids):
         incomplete_activities.add_partially_learnt_topic_id(topic_id)
         _save_incomplete_activities(incomplete_activities)
@@ -1141,10 +1141,7 @@ def get_all_incomplete_story_ids(user_id):
     if incomplete_activities_model:
         incomplete_activities = _get_incomplete_activities_from_model(
             incomplete_activities_model)
-
         return incomplete_activities.story_ids
-    else:
-        return []
 
 
 def get_all_partially_learnt_topic_ids(user_id):
@@ -1322,7 +1319,7 @@ def _get_filtered_collection_playlist_summaries(
         nonexistent_playlist_collection_ids)
 
 
-def get_story_summary_dicts(user_id, story_summaries):
+def get_displayable_story_summary_dicts(user_id, story_summaries):
     """Returns a displayable summary dict of the the story summaries
     given to it.
 
@@ -1332,21 +1329,24 @@ def get_story_summary_dicts(user_id, story_summaries):
             summary domain objects.
 
     Returns:
-        list(dict). The summary dict objects corresponding to the given summary
-        domain objects.
+        list(dict). The summary dict objects corresponding to the given summary.
     """
     summary_dicts = []
-    for story_summary in story_summaries:
-        story = story_fetchers.get_story_by_id(story_summary.id)
-        topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
+    story_ids = [story_summary.id for story_summary in story_summaries]
+    stories = story_fetchers.get_stories_by_ids(story_ids)
+    topic_ids = [story.corresponding_topic_id for story in stories]
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    for index, story in enumerate(stories):
         summary_dicts.append({
-            'id': story_summary.id,
-            'title': story_summary.title,
-            'node_titles': story_summary.node_titles,
-            'thumbnail_filename': story_summary.thumbnail_filename,
-            'thumbnail_bg_color': story_summary.thumbnail_bg_color,
-            'description': story_summary.description,
-            'url_fragment': story_summary.url_fragment,
+            'id': story.id,
+            'title': story.title,
+            'node_titles': [
+                node.title for node in story.story_contents.get_ordered_nodes()
+            ],
+            'thumbnail_filename': story.thumbnail_filename,
+            'thumbnail_bg_color': story.thumbnail_bg_color,
+            'description': story.description,
+            'url_fragment': story.url_fragment,
             'story_is_published': (
                 story_services.is_story_published_and_present_in_topic(story)),
             'completed_node_titles': [
@@ -1355,7 +1355,7 @@ def get_story_summary_dicts(user_id, story_summaries):
                         user_id, story.id))],
             'all_node_dicts': [
                 node.to_dict() for node in story.story_contents.nodes],
-            'topic_url_fragment': topic.url_fragment,
+            'topic_url_fragment': topics[index].url_fragment,
             'classroom_url_fragment': (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
                     story.corresponding_topic_id))
@@ -1364,7 +1364,7 @@ def get_story_summary_dicts(user_id, story_summaries):
     return summary_dicts
 
 
-def get_topic_summary_dicts(user_id, topic_summaries):
+def get_displayable_topic_summary_dicts(user_id, topic_summaries):
     """Returns a displayable summary dict of the the topic summaries
     given to it.
 
@@ -1374,8 +1374,7 @@ def get_topic_summary_dicts(user_id, topic_summaries):
             summary domain objects.
 
     Returns:
-        list(dict). The summary dict objects corresponding to the given summary
-        domain objects.
+        list(dict). The summary dict objects corresponding to the given summary.
     """
     summary_dicts = []
     topic_ids = [topic.id for topic in topic_summaries]

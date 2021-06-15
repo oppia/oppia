@@ -601,10 +601,12 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
 
         if user_id and story_id:
             story = story_fetchers.get_story_by_id(story_id)
-            learner_progress_services.mark_story_as_incomplete(
-                user_id, story.id)
-            learner_progress_services.mark_topic_as_partially_learnt(
-                user_id, story.corresponding_topic_id)
+            if story:
+                learner_progress_services.mark_story_as_incomplete(
+                    user_id, story.id)
+            if story.corresponding_topic_id:
+                learner_progress_services.mark_topic_as_partially_learnt(
+                    user_id, story.corresponding_topic_id)
 
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
