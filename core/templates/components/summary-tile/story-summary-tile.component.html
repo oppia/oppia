@@ -5,14 +5,14 @@
               cx="25"
               cy="25"
               r="20"
-              [attr.stroke-dasharray]="getStrokeDashArrayValues()"
+              [attr.stroke-dasharray]="strokeDashArrayValues"
               stroke-dashoffset="-2.5"
               stroke-linecap="round"/>
       <circle class="story-progress-circle completed-circle"
               cx="25"
               cy="25"
               r="20"
-              [attr.stroke-dasharray]="getCompletedStrokeDashArrayValues()"
+              [attr.stroke-dasharray]="completedStrokeDashArrayValues"
               stroke-dashoffset="-2.5"
               [attr.stroke-linecap]="completedStoriesCount ? 'round' : 'butt'"/>
       <text x="25"
@@ -28,7 +28,7 @@
   </div>
   <div class="oppia-story-title">
     <strong class="title-text">
-      <a [href]="getStoryLink()" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storySummary.getTitle() }} </a>
+      <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
     </strong>
     <span class="oppia-chapters-count">
       <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></span>
@@ -36,17 +36,17 @@
   </div>
   <div class="story-details">
     <div class="story-thumbnail"
-         [ngStyle]="{background: storySummary.getThumbnailBgColor()}">
-      <a [href]="getStoryLink()">
+         [ngStyle]="{background: thumbnailBgColor}">
+      <a [href]="storyLink">
         <img [src]="thumbnailUrl"
              alt=""
              class="img-thumbnail"
-             [ngStyle]="{background: storySummary.getThumbnailBgColor()}">
+             [ngStyle]="{background: thumbnailBgColor}">
       </a>
     </div>
     <div class="chapter-details">
       <div class="chapter-title"
-           *ngFor="let title of storySummary.getNodeTitles();let idx = index">
+           *ngFor="let title of nodeTitles;let idx = index">
         <div *ngIf="storySummary.isNodeCompleted(title)" class="material-icons completed-icon">
           done
         </div>
