@@ -163,8 +163,9 @@
         width: calc(100% - 280px);
       }
 
-      md-card.oppia-profile-content-card {
+      .mat-card.oppia-profile-content-card {
         background-color: transparent;
+        box-shadow: none;
         margin-top: 0;
         padding-top: 0;
       }
@@ -181,7 +182,7 @@
         width: 100%;
       }
 
-      md-content.oppia-profile-portfolio-container {
+      .mat-card-content.oppia-profile-portfolio-container {
         background-color: transparent;
       }
 
@@ -292,17 +293,17 @@
   <body>
     <oppia-root>
       <div ng-controller="Base" dir="<[direction]>">
-        <base-content>
+        <oppia-base-content>
           <navbar-breadcrumb>
             <profile-page-navbar></profile-page-navbar>
           </navbar-breadcrumb>
           <content>
-            <profile-page></profile-page>
+            <oppia-profile-page></oppia-profile-page>
           </content>
           <page-footer>
             <oppia-footer></oppia-footer>
           </page-footer>
-        </base-content>
+        </oppia-base-content>
       </div>
     </oppia-root>
     @load('pages/footer_js_libs.html')
