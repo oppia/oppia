@@ -69,7 +69,7 @@ def run_lighthouse_puppeteer_script():
         python_utils.PRINT(stdout)
         for line in stdout.split('\n'):
             export_url(line)
-        python_utils.PRINT('Lighthouse checks completed successfully.')
+        python_utils.PRINT('Puppeteer script completed successfully.')
     else:
         python_utils.PRINT('Return code: %s' % process.returncode)
         python_utils.PRINT('OUTPUT:')
@@ -101,7 +101,7 @@ def run_webpack_compilation():
 
 
 def export_url(line):
-    """Exports the entity ID in the given line to an environmental variable, if
+    """Exports the entity ID in the given line to an environment variable, if
     the line is a URL.
 
     Args:
@@ -121,8 +121,6 @@ def export_url(line):
         os.environ['story_id'] = url_parts[4]
     elif 'skill_editor' in line:
         os.environ['skill_id'] = url_parts[4]
-    else:
-        return
 
 
 def run_lighthouse_checks(lighthouse_mode):
