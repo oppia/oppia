@@ -85,6 +85,7 @@ export class ThumbnailUploaderComponent implements OnInit, OnChanges {
     if (this.filename !== null &&
         this.filename !== undefined &&
         this.filename !== '') {
+      this.hidePlaceholder = false;
       this.editableThumbnailDataUrl = (
         this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
           this.filename,
