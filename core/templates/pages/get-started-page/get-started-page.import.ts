@@ -35,4 +35,3 @@ platformBrowserDynamic().bootstrapModule(GetStartedPageModule).catch(
   // eslint-disable-next-line no-console
   (err) => console.error(err)
 );
-
