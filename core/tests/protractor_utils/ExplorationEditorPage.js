@@ -222,6 +222,7 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
+    await browser.sleep(2500);
     await waitFor.visibilityOf(
       toastSuccessElement,
       'Toast message is taking too long to appear after saving changes');
