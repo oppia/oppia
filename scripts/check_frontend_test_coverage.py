@@ -292,7 +292,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'stats-reporting.service.ts',
     'story-creation.service.ts',
     'story-editor-navbar-breadcrumb.component.ts',
-    'story-editor-navbar.component.ts',
     'story-editor-state.service.ts',
     'story-editor.directive.ts',
     'story-node-editor.directive.ts',
