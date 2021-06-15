@@ -609,6 +609,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var actualDiffDict = {};
     var scrollBarElements = element.all(by.css('.CodeMirror-vscrollbar'));
     var scrollBarWebElement = null;
+    await waitFor.presenceOf(scrollBarElements);
     if (codeMirrorPaneToScroll === 'first') {
       scrollBarWebElement = await scrollBarElements.first().getWebElement();
     } else {
