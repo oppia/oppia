@@ -25,8 +25,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Schema Default Value Service', () => {
+describe('Schema Default Value Service', () => {
   let sdvs: SchemaDefaultValueService;
   let ls: LoggerService;
 
