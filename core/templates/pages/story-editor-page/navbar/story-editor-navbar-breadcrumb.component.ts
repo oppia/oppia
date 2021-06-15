@@ -68,9 +68,9 @@ export class StoryEditorNavbarBreadcrumbComponent {
      this.directiveSubscriptions.add(
        this.storyEditorStateService.onStoryInitialized.subscribe(
          () => {
-            this.topicName = this.storyEditorStateService.getTopicName();
-            this.story = this.storyEditorStateService.getStory();
-          }
+           this.topicName = this.storyEditorStateService.getTopicName();
+           this.story = this.storyEditorStateService.getStory();
+         }
        ));
    }
 
