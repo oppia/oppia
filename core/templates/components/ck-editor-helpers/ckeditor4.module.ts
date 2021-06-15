@@ -13,16 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component to get changes in human readable form.
+ * @fileoverview Module for the CkEditor4 components.
  */
 
-import { Component, Input } from '@angular/core';
-import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
+import 'core-js/es7/reflect';
+import 'zone.js';
 
-@Component({
-  selector: 'oppia-changes-in-human-readable-form',
-  templateUrl: './changes-in-human-readable-form.component.html'
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { CkEditor4RteComponent } from './ck-editor-4-rte.component';
+
+@NgModule({
+  imports: [
+    CommonModule,
+    BrowserModule,
+  ],
+  declarations: [
+    CkEditor4RteComponent
+  ],
+  entryComponents: [
+    CkEditor4RteComponent
+  ],
+  exports: [
+    CkEditor4RteComponent
+  ],
 })
-export class ChangesInHumanReadableFormComponent {
-  @Input() lostChanges: LostChange[];
-}
+
+export class OppiaCkEditor4Module { }
