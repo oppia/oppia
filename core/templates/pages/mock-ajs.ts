@@ -18,7 +18,7 @@
 
 /**
  * We are at a stage where we can have some pages in Angular. But we share
- * component in between pages. SSo we can't remove the code that downgrades
+ * component in between pages. So we can't remove the code that downgrades
  * components and services. This code is found in most Angular components and
  * services (towards the end of the file). In order to not have to create a
  * separate file for each service and component just for the sake of downgrading
