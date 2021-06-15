@@ -1764,8 +1764,8 @@ def are_changes_mergeable(exp_id, version, change_list ):
         deleted_state_names = []
         new_to_old_state_names = {}
         changed_properties= {}
-        old_version = exp_fetchers.get_exploration_by_id(exp_id, version)
-        new_version = exp_fetchers.get_exploration_by_id(exp_id, latest_version)
+        old_version = exp_fetchers.get_exploration_by_id(exp_id, version=version)
+        new_version = exp_fetchers.get_exploration_by_id(exp_id, version=latest_version)
         print(old_version.to_dict())
         print("new_version")
         print(new_version.to_dict())
@@ -1812,21 +1812,10 @@ def are_changes_mergeable(exp_id, version, change_list ):
             and exploration to the admin, so that the conditions can we reviewed"""
             return False
 
-        """changed_properties = {}
-        for change in composite_change_list:
-            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                changed_properties[change.state_name][change.property].append(change)
-
-        print(changed_properties)
-
-        changed_properties = {
-            "statename" : {
-                "property1": [changes],
-                "property2": [changes],
-            }
-        } """
         changes_are_mergeable = False
         state_names_of_renamed_states = {}
+        print("changed_properties")
+        print(changed_properties)
         for change in change_list:
             change_is_mergeable = False
             if change.cmd == exp_domain.CMD_RENAME_STATE:
@@ -1849,31 +1838,41 @@ def are_changes_mergeable(exp_id, version, change_list ):
                         new_version.states[new_state_name].content.html):
                         change_is_mergeable = True
                 elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    if old_state_name in changed_properties:
                         if (old_version.states[old_state_name].interaction.id ==
                             new_version.states[new_state_name].interaction.id):
-                            print("interraction_id")
-                            change_is_mergeable = True
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                        if (old_version.states[old_state_name].interaction.id ==
-                            new_version.states[new_state_name].interaction.id):
-                            if old_state_name in changed_properties:
-                                if change.property_name not in changed_properties[old_state_name]:
-                                    change_is_mergeable = True
-                            else:
+                            if ('widget_customization_args' not in
+                                changed_properties[old_state_name] and
+                                'answer_group' not in changed_properties[old_state_name] and
+                                'solution' not in changed_properties[old_state_name]):
                                 change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+
                 elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    if old_state_name in changed_properties:
                         if (old_version.states[old_state_name].interaction.id ==
                             new_version.states[new_state_name].interaction.id):
-                            if old_state_name in changed_properties:
-                                if ('widget_customization_args' not in
-                                    changed_properties[old_state_name] and
-                                    change.property_name not in changed_properties[old_state_name]):
-                                    change_is_mergeable = True
-                            else:
+                            if (change.property_name not in changed_properties[old_state_name]
+                            and 'answer_group' not in changed_properties[old_state_name]
+                            and 'solution' not in changed_properties[old_state_name]):
                                 change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    if old_state_name in changed_properties:
+                        if (old_version.states[old_state_name].interaction.id ==
+                            new_version.states[new_state_name].interaction.id):
+                            if ('widget_customization_args' not in
+                                changed_properties[old_state_name] and
+                                change.property_name not in changed_properties[old_state_name]
+                                and 'solution' not in changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
                 elif (change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                         if old_state_name in changed_properties:
@@ -1905,7 +1904,8 @@ def are_changes_mergeable(exp_id, version, change_list ):
                         if (old_version.states[old_state_name].interaction.id ==
                             new_version.states[new_state_name].interaction.id):
                             if ('widget_customization_args' not in
-                                changed_properties[old_state_name]):
+                                changed_properties[old_state_name]
+                                and 'answer_group' not in changed_properties[old_state_name]):
                                 old_solution = old_version.states[old_state_name].interaction.solution
                                 new_solution = new_version.states[new_state_name].interaction.solution
                                 if old_solution and new_solution:
@@ -1928,7 +1928,21 @@ def are_changes_mergeable(exp_id, version, change_list ):
                 elif (change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                     if old_state_name in changed_properties:
-                        pass
+                        if all(property not in changed_properties[old_state_name]
+                            for property in ['content', 'solution', 'hints', 'written_translations',
+                            'default_outcome', 'customization_args', 'recorded_voicovers']):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
+                elif (change.property_name ==
+                    exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                    if old_state_name in changed_properties:
+                        if all(property not in changed_properties[old_state_name]
+                            for property in ['content', 'solution', 'hints', 'written_translations',
+                            'default_outcome', 'customization_args']):
+                            change_is_mergeable = True
+                    else:
+                        change_is_mergeable = True
 
 
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:

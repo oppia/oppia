@@ -3341,7 +3341,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         v1_exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
-
+        print("v1_exploration")
+        print(v1_exploration.to_dict())
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_0_ID)
         self.assertEqual(len(snapshots_metadata), 1)
@@ -5624,3 +5625,113 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
                 ], 8, 5
             )
         )
+
+
+class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
+    """Test methods related to exploration changes mergeability."""
+
+    SECOND_USERNAME = 'abc123'
+    SECOND_EMAIL = 'abc123@gmail.com'
+
+    def test_changes_are_mergeable_when_content_changes_do_not_conflict(self):
+        v1_exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'First title'
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
+
+        change_list_2 = [exp_domain.ExplorationChange({
+            "state_name":"Introduction",
+            "cmd":"edit_state_property",
+            "property_name":"widget_id",
+            "new_value": None,
+            "old_value":"TextInput"
+        }),
+        exp_domain.ExplorationChange({
+            "state_name":"Introduction",
+            "cmd":"edit_state_property",
+            "property_name":"widget_customization_args",
+            "new_value":{
+
+            },
+            "old_value":{
+                "placeholder":{
+                    "value":{
+                        "content_id":"ca_placeholder_0",
+                        "unicode_str":""
+                    }
+                },
+                "rows":{
+                    "value":1
+                }
+            }
+        }),
+        exp_domain.ExplorationChange({
+            "state_name":"Introduction",
+            "cmd":"edit_state_property",
+            "property_name":"next_content_id_index",
+            "new_value":2,
+            "old_value":1
+        }),
+        exp_domain.ExplorationChange({
+            "state_name":"Introduction",
+            "cmd":"edit_state_property",
+            "property_name":"widget_id",
+            "new_value":"Continue",
+            "old_value": None
+        }),
+        exp_domain.ExplorationChange({
+            "state_name":"Introduction",
+            "cmd":"edit_state_property",
+            "property_name":"widget_customization_args",
+            "new_value":{
+                "buttonText":{
+                    "value":{
+                        "content_id":"ca_buttonText_1",
+                        "unicode_str":"Continue"
+                    }
+                }
+            },
+            "old_value":{ }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
+
+        change_list_3 = [exp_domain.ExplorationChange({
+            "property_name":"content",
+            "state_name":"End",
+            "cmd":"edit_state_property",
+            "old_value":{
+                "html":"",
+                "content_id":"content"
+            },
+            "new_value":{
+                "html":"<p>Congratulations, you have finished!</p>",
+                "content_id":"content"
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_3, 'Changed content of End state.')
+
+        change_list_4 = [exp_domain.ExplorationChange({
+            "property_name":"content",
+            "state_name":"Introduction",
+            "cmd":"edit_state_property",
+            "old_value":{
+                "html":"",
+                "content_id":"content"
+            },
+            "new_value":{
+                "html":"<p>Hello</p>",
+                "content_id":"content"
+            }
+        })]
+        are_changes_mergeable = exp_services.are_changes_mergeable(self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(are_changes_mergeable, True)

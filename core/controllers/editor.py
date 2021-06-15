@@ -716,6 +716,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             raise self.InvalidInputException(e)
 
         version = self.payload.get('version')
+        print("are_changes_mergeable")
         print(exp_services.are_changes_mergeable(exploration_id, version, change_list))
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
