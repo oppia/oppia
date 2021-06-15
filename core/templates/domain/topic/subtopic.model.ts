@@ -13,12 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * subtopic domain objects.
  */
 
-import { ShortSkillSummary } from
-  'domain/skill/short-skill-summary.model';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 import constants from 'assets/constants';
 
@@ -40,7 +39,6 @@ export class Subtopic {
   _title: string;
   _skillSummaries: ShortSkillSummary[];
   _skillIds: string[];
-  _skillSummary: ShortSkillSummary;
   _thumbnailFilename: string;
   _thumbnailBgColor: string;
   _urlFragment: string;
@@ -92,20 +90,22 @@ export class Subtopic {
   }
 
   validate(): string[] {
-    var issues = [];
+    let issues: string[] = [];
     const VALID_URL_FRAGMENT_REGEX = new RegExp(
       constants.VALID_URL_FRAGMENT_REGEX);
-    if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
-      issues.push('Subtopic url fragment is invalid.');
+    if (this._urlFragment !== null) {
+      if (!VALID_URL_FRAGMENT_REGEX.test(this._urlFragment)) {
+        issues.push('Subtopic url fragment is invalid.');
+      }
     }
     if (this._title === '') {
       issues.push('Subtopic title should not be empty');
     }
-    var skillIds = this._skillSummaries.map(function(skillSummary) {
+    let skillIds = this._skillSummaries.map((skillSummary) => {
       return skillSummary.getId();
     });
-    for (var i = 0; i < skillIds.length; i++) {
-      var skillId = skillIds[i];
+    for (let i = 0; i < skillIds.length; i++) {
+      let skillId = skillIds[i];
       if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
         issues.push(
           'The skill with id ' + skillId + ' is duplicated in' +
@@ -116,7 +116,7 @@ export class Subtopic {
   }
 
   prepublishValidate(): string[] {
-    let issues = [];
+    let issues: string[] = [];
     if (!this._thumbnailFilename) {
       issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
     }
@@ -148,7 +148,7 @@ export class Subtopic {
   }
 
   removeSkill(skillId: string): void {
-    var index = this._skillSummaries.map(function(skillSummary) {
+    let index = this._skillSummaries.map((skillSummary) => {
       return skillSummary.getId();
     }).indexOf(skillId);
     if (index > -1) {

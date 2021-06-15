@@ -20,31 +20,49 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, Simpl
 import { downgradeComponent } from '@angular/upgrade/static';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
+interface CodeMirrorMergeViewOptions {
+  lineNumbers: boolean,
+  readOnly: boolean,
+  mode: string,
+  viewportMargin: number
+}
+
 @Component({
   selector: 'oppia-codemirror',
   templateUrl: './codemirror.component.html'
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
-  @Input() options;
-  @Input() value;
-  @Input() refresh: boolean;
+  @Input() options!: CodeMirrorMergeViewOptions;
+  @Input() value!: string;
+  @Input() refresh: boolean = false;
   @Input() readOnly = false;
   @Output() valueChange = new EventEmitter();
   @Output() onLoad = new EventEmitter();
-  @ViewChild(CodemirrorComponent) codemirrorComponent: CodemirrorComponent;
+  // NOTE TO DEVELOPERS: It can be the case sometimes that actual codeMirror
+  // file (https://github.com/scttcper/ngx-codemirror/blob/d7701404d188046bc
+  // 9fa27edfd6b4baa50179749/src/lib/codemirror.component.ts#L89)
+  // fails to initialise the component, this can make the below
+  // properties undefined.
+  @ViewChild(CodemirrorComponent) codemirrorComponent:
+   CodemirrorComponent | undefined;
+  codemirror: CodeMirror.Editor | undefined;
   autoFocus = false;
-  codemirror: CodeMirror.Editor;
+
   constructor() { }
 
-  updateValue(val: unknown): void {
+  updateValue(val: string): void {
     this.value = val;
     this.valueChange.emit(val);
   }
 
   ngAfterViewInit(): void {
     const runAfterViewInit = () => {
-      this.codemirror = this.codemirrorComponent.codeMirror;
-      this.onLoad.emit(this.codemirror);
+      if (this.codemirrorComponent !== undefined) {
+        this.codemirror = this.codemirrorComponent.codeMirror;
+        this.onLoad.emit(this.codemirror);
+      } else {
+        throw new Error('CodeMirrorComponent not Found');
+      }
     };
     setTimeout(() => runAfterViewInit(), 0);
   }

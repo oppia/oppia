@@ -37,6 +37,15 @@ describe('Oppia CodeMirror Component', () => {
     component = fixture.componentInstance;
   }));
 
+  it('should throw error if CodeMirrorComponent is undefined', fakeAsync(
+    () => {
+      component.codemirrorComponent = undefined;
+      expect(() => {
+        component.ngAfterViewInit();
+        tick(1);
+      }).toThrowError('CodeMirrorComponent not Found');
+    }));
+
   it('should notify that it has loaded', fakeAsync(() => {
     const onLoadSpy = jasmine.createSpy('onLoadSpy');
     let subscription = component.onLoad.subscribe(onLoadSpy);
