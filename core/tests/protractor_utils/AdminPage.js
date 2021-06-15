@@ -373,6 +373,10 @@ var AdminPage = function() {
 
   this.expectUsernamesToMatch = async function(expectedUsernamesArray) {
     var foundUsersArray = [];
+    if (expectedUsernamesArray.length !== 0) {
+      await waitFor.visibilityOf(element(
+        by.css('.protractor-test-roles-result-rows')));
+    }
     var usernames = await element.all(
       by.css('.protractor-test-roles-result-rows'))
       .map(async function(elm) {
