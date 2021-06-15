@@ -1142,6 +1142,8 @@ def get_all_incomplete_story_ids(user_id):
         incomplete_activities = _get_incomplete_activities_from_model(
             incomplete_activities_model)
         return incomplete_activities.story_ids
+    else:
+        return []
 
 
 def get_all_partially_learnt_topic_ids(user_id):
@@ -1161,7 +1163,6 @@ def get_all_partially_learnt_topic_ids(user_id):
     if incomplete_activities_model:
         incomplete_activities = _get_incomplete_activities_from_model(
             incomplete_activities_model)
-
         return incomplete_activities.partially_learnt_topic_ids
     else:
         return []

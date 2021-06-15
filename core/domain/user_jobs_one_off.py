@@ -31,6 +31,7 @@ from core.domain import learner_progress_services
 from core.domain import rights_manager
 from core.domain import story_fetchers
 from core.domain import subscription_services
+from core.domain import topic_fetchers
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -243,9 +244,13 @@ class PopulateStoriesAndTopicsInCompletedActivitiesOneOffJob(
         stories_linked_to_completed_explorations = (
             story_fetchers.get_stories_by_ids(
                 story_ids_linked_to_completed_explorations))
+        topic_ids_linked_to_stories = [
+            story.corresponding_topic_id for story in stories_linked_to_completed_explorations] # pylint: disable=line-too-long
+        topics_linked_to_stories = topic_fetchers.get_topics_by_ids(
+            topic_ids_linked_to_stories)
 
         # Mark story and topic as completed for completed explorations.
-        for story in stories_linked_to_completed_explorations:
+        for index, story in enumerate(stories_linked_to_completed_explorations):
             if story:
                 completed_nodes = (
                     story_fetchers.get_completed_nodes_in_story(
@@ -255,8 +260,17 @@ class PopulateStoriesAndTopicsInCompletedActivitiesOneOffJob(
                 if len(completed_nodes) == len(all_nodes):
                     learner_progress_services.mark_story_as_completed(
                         user_id, story.id)
+                completed_story_ids = (
+                    learner_progress_services.get_all_completed_story_ids(
+                        user_id))
+                story_ids_in_topic = []
+                for canonical_story in topics_linked_to_stories[index].canonical_story_references: # pylint: disable=line-too-long
+                    story_ids_in_topic.append(canonical_story.story_id)
+
+                if (set(story_ids_in_topic).issubset(
+                        set(completed_story_ids))):
                     learner_progress_services.mark_topic_as_learnt(
-                        user_id, story.corresponding_topic_id)
+                        user_id, topics_linked_to_stories[index].id)
 
         yield (
             'Successfully added story_ids and topic_ids '
