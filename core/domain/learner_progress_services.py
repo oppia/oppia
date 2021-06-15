@@ -1336,29 +1336,29 @@ def get_displayable_story_summary_dicts(user_id, story_summaries):
     stories = story_fetchers.get_stories_by_ids(story_ids)
     topic_ids = [story.corresponding_topic_id for story in stories]
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
-    for index, story in enumerate(stories):
+    for index, story_summary in enumerate(story_summaries):
         summary_dicts.append({
-            'id': story.id,
-            'title': story.title,
-            'node_titles': [
-                node.title for node in story.story_contents.get_ordered_nodes()
-            ],
-            'thumbnail_filename': story.thumbnail_filename,
-            'thumbnail_bg_color': story.thumbnail_bg_color,
-            'description': story.description,
-            'url_fragment': story.url_fragment,
+            'id': story_summary.id,
+            'title': story_summary.title,
+            'node_titles': story_summary.node_titles,
+            'thumbnail_filename': story_summary.thumbnail_filename,
+            'thumbnail_bg_color': story_summary.thumbnail_bg_color,
+            'description': story_summary.description,
+            'url_fragment': story_summary.url_fragment,
             'story_is_published': (
-                story_services.is_story_published_and_present_in_topic(story)),
+                story_services.is_story_published_and_present_in_topic(
+                    stories[index])),
             'completed_node_titles': [
                 node.title for node in (
                     story_fetchers.get_completed_nodes_in_story(
-                        user_id, story.id))],
+                        user_id, story_summary.id))],
             'all_node_dicts': [
-                node.to_dict() for node in story.story_contents.nodes],
+                node.to_dict() for node in stories[index].story_contents.nodes
+            ],
             'topic_url_fragment': topics[index].url_fragment,
             'classroom_url_fragment': (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
-                    story.corresponding_topic_id))
+                    stories[index].corresponding_topic_id))
         })
 
     return summary_dicts
