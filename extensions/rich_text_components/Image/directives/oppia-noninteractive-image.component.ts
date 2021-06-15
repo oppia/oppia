@@ -18,9 +18,23 @@
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -41,7 +55,7 @@ interface Dimension {
   templateUrl: './image.component.html',
   styleUrls: []
 })
-export class NoninteractiveImage implements OnInit {
+export class NoninteractiveImage implements OnInit, OnChanges {
   @Input() filepathWithValue: string;
   @Input() altWithValue: string = '';
   @Input() captionWithValue: string = '';
@@ -65,9 +79,17 @@ export class NoninteractiveImage implements OnInit {
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnNewImage(): void {
+    if (
+      !this.filepathWithValue || !this.altWithValue || !this.captionWithValue
+    ) {
+      return;
+    }
     this.filepath = this.htmlEscaperService.escapedJsonToObj(
       this.filepathWithValue) as string;
+    if (!this.filepath) {
+      return;
+    }
     this.loadingIndicatorUrl = this.urlInterpolationService.getStaticImageUrl(
       AppConstants.LOADING_INDICATOR_URL);
     this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
@@ -146,6 +168,10 @@ export class NoninteractiveImage implements OnInit {
     }
   }
 
+  ngOnInit(): void {
+    this._updateViewOnNewImage();
+  }
+
   loadImage(): void {
     this.isLoadingIndicatorShown = true;
     this.isTryAgainShown = false;
@@ -158,6 +184,16 @@ export class NoninteractiveImage implements OnInit {
       this.isTryAgainShown = true;
       this.isLoadingIndicatorShown = false;
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.filepathWithValue ||
+      changes.altWithValue ||
+      changes.captionWithValue
+    ) {
+      this._updateViewOnNewImage();
+    }
   }
 }
 

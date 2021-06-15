@@ -24,6 +24,7 @@ import { ImagePreloaderService } from 'pages/exploration-player-page/services/im
 import { ContextService } from 'services/context.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SimpleChanges, SimpleChange } from '@angular/core';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 describe('oppiaNoninteractiveSvgdiagram', () => {
@@ -77,11 +78,37 @@ describe('oppiaNoninteractiveSvgdiagram', () => {
     fixture.detectChanges();
   });
 
+  it('should run update on change', () => {
+    component.svgFilenameWithValue = undefined;
+    component.altWithValue = undefined;
+    component.ngOnInit();
+    component.svgFilenameWithValue = '&quot;svgFilename.svg&quot;';
+    component.altWithValue = '&quot;altText&quot;';
+    let changes: SimpleChanges = {};
+    changes.svgFilenameWithValue = new SimpleChange(
+      undefined,
+      '&quot;svgFilename.svg&quot;',
+      true
+    );
+    changes.svgFilenameWithValue = new SimpleChange(
+      undefined,
+      '&quot;altText&quot;',
+      true
+    );
+    component.ngOnChanges(changes);
+    expect(component.filename).toBe('svgFilename.svg');
+    expect(component.svgAltText).toBe('altText');
+    expect(component.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+  });
+
   it('should fetch the svg file', () => {
     component.ngOnInit();
     expect(component.filename).toBe('svgFilename.svg');
     expect(component.svgAltText).toBe('altText');
     expect(component.svgUrl).toBe('imageUrl:exploration_1_svgFilename.svg');
+    component.svgFilenameWithValue = '&quot;&quot;';
+    component.ngOnInit();
+    expect(component.filename).toBe('');
   });
 });
 

@@ -18,9 +18,23 @@
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
@@ -34,15 +48,28 @@ export interface TabContent {
   templateUrl: './tabs.component.html',
   styleUrls: []
 })
-export class NoninteractiveTabs implements OnInit {
+export class NoninteractiveTabs implements OnInit, OnChanges {
   @Input() tabContentsWithValue: string;
   tabContents: TabContent[] = [];
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
-  ngOnInit(): void {
+  private _updateViewOnTabContentChange(): void {
+    if (!this.tabContentsWithValue) {
+      return;
+    }
     this.tabContents = this.htmlEscaperService.escapedJsonToObj(
       this.tabContentsWithValue) as TabContent[];
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnTabContentChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.tabContentsWithValue) {
+      this._updateViewOnTabContentChange();
+    }
   }
 }
 

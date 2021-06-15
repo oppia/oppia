@@ -18,9 +18,23 @@
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
  */
 
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AutoplayedVideosService } from 'services/autoplayed-videos.service';
 import { ContextService } from 'services/context.service';
@@ -43,7 +57,7 @@ let apiLoaded = false;
   templateUrl: './video.component.html',
   styleUrls: []
 })
-export class NoninteractiveVideo implements OnInit {
+export class NoninteractiveVideo implements OnInit, OnChanges {
   @Input() autoplayWithValue: string;
   @Input() endWithValue: string;
   @Input() startWithValue: string;
@@ -66,7 +80,15 @@ export class NoninteractiveVideo implements OnInit {
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnNewVideo(): void {
+    if (
+      !this.autoplayWithValue ||
+      !this.endWithValue ||
+      !this.startWithValue ||
+      !this.videoIdWithValue
+    ) {
+      return;
+    }
     if (!apiLoaded) {
       // This code loads the IFrame Player API code asynchronously, according to
       // the instructions at
@@ -119,6 +141,21 @@ export class NoninteractiveVideo implements OnInit {
     // by tabbing while in Exploration Editor mode.
     if (this.contextService.isInExplorationEditorMode()) {
       this.tabIndexVal = -1;
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnNewVideo();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.autoplayWithValue ||
+      changes.endWithValue ||
+      changes.startWithValue ||
+      changes.videoIdWithValue
+    ) {
+      this._updateViewOnNewVideo();
     }
   }
 }

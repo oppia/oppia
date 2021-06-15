@@ -35,6 +35,7 @@ import { NoninteractiveVideo } from './Video/directives/oppia-noninteractive-vid
 import { NoninteractiveSkillreview } from './Skillreview/directives/oppia-noninteractive-skillreview.component';
 import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import { ConceptCardComponent } from 'components/concept-card/concept-card.directive';
+import { PortalModule } from '@angular/cdk/portal';
 
 
 @NgModule({
@@ -47,6 +48,7 @@ import { ConceptCardComponent } from 'components/concept-card/concept-card.direc
     NgbModalModule,
     NgbNavModule,
     NgbTooltipModule,
+    PortalModule,
     YouTubePlayerModule
   ],
   declarations: [

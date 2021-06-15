@@ -18,9 +18,23 @@
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the component is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
+ *
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
@@ -36,7 +50,7 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
   templateUrl: './svgdiagram.component.html',
   styleUrls: []
 })
-export class NoninteractiveSvgdiagram implements OnInit {
+export class NoninteractiveSvgdiagram implements OnInit, OnChanges {
   @Input() svgFilenameWithValue: string;
   @Input() altWithValue: string;
 
@@ -55,9 +69,15 @@ export class NoninteractiveSvgdiagram implements OnInit {
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnSvgFileChange(): void {
+    if (!this.svgFilenameWithValue || !this.altWithValue) {
+      return;
+    }
     this.filename = this.htmlEscaperService.escapedJsonToObj(
       this.svgFilenameWithValue) as string;
+    if (!this.filename) {
+      return;
+    }
     this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
       this.filename);
     this.svgContainerStyle = {
@@ -78,6 +98,16 @@ export class NoninteractiveSvgdiagram implements OnInit {
     if (this.altWithValue) {
       this.svgAltText = this.htmlEscaperService.escapedJsonToObj(
         this.altWithValue) as string;
+    }
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnSvgFileChange();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.svgFilenameWithValue || changes.altWithValue) {
+      this._updateViewOnSvgFileChange();
     }
   }
 }

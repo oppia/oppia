@@ -23,7 +23,7 @@ import { OppiaAngularRootComponent } from
 import { angularServices } from 'services/angular-services.index';
 
 angular.module('oppia').directive('oppiaRoot', [
-  '$translate', function($translate) {
+  '$translate', 'RteHelperService', function($translate, RteHelperService) {
     return {
       template: require('./oppia-root.directive.html'),
       scope: {},
@@ -32,7 +32,7 @@ angular.module('oppia').directive('oppiaRoot', [
       controller: ['$scope',
         function($scope) {
           $scope.initialized = false;
-
+          OppiaAngularRootComponent.rteHelperService = RteHelperService;
           $scope.onInit = function() {
             const map: Record<string, unknown[]> = {};
             for (let [serviceName, serviceType] of angularServices) {

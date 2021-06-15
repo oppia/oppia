@@ -37,6 +37,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader, TranslateService, TranslateDefaultParser, TranslateParser, MissingTranslationHandler } from '@ngx-translate/core';
 import { TranslateCacheModule, TranslateCacheService, TranslateCacheSettings } from 'ngx-translate-cache';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import { CodeMirrorModule } from './code-mirror/codemirror.module';
+import { OppiaCkEditor4Module } from './ck-editor-helpers/ckeditor4.module';
 
 
 // Components.
@@ -107,8 +110,6 @@ import { LimitToPipe } from 'filters/limit-to.pipe';
 
 // Services.
 import { AuthService } from 'services/auth.service';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { CodeMirrorModule } from './code-mirror/codemirror.module';
 import { HttpClient } from '@angular/common/http';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
@@ -171,6 +172,7 @@ const toastrConfig = {
     RichTextComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     /**
@@ -345,9 +347,10 @@ const toastrConfig = {
     MaterialModule,
     NgbTooltipModule,
     NgbNavModule,
-    RichTextComponentsModule,
     NgbModalModule,
+    RichTextComponentsModule,
     ObjectComponentsModule,
+    OppiaCkEditor4Module,
     SharedFormsModule,
     SharedPipesModule,
     TranslateModule,
