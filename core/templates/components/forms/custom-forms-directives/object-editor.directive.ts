@@ -122,15 +122,15 @@ angular.module('oppia').directive('objectEditor', [
         if (directiveName) {
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
             element.html(
-              '<input ng-show="false" style="height: 0; width: 0"' +
-              ' ng-model="value">' +
               '<' + directiveName +
               '-editor [always-editable]="alwaysEditable"' +
               ' [init-args]="initArgs" [is-editable]="' +
               'isEditable" [schema]="getSchema()"' +
               '[modal-id]="modalId" (validity-change)="updateValid($event)"' +
               '(value-changed)="updateValue($event)" [value]="value"></' +
-              directiveName + '-editor>');
+              directiveName + '-editor>' +
+              '<input ng-show="false" style="height: 0; width: 0"' +
+              ' ng-model="value">');
             $compile(element.contents())(scope);
           } else {
             element.html(
@@ -144,8 +144,10 @@ angular.module('oppia').directive('objectEditor', [
         } else {
           $log.error('Error in objectEditor: no editor type supplied.');
         }
-        scope.ngModelController = (
-          angular.element(element[0].firstElementChild).controller('ngModel'));
+        if (element[0]) {
+          scope.ngModelController = angular.element(
+            element[0].lastElementChild).controller('ngModel');
+        }
       },
       restrict: 'E'
     };
