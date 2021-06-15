@@ -249,7 +249,7 @@ describe('Editable story backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should call success handler if the story is associated '+
+  it('should call success handler if the story is associated ' +
     'with given url fragment', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -266,7 +266,7 @@ describe('Editable story backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should call rejection handler if the story is not associated '+
+  it('should call rejection handler if the story is not associated ' +
     'with given url fragment', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -287,7 +287,7 @@ describe('Editable story backend API service', () => {
       'Story with given url fragment doesn\'t exist.');
   }));
 
-  it('should call success handler if the exploration '+
+  it('should call success handler if the exploration ' +
     'is validated with no errors', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -305,16 +305,16 @@ describe('Editable story backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should call rejection handler if the exploration '+
+  it('should call rejection handler if the exploration ' +
     'has validation errors', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     editableStoryBackendApiService.validateExplorationsAsync(
       'not_valid', ['expId1', 'expId2']).then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/validate_story_explorations/not_valid?' +
-        'comma_separated_exp_ids=expId1,expId2');
+    let req = httpTestingController.expectOne(
+      '/validate_story_explorations/not_valid?' +
+      'comma_separated_exp_ids=expId1,expId2');
     expect(req.request.method).toEqual('GET');
     req.flush({error: 'Story has validation errors.'}, {
       status: 404,
