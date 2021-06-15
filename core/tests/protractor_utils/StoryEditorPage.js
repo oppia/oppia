@@ -292,7 +292,8 @@ var StoryEditorPage = function() {
 
   this.changeStoryDescription = async function(storyDescription) {
     await waitFor.visibilityOf(
-      storyDescriptionField, 'Story Description Field taking too long to appear.');
+      storyDescriptionField,
+      'Story Description Field taking too long to appear.');
     await storyDescriptionField.clear();
     await storyDescriptionField.sendKeys(storyDescription);
   };
@@ -327,8 +328,8 @@ var StoryEditorPage = function() {
   };
 
   this.expectSaveStoryDisabled = async function() {
-    await waitFor.visibilityOf(saveStoryButton,
-      'Save story button taking too long to appear');
+    await waitFor.visibilityOf(
+      saveStoryButton, 'Save story button taking too long to appear');
     return expect(
       await saveStoryButton.getAttribute('disabled')).toEqual('true');
   };

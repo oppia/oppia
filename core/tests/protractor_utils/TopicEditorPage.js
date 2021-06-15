@@ -238,7 +238,8 @@ var TopicEditorPage = function() {
 
   this.deleteSubtopicWithIndex = async function(index) {
     await waitFor.visibilityOf(
-      subtopicEditOptions.first(), 'Subtopic Edit Options taking too long to appear');
+      subtopicEditOptions.first(),
+      'Subtopic Edit Options taking too long to appear');
     var subtopicEditOptionBox = subtopicEditOptions.get(index);
     await action.click('Subtopic Edit Option Box', subtopicEditOptionBox);
     await waitFor.elementToBeClickable(
