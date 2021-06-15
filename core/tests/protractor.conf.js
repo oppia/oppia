@@ -336,7 +336,7 @@ exports.config = {
     // Only running video recorder on Github Actions, since running it on
     // CicleCI causes RAM issues (meaning very high flakiness).
 
-    if (process.env.GITHUB_ACTIONS) {
+    if (process.env.GITHUB_ACTIONS && process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       jasmine.getEnv().addReporter({
         specStarted: function(result){
           let ffmpegArgs = [
@@ -370,6 +370,12 @@ exports.config = {
           }
         },
       });
+    }
+    else {
+      console.log(
+        'Videos will not be recorded for this suite either because videos' +
+        ' have been disabled for it (using environment variables) or' +
+        ' because it\'s on CircleCI');
     }
 
     // Screenshots will only run on CircleCI, since we don't have videos here.
