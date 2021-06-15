@@ -108,7 +108,7 @@ describe('Story editor navbar component', () => {
         }],
       },
       language_code: 'en',
-      meta_tag_content: "meta",
+      meta_tag_content: 'meta',
       url_fragment: 'url',
       version: 1,
       corresponding_topic_id: 'topic_id',
