@@ -119,6 +119,9 @@ export class BaseContentComponent {
   }
 }
 
+/**
+ * This directive is used as selector for navbar breadcrumb transclusion.
+ */
 @Directive({
   selector: 'navbar-breadcrumb'
 })

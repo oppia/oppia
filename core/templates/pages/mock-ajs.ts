@@ -18,13 +18,17 @@
 
 /**
  * We are at a stage where we can have some pages in Angular. But we share
- * component in between pages. SSo we can't remove the code that downgrades
+ * component in between pages. So we can't remove the code that downgrades
  * components and services. This code is found in most Angular components and
  * services (towards the end of the file). In order to not have to create a
  * separate file for each service and component just for the sake of downgrading
  * , we have created this mock AngularJS object that will be used in the pages
  * that don't use AngularJS.
  */
+
+// TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
+
+import { VERSION } from '@angular/core';
 
 let mockAngular = {
   component: () => mockAngular,
@@ -38,7 +42,8 @@ let mockAngular = {
   requires: () => [],
   run: () => mockAngular,
   service: () => mockAngular,
-  value: () => mockAngular
+  value: () => mockAngular,
+  version: VERSION
 };
 // This throws "Property 'angular' does not exist on type 'Window & typeof
 // globalThis'." when the `as unknown as ...` is not used.

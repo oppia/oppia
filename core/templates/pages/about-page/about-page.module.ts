@@ -27,7 +27,6 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { AboutPageRootComponent } from './about-page-root.component';
 
 @NgModule({
