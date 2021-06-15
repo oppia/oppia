@@ -32,8 +32,8 @@ export class CodemirrorMergeviewComponent implements
   // and component interactions, therefore we need to do non-null assertion,
   // for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() leftValue!: string;
-  @Input() rightValue!: string;
+  @Input() leftValue!: string | undefined;
+  @Input() rightValue!: string | undefined;
   codeMirrorInstance!: CodeMirror.MergeView.MergeViewEditor;
 
   constructor(
@@ -58,8 +58,8 @@ export class CodemirrorMergeviewComponent implements
         (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
           this.elementRef.nativeElement,
           {
-            value: this.leftValue,
-            orig: this.rightValue,
+            value: this.leftValue !== undefined ? this.leftValue : ' ',
+            orig: this.rightValue !== undefined ? this.rightValue : ' ',
             ...this.options
           }
         );
@@ -72,6 +72,9 @@ export class CodemirrorMergeviewComponent implements
       changes.leftValue.currentValue !==
       changes.leftValue.previousValue &&
       this.codeMirrorInstance) {
+      if (this.leftValue === undefined) {
+        throw new Error('Left pane value is not defined.');
+      }
       this.ngZone.runOutsideAngular(() => {
         this.codeMirrorInstance.editor().setValue(
           changes.leftValue.currentValue);
@@ -82,6 +85,9 @@ export class CodemirrorMergeviewComponent implements
       changes.rightValue.currentValue !==
       changes.rightValue.previousValue &&
       this.codeMirrorInstance) {
+      if (this.rightValue === undefined) {
+        throw new Error('Right pane value is not defined.');
+      }
       this.ngZone.runOutsideAngular(() => {
         this.codeMirrorInstance.rightOriginal().setValue(
           changes.rightValue.currentValue);
