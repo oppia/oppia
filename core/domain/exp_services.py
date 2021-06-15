@@ -1819,6 +1819,7 @@ def are_changes_mergeable(exp_id, version, change_list ):
         for change in change_list:
             change_is_mergeable = False
             if change.cmd == exp_domain.CMD_RENAME_STATE:
+                change_is_mergeable = True
                 old_state_name = change.old_state_name
                 new_state_name = change.new_state_name
                 if old_state_name in state_names_of_renamed_states:
@@ -1831,8 +1832,9 @@ def are_changes_mergeable(exp_id, version, change_list ):
                 new_state_name = change.state_name
                 if change.state_name in state_names_of_renamed_states:
                     old_state_name = state_names_of_renamed_states[change.state_name]
+                    new_state_name = state_names_of_renamed_states[change.state_name]
                 if change.state_name in old_to_new_state_names:
-                    new_state_name = old_to_new_state_names[change.state_name]
+                    new_state_name = old_to_new_state_names[old_state_name]
                 if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     if (old_version.states[old_state_name].content.html ==
                         new_version.states[new_state_name].content.html):
@@ -1880,6 +1882,9 @@ def are_changes_mergeable(exp_id, version, change_list ):
                                 change_is_mergeable = True
                         else:
                             change_is_mergeable = True
+                elif (change.property_name ==
+                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                    change_is_mergeable = True
                 elif (change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if old_state_name in changed_properties:
                         if (old_version.states[old_state_name].interaction.id ==
