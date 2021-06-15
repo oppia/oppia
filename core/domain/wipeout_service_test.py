@@ -4661,6 +4661,15 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         )
         self.blog_post_summary_model.update_timestamps()
         self.blog_post_summary_model.put()
+
+        self.blog_post_rights_model = blog_models.BlogPostRightsModel(
+            id=self.BLOG_1_ID,
+            editor_ids=[self.user_1_id],
+            blog_post_is_published=True,
+        )
+        self.blog_post_rights_model.update_timestamps()
+        self.blog_post_rights_model.put()
+
         wipeout_service.pre_delete_user(self.user_1_id)
         wipeout_service.pre_delete_user(self.user_2_id)
         self.process_and_flush_pending_tasks()
@@ -4692,6 +4701,13 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
         )
 
+        # Verify that the user id is removed from the list of editor ids in
+        # BlogPostRights model.
+        blog_post_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(
+                self.BLOG_1_ID))
+        self.assertTrue(self.user_1_id not in blog_post_rights_model.editor_ids)
+
     def test_one_blog_when_the_deletion_is_repeated_is_pseudonymized(self):
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -4704,6 +4720,15 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
         blog_post_model.author_id = self.user_1_id
         blog_post_model.update_timestamps()
         blog_post_model.put()
+
+        blog_post_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(
+                self.BLOG_1_ID)
+        )
+
+        blog_post_rights_model.editor_ids.append(self.user_1_id)
+        blog_post_rights_model.update_timestamps()
+        blog_post_rights_model.put()
 
         # Run the user deletion again.
         wipeout_service.delete_user(
@@ -4724,6 +4749,13 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             new_blog_post_model.author_id,
             pseudonymizable_user_id_mapping[self.BLOG_1_ID]
         )
+
+        # Verify that the user id is removed from the list of editor ids in
+        # BlogPostRights model.
+        blog_post_rights_model = (
+            blog_models.BlogPostRightsModel.get_by_id(
+                self.BLOG_1_ID))
+        self.assertTrue(self.user_1_id not in blog_post_rights_model.editor_ids)
 
     def test_multiple_blog_post_models_are_pseudonymized(self):
         blog_post_models_list = []
@@ -4758,8 +4790,22 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             )
             blog_models.BlogPostSummaryModel.update_timestamps_multi(
                 blog_post_summary_models_list)
+
+        blog_post_rights_models_list = []
+        for i in python_utils.RANGE(self.NUMBER_OF_MODELS):
+            blog_post_rights_models_list.append(
+                blog_models.BlogPostRightsModel(
+                    id='blogmodel-%s' % i,
+                    editor_ids=[self.user_1_id],
+                    blog_post_is_published=True,
+                )
+            )
+            blog_models.BlogPostRightsModel.update_timestamps_multi(
+                blog_post_rights_models_list)
+
         datastore_services.put_multi(
-            blog_post_models_list + blog_post_summary_models_list)
+            blog_post_models_list + blog_post_summary_models_list +
+            blog_post_rights_models_list)
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -4791,3 +4837,14 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 blog_post_summary_model.author_id,
                 pseudonymizable_user_id_mapping[blog_post_summary_model.id]
             )
+
+        # Verify that user id is removed from the list of editor ids in all
+        # BlogPostRights models.
+        blog_post_rights_models = (
+            blog_models.BlogPostRightsModel.get_multi(
+                [model.id for model in blog_post_rights_models_list]
+            )
+        )
+        for blog_post_rights_model in blog_post_rights_models:
+            self.assertTrue(
+                self.user_1_id not in blog_post_rights_model.editor_ids)

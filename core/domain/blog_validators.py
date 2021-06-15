@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Validators for Blog models. """
+""" Validators for Blog models."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -34,9 +34,8 @@ class BlogPostModelValidator(base_model_validators.BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        # Valid id: random_hash of 12 chars.
-        regex_string = '[A-Za-z0-9-_]{1,%s}$' % (base_models.ID_LENGTH)
-        return regex_string
+        # Valid id: random_hash of base_models.ID_LENGTH chars.
+        return '[A-Za-z0-9-_]{1,%s}$' % (base_models.ID_LENGTH)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -52,14 +51,13 @@ class BlogPostModelValidator(base_model_validators.BaseModelValidator):
                 [item.id]
             )
         ]
-        if item.author_id:
-            field_name_to_external_model_references.append(
-                base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids', [item.author_id],
-                    may_contain_system_ids=True,
-                    may_contain_pseudonymous_ids=True
-                )
+        field_name_to_external_model_references.append(
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'author_ids', [item.author_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )
+        )
         return field_name_to_external_model_references
 
 
@@ -86,14 +84,13 @@ class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
                 [item.id]
             )
         ]
-        if item.author_id:
-            field_name_to_external_model_references.append(
-                base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids', [item.author_id],
-                    may_contain_system_ids=True,
-                    may_contain_pseudonymous_ids=True
-                )
+        field_name_to_external_model_references.append(
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'author_ids', [item.author_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )
+        )
         return field_name_to_external_model_references
 
 

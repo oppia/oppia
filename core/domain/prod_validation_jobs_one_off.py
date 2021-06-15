@@ -1071,8 +1071,7 @@ class PlatformParameterSnapshotContentModelAuditOneOffJob(
         return [config_models.PlatformParameterSnapshotContentModel]
 
 
-class BlogPostModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
+class BlogPostModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates BlogPostModel."""
 
     @classmethod
@@ -1080,8 +1079,7 @@ class BlogPostModelAuditOneOffJob(
         return [blog_models.BlogPostModel]
 
 
-class BlogPostSummaryModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
+class BlogPostSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates BlogPostSummaryModel."""
 
     @classmethod
@@ -1089,8 +1087,7 @@ class BlogPostSummaryModelAuditOneOffJob(
         return [blog_models.BlogPostSummaryModel]
 
 
-class BlogPostRightsModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
+class BlogPostRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates BlogPostRightsModel."""
 
     @classmethod
