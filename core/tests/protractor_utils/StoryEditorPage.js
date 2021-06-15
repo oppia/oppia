@@ -103,10 +103,6 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-remove-prerequisite-skill'));
   var deleteAcquiredSkillButton = element.all(
     by.css('.protractor-test-remove-acquired-skill'));
-  var prerequisiteSkillDescriptionCard = element.all(
-    by.css('.protractor-test-prerequisite-skill-description-card'));
-  var acquiredSkillDescriptionCard = element.all(
-    by.css('.protractor-test-acquired-skill-description-card'));
   var nextChapterCard = element(by.css('.protractor-test-next-chapter-card'));
   var warningIndicator = element(by.css('.protractor-test-warning-indicator'));
   var warningTextElements = element.all(
@@ -265,10 +261,15 @@ var StoryEditorPage = function() {
   };
 
   this.expectTitleToBe = async function(title) {
+    await waitFor.presenceOf(
+      storyTitleField, 'Story Title Field takes too long to appear');
     expect(await storyTitleField.getAttribute('value')).toEqual(title);
   };
 
   this.expectDescriptionToBe = async function(description) {
+    await waitFor.presenceOf(
+      storyDescriptionField,
+      'Story Description Field takes too long to appear');
     expect(await storyDescriptionField.getAttribute('value')).toEqual(
       description);
   };
@@ -357,8 +358,11 @@ var StoryEditorPage = function() {
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible'
     );
-    await expect(await nodeDescriptionInputField.getAttribute('value'))
-      .toMatch(nodeDescription);
+    let desc = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-add-chapter-description')[0].value;
+    });
+    await expect(desc).toMatch(nodeDescription);
   };
 
   this.expectChapterExplorationIdToBe = function(id) {
@@ -420,34 +424,21 @@ var StoryEditorPage = function() {
       selectSkill: async function(name) {
         await this._searchSkillByName(name);
         await this._selectSkillBasedOnIndex(0);
-        await waitFor.elementToBeClickable(
-          skillSaveButton,
-          'doneButton takes too long to be clickable');
-        await skillSaveButton.click();
+        await action.click('Skill Save Button', skillSaveButton);
       },
     };
   };
 
   this.addAcquiredSkill = async function(skillName) {
-    await waitFor.visibilityOf(
-      addAcquiredSkillButton,
-      'addAcquiredSkillButton takes too long to be visible');
-    await waitFor.elementToBeClickable(
-      addAcquiredSkillButton,
-      'addAcquiredSkillButton takes too long to be clickable');
-    await addAcquiredSkillButton.click();
+    await action.click(
+      'addAcquiredSkillButton', addAcquiredSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
 
   this.addPrerequisiteSkill = async function(skillName) {
-    await waitFor.visibilityOf(
-      addPrerequisiteSkillButton,
-      'addPrerequisitesSkillButton takes too long to be visible');
-    await waitFor.elementToBeClickable(
-      addPrerequisiteSkillButton,
-      'addPrerequisitesSkillButton takes too long to be clickable');
-    await addPrerequisiteSkillButton.click();
+    await action.click(
+      'addPrerequisiteSkillButton', addPrerequisiteSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
@@ -467,11 +458,19 @@ var StoryEditorPage = function() {
   };
 
   this.expectAcquiredSkillDescriptionCardCount = async function(number) {
-    expect(await acquiredSkillDescriptionCard.count()).toBe(number);
+    let count = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-acquired-skill-description-card').length;
+    });
+    await expect(count).toEqual(number);
   };
 
   this.expectPrerequisiteSkillDescriptionCardCount = async function(number) {
-    expect(await prerequisiteSkillDescriptionCard.count()).toBe(number);
+    let count = await browser.executeScript(() => {
+      return document.getElementsByClassName(
+        'protractor-test-prerequisite-skill-description-card').length;
+    });
+    await expect(count).toEqual(number);
   };
 
   this.expectWarningInIndicator = async function(warning) {
