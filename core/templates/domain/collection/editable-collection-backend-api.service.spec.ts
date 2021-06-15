@@ -170,4 +170,49 @@ describe('Editable collection backend API service', () => {
       expect(failHandler).not.toHaveBeenCalled();
     })
   );
+
+  it('should fail to update a collection after fetching it from the backend',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      var collection: Collection = null;
+      var collectionDict = sampleDataResults;
+      // Loading a collection the first time should fetch it from the backend.
+      editableCollectionBackendApiService.fetchCollectionAsync('1').then(
+        (data) => {
+          collection = data;
+        });
+      var req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+
+      collectionDict.collection.title = 'New Title';
+      collectionDict.collection.version = 2;
+      collection = Collection.create(collectionDict.collection);
+
+      // Sending a request to update collection with invalid Id.
+      editableCollectionBackendApiService.updateCollectionAsync(
+        'invalidId',
+        collectionDict.collection.version,
+        collectionDict.collection.title, []
+      ).then(successHandler, failHandler);
+      req = httpTestingController.expectOne(
+        '/collection_editor_handler/data/invalidId');
+      expect(req.request.method).toEqual('PUT');
+      req.flush({
+        error: 'Error updating collection.'
+      }, {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error updating collection.');
+    })
+  );
 });
