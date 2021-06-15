@@ -1,4 +1,3 @@
-
 <div class="oppia-same-row-container">
   <form class="navbar-form float-left oppia-search-bar-form" role="search">
     <div class="form-group">
@@ -11,7 +10,7 @@
         </div>
         <input type="text"
                class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
-               [attr.placeholder]="searchBarPlaceholder"
+               [placeholder]="searchBarPlaceholder"
                [(ngModel)]="searchQuery"
                (ngModelChange)="classroomPageIsActive ? null : onSearchQueryChangeExec()"
                [ngModelOptions]="{ updateOn: 'blur', standalone:'true' }"
@@ -31,7 +30,7 @@
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
             class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
-            title="{{selectionDetails.categories.description | translate}}">
+            title="{{ selectionDetails.categories.description | translate }}">
       {{categoryButtonText|truncate:14}}
     </button>
     <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
@@ -81,7 +80,6 @@
   </div>
 </div>
 <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown">
-
   <button ngbDropdownToggle
           (click)="openSubmenu($event, 'language')"
           data-toggle="dropdown"
@@ -89,7 +87,7 @@
           type="button"
           class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
           title="{{selectionDetails.languageCodes.description | translate}}">
-    {{languageButtonText|truncate:14}}
+    {{ languageButtonText | truncate:14 }}
   </button>
   <!-- The event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
   <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
@@ -145,7 +143,6 @@
     </div>
   </div>
 </div>
-
 <style>
   .oppia-search-bar-input,
   .oppia-search-button {
@@ -410,5 +407,4 @@
       padding-left: 0;
     }
   }
-
 </style>
