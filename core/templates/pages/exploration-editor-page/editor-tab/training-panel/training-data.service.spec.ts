@@ -19,6 +19,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -36,7 +38,22 @@ require(
 
 describe('TrainingDataService', function() {
   var siis, ecs, rs, tds, ess, oof;
-  var mockExplorationData;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: ExplorationDataService,
+          useValue: {
+            explorationId: 0,
+            autosaveChangeListAsync() {
+              return;
+            }
+          }
+        }
+      ]
+    });
+  });
 
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
@@ -50,14 +67,6 @@ describe('TrainingDataService', function() {
 
   beforeEach(function() {
     angular.mock.module('oppia');
-    mockExplorationData = {
-      explorationId: 0,
-      autosaveChangeListAsync: function() {}
-    };
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', [mockExplorationData][0]);
-    });
-    spyOn(mockExplorationData, 'autosaveChangeListAsync');
   });
 
   beforeEach(angular.mock.inject(function($injector, $rootScope) {
