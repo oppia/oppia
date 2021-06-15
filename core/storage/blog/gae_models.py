@@ -152,7 +152,7 @@ class BlogPostModel(base_models.BaseModel):
             content='',
             title='',
             published_on=None,
-            url_fragment='',
+            url_fragment=blog_post_id.lower(),
             tags=[],
             thumbnail_filename=None
         )
@@ -298,7 +298,7 @@ class BlogPostRightsModel(base_models.BaseModel):
     def get_deletion_policy():
         """Model contains data to be deleted corresponding to a user: editor_ids
         field. It does not delete the model but removes the user id from the
-        list of editor ids corresponding to a blog post rights model.
+        list of editor IDs corresponding to a blog post rights model.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -314,8 +314,8 @@ class BlogPostRightsModel(base_models.BaseModel):
         if blog_post_rights_models:
             for rights_model in blog_post_rights_models:
                 rights_model.editor_ids.remove(user_id)
-            datastore_services.update_timestamps_multi(blog_post_rights_models)
-            datastore_services.put_multi(blog_post_rights_models)
+            cls.update_timestamps_multi(blog_post_rights_models)
+            cls.put_multi(blog_post_rights_models)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
