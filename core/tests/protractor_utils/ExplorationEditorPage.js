@@ -222,6 +222,8 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
+    //TODO(#13096): Remove browser.sleep from e2e tests once Angular migration finishes.
+    browser.sleep(2500);
     await waitFor.visibilityOf(
       toastSuccessElement,
       'Toast message is taking too long to appear after saving changes');
