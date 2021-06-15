@@ -131,7 +131,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
   direction: string = 'ltr';
-  currentLang = 'en';
 
   static classroomBackendApiService: ClassroomBackendApiService;
   static contextService: ContextService;
@@ -251,22 +250,17 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       }
     ]);
 
-    // Add lang attribute to html tag.
-    this.documentAttributeCustomizationService.addAttribute(
-      'lang', this.currentLang);
-
     // Initialize translations.
     this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
       (code) => {
         this.translateService.use(code);
-        this.currentLang = code;
         for (var i = 0; i < AppConstants.SUPPORTED_SITE_LANGUAGES.length; i++) {
-          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id ===
-            this.currentLang) {
+          if (AppConstants.SUPPORTED_SITE_LANGUAGES[i].id === code) {
             this.direction = AppConstants.SUPPORTED_SITE_LANGUAGES[i].direction;
             break;
           }
         }
+        this.documentAttributeCustomizationService.addAttribute('lang', code);
       }
     );
     this.translateCacheService.init();
