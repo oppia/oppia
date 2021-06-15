@@ -267,7 +267,7 @@ angular.module('oppia').factory('ChangeListService', [
         // original_content is only required when submitting translations via
         // the contributor dashboard because such translation suggestions
         // undergo a manual review process where the reviewer will need to look
-        // at the corresponding original content at the time of submission. 
+        // at the corresponding original content at the time of submission.
         addChange({
           cmd: CMD_ADD_WRITTEN_TRANSLATION,
           content_id: contentId,
