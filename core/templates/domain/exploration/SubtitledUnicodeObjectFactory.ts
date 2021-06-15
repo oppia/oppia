@@ -18,7 +18,7 @@
  */
 
 export interface SubtitledUnicodeBackendDict {
-  'content_id': string;
+  'content_id': string | null;
   'unicode_str': string;
 }
 
@@ -31,7 +31,7 @@ export class SubtitledUnicode {
   // the content_id should be set to a string.
   constructor(
     private _unicode: string,
-    private _contentId: string
+    private _contentId: string | null
   ) {}
 
   toBackendDict(): SubtitledUnicodeBackendDict {
@@ -45,11 +45,11 @@ export class SubtitledUnicode {
     return !this._unicode;
   }
 
-  get contentId(): string {
+  get contentId(): string | null {
     return this._contentId;
   }
 
-  set contentId(contentId: string) {
+  set contentId(contentId: string | null) {
     this._contentId = contentId;
   }
 
@@ -74,7 +74,7 @@ export class SubtitledUnicodeObjectFactory {
       subtitledUnicodeBackendDict.content_id);
   }
 
-  createDefault(unicode: string, contentId: string): SubtitledUnicode {
+  createDefault(unicode: string, contentId: string | null): SubtitledUnicode {
     return new SubtitledUnicode(unicode, contentId);
   }
 }

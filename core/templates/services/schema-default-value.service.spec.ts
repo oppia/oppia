@@ -19,43 +19,45 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LoggerService } from 'services/contextual/logger.service';
-import { SchemaDefaultValueService } from
+import { Schema, SchemaDefaultValueService } from
   'services/schema-default-value.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-describe('Schema Default Value Service', () => {
-  let sdvs, ls;
+// eslint-disable-next-line oppia/no-test-blockers
+fdescribe('Schema Default Value Service', () => {
+  let sdvs: SchemaDefaultValueService;
+  let ls: LoggerService;
 
   beforeEach(() => {
-    sdvs = TestBed.get(SchemaDefaultValueService);
-    ls = TestBed.get(LoggerService);
+    sdvs = TestBed.inject(SchemaDefaultValueService);
+    ls = TestBed.inject(LoggerService);
   });
 
   it('should get default value if schema has choices', () => {
     const schema = {
       choices: ['Choice 1']
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe('Choice 1');
   });
 
   it('should get default value if schema type is bool', () => {
     const schema = {
       type: 'bool'
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBeFalse();
   });
 
   it('should get default value if schema type is unicode or html', () => {
     let schema = {
       type: 'unicode'
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe('');
 
     schema = {
       type: 'html'
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe('');
   });
 
@@ -67,13 +69,13 @@ describe('Schema Default Value Service', () => {
       }, {
         type: 'int'
       }]
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toEqual([false, 0]);
 
     let schema2 = {
       type: 'list',
       items: ''
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema2)).toEqual([]);
   });
 
@@ -96,7 +98,7 @@ describe('Schema Default Value Service', () => {
           type: 'int'
         }
       }]
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toEqual({
       property_1: false,
       property_2: '',
@@ -107,12 +109,12 @@ describe('Schema Default Value Service', () => {
   it('should get default value if schema type is int or float', () => {
     let schema = {
       type: 'int'
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe(0);
 
     schema = {
       type: 'float'
-    };
+    } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe(0);
   });
 
@@ -120,7 +122,7 @@ describe('Schema Default Value Service', () => {
     let schema = {
       type: 'custom',
       obj_type: 'SubtitledHtml'
-    };
+    } as Schema;
     expect(
       sdvs.getDefaultValue(schema)
     ).toEqual(new SubtitledHtml('', null));
@@ -130,7 +132,7 @@ describe('Schema Default Value Service', () => {
     let schema = {
       type: 'custom',
       obj_type: 'SubtitledUnicode'
-    };
+    } as Schema;
     expect(
       sdvs.getDefaultValue(schema)
     ).toEqual(new SubtitledUnicode('', null));
@@ -140,10 +142,21 @@ describe('Schema Default Value Service', () => {
     var loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
     const schema = {
       type: 'invalid'
-    };
+    } as Schema;
 
-    expect(sdvs.getDefaultValue(schema)).toBeUndefined();
+    expect(() => {
+      sdvs.getDefaultValue(schema);
+    }).toThrowError('Invalid Schema');
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       'Invalid schema: ' + JSON.stringify(schema));
+  });
+
+  it('should throw error if schema choices are undefined', () => {
+    const schema = {
+      choices: undefined
+    } as Schema;
+    expect(() => {
+      sdvs.getDefaultValue(schema);
+    }).toThrowError('Schema Choices does not exist');
   });
 });

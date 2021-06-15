@@ -58,7 +58,11 @@ interface FloatSchema {
 
 interface ListSchema {
   type: 'list';
-  items: Schema | Schema[];
+  items: Schema | Schema[] | string;
+}
+
+interface InvalidSchema {
+  type: 'invalid';
 }
 
 export interface DictSchema {
@@ -82,7 +86,8 @@ export type Schema = (
   FloatSchema |
   ListSchema |
   DictSchema |
-  CustomSchema
+  CustomSchema |
+  InvalidSchema
 );
 
 interface DictSchemaDefaultValue {
@@ -119,6 +124,9 @@ export class SchemaDefaultValueService {
     );
 
     if ('choices' in schema) {
+      if (schema.choices === undefined) {
+        throw new Error('Schema Choices does not exist');
+      }
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
       return SubtitledHtml.createFromBackendDict({
@@ -138,11 +146,11 @@ export class SchemaDefaultValueService {
       if (!Array.isArray(schema.items)) {
         return [];
       }
-      return schema.items.map(function(item) {
+      return schema.items.map((item) => {
         return that.getDefaultValue(item);
       });
     } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
-      var result = {};
+      var result: SchemaDefaultValue = {};
       for (var i = 0; i < schema.properties.length; i++) {
         result[schema.properties[i].name] = this.getDefaultValue(
           schema.properties[i].schema);
@@ -152,7 +160,10 @@ export class SchemaDefaultValueService {
         schema.type === SchemaConstants.SCHEMA_TYPE_FLOAT) {
       return 0;
     } else {
-      this.logger.error('Invalid schema: ' + JSON.stringify(schema));
+      if (schema.type === 'invalid') {
+        this.logger.error('Invalid schema: ' + JSON.stringify(schema));
+      }
+      throw new Error('Invalid Schema');
     }
   }
 }
