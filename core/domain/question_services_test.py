@@ -3221,4 +3221,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(
-            cust_args['placeholder'].value, True)
+            cust_args['inputGreaterThanZero'].value, True)
