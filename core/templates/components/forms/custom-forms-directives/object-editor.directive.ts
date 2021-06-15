@@ -78,6 +78,7 @@ angular.module('oppia').directive('objectEditor', [
           'nonnegative-int',
           'normalized-string',
           'numeric-expression',
+          'parameter-name',
           'position-of-terms',
           'positive-int',
           'ratio-expression',

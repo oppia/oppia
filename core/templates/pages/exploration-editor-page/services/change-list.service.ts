@@ -27,7 +27,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { ExplorationChange, ExplorationChangeEditExplorationProperty } from 'domain/exploration/exploration-draft.model';
 
 @Injectable({
   providedIn: 'root'
@@ -193,7 +193,8 @@ export class ChangeListService implements OnInit {
    */
 
   editExplorationProperty(
-      backendName: string, newValue: string, oldValue: string): void {
+      // TODO: Replace unknown with ParamSpecs (Mismatch with Backend dict).
+      backendName: string, newValue: unknown, oldValue: unknown): void {
     if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning(
         'Invalid exploration property: ' + backendName);
@@ -204,7 +205,7 @@ export class ChangeListService implements OnInit {
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
       property_name: backendName
-    });
+    } as ExplorationChangeEditExplorationProperty);
   }
 
   /**
