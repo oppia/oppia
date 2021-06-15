@@ -341,9 +341,6 @@ var TopicEditorPage = function() {
     const assignedSkillDescriptions = (
       subtopicColumns.get(subtopicIndex).all(
         by.css('.protractor-test-subtopic-skill-description')));
-    await waitFor.visibilityOf(
-      assignedSkillDescriptions.first(),
-      'Assigned Skill Descriptions taking too long to appear.');
     const assignedSkillsLength = await assignedSkillDescriptions.count();
 
     expect(skillNames.length).toEqual(assignedSkillsLength);
