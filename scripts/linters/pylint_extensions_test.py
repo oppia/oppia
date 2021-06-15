@@ -3423,7 +3423,7 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_classdef(schemaless_class_node)
 
-    def test_non_schema_handlers_with_BaseHandler_as_parent_raise_error(self):
+    def test_non_schema_handlers_with_basehandler_as_parent_raise_error(self):
         """Handlers which are child classes of BaseHandler must have schema
         defined locally into the class.
         """
