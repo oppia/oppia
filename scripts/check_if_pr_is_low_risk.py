@@ -242,7 +242,7 @@ def check_if_pr_is_changelog_pr(pr, diff_files, file_diffs):
 
     To be a low-risk changelog PR, a PR must:
 
-    * Be opened from a branch on the oppia/oppia repository.
+    * Be opened from a branch on the release coordinator's forked repository.
     * Be opened from a branch matching
       `^update-changelog-for-release-v[0-9.]+$`.
     * Only change the following files:
