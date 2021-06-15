@@ -64,9 +64,9 @@ def create_android_report_from_json(report_json):
     user_supplied_feedback_json = report_json['user_supplied_feedback']
     user_supplied_feedback_obj = (
         app_feedback_report_domain.UserSuppliedFeedback(
-            _get_report_type_from_string(
+            get_report_type_from_string(
                 user_supplied_feedback_json['report_type']),
-            _get_category_from_string(user_supplied_feedback_json['category']),
+            get_category_from_string(user_supplied_feedback_json['category']),
             user_supplied_feedback_json['user_feedback_selected_items'],
             user_supplied_feedback_json['user_feedback_other_text_input']))
 
@@ -81,16 +81,16 @@ def create_android_report_from_json(report_json):
             device_context_json['android_device_model'],
             device_context_json['android_sdk_version'],
             device_context_json['build_fingerprint'],
-            _get_android_network_type_from_string(
+            get_android_network_type_from_string(
                 device_context_json['network_type'])))
 
     app_context_json = report_json['app_context']
-    entry_point_obj = _get_entry_point_from_json(
+    entry_point_obj = get_entry_point_from_json(
         app_context_json['entry_point'])
     app_context_obj = app_feedback_report_domain.AndroidAppContext(
         entry_point_obj, app_context_json['text_language_code'],
         app_context_json['audio_language_code'],
-        _get_android_text_size_from_string(app_context_json['text_size']),
+        get_android_text_size_from_string(app_context_json['text_size']),
         app_context_json['only_allows_wifi_download_and_update'],
         app_context_json['automatically_update_topics'],
         app_context_json['account_is_profile_admin'],
@@ -109,7 +109,7 @@ def create_android_report_from_json(report_json):
     return report_obj
 
 
-def _get_report_type_from_string(report_type_name):
+def get_report_type_from_string(report_type_name):
     """Determines the report type based on the JSON value.
 
     Args:
@@ -125,7 +125,7 @@ def _get_report_type_from_string(report_type_name):
         'The given report type %s is invalid.' % report_type_name)
 
 
-def _get_category_from_string(category_name):
+def get_category_from_string(category_name):
     """Determines the category based on the JSON value.
 
     Args:
@@ -141,7 +141,7 @@ def _get_category_from_string(category_name):
         'The given category %s is invalid.' % category_name)
 
 
-def _get_android_text_size_from_string(text_size_name):
+def get_android_text_size_from_string(text_size_name):
     """Determines the app text size based on the JSON value.
 
     Args:
@@ -157,7 +157,7 @@ def _get_android_text_size_from_string(text_size_name):
         'The given Android app text size %s is invalid.' % text_size_name)
 
 
-def _get_entry_point_from_json(entry_point_json):
+def get_entry_point_from_json(entry_point_json):
     """Determines the entry point type based on the rececived JSON.
 
     Args:
@@ -188,7 +188,7 @@ def _get_entry_point_from_json(entry_point_json):
             'The given entry point %s is invalid.' % entry_point_name)
 
 
-def _get_android_network_type_from_string(network_type_name):
+def get_android_network_type_from_string(network_type_name):
     """Determines the network type based on the JSON value.
 
     Args:
@@ -298,36 +298,36 @@ def _update_report_stats_model_in_transaction(
         stats_dict = stats_model.daily_param_stats
 
         stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[constants.STATS_PARAMETER_NAMES.report_type.name],
                 report_type, delta))
         stats_dict[constants.STATS_PARAMETER_NAMES.country_locale_code.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[
                     constants.STATS_PARAMETER_NAMES.country_locale_code.name],
                 country_locale_code, delta))
         stats_dict[constants.STATS_PARAMETER_NAMES.entry_point_name.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[
                     constants.STATS_PARAMETER_NAMES.entry_point_name.name],
                 entry_point_name, delta))
         stats_dict[constants.STATS_PARAMETER_NAMES.audio_language_code.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[
                     constants.STATS_PARAMETER_NAMES.audio_language_code.name],
                 audio_language_code, delta))
         stats_dict[constants.STATS_PARAMETER_NAMES.text_language_code.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[
                     constants.STATS_PARAMETER_NAMES.text_language_code.name],
                 text_language_code, delta))
         stats_dict[constants.STATS_PARAMETER_NAMES.android_sdk_version.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[
                     constants.STATS_PARAMETER_NAMES.android_sdk_version.name],
                 sdk_version, delta))
         stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name] = (
-            _calculate_new_stats_count_for_parameter(
+            calculate_new_stats_count_for_parameter(
                 stats_dict[constants.STATS_PARAMETER_NAMES.version_name.name],
                 version_name, delta))
 
@@ -338,7 +338,7 @@ def _update_report_stats_model_in_transaction(
     stats_model.put()
 
 
-def _calculate_new_stats_count_for_parameter(
+def calculate_new_stats_count_for_parameter(
         current_stats_map, current_value, delta):
     """Helper to increment or initialize the stats count for a parameter.
 
@@ -384,7 +384,7 @@ def get_report_from_model(report_model):
             implemented.
     """
     if report_model.platform == PLATFORM_ANDROID:
-        return _get_android_report_from_model(report_model)
+        return get_android_report_from_model(report_model)
     else:
         raise NotImplementedError(
             'Web app feedback report domain objects must be defined.')
@@ -423,7 +423,7 @@ def get_stats_from_model(stats_model):
     """
     ticket = app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
         stats_model.ticket_id)
-    param_stats = _create_app_daily_stats_from_model_json(
+    param_stats = create_app_daily_stats_from_model_json(
         stats_model.daily_param_stats)
     app_feedback_report_domain.AppFeedbackReportDailyStats(
         stats_model.id, ticket, stats_model.platform,
@@ -431,7 +431,7 @@ def get_stats_from_model(stats_model):
         param_stats)
 
 
-def _create_app_daily_stats_from_model_json(daily_param_stats):
+def create_app_daily_stats_from_model_json(daily_param_stats):
     """Create and return a dict representing the AppFeedbackReportDailyStats
     domain object's daily_param_stats.
 
@@ -458,7 +458,7 @@ def _create_app_daily_stats_from_model_json(daily_param_stats):
     return stats_dict
 
 
-def _get_android_report_from_model(android_report_model):
+def get_android_report_from_model(android_report_model):
     """Creates a domain object that represents an android feedback report from
     the given model.
 
@@ -476,8 +476,8 @@ def _get_android_report_from_model(android_report_model):
             'report schemas implemented.')
     report_info_dict = android_report_model.android_report_info
     user_supplied_feedback = app_feedback_report_domain.UserSuppliedFeedback(
-        _get_report_type_from_string(android_report_model.report_type),
-        _get_category_from_string(android_report_model.category),
+        get_report_type_from_string(android_report_model.report_type),
+        get_category_from_string(android_report_model.category),
         report_info_dict['user_feedback_selected_items'],
         report_info_dict['user_feedback_other_text_input'])
     device_system_context = (
@@ -489,9 +489,9 @@ def _get_android_report_from_model(android_report_model):
             android_report_model.android_device_model,
             android_report_model.android_sdk_version,
             report_info_dict['build_fingerprint'],
-            _get_android_network_type_from_string(
+            get_android_network_type_from_string(
                 report_info_dict['network_type'])))
-    entry_point = _get_entry_point_from_json(
+    entry_point = get_entry_point_from_json(
         {
             'entry_point_name': android_report_model.entry_point,
             'entry_point_topic_id': android_report_model.entry_point_topic_id,
@@ -504,7 +504,7 @@ def _get_android_report_from_model(android_report_model):
     app_context = app_feedback_report_domain.AndroidAppContext(
         entry_point, android_report_model.text_language_code,
         android_report_model.audio_language_code,
-        _get_android_text_size_from_string(report_info_dict['text_size']),
+        get_android_text_size_from_string(report_info_dict['text_size']),
         report_info_dict['only_allows_wifi_download_and_update'],
         report_info_dict['automatically_update_topics'],
         report_info_dict['account_is_profile_admin'],

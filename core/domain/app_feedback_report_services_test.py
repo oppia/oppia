@@ -972,7 +972,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     def test_get_report_type_from_string_returns_expected_report_type(self):
         for report_type in constants.REPORT_TYPE:
             self.assertEqual(
-                app_feedback_report_services._get_report_type_from_string(
+                app_feedback_report_services.get_report_type_from_string(
                     report_type.name), report_type)
 
     def test_get_report_type_from_string_with_invalid_string_raises_error(self):
@@ -980,13 +980,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
             'The given report type %s is invalid.' % invalid_report_type):
-            app_feedback_report_services._get_report_type_from_string(
+            app_feedback_report_services.get_report_type_from_string(
                 invalid_report_type)
 
     def test_get_category_from_string_returns_expected_category(self):
         for category in constants.ALLOWED_CATEGORIES:
             self.assertEqual(
-                app_feedback_report_services._get_category_from_string(
+                app_feedback_report_services.get_category_from_string(
                     category.name), category)
 
     def test_get_category_from_string_with_invalid_string_raises_error(self):
@@ -994,13 +994,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.InvalidInputException,
             'The given category %s is invalid.' % invalid_category):
-            app_feedback_report_services._get_category_from_string(
+            app_feedback_report_services.get_category_from_string(
                 invalid_category)
 
     def test_get_android_text_size_from_string_returns_expected_text_size(self):
         for text_size in constants.ALLOWED_ANDROID_TEXT_SIZES:
             self.assertEqual(
-                app_feedback_report_services._get_android_text_size_from_string(
+                app_feedback_report_services.get_android_text_size_from_string(
                     text_size.name), text_size)
 
     def test_get_android_text_size_from_string_with_invalid_string_raises_error(
@@ -1010,7 +1010,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'The given Android app text size %s is invalid.' % (
                 invalid_text_size)):
-            app_feedback_report_services._get_android_text_size_from_string(
+            app_feedback_report_services.get_android_text_size_from_string(
                 invalid_text_size)
 
     def test_get_entry_point_from_json_returns_expected_entry_point_obj(self):
@@ -1025,7 +1025,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.navigation_drawer.name)
         navigation_drawer_obj = (
-            app_feedback_report_services._get_entry_point_from_json(
+            app_feedback_report_services.get_entry_point_from_json(
                 entry_point_json))
         self.assertTrue(
             isinstance(
@@ -1035,7 +1035,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.lesson_player.name)
         lesson_player_obj = (
-            app_feedback_report_services._get_entry_point_from_json(
+            app_feedback_report_services.get_entry_point_from_json(
                 entry_point_json))
         self.assertTrue(
             isinstance(
@@ -1045,7 +1045,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.revision_card.name)
         revision_card_obj = (
-            app_feedback_report_services._get_entry_point_from_json(
+            app_feedback_report_services.get_entry_point_from_json(
                 entry_point_json))
         self.assertTrue(
             isinstance(
@@ -1055,7 +1055,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         entry_point_json['entry_point_name'] = (
             constants.ENTRY_POINT.crash.name)
         crash_obj = (
-            app_feedback_report_services._get_entry_point_from_json(
+            app_feedback_report_services.get_entry_point_from_json(
                 entry_point_json))
         self.assertTrue(
             isinstance(
@@ -1070,14 +1070,14 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'The given entry point %s is invalid.' % (
                 'invalid_entry_point_name')):
-            app_feedback_report_services._get_entry_point_from_json(
+            app_feedback_report_services.get_entry_point_from_json(
                 invalid_json)
 
     def test_get_android_network_type_from_string_returns_expected_network_type(
             self):
         for network_type in constants.ANDROID_NETWORK_TYPES:
             self.assertEqual(
-                app_feedback_report_services._get_android_network_type_from_string( # pylint: disable=line-too-long
+                app_feedback_report_services.get_android_network_type_from_string( # pylint: disable=line-too-long
                     network_type.name), network_type)
 
     def test_get_android_network_type_from_string_invalid_string_raises_error(
@@ -1087,7 +1087,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'The given Android network type %s is invalid.' % (
                 invalid_network_type)):
-            app_feedback_report_services._get_android_network_type_from_string(
+            app_feedback_report_services.get_android_network_type_from_string(
                 invalid_network_type)
 
     def test_store_incoming_report_stats_with_web_platform_raises_error(self):
@@ -1122,7 +1122,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         delta = 1
 
         new_stats_map = (
-            app_feedback_report_services._calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
+            app_feedback_report_services.calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
                 stats_map, 'value_2', delta))
 
         self.assertEqual(new_stats_map['value_2'], delta)
@@ -1139,7 +1139,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'Cannot decrement a count for a parameter value that does '
             'not exist'):
-            app_feedback_report_services._calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
+            app_feedback_report_services.calculate_new_stats_count_for_parameter( # pylint: disable=line-too-long
                 stats_map, 'value_2', delta)
 
     def _verify_report_is_scrubbed(self, model_entity, scrubber):
