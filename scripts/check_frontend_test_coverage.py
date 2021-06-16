@@ -211,7 +211,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'outcome-destination-editor.directive.ts',
     'outcome-editor.directive.ts',
     'outcome-feedback-editor.component.ts',
-    'parameter-name-editor.directive.ts',
+    'parameter-name-editor.component.ts',
     'parameterize-rule-description.filter.ts',
     'player-correctness-feedback-enabled.service.ts',
     'player-transcript.service.ts',
