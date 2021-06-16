@@ -87,19 +87,19 @@ export interface TopicsAndSkillDashboardData {
   categorizedSkillsDict: CategorizedSkills;
 }
 
-interface SkillsDashboardDataBackendDict {
+export interface SkillsDashboardDataBackendDict {
   'skill_summary_dicts': AugmentedSkillSummaryBackendDict[];
   'next_cursor': string;
   'more': boolean;
 }
 
-interface SkillsDashboardData {
+export interface SkillsDashboardData {
   skillSummaries: AugmentedSkillSummary[];
   nextCursor: string;
   more: boolean;
 }
 
-interface AssignedSkillDataBackendDict {
+export interface AssignedSkillDataBackendDict {
   'topic_assignment_dicts': AssignedSkillBackendDict[];
 }
 
@@ -185,6 +185,14 @@ export class TopicsAndSkillsDashboardBackendApiService {
         num_skills_to_fetch: itemsPerPage,
         next_cursor: nextCursor
       }).toPromise().then(response => {
+        let a ={
+          skillSummaries: response.skill_summary_dicts.map(
+            backendDict => AugmentedSkillSummary
+              .createFromBackendDict(backendDict)),
+          nextCursor: response.next_cursor,
+          more: response.more
+        }
+        console.log(JSON.stringify(a))
       return {
         skillSummaries: response.skill_summary_dicts.map(
           backendDict => AugmentedSkillSummary
@@ -205,7 +213,11 @@ export class TopicsAndSkillsDashboardBackendApiService {
     };
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
-      mergeSkillsData).toPromise();
+      mergeSkillsData).toPromise().then(
+        response => response,
+        erroResponse => {
+          throw new Error(erroResponse.error.error);
+        });
   }
 
   get onTopicsAndSkillsDashboardReinitialized(): EventEmitter<boolean> {
