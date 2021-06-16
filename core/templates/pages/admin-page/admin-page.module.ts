@@ -35,6 +35,7 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
+import { AdminRolesTabComponent } from './roles-tab/admin-roles-tab.component';
 
 @NgModule({
   imports: [
@@ -48,6 +49,8 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
     AdminNavbarComponent,
+    AdminPageComponent,
+    AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent
   ],
@@ -56,6 +59,8 @@ import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-action
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
     AdminNavbarComponent,
+    AdminPageComponent,
+    AdminRolesTabComponent,
     AdminDevModeActivitiesTabComponent,
     RolesAndActionsVisualizerComponent
   ],
@@ -80,6 +85,7 @@ class AdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
+import { AdminPageComponent } from './admin-page.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
