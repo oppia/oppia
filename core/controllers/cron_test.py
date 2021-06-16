@@ -442,7 +442,7 @@ class CronJobTests(test_utils.GenericTestBase):
                 '/cron/app_feedback_report/scrub_expiring_reports')
 
         scrubbed_model = (
-            app_feedback_report_models.AppFeedbackReportMode.get_by_id(
+            app_feedback_report_models.AppFeedbackReportModel.get_by_id(
                 report_id))
         scrubbed_report_info = scrubbed_model.android_report_info
         self.assertEqual(
