@@ -237,8 +237,11 @@ var TopicEditorPage = function() {
   };
 
   this.deleteSubtopicWithIndex = async function(index) {
+    await waitFor.visibilityOf(
+      subtopicEditOptions.first(),
+      'Subtopic Edit Options taking too long to appear');
     var subtopicEditOptionBox = subtopicEditOptions.get(index);
-    await subtopicEditOptionBox.click();
+    await action.click('Subtopic Edit Option Box', subtopicEditOptionBox);
     await waitFor.elementToBeClickable(
       deleteSubtopicButton,
       'Delete subtopic button taking too long to be clickable');
@@ -268,12 +271,12 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       pageEditor, 'Subtopic html editor takes too long to appear');
     var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
-    await pageEditorInput.click();
-    await pageEditorInput.sendKeys(htmlContent);
-    await waitFor.elementToBeClickable(
-      confirmSubtopicCreationButton,
-      'Confirm subtopic creation button takes too long to be clickable');
-    await confirmSubtopicCreationButton.click();
+    await action.click(
+      'Page Editor Input', pageEditorInput);
+    await action.sendKeys(
+      'Page Editor Input', pageEditorInput, htmlContent);
+    await action.click(
+      'Confrim Subtopic Creation Button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
@@ -521,6 +524,8 @@ var TopicEditorPage = function() {
       saveTopicButton,
       'Save topic button takes too long to be clickable');
     await saveTopicButton.click();
+    await waitFor.visibilityOf(
+      commitMessageField, 'Commit Message field taking too long to appear.');
     await commitMessageField.sendKeys(commitMessage);
 
     await waitFor.elementToBeClickable(
