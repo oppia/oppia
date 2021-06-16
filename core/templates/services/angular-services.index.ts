@@ -31,6 +31,7 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { WinnowingPreprocessingService } from 'classifiers/winnowing-preprocessing.service';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content-service';
+import { CkEditorInitializerService } from 'components/ck-editor-helpers/ck-editor-4-widgets.initializer';
 import { CollectionCreationBackendService } from 'components/entity-creation-services/collection-creation-backend-api.service';
 import { CollectionCreationService } from 'components/entity-creation-services/collection-creation.service';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
@@ -361,6 +362,7 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { NavigationService } from './navigation.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -394,6 +396,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
   ['CapitalizePipe', CapitalizePipe],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
+  ['CkEditorInitializerService', CkEditorInitializerService],
   ['ClassifierDataBackendApiService', ClassifierDataBackendApiService],
   ['ClassroomBackendApiService', ClassroomBackendApiService],
   ['CodeNormalizerService', CodeNormalizerService],
@@ -559,6 +562,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['MusicNotesInputRulesService', MusicNotesInputRulesService],
   ['MusicNotesInputValidationService', MusicNotesInputValidationService],
   ['MusicPhrasePlayerService', MusicPhrasePlayerService],
+  ['NavigationService', NavigationService],
   ['NormalizeWhitespacePipe', NormalizeWhitespacePipe],
   ['NormalizeWhitespacePunctuationAndCasePipe',
     NormalizeWhitespacePunctuationAndCasePipe],
