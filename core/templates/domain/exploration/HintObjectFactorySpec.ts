@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 
 describe('Hint object factory', () => {
-  var hof: HintObjectFactory = null;
+  var hof: HintObjectFactory;
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [HintObjectFactory]
