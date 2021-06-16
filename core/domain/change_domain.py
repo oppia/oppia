@@ -79,7 +79,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
         for attribute_name, attribute_values in deprecated_values.items():
             actual_value = actual_cmd_attributes[attribute_name]
             if actual_value in attribute_values:
-                raise utils.DeprecatedError(
+                raise utils.DeprecatedCommandError(
                     'Value for %s in cmd %s: %s is deprecated' % (
                         attribute_name, cmd_name, actual_value))
 
@@ -184,7 +184,7 @@ class BaseChange(python_utils.OBJECT):
 
         for cmd in self.DEPRECATED_COMMANDS:
             if cmd == cmd_name:
-                raise utils.DeprecatedError(
+                raise utils.DeprecatedCommandError(
                     'Command %s is deprecated' % cmd_name)
 
         if not valid_cmd_attribute_specs:
