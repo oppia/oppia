@@ -106,6 +106,7 @@ const login = async function(browser, page) {
     console.log('Login Failed');
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -116,22 +117,23 @@ const setRole = async function(browser, page, role) {
       'http://127.0.0.1:8181/admin#/roles', { waitUntil: networkIdle });
     await page.waitForSelector(updateFormName);
     await page.type(updateFormName, 'username1');
-    await page.select(roleSelect, role);
+    await page.select(roleSelect, 'string:' + role);
     await page.waitForSelector(updateFormSubmit);
     await page.click(updateFormSubmit);
-    await page.waitForSelector(statusMessage);
+    await page.waitForSelector(statusMessage, {visible: true});
     await page.waitForFunction(
-      'document.querySelector(' +
-        '".protractor-test-status-message").innerText.includes(' +
-        '"successfully updated to")'
+      'Array.prototype.slice.call(' +
+      '  document.querySelectorAll(".protractor-test-status-message")' +
+      ').some(' +
+      '  (statusMessageElem) => statusMessageElem.innerText.includes(' +
+      '    "' + role + '"))', {
+        polling: 500
+      }
     );
-    // eslint-disable-next-line dot-notation
-    await page.goto(CREATOR_DASHBOARD_URL, { waitUntil: networkIdle});
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Changing role to admin failed');
-    // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -149,12 +151,12 @@ const getExplorationEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
 const getCollectionEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'string:COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -170,12 +172,12 @@ const getCollectionEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
 const getTopicEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'string:ADMIN');
     // eslint-disable-next-line dot-notation
     await page.goto(
       TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
@@ -214,6 +216,7 @@ const getTopicEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -245,6 +248,7 @@ const getStoryEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -276,6 +280,7 @@ const getSkillEditorUrl = async function(browser, page) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    process.exit(1);
   }
 };
 
@@ -291,7 +296,11 @@ const main = async function() {
   });
   await login(browser, page);
   await getExplorationEditorUrl(browser, page);
+
+  await setRole(browser, page, 'COLLECTION_EDITOR');
   await getCollectionEditorUrl(browser, page);
+
+  await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
@@ -305,7 +314,7 @@ const main = async function() {
     ].join('\n')
   );
   await page.close();
-  process.exit();
+  process.exit(0);
 };
 
 main();

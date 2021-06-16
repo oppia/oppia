@@ -101,8 +101,11 @@ describe('rich-text components', function() {
       // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-      'The target origin provided (\'https://www.youtube.com\') does not ' +
-      'match the recipient window\'s origin (\'http://localhost:9001\').'
+      // Triple backslashes are needed because backslashes are escape characters
+      // in both regexes and strings: https://stackoverflow.com/a/5514380
+      'The target origin provided \\\(\'https://www\.youtube\.com\'\\\) does ' +
+      'not match the recipient window\'s ' +
+      'origin \\\(\'http://localhost:9001\'\\\).',
     ]);
   });
 });

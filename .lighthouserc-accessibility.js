@@ -49,11 +49,11 @@ module.exports = {
         'http://127.0.0.1:8181/terms',
         'http://127.0.0.1:8181/thanks',
         'http://127.0.0.1:8181/volunteers',
-        `http://127.0.0.1:8181/create/${process.env.exploration_editor}`,
-        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_editor}`,
-        `http://127.0.0.1:8181/topic_editor/${process.env.topic_editor}`,
-        `http://127.0.0.1:8181/skill_editor/${process.env.skill_editor}`,
-        `http://127.0.0.1:8181/story_editor/${process.env.story_editor}`,
+        `http://127.0.0.1:8181/create/${process.env.exploration_id}`,
+        `http://127.0.0.1:8181/collection_editor/create/${process.env.collection_id}`,
+        `http://127.0.0.1:8181/topic_editor/${process.env.topic_id}`,
+        `http://127.0.0.1:8181/skill_editor/${process.env.skill_id}`,
+        `http://127.0.0.1:8181/story_editor/${process.env.story_id}`,
       ]
     },
     'assert': {
