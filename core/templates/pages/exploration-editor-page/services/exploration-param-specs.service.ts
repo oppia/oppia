@@ -38,4 +38,3 @@ export class ExplorationParamSpecsService extends ExplorationPropertyService {
 angular.module('oppia').factory(
   'ExplorationParamSpecsService', downgradeInjectable(
     ExplorationParamSpecsService));
-
