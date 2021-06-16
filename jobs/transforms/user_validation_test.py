@@ -321,6 +321,62 @@ class RelationshipsOfTests(test_utils.TestBase):
                 'UserStatsModel', 'id'),
             ['UserSettingsModel'])
 
+    def test_exploration_user_data_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExplorationUserDataModel', 'exploration_id'),
+            ['ExplorationModel'])
+
+    def test_collection_progress_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'CollectionProgressModel', 'collection_id'),
+            ['CollectionModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'CollectionProgressModel', 'completed_explorations'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'CollectionProgressModel', 'user_id'),
+            ['CompletedActivitiesModel'])
+
+    def test_story_progress_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'StoryProgressModel', 'story_id'),
+            ['StoryModel'])
+
+    def test_user_query_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserQueryModel', 'sent_email_model_id'),
+            ['BulkEmailModel'])
+
+    def test_user_bulk_emails_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserBulkEmailsModel', 'sent_email_model_ids'),
+            ['BulkEmailModel'])
+
+    def test_user_skill_mastery_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSkillMasteryModel', 'skill_id'),
+            ['SkillModel'])
+
+    def test_user_contribution_proficiency_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserContributionProficiencyModel', 'user_id'),
+            ['UserSettingsModel'])
+
+    def test_user_contribution_rights_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserContributionRightsModel', 'id'),
+            ['UserSettingsModel'])
+
 
 class ValidateArchivedModelsMarkedDeletedTests(
         job_test_utils.PipelinedTestBase):
