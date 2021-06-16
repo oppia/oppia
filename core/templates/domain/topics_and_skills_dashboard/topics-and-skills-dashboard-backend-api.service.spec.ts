@@ -440,6 +440,6 @@ describe('Topics and Skills Dashboard backend API service', () => {
     expect(
       topicsAndSkillsDashboardBackendApiService
         .onTopicsAndSkillsDashboardReinitialized)
-        .toEqual(mockEventEmitter);
+      .toEqual(mockEventEmitter);
   });
 });
