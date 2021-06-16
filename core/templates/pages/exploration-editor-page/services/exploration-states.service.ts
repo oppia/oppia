@@ -48,13 +48,13 @@ require('services/validators.service.ts');
 import { EventEmitter } from '@angular/core';
 
 angular.module('oppia').factory('ExplorationStatesService', [
-  '$filter', '$injector', '$location', '$q', '$rootScope', '$uibModal',
+  '$filter', '$injector', '$location', '$q', '$uibModal',
   'AlertsService', 'AngularNameService', 'AnswerClassificationService',
   'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
   'SolutionValidityService', 'StateEditorRefreshService', 'StateEditorService',
   'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $q, $rootScope, $uibModal,
+      $filter, $injector, $location, $q, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       ChangeListService, ContextService, ExplorationInitStateNameService,
       SolutionValidityService, StateEditorRefreshService, StateEditorService,
@@ -210,7 +210,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
           '\nChange list: ' + JSON.stringify(
             ChangeListService.getChangeList()) +
           '\nAll states names: ' + _states.getStateNames());
-        $rootScope.$applyAsync();
         e.message += additionalInfo;
         throw e;
       }
@@ -231,7 +230,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
       if (!angular.equals(oldValue, newValue)) {
         ChangeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
-        $rootScope.$applyAsync();
 
         var newStateData = _states.getState(stateName);
         var accessorList = PROPERTY_REF_DATA[backendName];
@@ -478,7 +476,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
-        $rootScope.$applyAsync();
         stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
@@ -513,7 +510,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
           _states.deleteState(deleteStateName);
 
           ChangeListService.deleteState(deleteStateName);
-          $rootScope.$applyAsync();
 
           if (StateEditorService.getActiveStateName() === deleteStateName) {
             StateEditorService.setActiveStateName(
@@ -552,7 +548,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
         // will raise an error because the new initial state name does not
         // exist.
         ChangeListService.renameState(newStateName, oldStateName);
-        $rootScope.$applyAsync();
         SolutionValidityService.onRenameState(newStateName, oldStateName);
         // Amend initStateName appropriately, if necessary. Note that this
         // must come after the state renaming, otherwise saving will lead to
