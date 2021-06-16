@@ -126,7 +126,9 @@ const setRole = async function(browser, page, role) {
       '  document.querySelectorAll(".protractor-test-status-message")' +
       ').some(' +
       '  (statusMessageElem) => statusMessageElem.innerText.includes(' +
-      '    "' + role + '"))'
+      '    "' + role + '"))', {
+        polling: 500
+      }
     );
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -155,7 +157,6 @@ const getExplorationEditorUrl = async function(browser, page) {
 
 const getCollectionEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'COLLECTION_EDITOR');
     // Load in Collection
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -177,7 +178,6 @@ const getCollectionEditorUrl = async function(browser, page) {
 
 const getTopicEditorUrl = async function(browser, page) {
   try {
-    await setRole(browser, page, 'ADMIN');
     // eslint-disable-next-line dot-notation
     await page.goto(
       TOPIC_AND_SKILLS_DASHBOARD_URL, { waitUntil: networkIdle });
@@ -296,7 +296,11 @@ const main = async function() {
   });
   await login(browser, page);
   await getExplorationEditorUrl(browser, page);
+
+  await setRole(browser, page, 'COLLECTION_EDITOR');
   await getCollectionEditorUrl(browser, page);
+
+  await setRole(browser, page, 'ADMIN');
   await getTopicEditorUrl(browser, page);
   await getStoryEditorUrl(browser, page);
   await getSkillEditorUrl(browser, page);
