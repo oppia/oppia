@@ -391,6 +391,82 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self.assertIsNone(model.last_nonempty_message_author_id)
 
 
+class TextMessageLengthAuditOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off text message length limit job."""
+
+    # Text with length more than 10000.
+    TEXT_WITH_LENGTH_PAST_LIMIT = 'a' * 10001
+
+    def setUp(self):
+        super(TextMessageLengthAuditOneOffJobTests, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off.TextMessageLengthAuditOneOffJob.create_new())
+        feedback_jobs_one_off.TextMessageLengthAuditOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+        return feedback_jobs_one_off.TextMessageLengthAuditOneOffJob.get_output(
+            job_id)
+
+    def test_text_length_limit(self):
+        """Checks text length."""
+        # Create a thread.
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', None, 'subject 1',
+            self.TEXT_WITH_LENGTH_PAST_LIMIT)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(
+            [
+                u'[u\'SUCCESS\', 1]',
+                u'[u\'Thread Id: ' + thread_id + '\', u"Message Id: [\'0\']"]'
+            ],
+            output)
+
+
+class TrimTextMessageLengthOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off trim text message length job."""
+
+    # Text with length more than 10000.
+    TEXT_WITH_LENGTH_PAST_LIMIT = 'a' * 10005
+
+    def setUp(self):
+        super(TrimTextMessageLengthOneOffJobTests, self).setUp()
+        self.signup('user@email', 'user')
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off.TrimTextMessageLengthOneOffJob.create_new())
+        feedback_jobs_one_off.TrimTextMessageLengthOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+        return feedback_jobs_one_off.TrimTextMessageLengthOneOffJob.get_output(
+            job_id)
+
+    def test_trim_text_length(self):
+        """Trims text length."""
+        # Create a thread.
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', None, 'subject 1',
+            self.TEXT_WITH_LENGTH_PAST_LIMIT)
+
+        output = self._run_one_off_job()
+
+        self.assertEqual(
+            [
+                u'[u\'SUCCESS\', 1]',
+                u'[u\'Thread Id: ' + thread_id + '\', u"Message Id: [\'0\']"]'
+            ],
+            output)
+
+
 class CleanUpFeedbackAnalyticsModelModelOneOffJobTest(
         test_utils.GenericTestBase):
     """Tests for one-off job to clean up feedback analytics model."""
