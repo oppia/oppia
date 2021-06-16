@@ -32,11 +32,16 @@ module.exports = {
     schema: [],
     messages: {
       disallowSleep: 'Please do not use browser.sleep() in protractor files',
-      disallowThen: 'Please do not use .then(), consider async/await instead'
+      disallowThen: 'Please do not use .then(), consider async/await instead',
+      useProtractorTest: (
+        'Please use “protractor-test-” prefix classname selector instead of ' +
+        '“<incorrect-classname>”')
     },
   },
 
   create: function(context) {
+    var selector = (
+      'CallExpression[callee.object.name=by][callee.property.name=css]');
     var checkSleepCall = function(node) {
       var callee = node.callee;
       if (callee.property && callee.property.name !== 'sleep') {
@@ -62,6 +67,14 @@ module.exports = {
           loc: node.callee.property.loc,
           messageId: 'disallowThen'
         });
+      },
+      [selector]: function(node) {
+        if (!node.arguments[0].value.startsWith('.protractor-test-')) {
+          context.report({
+            node: node.arguments[0],
+            messageId: 'useProtractorTest'
+          });
+        }
       }
     };
   }

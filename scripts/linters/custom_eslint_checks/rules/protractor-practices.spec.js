@@ -39,9 +39,23 @@ ruleTester.run('protractor-practices', rule, {
     code: 'then().age;',
   }, {
     code: 'sam.then.age;',
+  }, {
+    code: `var profileLink = element(by.css(
+          '.protractor-test-profile-link'));`
   }],
 
   invalid: [
+    {
+      code:
+      `var hideHeightWarningIcon = element(
+        by.css('.oppia-hide-card-height-warning-icon'));`,
+      errors: [{
+        message: (
+          'Please use “protractor-test-” prefix classname selector instead ' +
+          'of “<incorrect-classname>”'),
+        type: 'Literal',
+      }],
+    },
     {
       code:
       `it('should test a feature', function() {
