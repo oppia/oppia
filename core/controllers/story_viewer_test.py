@@ -579,7 +579,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             )
 
         self.assertEqual(len(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
+            learner_progress_services.get_all_learnt_topic_ids(
                 self.viewer_id)), 1)
         self.assertEqual(len(
             learner_progress_services.get_all_completed_story_ids(

@@ -211,7 +211,7 @@ class StoryProgressHandler(base.BaseHandler):
 
         # If there is no next_node_id, the story is marked as completed else
         # mark the story as incomplete.
-        if not next_node_id:
+        if next_node_id is None:
             learner_progress_services.mark_story_as_completed(
                 self.user_id, story_id)
         else:
@@ -225,11 +225,11 @@ class StoryProgressHandler(base.BaseHandler):
         for story in topic.canonical_story_references:
             story_ids_in_topic.append(story.story_id)
 
-        is_topic_completed = set(story_ids_in_topic).issubset(
+        is_topic_completed = set(story_ids_in_topic).intersection(
             set(completed_story_ids))
 
-        # If all the stories in the topic are not in the completed stories
-        # list, mark the topic as partially learnt else mark it as learnt.
+        # If atleast one story in the topic is completed,
+        # mark the topic as learnt else mark it as partially learnt.
         if not is_topic_completed:
             learner_progress_services.mark_topic_as_partially_learnt(
                 self.user_id, topic.id)

@@ -178,8 +178,16 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_0], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
+        learner_progress_services.mark_story_as_completed(
+            self.viewer_id, self.STORY_ID_1)
         learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_1)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
