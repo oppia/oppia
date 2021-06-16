@@ -40,9 +40,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   }`]
 })
 export class AudioSliderComponent {
-  // Below properties are assigned after component interaction in
-  // lifecycle hooks, See https://github.com/oppia/oppia/wiki/Gui
-  // de-on-defining-types#ts-7 for reference.
+  // These properties are initialized using component interactions
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: number;
   @Input() max!: number;
   @Input() thumbLabel = false;
