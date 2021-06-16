@@ -62,6 +62,9 @@ export class SharingLinksComponent implements OnInit {
       this.activityId = this.collectionId;
       this.activityUrlFragment = 'collection';
     } else {
+      // TODO(aishwary023): Remove this code to throw error. Remove @Input to
+      // this component and use ContextService directly to determine if the
+      // collection or exploration page is active and render accordingly.
       throw new Error(
         'SharingLinks component can only be used either in the' +
         'collection player or the exploration player');

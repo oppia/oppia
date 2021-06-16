@@ -57,6 +57,9 @@ describe('Editor state service', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
+    // mockInteraction consists of an TextInput interaction with an
+    // answer group leading to 'State' state and a default outcome leading to
+    // 'Hola' state.
     mockInteraction = interactionObjectFactory.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
@@ -258,51 +261,43 @@ describe('Editor state service', () => {
     expect(ecs.isExplorationWhitelisted()).toBe(false);
   });
 
-  it('should return if correctness feedback is enabled or not', () => {
-    expect(ecs.correctnessFeedbackEnabled).toBe(null);
-    ecs.correctnessFeedbackEnabled = true;
-    expect(ecs.correctnessFeedbackEnabled).toBe(true);
-    ecs.correctnessFeedbackEnabled = false;
-    expect(ecs.correctnessFeedbackEnabled).toBe(false);
-  });
-
-  it('should update state content editor initialised to true', () => {
+  it('should initialise state content editor', () => {
     expect(ecs.stateContentEditorInitialised).toBe(false);
     ecs.updateStateContentEditorInitialised();
     expect(ecs.stateContentEditorInitialised).toBe(true);
   });
 
-  it('should update state interaction editor initialised to true', () => {
+  it('should initialise state interaction editor', () => {
     expect(ecs.stateInteractionEditorInitialised).toBe(false);
     ecs.updateStateInteractionEditorInitialised();
     expect(ecs.stateInteractionEditorInitialised).toBe(true);
   });
 
-  it('should update state responses initialised to true', () => {
+  it('should initialise state responses initialised', () => {
     expect(ecs.stateResponsesInitialised).toBe(false);
     ecs.updateStateResponsesInitialised();
     expect(ecs.stateResponsesInitialised).toBe(true);
   });
 
-  it('should update state hints editor initialised to true', () => {
+  it('should initialise state hints editor', () => {
     expect(ecs.stateHintsEditorInitialised).toBe(false);
     ecs.updateStateHintsEditorInitialised();
     expect(ecs.stateHintsEditorInitialised).toBe(true);
   });
 
-  it('should update state solution editor initialised to true', () => {
+  it('should initialise state solution editor', () => {
     expect(ecs.stateSolutionEditorInitialised).toBe(false);
     ecs.updateStateSolutionEditorInitialised();
     expect(ecs.stateSolutionEditorInitialised).toBe(true);
   });
 
-  it('should update state editor directive initialised to true', () => {
+  it('should initialise state editor', () => {
     expect(ecs.stateEditorDirectiveInitialised).toBe(false);
     ecs.updateStateEditorDirectiveInitialised();
     expect(ecs.stateEditorDirectiveInitialised).toBe(true);
   });
 
-  it('should update update current rule input is valid', () => {
+  it('should update current rule input is valid', () => {
     expect(ecs.checkCurrentRuleInputIsValid()).toBe(false);
     ecs.updateCurrentRuleInputIsValid(true);
     expect(ecs.checkCurrentRuleInputIsValid()).toBe(true);
@@ -310,7 +305,7 @@ describe('Editor state service', () => {
     expect(ecs.checkCurrentRuleInputIsValid()).toBe(false);
   });
 
-  it('should set state names and emit state names change event', () => {
+  it('should get and set state names', () => {
     expect(ecs.getStateNames()).toEqual([]);
     ecs.setStateNames(['Introduction', 'State1']);
     expect(ecs.getStateNames()).toEqual(['Introduction', 'State1']);
@@ -322,18 +317,30 @@ describe('Editor state service', () => {
     // Registration status is true only when,
     // stateInteractionEditorInitialised, stateResponsesInitialised and
     // stateEditorDirectiveInitialised are true.
+    expect(ecs.stateInteractionEditorInitialised).toBe(false);
+    expect(ecs.stateResponsesInitialised).toBe(false);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
 
     // Set stateInteractionEditorInitialised as true.
     ecs.updateStateInteractionEditorInitialised();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
+    expect(ecs.stateResponsesInitialised).toBe(false);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
 
     // Set stateResponsesInitialised as true.
     ecs.updateStateResponsesInitialised();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
+    expect(ecs.stateResponsesInitialised).toBe(true);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
 
     // Set stateEditorDirectiveInitialised as true.
     ecs.updateStateEditorDirectiveInitialised();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
+    expect(ecs.stateResponsesInitialised).toBe(true);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(true);
     expect(ecs.checkEventListenerRegistrationStatus()).toBe(true);
   });
 
@@ -352,9 +359,10 @@ describe('Editor state service', () => {
   });
 
   it('should get event emitter for change in state names', () => {
-    let stateNamesChangedEventEmitter = new EventEmitter();
-    expect(ecs.onStateNamesChanged).toEqual(
-      stateNamesChangedEventEmitter);
+    spyOn(ecs.onStateNamesChanged, 'subscribe');
+    ecs.onStateNamesChanged.subscribe();
+    ecs.setStateNames(['State1']);
+    expect(ecs.onStateNamesChanged.subscribe).toHaveBeenCalled();
   });
 
   it('should set interaction ID', () => {
@@ -481,7 +489,11 @@ describe('Editor state service', () => {
   });
 
   it('should check if current solution is valid', () => {
+    // Set 'Hola' as the active state.
     ecs.activeStateName = 'Hola';
+    // At present, we are not keeping track of the solution's validity. So, we
+    // initialize the Solution Validity Service with the state. Upon,
+    // initialization the solution validity is set as true.
     expect(ecs.isCurrentSolutionValid()).toBe(undefined);
     solutionValidityService.init(['Hola']);
     expect(ecs.isCurrentSolutionValid()).toBe(true);
@@ -489,6 +501,7 @@ describe('Editor state service', () => {
 
   it('should delete current solution validity', () => {
     ecs.activeStateName = 'Hola';
+    expect(ecs.isCurrentSolutionValid()).toBe(undefined);
     solutionValidityService.init(['Hola']);
     expect(ecs.isCurrentSolutionValid()).toBe(true);
     ecs.deleteCurrentSolutionValidity();
@@ -496,58 +509,67 @@ describe('Editor state service', () => {
   });
 
   it('should get event emitter on state editor initialization', () => {
-    let stateEditorInitializedEventEmitter = new EventEmitter<State>();
-    expect(ecs.onStateEditorInitialized).toEqual(
-      stateEditorInitializedEventEmitter);
+    spyOn(ecs.onStateEditorInitialized, 'subscribe');
+    ecs.onStateEditorInitialized.subscribe();
+    ecs.onStateEditorInitialized.emit();
+    expect(ecs.onStateEditorInitialized.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on state editor directive' +
     ' initialization', () => {
-    let stateEditorDirectiveInitializedEventEmitter = new EventEmitter();
-    expect(ecs.onStateEditorDirectiveInitialized).toEqual(
-      stateEditorDirectiveInitializedEventEmitter);
+    spyOn(ecs.onStateEditorDirectiveInitialized, 'subscribe');
+    ecs.onStateEditorDirectiveInitialized.subscribe();
+    ecs.onStateEditorDirectiveInitialized.emit();
+    expect(ecs.onStateEditorDirectiveInitialized.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on interaction editor initialization', () => {
-    let interactionEditorInitializedEventEmitter = new EventEmitter();
-    expect(ecs.onInteractionEditorInitialized).toEqual(
-      interactionEditorInitializedEventEmitter);
+    spyOn(ecs.onInteractionEditorInitialized, 'subscribe');
+    ecs.onInteractionEditorInitialized.subscribe();
+    ecs.onInteractionEditorInitialized.emit();
+    expect(ecs.onInteractionEditorInitialized.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on showing' +
     ' translation tab busy modal', () => {
-    let showTranslationTabBusyModalEventEmitter = new EventEmitter();
-    expect(ecs.onShowTranslationTabBusyModal).toEqual(
-      showTranslationTabBusyModalEventEmitter);
+    spyOn(ecs.onShowTranslationTabBusyModal, 'subscribe');
+    ecs.onShowTranslationTabBusyModal.subscribe();
+    ecs.onShowTranslationTabBusyModal.emit();
+    expect(ecs.onShowTranslationTabBusyModal.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on refreshing state translation', () => {
-    let refreshStateTranslationEventEmitter = new EventEmitter();
-    expect(ecs.onRefreshStateTranslation).toEqual(
-      refreshStateTranslationEventEmitter);
+    spyOn(ecs.onRefreshStateTranslation, 'subscribe');
+    ecs.onRefreshStateTranslation.subscribe();
+    ecs.onRefreshStateTranslation.emit();
+    expect(ecs.onRefreshStateTranslation.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on updating answer choice', () => {
-    let updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
-    expect(ecs.onUpdateAnswerChoices).toEqual(
-      updateAnswerChoicesEventEmitter);
+    spyOn(ecs.onUpdateAnswerChoices, 'subscribe');
+    ecs.onUpdateAnswerChoices.subscribe();
+    ecs.onUpdateAnswerChoices.emit();
+    expect(ecs.onUpdateAnswerChoices.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on saving outcome destination details', () => {
-    let saveOutcomeDestDetailsEventEmitter = new EventEmitter();
-    expect(ecs.onSaveOutcomeDestDetails).toEqual(
-      saveOutcomeDestDetailsEventEmitter);
+    spyOn(ecs.onSaveOutcomeDestDetails, 'subscribe');
+    ecs.onSaveOutcomeDestDetails.subscribe();
+    ecs.onSaveOutcomeDestDetails.emit();
+    expect(ecs.onSaveOutcomeDestDetails.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on handling custom arguments update', () => {
-    let handleCustomArgsUpdateEventEmitter = new EventEmitter<AnswerChoice[]>();
-    expect(ecs.onHandleCustomArgsUpdate).toEqual(
-      handleCustomArgsUpdateEventEmitter);
+    spyOn(ecs.onHandleCustomArgsUpdate, 'subscribe');
+    ecs.onHandleCustomArgsUpdate.subscribe();
+    ecs.onHandleCustomArgsUpdate.emit();
+    expect(ecs.onHandleCustomArgsUpdate.subscribe).toHaveBeenCalled();
   });
 
   it('should get event emitter on object form validity change', () => {
-    let objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
-    expect(ecs.onObjectFormValidityChange).toEqual(
-      objectFormValidityChangeEventEmitter);
+    spyOn(ecs.onObjectFormValidityChange, 'subscribe');
+    ecs.onObjectFormValidityChange.subscribe();
+    ecs.onObjectFormValidityChange.emit();
+    expect(ecs.onObjectFormValidityChange.subscribe).toHaveBeenCalled();
   });
 });

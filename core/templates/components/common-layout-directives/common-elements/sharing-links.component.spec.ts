@@ -69,10 +69,16 @@ describe('SharingLinksComponent', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  it('should initialize component properties when an' +
+  it('should set query fields for social platform APIs when an' +
     ' exploration is shared', () => {
     component.shareType = 'exploration';
     component.explorationId = 'exp1';
+
+    expect(component.activityId).toBe(undefined);
+    expect(component.activityUrlFragment).toBe(undefined);
+    expect(component.serverName).toBe(undefined);
+    expect(component.escapedTwitterText).toBe(undefined);
+    expect(component.classroomUrl).toBe(undefined);
 
     component.ngOnInit();
 
@@ -85,10 +91,16 @@ describe('SharingLinksComponent', () => {
     expect(component.classroomUrl).toBe('/assets/images/general/classroom.png');
   });
 
-  it('should initialize component properties when a' +
+  it('should set query fields for social platform APIs when a' +
     ' collection is shared', () => {
     component.shareType = 'collection';
     component.collectionId = 'col1';
+
+    expect(component.activityId).toBe(undefined);
+    expect(component.activityUrlFragment).toBe(undefined);
+    expect(component.serverName).toBe(undefined);
+    expect(component.escapedTwitterText).toBe(undefined);
+    expect(component.classroomUrl).toBe(undefined);
 
     component.ngOnInit();
 
@@ -129,7 +141,7 @@ describe('SharingLinksComponent', () => {
       'font-big fx-row fx-main-center fx-cross-end');
   });
 
-  it('should get social media urls', () => {
+  it('should get social media URLs', () => {
     component.serverName = 'https://www.oppia.org';
     component.activityUrlFragment = 'explore';
     component.activityId = 'exp1';
@@ -167,10 +179,10 @@ describe('SharingLinksComponent', () => {
     const shareExplorationEventSpy =
       spyOn(siteAnalyticsService, 'registerShareExplorationEvent');
     const windowRefSpy = spyOn(windowRef.nativeWindow, 'open');
-
     component.shareType = 'exploration';
 
     component.registerShareEvent('facebook');
+
     expect(shareExplorationEventSpy).toHaveBeenCalledWith('facebook');
     expect(windowRefSpy).toHaveBeenCalled();
   });
@@ -180,8 +192,8 @@ describe('SharingLinksComponent', () => {
     const shareCollectionEventSpy =
       spyOn(siteAnalyticsService, 'registerShareCollectionEvent');
     const windowRefSpy = spyOn(windowRef.nativeWindow, 'open');
-
     component.shareType = 'collection';
+
     component.registerShareEvent('twitter');
 
     expect(shareCollectionEventSpy).toHaveBeenCalledWith('twitter');
