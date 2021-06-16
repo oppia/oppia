@@ -34,9 +34,6 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
 import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { SwitchContentLanguageRefreshRequiredModalComponent } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { SaveVersionMismatchModalComponent } from './modal-templates/save-version-mismatch-modal.component';
-import { ChangesInHumanReadableFormComponent } from './changes-in-human-readable-form/changes-in-human-readable-form.component';
-import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
 
 @NgModule({
   imports: [
@@ -52,10 +49,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent,
-    SaveVersionMismatchModalComponent,
-    ChangesInHumanReadableFormComponent,
-    LostChangesModalComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -63,10 +57,7 @@ import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.
     DeleteStateSkillModalComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent,
-    SwitchContentLanguageRefreshRequiredModalComponent,
-    SaveVersionMismatchModalComponent,
-    ChangesInHumanReadableFormComponent,
-    LostChangesModalComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   providers: [
     {
