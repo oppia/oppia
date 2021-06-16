@@ -142,11 +142,11 @@ angular.module('oppia').factory('ChangeListService', [
 
     return {
       /**
-     * Saves a change dict that represents adding a new state. It is the
-     * responsbility of the caller to check that the new state name is valid.
-     *
-     * @param {string} stateName - The name of the newly-added state
-     */
+       * Saves a change dict that represents adding a new state. It is the
+       * responsbility of the caller to check that the new state name is valid.
+       *
+       * @param {string} stateName - The name of the newly-added state
+       */
       addState: function(stateName) {
         addChange({
           cmd: CMD_ADD_STATE,
@@ -154,12 +154,12 @@ angular.module('oppia').factory('ChangeListService', [
         });
       },
       /**
-     * Saves a change dict that represents deleting a new state. It is the
-     * responsbility of the caller to check that the deleted state name
-     * corresponds to an existing state.
-     *
-     * @param {string} stateName - The name of the deleted state.
-     */
+       * Saves a change dict that represents deleting a new state. It is the
+       * responsbility of the caller to check that the deleted state name
+       * corresponds to an existing state.
+       *
+       * @param {string} stateName - The name of the deleted state.
+       */
       deleteState: function(stateName) {
         addChange({
           cmd: CMD_DELETE_STATE,
@@ -172,15 +172,15 @@ angular.module('oppia').factory('ChangeListService', [
         return ExplorationDataService.discardDraftAsync();
       },
       /**
-     * Saves a change dict that represents a change to an exploration
-     * property (such as its title, category, ...). It is the responsibility
-     * of the caller to check that the old and new values are not equal.
-     *
-     * @param {string} backendName - The backend name of the property
-     *   (e.g. title, category)
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
+       * Saves a change dict that represents a change to an exploration
+       * property (such as its title, category, ...). It is the responsibility
+       * of the caller to check that the old and new values are not equal.
+       *
+       * @param {string} backendName - The backend name of the property
+       *   (e.g. title, category)
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
       editExplorationProperty: function(backendName, newValue, oldValue) {
         if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
           AlertsService.addWarning(
@@ -195,15 +195,15 @@ angular.module('oppia').factory('ChangeListService', [
         });
       },
       /**
-     * Saves a change dict that represents a change to a state property. It
-     * is the responsibility of the caller to check that the old and new
-     * values are not equal.
-     *
-     * @param {string} stateName - The name of the state that is being edited
-     * @param {string} backendName - The backend name of the edited property
-     * @param {string} newValue - The new value of the property
-     * @param {string} oldValue - The previous value of the property
-     */
+       * Saves a change dict that represents a change to a state property. It
+       * is the responsibility of the caller to check that the old and new
+       * values are not equal.
+       *
+       * @param {string} stateName - The name of the state that is being edited
+       * @param {string} backendName - The backend name of the edited property
+       * @param {string} newValue - The new value of the property
+       * @param {string} oldValue - The previous value of the property
+       */
       editStateProperty: function(stateName, backendName, newValue, oldValue) {
         if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
           AlertsService.addWarning('Invalid state property: ' + backendName);
@@ -224,24 +224,24 @@ angular.module('oppia').factory('ChangeListService', [
         return explorationChangeList.length > 0;
       },
       /**
-     * Initializes the current changeList with the one received from backend.
-     * This behavior exists only in case of an autosave.
-     *
-     * @param {object} changeList - Autosaved changeList data
-     */
+       * Initializes the current changeList with the one received from backend.
+       * This behavior exists only in case of an autosave.
+       *
+       * @param {object} changeList - Autosaved changeList data
+       */
       loadAutosavedChangeList: function(changeList) {
         explorationChangeList = changeList;
       },
       /**
-     * Saves a change dict that represents the renaming of a state. This
-     * is also intended to change the initial state name if necessary
-     * (that is, the latter change is implied and does not have to be
-     * recorded separately in another change dict). It is the responsibility
-     * of the caller to check that the two names are not equal.
-     *
-     * @param {string} newStateName - The new name of the state
-     * @param {string} oldStateName - The previous name of the state
-     */
+       * Saves a change dict that represents the renaming of a state. This
+       * is also intended to change the initial state name if necessary
+       * (that is, the latter change is implied and does not have to be
+       * recorded separately in another change dict). It is the responsibility
+       * of the caller to check that the two names are not equal.
+       *
+       * @param {string} newStateName - The new name of the state
+       * @param {string} oldStateName - The previous name of the state
+       */
       renameState: function(newStateName, oldStateName) {
         addChange({
           cmd: CMD_RENAME_STATE,
@@ -250,15 +250,15 @@ angular.module('oppia').factory('ChangeListService', [
         });
       },
       /**
-     * Saves a change dict that represents the adding of a translation for a
-     * content html in a state.
-     *
-     * @param {string} contentId - The content id of the translated content.
-     * @param {string} dataFormat - The data format of the content.
-     * @param {string} languageCode - The language code.
-     * @param {string} stateName - The current state name.
-     * @param {string} translationHtml - The translated content.
-     */
+       * Saves a change dict that represents the adding of a translation for a
+       * content html in a state.
+       *
+       * @param {string} contentId - The content id of the translated content.
+       * @param {string} dataFormat - The data format of the content.
+       * @param {string} languageCode - The language code.
+       * @param {string} stateName - The current state name.
+       * @param {string} translationHtml - The translated content.
+       */
       addWrittenTranslation: function(
           contentId, dataFormat, languageCode, stateName, translationHtml) {
         // Written translations submitted via the translation tab in the
@@ -279,13 +279,13 @@ angular.module('oppia').factory('ChangeListService', [
         });
       },
       /**
-     * Saves a change dict that represents marking a translation as needing
-     * update.
-     *
-     * @param {string} contentId - The content id of the translated content.
-     * @param {string} languageCode - The language code.
-     * @param {string} stateName - The current state name.
-     */
+       * Saves a change dict that represents marking a translation as needing
+       * update.
+       *
+       * @param {string} contentId - The content id of the translated content.
+       * @param {string} languageCode - The language code.
+       * @param {string} stateName - The current state name.
+       */
       markTranslationsAsNeedingUpdate: function(contentId, stateName) {
         addChange({
           cmd: CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
@@ -309,4 +309,3 @@ angular.module('oppia').factory('ChangeListService', [
     };
   }
 ]);
- 
