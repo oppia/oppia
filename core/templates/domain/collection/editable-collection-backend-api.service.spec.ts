@@ -189,10 +189,6 @@ describe('Editable collection backend API service', () => {
 
       flushMicrotasks();
 
-      collectionDict.collection.title = 'New Title';
-      collectionDict.collection.version = 2;
-      collection = Collection.create(collectionDict.collection);
-
       // Sending a request to update collection with invalid Id.
       editableCollectionBackendApiService.updateCollectionAsync(
         'invalidId',

@@ -185,14 +185,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
         num_skills_to_fetch: itemsPerPage,
         next_cursor: nextCursor
       }).toPromise().then(response => {
-        let a ={
-          skillSummaries: response.skill_summary_dicts.map(
-            backendDict => AugmentedSkillSummary
-              .createFromBackendDict(backendDict)),
-          nextCursor: response.next_cursor,
-          more: response.more
-        }
-        console.log(JSON.stringify(a))
+
       return {
         skillSummaries: response.skill_summary_dicts.map(
           backendDict => AugmentedSkillSummary
@@ -214,10 +207,10 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this.http.post<void>(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
       mergeSkillsData).toPromise().then(
-        response => response,
-        erroResponse => {
-          throw new Error(erroResponse.error.error);
-        });
+      response => response,
+      erroResponse => {
+        throw new Error(erroResponse.error.error);
+      });
   }
 
   get onTopicsAndSkillsDashboardReinitialized(): EventEmitter<boolean> {

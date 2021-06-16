@@ -26,16 +26,16 @@ import { AugmentedSkillSummary } from 'domain/skill/augmented-skill-summary.mode
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillSummary } from 'domain/skill/skill-summary.model';
 import { TopicSummary } from 'domain/topic/topic-summary.model';
-import { AssignedSkillDataBackendDict, SkillsDashboardData, SkillsDashboardDataBackendDict,
-  TopicsAndSkillDashboardData, TopicsAndSkillsDashboardBackendApiService,
-  TopicsAndSkillsDashboardDataBackendDict } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+// eslint-disable-next-line max-len
+import { AssignedSkillDataBackendDict, SkillsDashboardData, SkillsDashboardDataBackendDict, TopicsAndSkillDashboardData, TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillsDashboardDataBackendDict } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicsAndSkillsDashboardFilter } from './topics-and-skills-dashboard-filter.model';
 
 describe('Topics and Skills Dashboard backend API service', () => {
   let topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService = null;
   let httpTestingController: HttpTestingController = null;
-  let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillsDashboardDataBackendDict;
+  let topicAndSkillsDashboardDataBackendDict:
+    TopicsAndSkillsDashboardDataBackendDict;
   let topicAndSkillsDashboardBackendResponse: TopicsAndSkillDashboardData;
   let assignedSkillDataBackendDict: AssignedSkillDataBackendDict;
   let assignedSkillDataBackendResponse: AssignedSkill;
@@ -83,7 +83,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
       topic_summary_dicts: [
         {
           version: 1,
-          url_fragment:' empty-topic',
+          url_fragment: 'empty-topic',
           language_code: 'en',
           description: 'description',
           uncategorized_skill_count: 0,
@@ -164,7 +164,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
       ],
       can_delete_topic: true,
     };
-  
+
     topicAndSkillsDashboardBackendResponse = {
       allClassroomNames: [
         'math'
@@ -175,13 +175,16 @@ describe('Topics and Skills Dashboard backend API service', () => {
       canDeleteTopic: true,
       untriagedSkillSummaries: [
         SkillSummary.createFromBackendDict(
-          topicAndSkillsDashboardDataBackendDict.untriaged_skill_summary_dicts[0]),
+          topicAndSkillsDashboardDataBackendDict
+          .untriaged_skill_summary_dicts[0]),
       ],
       mergeableSkillSummaries: [
         SkillSummary.createFromBackendDict(
-          topicAndSkillsDashboardDataBackendDict.mergeable_skill_summary_dicts[0]),
+          topicAndSkillsDashboardDataBackendDict
+          .mergeable_skill_summary_dicts[0]),
         SkillSummary.createFromBackendDict(
-          topicAndSkillsDashboardDataBackendDict.mergeable_skill_summary_dicts[1]),
+          topicAndSkillsDashboardDataBackendDict
+          .mergeable_skill_summary_dicts[1]),
       ],
       totalSkillCount: 3,
       topicSummaries: [
@@ -227,7 +230,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
       more: false,
       skill_summary_dicts: [
         {
-          description:' Dummy Skill 1',
+          description: 'Dummy Skill 1',
           skill_model_last_updated: 1623851493737.808,
           skill_model_created_on: 1623851493737.796,
           worked_examples_count: 0,
@@ -253,32 +256,29 @@ describe('Topics and Skills Dashboard backend API service', () => {
       nextCursor: skillsDashboardDataBackendDict.next_cursor,
       more: skillsDashboardDataBackendDict.more
     };
-    
-    
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch topic and skills dashboard data from the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);
+  it('should successfully fetch topic and skills dashboard ' +
+    'data from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);
 
-      expect(req.request.method).toEqual('GET');
-      req.flush(topicAndSkillsDashboardDataBackendDict);
-      flushMicrotasks();
+    expect(req.request.method).toEqual('GET');
+    req.flush(topicAndSkillsDashboardDataBackendDict);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        topicAndSkillsDashboardBackendResponse);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(
+      topicAndSkillsDashboardBackendResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it('should fail to fetch topic and skills dashboard data from the backend',
     fakeAsync(() => {
@@ -324,27 +324,27 @@ describe('Topics and Skills Dashboard backend API service', () => {
   );
 
   it('should fail to fetch skills dashboard data from backend',
-  fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let filter = TopicsAndSkillsDashboardFilter.createDefault();
-      
-      topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardDataAsync(
-        filter, 0, 'next').then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(SKILLS_DASHBOARD_DATA_URL);
-    expect(req.request.method).toEqual('POST');
-    req.flush({
-      error: 'Error loading skills dashboard data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error.'
-    });
-    flushMicrotasks();
+    fakeAsync(() => {
+        let successHandler = jasmine.createSpy('success');
+        let failHandler = jasmine.createSpy('fail');
+        let filter = TopicsAndSkillsDashboardFilter.createDefault();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      new Error('Error loading skills dashboard data.'));
-  })
-);
+        topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardDataAsync(
+          filter, 0, 'next').then(successHandler, failHandler);
+        let req = httpTestingController.expectOne(SKILLS_DASHBOARD_DATA_URL);
+      expect(req.request.method).toEqual('POST');
+      req.flush({
+        error: 'Error loading skills dashboard data.'
+      }, {
+        status: 500, statusText: 'Internal Server Error.'
+      });
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        new Error('Error loading skills dashboard data.'));
+    })
+  );
 
   it('should successfully fetch assigned skills data from the backend',
     fakeAsync(() => {
@@ -393,7 +393,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
     })
   );
 
-  it('should successfully merge skills given their '+
+  it('should successfully merge skills given their ' +
     'skill Id\'s', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
@@ -434,10 +434,11 @@ describe('Topics and Skills Dashboard backend API service', () => {
   })
   );
 
-  it('should get topic and skills dashboard event emitter when'+
+  it('should get topic and skills dashboard event emitter when ' +
     're-initialized', () => {
     let mockEventEmitter = new EventEmitter();
-    expect(topicsAndSkillsDashboardBackendApiService
+    expect(
+      topicsAndSkillsDashboardBackendApiService
       .onTopicsAndSkillsDashboardReinitialized)
       .toEqual(mockEventEmitter);
   });
