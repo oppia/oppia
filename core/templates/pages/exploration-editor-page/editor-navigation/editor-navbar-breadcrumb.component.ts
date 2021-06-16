@@ -29,12 +29,12 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavbarBreadcrumb', {
   template: require('./editor-navbar-breadcrumb.component.html'),
   controller: [
-    '$rootScope', '$scope', 'ExplorationPropertyService',
-    'ExplorationTitleService', 'FocusManagerService', 'RouterService',
+    '$scope', 'ExplorationPropertyService', 'ExplorationTitleService',
+    'FocusManagerService', 'RouterService',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
     function(
-        $rootScope, $scope, ExplorationPropertyService,
-        ExplorationTitleService, FocusManagerService, RouterService,
+        $scope, ExplorationPropertyService, ExplorationTitleService,
+        FocusManagerService, RouterService,
         EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -75,7 +75,6 @@ angular.module('oppia').component('editorNavbarBreadcrumb', {
                   $scope.navbarTitle.substring(
                     0, _MAX_TITLE_LENGTH - 3) + '...');
               }
-              $rootScope.$applyAsync();
             }
           )
         );

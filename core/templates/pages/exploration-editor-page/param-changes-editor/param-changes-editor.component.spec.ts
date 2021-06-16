@@ -43,7 +43,6 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
 import { importAllAngularServices, setupAndGetUpgradedComponentAsync } from 'tests/unit-test-utils';
-import { ExplorationDataService } from '../services/exploration-data.service';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
@@ -63,22 +62,6 @@ describe('Param Changes Editor Component', function() {
 
   var mockExternalSaveEventEmitter = null;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: ExplorationDataService,
-          useValue: {
-            explorationId: 0,
-            autosaveChangeListAsync() {
-              return;
-            }
-          }
-        }
-      ]
-    });
-  });
-
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
@@ -89,8 +72,11 @@ describe('Param Changes Editor Component', function() {
     paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
     stateParamChangesService = TestBed.get(StateParamChangesService);
   });
-
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationDataService', {
+      autosaveChangeListAsync: function() {}
+    });
+
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
       'TextInputRulesService',

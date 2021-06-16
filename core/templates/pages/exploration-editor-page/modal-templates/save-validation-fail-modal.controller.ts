@@ -13,13 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component to get changes in human readable form.
+ * @fileoverview Controller for non strict validation fail modal.
  */
+angular.module('oppia').controller('SaveValidationFailModalController', [
+  '$scope', '$timeout', '$uibModalInstance', 'WindowRef',
+  function(
+      $scope, $timeout, $uibModalInstance, WindowRef) {
+    var MSECS_TO_REFRESH = 20;
+    var _refreshPage = function(delay) {
+      $timeout(function() {
+        WindowRef.nativeWindow.location.reload();
+      }, delay);
+    };
 
-angular.module('oppia').component('changesInHumanReadableForm', {
-  bindings: {
-    lostChanges: '='
-  },
-  template: require(
-    './changes-in-human-readable-form.component.html')
-});
+    $scope.closeAndRefresh = function() {
+      $uibModalInstance.dismiss('cancel');
+      _refreshPage(MSECS_TO_REFRESH);
+    };
+  }
+]);
