@@ -193,7 +193,6 @@ export class ChangeListService implements OnInit {
    */
 
   editExplorationProperty(
-      // TODO: Replace unknown with ParamSpecs (Mismatch with Backend dict).
       backendName: string, newValue: unknown, oldValue: unknown): void {
     if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning(
