@@ -57,11 +57,17 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // part of an editable list).
     this.svgString = '';
     this.numberOfElementsInQueue = 0;
-    // Customize args modal uses the value of mathExpressionSvgIsBeingProcessed
-    // to check if the modal can be closed. If an SVG image already exists i.e.
-    // the component is being edited, mathExpressionSvgIsBeingProcessed can be
-    // set to false and otherwise it should be true.
-    this.value.mathExpressionSvgIsBeingProcessed = !this.value.svg_filename;
+    // If svg_filename and raw_latex values are already initialised, it means
+    // that an existing math expression is being edited. In this case, the
+    // editor template can be initialised with the actual values instead of
+    // default ones.
+    if (this.value.svg_filename && this.value.raw_latex) {
+      this.localValue.label = this.value.raw_latex;
+      this.value.mathExpressionSvgIsBeingProcessed = false;
+      this.convertLatexStringToSvg(this.localValue.label);
+    } else {
+      this.value.mathExpressionSvgIsBeingProcessed = true;
+    }
     this.valueChanged.emit(this.value);
     this.directiveSubscriptions.add(
       this.externalRteSaveService.onExternalRteSave.subscribe(() => {
@@ -185,12 +191,10 @@ export class MathExpressionContentEditorComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     let value = changes.value;
     if (value &&
-      (value.currentValue.raw_latex !== value.previousValue.raw_latex ||
-        this.localValue.label !== value.currentValue.raw_latex)) {
+      (value.currentValue.raw_latex !== value.previousValue.raw_latex)) {
       this.localValue = {
         label: this.value.raw_latex || '',
       };
-      this.convertLatexStringToSvg(this.localValue.label);
     }
   }
 
