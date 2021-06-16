@@ -24,8 +24,9 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './audio-file-uploader.component.html'
 })
 export class AudioFileUploaderComponent {
-  // Angular lifecycle hooks are used to populate values, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types.
+  // These properties are initialized using Angular lifecycle hooks 
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   @Input() droppedFile!: FileList;
   @Output() fileChange: EventEmitter<File> = new EventEmitter<File>();
   @Output() fileClear: EventEmitter<void> = new EventEmitter<void>();
