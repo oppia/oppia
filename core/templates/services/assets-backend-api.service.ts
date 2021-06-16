@@ -163,13 +163,17 @@ export class AssetsBackendApiService {
   private getDownloadUrl(
       entityType: string, entityId: string, filename: string,
       assetType: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let downloadUrl = this.urlInterpolationService.interpolateUrl(
       this.downloadUrlTemplate, {
         entity_type: entityType,
         entity_id: entityId,
         asset_type: assetType,
         filename: filename,
       });
+    if (downloadUrl === null) {
+      throw new Error('Values passed are not correct, Download URL seems null');
+    }
+    return downloadUrl;
   }
 
   private getFileDownloadRequestsByAssetType(
@@ -184,8 +188,8 @@ export class AssetsBackendApiService {
   private async fetchFile(
       entityType: string, entityId: string, filename: string,
       assetType: string): Promise<AudioFile | ImageFile> {
-    let onResolve: (_: Blob) => void;
-    let onReject: () => void;
+    let onResolve!: (_: Blob) => void;
+    let onReject!: () => void;
     const blobPromise = new Promise<Blob>((resolve, reject) => {
       onResolve = resolve;
       onReject = reject;
@@ -226,16 +230,24 @@ export class AssetsBackendApiService {
   }
 
   private getAudioUploadUrl(explorationId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let audioUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.AUDIO_UPLOAD_URL_TEMPLATE, {
         exploration_id: explorationId
       });
+    if (audioUploadUrl === null) {
+      throw new Error('Failed to Post Audio');
+    }
+    return audioUploadUrl;
   }
 
   private getImageUploadUrl(entityType: string, entityId: string): string {
-    return this.urlInterpolationService.interpolateUrl(
+    let imageUploadUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.IMAGE_UPLOAD_URL_TEMPLATE,
       { entity_type: entityType, entity_id: entityId });
+    if (imageUploadUrl === null) {
+      throw new Error('Failed to Post Image');
+    }
+    return imageUploadUrl;
   }
 }
 

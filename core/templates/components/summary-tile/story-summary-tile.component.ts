@@ -32,25 +32,29 @@ import { StorySummary } from 'domain/story/story-summary.model';
   templateUrl: 'story-summary-tile.component.html'
 })
 export class StorySummaryTileComponent implements OnInit {
-  @Input() classroomUrlFragment: string;
-  @Input() storySummary: StorySummary;
-  @Input() topicUrlFragment: string;
-  initialCount: number;
-  chaptersDisplayed: number;
-  nodeCount: number;
-  completedStoriesCount: number;
-  storyProgress: number;
-  thumbnailUrl: string;
-  showButton: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and component interactions, therefore we need to do non-null assertion,
+  // for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() classroomUrlFragment!: string;
+  @Input() storySummary!: StorySummary;
+  @Input() topicUrlFragment!: string;
+  initialCount!: number;
+  chaptersDisplayed!: number;
+  nodeCount!: number;
+  completedStoriesCount!: number;
+  storyProgress!: number;
+  thumbnailUrl!: string | null;
+  storyLink!: string | null;
+  storyTitle!: string;
+  strokeDashArrayValues!: string | number;
+  completedStrokeDashArrayValues!: string;
+  thumbnailBgColor!: string;
+  nodeTitles!: string[];
+  showButton: boolean = false;
   circumference = (20 * 2 * Math.PI);
   gapLength = 5;
   EXPLORE_PAGE_PREFIX = '/explore/';
-  storyLink: string;
-  storyTitle: string;
-  strokeDashArrayValues: string | number;
-  completedStrokeDashArrayValues: string;
-  thumbnailBgColor: string;
-  nodeTitles: string[];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -59,7 +63,7 @@ export class StorySummaryTileComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
-  getStoryLink(): string {
+  getStoryLink(): string | null {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {

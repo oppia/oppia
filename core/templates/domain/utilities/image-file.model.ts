@@ -18,9 +18,12 @@
 
 export class ImageFile {
   filename: string;
-  data: Blob;
+  // 'get' method from a 'Map' interface can return an undefined value
+  // for a data.
+  // get(key: K): V | undefined; used at line 77 assets-backend-api.service.ts .
+  data: Blob | undefined;
 
-  constructor(filename: string, data: Blob) {
+  constructor(filename: string, data: Blob | undefined) {
     this.filename = filename;
     this.data = data;
   }
