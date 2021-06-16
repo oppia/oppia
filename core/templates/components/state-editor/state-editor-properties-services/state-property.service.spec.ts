@@ -21,6 +21,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 import { AlertsService } from 'services/alerts.service';
+import { UrlService } from 'services/contextual/url.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -68,6 +69,9 @@ describe('Change list service', function() {
     });
 
     beforeEach(() => {
+      spyOn(TestBed.inject(UrlService), 'getPathname').and.callFake(() => {
+        return '/create/0';
+      });
       cls = TestBed.inject(ChangeListService);
       alertsService = TestBed.inject(AlertsService);
 
@@ -210,7 +214,6 @@ describe('Change list service', function() {
 
     it('should correctly undo changes', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
-
       cls.addState('newState1');
       cls.addState('newState2');
       expect(cls.getChangeList()).toEqual([{
