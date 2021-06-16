@@ -55,7 +55,6 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 U = TypeVar('U')
-DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
 
 # TODO(#13059): Every use of constants is followed by
 # 'type: ignore[attr-defined]' because mypy is not able to identify the
@@ -232,7 +231,7 @@ def dict_from_yaml(yaml_str):
 
 
 def recursively_remove_key(obj, key_to_remove):
-    # type: (DICT_LIST_TYPE, Text) -> None
+    # type: (Union[Dict[Any, Any], List[Any]], Text) -> None
     """Recursively removes keys from a list or dict.
 
     Args:
