@@ -1091,6 +1091,10 @@ class ExplorationStatsModel(base_models.BaseModel):
     The ID of instances of this class has the form [exp_id].[exp_version].
     """
 
+    # NOTE TO DEVELOPERS: The method save_multi() was removed in #13021 as part
+    # of the migration to Apache Beam. Please refer to that PR if you need to
+    # reinstate it.
+
     # ID of exploration.
     exp_id = datastore_services.StringProperty(indexed=True)
     # Version of exploration.
@@ -2107,6 +2111,10 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     This model is keyed using a custom ID of the format
     {[EXPLORATION_ID]:[EXPLORATION_VERSION]:[STATE_NAME]:[CALCULATION_ID]}.
     """
+
+    # NOTE TO DEVELOPERS: The methods create_or_update() and get_model() were
+    # removed in #13021 as part of the migration to Apache Beam. Please refer to
+    # that PR if you need to reinstate them.
 
     exploration_id = (
         datastore_services.StringProperty(indexed=True, required=True))

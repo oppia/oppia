@@ -31,9 +31,11 @@ import feconf
 import python_utils
 
 (
-    collection_models, job_models, user_models
+    collection_models, exp_models, job_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.job, models.NAMES.user
+    models.NAMES.collection, models.NAMES.exploration, models.NAMES.job,
+    models.NAMES.user
 ])
 datastore_services = models.Registry.import_datastore_services()
 

@@ -1486,6 +1486,10 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
     state answers.
     """
 
+    # NOTE TO DEVELOPERS: The method save() was removed in #13021 as part of the
+    # migration to Apache Beam. Please refer to that PR if you need to reinstate
+    # it.
+
     def __init__(
             self, exploration_id, exploration_version, state_name,
             interaction_id, calculation_id, calculation_output):

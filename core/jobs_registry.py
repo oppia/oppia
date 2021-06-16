@@ -49,11 +49,6 @@ ONE_OFF_JOB_MANAGERS = [
     topic_jobs_one_off.TopicMigrationOneOffJob,
 ]
 
-# List of all manager classes for prod validation one-off batch jobs for which
-# to show controls on the admin dashboard.
-AUDIT_JOB_MANAGERS = [
-]
-
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,

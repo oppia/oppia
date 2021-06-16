@@ -33,6 +33,14 @@ import utils
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
 
+# NOTE TO DEVELOPERS: The functions:
+#   - get_visualizations_info()
+#   - get_top_state_answer_stats()
+#   - get_top_state_unresolved_answers()
+#   - get_top_state_answer_stats_multi()
+# were removed in #13021 as part of the migration to Apache Beam. Please refer
+# to that PR if you need to reinstate them.
+
 
 def _migrate_to_latest_issue_schema(exp_issue_dict):
     """Holds the responsibility of performing a step-by-step sequential update

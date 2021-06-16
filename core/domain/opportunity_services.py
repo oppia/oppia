@@ -33,6 +33,12 @@ import utils
 (opportunity_models,) = models.Registry.import_models(
     [models.NAMES.opportunity])
 
+# NOTE TO DEVELOPERS: The functions:
+#   - delete_all_exploration_opportunity_summary_models()
+#   - delete_all_skill_opportunity_models()
+# were removed in #13021 as part of the migration to Apache Beam. Please refer
+# to that PR if you need to reinstate them.
+
 
 def is_exploration_available_for_contribution(exp_id):
     """Checks whether a given exploration id belongs to a curated list of
