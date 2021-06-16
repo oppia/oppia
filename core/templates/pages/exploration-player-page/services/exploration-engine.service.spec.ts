@@ -770,7 +770,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.currentStateName).toBe('Mid');
   });
 
-  it('should load initial state', () => {
+  it('should load initial state when moved to new exploration', () => {
     let moveToExplorationCb = jasmine.createSpy('success');
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
@@ -780,6 +780,7 @@ describe('Exploration engine service ', () => {
     let currentStateName = explorationEngineService.currentStateName;
     expect(currentStateName).toBe(undefined);
 
+    // Please note that we are not calling init funtion here.
     explorationEngineService.moveToExploration(moveToExplorationCb);
 
     currentStateName = explorationEngineService.currentStateName;
@@ -802,7 +803,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.isCurrentStateInitial()).toBe(true);
   });
 
-  it('should return current state', () => {
+  it('should return current state when calling \'getState\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
     spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
@@ -818,7 +819,7 @@ describe('Exploration engine service ', () => {
     expect(currentState.name).toBe('Start');
   });
 
-  it('should return language code', () => {
+  it('should return language code when calling \'getLanguageCode\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
 
