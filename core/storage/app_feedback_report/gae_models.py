@@ -258,7 +258,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             'many collisions.')
 
     @classmethod
-    def get_all_unscrubbed_expiring_reports(cls):
+    def get_all_unscrubbed_expiring_report_models(cls):
         """Fetches the reports that are past their 90-days in storage and must
         be scrubbed.
 

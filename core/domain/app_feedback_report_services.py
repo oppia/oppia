@@ -539,7 +539,7 @@ def get_all_expiring_reports_to_scrub():
         objects that need to be scrubbed.
     """
     model_class = app_feedback_report_models.AppFeedbackReportModel
-    model_entities = model_class.get_all_unscrubbed_expiring_reports()
+    model_entities = model_class.get_all_unscrubbed_expiring_report_models()
     return [
         get_report_from_model(model_entity) for model_entity in model_entities]
 

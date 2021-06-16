@@ -218,7 +218,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         }
         self.assertEqual(exported_data, expected_data)
 
-    def test_get_all_unscrubbed_expiring_reports(self):
+    def test_get_all_unscrubbed_expiring_report_models(self):
         expired_timestamp = datetime.datetime.utcnow() - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_NUMBER_OF_DAYS +
             datetime.timedelta(days=10))
@@ -253,7 +253,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         expired_model.put()
 
         model_class = app_feedback_report_models.AppFeedbackReportModel
-        model_entities = model_class.get_all_unscrubbed_expiring_reports()
+        model_entities = model_class.get_all_unscrubbed_expiring_report_models()
 
         self.assertEqual(len(model_entities), 1)
         self.assertEqual(model_entities[0].id, expired_model.id)

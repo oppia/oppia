@@ -62,7 +62,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
     FIVE_WEEKS = datetime.timedelta(weeks=5)
     NINE_WEEKS = datetime.timedelta(weeks=9)
-    TWELVE_WEEKS = datetime.timedelta(weeks=12)
+    FOURTEEN_WEEKS = datetime.timedelta(weeks=14)
 
     def setUp(self):
         super(CronJobTests, self).setUp()
@@ -390,7 +390,9 @@ class CronJobTests(test_utils.GenericTestBase):
     def test_run_cron_to_scrub_app_feedback_reports_scrubs_reports(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
-        report_submitted_timestamp = datetime.datetime.fromtimestamp(1615519337)
+        report_timestamp = (
+            datetime.datetime.utcnow() - self.FOURTEEN_WEEKS)
+        report_submitted_timestamp = report_timestamp
         ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)
         android_report_info = {
             'user_feedback_selected_items': None,
@@ -433,8 +435,7 @@ class CronJobTests(test_utils.GenericTestBase):
                 audio_language_code='en',
                 android_report_info=android_report_info,
                 android_report_info_schema_version=1))
-        report_model.created_on = (
-            datetime.datetime.utcnow() - self.TWELVE_WEEKS)
+        report_model.created_on = report_timestamp
         report_model.put()
 
         with self.testapp_swap:
