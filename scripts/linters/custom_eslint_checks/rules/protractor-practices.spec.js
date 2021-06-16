@@ -53,7 +53,19 @@ ruleTester.run('protractor-practices', rule, {
         message: (
           'Please use “protractor-test-” prefix classname selector instead ' +
           'of “<incorrect-classname>”'),
-        type: 'Literal',
+      }],
+    },
+    {
+      code:
+      `var deleteWorkedExampleButton = function(index) {
+        return element(
+        by.css('.protractor-worked-example-' + index))
+        .element(by.css('.protractor-test-delete-example-button'));
+      };`,
+      errors: [{
+        message: (
+          'Please use “protractor-test-” prefix classname selector instead ' +
+          'of “<incorrect-classname>”'),
       }],
     },
     {

@@ -69,7 +69,15 @@ module.exports = {
         });
       },
       [selector]: function(node) {
-        if (!node.arguments[0].value.startsWith('.protractor-test-')) {
+        if ((node.arguments[0].type === 'BinaryExpression') &&
+          (!node.arguments[0].left.value.startsWith('.protractor-test-'))) {
+          context.report({
+            node: node.arguments[0],
+            messageId: 'useProtractorTest'
+          });
+        }
+        if ((node.arguments[0].type === 'Literal') &&
+          (!node.arguments[0].value.startsWith('.protractor-test-'))) {
           context.report({
             node: node.arguments[0],
             messageId: 'useProtractorTest'
