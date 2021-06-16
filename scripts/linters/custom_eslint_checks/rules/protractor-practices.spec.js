@@ -51,21 +51,8 @@ ruleTester.run('protractor-practices', rule, {
         by.css('.oppia-hide-card-height-warning-icon'));`,
       errors: [{
         message: (
-          'Please use “protractor-test-” prefix classname selector instead ' +
-          'of “<incorrect-classname>”'),
-      }],
-    },
-    {
-      code:
-      `var deleteWorkedExampleButton = function(index) {
-        return element(
-        by.css('.protractor-worked-example-' + index))
-        .element(by.css('.protractor-test-delete-example-button'));
-      };`,
-      errors: [{
-        message: (
-          'Please use “protractor-test-” prefix classname selector instead ' +
-          'of “<incorrect-classname>”'),
+          'Please use “.protractor-test-” prefix classname selector instead ' +
+          'of “.oppia-hide-card-height-warning-icon”'),
       }],
     },
     {

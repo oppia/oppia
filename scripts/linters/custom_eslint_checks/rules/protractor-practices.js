@@ -34,13 +34,13 @@ module.exports = {
       disallowSleep: 'Please do not use browser.sleep() in protractor files',
       disallowThen: 'Please do not use .then(), consider async/await instead',
       useProtractorTest: (
-        'Please use “protractor-test-” prefix classname selector instead of ' +
-        '“<incorrect-classname>”')
+        'Please use “.protractor-test-” prefix classname selector instead of ' +
+        '“{{incorrectClassname}}”')
     },
   },
 
   create: function(context) {
-    var selector = (
+    var byCssSelector = (
       'CallExpression[callee.object.name=by][callee.property.name=css]');
     var checkSleepCall = function(node) {
       var callee = node.callee;
@@ -68,19 +68,15 @@ module.exports = {
           messageId: 'disallowThen'
         });
       },
-      [selector]: function(node) {
-        if ((node.arguments[0].type === 'BinaryExpression') &&
-          (!node.arguments[0].left.value.startsWith('.protractor-test-'))) {
-          context.report({
-            node: node.arguments[0],
-            messageId: 'useProtractorTest'
-          });
-        }
+      [byCssSelector]: function(node) {
         if ((node.arguments[0].type === 'Literal') &&
           (!node.arguments[0].value.startsWith('.protractor-test-'))) {
           context.report({
             node: node.arguments[0],
-            messageId: 'useProtractorTest'
+            messageId: 'useProtractorTest',
+            data: {
+              incorrectClassname: node.arguments[0].value
+            }
           });
         }
       }
