@@ -26,6 +26,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import schema_utils
+import copy
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
@@ -38,6 +39,7 @@ SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
 SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DEFAULT_VALUE = schema_utils.SCHEMA_KEY_DEFAULT_VALUE
+SCHEMA_KEY_VALIDATE_METHOD = schema_utils.SCHEMA_KEY_VALIDATE_METHOD
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
 # This key is used for 'type: custom' objects, as a way of indicating how
@@ -65,10 +67,11 @@ SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
 SCHEMA_TYPE_UNICODE_OR_NONE = schema_utils.SCHEMA_TYPE_UNICODE_OR_NONE
+SCHEMA_TYPE_OBJECT_DICT = schema_utils.SCHEMA_TYPE_OBJECT_DICT
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
     SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST,
-    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE]
+    SCHEMA_TYPE_UNICODE, SCHEMA_TYPE_UNICODE_OR_NONE, SCHEMA_TYPE_OBJECT_DICT]
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathExpressionContent', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
@@ -299,6 +302,9 @@ def validate_schema(schema):
       property which specifies the len of the list.
     - 'dict' requires an additional 'properties' property, which specifies the
       names of the keys in the dict, and schema definitions for their values.
+    - 'object_dict' requires an additional 'validate_method' property,
+      which specifies the name of the validate method written in
+      domain_object_validator.
     There may also be an optional 'post_normalizers' key whose value is a list
     of normalizers.
 
@@ -355,6 +361,15 @@ def validate_schema(schema):
                         'Expected %s, got %s' % (
                             python_utils.BASESTRING,
                             prop[SCHEMA_KEY_DESCRIPTION]))
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_OBJECT_DICT:
+        _validate_dict_keys(
+            schema,
+            [SCHEMA_KEY_TYPE, SCHEMA_KEY_VALIDATE_METHOD],
+            OPTIONAL_SCHEMA_KEYS
+        )
+        assert isinstance(
+            schema[SCHEMA_KEY_VALIDATE_METHOD], python_utils.BASESTRING), (
+                'Expected str, got %s' % schema[SCHEMA_KEY_VALIDATE_METHOD])
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
@@ -560,6 +575,9 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'ui_config': {
                 'coding_mode': 'python',
             }
+        }, {
+            'type': 'object_dict',
+            'validate_method': 'arbitary_method'
         }]
 
         for schema in valid_schemas:
@@ -757,12 +775,14 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         validate_schema(schema)
 
         for raw_value, expected_value in mappings:
+            schema1 = copy.deepcopy(schema)
             self.assertEqual(
-                schema_utils.normalize_against_schema(raw_value, schema),
+                schema_utils.normalize_against_schema(raw_value, schema1),
                 expected_value)
         for value, error_msg in invalid_items_with_error_messages:
+            schema1 = copy.deepcopy(schema)
             with self.assertRaisesRegexp(Exception, error_msg):
-                schema_utils.normalize_against_schema(value, schema)
+                schema_utils.normalize_against_schema(value, schema1)
 
     def test_float_schema(self):
         schema = {
@@ -979,16 +999,16 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         schema = {
             'type': schema_utils.SCHEMA_TYPE_DICT,
             'properties': [{
-                'name': 'arg_with_default_none',
-                'schema': {
-                    'type': 'unicode',
-                    'default_value': None
-                }
-            }, {
                 'name': 'arg_with_some_default',
                 'schema': {
                     'type': 'unicode',
                     'default_value': 'arbitary_text'
+                }
+            }, {
+                'name': 'arg_with_default_none',
+                'schema': {
+                    'type': 'unicode',
+                    'default_value': None
                 }
             }]
         }
@@ -998,8 +1018,40 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [
             ({}, {
                 'arg_with_some_default': 'arbitary_text'
+            }),
+            ({
+                'arg_with_default_none': 'python2',
+                'arg_with_some_default': 'python3'
+            }, {
+                'arg_with_default_none': 'python2',
+                'arg_with_some_default': 'python3'
+            }),
+            ({
+                'arg_with_default_none': 'python2'
+            }, {
+                'arg_with_default_none': 'python2',
+                'arg_with_some_default': 'arbitary_text'
             })
         ]
+
+        invalid_values_with_error_messages = []
+
+        self.check_normalization(
+            schema, mappings, invalid_values_with_error_messages)
+
+    def test_object_dict_schema(self):
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_OBJECT_DICT,
+            'validate_method': 'validate_exploration_change'
+        }
+        exploration_change = {
+            'old_value': '',
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'newValue'
+        }
+
+        mappings = [(exploration_change, exploration_change)]
 
         invalid_values_with_error_messages = []
 
