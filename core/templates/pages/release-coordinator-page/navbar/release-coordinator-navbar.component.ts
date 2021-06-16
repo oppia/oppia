@@ -34,8 +34,7 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
   @Input() activeTab: string;
   @Output() activeTabChange = new EventEmitter();
 
-  BEAM_JOBS_TAB_IS_ENABLED = (
-    ReleaseCoordinatorPageConstants.BEAM_JOBS_TAB_IS_ENABLED);
+  BEAM_JOBS_TAB_IS_ENABLED = AppConstants.BEAM_JOBS_ARE_ENABLED;
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;

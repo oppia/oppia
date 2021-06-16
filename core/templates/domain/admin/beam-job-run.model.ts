@@ -13,7 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for an instance of an Apache Beam job.
+ * @fileoverview Domain object for an Apache Beam job invocation.
+ *
+ * These are distinct from BeamJob in that BeamJobRun represents a specific
+ * invocation of an Apache Beam job, whereas the former represents the
+ * definition of one.
  */
 
 export type BeamJobRunState = (

@@ -38,8 +38,8 @@ import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-p
 })
 export class BeamJobsTabComponent implements OnInit, OnDestroy {
   public dataFailedToLoad = false;
-  readonly jobRunTableColumns: readonly string[] =
-    ['run_status', 'job_name', 'started_on', 'ended_on', 'action'];
+  readonly jobRunTableColumns: readonly string[] = [
+    'run_status', 'job_name', 'started_on', 'ended_on', 'action'];
 
   jobNameControl = new FormControl('');
 

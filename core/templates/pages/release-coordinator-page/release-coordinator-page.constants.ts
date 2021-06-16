@@ -17,7 +17,6 @@
  */
 
 export const ReleaseCoordinatorPageConstants = {
-  BEAM_JOBS_TAB_IS_ENABLED: false,
   TAB_ID_BEAM_JOBS: 'beam_jobs',
   TAB_ID_JOBS: 'jobs',
   TAB_ID_MISC: ' misc',

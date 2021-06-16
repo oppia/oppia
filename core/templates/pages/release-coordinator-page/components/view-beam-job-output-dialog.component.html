@@ -1,16 +1,16 @@
 <div class="beam-job-run-dialog">
   <mat-dialog-content>
-    <h2 mat-dialog-title>{{beamJobRun.jobName}}(id="{{beamJobRun.jobId}}") output</h2>
+    <h2 mat-dialog-title>{{ beamJobRun.jobName }}(id="{{ beamJobRun.jobId }}") output</h2>
 
     <mat-tab-group *ngIf="output !== null">
       <mat-tab *ngIf="output.stdout" label="Output" aria-label="Output">
         <ng-template matTabContent>
-          <pre class="beam-job-run-output">{{output.stdout}}</pre>
+          <pre class="beam-job-run-output">{{ output.stdout }}</pre>
         </ng-template>
       </mat-tab>
       <mat-tab *ngIf="output.stderr" label="Errors" aria-label="Errors">
         <ng-template matTabContent>
-          <pre class="beam-job-run-output">{{output.stderr}}</pre>
+          <pre class="beam-job-run-output">{{ output.stderr }}</pre>
         </ng-template>
       </mat-tab>
     </mat-tab-group>
