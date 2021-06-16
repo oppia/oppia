@@ -14,38 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for topic model validator errors."""
+"""Unit tests for improvements model validator errors."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+
 from core.platform import models
 from jobs.types import base_validation_errors_test
-from jobs.types import topic_validation_errors
+from jobs.types import improvements_validation_errors
 
-(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+(improvements_models,) = models.Registry.import_models(
+    [models.NAMES.improvements])
 
-datastore_services = models.Registry.import_datastore_services()
 
-
-class ModelCanonicalNameMismatchErrorTests(
+class InvalidCompositeEntityErrorTests(
         base_validation_errors_test.AuditErrorsTestBase):
 
     def test_message(self):
-        model = topic_models.TopicModel(
-            id='test',
-            name='name',
-            url_fragment='name-two',
-            canonical_name='canonical_name',
-            next_subtopic_id=1,
-            language_code='en',
-            subtopic_schema_version=0,
-            story_reference_schema_version=0
+        model = improvements_models.TaskEntryModel(
+            id='23',
+            entity_id='999',
+            entity_type='exploration',
+            entity_version=2,
+            target_id='888',
+            target_type='state',
+            task_type='high_bounce_rate',
+            status='open',
+            composite_entity_id='invalid',
+            created_on=self.NOW,
+            last_updated=self.NOW,
         )
-        error = topic_validation_errors.ModelCanonicalNameMismatchError(model)
+        error = improvements_validation_errors.InvalidCompositeEntityError(
+            model)
 
         self.assertEqual(
-            error.stderr,
-            'ModelCanonicalNameMismatchError in TopicModel(id="test"): '
-            'Entity name %s in lowercase does not match canonical name %s' %
-            (model.name, model.canonical_name))
+            error.message,
+            'InvalidCompositeEntityError in TaskEntryModel(id=\'23\'): model '
+            'has invalid composite entity %s' % model.composite_entity_id)

@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_user_features:
+  e2e_topic_tests:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -23,7 +23,6 @@ jobs:
           architecture: 'x64'
       - name: Setup python by installing wheel
         run: pip install wheel==0.35.0
-      - uses: ./.github/actions/merge
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - id: check-risk
@@ -35,19 +34,24 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
-      - name: Run e2e preferences test
+      - name: Run Topics and Skills Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="preferences" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e subscriptions test
+      - name: Run Topic and Story Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="subscriptions" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditor" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
-      - name: Run e2e wipeout test
+      - name: Run Topic and Story Editor File Upload E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
+        env: 
+          VIDEO_RECORDING_IS_ENABLED: 0
+      - name: Run Topic and Story Viewer E2E Test
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryViewer" --prod_env
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Uploading protractor-video as Artifacts
