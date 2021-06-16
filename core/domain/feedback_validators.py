@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import feedback_services
 from core.platform import models
@@ -153,6 +154,25 @@ class GeneralFeedbackMessageModelValidator(
         return field_name_to_external_model_references
 
     @classmethod
+    def _validate_text(cls, item):
+        """Validates text length is less than 10000 characters.
+
+        Args:
+            item: datastore_services.Model. GeneralFeedbackMessageModel to
+                validate.
+
+                MAX_REVIEW_MESSAGE_LENGTH: The max review message length
+                allowed.
+        """
+        if item.text:
+            if len(item.text) > constants.MAX_REVIEW_MESSAGE_LENGTH:
+                cls._add_error(
+                    'text',
+                    'Entity id %s: has text length of more than %s '
+                    'characters' % (
+                        item.id, constants.MAX_REVIEW_MESSAGE_LENGTH))
+
+    @classmethod
     def _validate_message_id(
             cls, item, field_name_to_external_model_references):
         """Validate that message_id is less than the message count for
@@ -204,6 +224,10 @@ class GeneralFeedbackMessageModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_message_id]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_text]
 
 
 class GeneralFeedbackThreadUserModelValidator(
