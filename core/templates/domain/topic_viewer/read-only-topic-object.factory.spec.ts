@@ -21,8 +21,8 @@ import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
 import { StoryNode } from 'domain/story/story-node.model';
 
 describe('Read only topic object Factory', () => {
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
-  let _sampleReadOnlyTopic: ReadOnlyTopic = null;
+  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
+  let _sampleReadOnlyTopic: ReadOnlyTopic;
 
   beforeEach(() => {
     readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
