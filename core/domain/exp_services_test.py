@@ -8041,6 +8041,331 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         are_changes_mergeable = exp_services.are_changes_mergeable(self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(are_changes_mergeable, True)
 
+    def test_changes_are_mergeable_when_exploration_properties_changes_do_not_conflict(self):
+        v1_exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            }
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            }
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': ''
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            }
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'hints',
+            'old_value': [
+
+            ],
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': '<p>Hint 1.</p>'
+                    }
+                }
+            ]
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'next_content_id_index',
+            'old_value': 1,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': 2
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                },
+                'correct_answer': 'Solution'
+            }
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Second State Content.</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Added various contents.')
+
+        change_list_2 = [exp_domain.ExplorationChange({
+            'property_name': 'written_translations',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'translations_mapping': {
+                    'content': { },
+                    'hint_1': {},
+                    'ca_placeholder_0': {},
+                    'default_outcome': {},
+                    'solution': {}
+                }
+            },
+            'new_value': {
+                'translations_mapping': {
+                    'content': {
+                        'fr': {
+                            'translation': '<p>Translation Content 1.</p>',
+                            'needs_update': False,
+                            'data_format': 'html'
+                        }
+                    },
+                    'hint_1': {},
+                    'ca_placeholder_0': {},
+                    'default_outcome': {},
+                    'solution': {}
+                }
+            },
+            'state_name': 'Introduction'
+        }),
+        exp_domain.ExplorationChange({
+            'property_name': 'written_translations',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'translations_mapping': {
+                    'content': {
+                        'fr': {
+                            'translation': '<p>Translation Content 1.</p>',
+                            'needs_update': False,
+                            'data_format': 'html'
+                        }
+                    },
+                    'hint_1': {},
+                    'ca_placeholder_0': {},
+                    'default_outcome': {},
+                    'solution': {}
+                }
+            },
+            'new_value': {
+                'translations_mapping': {
+                    'content': {
+                        'fr': {
+                            'translation': '<p>Translation Content 1.</p>',
+                            'needs_update': False,
+                            'data_format': 'html'
+                        }
+                    },
+                    'hint_1': {},
+                    'ca_placeholder_0': {
+                        'fr': {
+                            'translation': 'Translation Placeholder.',
+                            'needs_update': False,
+                            'data_format': 'unicode'
+                        }
+                    },
+                    'default_outcome': {},
+                    'solution': {}
+                }
+            },
+            'state_name': 'Introduction'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2, 'Added some translations.')
+
+        change_list_3 = [exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'translations_mapping': {
+                    'hint_1': {},
+                    'content': {
+                        'fr': {
+                            'translation': '<p>Translation Content 1.</p>',
+                            'needs_update': False,
+                            'data_format': 'html'
+                        }
+                    },
+                    'ca_placeholder_0': {
+                        'fr': {
+                            'translation': 'Translation Placeholder.',
+                            'needs_update': False,
+                            'data_format': 'unicode'
+                        }
+                    },
+                    'solution': {},
+                    'default_outcome': {}
+                }
+            },
+            'new_value': {
+                'translations_mapping': {
+                    'hint_1': {
+                        'fr': {
+                            'translation': '<p>Translation Hint 2.</p>',
+                            'needs_update': False,
+                            'data_format': 'html'
+                        }
+                    },
+                    'content': {
+                        'fr': {
+                            'translation': '<p>Translation Content 1.</p>',
+                            'needs_update': False,
+                            'data_format': 'html'
+                        }
+                    },
+                    'ca_placeholder_0': {
+                        'fr': {
+                            'translation': 'Translation Placeholder.',
+                            'needs_update': False,
+                            'data_format': 'unicode'
+                        }
+                    },
+                    'solution': {},
+                    'default_outcome': {}
+                }
+            },
+            'property_name': 'written_translations',
+            'state_name': 'Introduction'
+        })]
+
+        are_changes_mergeable = exp_services.are_changes_mergeable(self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(are_changes_mergeable, False)
+
+        change_list_4 = [exp_domain.ExplorationChange({
+            'new_value': {
+                'translations_mapping': {
+                    'content': {
+                        'fr': {
+                            'data_format': 'html',
+                            'needs_update': False,
+                            'translation': '<p>Translation Content 2.</p>'
+                        }
+                    }
+                }
+            },
+            'state_name': 'End',
+            'old_value': {
+                'translations_mapping': {
+                    'content': {}
+                }
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'written_translations'
+        })]
+
+        are_changes_mergeable_1 = exp_services.are_changes_mergeable(self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(are_changes_mergeable_1, True)
+
+        change_list_5 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            },
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Changed First State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_5, 'Changing Content in First State.')
+        are_changes_mergeable_2 = exp_services.are_changes_mergeable(self.EXP_0_ID, 3, change_list_4)
+        self.assertEqual(are_changes_mergeable_2, True)
+
+        change_list_6 = [exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'old_value': {
+                'content_id': 'content',
+                'html': '<p>Second State Content.</p>'
+            },
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Changed Second State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_6, 'Changing Content in First State.')
+
+        are_changes_mergeable_2 = exp_services.are_changes_mergeable(self.EXP_0_ID, 4, change_list_4)
+        self.assertEqual(are_changes_mergeable_2, False)
+
     def test_changes_are_not_mergeable_when_state_added_or_deleted(self):
         v1_exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
