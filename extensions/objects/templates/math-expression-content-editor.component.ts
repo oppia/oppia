@@ -107,6 +107,10 @@ export class MathExpressionContentEditorComponent implements OnInit {
         let svgElement = outputElement.getElementsByTagName('svg')[0];
         // This is required so that DOMParser can correctly set the namespaceURI
         // for the document when parsing the SVG string in SVGSanitizerService.
+        // Without this change, getting the 'outerHTML' property on the parsed
+        // document will result in xmlns being removed in Firefox browsers and
+        // the image rendered will appear broken. Note that Chrome's
+        // implementation of outerHTML does not remove xmlns.
         svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         this.svgString = svgElement.outerHTML;
       }
