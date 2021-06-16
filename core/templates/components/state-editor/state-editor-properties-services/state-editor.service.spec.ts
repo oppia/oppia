@@ -16,10 +16,9 @@
  * @fileoverview Unit test for the Editor state service.
  */
 
-import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { AnswerChoice, StateEditorService } from
+import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
@@ -29,7 +28,6 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 
 describe('Editor state service', () => {
@@ -57,7 +55,7 @@ describe('Editor state service', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
-    // mockInteraction consists of an TextInput interaction with an
+    // Here, mockInteraction consists of an TextInput interaction with an
     // answer group leading to 'State' state and a default outcome leading to
     // 'Hola' state.
     mockInteraction = interactionObjectFactory.createFromBackendDict({
