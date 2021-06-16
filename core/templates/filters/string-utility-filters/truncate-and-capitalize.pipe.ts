@@ -29,7 +29,6 @@ export class TruncateAndCapitalizePipe implements PipeTransform {
     }
     // The following regexp match will only return 'null' on an empty input
     // string, the condition is already being checked above.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     let words = input.trim().match(/\S+/g)!;
 
     // Capitalize the first word and add it to the result.
