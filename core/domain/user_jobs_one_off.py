@@ -153,10 +153,10 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (userbio_length, stringified_usernames)
 
 
-class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
+class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to populate the story_ids and partially_learnt_topic_ids
-    in Incomplete Activities Model."""
+    """One-off job to populate the story_ids and topic_ids
+    in Incomplete and Completed Activities Model."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -181,6 +181,12 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
         stories_linked_to_incomplete_explorations = (
             story_fetchers.get_stories_by_ids(
                 story_ids_linked_to_incomplete_explorations))
+        topic_ids_linked_to_stories_for_incomplete_exps = [
+            story.corresponding_topic_id for story in (
+                stories_linked_to_incomplete_explorations)]
+        topics_linked_to_stories_for_incomplete_exps = (
+            topic_fetchers.get_topics_by_ids(
+                topic_ids_linked_to_stories_for_incomplete_exps))
 
         story_ids_linked_to_completed_explorations = (
             list(set(exp_services.get_story_ids_linked_to_explorations(
@@ -188,17 +194,15 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
         stories_linked_to_completed_explorations = (
             story_fetchers.get_stories_by_ids(
                 story_ids_linked_to_completed_explorations))
+        topic_ids_linked_to_stories_for_completed_exps = [
+            story.corresponding_topic_id for story in (
+                stories_linked_to_completed_explorations)]
+        topics_linked_to_stories_for_completed_exps = (
+            topic_fetchers.get_topics_by_ids(
+                topic_ids_linked_to_stories_for_completed_exps))
 
-        # Mark story and topic as incomplete for incomplete explorations.
-        for story in stories_linked_to_incomplete_explorations:
-            if story:
-                learner_progress_services.mark_story_as_incomplete(
-                    user_id, story.id)
-                learner_progress_services.mark_topic_as_partially_learnt(
-                    user_id, story.corresponding_topic_id)
-
-        # Mark story and topic as incomplete for completed explorations.
-        for story in stories_linked_to_completed_explorations:
+        # Mark stories and topics for completed explorations.
+        for index, story in enumerate(stories_linked_to_completed_explorations):
             if story:
                 completed_nodes = (
                     story_fetchers.get_completed_nodes_in_story(
@@ -208,75 +212,49 @@ class PopulateStoriesAndTopicsInIncompleteActivitiesOneOffJob(
                 if len(completed_nodes) != len(all_nodes):
                     learner_progress_services.mark_story_as_incomplete(
                         user_id, story.id)
+                else:
+                    learner_progress_services.mark_story_as_completed(
+                        user_id, story.id)
+
+                completed_story_ids = (
+                    learner_progress_services.get_all_completed_story_ids(
+                        user_id))
+                story_ids_in_topic = []
+                for canonical_story in (
+                        topics_linked_to_stories_for_completed_exps[index]
+                        .canonical_story_references):
+                    story_ids_in_topic.append(canonical_story.story_id)
+                if not set(story_ids_in_topic).intersection(set(
+                        completed_story_ids)):
+                    learner_progress_services.mark_topic_as_partially_learnt(
+                        user_id, story.corresponding_topic_id)
+                else:
+                    learner_progress_services.mark_topic_as_learnt(
+                        user_id, story.corresponding_topic_id)
+
+        # Mark stories and topics for incomplete explorations.
+        for index, story in enumerate(
+                stories_linked_to_incomplete_explorations):
+            if story:
+                learner_progress_services.mark_story_as_incomplete(
+                    user_id, story.id)
+                completed_story_ids = (
+                    learner_progress_services.get_all_completed_story_ids(
+                        user_id))
+                story_ids_in_topic = []
+                for canonical_story in (
+                        topics_linked_to_stories_for_incomplete_exps[index]
+                        .canonical_story_references):
+                    story_ids_in_topic.append(canonical_story.story_id)
+                if not set(story_ids_in_topic).intersection(set(
+                        completed_story_ids)):
                     learner_progress_services.mark_topic_as_partially_learnt(
                         user_id, story.corresponding_topic_id)
 
         yield (
             'Successfully added story_ids and topic_ids '
-            'to the story_ids and partially_learnt_topic_ids field '
-            'of IncompleteActivitiesModel for the user: %s' % (user_id), 1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class PopulateStoriesAndTopicsInCompletedActivitiesOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to populate the story_ids and learnt_topic_ids
-    in Completed Activities Model."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-        user_id = item.id
-        completed_exploration_ids = (
-            learner_progress_services.get_all_completed_exp_ids(user_id))
-
-        story_ids_linked_to_completed_explorations = (
-            list(set(exp_services.get_story_ids_linked_to_explorations(
-                completed_exploration_ids))))
-        stories_linked_to_completed_explorations = (
-            story_fetchers.get_stories_by_ids(
-                story_ids_linked_to_completed_explorations))
-        topic_ids_linked_to_stories = [
-            story.corresponding_topic_id for story in stories_linked_to_completed_explorations] # pylint: disable=line-too-long
-        topics_linked_to_stories = topic_fetchers.get_topics_by_ids(
-            topic_ids_linked_to_stories)
-
-        # Mark story and topic as completed for completed explorations.
-        for index, story in enumerate(stories_linked_to_completed_explorations):
-            if story:
-                completed_nodes = (
-                    story_fetchers.get_completed_nodes_in_story(
-                        user_id, story.id))
-                all_nodes = story.story_contents.nodes
-
-                if len(completed_nodes) == len(all_nodes):
-                    learner_progress_services.mark_story_as_completed(
-                        user_id, story.id)
-                completed_story_ids = (
-                    learner_progress_services.get_all_completed_story_ids(
-                        user_id))
-                story_ids_in_topic = []
-                for canonical_story in topics_linked_to_stories[index].canonical_story_references: # pylint: disable=line-too-long
-                    story_ids_in_topic.append(canonical_story.story_id)
-
-                if (set(story_ids_in_topic).issubset(
-                        set(completed_story_ids))):
-                    learner_progress_services.mark_topic_as_learnt(
-                        user_id, topics_linked_to_stories[index].id)
-
-        yield (
-            'Successfully added story_ids and topic_ids '
-            'to the story_ids and learnt_topic_ids field of '
-            'CompletedActivitiesModel for the user: %s' % (
-                user_id), 1)
+            'in IncompleteActivitiesModel and CompletedActivitiesModel '
+            'for the user: %s' % (user_id), 1)
 
     @staticmethod
     def reduce(key, values):

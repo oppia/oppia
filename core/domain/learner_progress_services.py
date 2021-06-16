@@ -1008,7 +1008,7 @@ def _get_filtered_learnt_topic_summaries(
         - list(str). The ids of the topics that are no longer present.
         - list(TopicSummary). The summaries corresponding to those
             topics which have been moved to the in partially learnt section on
-            account of new stories being added to them.
+            account of new nodes added to a completed story in the topic.
     """
 
     nonexistent_learnt_topic_ids = []
@@ -1028,8 +1028,8 @@ def _get_filtered_learnt_topic_summaries(
             for story in topic.canonical_story_references:
                 story_ids_in_topic.append(story.story_id)
 
-            if not (set(story_ids_in_topic).issubset(
-                    set(completed_story_ids))):
+            if not set(story_ids_in_topic).intersection(
+                    set(completed_story_ids)):
                 remove_topic_from_learnt_list(user_id, topic_id)
                 mark_topic_as_partially_learnt(user_id, topic_id)
                 learnt_to_partially_learnt_topics.append(topic_summary)
@@ -1465,7 +1465,8 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             summary domain objects.
 
     Returns:
-        list(dict). The summary dict objects corresponding to the given summary.
+        list(dict). The summary dict objects corresponding to the given
+        summaries.
     """
     summary_dicts = []
     topic_ids = [topic.id for topic in topic_summaries]
