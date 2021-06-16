@@ -512,8 +512,6 @@
 /core/templates/Polyfills.ts @srijanreddy98
 /extensions/extensions.module.ts @vojtechjelinek
 /schema_utils*.py @DubeySandeep
-/core/controllers/payload_validator.py @aks681
-/core/controllers/payload_validator_test.py @aks681
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
 
@@ -655,6 +653,11 @@
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @DubeySandeep
+
+
+# Schema validation.
+/core/controllers/payload_validator* @aks681
+/core/controllers/domain_objects_validator* @aks681
 
 
 # QA team.

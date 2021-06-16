@@ -23,7 +23,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import platform_parameter_domain
-import copy
+import python_utils
+
 
 def map_to_validate_method(name):
     """Takes the name in string and maps to the corresponding method written
@@ -31,17 +32,30 @@ def map_to_validate_method(name):
 
     Args:
         name: str. A method of DomainObjectsValidationClass in string format.
+
+    Returns:
+        *. Returns the corresponding method of 'name' from
+        DomainObjectsValidationClass.
     """
     return getattr(DomainObjectsValidationClass, name)
 
-class DomainObjectsValidationClass:
+
+class DomainObjectsValidationClass(python_utils.OBJECT):
+    """Contains all the methods for objects which needs validation from the
+    methods written in the domain layer of the codebase.
+    """
+
+    def __init__(self):
+        pass
 
     def validate_exploration_change(self, obj):
+        """Validates exploration change."""
         # No explicit call to validate_dict method is necessary, because
         # ExplorationChange calls it while initialization.
         exp_domain.ExplorationChange(obj)
 
     def validate_new_rules_dict(self, obj):
+        """Validates new rules dict."""
         domain_object = (
             platform_parameter_domain.PlatformParameterRule.from_dict(obj))
         domain_object.validate()

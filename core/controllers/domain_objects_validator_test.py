@@ -20,10 +20,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.controllers import domain_objects_validator
 from core.tests import test_utils
 
-validator_object = domain_objects_validator.DomainObjectsValidationClass()
 
 class ValidateExplorationChangeTests(test_utils.GenericTestBase):
     """Tests to validate domain objects coming from API."""
+    validator_object = domain_objects_validator.DomainObjectsValidationClass()
 
     def test_incorrect_object_raises_exception(self):
         exploration_change = {
@@ -31,15 +31,7 @@ class ValidateExplorationChangeTests(test_utils.GenericTestBase):
             'property_name': 'title',
             'new_value': 'newValue'
         }
-        new_rules_dict = {
-            'filters': [
-                {
-                    'type': 'server_mode',
-                    'conditions': []
-                }
-            ],
-            'value_when_matched': False
-        }
         with self.assertRaisesRegexp(
-                Exception, 'Missing cmd key in change dict'):
-            validator_object.validate_exploration_change(exploration_change)
+            Exception, 'Missing cmd key in change dict'):
+            self.validator_object.validate_exploration_change(
+                exploration_change)

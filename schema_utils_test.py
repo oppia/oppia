@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import inspect
 
 from core.domain import email_manager
@@ -26,7 +27,6 @@ from core.tests import test_utils
 import feconf
 import python_utils
 import schema_utils
-import copy
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
 SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
