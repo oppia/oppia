@@ -715,18 +715,20 @@ NOT_FULLY_COVERED_FILES = [
 
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
 MYPY_CMD = 'mypy'
+MYPY_REQUIREMENTS_PATH = os.path.join('.', 'mypy_requirements.txt')
+PYTHON3_CMD = 'python3'
+
 
 _PARSER = argparse.ArgumentParser(
-    description="""
-Type checking script for Oppia codebase.
-""")
+    description="Type checking script for Oppia codebase."
+)
 
 _PARSER.add_argument(
     '--files',
     help='Files to type-check',
     action='append',
     nargs='+'
-    )
+)
 
 
 def get_mypy_cmd(files):
@@ -734,15 +736,33 @@ def get_mypy_cmd(files):
     if files:
         cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
     else:
-        rgx = '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES)
+        excluded_files_regex = (
+            '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
         cmd = [
-            MYPY_CMD, '--exclude', rgx, '--config-file', CONFIG_FILE_PATH, '.']
+            MYPY_CMD, '--exclude', excluded_files_regex,
+            '--config-file', CONFIG_FILE_PATH, '.'
+        ]
     return cmd
+
+
+def install_mypy_prerequisites():
+    cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
+    process = subprocess.call(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    return process
 
 
 def main(args=None):
     """Runs the MyPy type checks."""
     unused_parsed_args = _PARSER.parse_args(args=args)
+
+    python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
+    return_code = install_mypy_prerequisites()
+    if return_code != 0:
+        python_utils.PRINT('Cannot install Mypy and stubs for third party libraries.')
+        sys.exit(1)
+    else:
+        python_utils.PRINT('Installed Mypy and stubs for third party libraries.')
+
     python_utils.PRINT('Starting Mypy type checks.')
     cmd = get_mypy_cmd(getattr(unused_parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)

@@ -38,7 +38,7 @@ import feconf
 import python_utils
 
 from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
-    Any, Callable, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
+    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
     Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 
 
@@ -321,7 +321,10 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    if imghdr.what(None, h=content) == 'png': # type: ignore[call-overload]
+    # We accept unicode but imghdr.what(file, h) accept 'h' of type str.
+    # So we have casted content to be str.
+    content = cast(str, content)
+    if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
             python_utils.url_quote( # type: ignore[no-untyped-call]
