@@ -30,8 +30,9 @@ import { UserService } from 'services/user.service';
   templateUrl: './collection-summary-tile.component.html',
 })
 export class CollectionSummaryTileComponent implements OnInit {
-  // These properties are initialized using component interactions,
-  // see https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() getCollectionId!: string;
   @Input() getCollectionTitle!: string;
   @Input() getLastUpdatedMsec!: number;
@@ -48,8 +49,6 @@ export class CollectionSummaryTileComponent implements OnInit {
 
   userIsLoggedIn: boolean = false;
   collectionIsCurrentlyHoveredOver: boolean = false;
-  // These properties are initialized using lifecycle hooks,
-  // see https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1.
   defaultEmptyTitle!: string;
   activityTypeCollection!: string;
 
