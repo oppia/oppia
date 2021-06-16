@@ -197,7 +197,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
               draftChanges !== null &&
               draftChanges.length > 0) {
             AutosaveInfoModalsService.showVersionMismatchModal(changeList);
-            $rootScope.$applyAsync();
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
