@@ -146,9 +146,9 @@
     "core/templates/domain/statistics/state-top-answers-stats-object.factory.spec.ts",
     "core/templates/domain/story/StoryContentsObjectFactory.ts",
     "core/templates/domain/story/StoryContentsObjectFactorySpec.ts",
+    "core/templates/domain/story/story-domain.constants.ts",
     "core/templates/domain/story/story-node.model.ts",
     "core/templates/domain/story/story-node.model.spec.ts",
-    "core/templates/domain/story/story-domain.constants.ts",
     "core/templates/domain/suggestion/suggestion.model.ts",
     "core/templates/domain/suggestion/suggestion.model.spec.ts",
     "core/templates/domain/summary/creator-exploration-summary.model.ts",
@@ -285,8 +285,8 @@
     "extensions/objects/templates/code-string-editor.component.ts",
   ],
   "include": [
-    "typings/*.ts",
     "core/templates/pages/delete-account-page/services/*.ts",
+    "typings/*.ts"
   ],
   "exclude": ["extensions/classifiers/proto"]
 }
