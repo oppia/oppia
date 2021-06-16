@@ -19,6 +19,7 @@
 
 var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
+var forms = require('./forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -253,30 +254,26 @@ var TopicEditorPage = function() {
   };
 
   this.addSubtopic = async function(title, urlFragment, imgPath, htmlContent) {
-    await addSubtopicButton.click();
-    await newSubtopicTitlefield.sendKeys(title);
+    await action.click('Add subtopic button', addSubtopicButton);
+    await action.sendKeys(
+      'New subtopic title field', newSubtopicTitlefield, title);
 
     await action.sendKeys(
       'Create new url fragment', newSubtopicUrlFragmentField, urlFragment);
-    await workflow.submitImage(
-      topicThumbnailButton, thumbnailContainer, imgPath, false);
+
     var subtopicPageContentButton = element(by.css(
       '.protractor-test-show-schema-editor'));
-    await waitFor.elementToBeClickable(
-      subtopicPageContentButton,
-      'Edit subtopic htm content button taking too long to be clickable');
-    await subtopicPageContentButton.click();
-    var pageEditor = element(by.css(
-      '.protractor-test-create-subtopic-page-content'));
-    await waitFor.visibilityOf(
-      pageEditor, 'Subtopic html editor takes too long to appear');
-    var pageEditorInput = pageEditor.element(by.css('.oppia-rte'));
     await action.click(
-      'Page Editor Input', pageEditorInput);
-    await action.sendKeys(
-      'Page Editor Input', pageEditorInput, htmlContent);
+      'Edit subtopic htm content button', subtopicPageContentButton);
+    var subtopicDescriptionEditor = element(by.css(
+      '.protractor-test-subtopic-description-editor'));
+    var richTextEditor = await forms.RichTextEditor(subtopicDescriptionEditor);
+    await richTextEditor.appendPlainText(htmlContent);
+    await workflow.submitImage(
+      topicThumbnailButton, thumbnailContainer, imgPath, false);
+
     await action.click(
-      'Confrim Subtopic Creation Button', confirmSubtopicCreationButton);
+      'Confirm subtopic creation button', confirmSubtopicCreationButton);
     await waitFor.invisibilityOf(
       element(by.css('.protractor-test-new-subtopic-editor')),
       'Create subtopic modal taking too long to disappear.');
@@ -528,10 +525,7 @@ var TopicEditorPage = function() {
       commitMessageField, 'Commit Message field taking too long to appear.');
     await commitMessageField.sendKeys(commitMessage);
 
-    await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable');
-    await closeSaveModalButton.click();
+    await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for saving topic takes too long to appear.');
   };
