@@ -212,31 +212,6 @@ export class AdminMiscTabComponent {
       });
   }
 
-
-  flushMemoryCache(): void {
-    this.adminBackendApiService.flushMemoryCacheAsync()
-      .then(() => {
-        this.setStatusMessage.emit('Success! Memory Cache Flushed.');
-      }, errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-      });
-  }
-
-  getMemoryCacheProfile(): void {
-    this.adminBackendApiService.getMemoryCacheProfileAsync()
-      .then(response => {
-        this.result = {
-          totalAllocatedInBytes: response.total_allocation,
-          peakAllocatedInBytes: response.peak_allocation,
-          totalKeysStored: response.total_keys_stored
-        };
-        this.memoryCacheDataFetched = true;
-        this.setStatusMessage.emit('Success!');
-      }, errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-      });
-  }
-
   updateUsername(): void {
     this.setStatusMessage.emit('Updating username...');
     this.adminBackendApiService.updateUserNameAsync(
@@ -247,8 +222,7 @@ export class AdminMiscTabComponent {
               this.newUsername + '!');
       }, errorResponse => {
         this.setStatusMessage.emit('Server error: ' + errorResponse);
-      }
-      );
+      });
   }
 
   getNumberOfPendingDeletionRequestModels(): void {

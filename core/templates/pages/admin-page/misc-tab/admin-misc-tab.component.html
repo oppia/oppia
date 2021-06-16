@@ -19,16 +19,34 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="submitQuery()">
       <div class="form-group row">
-        <label>Exploration ID:</label> <input type="text" [(ngModel)]="expId" required="true">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expId"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
-        <label>Exploration version:</label> <input type="number" min="0" [(ngModel)]="expVersion" required="true">
+        <label>Exploration version:</label>
+        <input type="number"
+               min="0"
+               [(ngModel)]="expVersion"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
-        <label>State name:</label> <input type="text" [(ngModel)]="stateName" required="true">
+        <label>State name:</label>
+        <input type="text"
+               [(ngModel)]="stateName"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
-        <label>Number of answers:</label> <input type="number" min="0" [(ngModel)]="numAnswers" required="true">
+        <label>Number of answers:</label>
+        <input type="number"
+               min="0"
+               [(ngModel)]="numAnswers"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="submit query">
@@ -45,7 +63,11 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="regenerateOpportunitiesRelatedToTopic()">
       <div class="form-group row">
-        <label>Topic ID:</label> <input type="text" [(ngModel)]="topicIdForRegeneratingOpportunities" required="true">
+        <label>Topic ID:</label>
+        <input type="text"
+               [(ngModel)]="topicIdForRegeneratingOpportunities"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="Regenerate">
@@ -73,11 +95,18 @@
     <form class="form" (submit)="updateUsername()">
       <div class="form-group row">
         <label>Old username:</label>
-        <input type="text" [(ngModel)]="oldUsername" required="true">
+        <input type="text"
+               [(ngModel)]="oldUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <label>New username:</label>
-        <input type="text" [(ngModel)]="newUsername" required="true" [maxlength]="MAX_USERNAME_LENGTH">
+        <input type="text"
+               [(ngModel)]="newUsername"
+               [ngModelOptions]="{standalone: true}"
+               required="true"
+               [maxlength]="MAX_USERNAME_LENGTH">
       </div>
       <div class="form-group row">
         <input type="submit" value="Update">
@@ -105,7 +134,10 @@
     <form class="form" (submit)="getModelsRelatedToUser()">
       <div class="form-group row">
         <label>User ID:</label>
-        <input type="text" [(ngModel)]="userIdToGet" required="true">
+        <input type="text"
+               [(ngModel)]="userIdToGet"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="Get">
@@ -120,11 +152,17 @@
     <form class="form" (submit)="deleteUser()">
       <div class="form-group row">
         <label>User ID:</label>
-        <input type="text" [(ngModel)]="userIdToDelete" required="true">
+        <input type="text"
+               [(ngModel)]="userIdToDelete"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <label>Username:</label>
-        <input type="text" [(ngModel)]="usernameToDelete" required="true">
+        <input type="text"
+               [(ngModel)]="usernameToDelete"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="Delete">
@@ -139,15 +177,27 @@
     <form class="form" (submit)="regenerateMissingExplorationStats()">
       <div class="form-group row">
         <label class="w-100">Comma separated exploration IDs:</label>
-        <textarea type="text" [(ngModel)]="explorationIdsForRegeneratingMissingStats" cols="40" rows="5" required="true"></textarea>
+        <textarea type="text"
+                  [(ngModel)]="explorationIdsForRegeneratingMissingStats"
+                  [ngModelOptions]="{standalone: true}"
+                  cols="40"
+                  rows="5"
+                  required="true"></textarea>
       </div>
       <div class="form-group row">
         <input type="submit" value="Regenerate">
-        <a *ngIf="csvUri" [href]="csvUri" [download]="csvFilename"><input type="button" value="Download CSV output"></a>
-        <input *ngIf="csvUri" type="button" (click)="resetExplorationStatsRegenerationUtilityCsvRows()" value="Reset CSV data">
+        <a *ngIf="csvUri" [href]="csvUri" [download]="csvFilename">
+          <input type="button" value="Download CSV output">
+        </a>
+        <input *ngIf="csvUri"
+               type="button"
+               (click)="resetExplorationStatsRegenerationUtilityCsvRows()"
+               value="Reset CSV data">
       </div>
     </form>
-    <pre *ngIf="missingExplorationStatsRegenerationMessage">{{ missingExplorationStatsRegenerationMessage }}</pre>
+    <pre *ngIf="missingExplorationStatsRegenerationMessage">
+      {{ missingExplorationStatsRegenerationMessage }}
+    </pre>
   </div>
 </mat-card>
 
@@ -159,7 +209,10 @@
     <form class="form" (submit)="grantSuperAdminPrivileges()">
       <div class="form-group row">
         <label>Username:</label>
-        <input type="text" [(ngModel)]="usernameToGrant" required="true">
+        <input type="text"
+               [(ngModel)]="usernameToGrant"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="Grant">
@@ -176,7 +229,10 @@
     <form class="form" (submit)="revokeSuperAdminPrivileges()">
       <div class="form-group row">
         <label>Username:</label>
-        <input type="text" [(ngModel)]="usernameToRevoke" required="true">
+        <input type="text"
+               [(ngModel)]="usernameToRevoke"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
       </div>
       <div class="form-group row">
         <input type="submit" value="Revoke">
