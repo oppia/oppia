@@ -71,7 +71,8 @@
         "core.domain.topic_domain_test",
         "core.controllers.acl_decorators_test",
         "core.domain.user_query_jobs_one_off_test",
-        "core.domain.question_domain_test"
+        "core.domain.question_domain_test",
+        "jobs.io.job_io_test"
     ],
     "3": [
         "core.domain.feedback_validators_test",
