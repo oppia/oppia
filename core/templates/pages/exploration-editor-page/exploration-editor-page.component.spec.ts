@@ -16,10 +16,8 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, fakeAsync, flushMicrotasks, flush } from '@angular/core/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { EventEmitter } from '@angular/core';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateEditorService } from
   // eslint-disable-next-line max-len
@@ -49,10 +47,6 @@ import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { LostChangesModalComponent } from './modal-templates/lost-changes-modal.component';
-import { AutosaveInfoModalsService } from './services/autosave-info-modals.service';
-import { ChangeListService } from './services/change-list.service';
-import { ExplorationDataService } from './services/exploration-data.service';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -68,8 +62,8 @@ describe('Exploration editor page component', function() {
   var $rootScope = null;
   var $scope = null;
   var $uibModal = null;
-  let aims: AutosaveInfoModalsService = null;
-  let cls: ChangeListService = null;
+  var aims = null;
+  var cls = null;
   var cs = null;
   var efbas = null;
   var eis = null;
@@ -189,18 +183,16 @@ describe('Exploration editor page component', function() {
     show_state_editor_tutorial_on_load: true,
     show_state_translation_tutorial_on_load: true
   };
+  var mockExplorationDataService = {
+    getDataAsync: function(callback) {
+      callback();
+      return $q.resolve(explorationData);
+    }
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgbModule
-      ],
-      declarations: [
-        LostChangesModalComponent
-      ],
       providers: [
-        AutosaveInfoModalsService,
-        ChangeListService,
         ContextService,
         EditabilityService,
         ExplorationFeaturesBackendApiService,
@@ -216,35 +208,21 @@ describe('Exploration editor page component', function() {
         StateTopAnswersStatsBackendApiService,
         UserExplorationPermissionsService,
         UrlInterpolationService,
-        FocusManagerService,
-        {
-          provide: ExplorationDataService,
-          useValue: {
-            getDataAsync: function(callback) {
-              callback();
-              return $q.resolve(explorationData);
-            },
-            autosaveChangeListAsync: function() {
-              return;
-            }
-          }
-        }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [LostChangesModalComponent]
-      }
+        FocusManagerService
+      ]
     });
-
-    aims = TestBed.inject(AutosaveInfoModalsService);
-    cls = TestBed.inject(ChangeListService);
   });
+
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ExplorationDataService', mockExplorationDataService);
+  }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
+    aims = $injector.get('AutosaveInfoModalsService');
+    cls = $injector.get('ChangeListService');
     cs = $injector.get('ContextService');
     efbas = $injector.get('ExplorationFeaturesBackendApiService');
     eis = $injector.get('ExplorationImprovementsService');
@@ -399,15 +377,15 @@ describe('Exploration editor page component', function() {
     });
 
     it('should load change list by draft changes successfully', () => {
-      const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
+      spyOn(cls, 'loadAutosavedChangeList').and.callThrough();
       $scope.$apply();
 
-      expect(loadSpy).toHaveBeenCalledWith(
+      expect(cls.loadAutosavedChangeList).toHaveBeenCalledWith(
         explorationData.draft_changes);
     });
 
     it('should show mismatch version modal when draft change exists', () => {
-      spyOn(aims, 'showVersionMismatchModal').and.returnValue(null);
+      spyOn(aims, 'showVersionMismatchModal').and.callThrough();
       $scope.$apply();
 
       expect(aims.showVersionMismatchModal)
@@ -788,12 +766,11 @@ describe('Exploration editor page component', function() {
       spyOn(cls, 'renameState');
 
       $scope.$apply();
-      flush();
+      flushMicrotasks();
 
       ess.renameState('Introduction', 'Start');
-      $scope.$apply();
-      flush();
 
+      flushMicrotasks();
       expect(onStateRenamedSpy).toHaveBeenCalledWith('Introduction', 'Start');
     }));
 
