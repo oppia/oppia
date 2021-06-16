@@ -36,7 +36,7 @@ export class ProfileLinkImageBackendApiService {
   // This function will return a 'null' Promise in the following cases:
   // 1. The user is not logged in
   // 2. The user didn't upload a profile picture
-  // 3. The player is in preview mode.
+  // 3. The exploration player user is in preview mode inside the editor.
   async fetchProfilePictureDataAsync(profileImageUrl: string):
       Promise<string | null> {
     return this.http.get<ProfileDict>(profileImageUrl).pipe(
