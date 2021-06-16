@@ -22,6 +22,9 @@ import { CustomSchema } from 'services/schema-default-value.service';
 
 interface ObjectEditorCustomScope extends ng.IScope {
   objType?: string;
+  ngModelController: {
+    $setValidity: (validationErrorKey: string, isValid: boolean) => void
+  };
   schema: CustomSchema;
   initArgs?: Object;
   modalId: symbol;
@@ -32,6 +35,7 @@ interface ObjectEditorCustomScope extends ng.IScope {
   getIsEditable?: (() => boolean);
   getSchema?: (() => CustomSchema);
   updateValue: (unknown) => void;
+  updateValid: (e: Record<string, boolean>) => void;
   value: unknown;
 }
 
@@ -107,6 +111,14 @@ angular.module('oppia').directive('objectEditor', [
           scope.value = e;
           $rootScope.$applyAsync();
         };
+        scope.updateValid = function(e) {
+          if (!scope.ngModelController) {
+            return;
+          }
+          for (const key of Object.keys(e)) {
+            scope.ngModelController.$setValidity(key, e[key]);
+          }
+        };
         if (directiveName) {
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
             element.html(
@@ -114,9 +126,11 @@ angular.module('oppia').directive('objectEditor', [
               '-editor [always-editable]="alwaysEditable"' +
               ' [init-args]="initArgs" [is-editable]="' +
               'isEditable" [schema]="getSchema()"' +
-              '[modal-id]="modalId"' +
+              '[modal-id]="modalId" (validity-change)="updateValid($event)"' +
               '(value-changed)="updateValue($event)" [value]="value"></' +
-              directiveName + '-editor>');
+              directiveName + '-editor>' +
+              '<input ng-show="false" style="height: 0; width: 0"' +
+              ' ng-model="value">');
             $compile(element.contents())(scope);
           } else {
             element.html(
@@ -129,6 +143,10 @@ angular.module('oppia').directive('objectEditor', [
           }
         } else {
           $log.error('Error in objectEditor: no editor type supplied.');
+        }
+        if (element[0]) {
+          scope.ngModelController = angular.element(
+            element[0].lastElementChild).controller('ngModel');
         }
       },
       restrict: 'E'
