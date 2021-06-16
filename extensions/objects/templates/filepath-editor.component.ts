@@ -556,6 +556,7 @@ export class FilepathEditorComponent implements OnInit, OnChanges {
       tags: [],
       attrs: []
     };
+    this.validityChange.emit({empty: false});
   }
 
   validate(data: FilepathData): boolean {

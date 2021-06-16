@@ -52,7 +52,12 @@
                            (value-change)="$ctrl.updateValue($event, item.varName)">
             </object-editor>
           </span>
-          <span ng-if="item.type != 'select' && item.type != 'noneditable'">
+          <span ng-if="item.type != 'select' &&
+                       item.type != 'noneditable' &&
+                       item.type != 'dragAndDropPositiveIntSelect' &&
+                       item.type != 'dragAndDropHtmlStringSelect' &&
+                       item.type != 'dropdown' &&
+                       item.type != 'checkboxes'">
             <object-editor [modal-id]="$ctrl.modalId"
                            [obj-type]="item.type"
                            [is-editable]="$ctrl.isEditable"

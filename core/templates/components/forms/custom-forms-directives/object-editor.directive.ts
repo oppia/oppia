@@ -168,7 +168,7 @@ export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
       ref.instance.isEditable = this.isEditable;
       ref.instance.modalId = this.modalId;
       ref.instance.objType = this.objType;
-      if (this.schema) {
+      if (this.schema && !ref.instance.schema) {
         ref.instance.schema = this.schema;
       }
       ref.instance.value = this.value;
