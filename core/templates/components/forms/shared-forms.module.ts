@@ -30,6 +30,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CustomFormsComponentsModule } from './custom-forms-directives/custom-form-components.module';
 import { SchemaBasedEditorDirective } from './schema-based-editors/schema-based-editor.directive';
 import { AudioSliderComponent } from './slider/audio-slider.component';
+import { ObjectEditorComponent } from './custom-forms-directives/object-editor.directive';
 
 @NgModule({
   imports: [
@@ -47,15 +48,18 @@ import { AudioSliderComponent } from './slider/audio-slider.component';
   ],
   declarations: [
     AudioSliderComponent,
-    SchemaBasedEditorDirective
+    SchemaBasedEditorDirective,
+    ObjectEditorComponent
   ],
   entryComponents: [
-    AudioSliderComponent
+    AudioSliderComponent,
+    ObjectEditorComponent
   ],
   exports: [
     AudioSliderComponent,
     CustomFormsComponentsModule,
-    SchemaBasedEditorDirective
+    SchemaBasedEditorDirective,
+    ObjectEditorComponent
   ],
 })
 

@@ -33,7 +33,17 @@ angular.module('oppia').directive('schemaBasedCustomEditor', [
       template: require('./schema-based-custom-editor.directive.html'),
       controllerAs: '$ctrl',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: [function() {}]
+      controller: ['$element', '$scope', function($element, $scope) {
+        var ctrl = this;
+        ctrl.updateValue = function(value) {
+          ctrl.localValue = value;
+          $scope.$applyAsync();
+        };
+        ctrl.$postLink = function() {
+          ctrl.form = angular.element(
+            $element[0].lastElementChild).controller('ngModel');
+        };
+      }]
     };
   }
 ]);
