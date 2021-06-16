@@ -39,7 +39,7 @@ import python_utils
 
 from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
     Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
-    Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
+    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
 
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
@@ -830,7 +830,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
 
 
 def capitalize_string(input_string):
-    # type: (Text) -> Text
+    # type: (Optional[Text]) -> Optional[Text]
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
 
