@@ -57,6 +57,10 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // part of an editable list).
     this.svgString = '';
     this.numberOfElementsInQueue = 0;
+    // Customize args modal uses the value of mathExpressionSvgIsBeingProcessed
+    // to check if the modal can be closed. If an SVG image already exists i.e.
+    // the component is being edited, mathExpressionSvgIsBeingProcessed can be
+    // set to false and otherwise it should be true.
     this.value.mathExpressionSvgIsBeingProcessed = !this.value.svg_filename;
     this.valueChanged.emit(this.value);
     this.directiveSubscriptions.add(
@@ -94,8 +98,11 @@ export class MathExpressionContentEditorComponent implements OnInit {
     this.numberOfElementsInQueue++;
     MathJax.Hub.Queue(() => {
       if (outputElement.getElementsByTagName('svg')[0] !== undefined) {
-        this.svgString = (
-          outputElement.getElementsByTagName('svg')[0].outerHTML);
+        let svgElement = outputElement.getElementsByTagName('svg')[0];
+        // This is required so that DOMParser can correctly set the namespaceURI
+        // for the document when parsing the SVG string in SVGSanitizerService.
+        svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        this.svgString = svgElement.outerHTML;
       }
       this.numberOfElementsInQueue--;
       // We need to ensure that all the typepsetting requests in the
@@ -179,7 +186,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
     let value = changes.value;
     if (value &&
       (value.currentValue.raw_latex !== value.previousValue.raw_latex ||
-        this.localValue.label !== changes.value.currentValue.raw_latex)) {
+        this.localValue.label !== value.currentValue.raw_latex)) {
       this.localValue = {
         label: this.value.raw_latex || '',
       };
