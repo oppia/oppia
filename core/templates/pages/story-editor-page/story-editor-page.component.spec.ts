@@ -33,6 +33,7 @@ describe('Story editor page', function() {
   var $rootScope = null;
   var $uibModal = null;
   var PageTitleService = null;
+  var PreventPageUnloadEventService = null;
   var StoryEditorStateService = null;
   var StoryObjectFactory = null;
   var UndoRedoService = null;
@@ -69,6 +70,8 @@ describe('Story editor page', function() {
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
     PageTitleService = $injector.get('PageTitleService');
+    PreventPageUnloadEventService = $injector.get(
+      'PreventPageUnloadEventService');
     StoryEditorStateService = $injector.get('StoryEditorStateService');
     StoryObjectFactory = $injector.get('StoryObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
@@ -152,13 +155,18 @@ describe('Story editor page', function() {
     ctrl.$onDestroy();
   });
 
-  it('should call confirm before leaving', function() {
+  it('should addListener by passing getChangeCount to ' +
+  'PreventPageUnloadEventService', function() {
+    spyOn(UrlService, 'getStoryIdFromUrl').and.returnValue('story_1');
+    spyOn(PageTitleService, 'setPageTitle');
     spyOn(UndoRedoService, 'getChangeCount').and.returnValue(10);
-    spyOn(window, 'addEventListener');
-    ctrl.setUpBeforeUnload();
-    ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(window.addEventListener).toHaveBeenCalledWith(
-      'beforeunload', ctrl.confirmBeforeLeaving);
+    spyOn(PreventPageUnloadEventService, 'addListener').and
+      .callFake((callback) => callback());
+
+    ctrl.$onInit();
+
+    expect(PreventPageUnloadEventService.addListener)
+      .toHaveBeenCalledWith(jasmine.any(Function));
   });
 
   it('should return to topic editor page when closing confirmation modal',

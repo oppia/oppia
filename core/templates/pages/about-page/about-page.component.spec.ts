@@ -16,204 +16,92 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA, Pipe }
-  from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
 import { AboutPageComponent } from './about-page.component';
-import { AboutPageConstants } from './about-page.constants';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TranslateService } from 'services/translate.service';
-import { UtilsService } from 'services/utils.service';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
 
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
-
-class MockI18nLanguageCodeService {
-  codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
-    return 'en';
-  }
-
-  get onI18nLanguageCodeChange() {
-    return this.codeChangeEventEmiiter;
-  }
-}
-
-// Mocking window object here because changing location.href causes the
-// full page to reload. Page reloads raise an error in karma.
-class MockWindowRef {
-  _window = {
-    location: {
-      _hash: '',
-      _hashChange: null,
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
-      reload: (val) => val
-    },
-    get onhashchange() {
-      return this.location._hashChange;
-    },
-
-    set onhashchange(val) {
-      this.location._hashChange = val;
-    }
-  };
-  get nativeWindow() {
-    return this._window;
-  }
-}
-
-let component: AboutPageComponent;
-let fixture: ComponentFixture<AboutPageComponent>;
-
-describe('About Page', function() {
-  let windowRef: MockWindowRef;
-
-  beforeEach(() => {
-    windowRef = new MockWindowRef();
+describe('About Page', () => {
+  const siteAnalyticsService = new SiteAnalyticsService(
+    new WindowRef());
+  beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [AboutPageComponent, MockTranslatePipe],
+      declarations: [AboutPageComponent,
+        MockTranslatePipe],
       providers: [
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
-        { provide: TranslateService, useClass: MockTranslateService },
-        UtilsService,
+        { provide: SiteAnalyticsService, useValue: siteAnalyticsService },
         UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                href: ''
+              }
+            }
+          }
+        }
+      ]
     }).compileComponents();
-    fixture = TestBed.createComponent(AboutPageComponent);
-    component = fixture.componentInstance;
+    const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
+    component = aboutPageComponent.componentInstance;
+  });
+  beforeEach(angular.mock.module('oppia'));
+  let component = null;
+
+  it('should successfully instantiate the component',
+    () => {
+      expect(component).toBeDefined();
+    });
+
+  it('should return correct static image url when calling getStaticImageUrl',
+    () => {
+      expect(component.getStaticImageUrl('/path/to/image')).toBe(
+        '/assets/images/path/to/image');
+    });
+
+  it('should redirect guest user to the login page when they click' +
+  'create lesson button', () => {
+    spyOn(
+      siteAnalyticsService, 'registerCreateLessonButtonEvent')
+      .and.callThrough();
+    component.onClickCreateLessonButton();
+
+    expect(siteAnalyticsService.registerCreateLessonButtonEvent)
+      .toHaveBeenCalledWith();
+    expect(component.windowRef.nativeWindow.location.href).toBe(
+      '/creator-dashboard?mode=create');
   });
 
-  it('should click on about tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
+  it('should register correct event on calling onClickVisitClassroomButton',
+    () => {
+      spyOn(
+        siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
+        .and.callThrough();
+      component.onClickVisitClassroomButton();
 
-    component.onTabClick('about');
+      expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
+        .toHaveBeenCalledWith();
+      expect(component.windowRef.nativeWindow.location.href).toBe(
+        '/learn/math');
+    });
 
-    expect(windowRef.nativeWindow.location.hash).toBe('#about');
-    expect(component.activeTabName).toBe('about');
-  });
+  it('should register correct event on calling onClickBrowseLibraryButton',
+    () => {
+      spyOn(
+        siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+        .and.callThrough();
 
-  it('should click on license tab', fakeAsync(() => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
+      component.onClickBrowseLibraryButton();
 
-    component.onTabClick('license');
-    fixture.detectChanges();
-    expect(windowRef.nativeWindow.location.hash).toBe('#license');
-    expect(component.activeTabName).toBe('foundation');
-  }));
-
-  it('should click on foundation tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
-
-    component.onTabClick('foundation');
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#foundation');
-    expect(component.activeTabName).toBe('foundation');
-  });
-
-  it('should click on credits tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
-
-    component.onTabClick('credits');
-
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#credits');
-    expect(component.activeTabName).toBe('credits');
-  });
-
-  it('should activate about tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#about';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#about');
-    expect(component.activeTabName).toBe('about');
-  });
-
-  it('should activate about license on init', () => {
-    windowRef.nativeWindow.location.hash = '#license';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#license');
-    expect(component.activeTabName).toBe('foundation');
-  });
-
-  it('should activate foundation tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#foundation';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#foundation');
-    expect(component.activeTabName).toBe('foundation');
-  });
-
-  it('should activate credits tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#credits';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#credits');
-    expect(component.activeTabName).toBe('credits');
-  });
-
-  it('should get static image url', () => {
-    expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image');
-  });
-
-  it('should initialize listOfNames and aboutPageMascotImgUrl variables' +
-    ' when onInit is called', () => {
-    component.ngOnInit();
-
-    expect(component.listOfNames).toBe(
-      'Alex Kauffmann, Allison Barros, Amy Latten, Brett Barros,' +
-      ' Crystal Kwok, Daniel Hernandez, Divya Siddarth, Ilwon Yoon,' +
-      ' Jennifer Chen, John Cox, John Orr, Katie Berlent, Michael Wawszczak,' +
-      ' Mike Gainer, Neil Fraser, Noah Falstein, Nupur Jain, Peter Norvig,' +
-      ' Philip Guo, Piotr Mitros, Rachel Chen, Rahim Nathwani, Robyn Choo,' +
-      ' Tricia Ngoon, Vikrant Nanda, Vinamrata Singal & Yarin Feigenbaum');
-    expect(component.aboutPageMascotImgUrl).toBe(
-      '/assets/images/general/about_page_mascot.webp');
-  });
-
-  it('should obtain developer names with a letter', () => {
-    const namesWithV = AboutPageConstants.CREDITS_CONSTANTS.filter(
-      (credit) => credit.startsWith('V')).sort();
-    expect(component.getCredits('V')).toEqual(namesWithV);
-    expect(component.getCredits('8')).toEqual([]);
-  });
+      expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
+        .toHaveBeenCalledWith();
+      expect(component.windowRef.nativeWindow.location.href)
+        .toBe('/community-library');
+    });
 });

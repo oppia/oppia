@@ -16,7 +16,24 @@
  * @fileoverview Directive for the concept card rich-text component.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+/**
+ * IMPORTANT NOTE:
+ * All of the RTE components follow this pattern of updateView and ngOnChanges.
+ * This is because these are also web-components (So basically, we can create
+ * this component using document.createElement). CKEditor creates instances of
+ * these on the fly and runs ngOnInit before we can set the @Input properties.
+ * When the input properties are not set, we get errors in the console.
+ * The `if` condition in update view prevents that from happening.
+ * The `if` condition in the updateView and ngOnChanges might look like the
+ * literal opposite but that's not the case. We know from the previous
+ * statements above that the if condition in the updateView is for preventing
+ * the code to run until all the values needed for successful execution are
+ * present. The if condition in ngOnChanges is to optimize the re-runs of
+ * updateView and only re-run when a property we care about has changed in
+ * value.
+ */
+
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -29,7 +46,7 @@ import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia
   selector: 'oppia-noninteractive-skillreview',
   templateUrl: './skillreview.component.html'
 })
-export class NoninteractiveSkillreview implements OnInit {
+export class NoninteractiveSkillreview implements OnInit, OnChanges {
   @Input() skillIdWithValue: string;
   @Input() textWithValue: string;
   skillId: string;
@@ -42,11 +59,18 @@ export class NoninteractiveSkillreview implements OnInit {
     private ngbModal: NgbModal
   ) {}
 
-  ngOnInit(): void {
+  private _updateViewOnNewSkillSelected(): void {
+    if (!this.skillIdWithValue || !this.textWithValue) {
+      return;
+    }
     this.skillId = this.htmlEscaperService.escapedJsonToObj(
       this.skillIdWithValue) as string;
     this.linkText = this.htmlEscaperService.escapedJsonToObj(
       this.textWithValue) as string;
+  }
+
+  ngOnInit(): void {
+    this._updateViewOnNewSkillSelected();
   }
 
   // The default onclick behaviour for an element inside CKEditor
@@ -90,6 +114,12 @@ export class NoninteractiveSkillreview implements OnInit {
         throw new Error(res);
       }
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.skillIdWithValue || changes.textWithValue) {
+      this._updateViewOnNewSkillSelected();
+    }
   }
 }
 
