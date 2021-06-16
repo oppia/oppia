@@ -237,7 +237,6 @@ angular.module('oppia').component('explorationEditorPage', {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showLostChangesModal(
                 lostChanges, explorationId);
-              $rootScope.$applyAsync();
             }
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
@@ -337,7 +336,6 @@ angular.module('oppia').component('explorationEditorPage', {
           if (explorationData.draft_changes !== null) {
             ChangeListService.loadAutosavedChangeList(
               explorationData.draft_changes);
-            $rootScope.$applyAsync();
           }
 
           if (explorationData.is_version_of_draft_valid === false &&
@@ -347,7 +345,6 @@ angular.module('oppia').component('explorationEditorPage', {
             // changes is invalid, and draft_changes is not `null`.
             AutosaveInfoModalsService.showVersionMismatchModal(
               ChangeListService.getChangeList());
-            $rootScope.$applyAsync();
             return;
           }
           RouterService.onRefreshStatisticsTab.emit();
@@ -518,7 +515,6 @@ angular.module('oppia').component('explorationEditorPage', {
           ExplorationPropertyService.onExplorationPropertyChanged.subscribe(
             () => {
               setPageTitle();
-              $rootScope.$applyAsync();
             }
           )
         );
