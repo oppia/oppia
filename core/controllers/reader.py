@@ -625,29 +625,6 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerGoalsHandler(base.BaseHandler):
-    """Tracks a learner selecting and deleting a topic as their current goal."""
-
-    @acl_decorators.can_access_learner_dashboard
-    def post(self, topic_id):
-        """Adds the topic to topics to learn list."""
-        user_id = self.user_id
-        if user_id:
-            learner_progress_services.add_topic_to_learn(user_id, topic_id)
-
-        self.render_json(self.values)
-
-    @acl_decorators.can_access_learner_dashboard
-    def delete(self, topic_id):
-        """Removes the topic from topics to learn list."""
-        user_id = self.user_id
-        if user_id:
-            learner_progress_services.remove_topic_to_learn(
-                user_id, topic_id)
-
-        self.render_json(self.values)
-
-
 class LearnerIncompleteActivityHandler(base.BaseHandler):
     """Handles operations related to the activities in the incomplete list of
     the user.

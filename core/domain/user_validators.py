@@ -251,37 +251,6 @@ class IncompleteActivitiesModelValidator(
         ]
 
 
-class LearnerGoalsModelValidator(
-        base_model_validators.BaseUserModelValidator):
-    """Class for validating LearnerGoalsModels."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.UserSettingsModelFetcherDetails(
-                'user_settings_ids', [item.id],
-                may_contain_system_ids=False,
-                may_contain_pseudonymous_ids=False),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids_to_learn', topic_models.TopicModel,
-                item.topic_ids_to_learn)]
-
-    @classmethod
-    def _get_common_properties_of_external_model_which_should_not_match(
-            cls, item):
-        return [(
-            'CompletedActivitiesModel',
-            'topic_ids_to_learn',
-            item.topic_ids_to_learn,
-            'learnt_topic_ids',
-            learner_progress_services.get_all_learnt_topic_ids(item.id)
-        )]
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_common_properties_do_not_match]
-
-
 class ExpUserLastPlaythroughModelValidator(
         base_model_validators.BaseUserModelValidator):
     """Class for validating ExpUserLastPlaythroughModels."""

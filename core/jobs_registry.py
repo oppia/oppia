@@ -232,7 +232,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.CommunityContributionStatsModelAuditOneOffJob,
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
-    prod_validation_jobs_one_off.LearnerGoalsModelAuditOneOffJob,
     prod_validation_jobs_one_off.LearnerPlaylistModelAuditOneOffJob,
     prod_validation_jobs_one_off.MachineTranslationModelAuditOneOffJob,
     prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob,

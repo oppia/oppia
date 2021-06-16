@@ -68,7 +68,6 @@ interface LearnerDashboardDataBackendDict {
   'learnt_to_partially_learnt_topics': string[];
   'number_of_nonexistent_activities': NonExistentActivitiesBackendDict;
   'subscription_list': CreatorSummaryBackendDict[];
-  'topic_to_learn': LearnerTopicSummaryBackendDict[];
 }
 
 interface LearnerDashboardData {
@@ -88,7 +87,6 @@ interface LearnerDashboardData {
   learntToPartiallyLearntTopics: string[];
   numberOfNonexistentActivities: NonExistentActivities;
   subscriptionList: ProfileSummary[];
-  topicsToLearn: LearnerTopicSummary[];
 }
 
 interface AddMessagePayload {
@@ -149,11 +147,6 @@ export class LearnerDashboardBackendApiService {
             dashboardData.partially_learnt_topics_list.map(
               topicSummary => LearnerTopicSummary
                 .createFromBackendDict(topicSummary))),
-          topicsToLearn: (
-            dashboardData.topic_to_learn.map(
-              topicSummary => LearnerTopicSummary.createFromBackendDict(
-                topicSummary))
-          ),
           numberOfUnreadThreads: dashboardData.number_of_unread_threads,
           threadSummaries: (
             dashboardData.thread_summaries.map(
