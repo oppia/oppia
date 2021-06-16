@@ -75,7 +75,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     def test_install_mypy_prerequisites_failure(self):
         with self.popen_swap_failure:
             with self.swap(
-                    run_mypy_checks, 'MYPY_REQUIREMENTS_PATH', 'scripts.wrong'):
+                run_mypy_checks, 'MYPY_REQUIREMENTS_PATH', 'scripts.wrong'):
                 code = run_mypy_checks.install_mypy_prerequisites()
                 self.assertEqual(code, 1)
 
