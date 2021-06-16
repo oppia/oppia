@@ -144,7 +144,7 @@ export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private loggerService: LoggerService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private vc: ViewContainerRef
+    private viewContainerRef: ViewContainerRef
   ) { }
 
   private _updateValue(e) {
@@ -160,8 +160,8 @@ export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
         this.componentFactoryResolver.resolveComponentFactory(
           EDITORS[editorName])
       );
-      this.vc.clear();
-      const ref = this.vc.createComponent<unknown>(
+      this.viewContainerRef.clear();
+      const ref = this.viewContainerRef.createComponent<unknown>(
         componentFactory) as ComponentRef<ObjectEditor>;
       ref.instance.alwaysEditable = this.alwaysEditable;
       ref.instance.initArgs = this.initArgs;
@@ -208,7 +208,7 @@ export class ObjectEditorComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
-    this.vc.clear();
+    this.viewContainerRef.clear();
   }
 }
 
