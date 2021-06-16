@@ -27,6 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { PreferencesPageComponent } from './preferences-page.component';
 
 @NgModule({
   imports: [
@@ -35,10 +36,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PreferencesPageComponent
   ],
   entryComponents: [
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    PreferencesPageComponent
   ],
   providers: [
     {
