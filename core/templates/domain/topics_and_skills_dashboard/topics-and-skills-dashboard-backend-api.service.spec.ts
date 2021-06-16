@@ -176,15 +176,15 @@ describe('Topics and Skills Dashboard backend API service', () => {
       untriagedSkillSummaries: [
         SkillSummary.createFromBackendDict(
           topicAndSkillsDashboardDataBackendDict
-          .untriaged_skill_summary_dicts[0]),
+            .untriaged_skill_summary_dicts[0]),
       ],
       mergeableSkillSummaries: [
         SkillSummary.createFromBackendDict(
           topicAndSkillsDashboardDataBackendDict
-          .mergeable_skill_summary_dicts[0]),
+            .mergeable_skill_summary_dicts[0]),
         SkillSummary.createFromBackendDict(
           topicAndSkillsDashboardDataBackendDict
-          .mergeable_skill_summary_dicts[1]),
+            .mergeable_skill_summary_dicts[1]),
       ],
       totalSkillCount: 3,
       topicSummaries: [
@@ -325,13 +325,13 @@ describe('Topics and Skills Dashboard backend API service', () => {
 
   it('should fail to fetch skills dashboard data from backend',
     fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
-        let filter = TopicsAndSkillsDashboardFilter.createDefault();
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let filter = TopicsAndSkillsDashboardFilter.createDefault();
 
-        topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardDataAsync(
-          filter, 0, 'next').then(successHandler, failHandler);
-        let req = httpTestingController.expectOne(SKILLS_DASHBOARD_DATA_URL);
+      topicsAndSkillsDashboardBackendApiService.fetchSkillsDashboardDataAsync(
+        filter, 0, 'next').then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(SKILLS_DASHBOARD_DATA_URL);
       expect(req.request.method).toEqual('POST');
       req.flush({
         error: 'Error loading skills dashboard data.'
@@ -439,7 +439,7 @@ describe('Topics and Skills Dashboard backend API service', () => {
     let mockEventEmitter = new EventEmitter();
     expect(
       topicsAndSkillsDashboardBackendApiService
-      .onTopicsAndSkillsDashboardReinitialized)
-      .toEqual(mockEventEmitter);
+        .onTopicsAndSkillsDashboardReinitialized)
+        .toEqual(mockEventEmitter);
   });
 });
