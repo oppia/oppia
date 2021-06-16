@@ -34,7 +34,6 @@ import { OppiaAdminProdModeActivitiesTabComponent } from
   './activities-tab/admin-prod-mode-activities-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { AdminJobsTabComponent } from './jobs-tab/admin-jobs-tab.component';
 import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
 import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
 
@@ -49,7 +48,6 @@ import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
-    AdminJobsTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
@@ -59,7 +57,6 @@ import { AdminMiscTabComponent } from './misc-tab/admin-misc-tab.component';
     OppiaAdminProdModeActivitiesTabComponent,
     OppiaAngularRootComponent,
     AdminFeaturesTabComponent,
-    AdminJobsTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminDevModeActivitiesTabComponent,
