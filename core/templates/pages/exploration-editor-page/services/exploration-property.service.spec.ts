@@ -22,7 +22,7 @@ import { ExplorationPropertyService } from 'pages/exploration-editor-page/servic
 import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
 
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
+import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
@@ -51,11 +51,11 @@ describe('Exploration Property Service', () => {
 
   it('should create a new exploration properties object', function() {
     expect(function() {
-      explorationPropertyService.init('initial value');
+      explorationPropertyService.init('initial value' as unknown as ParamSpecs);
     }).toThrowError('Exploration property name cannot be null.');
 
     explorationPropertyService.propertyName = 'property_1';
-    explorationPropertyService.init('initial value');
+    explorationPropertyService.init('initial value' as unknown as ParamSpecs);
 
     expect(explorationPropertyService.hasChanged()).toBe(false);
   });
