@@ -216,6 +216,31 @@ describe('SkillSelectorComponent', () => {
       }
     ];
 
+    expect(component.currCategorizedSkills).toEqual({
+      topic1: {
+        uncategorized: [
+          ShortSkillSummary.create('skill1', 'Skill 1 description.')
+        ],
+        subtopic1: [
+          ShortSkillSummary.create('skill2', 'Skill 2 description.')
+        ],
+        subtopic2: [
+          ShortSkillSummary.create('skill3', 'Skill 3 description.')
+        ]
+      },
+      topic2: {
+        uncategorized: [
+          ShortSkillSummary.create('skill4', 'Skill 4 description.')
+        ],
+        subtopic3: [
+          ShortSkillSummary.create('skill5', 'Skill 5 description.')
+        ],
+        subtopic4: [
+          ShortSkillSummary.create('skill6', 'Skill 6 description.')
+        ]
+      }
+    });
+
     component.updateSkillsListOnTopicFilterChange();
 
     expect(component.currCategorizedSkills).toEqual({

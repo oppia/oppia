@@ -14,7 +14,6 @@
 
 /**
  * @fileoverview Tests for audio-file-uploader component.
-
  */
 
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
@@ -22,7 +21,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
-
 
 describe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
