@@ -34,8 +34,6 @@ describe('Testing NormalizeWhitespacePipe', () => {
   });
 
   it('should correctly normalize whitespace', () => {
-    expect(nwp.transform('')).toEqual('');
-
     expect(nwp.transform('a')).toEqual('a');
     expect(nwp.transform('a  ')).toEqual('a');
     expect(nwp.transform('  a')).toEqual('a');
