@@ -17,6 +17,7 @@
  */
 
 import { ChangeDetectorRef, Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
@@ -41,7 +42,7 @@ export class CreateNewSkillModalComponent {
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
-  conceptCardExplanationEditorIsShown: boolean = false;
+  isEditorShown = {conceptCardExplanationEditorIsShown: false};
   bindableDict = {displayedConceptCardExplanation: ''};
   HTML_SCHEMA: {type: string} = { type: 'html' };
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
@@ -70,7 +71,10 @@ export class CreateNewSkillModalComponent {
   }
 
   openConceptCardExplanationEditor(): void {
-    this.conceptCardExplanationEditorIsShown = true;
+    if (this.isEditorShown.conceptCardExplanationEditorIsShown !== true) {
+      this.isEditorShown.conceptCardExplanationEditorIsShown = true;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   getHtmlSchema(): { type: string } {
@@ -147,3 +151,6 @@ export class CreateNewSkillModalComponent {
     this.ngbActiveModal.dismiss('cancel');
   }
 }
+
+angular.module('oppia').directive('oppiaCreateNewSkillModalComponent',
+  downgradeComponent({ component: CreateNewSkillModalComponent }));

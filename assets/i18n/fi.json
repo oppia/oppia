@@ -40,6 +40,7 @@
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "Hae ”Teach with Oppia” -ohjelmaan",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "Selaa tutkimuksiamme",
 	"I18N_ACTION_BROWSE_LESSONS": "Selaa oppituntejamme",
+	"I18N_ACTION_BROWSE_LIBRARY": "Selaa kirjastoa",
 	"I18N_ACTION_CREATE_EXPLORATION": "Luo tutkimus",
 	"I18N_ACTION_CREATE_LESSON": "Luo oma oppituntisi",
 	"I18N_ACTION_EXPLORE_LESSONS": "Selaa oppitunteja",

@@ -13,40 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for the Custom Form components.
+ * @fileoverview Module for the CkEditor4 components.
  */
 
 import 'core-js/es7/reflect';
 import 'zone.js';
+
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { FocusOnDirective } from './focus-on.directive';
-import { HeadroomDirective } from './headroom.directive';
-import { MathJaxDirective } from './mathjax.directive';
-import { NgInitDirective } from './ng-init.directive';
+import { CkEditor4RteComponent } from './ck-editor-4-rte.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BrowserModule,
-    FormsModule,
   ],
   declarations: [
-    FocusOnDirective,
-    HeadroomDirective,
-    MathJaxDirective,
-    NgInitDirective,
+    CkEditor4RteComponent
   ],
-  entryComponents: [],
+  entryComponents: [
+    CkEditor4RteComponent
+  ],
   exports: [
-    FocusOnDirective,
-    HeadroomDirective,
-    MathJaxDirective,
-    NgInitDirective,
+    CkEditor4RteComponent
   ],
 })
 
-export class DirectivesModule { }
+export class OppiaCkEditor4Module { }
