@@ -68,7 +68,7 @@ export class ExplorationCreationService {
         );
         }, 150);
         return false;
-      }, function() {
+      }, () => {
         this.loaderService.hideLoadingScreen();
         this.explorationCreationInProgress = false;
       });
@@ -91,7 +91,7 @@ export class ExplorationCreationService {
         $.ajax({
           contentType: false,
           data: form,
-          dataFilter: function(data) {
+          dataFilter: (data) => {
             // Remove the XSSI prefix.
             return JSON.parse(data.substring(5));
           },
@@ -99,7 +99,7 @@ export class ExplorationCreationService {
           processData: false,
           type: 'POST',
           url: 'contributehandler/upload'
-        }).done(function(data) {
+        }).done((data) => {
           this.windowRef.nativeWindow.location.href =
           this.urlInterpolationService.interpolateUrl(
             this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
