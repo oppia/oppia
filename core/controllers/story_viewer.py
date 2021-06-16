@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import skill_fetchers
@@ -235,6 +236,8 @@ class StoryProgressHandler(base.BaseHandler):
                 self.user_id, topic.id)
         else:
             learner_progress_services.mark_topic_as_learnt(
+                self.user_id, topic.id)
+            learner_goals_services.remove_topic_from_learn(
                 self.user_id, topic.id)
 
         return self.render_json({

@@ -847,7 +847,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.assertListEqual(
             learner_goals.topic_ids_to_learn, ['topic_id0'])
 
-        learner_goals.remove_topic_id_to_learn('topic_id0')
+        learner_goals.remove_topic_id_from_learn('topic_id0')
 
         self.assertListEqual(
             learner_goals.topic_ids_to_learn, [])

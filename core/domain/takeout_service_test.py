@@ -141,6 +141,11 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME).put()
 
+        # Setup for LearnerGoalsModel.
+        user_models.LearnerGoalsModel(
+            id=self.PROFILE_ID_1,
+            topic_ids_to_learn=self.TOPIC_IDS).put()
+
         # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
             id=self.PROFILE_ID_1,
@@ -472,6 +477,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             user_id=self.USER_ID_1, exploration_id=self.EXPLORATION_IDS[0],
             last_played_exp_version=self.EXP_VERSION,
             last_played_state_name=self.STATE_NAME).put()
+
+        # Setup for LearnerGoalsModel.
+        user_models.LearnerGoalsModel(
+            id=self.USER_ID_1,
+            topic_ids_to_learn=self.TOPIC_IDS).put()
+        user_models.LearnerGoalsModel(
+            id=self.PROFILE_ID_1,
+            topic_ids_to_learn=self.TOPIC_IDS_2).put()
 
         # Setup for LearnerPlaylistModel.
         user_models.LearnerPlaylistModel(
@@ -828,6 +841,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         general_feedback_thread_user_data = {}
         general_suggestion_data = {}
         last_playthrough_data = {}
+        learner_goals_data = {}
         learner_playlist_data = {}
         incomplete_activities_data = {}
         user_settings_data = {
@@ -901,6 +915,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'completed_activities': completed_activities_data,
             'incomplete_activities': incomplete_activities_data,
             'exp_user_last_playthrough': last_playthrough_data,
+            'learner_goals': learner_goals_data,
             'learner_playlist': learner_playlist_data,
             'task_entry': task_entry_data,
             'topic_rights': topic_rights_data,
@@ -1198,6 +1213,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'state_name': self.STATE_NAME
             }
         }
+        expected_learner_goals_data = {
+            'topic_ids_to_learn': self.TOPIC_IDS
+        }
         expected_learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS,
             'playlist_collection_ids': self.COLLECTION_IDS
@@ -1482,6 +1500,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'completed_activities': expected_completed_activities_data,
             'incomplete_activities': expected_incomplete_activities_data,
             'exp_user_last_playthrough': expected_last_playthrough_data,
+            'learner_goals': expected_learner_goals_data,
             'learner_playlist': expected_learner_playlist_data,
             'task_entry': expected_task_entry_data,
             'topic_rights': expected_topic_data,
@@ -1589,6 +1608,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         incomplete_activities_data = {}
         last_playthrough_data = {}
+        learner_goals_data = {}
         learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS_2,
             'playlist_collection_ids': self.COLLECTION_IDS_2
@@ -1605,6 +1625,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'completed_activities': completed_activities_data,
             'incomplete_activities': incomplete_activities_data,
             'exp_user_last_playthrough': last_playthrough_data,
+            'learner_goals': learner_goals_data,
             'learner_playlist': learner_playlist_data,
             'collection_progress': collection_progress_data,
             'story_progress': story_progress_data,
