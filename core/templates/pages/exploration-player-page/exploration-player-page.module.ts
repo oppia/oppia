@@ -41,6 +41,8 @@ import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.c
 import { FeedbackPopupComponent } from './layout-directives/feedback-popup.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-card.component';
+import { MaterialModule } from 'components/material.module';
+import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 
 @NgModule({
   imports: [
@@ -49,8 +51,9 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
-    SharedComponentsModule,
-    NgbPopoverModule
+    MaterialModule,
+    NgbPopoverModule,
+    SharedComponentsModule
   ],
   declarations: [
     ContentLanguageSelectorComponent,
@@ -61,6 +64,7 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
+    RefresherExplorationConfirmationModal,
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
@@ -70,7 +74,8 @@ import { LearnerAnswerInfoCard } from './learner-experience/learner-answer-info-
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     FeedbackPopupComponent,
-    LearnerAnswerInfoCard
+    LearnerAnswerInfoCard,
+    RefresherExplorationConfirmationModal,
   ],
   providers: [
     {

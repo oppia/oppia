@@ -20,7 +20,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from './alerts.service';
 import { ImageLocalStorageService } from './image-local-storage.service';
-import { ImageUploadHelperService } from './image-upload-helper.service';
 
 
 describe('ImageLocalStorageService', () => {
@@ -28,42 +27,17 @@ describe('ImageLocalStorageService', () => {
   let imageLocalStorageService: ImageLocalStorageService = null;
   let sampleImageData = 'data:image/png;base64,xyz';
   let imageFilename = 'filename';
-  let imageUploadHelperService: ImageUploadHelperService;
-  class MockImageUploadHelperService {
-    convertImageDataToImageFile(imageData) {
-      return imageData;
-    }
-  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [{
-        provide: ImageUploadHelperService,
-        useClass: MockImageUploadHelperService
-      }]
+      imports: [HttpClientTestingModule]
     });
   });
 
   beforeEach(() => {
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     alertsService = TestBed.inject(AlertsService);
-    imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
   });
-
-  it(
-    'should call helper service function correctly when getting' +
-    ' object url', () => {
-      const imageUploaderSpy = spyOn(
-        imageUploadHelperService, 'convertImageDataToImageFile');
-      spyOn(URL, 'createObjectURL').and.returnValue('objectUrl');
-      imageLocalStorageService.saveImage(imageFilename, sampleImageData);
-      expect(
-        imageLocalStorageService.getObjectUrlForImage(imageFilename)
-      ).toBe('objectUrl');
-      expect(imageUploaderSpy).toHaveBeenCalledWith(sampleImageData);
-    }
-  );
 
   it('should delete images from localStorage correctly', () => {
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
@@ -77,6 +51,16 @@ describe('ImageLocalStorageService', () => {
       imageLocalStorageService.getStoredImagesData().length).toEqual(0);
   });
 
+  it('should get raw image data correctly', () => {
+    imageLocalStorageService.saveImage(imageFilename, sampleImageData);
+    expect(
+      imageLocalStorageService.getRawImageData(imageFilename)).toEqual(
+      sampleImageData);
+    expect(
+      imageLocalStorageService.getRawImageData('invalidFilename')).toEqual(
+      null);
+  });
+
   it('should return correctly check whether file exist in storage', () => {
     expect(imageLocalStorageService.isInStorage(imageFilename)).toBeFalse();
     imageLocalStorageService.saveImage(imageFilename, sampleImageData);
@@ -86,7 +70,7 @@ describe('ImageLocalStorageService', () => {
   it(
     'should show error message if number of stored images crosses ' +
     'limit', () => {
-      for (var i = 0; i <= 50; i++) {
+      for (let i = 0; i <= 50; i++) {
         imageLocalStorageService.saveImage('filename' + i, sampleImageData);
       }
       expect(alertsService.messages.length).toEqual(0);

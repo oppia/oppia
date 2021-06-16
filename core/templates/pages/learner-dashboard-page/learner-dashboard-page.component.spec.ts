@@ -45,13 +45,7 @@ import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/su
 import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
 import { UserService } from 'services/user.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined): string {
-    return value;
-  }
-}
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -114,8 +108,9 @@ describe('Learner dashboard page', () => {
     param_changes: [],
     param_specs: {},
     is_version_of_draft_valid: true,
+    correctness_feedback_enabled: false,
     draft_changes: [],
-    version: '1',
+    version: 1,
     draft_change_list_id: 3,
     title: 'Test Exploration',
 

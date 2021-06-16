@@ -39,7 +39,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
-  save(): void {
+  confirm(): void {
     let totalSkills = [];
     if (this.skillSummaries) {
       totalSkills = [...this.skillSummaries];

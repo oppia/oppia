@@ -48,3 +48,8 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             role_services.get_all_actions(feconf.ROLE_ID_GUEST),
             [role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY])
+
+    def test_action_allocated_to_all_allowed_roles(self):
+        role_actions = role_services.get_role_actions()
+
+        self.assertItemsEqual(list(role_actions), feconf.ALLOWED_USER_ROLES)

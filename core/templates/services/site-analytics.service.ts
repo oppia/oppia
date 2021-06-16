@@ -110,6 +110,11 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
   }
+  registerCreateLessonButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'CreateLessonButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerApplyToTeachWithOppiaEvent(): void {
     this._sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
   }

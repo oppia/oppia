@@ -149,6 +149,8 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should save modal customization args when closing it', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {
@@ -184,6 +186,8 @@ describe('Rte Helper Modal Controller', function() {
 
     it('should cancel the modal when saving of math SVG fails', function() {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+      spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
       $scope.tmpCustomizationArgs = [{
         name: 'math_content',
         value: {

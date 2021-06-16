@@ -87,9 +87,9 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
             'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, 1)
 
-        training_jobs, cursor, more = (
+        training_jobs, offset = (
             classifier_models.ClassifierTrainingJobModel.
-            query_new_and_pending_training_jobs(None))
+            query_new_and_pending_training_jobs(0))
 
         self.assertEqual(len(training_jobs), 2)
         self.assertEqual(training_jobs[0].algorithm_id, 'TextClassifier')
@@ -109,8 +109,92 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_jobs[1].status,
             feconf.TRAINING_JOB_STATUS_PENDING)
-        self.assertEqual(more, False)
-        self.assertEqual(cursor is not None, True)
+        self.assertEqual(offset, 2)
+
+    def test_query_new_and_pending_training_jobs_with_non_zero_offset(self):
+        with self.swap(
+            classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
+            next_scheduled_check_time = datetime.datetime.utcnow()
+            # Creating 6 jobs out of which 4 will be fetched in steps.
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', 'exp_id01', 1,
+                next_scheduled_check_time,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', 'exp_id02', 2,
+                next_scheduled_check_time,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', 'exp_id03', 3,
+                next_scheduled_check_time + datetime.timedelta(
+                    minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', 'exp_id04', 4,
+                next_scheduled_check_time,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, 1)
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', 'exp_id05', 1,
+                next_scheduled_check_time,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
+            classifier_models.ClassifierTrainingJobModel.create(
+                'TextClassifier', 'TextInput', 'exp_id06', 1,
+                next_scheduled_check_time,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+                'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
+
+            training_jobs, offset = (
+                classifier_models.ClassifierTrainingJobModel.
+                query_new_and_pending_training_jobs(0))
+
+            self.assertEqual(len(training_jobs), 2)
+            self.assertEqual(training_jobs[0].algorithm_id, 'TextClassifier')
+            self.assertEqual(training_jobs[0].interaction_id, 'TextInput')
+            self.assertEqual(training_jobs[0].exp_id, 'exp_id01')
+            self.assertEqual(training_jobs[0].exp_version, 1)
+            self.assertEqual(
+                training_jobs[0].next_scheduled_check_time,
+                next_scheduled_check_time)
+            self.assertEqual(training_jobs[0].state_name, 'state_name2')
+            self.assertEqual(
+                training_jobs[0].status,
+                feconf.TRAINING_JOB_STATUS_NEW)
+            self.assertEqual(
+                training_jobs[0].training_data,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
+            self.assertEqual(
+                training_jobs[1].status,
+                feconf.TRAINING_JOB_STATUS_PENDING)
+            self.assertEqual(offset, 2)
+
+            training_jobs, offset = (
+                classifier_models.ClassifierTrainingJobModel.
+                query_new_and_pending_training_jobs(offset))
+
+            self.assertEqual(len(training_jobs), 2)
+            self.assertEqual(training_jobs[0].algorithm_id, 'TextClassifier')
+            self.assertEqual(training_jobs[0].interaction_id, 'TextInput')
+            self.assertEqual(training_jobs[0].exp_id, 'exp_id05')
+            self.assertEqual(training_jobs[0].exp_version, 1)
+            self.assertEqual(
+                training_jobs[0].next_scheduled_check_time,
+                next_scheduled_check_time)
+            self.assertEqual(training_jobs[0].state_name, 'state_name2')
+            self.assertEqual(
+                training_jobs[0].status,
+                feconf.TRAINING_JOB_STATUS_NEW)
+            self.assertEqual(
+                training_jobs[0].training_data,
+                [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
+            self.assertEqual(
+                training_jobs[1].status,
+                feconf.TRAINING_JOB_STATUS_PENDING)
+            self.assertEqual(offset, 4)
 
     def test_create_multi_jobs(self):
         next_scheduled_check_time = datetime.datetime.utcnow()

@@ -142,13 +142,18 @@
       <i class="material-icons"><[isPlayingUploadedAudio() ? 'pause' : 'play_arrow']></i>
     </button>
   </div>
-  <div class="oppia-slider-section oppia-content-wrapper">
+  <div class="oppia-slider-section oppia-content-wrapper fx-main-center fx-cross-center full-height">
     <div ng-if="audioLoadingIndicatorIsShown">
       <md-progress-linear md-mode="indeterminate"></md-progress-linear>
     </div>
-    <div ng-if="!audioLoadingIndicatorIsShown">
-      <md-slider ng-model="track.progress" ng-model-options="{getterSetter: true}" aria-label="audio-slider">
-      </md-slider>
+    <div ng-if="!audioLoadingIndicatorIsShown" class="fx-row fx-main-center fx-cross-center">
+      <oppia-audio-slider class="full-width"
+                          [value]="AudioPlayerService.getCurrentTime()"
+                          [max]="durationSecs"
+                          (value-change)="setProgress($event)"
+                          [thumb-label]="true"
+                          aria-label="audio-slider">
+      </oppia-audio-slider>
     </div>
   </div>
   <div class="oppia-content-wrapper oppia-recording-timer">
@@ -156,7 +161,10 @@
       <[0 | formatTimer]> / <[durationSecs | formatTimer]>
     </div>
     <div ng-if="audioTimerIsShown && !audioIsLoading">
-      <[getUploadedAudioTimer()]>
+      <[AudioPlayerService.getCurrentTime() | formatTimer]> / <[durationSecs | formatTimer]>
+    </div>
+    <div ng-if="!audioTimerIsShown && !audioIsLoading">
+       -- / --
     </div>
   </div>
   <div class="oppia-content-wrapper">
@@ -405,5 +413,11 @@
     background: #e4e1d1;
     border-radius: 3px;
     max-width: unset;
+  }
+  .full-width {
+    width: 100%;
+  }
+  .full-height {
+    height: 100%;
   }
 </style>

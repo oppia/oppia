@@ -1127,6 +1127,35 @@ class DiscardOldDraftsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
+class UserRolesPopulationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that populates the roles and banned fields of the UserSettingsModel.
+
+    It is a one-off job and can be removed from the codebase after May 2021
+    release.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(UserRolesPopulationOneOffJob, cls).enqueue(job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        user_services.update_roles_and_banned_fields(model_instance)
+
+        model_instance.update_timestamps(update_last_updated_time=False)
+        model_instance.put()
+
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
 class DeleteNonExistentExpsFromUserModelsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that removes explorations that do not exist or that are private from

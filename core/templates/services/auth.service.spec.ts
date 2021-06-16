@@ -20,7 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { md5 } from 'hash-wasm';
 
-import { AppConstants } from 'app.constants';
 import { AuthService } from 'services/auth.service';
 import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
@@ -60,38 +59,6 @@ describe('Auth service', function() {
       credential: null,
       additionalUserInfo: null,
     };
-  });
-
-  it('should use firebase auth in unit tests', () => {
-    expect(AuthService.firebaseAuthIsEnabled).toBeTrue();
-  });
-
-  it('should be in emulator mode by default', () => {
-    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
-      .and.returnValue(true);
-
-    expect(AuthService.firebaseEmulatorIsEnabled).toBeTrue();
-  });
-
-  it('should not provide firebase config if auth is disabled', () => {
-    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
-      .and.returnValue(false);
-
-    expect(AuthService.firebaseConfig).toBeUndefined();
-  });
-
-  it('should use firebase constants for the config', () => {
-    spyOnProperty(AuthService, 'firebaseAuthIsEnabled', 'get')
-      .and.returnValue(true);
-
-    expect(AuthService.firebaseConfig).toEqual({
-      apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
-      authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
-      projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
-      storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
-      messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
-      appId: AppConstants.FIREBASE_CONFIG_APP_ID,
-    });
   });
 
   it('should return emulator config when emulator is enabled', () => {

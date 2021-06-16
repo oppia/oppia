@@ -109,16 +109,12 @@ export class AuthService {
     }
   }
 
-  static get firebaseAuthIsEnabled(): boolean {
-    return AppConstants.FIREBASE_AUTH_ENABLED;
-  }
-
   static get firebaseEmulatorIsEnabled(): boolean {
-    return AuthService.firebaseAuthIsEnabled && AppConstants.EMULATOR_MODE;
+    return AppConstants.EMULATOR_MODE;
   }
 
   static get firebaseConfig(): FirebaseOptions {
-    return !AuthService.firebaseAuthIsEnabled ? undefined : {
+    return {
       apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
       authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
       projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,

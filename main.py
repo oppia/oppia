@@ -48,6 +48,7 @@ from core.controllers import question_editor
 from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
+from core.controllers import release_coordinator
 from core.controllers import resources
 from core.controllers import review_tests
 from core.controllers import skill_editor
@@ -71,8 +72,6 @@ from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras import routes
 
-
-current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # Suppress debug logging for chardet. See https://stackoverflow.com/a/48581323.
@@ -223,9 +222,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
     get_redirect_route(
         r'/adminsuperadminhandler', admin.AdminSuperAdminPrivilegesHandler),
-    get_redirect_route(
-        r'/memorycacheadminhandler', admin.MemoryCacheAdminHandler),
-    get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
@@ -505,6 +501,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
+        r'/release-coordinator', release_coordinator.ReleaseCoordinatorPage),
+    get_redirect_route(
+        r'/joboutputhandler', release_coordinator.JobOutputHandler),
+    get_redirect_route(r'/jobshandler', release_coordinator.JobsHandler),
+    get_redirect_route(
+        r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
+
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -660,6 +664,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler),
     get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.UPDATE_TRANSLATION_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateTranslationSuggestionHandler),
+    get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX,
+        suggestion.UpdateQuestionSuggestionHandler),
+    get_redirect_route(
         r'%s' % feconf.QUESTIONS_URL_PREFIX,
         reader.QuestionPlayerHandler),
     get_redirect_route(
@@ -811,7 +821,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(r'/session_begin', base.SessionBeginHandler),
     get_redirect_route(r'/session_end', base.SessionEndHandler),
-    get_redirect_route(r'/seed_firebase', base.SeedFirebaseHandler),
 
     get_redirect_route(
         r'%s/%s/<exploration_id>' % (

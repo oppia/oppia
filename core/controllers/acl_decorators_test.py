@@ -26,11 +26,15 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classifier_domain
 from core.domain import classifier_services
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -974,6 +978,219 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_access_release_coordinator_page
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanAccessReleaseCoordinatorPageDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/release-coordinator', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access release coordinator page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/release-coordinator', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access release coordinator page.')
+        self.logout()
+
+    def test_release_coordinator_can_access_release_coordinator_page(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/release-coordinator')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_run_any_job
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanRunAnyJobDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/run-anny-job', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to run jobs.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to run jobs.')
+        self.logout()
+
+    def test_release_coordinator_can_run_any_job(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/run-anny-job')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_manage_memcache
+        def get(self):
+            return self.render_json({'success': 1})
+
+    def setUp(self):
+        super(CanManageMemcacheDecoratorTests, self).setUp()
+        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+
+        self.signup(
+            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
+
+        self.set_user_role(
+            self.RELEASE_COORDINATOR_USERNAME,
+            feconf.ROLE_ID_RELEASE_COORDINATOR)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/manage-memcache', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_release_coordinator_page(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/manage-memcache', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to manage memcache.')
+        self.logout()
+
+    def test_guest_user_cannot_access_release_coordinator_page(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/manage-memcache', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+        self.logout()
+
+    def test_super_admin_cannot_access_release_coordinator_page(self):
+        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/manage-memcache', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to manage memcache.')
+        self.logout()
+
+    def test_release_coordinator_can_run_any_job(self):
+        self.login(self.RELEASE_COORDINATOR_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/manage-memcache')
+
         self.assertEqual(response['success'], 1)
         self.logout()
 
@@ -3483,7 +3700,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -3497,7 +3715,8 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
         with self.swap(self, 'testapp', self.mock_testapp):
             with self.swap(constants, 'DEV_MODE', False):
                 self.post_json(
@@ -3510,7 +3729,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('malicious message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            'message', payload['vm_id'])
+            python_utils.convert_to_bytes('message'), payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             self.post_json(
@@ -3523,9 +3742,247 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
         payload['message'] = json.dumps('message')
         payload['signature'] = classifier_services.generate_signature(
             python_utils.convert_to_bytes(secret),
-            payload['message'], payload['vm_id'])
+            python_utils.convert_to_bytes(payload['message']),
+            payload['vm_id'])
 
         with self.swap(self, 'testapp', self.mock_testapp):
             json_response = self.post_json('/ml/nextjobhandler', payload)
 
         self.assertEqual(json_response['job_id'], 'new_job')
+
+
+class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
+    """Tests for can_update_suggestion decorator."""
+
+    admin_username = 'adn'
+    admin_email = 'admin@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    hi_language_reviewer = 'reviewer1@example.com'
+    en_language_reviewer = 'reviewer2@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+    TARGET_TYPE = 'exploration'
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
+        'cmd': 'add_translation',
+        'content_id': 'content',
+        'language_code': 'hi',
+        'content_html': '<p>old content html</p>',
+        'state_name': 'State 1',
+        'translation_html': '<p>Translation for content.</p>'
+    }
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_update_suggestion
+        def get(self, suggestion_id):
+            self.render_json({'suggestion_id': suggestion_id})
+
+    def setUp(self):
+        super(DecoratorForUpdatingSuggestionTests, self).setUp()
+        self.signup(self.author_email, self.author_username)
+        self.signup(self.user_email, self.username)
+        self.signup(self.admin_email, self.admin_username)
+        self.signup(self.hi_language_reviewer, 'reviewer1')
+        self.signup(self.en_language_reviewer, 'reviewer2')
+        self.author_id = self.get_user_id_from_email(self.author_email)
+        self.admin_id = self.get_user_id_from_email(self.admin_email)
+        self.hi_language_reviewer_id = self.get_user_id_from_email(
+            self.hi_language_reviewer)
+        self.en_language_reviewer_id = self.get_user_id_from_email(
+            self.en_language_reviewer)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.author = user_services.get_user_actions_info(self.author_id)
+        user_services.update_user_role(self.admin_id, feconf.ROLE_ID_ADMIN)
+        user_services.allow_user_to_review_translation_in_language(
+            self.hi_language_reviewer_id, 'hi')
+        user_services.allow_user_to_review_translation_in_language(
+            self.en_language_reviewer_id, 'en')
+        user_services.allow_user_to_review_question(
+            self.hi_language_reviewer_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                self.exploration_id, self.author_id, [
+                    'State 1', 'State 2', 'State 3'],
+                ['TextInput'], category='Algebra'))
+
+        self.old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['State 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exploration.states['State 2'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exploration.states['State 3'].update_content(
+            state_domain.SubtitledHtml.from_dict(self.old_content))
+        exp_services._save_exploration(self.author_id, exploration, '', [])  # pylint: disable=protected-access
+
+        rights_manager.publish_exploration(self.author, self.exploration_id)
+
+        self.new_content = state_domain.SubtitledHtml(
+            'content', '<p>new content html</p>').to_dict()
+        self.resubmit_change_content = state_domain.SubtitledHtml(
+            'content', '<p>resubmit change content html</p>').to_dict()
+
+        self.save_new_skill('skill_123', self.admin_id)
+
+        add_question_change_dict = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': 'skill_123',
+            'skill_difficulty': 0.3
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT, self.TARGET_TYPE,
+            self.exploration_id, self.target_version_id,
+            self.author_id,
+            self.change_dict, '')
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
+            'skill_123', feconf.CURRENT_STATE_SCHEMA_VERSION,
+            self.author_id, add_question_change_dict,
+            'test description')
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.exploration_id, exploration.version,
+            self.author_id, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 2',
+                'old_value': self.old_content,
+                'new_value': self.new_content
+            },
+            'change to state 1')
+
+        translation_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        question_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        edit_state_suggestions = suggestion_services.get_submitted_suggestions(
+            self.author_id, feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+
+        self.assertEqual(len(translation_suggestions), 1)
+        self.assertEqual(len(question_suggestions), 1)
+        self.assertEqual(len(edit_state_suggestions), 1)
+
+        translation_suggestion = translation_suggestions[0]
+        question_suggestion = question_suggestions[0]
+        edit_state_suggestion = edit_state_suggestions[0]
+
+        self.translation_suggestion_id = translation_suggestion.suggestion_id
+        self.question_suggestion_id = question_suggestion.suggestion_id
+        self.edit_state_suggestion_id = edit_state_suggestion.suggestion_id
+
+    def test_authors_cannot_update_suggestion_that_they_created(self):
+        self.login(self.author_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'The user, %s is not allowed to update self-created'
+            'suggestions.' % self.author_username)
+        self.logout()
+
+    def test_admin_can_update_any_given_translation_suggestion(self):
+        self.login(self.admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id)
+        self.assertEqual(
+            response['suggestion_id'], self.translation_suggestion_id)
+        self.logout()
+
+    def test_admin_can_update_any_given_question_suggestion(self):
+        self.login(self.admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_suggestion_id)
+        self.assertEqual(response['suggestion_id'], self.question_suggestion_id)
+        self.logout()
+
+    def test_reviewer_can_update_translation_suggestion(self):
+        self.login(self.hi_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id)
+        self.assertEqual(
+            response['suggestion_id'], self.translation_suggestion_id)
+        self.logout()
+
+    def test_reviewer_can_update_question_suggestion(self):
+        self.login(self.hi_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_suggestion_id)
+        self.assertEqual(
+            response['suggestion_id'], self.question_suggestion_id)
+        self.logout()
+
+    def test_guest_cannot_update_any_suggestion(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_reviewers_without_permission_cannot_update_any_suggestion(self):
+        self.login(self.en_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.translation_suggestion_id,
+                expected_status_int=401)
+        self.assertEqual(
+            response['error'], 'You are not allowed to update the suggestion.')
+        self.logout()
+
+    def test_suggestions_with_invalid_suggestion_id_cannot_be_updated(self):
+        self.login(self.hi_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % 'suggestion-id',
+                expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid format for suggestion_id. ' +
+            'It must contain 3 parts separated by \'.\'')
+        self.logout()
+
+    def test_non_existent_suggestions_cannot_be_updated(self):
+        self.login(self.hi_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'exploration.exp1.' +
+                'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
+                expected_status_int=404)
+        self.logout()
+
+    def test_not_allowed_suggestions_cannot_be_updated(self):
+        self.login(self.en_language_reviewer)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.edit_state_suggestion_id,
+                expected_status_int=400)
+        self.assertEqual(
+            response['error'], 'Invalid suggestion type.')
+        self.logout()

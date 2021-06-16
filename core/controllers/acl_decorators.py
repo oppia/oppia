@@ -464,6 +464,122 @@ def can_access_moderator_page(handler):
     return test_can_access_moderator_page
 
 
+def can_access_release_coordinator_page(handler):
+    """Decorator to check whether user can access release coordinator page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the release coordinator page.
+    """
+
+    def test_can_access_release_coordinator_page(self, **kwargs):
+        """Checks if the user is logged in and can access release coordinator
+        page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the release coordinator page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_ACCESS_RELEASE_COORDINATOR_PAGE in (
+                self.user.actions):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access release coordinator page.')
+    test_can_access_release_coordinator_page.__wrapped__ = True
+
+    return test_can_access_release_coordinator_page
+
+
+def can_manage_memcache(handler):
+    """Decorator to check whether user can can manage memcache.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to manage memcache.
+    """
+
+    def test_can_manage_memcache(self, **kwargs):
+        """Checks if the user is logged in and can manage memcache.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials manage
+                memcache.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_MANAGE_MEMCACHE in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to manage memcache.')
+    test_can_manage_memcache.__wrapped__ = True
+
+    return test_can_manage_memcache
+
+
+def can_run_any_job(handler):
+    """Decorator to check whether user can can run any job.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to run any job.
+    """
+
+    def test_can_run_any_job(self, **kwargs):
+        """Checks if the user is logged in and can run any job.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials run
+                any job.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if role_services.ACTION_RUN_ANY_JOB in self.user.actions:
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to run jobs.')
+    test_can_run_any_job.__wrapped__ = True
+
+    return test_can_run_any_job
+
+
 def can_send_moderator_emails(handler):
     """Decorator to check whether user can send moderator emails.
 
@@ -2933,3 +3049,85 @@ def is_from_oppia_ml(handler):
     test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
 
     return test_request_originates_from_valid_oppia_ml_instance
+
+
+def can_update_suggestion(handler):
+    """Decorator to check whether the current user can update suggestions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+        if the user can update a given suggestion.
+
+    Raises:
+        NotLoggedInException. The user is not logged in.
+        UnauthorizedUserException. The user does not have credentials to
+            edit this suggestion.
+        InvalidInputException. The submitted suggestion id is not valid.
+        PageNotFoundException. A suggestion is not found with the given
+            suggestion id.
+    """
+    def test_can_update_suggestion(
+            self, suggestion_id, **kwargs):
+        """Returns a handler to test whether a suggestion can be updated based
+        on the user's roles.
+
+        Args:
+            suggestion_id: str. The suggestion id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            function. The handler for updating a suggestion.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                edit this suggestion.
+            InvalidInputException. The submitted suggestion id is not valid.
+            PageNotFoundException. A suggestion is not found with the given
+                suggestion id.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        user_actions = self.user.actions
+
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException(
+                'Invalid format for suggestion_id.' +
+                ' It must contain 3 parts separated by \'.\'')
+
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if suggestion is None:
+            raise self.PageNotFoundException
+
+        if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
+            return handler(self, suggestion_id, **kwargs)
+
+        if suggestion.author_id == self.user_id:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'The user, %s is not allowed to update self-created'
+                'suggestions.' % (user_services.get_username(self.user_id)))
+
+        if suggestion.suggestion_type not in (
+                feconf.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES):
+            raise self.InvalidInputException('Invalid suggestion type.')
+
+        if suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(
+                    self.user_id,
+                    language_code=suggestion.change.language_code):
+                return handler(self, suggestion_id, **kwargs)
+        elif suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+            if user_services.can_review_question_suggestions(self.user_id):
+                return handler(self, suggestion_id, **kwargs)
+
+        raise base.UserFacingExceptions.UnauthorizedUserException(
+            'You are not allowed to update the suggestion.')
+
+    test_can_update_suggestion.__wrapped__ = True
+    return test_can_update_suggestion

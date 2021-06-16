@@ -44,9 +44,10 @@ describe('Audio preloader service', () => {
   const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
 
   let explorationDict: ExplorationBackendDict = {
+    correctness_feedback_enabled: false,
     draft_change_list_id: 1,
     draft_changes: [],
-    version: '1',
+    version: 1,
     is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',

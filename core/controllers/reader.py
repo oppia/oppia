@@ -386,7 +386,7 @@ class StateHitEventHandler(base.BaseHandler):
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
         else:
-            logging.error('Unexpected StateHit event for the END state.')
+            logging.exception('Unexpected StateHit event for the END state.')
         self.render_json({})
 
 

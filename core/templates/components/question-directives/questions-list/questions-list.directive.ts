@@ -349,6 +349,8 @@ angular.module('oppia').directive('questionsList', [
               });
             ctrl.populateMisconceptions(ctrl.newQuestionSkillIds);
             if (AlertsService.warnings.length === 0) {
+              ImageLocalStorageService.flushStoredImagesData();
+              ContextService.setImageSaveDestinationToLocalStorage();
               ctrl.initializeNewQuestionCreation(
                 ctrl.newQuestionSkillIds);
               ctrl.editorIsOpen = true;

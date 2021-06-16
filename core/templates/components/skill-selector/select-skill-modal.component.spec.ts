@@ -89,7 +89,7 @@ describe('Select Skill Modal', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
-  it('should close modal on save', () => {
+  it('should close modal on confirm', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedSkillId = '2';
     let totalSkills = [];
@@ -108,7 +108,7 @@ describe('Select Skill Modal', () => {
     let summary = totalSkills.find(
       summary => summary.id === componentInstance.selectedSkillId);
 
-    componentInstance.save();
+    componentInstance.confirm();
     expect(ngbActiveModal.close).toHaveBeenCalledWith(summary);
   });
 

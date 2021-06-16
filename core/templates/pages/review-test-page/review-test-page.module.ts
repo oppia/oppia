@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InteractionExtensionsModule } from 'interactions/interactions.module';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -37,9 +38,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent
   ],
   providers: [

@@ -41,14 +41,15 @@ def generate_signature(secret, message, vm_id):
     """Generates digital signature for given data.
 
     Args:
-        secret: str. The secret used to communicate with Oppia-ml.
-        message: str. The message payload data.
+        secret: bytes. The secret used to communicate with Oppia-ml.
+        message: bytes. The message payload data.
         vm_id: str. The ID of the VM that generated the message.
 
     Returns:
         str. The signature of the payload data.
     """
-    message = '%s|%s' % (base64.b64encode(message), vm_id)
+    encoded_vm_id = python_utils.convert_to_bytes(vm_id)
+    message = b'%s|%s' % (base64.b64encode(message), encoded_vm_id)
     return hmac.new(
         secret, msg=message, digestmod=hashlib.sha256).hexdigest()
 
@@ -72,7 +73,8 @@ def verify_signature(oppia_ml_auth_info):
         return False
 
     generated_signature = generate_signature(
-        secret, oppia_ml_auth_info.message, oppia_ml_auth_info.vm_id)
+        secret, python_utils.convert_to_bytes(oppia_ml_auth_info.message),
+        oppia_ml_auth_info.vm_id)
     if generated_signature != oppia_ml_auth_info.signature:
         return False
     return True
@@ -350,15 +352,17 @@ def fetch_next_job():
         ClassifierTrainingJob. Domain object of the next training Job.
     """
     classifier_training_jobs = []
-    # Initially the cursor for query is set to None.
-    cursor = None
+    # Initially the offset for query is set to None.
+    offset = 0
     valid_jobs = []
     timed_out_job_ids = []
 
     while len(valid_jobs) == 0:
-        classifier_training_jobs, cursor, more = (
+        classifier_training_jobs, offset = (
             classifier_models.ClassifierTrainingJobModel.
-            query_new_and_pending_training_jobs(cursor))
+            query_new_and_pending_training_jobs(offset))
+        if len(classifier_training_jobs) == 0:
+            break
         for training_job in classifier_training_jobs:
             if (training_job.status == (
                     feconf.TRAINING_JOB_STATUS_PENDING)):
@@ -367,8 +371,6 @@ def fetch_next_job():
                     timed_out_job_ids.append(training_job.id)
             else:
                 valid_jobs.append(training_job)
-        if not more:
-            break
 
     if timed_out_job_ids:
         mark_training_jobs_failed(timed_out_job_ids)

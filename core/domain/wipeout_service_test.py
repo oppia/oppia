@@ -193,7 +193,6 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',

@@ -32,10 +32,13 @@ export interface StoryContentsBackendDict {
 }
 
 interface NodeTitles {
-  [key: string]: string
+  [title: string]: string
 }
 
 export class StoryContents {
+  // When the Story contains a single node and it needs to be deleted
+  // then the value '_initialNodeId' needs to be changed to null.
+  // See 'deleteNode' function below in this file for more details.
   _initialNodeId: string | null;
   _nodes: StoryNode[];
   _nextNodeId: string;

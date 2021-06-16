@@ -145,8 +145,8 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - install_chrome
       - skip_for_low_risk_prs
+      - install_chrome
       - run:
           name: Run e2e library test
           command: |

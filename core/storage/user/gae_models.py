@@ -120,6 +120,13 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
+    # Currently, "roles" and "banned" fields are not in use.
+    # A list of roles assigned to the user.
+    roles = datastore_services.StringProperty(
+        repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES)
+    # Flag to indicate whether the user is banned.
+    banned = datastore_services.BooleanProperty(indexed=True, default=False)
+
     @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id, model,
@@ -183,7 +190,12 @@ class UserSettingsModel(base_models.BaseModel):
             'first_contribution_msec':
                 base_models.EXPORT_POLICY.EXPORTED,
             # Pin is not exported since this is an auth mechanism.
-            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'pin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+
+            # TODO(#12755): Change export policy for roles and banned fields to
+            # "EXPORTED" once the fields are populated in the datastore.
+            'roles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'banned': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod

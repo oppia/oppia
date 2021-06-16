@@ -43,6 +43,7 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
 PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
@@ -1015,7 +1016,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
     # To understand how/why this works, please refer to the following
     # Stack Overflow answer: https://stackoverflow.com/a/49181132/4859885.
     args = [iter(iterable)] * chunk_len
-    return itertools.izip_longest(*args, fillvalue=fillvalue) # pylint: disable=deprecated-itertools-function
+    return python_utils.zip_longest(*args, fillvalue=fillvalue)
 
 
 def partition(iterable, predicate=bool, enumerated=False):
