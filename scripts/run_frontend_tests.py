@@ -92,70 +92,71 @@ def run_dtslint_type_tests():
 
 
 def main(args=None):
-    """Runs the frontend tests."""
-    parsed_args = _PARSER.parse_args(args=args)
+    for x in range(100):
+        """Runs the frontend tests."""
+        parsed_args = _PARSER.parse_args(args=args)
 
-    run_dtslint_type_tests()
-    if parsed_args.dtslint_only:
-        return
+        run_dtslint_type_tests()
+        if parsed_args.dtslint_only:
+            return
 
-    if not parsed_args.skip_install:
-        install_third_party_libs.main()
+        if not parsed_args.skip_install:
+            install_third_party_libs.main()
 
-    common.print_each_string_after_two_new_lines([
-        'View interactive frontend test coverage reports by navigating to',
-        '../karma_coverage_reports',
-        'on your filesystem.',
-        'Running test in development environment'])
+        common.print_each_string_after_two_new_lines([
+            'View interactive frontend test coverage reports by navigating to',
+            '../karma_coverage_reports',
+            'on your filesystem.',
+            'Running test in development environment'])
 
-    if parsed_args.run_minified_tests:
-        python_utils.PRINT('Running test in production environment')
+        if parsed_args.run_minified_tests:
+            python_utils.PRINT('Running test in production environment')
 
-        build.main(args=['--prod_env', '--minify_third_party_libs_only'])
+            build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
-        cmd = [
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--prodEnv']
-    else:
-        build.main(args=[])
-
-        cmd = [
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
-
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output_lines = []
-    # Reads and prints realtime output from the subprocess until it terminates.
-    while True:
-        line = task.stdout.readline()
-        # No more output from the subprocess, and the subprocess has ended.
-        if len(line) == 0 and task.poll() is not None:
-            break
-        if line:
-            python_utils.PRINT(line, end='')
-            output_lines.append(line)
-    concatenated_output = ''.join(
-        line.decode('utf-8') for line in output_lines)
-
-    python_utils.PRINT('Done!')
-
-    if 'Trying to get the Angular injector' in concatenated_output:
-        python_utils.PRINT(
-            'If you run into the error "Trying to get the Angular injector",'
-            ' please see https://github.com/oppia/oppia/wiki/'
-            'Frontend-unit-tests-guide#how-to-handle-common-errors'
-            ' for details on how to fix it.')
-
-    if parsed_args.check_coverage:
-        if task.returncode:
-            sys.exit(
-                'The frontend tests failed. Please fix it before running the'
-                ' test coverage check.')
+            cmd = [
+                os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+                'start', os.path.join('core', 'tests', 'karma.conf.ts'),
+                '--prodEnv']
         else:
-            check_frontend_test_coverage.main()
-    elif task.returncode:
-        sys.exit(task.returncode)
+            build.main(args=[])
+
+            cmd = [
+                os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+                'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+
+        task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        output_lines = []
+        # Reads and prints realtime output from the subprocess until it terminates.
+        while True:
+            line = task.stdout.readline()
+            # No more output from the subprocess, and the subprocess has ended.
+            if len(line) == 0 and task.poll() is not None:
+                break
+            if line:
+                python_utils.PRINT(line, end='')
+                output_lines.append(line)
+        concatenated_output = ''.join(
+            line.decode('utf-8') for line in output_lines)
+
+        python_utils.PRINT('Done!')
+
+        if 'Trying to get the Angular injector' in concatenated_output:
+            python_utils.PRINT(
+                'If you run into the error "Trying to get the Angular injector",'
+                ' please see https://github.com/oppia/oppia/wiki/'
+                'Frontend-unit-tests-guide#how-to-handle-common-errors'
+                ' for details on how to fix it.')
+
+        if parsed_args.check_coverage:
+            if task.returncode:
+                sys.exit(
+                    'The frontend tests failed. Please fix it before running the'
+                    ' test coverage check.')
+            else:
+                check_frontend_test_coverage.main()
+        elif task.returncode:
+            sys.exit(task.returncode)
 
 
 if __name__ == '__main__':
