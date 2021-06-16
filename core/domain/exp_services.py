@@ -1819,7 +1819,6 @@ def are_changes_mergeable(exp_id, version, change_list ):
         for change in change_list:
             change_is_mergeable = False
             if change.cmd == exp_domain.CMD_RENAME_STATE:
-                change_is_mergeable = True
                 old_state_name = change.old_state_name
                 new_state_name = change.new_state_name
                 if old_state_name in state_names_of_renamed_states:
@@ -1827,6 +1826,8 @@ def are_changes_mergeable(exp_id, version, change_list ):
                         state_names_of_renamed_states.pop(old_state_name))
                 else:
                     state_names_of_renamed_states[new_state_name] = old_state_name
+                if state_names_of_renamed_states[new_state_name] not in old_to_new_state_names:
+                    change_is_mergeable = True
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 old_state_name = change.state_name
                 new_state_name = change.state_name
@@ -1887,21 +1888,8 @@ def are_changes_mergeable(exp_id, version, change_list ):
                     change_is_mergeable = True
                 elif (change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if old_state_name in changed_properties:
-                        if (old_version.states[old_state_name].interaction.id ==
-                            new_version.states[new_state_name].interaction.id):
-                            if change.property_name not in changed_properties[old_state_name]:
+                        if change.property_name not in changed_properties[old_state_name]:
                                 change_is_mergeable = True
-                            else:
-                                old_content_id_list = [hint.hint_content.content_id
-                                    for hint in old_version.states[old_state_name].interaction.hints]
-                                new_content_id_list = [hint.hint_content.content_id
-                                    for hint in new_version.states[new_state_name].interaction.hints]
-                                if len(old_content_id_list) == 5 or len(old_content_id_list) == 5:
-                                    return False
-                                for hint in change.new_value:
-                                    if (hint["hint_content"]["content_id"] not in old_content_id_list and
-                                        hint["hint_content"]["content_id"] not in new_content_id_list):
-                                        change_is_mergeable = True
                     else:
                         change_is_mergeable = True
                 elif (change.property_name == exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
