@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from constants import constants
+from core.domain import learner_goals_services
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import story_domain
@@ -507,6 +508,11 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID, self.NODE_ID_2)
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.STORY_ID, self.NODE_ID_1)
+        learner_progress_services.add_topic_to_learn(
+            self.viewer_id, self.TOPIC_ID)
+        self.assertEqual(len(
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 1)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/staging/topic/%s/%s' % (
@@ -518,6 +524,9 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertEqual(len(
             learner_progress_services.get_all_learnt_topic_ids(
                 self.viewer_id)), 1)
+        self.assertEqual(len(
+            learner_goals_services.get_all_topic_ids_to_learn(
+                self.viewer_id)), 0)
         self.assertEqual(len(
             learner_progress_services.get_all_completed_story_ids(
                 self.viewer_id)), 1)

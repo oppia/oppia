@@ -23,6 +23,7 @@ from constants import constants
 from core.domain import classroom_services
 from core.domain import collection_services
 from core.domain import exp_fetchers
+from core.domain import learner_goals_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_domain
 from core.domain import skill_services
@@ -235,7 +236,7 @@ def mark_story_as_completed(user_id, story_id):
 def mark_topic_as_learnt(user_id, topic_id):
     """Adds the topic id to the learnt list of the user unless the
     topic has already been learnt by the user. It is also removed from
-    the partially learnt list(if present).
+    the partially learnt list and topics to learn list(if present).
 
     Args:
         user_id: str. The id of the user who has learnt the topic.
@@ -253,6 +254,7 @@ def mark_topic_as_learnt(user_id, topic_id):
 
     if topic_id not in activities_completed.learnt_topic_ids:
         remove_topic_from_partially_learnt_list(user_id, topic_id)
+        learner_goals_services.remove_topic_from_learn(user_id, topic_id)
         activities_completed.add_learnt_topic_id(topic_id)
         _save_completed_activities(activities_completed)
 
@@ -443,6 +445,61 @@ def mark_collection_as_incomplete(user_id, collection_id):
             user_id, collection_id)
         incomplete_activities.add_collection_id(collection_id)
         _save_incomplete_activities(incomplete_activities)
+
+
+def add_topic_to_learn(user_id, topic_id):
+    """This function checks if the topic exists in the learnt.
+    If it does not exist we call the function in learner
+    goals services to add the topic to the learn list.
+
+    Args:
+        user_id: str. The id of the user.
+        topic_id: str. The id of the topic to be added to the
+            learner goals.
+
+    Returns:
+        (bool, bool). The first boolean indicates whether the topic
+        already exists in either of the "learnt topics" lists and
+        the second boolean indicates whether the learner goals
+        limit of the user has been exceeded.
+    """
+    learnt_topic_ids = get_all_learnt_topic_ids(user_id)
+    goals_limit_exceeded = False
+    belongs_to_learnt_list = False
+
+    if topic_id not in learnt_topic_ids:
+        goals_limit_exceeded = (
+            learner_goals_services.mark_topic_to_learn(user_id, topic_id))
+        belongs_to_learnt_list = False
+    else:
+        belongs_to_learnt_list = True
+
+    return (
+        belongs_to_learnt_list,
+        goals_limit_exceeded)
+
+
+def _remove_topic_ids_from_learner_goals(
+        user_id, topic_ids_in_learn):
+    """Removes the topics from the learner goals of the user.
+
+    Args:
+        user_id: str. The id of the user.
+        topic_ids_in_learn: list(str). The ids of the topics to be removed
+            from learn.
+    """
+    learner_goals_model = user_models.LearnerGoalsModel.get(
+        user_id, strict=False)
+
+    if learner_goals_model:
+        learner_goals = (
+            learner_goals_services.get_learner_goals_from_model(
+                learner_goals_model))
+
+        for topic_id in topic_ids_in_learn:
+            learner_goals.remove_topic_id_from_learn(topic_id)
+
+        learner_goals_services.save_learner_goals(learner_goals)
 
 
 def add_collection_to_learner_playlist(
@@ -1248,6 +1305,39 @@ def _get_filtered_incomplete_collection_summaries(
         nonexistent_incomplete_collection_ids)
 
 
+def _get_filtered_topics_to_learn_summaries(
+        topic_summaries, topic_ids):
+    """Returns a list of summaries of the topics in the learner goals
+    and the ids of topics that are no longer present.
+
+    Args:
+        topic_summaries: list(TopicSummary). The list of topic
+            summary domain objects to be filtered.
+        topic_ids: list(str). The ids of the topics corresponding to
+            the topic summary domain objects.
+
+    Returns:
+        tuple. A 2-tuple whose elements are as follows:
+        - list(TopicSummary). Filtered list of TopicSummary domain
+            objects of the topics in the learner goals.
+        - list(str). The ids of the topics that are no longer present.
+    """
+    nonexistent_topic_ids_to_learn = []
+    filtered_topics_to_learn_summaries = []
+    for index, topic_summary in enumerate(topic_summaries):
+        if topic_summary is None:
+            nonexistent_topic_ids_to_learn.append(topic_ids[index])
+        else:
+            topic_id = topic_summary.id
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
+            if not topic_rights.topic_is_published:
+                nonexistent_topic_ids_to_learn.append(topic_ids[index])
+            else:
+                filtered_topics_to_learn_summaries.append(topic_summary)
+
+    return filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn
+
+
 def _get_filtered_exp_playlist_summaries(
         exploration_summaries, exploration_ids):
     """Returns a list of summaries of the explorations in the learner playlist
@@ -1435,8 +1525,12 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             summary domain objects.
 
     Returns:
+<<<<<<< HEAD
         list(dict). The summary dict corresponding to the given
         summaries.
+=======
+        list(dict). The summary dict objects corresponding to the given summary.
+>>>>>>> 64ec79a15 (Added new changes)
     """
     summary_dicts = []
     topic_ids = [topic.id for topic in topic_summaries]
@@ -1524,7 +1618,8 @@ def get_learner_dashboard_activities(user_id):
             [
                 ('CompletedActivitiesModel', [user_id]),
                 ('IncompleteActivitiesModel', [user_id]),
-                ('LearnerPlaylistModel', [user_id])
+                ('LearnerPlaylistModel', [user_id]),
+                ('LearnerGoalsModel', [user_id])
             ]))
 
     # If completed model is present.
@@ -1565,12 +1660,21 @@ def get_learner_dashboard_activities(user_id):
         exploration_playlist_ids = []
         collection_playlist_ids = []
 
+    # If learner goals model is present.
+    if learner_progress_models[3][0]:
+        learner_goals = (
+            learner_goals_services.get_learner_goals_from_model(
+                learner_progress_models[3][0]))
+        topic_ids_to_learn = learner_goals.topic_ids_to_learn
+    else:
+        topic_ids_to_learn = []
+
     activity_ids = learner_progress_domain.ActivityIdsInLearnerDashboard(
         completed_exploration_ids, completed_collection_ids,
         completed_story_ids, learnt_topic_ids,
         incomplete_exploration_ids, incomplete_collection_ids,
-        partially_learnt_topic_ids, exploration_playlist_ids,
-        collection_playlist_ids)
+        partially_learnt_topic_ids, topic_ids_to_learn,
+        exploration_playlist_ids, collection_playlist_ids)
 
     return activity_ids
 
@@ -1619,6 +1723,8 @@ def get_activity_progress(user_id):
         activity_ids_in_learner_dashboard.incomplete_collection_ids)
     partially_learnt_topic_ids = (
         activity_ids_in_learner_dashboard.partially_learnt_topic_ids)
+    topic_ids_to_learn = (
+        activity_ids_in_learner_dashboard.topic_ids_to_learn)
     exploration_playlist_ids = (
         activity_ids_in_learner_dashboard.exploration_playlist_ids)
     collection_playlist_ids = (
@@ -1634,6 +1740,7 @@ def get_activity_progress(user_id):
                 ('CollectionSummaryModel', completed_collection_ids),
                 ('StorySummaryModel', completed_story_ids),
                 ('TopicSummaryModel', learnt_topic_ids),
+                ('TopicSummaryModel', topic_ids_to_learn),
                 ('ExpSummaryModel', exploration_playlist_ids),
                 ('CollectionSummaryModel', collection_playlist_ids),
             ]))
@@ -1645,8 +1752,9 @@ def get_activity_progress(user_id):
     completed_collection_models = activity_models[4]
     completed_story_models = activity_models[5]
     learnt_topic_models = activity_models[6]
-    exploration_playlist_models = activity_models[7]
-    collection_playlist_models = activity_models[8]
+    topics_to_learn_models = activity_models[7]
+    exploration_playlist_models = activity_models[8]
+    collection_playlist_models = activity_models[9]
 
     incomplete_exp_summaries = (
         [exp_fetchers.get_exploration_summary_from_model(model)
@@ -1669,6 +1777,9 @@ def get_activity_progress(user_id):
     learnt_topic_summaries = (
         [topic_fetchers.get_topic_summary_from_model(model)
          if model else None for model in learnt_topic_models])
+    topics_to_learn_summaries = (
+        [topic_fetchers.get_topic_summary_from_model(model)
+         if model else None for model in topics_to_learn_models])
     exploration_playlist_summaries = (
         [exp_fetchers.get_exploration_summary_from_model(model)
          if model else None for model in exploration_playlist_models])
@@ -1739,6 +1850,10 @@ def get_activity_progress(user_id):
             _get_filtered_partially_learnt_topic_summaries(
                 partially_learnt_topic_summaries, partially_learnt_topic_ids))
 
+    filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn = (
+        _get_filtered_topics_to_learn_summaries(
+            topics_to_learn_summaries, topic_ids_to_learn))
+
     filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
         _get_filtered_exp_playlist_summaries(
             exploration_playlist_summaries, exploration_playlist_ids))
@@ -1757,6 +1872,7 @@ def get_activity_progress(user_id):
         'completed_collections': len(nonexistent_completed_collection_ids),
         'completed_stories': len(nonexistent_completed_story_ids),
         'learnt_topics': len(nonexistent_learnt_topic_ids),
+        'topics_to_learn': len(nonexistent_topic_ids_to_learn),
         'exploration_playlist': len(nonexistent_playlist_exp_ids),
         'collection_playlist': len(nonexistent_playlist_collection_ids),
     }
@@ -1774,6 +1890,8 @@ def get_activity_progress(user_id):
     _remove_activity_ids_from_playlist(
         user_id, nonexistent_playlist_exp_ids,
         nonexistent_playlist_collection_ids)
+    _remove_topic_ids_from_learner_goals(
+        user_id, nonexistent_topic_ids_to_learn)
 
     learner_progress = learner_progress_domain.LearnerProgress(
         filtered_incomplete_exp_summaries,
@@ -1783,6 +1901,7 @@ def get_activity_progress(user_id):
         filtered_completed_collection_summaries,
         filtered_completed_story_summaries,
         filtered_learnt_topic_summaries,
+        filtered_topics_to_learn_summaries,
         filtered_exp_playlist_summaries,
         filtered_collection_playlist_summaries,
         completed_to_incomplete_collection_titles,
