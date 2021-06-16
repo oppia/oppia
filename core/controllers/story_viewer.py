@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -171,7 +173,16 @@ class StoryProgressHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
         story = story_fetchers.get_story_by_id(story_id)
+        if story is None:
+            logging.error('Could not find a story corresponding to id.')
+            self.render_json({})
+            return
+
         topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
+        if topic is None:
+            self.render_json({})
+            return
+
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
         completed_node_ids = [
@@ -228,7 +239,7 @@ class StoryProgressHandler(base.BaseHandler):
         is_topic_completed = set(story_ids_in_topic).intersection(
             set(completed_story_ids))
 
-        # If atleast one story in the topic is completed,
+        # If at least one story in the topic is completed,
         # mark the topic as learnt else mark it as partially learnt.
         if not is_topic_completed:
             learner_progress_services.mark_topic_as_partially_learnt(

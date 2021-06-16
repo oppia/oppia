@@ -181,12 +181,6 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
         stories_linked_to_incomplete_explorations = (
             story_fetchers.get_stories_by_ids(
                 story_ids_linked_to_incomplete_explorations))
-        topic_ids_linked_to_stories_for_incomplete_exps = [
-            story.corresponding_topic_id for story in (
-                stories_linked_to_incomplete_explorations)]
-        topics_linked_to_stories_for_incomplete_exps = (
-            topic_fetchers.get_topics_by_ids(
-                topic_ids_linked_to_stories_for_incomplete_exps))
 
         story_ids_linked_to_completed_explorations = (
             list(set(exp_services.get_story_ids_linked_to_explorations(
@@ -200,9 +194,10 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
         topics_linked_to_stories_for_completed_exps = (
             topic_fetchers.get_topics_by_ids(
                 topic_ids_linked_to_stories_for_completed_exps))
+        completed_story_ids = []
 
-        # Mark stories and topics for completed explorations.
-        for index, story in enumerate(stories_linked_to_completed_explorations):
+        # Mark stories for completed explorations.
+        for story in stories_linked_to_completed_explorations:
             if story:
                 completed_nodes = (
                     story_fetchers.get_completed_nodes_in_story(
@@ -215,41 +210,30 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
                 else:
                     learner_progress_services.mark_story_as_completed(
                         user_id, story.id)
+                    completed_story_ids.append(story.id)
 
-                completed_story_ids = (
-                    learner_progress_services.get_all_completed_story_ids(
-                        user_id))
-                story_ids_in_topic = []
-                for canonical_story in (
-                        topics_linked_to_stories_for_completed_exps[index]
-                        .canonical_story_references):
-                    story_ids_in_topic.append(canonical_story.story_id)
-                if not set(story_ids_in_topic).intersection(set(
-                        completed_story_ids)):
-                    learner_progress_services.mark_topic_as_partially_learnt(
-                        user_id, story.corresponding_topic_id)
-                else:
-                    learner_progress_services.mark_topic_as_learnt(
-                        user_id, story.corresponding_topic_id)
-
-        # Mark stories and topics for incomplete explorations.
-        for index, story in enumerate(
-                stories_linked_to_incomplete_explorations):
+        # Mark stories for incomplete explorations.
+        for story in stories_linked_to_incomplete_explorations:
             if story:
                 learner_progress_services.mark_story_as_incomplete(
                     user_id, story.id)
-                completed_story_ids = (
-                    learner_progress_services.get_all_completed_story_ids(
-                        user_id))
-                story_ids_in_topic = []
-                for canonical_story in (
-                        topics_linked_to_stories_for_incomplete_exps[index]
-                        .canonical_story_references):
-                    story_ids_in_topic.append(canonical_story.story_id)
-                if not set(story_ids_in_topic).intersection(set(
-                        completed_story_ids)):
+                if story.corresponding_topic_id:
                     learner_progress_services.mark_topic_as_partially_learnt(
                         user_id, story.corresponding_topic_id)
+
+        # Mark topics for completed explorations.
+        for topic in topics_linked_to_stories_for_completed_exps:
+            if topic:
+                story_ids_in_topic = []
+                for canonical_story in topic.canonical_story_references:
+                    story_ids_in_topic.append(canonical_story.story_id)
+                if set(story_ids_in_topic).intersection(set(
+                        completed_story_ids)):
+                    learner_progress_services.mark_topic_as_learnt(
+                        user_id, topic.id)
+                else:
+                    learner_progress_services.mark_topic_as_partially_learnt(
+                        user_id, topic.id)
 
         yield (
             'Successfully added story_ids and topic_ids '

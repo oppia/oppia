@@ -68,81 +68,71 @@ export class LearnerDashboardActivityIds {
         this.partiallyLearntTopicIds.indexOf(activityId) !== -1 ||
         this.learntTopicIds.indexOf(activityId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToExplorationPlaylist(explorationId: string): boolean {
     if (this.explorationPlaylistIds.indexOf(explorationId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToCollectionPlaylist(collectionId: string): boolean {
     if (this.collectionPlaylistIds.indexOf(collectionId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToCompletedExplorations(explorationId: string): boolean {
     if (this.completedExplorationIds.indexOf(explorationId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToCompletedCollections(collectionId: string): boolean {
     if (this.completedCollectionIds.indexOf(collectionId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToCompletedStories(storyId: string): boolean {
     if (this.completedStoryIds.indexOf(storyId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToLearntTopics(topicId: string): boolean {
     if (this.learntTopicIds.indexOf(topicId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToIncompleteExplorations(explorationId: string): boolean {
     if (this.incompleteExplorationIds.indexOf(explorationId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToIncompleteCollections(collectionId: string): boolean {
     if (this.incompleteCollectionIds.indexOf(collectionId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   belongsToPartiallyLearntTopics(topicId: string): boolean {
     if (this.partiallyLearntTopicIds.indexOf(topicId) !== -1) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   addToExplorationLearnerPlaylist(explorationId: string): void {

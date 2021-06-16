@@ -17,11 +17,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 
 from constants import constants
 from core.domain import learner_progress_services
 from core.domain import question_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_domain
@@ -520,7 +522,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             learner_progress_services.get_all_completed_story_ids(
                 self.viewer_id)), 1)
 
-    def test_mark_topic_as_partially_learnt_and_story_as_completed(self):
+    def test_mark_topic_as_learnt_and_story_as_completed(self):
         self.NEW_USER_EMAIL = 'newUser@newUser.com'
         self.NEW_USER_USERNAME = 'newUser'
 
@@ -584,3 +586,22 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertEqual(len(
             learner_progress_services.get_all_completed_story_ids(
                 self.viewer_id)), 1)
+
+        def _mock_none_function(_):
+            """Mocks None."""
+            return None
+
+        story_fetchers_swap = self.swap(
+            story_fetchers, 'get_story_by_id', _mock_none_function)
+
+        with story_fetchers_swap:
+            with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+                self.post_json(
+                    '%s/staging/topic/%s/%s' % (
+                        feconf.STORY_PROGRESS_URL_PREFIX,
+                        self.STORY_URL_FRAGMENT,
+                        self.NODE_ID_3
+                    ), {}, csrf_token=csrf_token)
+                self.assertEqual(
+                    captured_logs,
+                    ['Could not find a story corresponding to id.'])

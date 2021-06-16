@@ -608,7 +608,9 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
                     learner_progress_services.mark_topic_as_partially_learnt(
                         user_id, story.corresponding_topic_id)
             else:
-                raise Exception('Story with id %s does not exist.' % story_id)
+                logging.error('Could not find a story corresponding to id.')
+                self.render_json({})
+                return
 
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,

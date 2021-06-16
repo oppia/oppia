@@ -268,7 +268,7 @@ def get_story_ids_linked_to_explorations(exp_ids):
         exp_ids)
     linked_story_ids = [
         exp_context_model.story_id for exp_context_model in (
-            exploration_context_models)]
+            exploration_context_models) if exp_context_model]
     return linked_story_ids
 
 
