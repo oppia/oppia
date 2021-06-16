@@ -31,7 +31,7 @@ class LearnerProgress(python_utils.OBJECT):
             partially_learnt_topic_summaries, completed_exp_summaries,
             completed_collection_summaries, completed_story_summaries,
             learnt_topic_summaries, exploration_playlist,
-            collection_playlist, topics_to_learn,
+            collection_playlist,
             completed_to_incomplete_collection_titles,
             completed_to_incomplete_story_titles,
             learnt_to_partially_learnt_topic_titles):
@@ -58,8 +58,6 @@ class LearnerProgress(python_utils.OBJECT):
                 explorations in the learner playlist.
             collection_playlist: list(CollectionSummary). The summaries of the
                 collections in the learner playlist.
-            topics_to_learn: list(TopicSummary). The summaries of the topics to
-                learn in the learner goals.
             completed_to_incomplete_collection_titles: list(CollectionSummary).
                 The summaries corresponding to those collections which have
                 been moved to the in progress section on account of new
@@ -82,7 +80,6 @@ class LearnerProgress(python_utils.OBJECT):
         self.learnt_topic_summaries = learnt_topic_summaries
         self.exploration_playlist_summaries = exploration_playlist
         self.collection_playlist_summaries = collection_playlist
-        self.topics_to_learn_summaries = topics_to_learn
         self.completed_to_incomplete_collections = (
             completed_to_incomplete_collection_titles)
         self.completed_to_incomplete_stories = (
@@ -101,8 +98,7 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             completed_story_ids, learnt_topic_ids,
             incomplete_exploration_ids, incomplete_collection_ids,
             partially_learnt_topic_ids,
-            exploration_playlist_ids, collection_playlist_ids,
-            topic_ids_to_learn):
+            exploration_playlist_ids, collection_playlist_ids):
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 
         Args:
@@ -124,8 +120,6 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                 in the playlist of the user.
             collection_playlist_ids: list(str). The ids of the collections
                 in the playlist of the user.
-            topic_ids_to_learn: list(str). The ids of the topics to learn in
-                the learner goals.
         """
         self.completed_exploration_ids = completed_exploration_ids
         self.completed_collection_ids = completed_collection_ids
@@ -136,7 +130,6 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
         self.partially_learnt_topic_ids = partially_learnt_topic_ids
         self.exploration_playlist_ids = exploration_playlist_ids
         self.collection_playlist_ids = collection_playlist_ids
-        self.topic_ids_to_learn = topic_ids_to_learn
 
     def to_dict(self):
         """Return dictionary representation of ActivityIdsInLearnerDashboard.
@@ -161,8 +154,6 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                     explorations that are in the playlist
                 'collection_playlist_ids': list(str). The ids of the
                     collections that are in the playlist.
-                'topic_ids_to_learn': list(str). The ids of the topics
-                    to learn in learner goals.
         """
 
         return {
@@ -175,5 +166,4 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
             'partially_learnt_topic_ids': self.partially_learnt_topic_ids,
             'exploration_playlist_ids': self.exploration_playlist_ids,
             'collection_playlist_ids': self.collection_playlist_ids,
-            'topic_ids_to_learn': self.topic_ids_to_learn
         }

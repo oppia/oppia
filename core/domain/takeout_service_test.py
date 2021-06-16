@@ -89,7 +89,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
         1) Simulates skill mastery of user_1 and profile_1.
         2) Simulates completion of some activities of user_1 and profile_1.
         3) Simulates incomplete status of some activities.
-        4) Populates LearnerGoalsModel of user.
         5) Populates ExpUserLastPlaythroughModel of user.
         6) Creates user LearnerPlaylsts.
         7) Simulates collection progress of user.
@@ -134,12 +133,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS,
             story_ids=self.STORY_IDS_2,
             partially_learnt_topic_ids=self.TOPIC_IDS).put()
-
-        # Setup for LearnerGoalsModel.
-        user_models.LearnerGoalsModel(
-            id=self.USER_ID_1,
-            topic_ids_to_learn=self.TOPIC_IDS
-        ).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
@@ -371,7 +364,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         5) Creates an ExplorationUserDataModel.
         6) Simulates completion of some activities.
         7) Simulates incomplete status of some activities.
-        8) Populates LearnerGoalsModel of user.
         9) Populates ExpUserLastPlaythroughModel of user.
         10) Creates user LearnerPlaylsts.
         11) Simulates collection progress of user.
@@ -473,11 +465,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             collection_ids=self.COLLECTION_IDS,
             story_ids=self.STORY_IDS,
             partially_learnt_topic_ids=self.TOPIC_IDS).put()
-
-        # Setup for LearnerGoalsModel.
-        user_models.LearnerGoalsModel(
-            id=self.USER_ID_1,
-            topic_ids_to_learn=self.TOPIC_IDS).put()
 
         # Setup for ExpUserLastPlaythroughModel.
         user_models.ExpUserLastPlaythroughModel(
@@ -843,7 +830,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         last_playthrough_data = {}
         learner_playlist_data = {}
         incomplete_activities_data = {}
-        learner_goals_data = {}
         user_settings_data = {
             'email': 'user1@example.com',
             'role': feconf.ROLE_ID_ADMIN,
@@ -914,7 +900,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_user_data': exploration_data,
             'completed_activities': completed_activities_data,
             'incomplete_activities': incomplete_activities_data,
-            'learner_goals': learner_goals_data,
             'exp_user_last_playthrough': last_playthrough_data,
             'learner_playlist': learner_playlist_data,
             'task_entry': task_entry_data,
@@ -1207,9 +1192,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'incomplete_story_ids': self.STORY_IDS,
             'partially_learnt_topic_ids': self.TOPIC_IDS
         }
-        expected_learner_goals_data = {
-            'topic_ids_to_learn': self.TOPIC_IDS
-        }
         expected_last_playthrough_data = {
             self.EXPLORATION_IDS[0]: {
                 'exp_version': self.EXP_VERSION,
@@ -1499,7 +1481,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'exploration_user_data': expected_exploration_data,
             'completed_activities': expected_completed_activities_data,
             'incomplete_activities': expected_incomplete_activities_data,
-            'learner_goals': expected_learner_goals_data,
             'exp_user_last_playthrough': expected_last_playthrough_data,
             'learner_playlist': expected_learner_playlist_data,
             'task_entry': expected_task_entry_data,
@@ -1607,7 +1588,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'learnt_topic_ids': self.TOPIC_IDS
         }
         incomplete_activities_data = {}
-        learner_goals_data = {}
         last_playthrough_data = {}
         learner_playlist_data = {
             'playlist_exploration_ids': self.EXPLORATION_IDS_2,
@@ -1624,7 +1604,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_skill_mastery': user_skill_data,
             'completed_activities': completed_activities_data,
             'incomplete_activities': incomplete_activities_data,
-            'learner_goals': learner_goals_data,
             'exp_user_last_playthrough': last_playthrough_data,
             'learner_playlist': learner_playlist_data,
             'collection_progress': collection_progress_data,
