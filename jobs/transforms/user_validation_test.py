@@ -22,8 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.platform import models
+from core.tests import test_utils
 import feconf
 from jobs import job_test_utils
+from jobs.decorators import validation_decorators
 from jobs.transforms import user_validation
 from jobs.types import base_validation_errors
 from jobs.types import user_validation_errors
@@ -227,6 +229,97 @@ class ValidateDraftChangeListLastUpdatedTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(user_validation.ValidateDraftChangeListLastUpdated())
         )
         self.assert_pcoll_equal(output, [])
+
+
+class RelationshipsOfTests(test_utils.TestBase):
+
+    def test_completed_activities_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'CompletedActivitiesModel', 'exploration_ids'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'CompletedActivitiesModel', 'collection_ids'),
+            ['CollectionModel'])
+
+    def test_incomplete_activities_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'IncompleteActivitiesModel', 'exploration_ids'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'IncompleteActivitiesModel', 'collection_ids'),
+            ['CollectionModel'])
+
+    def test_exp_user_last_playthrough_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'ExpUserLastPlaythroughModel', 'exploration_id'),
+            ['ExplorationModel'])
+
+    def test_learner_playlist_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'LearnerPlaylistModel', 'exploration_ids'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'LearnerPlaylistModel', 'collection_ids'),
+            ['CollectionModel'])
+
+    def test_user_contributions_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserContributionsModel', 'created_exploration_ids'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserContributionsModel', 'edited_exploration_ids'),
+            ['ExplorationModel'])
+
+    def test_user_email_preferences_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserEmailPreferencesModel', 'id'),
+            ['UserSettingsModel'])
+
+    def test_user_subscriptions_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'exploration_ids'),
+            ['ExplorationModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'collection_ids'),
+            ['CollectionModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'general_feedback_thread_ids'),
+            ['GeneralFeedbackThreadModel'])
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscriptionsModel', 'creator_ids'),
+            ['UserSubscribersModel'])
+
+    def test_user_subscribers_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserSubscribersModel', 'subscriber_ids'),
+            ['UserSubscriptionsModel'])
+
+    def test_user_recent_changes_batch_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserRecentChangesBatchModel', 'id'),
+            ['UserSettingsModel'])
+
+    def test_user_stats_model_relationships(self):
+        self.assertItemsEqual(
+            validation_decorators.RelationshipsOf.get_model_kind_references(
+                'UserStatsModel', 'id'),
+            ['UserSettingsModel'])
 
 
 class ValidateArchivedModelsMarkedDeletedTests(
