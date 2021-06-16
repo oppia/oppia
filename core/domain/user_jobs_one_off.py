@@ -250,9 +250,6 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
                         completed_story_ids)):
                     learner_progress_services.mark_topic_as_partially_learnt(
                         user_id, story.corresponding_topic_id)
-                else:
-                    learner_progress_services.mark_topic_as_learnt(
-                        user_id, story.corresponding_topic_id)
 
         yield (
             'Successfully added story_ids and topic_ids '
