@@ -310,6 +310,11 @@ angular.module('oppia').directive('ruleEditor', [
             );
           };
 
+          ctrl.updateValue = function(value, varName) {
+            ctrl.rule.inputs[varName] = value;
+            $scope.$applyAsync();
+          };
+
           ctrl.$onDestroy = function() {
             if (ctrl.eventBusGroup) {
               ctrl.eventBusGroup.unsubscribe();
