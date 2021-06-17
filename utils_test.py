@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-from typing import Any, List, Text, Union # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, Dict, List, Text, Union # isort:skip # pylint: disable=unused-import, import-only-modules
 
 # TODO(#13059): Remove #type: ignore[attr-defined] from constants after
 # introduction of protobuf for constants.
@@ -82,28 +82,40 @@ class UtilsTests(test_utils.GenericTestBase):
             'expected the node content, but found \'<stream end>\'\n'):
             yaml_str = utils.dict_from_yaml('{')
 
-    def test_recursively_remove_key(self):
+    def test_recursively_remove_key_for_empty_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method for an empty dict."""
+        d = {} # type: Dict[None, None]
+        utils.recursively_remove_key(d, 'a')
+        self.assertEqual(d, {})
+
+    def test_recursively_remove_key_for_single_key_dict(self):
         # type: () -> None
         """Test recursively_remove_key method."""
-        d = {'a': 'b'} # type: Any
+        d = {'a': 'b'}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {})
 
-        d = {}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {})
-
+    def test_recursively_remove_key_for_multi_key_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method."""
         d = {'a': 'b', 'c': 'd'}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': 'd'})
 
+    def test_recursively_remove_key_for_dict_with_value_dict(self):
+        # type: () -> None
+        """Test recursively_remove_key method."""
         d = {'a': 'b', 'c': {'a': 'b'}}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': {}})
 
-        d = ['a', 'b', {'c': 'd'}]
-        utils.recursively_remove_key(d, 'c')
-        self.assertEqual(d, ['a', 'b', {}])
+    def test_recursively_remove_key_for_list(self):
+        # type: () -> None
+        """Test recursively_remove_key method."""
+        l = ['a', 'b', {'c': 'd'}]
+        utils.recursively_remove_key(l, 'c')
+        self.assertEqual(l, ['a', 'b', {}])
 
     def test_camelcase_to_hyphenated(self):
         # type: () -> None
