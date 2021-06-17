@@ -28,7 +28,7 @@ describe('Url Service', () => {
   let pathname = '/embed';
   // Check https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys
   let mockLocation:
-   Pick<Location, 'href' | 'origin' | 'pathname' | 'hash' | 'search'>;
+    Pick<Location, 'href' | 'origin' | 'pathname' | 'hash' | 'search'>;
   let origin = 'http://sample.com';
 
   beforeEach(() => {
