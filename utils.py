@@ -54,7 +54,6 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
-U = TypeVar('U')
 
 # TODO(#13059): Every use of constants is followed by
 # 'type: ignore[attr-defined]' because mypy is not able to identify the
@@ -208,7 +207,7 @@ def to_ascii(input_string):
 
 
 def dict_from_yaml(yaml_str):
-    # type: (Text) -> Dict[Any, Any]
+    # type: (Text) -> Dict[str, Any]
     """Gets the dict representation of a YAML string.
 
     Args:
@@ -1102,7 +1101,7 @@ class OrderedCounter(
 
 
 def grouper(iterable, chunk_len, fillvalue=None):
-    # type: (Iterable[T], int, Any) -> Iterable[Iterable[T]]
+    # type: (Iterable[T], int, Optional[T]) -> Iterable[Iterable[T]]
     """Collect data into fixed-length chunks.
 
     Source: https://docs.python.org/3/library/itertools.html#itertools-recipes.
