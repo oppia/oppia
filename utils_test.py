@@ -24,18 +24,15 @@ import copy
 import datetime
 import os
 
-
 from constants import constants
 from core.tests import test_utils
 import feconf
 import python_utils
 import utils
 
-MYPY = False
-if MYPY:
-    from typing import Any, List, Text # isort:skip # pylint: disable=unused-import, import-only-modules
+from typing import Any, List, Text, Union # isort:skip # pylint: disable=unused-import, import-only-modules
 
-# TODO(#1234): Remove #type: ignore[attr-defined] from constants after
+# TODO(#13059): Remove #type: ignore[attr-defined] from constants after
 # introduction of protobuf for constants.
 
 
@@ -217,7 +214,7 @@ class UtilsTests(test_utils.GenericTestBase):
             ['Partially', 'Partially'],
             ['miDdle', 'MiDdle'],
             ['2be', '2be'],
-        ] # type: List[Any]
+        ] # type: List[List[Union[None, Text]]]
 
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])

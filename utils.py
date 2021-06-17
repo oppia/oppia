@@ -30,13 +30,17 @@ import re
 import string
 import sys
 import time
-
 import unicodedata
 import zlib
 
 from constants import constants
 import feconf
 import python_utils
+
+from typing import ( # isort:skip # pylint: disable=unused-import, import-only-modules
+    Any, Callable, cast, Dict, Generator, Iterable, Iterator, List, # isort:skip # pylint: disable=unused-import, import-only-modules
+    Optional, Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import, import-only-modules
+
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH) # type: ignore[arg-type]
@@ -49,17 +53,8 @@ PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
-# During type checking, mypy assumes the variable 'MYPY' to be true.
-# Typing is not a module in python2, so it will only be imported only while type
-# checking.
-MYPY = False
-if MYPY:
-    from typing import (
-        Any, Callable, Dict, Generator, Iterable, Iterator, List,
-        Text, Tuple, TypeVar, Union) # isort:skip # pylint: disable=unused-import,import-only-modules
-    T = TypeVar('T')
-    U = TypeVar('U')
-    DICT_LIST_TYPE = TypeVar('DICT_LIST_TYPE', Dict[Any, Any], List[Any])
+T = TypeVar('T')
+U = TypeVar('U')
 
 # TODO(#13059): Every use of constants is followed by
 # 'type: ignore[attr-defined]' because mypy is not able to identify the
@@ -236,7 +231,7 @@ def dict_from_yaml(yaml_str):
 
 
 def recursively_remove_key(obj, key_to_remove):
-    # type: (DICT_LIST_TYPE, Text) -> None
+    # type: (Union[Dict[Any, Any], List[Any]], Text) -> None
     """Recursively removes keys from a list or dict.
 
     Args:
@@ -325,7 +320,10 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception. The given binary string does not represent a PNG image.
     """
-    if imghdr.what(None, h=content) == 'png': # type: ignore[call-overload]
+    # We accept unicode but imghdr.what(file, h) accept 'h' of type str.
+    # So we have casted content to be str.
+    content = cast(str, content)
+    if imghdr.what(None, h=content) == 'png':
         return '%s%s' % (
             PNG_DATA_URL_PREFIX,
             python_utils.url_quote( # type: ignore[no-untyped-call]
@@ -832,7 +830,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
 
 
 def capitalize_string(input_string):
-    # type: (Text) -> Text
+    # type: (Optional[Text]) -> Optional[Text]
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
 
@@ -1130,7 +1128,7 @@ def grouper(iterable, chunk_len, fillvalue=None):
 
 
 def partition(iterable, predicate=bool, enumerated=False):
-    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[T], Iterable[T]]
+    # type: (Iterable[T], Callable[..., Any], bool) -> Tuple[Iterable[Union[T, Tuple[int,T]]], Iterable[Union[T, Tuple[int,T]]]]
     """Returns two generators which split the iterable based on the predicate.
 
     NOTE: The predicate is called AT MOST ONCE per item.
@@ -1166,7 +1164,7 @@ def partition(iterable, predicate=bool, enumerated=False):
         themselves.
     """
     if enumerated:
-        new_iterable = enumerate(iterable) # type: Any
+        new_iterable = enumerate(iterable) # type: Iterable[Union[T, Tuple[int, T]]]
         old_predicate = predicate
         predicate = lambda pair: old_predicate(pair[1])
     else:

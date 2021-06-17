@@ -597,6 +597,8 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/transforms/exp_validation_test.py',
     'jobs/transforms/feedback_validation.py',
     'jobs/transforms/feedback_validation_test.py',
+    'jobs/transforms/improvements_validation.py',
+    'jobs/transforms/improvements_validation_test.py',
     'jobs/transforms/question_validation.py',
     'jobs/transforms/question_validation_test.py',
     'jobs/transforms/topic_validation.py',
@@ -607,6 +609,8 @@ NOT_FULLY_COVERED_FILES = [
     'jobs/types/base_validation_errors_test.py',
     'jobs/types/feedback_validation_errors.py',
     'jobs/types/feedback_validation_errors_test.py',
+    'jobs/types/improvements_validation_errors.py',
+    'obs/types/improvements_validation_errors_test.py',
     'jobs/types/job_run_result.py',
     'jobs/types/job_run_result_test.py',
     'jobs/types/model_property.py',
@@ -714,19 +718,22 @@ NOT_FULLY_COVERED_FILES = [
 
 
 CONFIG_FILE_PATH = os.path.join('.', 'mypy.ini')
+# TODO(#13113): Change mypy command to mypy path after Python3 migration.
 MYPY_CMD = 'mypy'
+MYPY_REQUIREMENTS_PATH = os.path.join('.', 'mypy_requirements.txt')
+PYTHON3_CMD = 'python3'
+
 
 _PARSER = argparse.ArgumentParser(
-    description="""
-Type checking script for Oppia codebase.
-""")
+    description='Type checking script for Oppia codebase.'
+)
 
 _PARSER.add_argument(
     '--files',
     help='Files to type-check',
     action='append',
     nargs='+'
-    )
+)
 
 
 def get_mypy_cmd(files):
@@ -734,15 +741,37 @@ def get_mypy_cmd(files):
     if files:
         cmd = [MYPY_CMD, '--config-file', CONFIG_FILE_PATH] + files[0]
     else:
-        rgx = '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES)
+        excluded_files_regex = (
+            '|'.join(NOT_FULLY_COVERED_FILES + EXCLUDED_DIRECTORIES))
         cmd = [
-            MYPY_CMD, '--exclude', rgx, '--config-file', CONFIG_FILE_PATH, '.']
+            MYPY_CMD, '--exclude', excluded_files_regex,
+            '--config-file', CONFIG_FILE_PATH, '.'
+        ]
     return cmd
+
+
+def install_mypy_prerequisites():
+    """Install mypy and type stubs from mypy_requirements.txt."""
+    cmd = [PYTHON3_CMD, '-m', 'pip', 'install', '-r', MYPY_REQUIREMENTS_PATH]
+    process = subprocess.call(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    return process
 
 
 def main(args=None):
     """Runs the MyPy type checks."""
     unused_parsed_args = _PARSER.parse_args(args=args)
+
+    python_utils.PRINT('Installing Mypy and stubs for third party libraries.')
+    return_code = install_mypy_prerequisites()
+    if return_code != 0:
+        python_utils.PRINT(
+            'Cannot install Mypy and stubs for third party libraries.')
+        sys.exit(1)
+    else:
+        python_utils.PRINT(
+            'Installed Mypy and stubs for third party libraries.')
+
     python_utils.PRINT('Starting Mypy type checks.')
     cmd = get_mypy_cmd(getattr(unused_parsed_args, 'files'))
     process = subprocess.call(cmd, stdin=subprocess.PIPE)
