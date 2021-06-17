@@ -25,7 +25,6 @@
  */
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import 'firebase/auth';
-import 'hammerjs';
 import 'leaflet/dist/leaflet.css';
 import { ContextService } from 'services/context.service';
 require('app.constants.ajs.ts');
@@ -43,7 +42,7 @@ require(
   'side-navigation-bar.component.ts');
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.directive.ts');
+  'top-navigation-bar.component.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');

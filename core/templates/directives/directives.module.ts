@@ -38,14 +38,14 @@ import { NgInitDirective } from './ng-init.directive';
     FocusOnDirective,
     HeadroomDirective,
     MathJaxDirective,
-    NgInitDirective
+    NgInitDirective,
   ],
   entryComponents: [],
   exports: [
     FocusOnDirective,
     HeadroomDirective,
     MathJaxDirective,
-    NgInitDirective
+    NgInitDirective,
   ],
 })
 
