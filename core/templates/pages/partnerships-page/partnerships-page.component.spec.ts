@@ -19,7 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 import { PartnershipsPageComponent } from './partnerships-page.component';
 import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service'
+  'domain/utilities/url-interpolation.service';
 
 describe('Partnerships page', () => {
   beforeEach(async() => {
