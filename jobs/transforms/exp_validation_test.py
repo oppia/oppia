@@ -19,9 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import re
-
-from core.domain import base_model_validators
 from core.domain import rights_domain
 from core.platform import models
 from jobs import job_test_utils
