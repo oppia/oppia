@@ -408,6 +408,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_linter(['files']), 0)
 
+    def test_start_mypy_checks(self):
+        with self.popen_swap:
+            self.assertEqual(pre_push_hook.start_mypy_checks(), 0)
+
     def test_run_script_and_get_returncode(self):
         with self.popen_swap:
             self.assertEqual(
