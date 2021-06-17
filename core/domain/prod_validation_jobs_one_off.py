@@ -27,20 +27,22 @@ import python_utils
 
 (
     activity_models, app_feedback_report_models, audit_models, auth_models,
-    beam_job_models, classifier_models, collection_models, config_models,
-    email_models, exp_models, feedback_models, improvements_models, job_models,
-    opportunity_models, question_models, recommendations_models, skill_models,
-    stats_models, story_models, subtopic_models, suggestion_models,
-    topic_models, translation_models, user_models
+    beam_job_models, blog_models, classifier_models, collection_models,
+    config_models, email_models, exp_models, feedback_models,
+    improvements_models, job_models, opportunity_models, question_models,
+    recommendations_models, skill_models, stats_models, story_models,
+    subtopic_models, suggestion_models, topic_models, translation_models,
+    user_models
 ) = models.Registry.import_models([
     models.NAMES.activity, models.NAMES.app_feedback_report, models.NAMES.audit,
-    models.NAMES.auth, models.NAMES.beam_job, models.NAMES.classifier,
-    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.job, models.NAMES.opportunity, models.NAMES.question,
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.translation, models.NAMES.user
+    models.NAMES.auth, models.NAMES.beam_job, models.NAMES.blog,
+    models.NAMES.classifier, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.job, models.NAMES.opportunity,
+    models.NAMES.question, models.NAMES.recommendations, models.NAMES.skill,
+    models.NAMES.statistics, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.translation,
+    models.NAMES.user
 ])
 
 VALIDATION_STATUS_SUCCESS = 'fully-validated'
@@ -1067,3 +1069,27 @@ class PlatformParameterSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [config_models.PlatformParameterSnapshotContentModel]
+
+
+class BlogPostModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates BlogPostModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [blog_models.BlogPostModel]
+
+
+class BlogPostSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates BlogPostSummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [blog_models.BlogPostSummaryModel]
+
+
+class BlogPostRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates BlogPostRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [blog_models.BlogPostRightsModel]
