@@ -44,6 +44,7 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
     Raises:
         ValidationError. Any required attribute is missing or an extra attribute
             exists or the value of an attribute is not allowed.
+        DeprecatedCommandError. The value of any attribute is deprecated.
     """
 
     required_attribute_names = valid_cmd_attribute_specs[
@@ -166,6 +167,8 @@ class BaseChange(python_utils.OBJECT):
             ValidationError. The change dict does not contain the cmd key,
                 or the cmd name is not allowed for the Change domain object
                 or the command attributes are missing or extra.
+            DeprecatedCommandError. The change dict contains a deprecated
+                command or the value for the command attribute is deprecated.
         """
         if 'cmd' not in change_dict:
             raise utils.ValidationError('Missing cmd key in change dict')
@@ -181,10 +184,9 @@ class BaseChange(python_utils.OBJECT):
                 valid_cmd_attribute_specs = copy.deepcopy(cmd)
                 break
 
-        for cmd in self.DEPRECATED_COMMANDS:
-            if cmd == cmd_name:
-                raise utils.DeprecatedCommandError(
-                    'Command %s is deprecated' % cmd_name)
+        if cmd_name in self.DEPRECATED_COMMANDS:
+            raise utils.DeprecatedCommandError(
+                'Command %s is deprecated' % cmd_name)
 
         if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
