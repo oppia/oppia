@@ -21,14 +21,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 // Note that this filter does not truncate at the middle of a word.
 @Pipe({name: 'truncateAndCapitalize'})
 export class TruncateAndCapitalizePipe implements PipeTransform {
-  // 'maxNumberOfCharacters' can be set to 'null' for returning the entire input
-  // string with the first letter capitalized.
-  transform(input: string, maxNumberOfCharacters: number | null): string {
+  transform(input: string, maxNumberOfCharacters: number): string {
     if (!input) {
       return input;
     }
     // The following regexp match will only return 'null' on an empty input
-    // string, the empty string condition is already being checked above. 
+    // string, the empty string condition is already being checked above.
     // Non-null assertion is used to make the TypeScript typing happy.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     let words = input.trim().match(/\S+/g)!;
