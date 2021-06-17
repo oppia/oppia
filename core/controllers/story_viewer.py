@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -172,6 +174,12 @@ class StoryProgressHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def post(self, story_id, node_id):
         story = story_fetchers.get_story_by_id(story_id)
+        if story is None:
+            logging.error(
+                'Could not find a story corresponding to '
+                '%s id.' % story_id)
+            self.render_json({})
+            return
         topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
@@ -216,7 +224,7 @@ class StoryProgressHandler(base.BaseHandler):
             learner_progress_services.mark_story_as_completed(
                 self.user_id, story_id)
         else:
-            learner_progress_services.mark_story_as_incomplete(
+            learner_progress_services.record_story_started(
                 self.user_id, story.id)
 
         completed_story_ids = (
@@ -229,10 +237,10 @@ class StoryProgressHandler(base.BaseHandler):
         is_topic_completed = set(story_ids_in_topic).intersection(
             set(completed_story_ids))
 
-        # If atleast one story in the topic is completed,
+        # If at least one story in the topic is completed,
         # mark the topic as learnt else mark it as partially learnt.
         if not is_topic_completed:
-            learner_progress_services.mark_topic_as_partially_learnt(
+            learner_progress_services.record_topic_started(
                 self.user_id, topic.id)
         else:
             learner_progress_services.mark_topic_as_learnt(

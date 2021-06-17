@@ -34,6 +34,7 @@ from core.domain import skill_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import taskqueue_services
 from core.domain import topic_domain
@@ -1364,6 +1365,26 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [self.TOPIC_ID])
+
+        # If the exploration is played in context of an invalid story, raise
+        # an error.
+
+        def _mock_none_function(_):
+            """Mocks None."""
+            return None
+
+        story_fetchers_swap = self.swap(
+            story_fetchers, 'get_story_by_id', _mock_none_function)
+
+        with story_fetchers_swap:
+            with self.capture_logging(min_level=logging.ERROR) as captured_logs:
+                self.post_json(
+                    '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_2_0, # pylint: disable=line-too-long
+                    payload, csrf_token=csrf_token)
+                self.assertEqual(
+                    captured_logs,
+                    ['Could not find a story corresponding to '
+                     '%s id.' % self.STORY_ID])
 
     def test_exp_incomplete_event_handler_with_no_version_raises_error(self):
         self.login(self.USER_EMAIL)

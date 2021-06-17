@@ -20,7 +20,9 @@
           </angular-html-bind>
         </div>
         <div ng-show="suggestionEditorIsShown">
-          <ck-editor-4-rte ng-model="suggestionData.newSuggestionHtml"></ck-editor-4-rte>
+          <ck-editor-4-rte [value]="suggestionData.newSuggestionHtml"
+                           (value-change)="updateValue($event)">
+          </ck-editor-4-rte>
           <input type="text" class="form-control oppia-review-message" ng-model="summaryMessage" placeholder="Summarize your new changes">
         </div>
       </div>

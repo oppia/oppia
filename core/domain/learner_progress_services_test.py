@@ -512,7 +512,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [self.STORY_ID_0])
 
         # Add a story to the incomplete list.
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [self.STORY_ID_1])
@@ -544,7 +544,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [self.TOPIC_ID_0])
 
         # Add a topic to the partially learnt list.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_1])
@@ -693,18 +693,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [self.COL_ID_0, self.COL_ID_3])
 
-    def test_mark_story_as_incomplete(self):
+    def test_record_story_started(self):
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [])
 
         # Add a story to the incomplete list of the learner.
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_0)
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [self.STORY_ID_0])
 
         # Adding a story again has no effect.
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_0)
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [self.STORY_ID_0])
@@ -713,23 +713,23 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # list.
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [self.STORY_ID_0])
 
-    def test_mark_topic_as_partially_learnt(self):
+    def test_record_topic_started(self):
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [])
 
         # Add a topic to the partially learnt list of the learner.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_0])
 
         # Adding a topic again has no effect.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_0])
@@ -738,7 +738,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # list.
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_0])
@@ -811,9 +811,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
         # Add two stories to the incomplete list.
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_0)
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(self._get_all_incomplete_story_ids(
             self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
@@ -841,9 +841,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id), [])
 
         # Add two topics to the partially learnt list.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(self._get_all_partially_learnt_topic_ids(
             self.user_id), [self.TOPIC_ID_0, self.TOPIC_ID_1])
@@ -1431,14 +1431,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Add a story to the incomplete list.
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_0)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_story_ids(
                 self.user_id), [self.STORY_ID_0])
 
         # Add another story.
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_story_ids(
@@ -1450,14 +1450,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Add a topic to the partially learnt list.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [self.TOPIC_ID_0])
 
         # Add another topic.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
@@ -1546,9 +1546,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_unpublishing_partially_learnt_topic_filters_it_out(self):
         # Add topics to the partially learnt list.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
@@ -1576,7 +1576,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_republishing_partially_learnt_topic_filters_as_incomplete(self):
         # Add topic to the partially learnt list.
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
@@ -1600,7 +1600,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Republish TOPIC_ID_0.
         topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID_0)
         self.assertEqual(
@@ -1811,9 +1811,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
 
         # Add activities to the playlist section.
@@ -1872,9 +1872,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_1, state_name, version)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_1)
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
 
         # Add activities to the playlist section.

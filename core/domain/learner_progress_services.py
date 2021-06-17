@@ -356,11 +356,9 @@ def mark_exploration_as_incomplete(
         _save_incomplete_activities(incomplete_activities)
 
 
-def mark_story_as_incomplete(user_id, story_id):
+def record_story_started(user_id, story_id):
     """Adds the story id to the incomplete list of the user unless the
-    story has been already completed by the user. If the story is already
-    present in the incomplete list, just the details associated with it are
-    updated.
+    story has been already completed by the user.
 
     Args:
         user_id: str. The id of the user who partially completed the story.
@@ -385,7 +383,7 @@ def mark_story_as_incomplete(user_id, story_id):
         _save_incomplete_activities(incomplete_activities)
 
 
-def mark_topic_as_partially_learnt(user_id, topic_id):
+def record_topic_started(user_id, topic_id):
     """Adds the topic id to the partially learnt list of the user unless the
     topic has been already learnt by the user. If the topic is already
     present in the partially learnt list, just the details associated with it
@@ -686,7 +684,7 @@ def remove_collection_from_completed_list(user_id, collection_id):
 
 def _remove_activity_ids_from_completed_list(
         user_id, exploration_ids, collection_ids, story_ids, learnt_topic_ids):
-    """Removes the explorations, collections, stories and learnt_topics
+    """Removes the explorations, collections, stories and learnt topics
     from the completed list of the learner.
 
     Args:
@@ -803,7 +801,7 @@ def remove_collection_from_incomplete_list(user_id, collection_id):
 def _remove_activity_ids_from_incomplete_list(
         user_id, exploration_ids=None, collection_ids=None,
         partially_learnt_topic_ids=None):
-    """Removes the collections, explorations, stories and topics
+    """Removes the collections, explorations and topics
     from the incomplete list of the learner.
 
     Args:
@@ -853,8 +851,7 @@ def get_all_completed_exp_ids(user_id):
             completed_activities_model)
 
         return activities_completed.exploration_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_completed_exp_summaries(
@@ -908,8 +905,7 @@ def get_all_completed_story_ids(user_id):
             completed_activities_model)
 
         return activities_completed.story_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_completed_story_summaries(
@@ -929,29 +925,29 @@ def _get_filtered_completed_story_summaries(
     Returns:
         tuple. A 3-tuple whose elements are as follows:
         - list(StorySummary). A filtered list with the summary domain
-            objects of the completed story.
+            objects of the completed stories.
         - list(str). The ids of the stories that are no longer present.
         - list(StorySummary). The summaries corresponding to those
             stories which have been moved to the in progress section on
             account of new nodes being added to them.
     """
     nonexistent_completed_story_ids = []
-    completed_to_incomplete_stories = []
+    completed_to_incomplete_story_summaries = []
     filtered_completed_story_summaries = []
+    stories = story_fetchers.get_stories_by_ids(story_ids)
 
     for index, story_summary in enumerate(story_summaries):
         if story_summary is None:
             nonexistent_completed_story_ids.append(story_ids[index])
         else:
             story_id = story_summary.id
-            story = story_fetchers.get_story_by_id(story_id)
             if len(story_fetchers.get_completed_node_ids(
                     user_id, story_id)) != len(story_summary.node_titles):
                 remove_story_from_completed_list(user_id, story_id)
-                mark_story_as_incomplete(user_id, story_id)
-                completed_to_incomplete_stories.append(story_summary)
+                record_story_started(user_id, story_id)
+                completed_to_incomplete_story_summaries.append(story_summary)
             elif not story_services.is_story_published_and_present_in_topic(
-                    story):
+                    stories[index]):
                 nonexistent_completed_story_ids.append(story_ids[index])
             else:
                 filtered_completed_story_summaries.append(story_summary)
@@ -959,7 +955,7 @@ def _get_filtered_completed_story_summaries(
     return (
         filtered_completed_story_summaries,
         nonexistent_completed_story_ids,
-        completed_to_incomplete_stories)
+        completed_to_incomplete_story_summaries)
 
 
 def get_all_learnt_topic_ids(user_id):
@@ -983,8 +979,7 @@ def get_all_learnt_topic_ids(user_id):
             completed_activities_model)
 
         return activities_completed.learnt_topic_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_learnt_topic_summaries(
@@ -1007,7 +1002,7 @@ def _get_filtered_learnt_topic_summaries(
             objects of the learnt topic.
         - list(str). The ids of the topics that are no longer present.
         - list(TopicSummary). The summaries corresponding to those
-            topics which have been moved to the in partially learnt section on
+            topics which have been moved to the partially learnt section on
             account of new nodes added to a completed story in the topic.
     """
 
@@ -1016,24 +1011,24 @@ def _get_filtered_learnt_topic_summaries(
     filtered_learnt_topic_summaries = []
 
     completed_story_ids = get_all_completed_story_ids(user_id)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
 
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is None:
             nonexistent_learnt_topic_ids.append(topic_ids[index])
         else:
             topic_id = topic_summary.id
-            topic_rights = topic_fetchers.get_topic_rights(topic_id)
-            topic = topic_fetchers.get_topic_by_id(topic_id)
             story_ids_in_topic = []
-            for story in topic.canonical_story_references:
+            for story in topics[index].canonical_story_references:
                 story_ids_in_topic.append(story.story_id)
 
             if not set(story_ids_in_topic).intersection(
                     set(completed_story_ids)):
                 remove_topic_from_learnt_list(user_id, topic_id)
-                mark_topic_as_partially_learnt(user_id, topic_id)
+                record_topic_started(user_id, topic_id)
                 learnt_to_partially_learnt_topics.append(topic_summary)
-            elif not topic_rights.topic_is_published:
+            elif not topic_rights[index].topic_is_published:
                 nonexistent_learnt_topic_ids.append(topic_ids[index])
             else:
                 filtered_learnt_topic_summaries.append(topic_summary)
@@ -1064,8 +1059,7 @@ def get_all_completed_collection_ids(user_id):
             completed_activities_model)
 
         return activities_completed.collection_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_completed_collection_summaries(
@@ -1147,8 +1141,7 @@ def get_all_incomplete_exp_ids(user_id):
             incomplete_activities_model)
 
         return incomplete_activities.exploration_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_incomplete_exp_summaries(
@@ -1199,8 +1192,7 @@ def get_all_incomplete_story_ids(user_id):
         incomplete_activities = _get_incomplete_activities_from_model(
             incomplete_activities_model)
         return incomplete_activities.story_ids
-    else:
-        return []
+    return []
 
 
 def get_all_partially_learnt_topic_ids(user_id):
@@ -1221,8 +1213,7 @@ def get_all_partially_learnt_topic_ids(user_id):
         incomplete_activities = _get_incomplete_activities_from_model(
             incomplete_activities_model)
         return incomplete_activities.partially_learnt_topic_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_partially_learnt_topic_summaries(
@@ -1244,14 +1235,14 @@ def _get_filtered_partially_learnt_topic_summaries(
     """
     nonexistent_partially_learnt_topic_ids = []
     filtered_partially_learnt_topic_summaries = []
+    topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is None:
             nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
         else:
             topic_id = topic_summary.id
-            topic_rights = topic_fetchers.get_topic_rights(topic_id)
-            if not topic_rights.topic_is_published:
-                nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
+            if not topic_rights[index].topic_is_published:
+                nonexistent_partially_learnt_topic_ids.append(topic_id)
             else:
                 filtered_partially_learnt_topic_summaries.append(topic_summary)
 
@@ -1279,8 +1270,7 @@ def get_all_incomplete_collection_ids(user_id):
             incomplete_activities_model)
 
         return incomplete_activities.collection_ids
-    else:
-        return []
+    return []
 
 
 def _get_filtered_incomplete_collection_summaries(
@@ -1411,7 +1401,7 @@ def _get_filtered_collection_playlist_summaries(
 
 
 def get_displayable_story_summary_dicts(user_id, story_summaries):
-    """Returns a displayable summary dict of the the story summaries
+    """Returns a displayable summary dict of the story summaries
     given to it.
 
     Args:
@@ -1420,7 +1410,7 @@ def get_displayable_story_summary_dicts(user_id, story_summaries):
             summary domain objects.
 
     Returns:
-        list(dict). The summary dict objects corresponding to the given summary.
+        list(dict). The summary dict corresponding to the given summary.
     """
     summary_dicts = []
     story_ids = [story_summary.id for story_summary in story_summaries]
@@ -1465,7 +1455,7 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             summary domain objects.
 
     Returns:
-        list(dict). The summary dict objects corresponding to the given
+        list(dict). The summary dict corresponding to the given
         summaries.
     """
     summary_dicts = []
