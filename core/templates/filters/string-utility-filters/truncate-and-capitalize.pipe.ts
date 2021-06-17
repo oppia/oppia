@@ -28,7 +28,8 @@ export class TruncateAndCapitalizePipe implements PipeTransform {
       return input;
     }
     // The following regexp match will only return 'null' on an empty input
-    // string, the condition is already being checked above.
+    // string, the empty string condition is already being checked above. 
+    // Non-null assertion is used to make the TypeScript typing happy.
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     let words = input.trim().match(/\S+/g)!;
 
