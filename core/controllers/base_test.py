@@ -1472,6 +1472,9 @@ class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
 
 
 class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
+    """Tests all the functionality of SVS(Schema-Validation-System)
+    architecture.
+    """
 
     non_schema_handlers = payload_validator.NON_SCHEMA_HANDLERS
     non_schema_requiring_handlers = (
