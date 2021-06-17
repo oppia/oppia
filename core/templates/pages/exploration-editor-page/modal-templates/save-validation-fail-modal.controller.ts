@@ -13,13 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Valid syntax .ts file, used by scripts/linters/
- * js_ts_linter_test.py. Ts expect error is used and it is a spec file.
+ * @fileoverview Controller for non strict validation fail modal.
  */
+angular.module('oppia').controller('SaveValidationFailModalController', [
+  '$scope', '$timeout', '$uibModalInstance', 'WindowRef',
+  function(
+      $scope, $timeout, $uibModalInstance, WindowRef) {
+    var MSECS_TO_REFRESH = 20;
+    var _refreshPage = function(delay) {
+      $timeout(function() {
+        WindowRef.nativeWindow.location.reload();
+      }, delay);
+    };
 
-let x: string;
-
-// This throws "Type 'string' is not assignable to type 'number'."
-// We need this to test the lint checks.
-// @ts-expect-error
-let b: number = x;
+    $scope.closeAndRefresh = function() {
+      $uibModalInstance.dismiss('cancel');
+      _refreshPage(MSECS_TO_REFRESH);
+    };
+  }
+]);

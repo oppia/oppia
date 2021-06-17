@@ -21,8 +21,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { TestBed } from '@angular/core/testing';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -73,21 +71,18 @@ describe('Translation status service', function() {
     var FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
     var NO_ASSETS_AVAILABLE_COLOR = '#D14836';
     var statesWithAudioDict = null;
+    var mockExplorationData;
 
-    beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [
-          {
-            provide: ExplorationDataService,
-            useValue: {
-              explorationId: 0,
-              autosaveChangeListAsync() {
-                return;
-              }
-            }
-          }
-        ]
+    beforeEach(function() {
+      mockExplorationData = {
+        explorationId: 0,
+        autosaveChangeListAsync: function() {},
+        discardDraftAsync: function() {}
+      };
+      angular.mock.module(function($provide) {
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
+      spyOn(mockExplorationData, 'autosaveChangeListAsync');
     });
 
     beforeEach(angular.mock.inject(function($injector) {
@@ -351,7 +346,8 @@ describe('Translation status service', function() {
       swts.init('First', ess.getWrittenTranslationsMemento('First'));
       swts.displayed.toggleNeedsUpdateAttribute('feedback_1', 'hi');
       swts.displayed.toggleNeedsUpdateAttribute('feedback_2', 'hi');
-      ess.saveWrittenTranslations('First', swts.displayed);
+      ess.markWrittenTranslationsAsNeedingUpdate('feedback_1', 'First');
+      ess.markWrittenTranslationsAsNeedingUpdate('feedback_2', 'First');
       tss.refresh();
 
       statesNeedingTranslationUpdate = tss.getAllStatesNeedUpdatewarning();
@@ -457,7 +453,7 @@ describe('Translation status service', function() {
       expect(stateWiseStatusColor.Third).toBe(NO_ASSETS_AVAILABLE_COLOR);
 
       swts.displayed.addWrittenTranslation('content', 'hi', 'html', 'content');
-      ess.saveWrittenTranslations('Second', swts.displayed);
+      ess.saveWrittenTranslation('content', 'html', 'hi', 'Second', 'content');
 
       tss.refresh();
       stateWiseStatusColor = tss.getAllStateStatusColors();
