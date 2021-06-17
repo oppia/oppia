@@ -95,7 +95,4 @@ class ValidateExplorationCommitLogEntryModel(
         elif model.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:
-            raise base_validation_errors.ModelIdRegexException(
-                'model %s Entity id %s: Entity id does not match regex '
-                'pattern' % (
-                    base_model_validators.ERROR_CATEGORY_ID_CHECK, model.id))
+            return None
