@@ -19,15 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-
 from constants import constants
 from core.domain import blog_domain
 from core.domain import blog_services
-from core.domain import user_services
 from core.tests import test_utils
-import feconf
+
 import utils
+
 
 class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     """Tests for blog post domain objects."""
@@ -51,7 +49,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.blog_post.validate()
 
-    def _assert_valid_blog_post_id(self, expected_error_substring, blog_post_id):
+    def _assert_valid_blog_post_id(
+            self, expected_error_substring, blog_post_id):
         """Checks that the blog post ID passes validation."""
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
@@ -69,7 +68,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
-                thumbnail_filename)
+                thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
             self, expected_error_substring, thumbnail_filename):
@@ -77,7 +76,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPost.require_valid_thumbnail_filename(
-                thumbnail_filename, True)
+                thumbnail_filename, strict=True)
 
     def _assert_strict_valid_title_for_blog_post(
             self, expected_error_substring, title):
@@ -125,7 +124,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
     def test_blog_post_thumbnail_filename_in_strict_mode(self):
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
-        'Expected thumbnail filename to be a string, received: None.', None)
+            'Expected thumbnail filename to be a string, received: None.', None)
 
     def test_title_validation(self):
         self._assert_valid_title_for_blog_post('Title should be a string', 50)
@@ -143,7 +142,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Blog Post URL Fragment field should not be empty.', '')
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not be empty.', '')
-        url_fragment= 'very-very-long' * 30
+        url_fragment = 'very-very-long' * 30
         url_fragment_char_limit = constants.MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
         self._assert_valid_url_fragment_for_blog_post(
             'Blog Post URL Fragment field should not exceed %d characters, '
@@ -151,12 +150,14 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
                 url_fragment_char_limit, url_fragment), url_fragment)
 
     def test_serialize_and_deserialize_returns_unchanged_blog_post(self):
-        """Checks that serializing and then deserializing a blog post works as intended
-        by leaving the blog post unchanged.
+        """Checks that serializing and then deserializing a blog post works as
+        intended by leaving the blog post unchanged.
         """
         self.assertEqual(
             self.blog_post.to_dict(),
-            blog_domain.BlogPost.deserialize(self.blog_post.serialize()).to_dict())
+            blog_domain.BlogPost.deserialize(
+                self.blog_post.serialize()).to_dict()
+        )
 
     def test_update_title(self):
         self.assertEqual(self.blog_post.title, '')
@@ -204,20 +205,20 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Expected each tag in \'tags\' to be a string,' +
             ' received: ''\'%s\'' % 123, [123])
         self._assert_valid_tags_for_blog_post(
-            'Expected each tag in \'tags\' to be a string,'+
+            'Expected each tag in \'tags\' to be a string,' +
             ' received: ''\'%s\'' % 123, ['abc', 123])
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain lowercase letters and spaces, '
-                'received: \'%s\''% 'ABC', ['ABC'])
+            'received: \'%s\'' % 'ABC', ['ABC'])
         self._assert_valid_tags_for_blog_post(
             'Tags should not start or end with whitespace, '
-                'received: \'%s\''% ' a b', [' a b'])
+            'received: \'%s\'' % ' a b', [' a b'])
         self._assert_valid_tags_for_blog_post(
             'Tags should not start or end with whitespace, '
-                'received: \'%s\''% 'a b ', ['a b '])
+            'received: \'%s\'' % 'a b ', ['a b '])
         self._assert_valid_tags_for_blog_post(
             'Adjacent whitespace in tags should be collapsed, '
-                'received: \'%s\''% 'a    b', ['a    b'])
+            'received: \'%s\'' % 'a    b', ['a    b'])
         self._assert_valid_tags_for_blog_post(
             'Some tags duplicate each other', ['abc', 'abc'])
 
@@ -255,7 +256,7 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(self.blog_post_rights.is_editor(self.user_id_b))
 
     def test_to_human_readable_dict(self):
-        """Checks conversion of BlogPostRights to human readable dict"""
+        """Checks conversion of BlogPostRights to human readable dict."""
         expected_dict = {
             'blog_post_id': self.blog_post_id,
             'editor_names': ['A'],
@@ -281,7 +282,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
-                thumbnail_filename)
+                thumbnail_filename, strict=False)
 
     def _assert_strict_valid_thumbnail_filename_for_blog_post(
             self, expected_error_substring, thumbnail_filename):
@@ -289,7 +290,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             blog_domain.BlogPostSummary.require_valid_thumbnail_filename(
-                thumbnail_filename, True)
+                thumbnail_filename, strict=True)
 
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(
@@ -311,9 +312,10 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def test_blog_post_thumbnail_filename_in_strict_mode(self):
         self._assert_strict_valid_thumbnail_filename_for_blog_post(
-        'Expected thumbnail filename to be a string, received: None.', None)
+            'Expected thumbnail filename to be a string, received: None.', None)
 
-    def _assert_valid_blog_post_id(self, expected_error_substring, blog_post_id):
+    def _assert_valid_blog_post_id(
+            self, expected_error_substring, blog_post_id):
         """Checks that the blog post ID passes validation."""
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
@@ -397,6 +399,5 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.summary = 123
         self._assert_validation_error(
             'Expected summary to be a string, received: 123')
-        self.blog_post_summary.summary= 'Hello'
+        self.blog_post_summary.summary = 'Hello'
         self.blog_post_summary.validate(strict=True)
-

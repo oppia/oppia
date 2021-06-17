@@ -21,14 +21,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
 from core.domain import blog_services
-from core.domain import blog_domain
 from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
 
 (base_models, blog_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.blog
-    ])
+    models.NAMES.base_model, models.NAMES.blog])
 
 
 class BlogPostModelValidator(base_model_validators.BaseModelValidator):
@@ -84,22 +82,22 @@ class BlogPostModelValidator(base_model_validators.BaseModelValidator):
             item: datastore_services.Model. BlogPostModel to validate.
         """
         if item.title != '':
-            blog_post_models_list = blog_models.BlogPostModel.query().filter(
-            blog_models.BlogPostModel.title == (
-                item.title)).filter(
-                    blog_models.BlogPostModel.deleted == False).fetch() # pylint: disable=singleton-comparison
+            blog_post_models = blog_models.BlogPostModel.query().filter(
+                blog_models.BlogPostModel.title == (
+                    item.title)).filter(
+                        blog_models.BlogPostModel.deleted == False).fetch() # pylint: disable=singleton-comparison
             blog_model_ids = [
-                model.id for model in blog_post_models_list if model.id != item.id]
+                model.id for model in blog_post_models if model.id != item.id]
             if blog_model_ids:
                 cls._add_error(
-                    'unique title for blog post of',
+                    'unique title for blog post',
                     'Entity id %s: title %s matches with title '
                     'blog post models with ids %s' % (
                         item.id, item.title, blog_model_ids))
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_title_is_unique,]
+        return [cls._validate_title_is_unique]
 
 
 class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
@@ -153,24 +151,30 @@ class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
         """Validate that title of the model unique.
 
         Args:
-            item: datastore_services.Model. BlogPostModel to validate.
+            item: datastore_services.Model. BlogPostSummaryModel to validate.
         """
         if item.title != '':
-            blog_post_summary_models_list = blog_models.BlogPostSummaryModel.query().filter(
-            blog_models.BlogPostSummaryModel.title == (
-                item.title)).filter(
-                    blog_models.BlogPostSummaryModel.deleted == False).fetch() # pylint: disable=singleton-comparison
+            blog_post_summary_models = (
+                blog_models.BlogPostSummaryModel.query().filter(
+                    blog_models.BlogPostSummaryModel.title == (item.title)
+                    ).filter(
+                        blog_models.BlogPostSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+                    ).fetch()
+                )
             blog_model_ids = [
-                model.id for model in blog_post_summary_models_list if model.id != item.id]
+                model.id
+                for model in blog_post_summary_models if model.id != item.id]
             if blog_model_ids:
                 cls._add_error(
-                    'unique title for blog post of',
+                    'unique title for blog post',
                     'Entity id %s: title %s matches with title '
-                    'blog post models with ids %s' % (
+                    'blog post summary models with ids %s' % (
                         item.id, item.title, blog_model_ids))
+
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_title_is_unique]
+
 
 class BlogPostRightsModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BlogPostRightsModel."""
