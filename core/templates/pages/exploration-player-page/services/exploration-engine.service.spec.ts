@@ -728,8 +728,9 @@ describe('Exploration engine service ', () => {
 
     explorationEngineService.currentStateName = 'Start';
     expect(() => {
-      explorationEngineService.getAuthorRecommendedExpIds()
-    }).toThrowError('Tried to get recommendations for a non-terminal state: Start');
+      explorationEngineService.getAuthorRecommendedExpIds();
+    }).toThrowError(
+      'Tried to get recommendations for a non-terminal state: Start');
 
     // Please note that in order to get author recommended exploration id's
     // current should be the last state.
@@ -861,7 +862,7 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.getLanguageCode()).toBe('en');
 
     // Setting next exploration language code to 'bn'.
-    explorationDict.language_code = 'bn'
+    explorationDict.language_code = 'bn';
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
     expect(explorationEngineService.getLanguageCode()).toBe('bn');
