@@ -55,13 +55,13 @@ module.exports = {
 
     if (filename.endsWith('constants.ts')) {
       return {
-        'Program': (node) => {
+        Program: function(node) {
           asConstFound = false;
         },
-        'TSAsExpression[typeAnnotation.typeName.name=const]': () => {
+        'TSAsExpression[typeAnnotation.typeName.name=const]': function(node) {
           asConstFound = true;
         },
-        'Program:exit': (node) => {
+        'Program:exit': function(node) {
           if (!asConstFound) {
             context.report ({
               node: node,
@@ -69,7 +69,7 @@ module.exports = {
             });
           }
         }
-      }
+      };
     }
 
     return {

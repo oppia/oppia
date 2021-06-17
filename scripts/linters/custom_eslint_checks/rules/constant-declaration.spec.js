@@ -21,7 +21,14 @@
 var rule = require('./constant-declaration');
 var RuleTester = require('eslint').RuleTester;
 
-var ruleTester = new RuleTester();
+var ruleTester = new RuleTester({
+  parserOptions: {
+    ecmaVersion: 2016,
+    sourceType: 'module'
+  },
+  parser: require.resolve('@typescript-eslint/parser')
+});
+
 ruleTester.run('constant-declaration', rule, {
   valid: [{
     code:
@@ -30,6 +37,17 @@ ruleTester.run('constant-declaration', rule, {
     angular.module('oppia').constant(
     'MODE_SELECT_DIFFICULTY', QuestionsListConstants.MODE_SELECT_SKILL);`,
     filename: 'foo/bar.constants.ajs.ts'
+  },
+  {
+    code:
+    `export const ClassifiersExtensionConstants = {
+      PythonProgramTokenType: {
+        COMMENT: 'COMMENT',
+        NL: 'NL',
+        STRING: 'STRING',
+      }
+    } as const;`,
+    filename: 'foo/bar.constants.ts'
   }
   ],
 
@@ -52,6 +70,20 @@ ruleTester.run('constant-declaration', rule, {
       filename: 'foo/bar.constants.ajs.ts',
       errors: [{
         message: 'There are two constants in this file.',
+      }],
+    },
+    {
+      code:
+      `export class SchemaConstants {
+        static readonly SCHEMA_KEY_LIST = 'list';
+        static readonly SCHEMA_TYPE_BOOL = 'bool';
+      }`,
+      filename: 'foo/bar.constants.ts',
+      errors: [{
+        message: (
+          'Please add \'as const\' at the end of the constant ' +
+          'deceleration. A constants file should have the following ' +
+          'structure:\n export const SomeConstants = { ... } as const;'),
       }],
     },
   ]
