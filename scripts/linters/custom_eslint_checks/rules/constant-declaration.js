@@ -46,7 +46,6 @@ module.exports = {
   create: function(context) {
     var constantsDeclarations = [];
     var args;
-    var asConstFound = false;
     var filename = context.getFilename();
 
     var selector = (
@@ -55,14 +54,9 @@ module.exports = {
 
     if (filename.endsWith('constants.ts')) {
       return {
-        Program: function(node) {
-          asConstFound = false;
-        },
-        'TSAsExpression[typeAnnotation.typeName.name=const]': function(node) {
-          asConstFound = true;
-        },
-        'Program:exit': function(node) {
-          if (!asConstFound) {
+        VariableDeclarator: function(node) {
+          if ((node.init.type !== 'TSAsExpression') ||
+           (node.init.typeAnnotation.typeName.name !== 'const')) {
             context.report ({
               node: node,
               messageId: 'notFoundAsConst'

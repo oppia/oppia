@@ -74,10 +74,9 @@ ruleTester.run('constant-declaration', rule, {
     },
     {
       code:
-      `export class SchemaConstants {
-        static readonly SCHEMA_KEY_LIST = 'list';
-        static readonly SCHEMA_TYPE_BOOL = 'bool';
-      }`,
+      `export const InteractionSpecsConstants = {
+        INTERACTION_SPECS: INTERACTION_SPECS
+      } ;`,
       filename: 'foo/bar.constants.ts',
       errors: [{
         message: (
