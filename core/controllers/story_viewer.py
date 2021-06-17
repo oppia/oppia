@@ -179,15 +179,7 @@ class StoryProgressHandler(base.BaseHandler):
                 '%s id.' % story_id)
             self.render_json({})
             return
-
         topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
-        if topic is None:
-            logging.error(
-                'Could not find a topic corresponding to '
-                '%s id.' % story.corresponding_topic_id)
-            self.render_json({})
-            return
-
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
         completed_node_ids = [
