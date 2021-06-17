@@ -24,19 +24,22 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './audio-file-uploader.component.html'
 })
 export class AudioFileUploaderComponent {
-  @Input() droppedFile: FileList;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion, for more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() droppedFile!: FileList;
   @Output() fileChange: EventEmitter<File> = new EventEmitter<File>();
   @Output() fileClear: EventEmitter<void> = new EventEmitter<void>();
-  @ViewChild('fileInput') fileInputRef: ElementRef;
-  @ViewChild('inputForm') inputFormRef: ElementRef;
+  // The following properties are used in function 'addAudio' which cannot
+  // be called until the input form and file input views are initialized.
+  @ViewChild('fileInput') fileInputRef!: ElementRef;
+  @ViewChild('inputForm') inputFormRef!: ElementRef;
   ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
-  errorMessage: string;
+  // 'null' implies not displaying an error message.
+  errorMessage: string | null = null;
 
-  validateUploadedFile(file: File): string {
-    if (!file) {
-      return 'No audio file was uploaded.';
-    }
-
+  // Returns 'null' when the uploaded file is valid.
+  validateUploadedFile(file: File): string | null {
     if (!file.size || !file.type.match('audio.*')) {
       return 'This file is not recognized as an audio file.';
     }
