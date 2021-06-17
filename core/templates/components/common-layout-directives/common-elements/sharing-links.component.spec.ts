@@ -116,7 +116,7 @@ describe('SharingLinksComponent', () => {
   it('should throw an error when SharingLink component is used' +
     ' at any other place than exploration player or collection player', () => {
     // This throws "Type '"not-exp-or-col"' is not assignable to type
-    // 'ShareType'". This needs to be suppressed because, 'shareType' can only
+    // 'ShareType'". We need to suppress this because, 'shareType' can only
     // be equal to 'exploration' or 'collection', but we set an invalid value
     // in order to test validations.
     // @ts-expect-error
