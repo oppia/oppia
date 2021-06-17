@@ -1605,7 +1605,6 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                     self.handlers_with_non_conforming_default_schema.append(
                         handler_class_name)
 
-
     def handlers_with_schema_are_not_in_the_schema_requiring_list(
             self, handler, name):
         """This test checks if a handler contains schema then, handler class
@@ -1659,7 +1658,6 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
             self.handlers_with_schema_are_not_in_the_schema_requiring_list(
                 handler, handler_class_name)
 
-
         error_msg1 = (
             'Schema required in handlers: [ %s ].'
             '\nVisit %s to know, How to write schema for handler args.' % (
@@ -1698,6 +1696,7 @@ class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
                 ', '.join(self.handlers_to_remove)))
 
         self.assertEqual(self.handlers_to_remove, [], error_msg5)
+
 
 class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
     """Tests to check schema validation architecture for url path elements."""
