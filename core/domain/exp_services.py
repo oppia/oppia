@@ -1749,12 +1749,35 @@ def are_changes_mergeable(exp_id, version, change_list):
     if latest_version == version:
         return True
     else:
+        # A complete list of changes from one version to another
+        # is composite_change_list.
         composite_change_list = get_composite_change_list(
             exp_id, version, latest_version)
+
+        # Added_state_names: list(str). Name of the states added to the
+        # exploration from prev_exp_version to current_exp_version. It stores
+        # the newest name of the added state.
+
+        # Deleted_state_names: list(str). Name of the states deleted from the
+        # exploration from prev_exp_version to current_exp_version. It stores
+        # the initial name of the deleted state from pre_exp_version.
+
+        # New_to_old_state_names: dict. Dictionary mapping state names of
+        # current_exp_version to the state names of prev_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+
+        # Old_to_new_state_names: dict. Dictionary mapping state names of
+        # prev_exp_version to the state names of current_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+
+        # Changed_properties: dict. List of all the properties changed
+        # according to the state and property name.
+
         added_state_names = []
         deleted_state_names = []
         new_to_old_state_names = {}
         changed_properties = {}
+
         old_version = exp_fetchers.get_exploration_by_id(
             exp_id, version=version)
         new_version = exp_fetchers.get_exploration_by_id(
@@ -1783,6 +1806,9 @@ def are_changes_mergeable(exp_id, version, change_list):
                         new_to_old_state_names.pop(old_state_name))
                 else:
                     new_to_old_state_names[new_state_name] = old_state_name
+
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state_name = change.state_name
                 if state_name in new_to_old_state_names:
@@ -1846,7 +1872,19 @@ def are_changes_mergeable(exp_id, version, change_list):
                                 change_is_mergeable = True
                     else:
                         change_is_mergeable = True
-
+                # Customization args differ for every interaction, so in case of
+                # different interactions merging is simply not possible,
+                # but in case of same interaction, the values in the
+                # customization_args are often lists so if someone changes
+                # even one item of that list then determining which item is
+                # changed is not feasible, so suppose there is long list of
+                # values in item selection interaction and one user deletes
+                # one value and another one edits another value, so after
+                # deletion the indices of all the values will be changed and
+                # it will not be possible to compare and know that which value
+                # is changed by second user.
+                # So we will not be handling the merge on the basis of
+                # individual fields.
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     if old_state_name in changed_properties:
@@ -1886,6 +1924,11 @@ def are_changes_mergeable(exp_id, version, change_list):
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     change_is_mergeable = True
+                # We’ll not be able to handle the merge if changelists affect
+                # the different indices of the hint in the same state because
+                # whenever there is even a small change in one field of any
+                # hint, they treat the whole hints list as a new value.
+                # So it will not be possible to find out the exact change.
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
                     if old_state_name in changed_properties:

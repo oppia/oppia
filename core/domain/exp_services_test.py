@@ -5642,6 +5642,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
+        # Making changes to properties except content.
         change_list_2 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
@@ -5693,6 +5694,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
 
+        # Changing content of second state.
         change_list_3 = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'state_name': 'End',
@@ -5710,6 +5712,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Changed content of End state.')
 
+        # Changing content of first state.
         change_list_4 = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'state_name': 'Introduction',
@@ -5723,6 +5726,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                 'content_id': 'content'
             }
         })]
+
+        # Checking for the mergability of the fourth change list.
         are_changes_mergeable = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 2, change_list_4)
         self.assertEqual(are_changes_mergeable, True)
@@ -5733,6 +5738,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Renamed states to check that changes can be
+        # applied even when the states are renamed.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'new_state_name': 'Intro-Rename',
@@ -5746,6 +5753,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list, 'Renamed State.')
 
+        # Making changes in the properties which are
+        # not related to the interaction id.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -5819,6 +5828,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
+        # Changes to the properties related to the interaction
+        # id and in interaction_id itself.
         change_list_3 = [exp_domain.ExplorationChange({
             'new_value': None,
             'state_name': 'Introduction',
@@ -5872,13 +5883,21 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 1, change_list_3)
         self.assertEqual(are_changes_mergeable, True)
 
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
         self.save_new_valid_exploration(
             self.EXP_1_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
+
+        # Using the old change_list_3 here because they already covers
+        # the changes related to interaction in first state.
         exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_3, 'Changed Interaction')
 
+        # Changes related to interaction in the second state
+        # to check for mergeability.
         change_list_4 = [exp_domain.ExplorationChange({
             'state_name': 'End',
             'cmd': 'edit_state_property',
@@ -5960,6 +5979,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Changes in the properties which aren't affected by
+        # customization args or doesn't affects customization_args.
         change_list = [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -6033,6 +6054,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed Contents and Hints')
 
+        # Changes to the properties affectiong customization_args
+        # or are affected by customization_args in the same state.
+        # Also includes changes related to re-name state
+        # to check if after renaming the changes can we applied.
         change_list_2 = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'new_state_name': 'Intro-rename',
@@ -6159,15 +6184,22 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(are_changes_mergeable, True)
 
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
         self.save_new_valid_exploration(
             self.EXP_1_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
 
+        # Using the old change_list_2 here because they already covers
+        # the changes related to customization args in first state.
         exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Changed Interactions and Customization_args in One State')
 
+        # Changes to the properties related to the customization args
+        # in the second state to check for mergeability.
         change_list_3 = [exp_domain.ExplorationChange({
             'old_value': 'EndExploration',
             'state_name': 'End',
@@ -6296,6 +6328,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Adding answer_groups and solutions to the existing state.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
@@ -6367,6 +6400,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
+        # Changes to the properties that are not related to
+        # the answer_groups. These changes are done to check
+        # when the changes are made in unrelated properties,
+        # they can be merged easily.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -6423,6 +6460,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
+        # Changes to the answer_groups and the properties that
+        # affects or are affected by answer_groups.
         change_list_3 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -6605,11 +6644,17 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(are_changes_mergeable, True)
 
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
         self.save_new_valid_exploration(
             self.EXP_1_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
 
+        # Using the old change_list_2 and change_list_3 here
+        # because they already covers the changes related to
+        # the answer_groups in the first state.
         exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Added Answer Group and Solution in One state')
@@ -6618,6 +6663,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
+        # Changes to the properties related to the answer_groups
+        # in the second state to check for mergeability.
         change_list_4 = [exp_domain.ExplorationChange({
             'old_value': 'EndExploration',
             'state_name': 'End',
@@ -6734,6 +6781,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Adding new answer_groups and solutions.
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'property_name': 'next_content_id_index',
@@ -6808,6 +6856,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added answer groups and solution')
 
+        # Changes to the properties unrelated to the solutions.
         change_list_2 = [exp_domain.ExplorationChange({
             'new_value': {
                 'content_id': 'content',
@@ -6864,6 +6913,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
+        # Changes to the solutions and the related properties
+        # to check for mergeability.
         change_list_3 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'new_value': [{
@@ -7043,11 +7094,17 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(are_changes_mergeable, True)
 
+        # Creating second exploration to test the scenario
+        # when changes to same properties are made in two
+        # different states.
         self.save_new_valid_exploration(
             self.EXP_1_ID, self.owner_id, end_state_name='End')
 
         rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
 
+        # Using the old change_list_2 and change_list_3 here
+        # because they already covers the changes related to
+        # the solutions in the first state.
         exp_services.update_exploration(
             self.owner_id, self.EXP_1_ID, change_list_2,
             'Added Answer Group and Solution in One state')
@@ -7056,6 +7113,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
+        # Changes to the properties related to the solutions
+        # in the second state to check for mergeability.
         change_list_4 = [exp_domain.ExplorationChange({
             'old_value': 'EndExploration',
             'new_value': None,
@@ -7186,6 +7245,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
 
+        # Adding hints to the existing state.
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
         change_list = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
@@ -7223,6 +7283,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
+        # Changes to all the propeties other than the hints.
         change_list_2 = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'state_name': 'Introduction',
@@ -7402,6 +7463,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Made changes in interaction, contents, solutions, answer_groups in both states') # pylint: disable=line-too-long
 
+        # Changes to the old hints and also deleted and added
+        # new hints to take all the cases to check for mergeability.
         change_list_3 = [exp_domain.ExplorationChange({
             'old_value': [{
                 'hint_content': {
@@ -7495,6 +7558,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Changes to all the properties of both states other than
+        # exploration properties i.e. title, category, objective etc.
+        # Also included rename states changes to check that
+        # renaming states doesn't affect anything.
         change_list = [exp_domain.ExplorationChange({
             'new_state_name': 'Intro-rename',
             'cmd': 'rename_state',
@@ -7666,6 +7733,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Made changes in interaction, contents, solutions, answer_groups in introduction state.') # pylint: disable=line-too-long
 
+        # Changes to properties of second state.
         change_list_2 = [exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
             'new_value': {
@@ -7731,6 +7799,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Made changes in solutions in introduction state and content, state_name in end state.') # pylint: disable=line-too-long
 
+        # Changes to the exploration properties to check
+        # for mergeability.
         change_list_3 = [exp_domain.ExplorationChange({
             'property_name': 'title',
             'cmd': 'edit_exploration_property',
@@ -7782,6 +7852,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Adding content, feedbacks, solutions so that
+        # translations can be added later on.
         change_list = [exp_domain.ExplorationChange({
             'property_name': 'content',
             'old_value': {
@@ -7901,6 +7973,7 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Added various contents.')
 
+        # Adding some translations to the first state.
         change_list_2 = [exp_domain.ExplorationChange({
             'property_name': 'written_translations',
             'cmd': 'edit_state_property',
@@ -7975,6 +8048,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Added some translations.')
 
+        # Adding translations again to the same first state
+        # to check if they can be applied. They will not
+        # be mergeable as the changes are in the same property
+        # i.e. written_translations.
         change_list_3 = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'old_value': {
@@ -8033,6 +8110,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 2, change_list_3)
         self.assertEqual(are_changes_mergeable, False)
 
+        # Adding translations to the second state to check
+        # if they can be applied. They can be mergead as
+        # the changes are in the differents states.
         change_list_4 = [exp_domain.ExplorationChange({
             'new_value': {
                 'translations_mapping': {
@@ -8059,6 +8139,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 2, change_list_4)
         self.assertEqual(are_changes_mergeable_1, True)
 
+        # Changes to the content of first state to check
+        # that the changes in the contents of first state
+        # doesn't affects the changes to the translations in
+        # second state.
         change_list_5 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
             'old_value': {
@@ -8080,6 +8164,10 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 3, change_list_4)
         self.assertEqual(are_changes_mergeable_2, True)
 
+        # Changes to the content of second state to check that
+        # the changes to the translations can not be made in
+        # same state if the property which can be translated is
+        # changed.
         change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'End',
             'old_value': {
@@ -8096,11 +8184,11 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, change_list_6,
-            'Changing Content in First State.')
+            'Changing Content in Second State.')
 
-        are_changes_mergeable_2 = exp_services.are_changes_mergeable(
+        are_changes_mergeable_3 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 4, change_list_4)
-        self.assertEqual(are_changes_mergeable_2, False)
+        self.assertEqual(are_changes_mergeable_3, False)
 
     def test_changes_are_not_mergeable_when_state_added_or_deleted(self):
         self.save_new_valid_exploration(
@@ -8108,6 +8196,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        # Changes to the various properties of the first and
+        # second state.
         change_list = [exp_domain.ExplorationChange({
             'old_value': 'TextInput',
             'cmd': 'edit_state_property',
@@ -8209,6 +8299,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list,
             'Changed various properties in both states.')
 
+        # Change to the unrelated property to check that
+        # it can be merged.
         change_list_2 = [exp_domain.ExplorationChange({
             'old_value': {
                 'html': '',
@@ -8227,6 +8319,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(are_changes_mergeable, True)
 
+        # Deleting and Adding states to check if any state
+        # is deleted or added, then the second user cannot
+        # make any changes to the old_version.
         change_list_3 = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'End'
@@ -8355,6 +8450,9 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_0_ID, change_list_3,
             'Added and deleted states.')
 
+        # Again checking that old change which was able to
+        # merge before cannot be merged after addition or
+        # deletion of state.
         are_changes_mergeable_1 = exp_services.are_changes_mergeable(
             self.EXP_0_ID, 1, change_list_2)
         self.assertEqual(are_changes_mergeable_1, False)
