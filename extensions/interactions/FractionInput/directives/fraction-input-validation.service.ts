@@ -188,7 +188,7 @@ export class FractionInputValidationService {
             var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, f, true, true);
             break;
-          case 'IsEquivalentTo': // fall-through
+          case 'IsEquivalentTo': // fall-through.
           case 'IsEquivalentToAndInSimplestForm':
             var f = toFloat.call(this, rule.inputs.f);
             setLowerAndUpperBounds(range, f, f, true, true);
