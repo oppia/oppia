@@ -152,7 +152,7 @@ class BlogPostModel(base_models.BaseModel):
             content='',
             title='',
             published_on=None,
-            url_fragment=blog_post_id.lower(),
+            url_fragment='',
             tags=[],
             thumbnail_filename=None
         )
