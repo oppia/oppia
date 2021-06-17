@@ -70,9 +70,9 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @darksun27
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @darksun27
 # TODO(#13119): Set @vojtechjelinek as owner after 2021-07-06
-/typings/ @srijanreddy
-/tsconfig.json @srijanreddy
-/tsconfig-strict.json @srijanreddy
+/typings/ @srijanreddy98
+/tsconfig.json @srijanreddy98
+/tsconfig-strict.json @srijanreddy98
 
 
 # Answer classification team.
