@@ -61,10 +61,10 @@ describe('Story object factory', () => {
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
       // This throws "Argument of type '{ id: string; ... }'
-      // is not assignable to parameter of type 'StoryBackendDict'."
-      // This is because 'sampleStoryBackendDict' should have a property
-      // 'thumbnail' but we didn't add that property in order to test
-      // validations.
+      // is not assignable to parameter of type 'StoryBackendDict'.".
+      // We need to suppress this error because 'sampleStoryBackendDict'
+      // should have a property 'thumbnail' but we didn't add that property in
+      // order to test validations.
       // @ts-expect-error
       sampleStoryBackendDict);
   });
