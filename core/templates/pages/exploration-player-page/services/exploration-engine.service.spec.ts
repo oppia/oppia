@@ -671,15 +671,16 @@ describe('Exploration engine service ', () => {
     expect(answerDetails).toBe(true);
   }));
 
-  it('should return default exploration Id', () => {
-    // Please note that default exploration Id is 'test_id'.
+  it('should return default exploration id', () => {
+    // Please note that default exploration id is 'test_id'.
     // This is being initialized in the constructor.
 
     const explorationId = explorationEngineService.getExplorationId();
     expect(explorationId).toBe('test_id');
   });
 
-  it('should return exploration title', () => {
+  it('should return exploration title ' +
+    'when calling \'getExplorationTitle\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -695,7 +696,8 @@ describe('Exploration engine service ', () => {
     expect(explorationTitle).toBe('My Exploration Title');
   });
 
-  it('should return exploration version', () => {
+  it('should return exploration version ' +
+    'when calling \'getExplorationVersion\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -710,7 +712,8 @@ describe('Exploration engine service ', () => {
     expect(explorationVersion).toBe(2);
   });
 
-  it('should return author recommended exploration Id\'s', () => {
+  it('should return author recommended exploration id\'s ' +
+    'when calling \'getAuthorRecommendedExpIds\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -723,6 +726,13 @@ describe('Exploration engine service ', () => {
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
 
+    explorationEngineService.currentStateName = 'Start';
+    expect(() => {
+      explorationEngineService.getAuthorRecommendedExpIds()
+    }).toThrowError('Tried to get recommendations for a non-terminal state: Start');
+
+    // Please note that in order to get author recommended exploration id's
+    // current should be the last state.
     explorationEngineService.currentStateName = 'End';
 
     const recommendedId = explorationEngineService.getAuthorRecommendedExpIds();
@@ -788,7 +798,8 @@ describe('Exploration engine service ', () => {
     expect(currentStateName).toBe(initalState);
   });
 
-  it('should return true if current state is initial state', () => {
+  it('should return true if current state is initial state ' +
+    'when calling \'isCurrentStateInitial\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
 
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
@@ -806,7 +817,7 @@ describe('Exploration engine service ', () => {
   it('should return current state when calling \'getState\'', () => {
     let initSuccessCb = jasmine.createSpy('success');
     spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
-    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('Start');
+    let lastStateNameSpy = spyOn(playerTranscriptService, 'getLastStateName');
 
     expect(() => {
       explorationEngineService.getState();
@@ -815,8 +826,25 @@ describe('Exploration engine service ', () => {
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
 
+    // Check for first state.
+    lastStateNameSpy.and.returnValue('Start');
     let currentState = explorationEngineService.getState();
+
     expect(currentState.name).toBe('Start');
+
+    // Check for second state.
+    lastStateNameSpy.and.returnValue('Mid');
+    explorationEngineService.recordNewCardAdded();
+    currentState = explorationEngineService.getState();
+
+    expect(currentState.name).toBe('Mid');
+
+    // Check for last state.
+    lastStateNameSpy.and.returnValue('End');
+    explorationEngineService.recordNewCardAdded();
+    currentState = explorationEngineService.getState();
+
+    expect(currentState.name).toBe('End');
   });
 
   it('should return language code when calling \'getLanguageCode\'', () => {
@@ -827,10 +855,16 @@ describe('Exploration engine service ', () => {
       explorationEngineService.getLanguageCode();
     }).toThrowError('Cannot read property \'getLanguageCode\' of undefined');
 
+    // First exploration has language code 'en'.
     explorationEngineService.init(
       explorationDict, 1, null, true, ['en'], initSuccessCb);
-
     expect(explorationEngineService.getLanguageCode()).toBe('en');
+
+    // Setting next exploration language code to 'bn'.
+    explorationDict.language_code = 'bn'
+    explorationEngineService.init(
+      explorationDict, 1, null, true, ['en'], initSuccessCb);
+    expect(explorationEngineService.getLanguageCode()).toBe('bn');
   });
 
   it('should get the update active state event emitter', () => {
