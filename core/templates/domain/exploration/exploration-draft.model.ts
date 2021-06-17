@@ -26,6 +26,8 @@ import { RecordedVoiceOverBackendDict } from './recorded-voiceovers.model';
 
 export type ExplorationChange = (
   ExplorationChangeAddState |
+  ExplorationChangeAddWrittenTranslation |
+  ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate |
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
   ExplorationChangeEditStateProperty |
@@ -90,6 +92,22 @@ export interface MigrateStatesVersionChangeList {
   'cmd': 'migrate_states_schema_to_latest_version';
   'from_version': number;
   'to_version': number;
+}
+
+export interface ExplorationChangeAddWrittenTranslation {
+  'cmd': 'add_written_translation';
+  'content_id': string;
+  'data_format': string;
+  'language_code': string;
+  'content_html': string;
+  'state_name': string;
+  'translation_html': string;
+}
+
+export interface ExplorationChangeMarkWrittenTranslationsAsNeedingUpdate {
+  'cmd': 'mark_written_translations_as_needing_update';
+  'content_id': string;
+  'state_name': string;
 }
 
 export interface ExplorationDraftDict {
