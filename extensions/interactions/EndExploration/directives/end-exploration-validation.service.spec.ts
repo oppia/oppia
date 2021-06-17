@@ -112,10 +112,10 @@ describe('EndExplorationValidationService', () => {
 
   it('should throw for missing recommendations argument', () => {
     expect(() => {
-      // This throws "Argument of type '{}' is not assignable to
-      // parameter of type 'EndExplorationCustomizationArgs'." We are purposely
-      // assigning the wrong type of customization args in order to test
-      // validations.
+      // This throws "Argument of type '{}'. We need to suppress this error
+      // because is not assignable to parameter of type
+      // 'EndExplorationCustomizationArgs'." We are purposely assigning the
+      // wrong type of customization args in order to test validations.
       // @ts-expect-error
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrowError(
@@ -140,9 +140,9 @@ describe('EndExplorationValidationService', () => {
 
   it('should catch non-string value for recommended exploration ID',
     () => {
-      // This throws "Type 'number' is not assignable to type 'string'."
-      // Here we are assigning the wrong type of value to
-      // "customizationArguments" in order to test validations.
+      // This throws "Type 'number'. We need to suppress this error because is
+      // not assignable to type 'string'." Here we are assigning the wrong type
+      // of value to "customizationArguments" in order to test validations.
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = [1];
       var warnings = validatorService.getAllWarnings(
@@ -155,9 +155,9 @@ describe('EndExplorationValidationService', () => {
 
   it('should have warnings for non-list format of recommended exploration IDs',
     () => {
-      // This throws "Type '"ExpID0"' is not assignable to type 'string[]'."
-      // Here we are assigning the wrong type of value to
-      // "customizationArguments" in order to test validations.
+      // This throws "Type '"ExpID0"'. We need to suppress this error because is
+      // not assignable to type 'string[]'." Here we are assigning the wrong
+      // type of value to "customizationArguments" in order to test validations.
       // @ts-expect-error
       customizationArguments.recommendedExplorationIds.value = 'ExpID0';
       var warnings = validatorService.getAllWarnings(

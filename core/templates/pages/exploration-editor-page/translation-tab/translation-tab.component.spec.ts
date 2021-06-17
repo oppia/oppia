@@ -444,7 +444,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({
@@ -470,7 +470,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationLanguage')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({
@@ -496,7 +496,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationState')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({
@@ -522,7 +522,7 @@ describe('Translation tab component', function() {
       spyOn(angular, 'element').withArgs('#tutorialTranslationOverview')
         .and.returnValue({
           // This throws "Type '{ top: number; }' is not assignable to type
-          // 'JQLite | Coordinates'". This needs to be suppressed because
+          // 'JQLite | Coordinates'". We need to suppress this error because
           // angular element have more properties than offset and top.
           // @ts-expect-error
           offset: () => ({

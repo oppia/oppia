@@ -62,7 +62,7 @@ interface FeatureFlagsCacheItem {
 })
 export class PlatformFeatureService {
   private static SESSION_STORAGE_KEY = 'SAVED_FEATURE_FLAGS';
-  private static SESSION_STORAGE_CACHE_TTL = 12 * 3600 * 1000; // 12 hours
+  private static SESSION_STORAGE_CACHE_TTL = 12 * 3600 * 1000; // 12 hours.
 
   private static COOKIE_NAME_FOR_SESSION_ID = 'SACSID';
   private static COOKIE_NAME_FOR_SESSION_ID_IN_DEV = 'dev_appserver_login';

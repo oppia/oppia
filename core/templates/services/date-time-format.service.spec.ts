@@ -38,10 +38,12 @@ describe('datetimeformatter', () => {
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
     // doesn't seem to be a good way to set the timezone locale directly).
+
     // This throws "Argument of type '(millisSinceEpoch?: number) => Date' is
-    // not assignable to parameter of type 'DateConstructor'." This is because
-    // the actual 'Date' has more properties than 'MockDateContructor'. We have
-    // only defined the properties we need in 'MockDateContructor'.
+    // not assignable to parameter of type 'DateConstructor'.". We need to
+    // suppress this error because the actual 'Date' has more properties than
+    // 'MockDateContructor'. We have only defined the properties we need in
+    // 'MockDateContructor'.
     // @ts-expect-error
     spyOn(window, 'Date').and.callFake(MockDateContructor);
   });

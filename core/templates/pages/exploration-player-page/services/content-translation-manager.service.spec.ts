@@ -457,8 +457,8 @@ describe('Content translation manager service', () => {
 
   describe('with custom INTERACTION_SPECS cases', () => {
     beforeAll(() => {
-      // This throws a "Property 'DummyInteraction' does not exist on type"
-      // error.
+      // This throws a error. We need to suppress this error because
+      // "Property 'DummyInteraction' does not exist on type".
       // @ts-expect-error
       INTERACTION_SPECS.DummyInteraction = {
         customization_arg_specs: [{
@@ -486,8 +486,8 @@ describe('Content translation manager service', () => {
     });
 
     afterAll(() => {
-      // This throws a "Property 'DummyInteraction' does not exist on type"
-      // error.
+      // This throws a error. We need to suppress this error because
+      // "Property 'DummyInteraction' does not exist on type".
       // @ts-expect-error
       delete INTERACTION_SPECS.DummyInteraction;
     });
