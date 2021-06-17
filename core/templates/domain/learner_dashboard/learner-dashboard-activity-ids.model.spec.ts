@@ -34,7 +34,8 @@ describe('Learner dashboard activity ids model', () => {
       completed_story_ids: ['10', '11'],
       learnt_topic_ids: ['12', '13'],
       exploration_playlist_ids: ['14', '15'],
-      collection_playlist_ids: ['16', '17']
+      collection_playlist_ids: ['16', '17'],
+      topic_ids_to_learn: ['18', '19']
     };
   });
 
