@@ -151,9 +151,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_collection
         def get(self, collection_id):
@@ -247,9 +245,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_collection
         def get(self, collection_id):
@@ -509,9 +505,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_comment_on_feedback_thread
         def get(self, thread_id):
@@ -631,9 +625,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_feedback_thread
         def get(self, exploration_id):
@@ -721,9 +713,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_view_feedback_thread
         def get(self, thread_id):
@@ -884,9 +874,7 @@ class RateExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_rate_exploration
         def get(self, exploration_id):
@@ -964,9 +952,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_flag_exploration
         def get(self, exploration_id):
@@ -1346,9 +1332,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_voiceover_exploration
         def get(self, exploration_id):
@@ -1483,9 +1467,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_exploration
         def get(self, exploration_id):
@@ -1574,9 +1556,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_own_account
         def get(self):
@@ -1665,9 +1645,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_delete_exploration
         def get(self, exploration_id):
@@ -1758,9 +1736,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_suggest_changes_to_exploration
         def get(self, exploration_id):
@@ -1803,9 +1779,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_suggest_changes
         def get(self):
@@ -1861,9 +1835,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_resubmit_suggestion
         def get(self, suggestion_id):
@@ -1934,9 +1906,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.get_decorator_for_accepting_suggestion(
             acl_decorators.can_edit_exploration)
@@ -2015,9 +1985,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_publish_exploration
         def get(self, exploration_id):
@@ -2096,9 +2064,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_modify_exploration_roles
         def get(self, exploration_id):
@@ -2158,9 +2124,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_publish_collection
         def get(self, collection_id):
@@ -2173,9 +2137,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_unpublish_collection
         def get(self, collection_id):
@@ -2284,9 +2246,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_learner_dashboard
         def get(self):
@@ -2331,9 +2291,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_topic
         def get(self, topic_id):
@@ -2411,9 +2369,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_story
         def get(self, story_id):
@@ -2505,9 +2461,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_add_new_story_to_topic
         def get(self, topic_id):
@@ -2791,9 +2745,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_subtopic_viewer_page
         def get(self, unused_topic_url_fragment, subtopic_url_fragment):
@@ -2811,9 +2763,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_subtopic_viewer_page
         def get(self, unused_topic_url_fragment, unused_subtopic_url_fragment):
@@ -2954,9 +2904,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
         def get(self, topic_name):
@@ -2971,9 +2919,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
         def get(self, unused_topic_name):
@@ -3077,9 +3023,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_skill
         def get(self):
@@ -3140,9 +3084,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_question_skill_status
         def get(self, skill_id):
@@ -3208,9 +3150,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_create_topic
         def get(self):
@@ -3270,9 +3210,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_manage_rights_for_topic
         def get(self, topic_id):
@@ -3335,9 +3273,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_change_topic_publication_status
         def get(self, topic_id):
@@ -3414,9 +3350,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
         URL_PATH_ARGS_SCHEMAS = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_perform_cron_tasks
         def get(self):
@@ -3471,9 +3405,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_skill
         def get(self, skill_id):
@@ -3547,9 +3479,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_question
         def get(self, question_id):
@@ -3638,9 +3568,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_question
         def get(self, question_id):
@@ -3684,9 +3612,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_play_entity
         def get(self, entity_type, entity_id):
@@ -3782,9 +3708,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_edit_entity
         def get(self, entity_type, entity_id):
@@ -3936,9 +3860,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_save_exploration
         def get(self, exploration_id):
@@ -4176,9 +4098,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 'type': 'unicode'
             }
         }
-        HANDLER_ARGS_SCHEMAS = {
-            'GET': {}
-        }
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
         @acl_decorators.can_update_suggestion
         def get(self, suggestion_id):
