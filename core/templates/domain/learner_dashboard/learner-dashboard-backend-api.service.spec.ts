@@ -241,6 +241,41 @@ describe('Learner Dashboard Backend API Service', () => {
         skill_id_2: 'Skill Description 2'
       }
     }],
+    topics_to_learn: [{
+      id: 'fyuy4GrevTqJ',
+      name: 'Sample Name',
+      classroom: 'Math',
+      language_code: 'en',
+      version: 1,
+      canonical_story_count: 3,
+      additional_story_count: 0,
+      uncategorized_skill_count: 1,
+      subtopic_count: 1,
+      topic_model_created_on: 1466178691847.67,
+      topic_model_last_updated: 1466178759209.839,
+      description: 'description',
+      total_skill_count: 2,
+      total_published_node_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      url_fragment: 'sample-name',
+      subtopics: [{
+        skill_ids: ['skill_id_2'],
+        id: 1,
+        title: 'subtopic_name',
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#F8BF74',
+        url_fragment: 'subtopic-name'
+      }],
+      degrees_of_mastery: {
+        skill_id_1: 0.5,
+        skill_id_2: 0.3
+      },
+      skill_descriptions: {
+        skill_id_1: 'Skill Description 1',
+        skill_id_2: 'Skill Description 2'
+      }
+    }],
     number_of_nonexistent_activities: {
       completed_collections: 0,
       incomplete_collections: 0,
@@ -251,7 +286,8 @@ describe('Learner Dashboard Backend API Service', () => {
       completed_stories: 0,
       incomplete_stories: 0,
       learnt_topics: 0,
-      partially_learnt_topics: 0
+      partially_learnt_topics: 0,
+      topics_to_learn: 0
     },
     completed_explorations_list: [{
       category: 'Welcome',
