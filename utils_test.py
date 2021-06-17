@@ -91,28 +91,28 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_recursively_remove_key_for_single_key_dict(self):
         # type: () -> None
-        """Test recursively_remove_key method."""
+        """Test recursively_remove_key method for single key dict."""
         d = {'a': 'b'}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {})
 
     def test_recursively_remove_key_for_multi_key_dict(self):
         # type: () -> None
-        """Test recursively_remove_key method."""
+        """Test recursively_remove_key method for multi key dict."""
         d = {'a': 'b', 'c': 'd'}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': 'd'})
 
     def test_recursively_remove_key_for_dict_with_value_dict(self):
         # type: () -> None
-        """Test recursively_remove_key method."""
+        """Test recursively_remove_key method for dict with a value dict."""
         d = {'a': 'b', 'c': {'a': 'b'}}
         utils.recursively_remove_key(d, 'a')
         self.assertEqual(d, {'c': {}})
 
     def test_recursively_remove_key_for_list(self):
         # type: () -> None
-        """Test recursively_remove_key method."""
+        """Test recursively_remove_key method for list."""
         l = ['a', 'b', {'c': 'd'}]
         utils.recursively_remove_key(l, 'c')
         self.assertEqual(l, ['a', 'b', {}])
