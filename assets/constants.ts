@@ -5524,6 +5524,8 @@ export default {
   "MAX_CHARS_IN_CHAPTER_TITLE": 36,
   "MAX_CHARS_IN_CHAPTER_DESCRIPTION": 152,
   "MAX_CHARS_IN_MISCONCEPTION_NAME": 100,
+  "MAX_CHARS_IN_BLOG_POST_TITLE": 40,
+  "MAX_CHARS_IN_BLOG_POST_SUMMARY": 240,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
   // in /learn/math/fractions/story/bakery/..., 'bakery' is the
@@ -5534,6 +5536,9 @@ export default {
   // in /learn/math/fractions/revision/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
+  // This represents the maximum number of characters in the URL fragment for
+  // the blog post.
+  "MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT": 65,
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,

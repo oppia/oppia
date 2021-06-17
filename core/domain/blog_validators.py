@@ -20,6 +20,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
+from core.domain import blog_services
+from core.domain import blog_domain
 from core.platform import models
 
 datastore_services = models.Registry.import_datastore_services()
@@ -31,6 +33,20 @@ datastore_services = models.Registry.import_datastore_services()
 
 class BlogPostModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BlogPostModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return blog_services.get_blog_post_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        blog_post_rights = blog_services.get_blog_post_rights(
+            item.id, strict=False)
+
+        if blog_post_rights.blog_post_is_published:
+            return base_model_validators.VALIDATION_MODE_STRICT
+
+        return base_model_validators.VALIDATION_MODE_NON_STRICT
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -53,16 +69,55 @@ class BlogPostModelValidator(base_model_validators.BaseModelValidator):
         ]
         field_name_to_external_model_references.append(
             base_model_validators.UserSettingsModelFetcherDetails(
-                'author_ids', [item.author_id],
+                'author_id', [item.author_id],
                 may_contain_system_ids=True,
                 may_contain_pseudonymous_ids=True
             )
         )
         return field_name_to_external_model_references
 
+    @classmethod
+    def _validate_title_is_unique(cls, item):
+        """Validate that title of the model unique.
+
+        Args:
+            item: datastore_services.Model. BlogPostModel to validate.
+        """
+        if item.title != '':
+            blog_post_models_list = blog_models.BlogPostModel.query().filter(
+            blog_models.BlogPostModel.title == (
+                item.title)).filter(
+                    blog_models.BlogPostModel.deleted == False).fetch() # pylint: disable=singleton-comparison
+            blog_model_ids = [
+                model.id for model in blog_post_models_list if model.id != item.id]
+            if blog_model_ids:
+                cls._add_error(
+                    'unique title for blog post of',
+                    'Entity id %s: title %s matches with title '
+                    'blog post models with ids %s' % (
+                        item.id, item.title, blog_model_ids))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_title_is_unique,]
+
 
 class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BlogPostSummaryModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return blog_services.get_blog_post_summary_from_model(item)
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, item):
+        blog_post_rights = blog_services.get_blog_post_rights(
+            item.id, strict=False)
+
+        if blog_post_rights.blog_post_is_published:
+            return base_model_validators.VALIDATION_MODE_STRICT
+
+        return base_model_validators.VALIDATION_MODE_NON_STRICT
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -86,13 +141,36 @@ class BlogPostSummaryModelValidator(base_model_validators.BaseModelValidator):
         ]
         field_name_to_external_model_references.append(
             base_model_validators.UserSettingsModelFetcherDetails(
-                'author_ids', [item.author_id],
+                'author_id', [item.author_id],
                 may_contain_system_ids=True,
                 may_contain_pseudonymous_ids=True
             )
         )
         return field_name_to_external_model_references
 
+    @classmethod
+    def _validate_title_is_unique(cls, item):
+        """Validate that title of the model unique.
+
+        Args:
+            item: datastore_services.Model. BlogPostModel to validate.
+        """
+        if item.title != '':
+            blog_post_summary_models_list = blog_models.BlogPostSummaryModel.query().filter(
+            blog_models.BlogPostSummaryModel.title == (
+                item.title)).filter(
+                    blog_models.BlogPostSummaryModel.deleted == False).fetch() # pylint: disable=singleton-comparison
+            blog_model_ids = [
+                model.id for model in blog_post_summary_models_list if model.id != item.id]
+            if blog_model_ids:
+                cls._add_error(
+                    'unique title for blog post of',
+                    'Entity id %s: title %s matches with title '
+                    'blog post models with ids %s' % (
+                        item.id, item.title, blog_model_ids))
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_title_is_unique]
 
 class BlogPostRightsModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating BlogPostRightsModel."""
@@ -117,4 +195,11 @@ class BlogPostRightsModelValidator(base_model_validators.BaseModelValidator):
                 [item.id]
             )
         ]
+        field_name_to_external_model_references.append(
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_ids', item.editor_ids,
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=False
+            )
+        )
         return field_name_to_external_model_references
