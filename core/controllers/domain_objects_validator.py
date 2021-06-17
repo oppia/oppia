@@ -53,9 +53,3 @@ class DomainObjectsValidationClass(python_utils.OBJECT):
         # No explicit call to validate_dict method is necessary, because
         # ExplorationChange calls it while initialization.
         exp_domain.ExplorationChange(obj)
-
-    def validate_new_rules_dict(self, obj):
-        """Validates new rules dict."""
-        domain_object = (
-            platform_parameter_domain.PlatformParameterRule.from_dict(obj))
-        domain_object.validate()
