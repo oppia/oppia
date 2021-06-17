@@ -153,7 +153,7 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (userbio_length, stringified_usernames)
 
 
-class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
+class PopulateStoriesAndTopicsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job to populate the story_ids and topic_ids
     in Incomplete and Completed Activities Model."""
@@ -235,10 +235,7 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
                     learner_progress_services.record_topic_started(
                         user_id, topic.id)
 
-        yield (
-            'Successfully added story_ids and topic_ids '
-            'in IncompleteActivitiesModel and CompletedActivitiesModel '
-            'for the user: %s' % (user_id), 1)
+        yield (user_id, 1)
 
     @staticmethod
     def reduce(key, values):

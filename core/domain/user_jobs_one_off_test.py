@@ -425,7 +425,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
 
-class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJobTests(
+class PopulateStoriesAndTopicsOneOffJobTests(
         test_utils.GenericTestBase):
     """Tests for the one-off populate story_ids and partially_learnt_topics_ids
     in IncompleteActivitiesModel job."""
@@ -444,8 +444,9 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJobTests(
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = user_jobs_one_off.PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob.create_new() # pylint: disable=line-too-long
-        user_jobs_one_off.PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob.enqueue(job_id) # pylint: disable=line-too-long
+        job_id = (
+            user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob.create_new())
+        user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
@@ -453,7 +454,7 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJobTests(
 
     def setUp(self):
         super(
-            PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJobTests, # pylint: disable=line-too-long
+            PopulateStoriesAndTopicsOneOffJobTests,
             self).setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
