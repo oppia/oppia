@@ -120,18 +120,18 @@ describe('Base Content Component', () => {
     loaderService = (loaderService as unknown) as jasmine.SpyObj<LoaderService>;
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     keyboardShortcutService = (keyboardShortcutService as unknown) as
-    jasmine.SpyObj<KeyboardShortcutService>;
+     jasmine.SpyObj<KeyboardShortcutService>;
     windowRef = TestBed.inject(WindowRef);
     windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     sidebarStatusService = (sidebarStatusService as unknown) as
-    jasmine.SpyObj<SidebarStatusService>;
+     jasmine.SpyObj<SidebarStatusService>;
     bottomNavbarStatusService = TestBed.inject(BottomNavbarStatusService);
     bottomNavbarStatusService = (bottomNavbarStatusService as unknown) as
-    jasmine.SpyObj<BottomNavbarStatusService>;
+     jasmine.SpyObj<BottomNavbarStatusService>;
     backgroundMaskService = TestBed.inject(BackgroundMaskService);
     backgroundMaskService = (backgroundMaskService as unknown) as
-    jasmine.SpyObj<BackgroundMaskService>;
+     jasmine.SpyObj<BackgroundMaskService>;
   });
 
   it('should create', () => {
@@ -150,14 +150,8 @@ describe('Base Content Component', () => {
     expect(componentInstance.getSubheaderText).toBeDefined();
     expect(windowRef.nativeWindow.location.href).toEqual(
       'https://oppiatestserver.appspot.com' +
-      pathname + search + hash
+       pathname + search + hash
     );
-  });
-
-  it('should toggle sidebar', () => {
-    spyOn(sidebarStatusService, 'toggleSidebar');
-    componentInstance.toggleSidebar();
-    expect(sidebarStatusService.toggleSidebar).toHaveBeenCalled();
   });
 
   it('should get sidebar status', () => {

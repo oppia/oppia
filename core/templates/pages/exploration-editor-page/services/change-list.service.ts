@@ -51,6 +51,9 @@ angular.module('oppia').factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+    var CMD_ADD_WRITTEN_TRANSLATION = 'add_written_translation';
+    var CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE = (
+      'mark_written_translations_as_needing_update');
     var autosaveInProgressEventEmitter: EventEmitter<boolean> = (
       new EventEmitter<boolean>());
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
@@ -244,6 +247,50 @@ angular.module('oppia').factory('ChangeListService', [
           cmd: CMD_RENAME_STATE,
           new_state_name: newStateName,
           old_state_name: oldStateName
+        });
+      },
+      /**
+       * Saves a change dict that represents the adding of a translation for a
+       * content html in a state.
+       *
+       * @param {string} contentId - The content id of the translated content.
+       * @param {string} dataFormat - The data format of the content.
+       * @param {string} languageCode - The language code.
+       * @param {string} stateName - The current state name.
+       * @param {string} translationHtml - The translated content.
+       */
+      addWrittenTranslation: function(
+          contentId, dataFormat, languageCode, stateName, translationHtml) {
+        // Written translations submitted via the translation tab in the
+        // exploration editor need not pass content_html because
+        // translations submitted via this method do not undergo a review. The
+        // content_html is only required when submitting translations via
+        // the contributor dashboard because such translation suggestions
+        // undergo a manual review process where the reviewer will need to look
+        // at the corresponding original content at the time of submission.
+        addChange({
+          cmd: CMD_ADD_WRITTEN_TRANSLATION,
+          content_id: contentId,
+          data_format: dataFormat,
+          language_code: languageCode,
+          state_name: stateName,
+          content_html: 'N/A',
+          translation_html: translationHtml
+        });
+      },
+      /**
+       * Saves a change dict that represents marking a translation as needing
+       * update.
+       *
+       * @param {string} contentId - The content id of the translated content.
+       * @param {string} languageCode - The language code.
+       * @param {string} stateName - The current state name.
+       */
+      markTranslationsAsNeedingUpdate: function(contentId, stateName) {
+        addChange({
+          cmd: CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+          content_id: contentId,
+          state_name: stateName
         });
       },
       undoLastChange: function() {
