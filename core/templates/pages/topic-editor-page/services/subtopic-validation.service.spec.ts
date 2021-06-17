@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for SubtopicValidationService.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
@@ -29,6 +30,9 @@ describe('Subtopic validation service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule
+      ],
       providers: [
         TopicEditorStateService,
         TopicObjectFactory
