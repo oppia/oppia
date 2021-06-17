@@ -54,6 +54,12 @@ VALID_BACKEND_API_SERVICE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
 INVALID_SORTED_DEPENDENCIES_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
+INVALID_CONSTANT_IN_TS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
+INVALID_CONSTANT_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid.constants.ts')
+INVALID_CONSTANT_AJS_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid.constants.ajs.ts')
 VALID_IGNORED_SERVICE_PATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_ignored.service.ts')
 VALID_UNLISTED_SERVICE_PATH = os.path.join(
@@ -92,6 +98,65 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ):
             js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_JS_FILEPATH], FILE_CACHE).perform_all_lint_checks()
+
+    def test_check_constants_declaration(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_CONSTANT_AJS_FILEPATH,
+                    INVALID_CONSTANT_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE
+            ).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        expected_messages = ['Duplicate constant declaration found.']
+        expected_messages.extend([
+            'Please ensure that the constant ADMIN_TABS is initialized '
+            'from the value from the corresponding Angular constants file '
+            '(the *.constants.ts file). Please create one in the Angular '
+            'constants file if it does not exist there.'
+            ])
+        self.validate(lint_task_report, expected_messages, 1)
+
+    def test_check_duplicate_constant_declaration_in_separate_files(self):
+        def mock_compile_all_ts_files():
+            cmd = (
+                './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
+                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
+                '%s -target %s -typeRoots %s %s typings/*') % (
+                    js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH +
+                    'scripts/linters/test_files/', 'true', 'es2017,dom', 'true',
+                    'true', 'es5', './node_modules/@types',
+                    INVALID_CONSTANT_IN_TS_FILEPATH)
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+
+        compile_all_ts_files_swap = self.swap(
+            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files)
+
+        with compile_all_ts_files_swap:
+            lint_task_report = js_ts_linter.JsTsLintChecksManager(
+                [], [INVALID_CONSTANT_IN_TS_FILEPATH,
+                     INVALID_CONSTANT_IN_TS_FILEPATH],
+                FILE_CACHE).perform_all_lint_checks()
+        shutil.rmtree(
+            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
+        expected_messages = [
+            'The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared '
+            'in', 'Please import the file where the constant is declared '
+            'or rename the constant.']
+        self.validate(lint_task_report, expected_messages, 1)
 
     def test_third_party_linter(self):
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
