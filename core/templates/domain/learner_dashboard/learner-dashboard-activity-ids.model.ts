@@ -91,7 +91,7 @@ export class LearnerDashboardActivityIds {
     return false;
   }
 
-  belongsToLearn(topicId: string): boolean {
+  belongsToTopicsToLearn(topicId: string): boolean {
     if (this.topicIdsToLearn.indexOf(topicId) !== -1) {
       return true;
     }
@@ -170,11 +170,11 @@ export class LearnerDashboardActivityIds {
     }
   }
 
-  addToLearn(topicId: string): void {
+  addToTopicLearn(topicId: string): void {
     this.topicIdsToLearn.push(topicId);
   }
 
-  removeFromLearn(topicId: string): void {
+  removeTopicFromLearn(topicId: string): void {
     var index = this.topicIdsToLearn.indexOf(topicId);
     if (index !== -1) {
       this.topicIdsToLearn.splice(index, 1);
