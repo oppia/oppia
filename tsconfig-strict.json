@@ -193,6 +193,8 @@
     "core/templates/services/debouncer.service.spec.ts",
     "core/templates/services/editability.service.ts",
     "core/templates/services/editability.service.spec.ts",
+    "core/templates/services/external-rte-save.service.ts",
+    "core/templates/services/external-rte-save.service.spec.ts",
     "core/templates/services/external-save.service.ts",
     "core/templates/services/external-save.service.spec.ts",
     "core/templates/services/i18n-language-code.service.ts",
@@ -239,7 +241,17 @@
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.ts",
     "extensions/interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service.spec.ts",
     "extensions/interactions/SetInput/directives/set-input-rules.service.ts",
-    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts"
+    "extensions/interactions/SetInput/directives/set-input-rules.service.spec.ts",
+    "extensions/objects/templates/html-editor.component.ts",
+    "extensions/objects/templates/int-editor.component.ts",
+    "extensions/objects/templates/list-of-tabs-editor.component.ts",
+    "extensions/objects/templates/list-of-unicode-string-editor.component.ts",
+    "extensions/objects/templates/logic-error-category-editor.component.ts",
+    "extensions/objects/templates/nonnegative-int-editor.component.ts",
+    "extensions/objects/templates/positive-int-editor.component.ts",
+    "extensions/objects/templates/positive-int-editor.component.spec.ts",
+    "extensions/objects/templates/sanitized-url-editor.component.ts",
+    "extensions/objects/templates/set-of-unicode-string-editor.component.ts"
   ],
   "include": ["typings/*.ts"],
   "exclude": ["extensions/classifiers/proto"]

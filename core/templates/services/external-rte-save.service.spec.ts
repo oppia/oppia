@@ -23,7 +23,7 @@ import { ExternalRteSaveService } from
   'services/external-rte-save.service';
 
 describe('External Rte Save Service', () => {
-  let externalRteSaveService = null;
+  let externalRteSaveService: ExternalRteSaveService;
 
   beforeEach(() => {
     externalRteSaveService = TestBed.get(ExternalRteSaveService);
