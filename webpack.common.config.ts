@@ -110,6 +110,8 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.import.ts',
+    partnerships:
+      commonPrefix + '/pages/partnerships-page/partnerships-page.import.ts',
     pending_account_deletion:
       commonPrefix + '/pages/pending-account-deletion-page/' +
       'pending-account-deletion-page.import.ts',
@@ -480,6 +482,16 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['partnerships'],
+      filename: 'partnerships-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/partnerships-page/' +
+          'partnerships-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
