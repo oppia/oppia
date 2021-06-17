@@ -330,7 +330,7 @@ def start_linter(files):
     return task.returncode
 
 
-def start_mypy_checks(self):
+def start_mypy_checks():
     """Starts the mypy type checks."""
     task = subprocess.Popen(
         [PYTHON3_CMD, '-m', MYPY_TYPE_CHECK_MODULE])
