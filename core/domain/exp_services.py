@@ -1988,7 +1988,7 @@ def are_changes_mergeable(exp_id, version, change_list):
                                                 'hints', 'written_translations',
                                                 'default_outcome',
                                                 'customization_args',
-                                                'recorded_voicovers']):
+                                                'recorded_voiceovers']):
                             change_is_mergeable = True
                     else:
                         change_is_mergeable = True

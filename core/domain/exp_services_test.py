@@ -8166,20 +8166,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
             'old_value': {
                 'translations_mapping': {
                     'hint_1': {},
-                    'content': {
-                        'fr': {
-                            'translation': '<p>Translation Content 1.</p>',
-                            'needs_update': False,
-                            'data_format': 'html'
-                        }
-                    },
-                    'ca_placeholder_0': {
-                        'fr': {
-                            'translation': 'Translation Placeholder.',
-                            'needs_update': False,
-                            'data_format': 'unicode'
-                        }
-                    },
+                    'content': {},
+                    'ca_placeholder_0': {},
                     'solution': {},
                     'default_outcome': {}
                 }
@@ -8193,20 +8181,8 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
                             'data_format': 'html'
                         }
                     },
-                    'content': {
-                        'fr': {
-                            'translation': '<p>Translation Content 1.</p>',
-                            'needs_update': False,
-                            'data_format': 'html'
-                        }
-                    },
-                    'ca_placeholder_0': {
-                        'fr': {
-                            'translation': 'Translation Placeholder.',
-                            'needs_update': False,
-                            'data_format': 'unicode'
-                        }
-                    },
+                    'content': {},
+                    'ca_placeholder_0': {},
                     'solution': {},
                     'default_outcome': {}
                 }
@@ -8276,6 +8252,330 @@ class ExplorationChangesMergeabilityUnitTests(ExplorationServicesUnitTests):
         # Changes to the content of second state to check that
         # the changes to the translations can not be made in
         # same state if the property which can be translated is
+        # changed.
+        change_list_6 = [exp_domain.ExplorationChange({
+            'state_name': 'End',
+            'old_value': {
+                'content_id': 'content',
+                'html': '<p>Second State Content.</p>'
+            },
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Changed Second State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_6,
+            'Changing Content in Second State.')
+
+        are_changes_mergeable_3 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 4, change_list_4)
+        self.assertEqual(are_changes_mergeable_3, False)
+
+    def test_changes_are_mergeable_when_voiceovers_changes_do_not_conflict(self): # pylint: disable=line-too-long
+        self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+
+        # Adding content, feedbacks, solutions so that
+        # voiceovers can be added later on.
+        change_list = [exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'widget_customization_args',
+            'old_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': '',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'placeholder': {
+                    'value': {
+                        'unicode_str': 'Placeholder',
+                        'content_id': 'ca_placeholder_0'
+                    }
+                },
+                'rows': {
+                    'value': 1
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'default_outcome',
+            'old_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': ''
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            },
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'labelled_as_correct': False,
+                'missing_prerequisite_skill_id': None,
+                'refresher_exploration_id': None,
+                'feedback': {
+                    'content_id': 'default_outcome',
+                    'html': '<p>Feedback 1.</p>'
+                },
+                'param_changes': [
+
+                ],
+                'dest': 'End'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'hints',
+            'old_value': [],
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': [
+                {
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': '<p>Hint 1.</p>'
+                    }
+                }
+            ]
+        }), exp_domain.ExplorationChange({
+            'property_name': 'next_content_id_index',
+            'old_value': 1,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': 2
+        }), exp_domain.ExplorationChange({
+            'property_name': 'solution',
+            'old_value': None,
+            'state_name': 'Introduction',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'answer_is_exclusive': False,
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': '<p>Explanation.</p>'
+                },
+                'correct_answer': 'Solution'
+            }
+        }), exp_domain.ExplorationChange({
+            'property_name': 'content',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'state_name': 'End',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Second State Content.</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list,
+            'Added various contents.')
+
+        # Adding some voiceovers to the first state.
+        change_list_2 = [exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {}
+                }
+            },
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'cmd': 'edit_state_property'
+        }), exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {},
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'hint_1': {},
+                    'default_outcome': {},
+                    'solution': {},
+                    'ca_placeholder_0': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'ca_placeholder_0-en-mfy5l6logg.mp3',
+                            'file_size_bytes': 175542,
+                            'duration_secs': 10.971375
+                        }
+                    },
+                    'content': {
+                        'en': {
+                            'needs_update': False,
+                            'filename': 'content-en-xrss3z3nso.mp3',
+                            'file_size_bytes': 114938,
+                            'duration_secs': 7.183625
+                        }
+                    }
+                }
+            },
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_2,
+            'Added some voiceovers.')
+
+        # Adding voiceovers again to the same first state
+        # to check if they can be applied. They will not
+        # be mergeable as the changes are in the same property
+        # i.e. recorded_voiceovers.
+        change_list_3 = [exp_domain.ExplorationChange({
+            'property_name': 'recorded_voiceovers',
+            'cmd': 'edit_state_property',
+            'old_value': {
+                'voiceovers_mapping': {
+                    'default_outcome': {},
+                    'solution': {},
+                    'content': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {}
+                }
+            },
+            'new_value': {
+                'voiceovers_mapping': {
+                    'default_outcome': {},
+                    'solution': {},
+                    'content': {},
+                    'ca_placeholder_0': {},
+                    'hint_1': {
+                        'en': {
+                            'needs_update': False,
+                            'duration_secs': 30.0669375,
+                            'filename': 'hint_1-en-ajclkw0cnz.mp3',
+                            'file_size_bytes': 481071
+                        }
+                    }
+                }
+            },
+            'state_name': 'Introduction'
+        })]
+
+        are_changes_mergeable = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_3)
+        self.assertEqual(are_changes_mergeable, False)
+
+        # Adding voiceovers to the second state to check
+        # if they can be applied. They can be mergead as
+        # the changes are in the differents states.
+        change_list_4 = [exp_domain.ExplorationChange({
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
+            },
+            'property_name': 'recorded_voiceovers',
+            'cmd': 'edit_state_property',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'duration_secs': 10.3183125,
+                            'filename': 'content-en-ar9zhd7edl.mp3',
+                            'file_size_bytes': 165093,
+                            'needs_update': False
+                        }
+                    }
+                }
+            },
+            'state_name': 'End'
+        })]
+
+        are_changes_mergeable_1 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 2, change_list_4)
+        self.assertEqual(are_changes_mergeable_1, True)
+
+        # Changes to the content of first state to check
+        # that the changes in the contents of first state
+        # doesn't affects the changes to the voiceovers in
+        # second state.
+        change_list_5 = [exp_domain.ExplorationChange({
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': '<p>First State Content.</p>'
+            },
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>Changed First State Content.</p>'
+            },
+            'property_name': 'content',
+            'cmd': 'edit_state_property'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_5,
+            'Changing Content in First State.')
+        are_changes_mergeable_2 = exp_services.are_changes_mergeable(
+            self.EXP_0_ID, 3, change_list_4)
+        self.assertEqual(are_changes_mergeable_2, True)
+
+        # Changes to the content of second state to check that
+        # the changes to the voiceovers can not be made in
+        # same state if the property which can be recorded is
         # changed.
         change_list_6 = [exp_domain.ExplorationChange({
             'state_name': 'End',
