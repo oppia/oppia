@@ -118,6 +118,7 @@ angular.module('oppia').directive('objectEditor', [
           for (const key of Object.keys(e)) {
             scope.ngModelController.$setValidity(key, e[key]);
           }
+          scope.$applyAsync();
         };
         if (directiveName) {
           if (MIGRATED_EDITORS.indexOf(directiveName) >= 0) {
