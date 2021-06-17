@@ -27,6 +27,7 @@ import { WindowDimensionsService } from
 })
 export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
+
   private pendingSidebarClick: boolean = false;
   private sidebarIsShown: boolean = false;
 
@@ -47,12 +48,15 @@ export class SidebarStatusService {
   isSidebarShown(): boolean {
     return this.sidebarIsShown;
   }
+
   openSidebar(): void {
     this._openSidebar();
   }
+
   closeSidebar(): void {
     this._closeSidebar();
   }
+
   toggleSidebar(): void {
     if (!this.sidebarIsShown) {
       this._openSidebar();
@@ -60,6 +64,7 @@ export class SidebarStatusService {
       this._closeSidebar();
     }
   }
+
   onDocumentClick(): void {
     if (!this.pendingSidebarClick) {
       this.sidebarIsShown = false;

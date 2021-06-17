@@ -18,19 +18,17 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SubtitledHtml} from
-  'domain/exploration/subtitled-html.model';
-import { WorkedExampleObjectFactory} from
-  'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { WorkedExampleBackendDict, WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 
 describe('Worked example object factory', () => {
-  let workedExampleDict;
+  let workedExampleBackendDict: WorkedExampleBackendDict;
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
-    workedExampleDict = {
+    workedExampleBackendDict = {
       question: {
         html: 'worked example question 1',
         content_id: 'worked_example_q_1'
@@ -43,8 +41,9 @@ describe('Worked example object factory', () => {
   });
 
   it('should create a new worked example from a backend dictionary', () => {
-    let workedExample =
-          workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
+    let workedExample = (
+      workedExampleObjectFactory.createFromBackendDict(
+        workedExampleBackendDict));
     expect(workedExample.getQuestion()).toEqual(
       SubtitledHtml.createDefault(
         'worked example question 1', 'worked_example_q_1'));
@@ -54,8 +53,9 @@ describe('Worked example object factory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    let workedExample =
-        workedExampleObjectFactory.createFromBackendDict(workedExampleDict);
-    expect(workedExample.toBackendDict()).toEqual(workedExampleDict);
+    let workedExample = (
+      workedExampleObjectFactory.createFromBackendDict(
+        workedExampleBackendDict));
+    expect(workedExample.toBackendDict()).toEqual(workedExampleBackendDict);
   });
 });

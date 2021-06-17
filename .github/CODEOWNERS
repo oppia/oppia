@@ -184,12 +184,11 @@
 /scripts/linters/codeowner_linter*.py @sajalasati @DubeySandeep
 /scripts/linters/pylint_extensions*.py @sajalasati @DubeySandeep
 /scripts/linters/python_linter*.py @sajalasati @DubeySandeep
-/scripts/linters/ts_ignore_exceptions.json @vojtechjelinek
 /ubuntu_dockerfile @DubeySandeep
 
 
 # Exploration project.
-/core/controllers/editor*.py @aks681
+/core/controllers/editor*.py @aks681 @rohitkatlaa
 /core/controllers/reader*.py @aks681
 /core/controllers/resources*.py @vojtechjelinek
 /core/domain/exp*.py @aks681
@@ -201,8 +200,8 @@
 /core/domain/value_generators_domain*.py @vojtechjelinek
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
 /core/templates/components/entity-creation-services/exploration-creation-backend-api.service*.ts @kevintab95
-/core/templates/components/button-directives/hint-and-solution-buttons.directive*.ts @kevintab95
-/core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
+/core/templates/components/button-directives/hint-and-solution-buttons.component*.ts @kevintab95
+/core/templates/components/button-directives/hint-and-solution-buttons.component.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
 /core/templates/components/on-screen-keyboard/ @aks681
@@ -268,6 +267,7 @@
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
 /core/templates/directives/directives.module.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/directives/headroom.directive.ts @srijanreddy98
 /core/templates/directives/ng-init.directive.ts @srijanreddy98
 /core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
@@ -386,7 +386,7 @@
 # New structures team.
 # Question project.
 /core/controllers/practice_sessions*.py @aks681
-/core/controllers/question*.py @aks681
+/core/controllers/question*.py @aks681 @rohitkatlaa
 /core/controllers/review_tests*.py @aks681
 /core/domain/classroom_domain.py @aks681
 /core/domain/classroom_services*.py @aks681
@@ -457,7 +457,7 @@
 
 
 # Infrastructure.
-/jobs/ @brianrodri
+/jobs/ @brianrodri @rohitkatlaa
 /core/controllers/cron*.py @nithusha21
 /core/domain/cron_services*.py @nithusha21
 /main_cron.py @nithusha21
@@ -526,11 +526,15 @@
 
 
 # Release team.
-/scripts/release_scripts/ @DubeySandeep
+# TODO(#12694): Add @nithusha21 as owner after 2021-05-08
+/core/controllers/release_coordinator*.py @vojtechjelinek
+/core/templates/pages/release-coordinator-page/ @vojtechjelinek
+/scripts/release_scripts/ @vojtechjelinek
 
 
 # Rich text editor team.
-/core/templates/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
+/core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @aks681
+/core/templates/components/ck-editor-helpers/ckeditor4.module.ts @aks681
 /core/templates/directives/mathjax-bind.directive.ts @aks681
 /core/templates/directives/mathjax.directive.ts @aks681
 /core/templates/mathjaxConfig.ts @aks681
@@ -593,8 +597,6 @@
 /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
 /core/templates/base-components/ @jameesjohn @vojtechjelinek
 /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-/core/templates/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
-/core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
 /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/pages/header_js_libs.html @jameesjohn @vojtechjelinek
