@@ -249,7 +249,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
             subtopics=[self.subtopic_0], next_subtopic_id=1)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.viewer_id, self.TOPIC_ID_1)
         response = self.get_json(feconf.LEARNER_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['partially_learnt_topics_list']), 1)
@@ -381,7 +381,7 @@ class LearnerDashboardHandlerTests(test_utils.GenericTestBase):
 
         learner_progress_services.mark_topic_as_learnt(
             self.viewer_id, self.TOPIC_ID_1)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.viewer_id, self.TOPIC_ID_2)
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_IDS_DATA_URL)

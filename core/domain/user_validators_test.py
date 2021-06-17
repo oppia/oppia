@@ -405,9 +405,9 @@ class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
             self.user_id, '0', 'Introduction', 1)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, '3')
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_0)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_0)
         for i in python_utils.RANGE(1, 3):
             learner_progress_services.mark_exploration_as_completed(
@@ -748,9 +748,9 @@ class IncompleteActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.user_id, '%s' % i, 'Introduction', 1)
             learner_progress_services.mark_collection_as_incomplete(
                 self.user_id, '%s' % (i + 3))
-        learner_progress_services.mark_story_as_incomplete(
+        learner_progress_services.record_story_started(
             self.user_id, self.STORY_ID_1)
-        learner_progress_services.mark_topic_as_partially_learnt(
+        learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1)
 
         self.model_instance = user_models.IncompleteActivitiesModel.get_by_id(

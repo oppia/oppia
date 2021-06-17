@@ -1383,7 +1383,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                     payload, csrf_token=csrf_token)
                 self.assertEqual(
                     captured_logs,
-                    ['Could not find a story corresponding to id.'])
+                    ['Could not find a story corresponding to '
+                     '%s id.' % self.STORY_ID])
 
     def test_exp_incomplete_event_handler_with_no_version_raises_error(self):
         self.login(self.USER_EMAIL)

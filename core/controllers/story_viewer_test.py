@@ -604,4 +604,5 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     ), {}, csrf_token=csrf_token)
                 self.assertEqual(
                     captured_logs,
-                    ['Could not find a story corresponding to id.'])
+                    ['Could not find a story corresponding to %s '
+                     'id.' % self.STORY_ID])

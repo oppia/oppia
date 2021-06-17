@@ -174,12 +174,17 @@ class StoryProgressHandler(base.BaseHandler):
     def post(self, story_id, node_id):
         story = story_fetchers.get_story_by_id(story_id)
         if story is None:
-            logging.error('Could not find a story corresponding to id.')
+            logging.error(
+                'Could not find a story corresponding to '
+                '%s id.' % story_id)
             self.render_json({})
             return
 
         topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
         if topic is None:
+            logging.error(
+                'Could not find a topic corresponding to '
+                '%s id.' % story.corresponding_topic_id)
             self.render_json({})
             return
 
@@ -226,7 +231,7 @@ class StoryProgressHandler(base.BaseHandler):
             learner_progress_services.mark_story_as_completed(
                 self.user_id, story_id)
         else:
-            learner_progress_services.mark_story_as_incomplete(
+            learner_progress_services.record_story_started(
                 self.user_id, story.id)
 
         completed_story_ids = (
@@ -242,7 +247,7 @@ class StoryProgressHandler(base.BaseHandler):
         # If at least one story in the topic is completed,
         # mark the topic as learnt else mark it as partially learnt.
         if not is_topic_completed:
-            learner_progress_services.mark_topic_as_partially_learnt(
+            learner_progress_services.record_topic_started(
                 self.user_id, topic.id)
         else:
             learner_progress_services.mark_topic_as_learnt(

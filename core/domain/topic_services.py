@@ -1128,5 +1128,5 @@ def get_story_titles_in_topic(topic):
     canonical_story_references = topic.canonical_story_references
     story_ids = [story.story_id for story in canonical_story_references]
     stories = story_fetchers.get_stories_by_ids(story_ids)
-    story_titles = [story.title for story in stories if story]
+    story_titles = [story.title for story in stories if story is not None]
     return story_titles

@@ -354,7 +354,7 @@ def mark_exploration_as_incomplete(
         _save_incomplete_activities(incomplete_activities)
 
 
-def mark_story_as_incomplete(user_id, story_id):
+def record_story_started(user_id, story_id):
     """Adds the story id to the incomplete list of the user unless the
     story has been already completed by the user.
 
@@ -381,7 +381,7 @@ def mark_story_as_incomplete(user_id, story_id):
         _save_incomplete_activities(incomplete_activities)
 
 
-def mark_topic_as_partially_learnt(user_id, topic_id):
+def record_topic_started(user_id, topic_id):
     """Adds the topic id to the partially learnt list of the user unless the
     topic has been already learnt by the user. If the topic is already
     present in the partially learnt list, just the details associated with it
@@ -887,7 +887,7 @@ def _get_filtered_completed_story_summaries(
             if len(story_fetchers.get_completed_node_ids(
                     user_id, story_id)) != len(story_summary.node_titles):
                 remove_story_from_completed_list(user_id, story_id)
-                mark_story_as_incomplete(user_id, story_id)
+                record_story_started(user_id, story_id)
                 completed_to_incomplete_story_summaries.append(story_summary)
             elif not story_services.is_story_published_and_present_in_topic(
                     stories[index]):
@@ -969,7 +969,7 @@ def _get_filtered_learnt_topic_summaries(
             if not set(story_ids_in_topic).intersection(
                     set(completed_story_ids)):
                 remove_topic_from_learnt_list(user_id, topic_id)
-                mark_topic_as_partially_learnt(user_id, topic_id)
+                record_topic_started(user_id, topic_id)
                 learnt_to_partially_learnt_topics.append(topic_summary)
             elif not topic_rights[index].topic_is_published:
                 nonexistent_learnt_topic_ids.append(topic_ids[index])

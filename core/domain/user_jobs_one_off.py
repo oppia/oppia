@@ -205,7 +205,7 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
                 all_nodes = story.story_contents.nodes
 
                 if len(completed_nodes) != len(all_nodes):
-                    learner_progress_services.mark_story_as_incomplete(
+                    learner_progress_services.record_story_started(
                         user_id, story.id)
                 else:
                     learner_progress_services.mark_story_as_completed(
@@ -215,10 +215,10 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
         # Mark stories for incomplete explorations.
         for story in stories_linked_to_incomplete_explorations:
             if story:
-                learner_progress_services.mark_story_as_incomplete(
+                learner_progress_services.record_story_started(
                     user_id, story.id)
                 if story.corresponding_topic_id:
-                    learner_progress_services.mark_topic_as_partially_learnt(
+                    learner_progress_services.record_topic_started(
                         user_id, story.corresponding_topic_id)
 
         # Mark topics for completed explorations.
@@ -232,7 +232,7 @@ class PopulateStoriesAndTopicsInIncompleteAndCompletedActivitiesOneOffJob(
                     learner_progress_services.mark_topic_as_learnt(
                         user_id, topic.id)
                 else:
-                    learner_progress_services.mark_topic_as_partially_learnt(
+                    learner_progress_services.record_topic_started(
                         user_id, topic.id)
 
         yield (
