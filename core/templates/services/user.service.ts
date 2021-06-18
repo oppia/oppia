@@ -36,12 +36,12 @@ export class UserService {
     private userBackendApiService: UserBackendApiService
   ) {}
 
-    // Below properties can be null for following cases:
-    // (UserInfo) - The user is not logged in.
-    // (UserContributionRightsDataBackendDict) - The User does not have
+
+    // This property will be null when the User does not have
     // enough rights to review translations, voiceover and questions.
     private userContributionRightsInfo:
-    UserContributionRightsDataBackendDict | null = null;
+      UserContributionRightsDataBackendDict | null = null;
+    // This property will be null when the User is not logged in.
     private userInfo: UserInfo | null = null;
     private returnUrl = '';
 

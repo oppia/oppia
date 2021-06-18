@@ -75,8 +75,7 @@ describe('Login required message component', () => {
   it('should refresh page if login url is not provided when login button is' +
     ' clicked', fakeAsync(() => {
     const reloadSpy = spyOn(windowRef.nativeWindow.location, 'reload');
-    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-      Promise.resolve(''));
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('');
     component.onLoginButtonClicked();
     flushMicrotasks();
 

@@ -41,7 +41,7 @@ export class ImageUploaderComponent {
   @ViewChild('dropArea') dropAreaRef!: ElementRef;
   @ViewChild('imageInput') imageInputRef!: ElementRef;
   fileInputClassName!: string;
-  // ErrorMessage will be null if the uploaded file is valid
+  // The errorMessage will be null if the uploaded file is valid .
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
 
@@ -67,7 +67,7 @@ export class ImageUploaderComponent {
         let file = event.dataTransfer.files[0];
         this.errorMessage = this.validateUploadedFile(file, file.name);
         if (!this.errorMessage) {
-        // Only fire this event if validations pass.
+          // Only fire this event if validations pass.
           this.fileChanged.emit(file);
         }
       });
