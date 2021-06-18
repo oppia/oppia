@@ -514,6 +514,9 @@
 /schema_utils*.py @DubeySandeep
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
+
+# Python type checks
+# TODO(#13119): Restore code ownership for @vojtechjelinek after 2021-07-06.
 /mypy.ini @sajalasati
 /mypy_requirements.txt @sajalasati
 
