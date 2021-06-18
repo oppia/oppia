@@ -66,6 +66,14 @@ class RegistryUnitTest(test_utils.TestBase):
             expected_base_models,
             self.registry_instance.import_models([models.NAMES.base_model]))
 
+    def test_import_models_blog_model(self):
+        """Tests import_models function with blog post model option."""
+        from core.storage.blog import gae_models as blog_models
+        expected_blog_models = (blog_models,)
+        self.assertEqual(
+            expected_blog_models,
+            self.registry_instance.import_models([models.NAMES.blog]))
+
     def test_import_models_beam_job_model(self):
         """Tests import_models function with base model option."""
         from core.storage.beam_job import gae_models as beam_job_models

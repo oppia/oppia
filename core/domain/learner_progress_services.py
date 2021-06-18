@@ -1400,6 +1400,77 @@ def _get_filtered_collection_playlist_summaries(
         nonexistent_playlist_collection_ids)
 
 
+def get_all_topic_ids_to_learn(user_id):
+    """Returns a list with the ids of all the topics selected
+    by the user to learn.
+
+    Args:
+        user_id: str. The id of the learner.
+
+    Returns:
+        list(str). A list of the ids of the topics selected by the learner to
+        learn.
+    """
+    learner_goals_model = (
+        user_models.LearnerGoalsModel.get(
+            user_id, strict=False))
+
+    if learner_goals_model:
+        learner_goals = learner_goals_services.get_learner_goals_from_model(
+            learner_goals_model)
+
+        return learner_goals.topic_ids_to_learn
+    else:
+        return []
+
+
+def _get_filtered_topics_to_learn_summaries(
+        user_id, topic_summaries, topic_ids):
+    """Returns a list of summaries of the topics selected by the user ids
+    of topics that are no longer present.
+
+    Args:
+        user_id: str. The id of the learner.
+        topic_summaries: list(TopicSummary). The list of topic
+            summary domain objects to be filtered.
+        topic_ids: list(str). The ids of the topics corresponding to
+            the topic summary domain objects.
+
+    Returns:
+        tuple. A 2-tuple whose elements are as follows:
+        - list(TopicSummary). Filtered list of TopicSummary domain
+            objects of the topics to learn.
+        - list(str). The ids of the topics that are no longer present.
+    """
+    nonexistent_topic_ids_to_learn = []
+    filtered_topics_to_learn_summaries = []
+
+    completed_story_ids = get_all_completed_story_ids(user_id)
+
+    for index, topic_summary in enumerate(topic_summaries):
+        if topic_summary is None:
+            nonexistent_topic_ids_to_learn.append(topic_ids[index])
+        else:
+            topic_id = topic_summary.id
+            topic_rights = topic_fetchers.get_topic_rights(topic_id)
+            topic = topic_fetchers.get_topic_by_id(topic_id)
+            story_ids_in_topic = []
+            for story in topic.canonical_story_references:
+                story_ids_in_topic.append(story.story_id)
+
+            if (set(story_ids_in_topic).issubset(
+                    set(completed_story_ids))):
+                learner_goals_services.remove_topic_from_learn(
+                    user_id, topic_id)
+                mark_topic_as_learnt(user_id, topic_id)
+            elif not topic_rights.topic_is_published:
+                nonexistent_topic_ids_to_learn.append(topic_ids[index])
+            else:
+                filtered_topics_to_learn_summaries.append(topic_summary)
+
+    return filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn
+
+
 def get_displayable_story_summary_dicts(user_id, story_summaries):
     """Returns a displayable summary dict of the story summaries
     given to it.
@@ -1778,7 +1849,7 @@ def get_activity_progress(user_id):
 
     filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn = (
         _get_filtered_topics_to_learn_summaries(
-            topics_to_learn_summaries, topic_ids_to_learn))
+            user_id, topics_to_learn_summaries, topic_ids_to_learn))
 
     filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
         _get_filtered_exp_playlist_summaries(

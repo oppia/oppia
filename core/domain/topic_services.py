@@ -1120,7 +1120,7 @@ def get_story_titles_in_topic(topic):
     """Returns titles of the stories present in the topic.
 
     Args:
-        topic: Topic. The topic domin objects.
+        topic: Topic. The topic domain objects.
 
     Returns:
         list(str). The list of story titles in the topic.
