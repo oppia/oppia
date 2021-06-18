@@ -18,6 +18,5 @@
 
 import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
-export default INTERACTION_SPECS;
 angular.module('oppia').constant(
   'INTERACTION_SPECS', InteractionSpecsConstants.INTERACTION_SPECS);
