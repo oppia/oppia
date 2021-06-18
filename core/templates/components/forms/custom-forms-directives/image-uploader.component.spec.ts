@@ -22,11 +22,14 @@ import { IdGenerationService } from 'services/id-generation.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { ImageUploaderComponent } from './image-uploader.component';
 
-describe('ImageUploaderComponent', () => {
+fdescribe('ImageUploaderComponent', () => {
   let component: ImageUploaderComponent;
   let fixture: ComponentFixture<ImageUploaderComponent>;
   let igs: IdGenerationService;
   let windowRef: WindowRef;
+
+  let dropAreaRefSpy = jasmine.createSpy('dropAreaRefSpy');
+  let windowRefSpy = jasmine.createSpy('windowRefSpy');
 
   beforeEach(waitForAsync(() => {
     windowRef = new WindowRef();
@@ -47,12 +50,16 @@ describe('ImageUploaderComponent', () => {
     igs = TestBed.inject(IdGenerationService);
     fixture.detectChanges();
 
-    spyOn(component.dropAreaRef.nativeElement, 'addEventListener');
-    spyOn(windowRef.nativeWindow, 'addEventListener');
+    dropAreaRefSpy = spyOn(component.dropAreaRef.nativeElement,
+      'addEventListener');
+    windowRefSpy = spyOn(windowRef.nativeWindow, 'addEventListener');
   });
 
   it('should generate a random input class name on initialization', () => {
     spyOn(igs, 'generateNewId').and.returnValue('-new-id');
+
+    expect(component.fileInputClassName).not.toBe(
+      'image-uploader-file-input-new-id');
 
     component.ngOnInit();
 
@@ -63,10 +70,16 @@ describe('ImageUploaderComponent', () => {
   it('should register drag and drop event listener', () => {
     component.ngAfterViewInit();
 
-    expect(component.dropAreaRef.nativeElement.addEventListener)
-      .toHaveBeenCalledTimes(3);
-    expect(windowRef.nativeWindow.addEventListener)
-      .toHaveBeenCalledTimes(2);
+    expect(dropAreaRefSpy.calls.allArgs()).toEqual([
+      ['drop', jasmine.any(Function)],
+      ['dragover', jasmine.any(Function)],
+      ['dragleave', jasmine.any(Function)]
+    ]);
+
+    expect(windowRefSpy.calls.allArgs()).toEqual([
+      ['dragover', jasmine.any(Function)],
+      ['drop', jasmine.any(Function)]
+    ]);
   });
 
   it('should upload image on drop', () => {
@@ -83,7 +96,7 @@ describe('ImageUploaderComponent', () => {
       dataTransfer: dataTransfer
     }));
 
-    expect(component.fileChanged.emit).toHaveBeenCalled();
+    expect(component.fileChanged.emit).toHaveBeenCalledWith(validFile);
   });
 
   it('should not upload image on drop if the image' +
@@ -176,8 +189,10 @@ describe('ImageUploaderComponent', () => {
     let dataTransfer = new DataTransfer();
     let fileWithLargeSize = new File(
       [''], 'image.jpg', {type: 'image/jpg'});
+    let sizeOfLargeFileInBytes = 100 * 1024 + 100;
 
-    Object.defineProperty(fileWithLargeSize, 'size', {value: 100 * 1024 + 100});
+    Object.defineProperty(
+      fileWithLargeSize, 'size', {value: sizeOfLargeFileInBytes});
 
     dataTransfer.items.add(fileWithLargeSize);
 
@@ -230,7 +245,7 @@ describe('ImageUploaderComponent', () => {
     expect(dragOverEvent.preventDefault).toHaveBeenCalled();
   });
 
-  it('should upload an image', () => {
+  it('should upload a valid image', () => {
     component.imageInputRef.nativeElement = {
       files: [new File(['image'], 'image.jpg', {type: 'image/jpg'})]
     };
