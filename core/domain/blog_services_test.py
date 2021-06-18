@@ -69,7 +69,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(blog_post.to_dict(), expected_blog_post)
 
     def test_get_blog_post_by_ids(self):
-        blog_posts = blog_services.get_blog_post_by_ids([
+        blog_posts = blog_services.get_blog_posts_by_ids([
             self.blog_post_a_id, self.blog_post_b_id])
         self.assertTrue(len(blog_posts) == 2)
         blog_post_ids = [blog_posts[0].id, blog_posts[1].id]
