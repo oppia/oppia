@@ -210,13 +210,6 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             blog_post_summary_models[1], self.blog_post_summary_model_old)
 
-    def test_get_blog_post_summary_by_title(self):
-        self.assertEqual(
-            blog_models.BlogPostSummaryModel.get_blog_post_summary_by_title(
-                self.TITLE),
-            self.blog_post_summary_model
-        )
-
 
 class BlogPostRightsModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostRightsModel class."""
