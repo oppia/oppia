@@ -23,6 +23,7 @@ import random
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.controllers import domain_objects_validator
 from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import config_domain
@@ -59,6 +60,8 @@ import utils
 
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -71,6 +74,88 @@ class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'POST': {
+            'action': {
+                'type': 'unicode',
+                'choices': [
+                    'reload_exploration', 'reload_collection',
+                    'generate_dummy_explorations', 'clear_search_index',
+                    'generate_dummy_new_structures_data',
+                    'generate_dummy_new_skill_data', 'save_config_properties',
+                    'revert_config_property', 'upload_topic_similarities',
+                    'start_computation', 'stop_computation',
+                    'cancel_job', 'regenerate_topic_related_opportunities',
+                    'start_new_job', 'regenerate_missing_exploration_stats',
+                    'update_feature_flag_rules'
+                ]
+            },
+            'exploration_id': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'collection_id': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'num_dummy_exps_to_generate': {
+                'type': 'int',
+                'default_value': None
+            },
+            'num_dummy_exps_to_publish': {
+                'type': 'int',
+                'default_value': None
+            },
+            'new_config_property_values': (
+                config_domain.NEW_CONFIG_PROPERTY_VALUE_SCHEMA),
+            'config_property_id': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'job_type': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'job_id': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'computation_type': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'data': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'topic_id': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'feature_name': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'commit_message': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'new_rules': {
+                'type': 'list',
+                'items': {
+                    'type': 'object_dict',
+                    'validate_method': (
+                        domain_objects_validator.validate_new_rules_dict)
+                }
+            }
+            'exp_id': {
+                'type': 'unicode',
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -124,13 +209,8 @@ class AdminHandler(base.BaseHandler):
                     'num_dummy_exps_to_generate')
                 num_dummy_exps_to_publish = self.payload.get(
                     'num_dummy_exps_to_publish')
-                if not isinstance(num_dummy_exps_to_generate, int):
-                    raise self.InvalidInputException(
-                        '%s is not a number' % num_dummy_exps_to_generate)
-                elif not isinstance(num_dummy_exps_to_publish, int):
-                    raise self.InvalidInputException(
-                        '%s is not a number' % num_dummy_exps_to_publish)
-                elif num_dummy_exps_to_generate < num_dummy_exps_to_publish:
+
+                if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
                         'Generate count cannot be less than publish count')
                 else:
@@ -599,6 +679,35 @@ class AdminRoleHandler(base.BaseHandler):
     """Handler for roles tab of admin page. Used to view and update roles."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'filter_criterion': {
+                'type': 'unicode',
+                'choices': ['role', 'username']
+            },
+            'role': {
+                'type': 'unicode',
+                'default_value': None
+            },
+            'username': {
+                'type': 'unicode',
+                'default_value': None
+            }
+        },
+        'POST': {
+            'role': {
+                'type': 'unicode'
+            },
+            'username': {
+                'type': 'unicode'
+            },
+            'topic_id': {
+                'type': 'unicode',
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -666,6 +775,19 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
 
     PUT_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'type': 'unicode'
+            }
+        },
+        'DELETE': {
+            'username': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def put(self):
@@ -674,8 +796,6 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
                 'Only the default system admin can manage super admins')
 
         username = self.payload.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -691,8 +811,6 @@ class AdminSuperAdminPrivilegesHandler(base.BaseHandler):
                 'Only the default system admin can manage super admins')
 
         username = self.request.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
@@ -710,6 +828,8 @@ class AdminTopicsCsvFileDownloader(base.BaseHandler):
     """Retrieves topic similarity data for download."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_DOWNLOADABLE
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -722,6 +842,23 @@ class DataExtractionQueryHandler(base.BaseHandler):
     """Handler for data extraction query."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'exp_id': {
+                'type': 'unicode'
+            },
+            'exp_version': {
+                'type': 'unicode'
+            },
+            'state_num': {
+                'type': 'unicode'
+            },
+            'num_answers': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -766,6 +903,27 @@ class AddContributionRightsHandler(base.BaseHandler):
     """Handles adding contribution rights for contributor dashboard page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'username': {
+                'type': 'unicode'
+            },
+            'category': {
+                'type': 'unicode',
+                'choices': [
+                    'translation', 'voiceover',
+                    'question', 'submit_question'
+                ]
+            },
+            'language_code': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }]
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -830,12 +988,36 @@ class RemoveContributionRightsHandler(base.BaseHandler):
     """Handles removing contribution rights for contributor dashboard."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {
+                'type': 'unicode'
+            },
+            'removal_type': {
+                'type': 'unicode',
+                'choices': ['all', 'specific']
+            },
+            'category': {
+                'type': 'unicode',
+                'choices': [
+                    'translation', 'voiceover',
+                    'question', 'submit_question'
+                ]
+            },
+            'language_code': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }],
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def put(self):
         username = self.payload.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -907,6 +1089,25 @@ class ContributorUsersListHandler(base.BaseHandler):
     """Handler to show users with contribution rights."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'category': {
+                'type': 'unicode',
+                'choices': [
+                    'translation', 'voiceover',
+                    'question', 'submit_question'
+                ]
+            },
+            'language_code': {
+                'type': 'unicode',
+                'validators': [{
+                    'id': 'is_supported_audio_language_code'
+                }],
+                'default_value': None
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -931,12 +1132,18 @@ class ContributionRightsDataHandler(base.BaseHandler):
     """Handler to show the contribution rights of a user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'username': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def get(self):
         username = self.request.get('username', None)
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
@@ -955,6 +1162,8 @@ class ContributionRightsDataHandler(base.BaseHandler):
 
 class SendDummyMailToAdminHandler(base.BaseHandler):
     """This function handles sending test emails."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
     def post(self):
@@ -968,19 +1177,22 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 
 class UpdateUsernameHandler(base.BaseHandler):
     """Handler for renaming usernames."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'old_username': {
+                'type': 'unicode'
+            },
+            'new_username': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def put(self):
         old_username = self.payload.get('old_username', None)
         new_username = self.payload.get('new_username', None)
-
-        if old_username is None:
-            raise self.InvalidInputException(
-                'Invalid request: The old username must be specified.')
-
-        if new_username is None:
-            raise self.InvalidInputException(
-                'Invalid request: A new username must be specified.')
 
         if not isinstance(old_username, python_utils.UNICODE):
             raise self.InvalidInputException(
@@ -1017,6 +1229,8 @@ class NumberOfDeletionRequestsHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
     def get(self):
@@ -1030,12 +1244,19 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
     """Handler for getting whether any models exist for specific user ID."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'user_id': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.can_access_admin_page
     def get(self):
         user_id = self.request.get('user_id', None)
-        if user_id is None:
-            raise self.InvalidInputException('Missing user_id param')
+
         user_is_deleted = wipeout_service.verify_user_deleted(
             user_id, include_delete_at_end_models=True)
         self.render_json({'related_models_exist': not user_is_deleted})
@@ -1043,15 +1264,23 @@ class VerifyUserModelsDeletedHandler(base.BaseHandler):
 
 class DeleteUserHandler(base.BaseHandler):
     """Handler for deleting a user with specific ID."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'DELETE': {
+            'user_id': {
+                'type': 'unicode'
+            },
+            'username': {
+                'type': 'unicode'
+            }
+        }
+    }
 
     @acl_decorators.can_delete_any_user
     def delete(self):
         user_id = self.request.get('user_id', None)
         username = self.request.get('username', None)
-        if user_id is None:
-            raise self.InvalidInputException('Missing user_id param')
-        if username is None:
-            raise self.InvalidInputException('Missing username param')
+
         user_id_from_username = (
             user_services.get_user_id_from_username(username))
         if user_id_from_username is None:

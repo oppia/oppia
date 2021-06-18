@@ -31,7 +31,7 @@ def set_property(committer_id, name, value):
     Args:
         committer_id: str. The user ID of the committer.
         name: str. The name of the property.
-        value: str. The value of the property.
+        value: *. The value of the property.
 
     Raises:
         Exception. No config property with the specified name is found.
