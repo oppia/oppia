@@ -64,8 +64,8 @@ class BlogPost(python_utils.OBJECT):
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename, strict=False):
-        """Checks whether the thumbnail filename of the blog_post  is a valid
-            one.
+        """Checks whether the thumbnail filename of the blog post is a valid
+           one.
 
         Args:
             thumbnail_filename: str. The thumbnail filename to validate.
@@ -111,17 +111,17 @@ class BlogPost(python_utils.OBJECT):
 
     @classmethod
     def require_valid_blog_post_id(cls, blog_post_id):
-        """Checks whether the blog post id is a valid one.
+        """Checks whether the blog post ID is a valid one.
 
         Args:
-            blog_post_id: str. The blog post id to validate.
+            blog_post_id: str. The blog post ID to validate.
         """
         if not isinstance(blog_post_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'blog post id should be a string, received: %s' % blog_post_id)
+                'Blog Post ID should be a string, received: %s' % blog_post_id)
 
         if len(blog_post_id) != 12:
-            raise utils.ValidationError('Invalid blog post id.')
+            raise utils.ValidationError('Invalid Blog Post ID.')
 
     @classmethod
     def require_valid_tags(cls, tags, strict):
@@ -192,6 +192,11 @@ class BlogPost(python_utils.OBJECT):
         if strict:
             if title == '':
                 raise utils.ValidationError('Title should not be empty')
+            if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
+                raise utils.ValidationError(
+                    'Title field contains invalid characters. Only words'
+                    '(a-zA-Z) separated by spaces are allowed. Received %s'
+                    % title)
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment):
@@ -228,7 +233,7 @@ class BlogPost(python_utils.OBJECT):
 
         Args:
             json_string: str. A JSON-encoded utf-8 string that can be
-                decoded into a dictionary representing a blog post . Only call
+                decoded into a dictionary representing a blog post. Only call
                 on strings that were created using serialize().
 
         Returns:
@@ -272,10 +277,10 @@ class BlogPost(python_utils.OBJECT):
     def from_dict(
             cls, blog_post_dict, blog_post_published_on=None,
             blog_post_last_updated=None):
-        """Returns a blog_post  domain object from a dictionary.
+        """Returns a blog post domain object from a dictionary.
 
         Args:
-            blog_post_dict: dict. The dictionary representation of blog_post
+            blog_post_dict: dict. The dictionary representation of blog post
                 object.
             blog_post_published_on: datetime.datetime. Date and time when the
                 blog post was last published.
@@ -310,7 +315,7 @@ class BlogPost(python_utils.OBJECT):
         """Updates the url_fragment of a blog post object.
 
         Args:
-            new_url_fragment: str. The updated url_fragment for the blog post.
+            new_url_fragment: str. The updated url fragment for the blog post.
         """
         self.require_valid_url_fragment(new_url_fragment)
         self.url_fragment = new_url_fragment
@@ -377,7 +382,7 @@ class BlogPostSummary(python_utils.OBJECT):
 
     @classmethod
     def require_valid_thumbnail_filename(cls, thumbnail_filename, strict=False):
-        """Checks whether the thumbnail filename of the blog_post  is a valid
+        """Checks whether the thumbnail filename of the blog post is a valid
             one.
 
         Args:
@@ -425,17 +430,17 @@ class BlogPostSummary(python_utils.OBJECT):
 
     @classmethod
     def require_valid_blog_post_id(cls, blog_post_id):
-        """Checks whether the blog post id is a valid one.
+        """Checks whether the blog post ID is a valid one.
 
         Args:
-            blog_post_id: str. The blog post id to validate.
+            blog_post_id: str. The blog post ID to validate.
         """
         if not isinstance(blog_post_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'blog post id should be a string, received: %s' % blog_post_id)
+                'Blog Post ID should be a string, received: %s' % blog_post_id)
 
         if len(blog_post_id) != 12:
-            raise utils.ValidationError('Invalid blog post id.')
+            raise utils.ValidationError('Invalid Blog Post ID.')
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment):
@@ -587,7 +592,7 @@ class BlogPostRights(python_utils.OBJECT):
         """Checks whether given user is an editor of the blog post.
 
         Args:
-            user_id: str or None. Id of the user.
+            user_id: str or None. ID of the user.
 
         Returns:
             bool. Whether user is an editor of the blog post.

@@ -85,8 +85,8 @@ def get_blog_posts_by_ids(blog_post_ids):
         blog_post_ids: list(str). List of IDs to get blog posts for.
 
     Returns:
-        list(BlogPost|None). The list of blog posts corresponding to given ids
-        (with None in place of blog post ids corresponding to deleted blog
+        list(BlogPost|None). The list of blog posts corresponding to given IDs
+        (with None in place of blog post IDs corresponding to deleted blog
         posts).
     """
     all_blog_post_models = (
@@ -105,7 +105,7 @@ def get_blog_post_by_url_fragment(url_fragment):
 
     Returns:
         BlogPost or None. The domain object representing a blog post with the
-        given id, or None if it does not exist.
+        given ID, or None if it does not exist.
     """
     blog_post_model = (
         blog_models.BlogPostModel.get_by_url_fragment(url_fragment))
@@ -150,7 +150,7 @@ def get_blog_post_summary_by_id(blog_post_id, strict=False):
 
     Returns:
         BlogPostSummary or None. The domain object representing a blog post
-        summary with the given id, or None if it does not exist.
+        summary with the given ID, or None if it does not exist.
     """
     blog_post_summary_model = blog_models.BlogPostSummaryModel.get(
         blog_post_id, strict=strict)
@@ -164,7 +164,7 @@ def get_blog_post_summary_by_id(blog_post_id, strict=False):
 
 def get_blog_post_summary_models_list_by_user_id(
         user_id, blog_post_is_published):
-    """Given the user id and status, it returns the list of blog post summary
+    """Given the user ID and status, it returns the list of blog post summary
     domain object for which user is an editor and the status matches.
 
     Args:
@@ -187,7 +187,7 @@ def get_blog_post_summary_models_list_by_user_id(
 
 
 def filter_blog_post_ids(user_id, blog_post_is_published):
-    """Given the user id and status, it returns the IDs of all blog post
+    """Given the user ID and status, it returns the IDs of all blog post
     according to the status.
 
     Args:
@@ -246,10 +246,10 @@ def get_all_blog_posts():
 
 
 def get_new_blog_post_id():
-    """Returns a new blog post id.
+    """Returns a new blog post ID.
 
     Returns:
-        str. A new blog post id.
+        str. A new blog post ID.
     """
     return blog_models.BlogPostModel.generate_new_blog_post_id()
 
@@ -279,7 +279,7 @@ def get_blog_post_rights(blog_post_id, strict=True):
     Args:
         blog_post_id: str. ID of the blog post.
         strict: bool. Whether to fail noisily if no blog post rights model
-            with a given id exists in the datastore.
+            with a given ID exists in the datastore.
 
     Returns:
         BlogPostRights. The rights object associated with the given blog post.
@@ -342,8 +342,7 @@ def _save_blog_post(blog_post):
         blog_post: BlogPost. The blog post domain object for the given
             blog post.
     """
-    model = blog_models.BlogPostModel.get(
-        blog_post.id, strict=True)
+    model = blog_models.BlogPostModel.get(blog_post.id, strict=True)
     blog_post.validate()
 
     model.title = blog_post.title
@@ -360,7 +359,7 @@ def publish_blog_post(blog_post_id):
     """Marks the given blog post as published.
 
     Args:
-        blog_post_id: str. The id of the given blog post.
+        blog_post_id: str. The ID of the given blog post.
 
     Raises:
         Exception. The given blog post does not exist.
@@ -388,7 +387,7 @@ def unpublish_blog_post(blog_post_id):
     """Marks the given blog post as unpublished or draft.
 
     Args:
-        blog_post_id: str. The id of the given blog post.
+        blog_post_id: str. The ID of the given blog post.
 
     Raises:
         Exception. The given blog post does not exist.
@@ -611,7 +610,7 @@ def create_new_blog_post(author_id):
     object.
 
     Args:
-        author_id: str. The user id of the author for new blog post.
+        author_id: str. The user ID of the author for new blog post.
 
     Returns:
         BlogPost. A newly created blog post domain object .

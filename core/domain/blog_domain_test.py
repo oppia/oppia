@@ -101,8 +101,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 
     def test_valid_blog_post_id(self):
         self._assert_valid_blog_post_id(
-            'blog post id should be a string, received: 10', 10)
-        self._assert_valid_blog_post_id('Invalid blog post id.', 'abc')
+            'Blog Post ID should be a string, received: 10', 10)
+        self._assert_valid_blog_post_id('Invalid Blog Post ID.', 'abc')
 
     def test_thumbnail_filename_validation_for_blog_post(self):
         self._assert_valid_thumbnail_filename_for_blog_post(
@@ -323,8 +323,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def test_valid_blog_post_id(self):
         self._assert_valid_blog_post_id(
-            'blog post id should be a string, received: 10', 10)
-        self._assert_valid_blog_post_id('Invalid blog post id.', 'abc')
+            'Blog Post ID should be a string, received: 10', 10)
+        self._assert_valid_blog_post_id('Invalid Blog Post ID.', 'abc')
 
     def _assert_strict_valid_title_for_blog_post(
             self, expected_error_substring, title):

@@ -5612,6 +5612,10 @@ export default {
   // A regular expression for allowed characters in URL fragment fields.
   "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
 
+
+  // A regular expression for allowed characters in URL fragment fields.
+  "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z][a-zA-Z ]+(-[a-zA-Z]+)*$",
+
   // A regular expression for valid skill misconception id.
   "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
 

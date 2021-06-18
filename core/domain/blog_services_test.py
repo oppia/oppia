@@ -329,3 +329,26 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.blog_post_a_id, strict=False))
         self.assertIsNone(blog_services.get_blog_post_summary_by_id(
             self.blog_post_a_id, strict=False))
+
+    def test_get_blog_post_summary_by_title(self):
+        model = (
+            blog_models.BlogPostSummaryModel.get_by_id(self.blog_post_a_id))
+        model.title = 'Hello Bloggers'
+        model.update_timestamps()
+        model.put()
+
+        blog_post_summary = (
+            blog_services.get_blog_post_summary_by_id(
+                self.blog_post_a_id, strict=True))
+        expected_blog_post_summary = (
+            blog_domain.BlogPostSummary(
+                self.blog_post_a_id,
+                self.user_id_a,
+                'Hello Bloggers',
+                '...',
+                '',
+                [],
+            )
+        )
+        self.assertEqual(
+            blog_post_summary.to_dict(), expected_blog_post_summary.to_dict())
