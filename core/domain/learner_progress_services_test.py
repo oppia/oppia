@@ -62,6 +62,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     STORY_ID_0 = 'story_0'
     TOPIC_ID_0 = 'topic_0'
     STORY_ID_1 = 'story_1'
+    STORY_ID_2 = 'story_2'
     TOPIC_ID_1 = 'topic_1'
     TOPIC_ID_2 = 'topic_2'
     USER_EMAIL = 'user@example.com'
@@ -244,6 +245,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
         # Publish topics and stories.
         topic_services.publish_story(
@@ -254,6 +258,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
+        topic_services.publish_story(
+            self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
         topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
 
     def _get_all_completed_exp_ids(self, user_id):

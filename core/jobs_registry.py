@@ -155,7 +155,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.DeleteNonExistentExpUserDataOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpsFromUserModelsOneOffJob,
     user_jobs_one_off.DeleteNonExistentExpUserContributionsOneOffJob,
-    user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob # pylint: disable=line-too-long
+    user_jobs_one_off.PopulateStoriesAndTopicsOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which

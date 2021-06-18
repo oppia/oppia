@@ -1305,39 +1305,6 @@ def _get_filtered_incomplete_collection_summaries(
         nonexistent_incomplete_collection_ids)
 
 
-def _get_filtered_topics_to_learn_summaries(
-        topic_summaries, topic_ids):
-    """Returns a list of summaries of the topics in the learner goals
-    and the ids of topics that are no longer present.
-
-    Args:
-        topic_summaries: list(TopicSummary). The list of topic
-            summary domain objects to be filtered.
-        topic_ids: list(str). The ids of the topics corresponding to
-            the topic summary domain objects.
-
-    Returns:
-        tuple. A 2-tuple whose elements are as follows:
-        - list(TopicSummary). Filtered list of TopicSummary domain
-            objects of the topics in the learner goals.
-        - list(str). The ids of the topics that are no longer present.
-    """
-    nonexistent_topic_ids_to_learn = []
-    filtered_topics_to_learn_summaries = []
-    for index, topic_summary in enumerate(topic_summaries):
-        if topic_summary is None:
-            nonexistent_topic_ids_to_learn.append(topic_ids[index])
-        else:
-            topic_id = topic_summary.id
-            topic_rights = topic_fetchers.get_topic_rights(topic_id)
-            if not topic_rights.topic_is_published:
-                nonexistent_topic_ids_to_learn.append(topic_ids[index])
-            else:
-                filtered_topics_to_learn_summaries.append(topic_summary)
-
-    return filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn
-
-
 def _get_filtered_exp_playlist_summaries(
         exploration_summaries, exploration_ids):
     """Returns a list of summaries of the explorations in the learner playlist
@@ -1416,7 +1383,7 @@ def get_all_topic_ids_to_learn(user_id):
             user_id, strict=False))
 
     if learner_goals_model:
-        learner_goals = _get_learner_goals_from_model(
+        learner_goals = learner_goals_services.get_learner_goals_from_model(
             learner_goals_model)
 
         return learner_goals.topic_ids_to_learn
@@ -1460,7 +1427,8 @@ def _get_filtered_topics_to_learn_summaries(
 
             if (set(story_ids_in_topic).issubset(
                     set(completed_story_ids))):
-                remove_topic_to_learn(user_id, topic_id)
+                learner_goals_services.remove_topic_from_learn(
+                    user_id, topic_id)
                 mark_topic_as_learnt(user_id, topic_id)
             elif not topic_rights.topic_is_published:
                 nonexistent_topic_ids_to_learn.append(topic_ids[index])
@@ -1525,12 +1493,8 @@ def get_displayable_topic_summary_dicts(user_id, topic_summaries):
             summary domain objects.
 
     Returns:
-<<<<<<< HEAD
         list(dict). The summary dict corresponding to the given
         summaries.
-=======
-        list(dict). The summary dict objects corresponding to the given summary.
->>>>>>> 64ec79a15 (Added new changes)
     """
     summary_dicts = []
     topic_ids = [topic.id for topic in topic_summaries]
@@ -1852,7 +1816,7 @@ def get_activity_progress(user_id):
 
     filtered_topics_to_learn_summaries, nonexistent_topic_ids_to_learn = (
         _get_filtered_topics_to_learn_summaries(
-            topics_to_learn_summaries, topic_ids_to_learn))
+            user_id, topics_to_learn_summaries, topic_ids_to_learn))
 
     filtered_exp_playlist_summaries, nonexistent_playlist_exp_ids = (
         _get_filtered_exp_playlist_summaries(

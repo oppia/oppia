@@ -616,7 +616,7 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                     ['Could not find a story corresponding to %s '
                      'id.' % self.STORY_ID])
 
-    def test_remove_topic_to_learn(self):
+    def test_remove_topic_from_learn(self):
         learner_progress_services.add_topic_to_learn(
             self.viewer_id, self.TOPIC_ID)
         self.assertEqual(
