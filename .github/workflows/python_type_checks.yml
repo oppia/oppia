@@ -1,4 +1,4 @@
-name: Mypy Type Checks
+name: Python type checks
 on:
   push:
     branches:
