@@ -30,12 +30,12 @@ import { AppConstants } from 'app.constants';
   styleUrls: []
 })
 export class LoginRequiredMessageComponent {
-  // This property is initialized using Angular lifecycle hooks
+  // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion, for more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   OPPIA_AVATAR_IMAGE_URL!: string;
   // This constant is defined as null at AppConstants.
-  OPPIA_AVATAR_LINK_URL: null;
+  OPPIA_AVATAR_LINK_URL!: string | null;
 
   constructor(
     private readonly siteAnalyticsService: SiteAnalyticsService,

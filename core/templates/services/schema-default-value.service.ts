@@ -118,10 +118,7 @@ export class SchemaDefaultValueService {
       schema.obj_type === SchemaConstants.SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE
     );
 
-    if ('choices' in schema) {
-      if (schema.choices === undefined) {
-        throw new Error('Schema Choices does not exist');
-      }
+    if ('choices' in schema && schema.choices !== undefined) {
       return schema.choices[0];
     } else if (schemaIsSubtitledHtml) {
       return SubtitledHtml.createFromBackendDict({

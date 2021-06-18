@@ -137,21 +137,17 @@ describe('Schema Default Value Service', () => {
 
   it('should not get default value if schema type is invalid', () => {
     var loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
+    // This throws "{ type: "invalid"; }' is not assignable to type
+    // 'Schema'". We need to suppress this error because 'type: 'invalid'
+    // does not exist as a type in 'Schema', but we set it to an invalid
+    // value in order to test validations.
+    // @ts-expect-error
     const schema = {
       type: 'invalid'
-    } as unknown as Schema;
+    } as Schema;
 
     expect(() => sdvs.getDefaultValue(schema)).toThrowError('Invalid Schema');
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       'Invalid schema: ' + JSON.stringify(schema));
-  });
-
-  it('should throw error if schema choices are undefined', () => {
-    const schema = {
-      choices: undefined
-    } as Schema;
-    expect(() => {
-      sdvs.getDefaultValue(schema);
-    }).toThrowError('Schema Choices does not exist');
   });
 });
