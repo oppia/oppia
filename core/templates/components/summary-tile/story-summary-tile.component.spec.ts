@@ -79,20 +79,21 @@ describe('StorySummaryTileComponent', () => {
     expect(component.storyTitle).toBe('Story Title');
 
     // Here the value is calculated by the formula -> (circumference -
-    // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5))
+    // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (3*5)) / 3
     // = 36.88790204786391. Along with this value, gapLength (5) is also
     // concatenated to the string.
     expect(component.strokeDashArrayValues).toBe('36.88790204786391 5');
 
-    // Here the first value is calculated with the same formula, and the second
-    // value is the difference of (2 * 20 * Math.PI) and first value.
+    // Here the value for completed node is calculated with the same formula,
+    // and the last node's value is the difference of (2 * 20 * Math.PI) and the
+    // first value.
     expect(component.completedStrokeDashArrayValues).toBe(
       '36.88790204786391 88.7758040957278');
     expect(component.thumbnailBgColor).toBe('#FF9933');
     expect(component.nodeTitles).toEqual(['node1', 'node2', 'node3']);
   });
 
-  it('should show thumbnail if thumbnail name is given', () => {
+  it('should not show thumbnail if thumbnail filename is not given', () => {
     // StorySummary without a thumbnail.
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
@@ -114,7 +115,7 @@ describe('StorySummaryTileComponent', () => {
     expect(component.thumbnailUrl).toBe(null);
   });
 
-  it('should not show thumbnail if thumbnail name is not given', () => {
+  it('should show thumbnail if thumbnail filename is given', () => {
     // StorySummary with a thumbnail.
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
@@ -183,7 +184,7 @@ describe('StorySummaryTileComponent', () => {
     expect(component.chaptersDisplayed).toBe(3);
   });
 
-  it('should show view all button if number of nodes is not same as the' +
+  it('should show \'View All\' button if number of nodes is not same as the' +
     ' number of chapters displayed', () => {
     // StorySummary with 3 nodes.
     component.storySummary = StorySummary.createFromBackendDict({
@@ -198,7 +199,9 @@ describe('StorySummaryTileComponent', () => {
       url_fragment: 'story1',
       all_node_dicts: []
     });
-    // Width > 800, to show 3 nodes, which is equal to total number of nodes.
+
+    // We return width equal to 801 (greater than 800), so that 3 chapters are
+    // displayed instead of 2.
     spyOn(wds, 'getWidth').and.returnValue(801);
 
     expect(component.showButton).toBe(undefined);
@@ -223,7 +226,7 @@ describe('StorySummaryTileComponent', () => {
 
     component.ngOnInit();
 
-    // Will show view all button as number of nodes (5) is more than chapters
+    // Will show 'View All' button as number of nodes (5) is more than chapters
     // displayed (3).
     expect(component.showButton).toBe(true);
   });
@@ -284,14 +287,21 @@ describe('StorySummaryTileComponent', () => {
 
     component.ngOnInit();
 
-    // The values are calculated by the same formula as explained above.
+    // Here the value is calculated by the formula -> (circumference -
+    // (nodeCount * gapLength))/nodeCount = (2 * 20 * Math.PI - (5*5)) / 5
+    // = 20.132741228718345. Along with this value, gapLength (5) is also
+    // concatenated to the string.
     expect(component.strokeDashArrayValues).toBe('20.132741228718345 5');
+
+    // Here the value for completed nodes is calculated with the same formula.
+    // The last is calculated by subtracting the segment length (the value
+    // calculated using the formula above) from the circumference .
     expect(component.completedStrokeDashArrayValues).toBe(
       '20.132741228718345 5 20.132741228718345 5' +
       ' 20.132741228718345 55.26548245743669');
   });
 
-  it('should link chapter title to URL', () => {
+  it('should return the chapter URL when the chapter title is provided', () => {
     component.storySummary = StorySummary.createFromBackendDict({
       id: 'storyId',
       title: 'Story Title',
@@ -327,7 +337,7 @@ describe('StorySummaryTileComponent', () => {
       'undefined&classroom_url_fragment=undefined&node_id=node1');
   });
 
-  it('should link story to title and thumbnail', () => {
+  it('should populate the story URL when URL fragments are set', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'fractions';
     component.storySummary = StorySummary.createFromBackendDict({
