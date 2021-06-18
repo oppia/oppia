@@ -66,7 +66,7 @@ describe('Audio File Uploader Component', () => {
     });
   });
 
-  it('should not upload an audio file if the file fails the' +
+  it('should not upload an audio file when the file fails' +
     ' validation criteria', () => {
     const testCases = [
       {
@@ -93,6 +93,7 @@ describe('Audio File Uploader Component', () => {
     ];
 
     spyOn(component.fileClear, 'emit');
+    spyOn(component.fileChange, 'emit');
     spyOn(component.inputFormRef.nativeElement, 'reset');
 
     testCases.forEach(testCase => {
