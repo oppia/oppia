@@ -216,7 +216,6 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_capitalize_string(self):
         # type: () -> None
         test_data = [
-            [None, None],
             ['', ''],
             ['a', 'A'],
             ['A', 'A'],
@@ -226,7 +225,7 @@ class UtilsTests(test_utils.GenericTestBase):
             ['Partially', 'Partially'],
             ['miDdle', 'MiDdle'],
             ['2be', '2be'],
-        ] # type: List[List[Union[None, Text]]]
+        ] # type: List[List[Text]]
 
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])

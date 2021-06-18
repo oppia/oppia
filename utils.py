@@ -829,7 +829,7 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
 
 
 def capitalize_string(input_string):
-    # type: (Optional[Text]) -> Optional[Text]
+    # type: (Text) -> Text
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
 
